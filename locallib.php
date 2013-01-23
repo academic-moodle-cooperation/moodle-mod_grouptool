@@ -2305,41 +2305,41 @@ EOS;
             //prepare form content
             $activity_title = get_string('grading_activity_title', 'grouptool');
 
-            /// Casting $course->modinfo to string prevents one notice when the field is null
-            if ($modinfo = unserialize((string)$this->course->modinfo)) {
+            if ($modinfo = get_fast_modinfo($this->course)) {
                 $section = 0;
-                $sections = get_all_sections($this->course->id);
-                foreach ($modinfo as $mod) {
-                    if ($mod->mod == "label") {
-                        continue;
-                    }
+                $sectionsinfo = $modinfo->get_section_info_all();
+                $sections = $modinfo->get_sections();
+                foreach ($sections as $curnumber => $sectionmodules) {
+                    $sectiontext = '--- '.
+                                   course_get_format($this->course)->get_section_name($curnumber).
+                                   ' ---';
+                    $activities["section/$curnumber"] = $sectiontext;
 
-                    if (file_exists($CFG->dirroot . '/mod/'.$mod->mod.'/lib.php')) {
-                        require_once($CFG->dirroot . '/mod/'.$mod->mod.'/lib.php');
-                        $supportfn = $mod->mod."_supports";
-                        if (function_exists($supportfn)) {
-                            if ($supportfn(FEATURE_GRADE_HAS_GRADE) !== true) {
-                                continue;
+                    foreach($sectionmodules as $curcmid) {
+                        $mod = $modinfo->get_cm($curcmid);
+                        if ($mod->modname == "label") {
+                            continue;
+                        }
+
+                        if (file_exists($CFG->dirroot . '/mod/'.$mod->modname.'/lib.php')) {
+                            require_once($CFG->dirroot . '/mod/'.$mod->modname.'/lib.php');
+                            $supportfn = $mod->modname."_supports";
+                            if (function_exists($supportfn)) {
+                                if ($supportfn(FEATURE_GRADE_HAS_GRADE) !== true) {
+                                    continue;
+                                }
                             }
                         }
-                    }
 
-                    if ($mod->section > 0 and $section <> $mod->section) {
-                        $sectiontext = '--- '.
-                                       get_section_name($this->course, $sections[$mod->section]).
-                                       ' ---';
-                        $activities["section/$mod->section"] = $sectiontext;
+                        $name = strip_tags(format_string($mod->name, true));
+                        if (textlib::strlen($name) > 55) {
+                            $name = textlib::substr($name, 0, 50)."...";
+                        }
+                        if (!$mod->visible) {
+                            $name = "(".$name.")";
+                        }
+                        $activities["$curcmid"] = $name;
                     }
-                    $section = $mod->section;
-                    $mod->name = strip_tags(format_string($mod->name, true));
-                    if (textlib::strlen($mod->name) > 55) {
-                        $mod->name = textlib::substr($mod->name, 0, 50)."...";
-                    }
-                    if (!$mod->visible) {
-                        $mod->name = "(".$mod->name.")";
-                    }
-                    $activities["$mod->cm"] = $mod->name;
-
                 }
             }
 
