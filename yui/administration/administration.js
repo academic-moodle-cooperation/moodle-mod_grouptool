@@ -64,7 +64,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
 
     M.mod_grouptool.administration_sizevalupdate = function() {
         if(Y.one('input[name=use_individual]').get('value') == 0) {
-            Y.all('.grpsize').one('input').set('value', Y.one('input[name=grpsize]').get('value'));
+            Y.all('.grpsize').one('input').set('value', Y.one('input[name=amount]').get('value'));
         }
     };
 
@@ -89,7 +89,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         Y.one('input[name=use_individual]').on('change',
                                                M.mod_grouptool.administration_sizevisupdate);
         //add JS-Eventhandler to let groupsize-fields follow global-grpsize changes
-        Y.one('input[name=grpsize]').on('change', M.mod_grouptool.administration_sizevalupdate);
+        Y.one('input[name=amount]').on('change', M.mod_grouptool.administration_sizevalupdate);
         Y.one('input[name=use_individual]').on('change',
                                                M.mod_grouptool.administration_sizevalupdate);
 
