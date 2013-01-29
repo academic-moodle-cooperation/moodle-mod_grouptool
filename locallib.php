@@ -1285,6 +1285,12 @@ class grouptool {
             if (isset($fromform->createGroups)) {
                 require_capability('mod/grouptool:create_groups', $this->context);
                 // save submitted data in session and show confirmation dialog
+                if(!isset($SESSION->grouptool)) {
+                    $SESSION->grouptool = new stdClass();
+                }
+                if(!isset($SESSION->grouptool->view_administration)) {
+                    $SESSION->grouptool->view_administration = new stdClass();
+                }
                 $SESSION->grouptool->view_administration = $fromform;
                 /*@todo more individual confirm-message*/
                 $data = $SESSION->grouptool->view_administration;
@@ -1806,6 +1812,9 @@ EOS;
         if (is_array($source)) {//then we are in multigroup mode (filter = 0 || -1)
             $sourceusers = $DB->get_records_list('user', 'id', $source);
             $groups = groups_get_all_groups($this->course->id);
+            if(!isset($previewtable)) {
+                $previewtable = new stdClass();
+            }
             $previewtable->head = array(get_string('groups')." (".count($selected).")",
                                         get_string('fullname'),
                                         get_string('grade'),
@@ -2643,7 +2652,8 @@ EOS;
                         $max = $this->grouptool->choose_max;
                         if (($allow_m && ( $usrregcnt >= $max) ) || !$allow_m) {
                             $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                            list($sql, $params) = $DB->get_in_or_equal(array_keys($agrps));
+                            $agrpids = array_keys($agrps);
+                            list($sql, $params) = $DB->get_in_or_equal($agrpids);
                             $DB->delete_records_select('grouptool_queued',
                                                        ' user_id = ? AND agrp_id '.$sql,
                                                        array_merge(array($new_record->user_id),
@@ -2905,7 +2915,8 @@ EOS;
                             && ($regcnt >= $this->grouptool->choose_max))
                             || !$this->grouptool->allow_multiple) {
                             $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                            list($sql, $params) = $DB->get_in_or_equal(array_keys($agrps));
+                            $agrpids = array_keys($agrps);
+                            list($sql, $params) = $DB->get_in_or_equal($agrpids);
                             $DB->delete_records_select('grouptool_queued',
                                                        ' user_id = ? AND agrp_id '.$sql,
                                                        array_merge(array($userid), $params));
@@ -3169,7 +3180,8 @@ EOS;
 
         $agrps = $DB->get_records('grouptool_agrps', array('grouptool_id'=>$this->cm->instance));
         if (is_array($agrps) && count($agrps)>=1) {
-            list($inorequal, $params) = $DB->get_in_or_equal(array_keys($agrps));
+            $agrpids = array_keys($agrps);
+            list($inorequal, $params) = $DB->get_in_or_equal($agrpids);
             $sql = "SELECT count(DISTINCT user_id)
             FROM {grouptool_registered}
             WHERE agrp_id ".$inorequal;
@@ -3222,7 +3234,8 @@ EOS;
         $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
 
         if (!empty($agrps)) {
-            list($agrpssql, $agrpsparam) = $DB->get_in_or_equal(array_keys($agrps));
+            $agrpids = array_keys($agrps);
+            list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
             $agrps_sql = " AND agrp.id ".$agrpssql;
             $agrps_params = array_merge(array($grouptool->id), $agrpsparam);
             //get queue-entries (sorted by timestamp)
@@ -3438,12 +3451,14 @@ EOS;
             $hide_form = 1;
             $reg = optional_param_array('reg', null, PARAM_INT);
             if ($reg != null) {
-                $agrpid = reset(array_keys($reg));
+                $agrpid = array_keys($reg);
+                $agrpid = reset($agrpid);
                 $action = 'reg';
             }
             $unreg = optional_param_array('unreg', null, PARAM_INT);
             if ($unreg != null) {
-                $agrpid = reset(array_keys($unreg));
+                $agrpid = array_keys($unreg);
+                $agrpid = reset();
                 $action = 'unreg';
             }
             $resolvequeues = optional_param('resolve_queues', 0, PARAM_BOOL);
