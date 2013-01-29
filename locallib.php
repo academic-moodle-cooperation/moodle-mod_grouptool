@@ -4079,8 +4079,8 @@ EOS;
         $groupinfo = groups_get_all_groups($this->grouptool->course);
         $userinfo = get_enrolled_users($this->context, "mod/grouptool:register");
         $sync_status = $this->get_sync_status();
-
-        if (!$data_only && count($agrps)) {
+        $context = context_module::instance($this->cm->id);
+        if ((!$data_only && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
             //global-downloadlinks
             $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
             $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
@@ -4316,7 +4316,8 @@ EOS;
                 $table->data = $rows;
                 $groupdata .= html_writer::table($table);
                 //group-downloadlinks
-                if ((count($agrp->queued) > 0) || (count($agrp->registered) > 0)) {
+                if (((count($agrp->queued) > 0) || (count($agrp->registered) > 0))
+                    && has_capability('mod/grouptool:export', $context)) {
                     $urltxt = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
                                                    'format'  => GROUPTOOL_TXT));
@@ -5347,6 +5348,7 @@ EOS;
         global $OUTPUT, $CFG, $COURSE, $DB, $PAGE, $SESSION;
         $return = "";
 
+        $context = context_module::instance($this->cm->id);
         //handles order direction
         if (isset($SESSION->mod_grouptool->userlist->orderby)) {
             $orderby = $SESSION->mod_grouptool->userlist->orderby;
@@ -5427,19 +5429,20 @@ EOS;
         $groupinfo = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
 
         if (!$data_only) {
-
-            $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
-            $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
-            $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
-            $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
-            $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
-                                              array('class'=>'title')).'&nbsp;'.
-                    html_writer::link($txturl, '.TXT').'&nbsp;'.
-                    html_writer::link($xlsurl, '.XLS').'&nbsp;'.
-                    html_writer::link($pdfurl, '.PDF').'&nbsp;'.
-                    html_writer::link($odsurl, '.ODS');
-            $return .= html_writer::tag('div', $downloadlinks, array('class'=>'download all'));
-
+            if(has_capability('mod/grouptool:export', $context)) {
+                $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
+                $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
+                $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
+                $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
+                $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
+                                                  array('class'=>'title')).'&nbsp;'.
+                        html_writer::link($txturl, '.TXT').'&nbsp;'.
+                        html_writer::link($xlsurl, '.XLS').'&nbsp;'.
+                        html_writer::link($pdfurl, '.PDF').'&nbsp;'.
+                        html_writer::link($odsurl, '.ODS');
+                $return .= html_writer::tag('div', $downloadlinks, array('class'=>'download all'));
+            }
+            
             $table = new html_table();
             $table->attributes['class'] = 'centeredblock userlist';
 
