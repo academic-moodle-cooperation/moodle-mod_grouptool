@@ -563,7 +563,7 @@ class grouptool {
      *                              for the tags to be replaced with
      * @return string the parsed format string
      */
-    private function groups_parse_name($name_scheme, $groupnumber, $members = null) {
+    private function groups_parse_name($name_scheme, $groupnumber, $members = null, $digits = 0) {
 
         $tags = array('firstname', 'lastname', 'idnumber', 'username');
         $preg_search = "#\[(".implode("|", $tags).")\]#";
@@ -636,7 +636,12 @@ class grouptool {
         }
 
         if (strstr($name_scheme, '#') !== false) {
-            $name_scheme = str_replace('#', $groupnumber+1, $name_scheme);
+            if($digits != 0) {
+                $format = '%0'.$digits.'d';
+            } else {
+                $format = '%d';
+            }
+            $name_scheme = str_replace('#', sprintf($format, $groupnumber+1), $name_scheme);
         }
         return $name_scheme;
     }
@@ -756,9 +761,10 @@ class grouptool {
             }
         }
         //every member is there, so we can parse the name
+        $digits = ceil(log10($numgrps));
         for ($i=0; $i<$numgrps; $i++) {
             $groups[$i]['name']    = $this->groups_parse_name(trim($data->namingscheme), $i,
-                                                              $groups[$i]['members']);
+                                                              $groups[$i]['members'], $digits);
         }
         if ($only_preview) {
             $error = false;
@@ -919,9 +925,11 @@ class grouptool {
         // prepare group data
         $groups = array();
         $i=0;
+        $digits = ceil(log10(count($users)));
         foreach ($users as $user) {
             $groups[$i] = array();
-            $groups[$i]['name']    = $this->groups_parse_name(trim($name_scheme), $i, $user);
+            $groups[$i]['name']    = $this->groups_parse_name(trim($name_scheme), $i, $user,
+                                                              $digits);
             $groups[$i]['member'] = $user;
             $i++;
         }
