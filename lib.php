@@ -385,7 +385,7 @@ function grouptool_user_complete($course, $user, $mod, $grouptool) {
  * @return boolean
  */
 function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
-    global $CFG, $COURSE, $USER, $DB, $OUTPUT;
+    global $CFG, $DB, $OUTPUT;
 
     $return = false;
 
@@ -426,6 +426,9 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
     foreach ($entries as $entry) {
         $cm = get_coursemodule_from_instance('grouptool', $entry->grouptoolid, $course->id);
         $groupmode = groups_get_activity_groupmode($cm, $course);
+        $context = context_course::instance($course->id);
+        $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
+        $modinfo =& get_fast_modinfo($course);
         if ($groupmode == SEPARATEGROUPS and !$accessallgroups) {
             if (isguestuser()) {
                 continue;
@@ -509,13 +512,12 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
  */
 function grouptool_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid,
                                            $userid=0, $groupid=0) {
-    global $CFG, $COURSE, $USER, $DB;
+    global $CFG, $DB;
 
-    if ($COURSE->id == $courseid) {
-        $course = $COURSE;
-    } else {
-        $course = $DB->get_records('course', array('id'=>$courseid));
-    }
+    $course = $DB->get_records('course', array('id'=>$courseid));
+    
+    $context = context_course::instance($courseid);
+    $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
 
     $modinfo =& get_fast_modinfo($course);
 

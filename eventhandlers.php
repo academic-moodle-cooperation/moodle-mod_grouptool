@@ -82,7 +82,7 @@ function group_add_member_handler($data) {
  * @return bool true if success
  */
 function group_remove_member_handler($data) {
-    global $DB, $COURSE;
+    global $DB;
 
     $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course
             FROM {grouptool}

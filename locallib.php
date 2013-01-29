@@ -53,13 +53,12 @@ class view_admin_form extends moodleform {
      * Definition of administration form
      *
      * @global object $CFG
-     * @global object $COURSE
      * @global object $DB
      * @global object $PAGE
      */
     protected function definition() {
 
-        global $CFG, $COURSE, $DB, $PAGE;
+        global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -86,9 +85,12 @@ class view_admin_form extends moodleform {
                 $mform->setDefault('roleid', $student->id);
             }
 
-            $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
+            $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
+            $course = $DB->get_record('course', array('id'=>$cm->course));
+            $context = context_course::instance($cm->course);
+
             if (has_capability('moodle/cohort:view', $context)) {
-                $options = cohort_get_visible_list($COURSE);
+                $options = cohort_get_visible_list($course);
                 if ($options) {
                     $options = array(0=>get_string('anycohort', 'cohort')) + $options;
                     $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
@@ -165,7 +167,7 @@ class view_admin_form extends moodleform {
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
                 $options['-1'] = get_string('newgrouping', 'group');
             }
-            if ($groupings = groups_get_all_groupings($COURSE->id)) {
+            if ($groupings = groups_get_all_groupings($course->id)) {
                 foreach ($groupings as $grouping) {
                     $options[$grouping->id] = strip_tags(format_string($grouping->name));
                 }
@@ -189,7 +191,7 @@ class view_admin_form extends moodleform {
                                                                              'grouptool'));
 
             $mform->addElement('html', get_string('groupingscreatedesc', 'grouptool'));
-            $coursegroups = groups_get_all_groups($COURSE->id, null, null, "id");
+            $coursegroups = groups_get_all_groups($course->id, null, null, "id");
             if (is_array($coursegroups) && !empty($coursegroups)) {
                 $options = array(0 => get_string('selected', 'grouptool'), 1 => get_string('all'));
                 $mform->addElement('select', 'use_all',
@@ -216,7 +218,7 @@ class view_admin_form extends moodleform {
                     "$CFG->dirroot/mod/grouptool/sortlist.php",
                     'MoodleQuickForm_sortlist');
             /*prepare agrp-data*/
-            $coursegroups = groups_get_all_groups($COURSE->id, null, null, "id");
+            $coursegroups = groups_get_all_groups($course->id, null, null, "id");
             if (is_array($coursegroups) && !empty($coursegroups)) {
                 $groups = array();
                 foreach ($coursegroups as $group) {
@@ -262,7 +264,7 @@ class view_admin_form extends moodleform {
 
             if ($nogroups != 1) {
                 $options = array();
-                $options['classes'] = groups_get_all_groupings($COURSE->id);
+                $options['classes'] = groups_get_all_groupings($course->id);
                 $options['add_fields'] = array();
                 $options['add_fields']['grpsize'] = new stdClass();
                 $options['add_fields']['grpsize']->name = 'grpsize';
@@ -342,19 +344,21 @@ class view_import_form extends moodleform {
      * Definition of import form
      *
      * @global object $CFG
-     * @global object $COURSE
      * @global object $DB
      * @global object $PAGE
      */
     protected function definition() {
 
-        global $CFG, $COURSE, $DB, $PAGE;
+        global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $this->context = context_module::instance($this->_customdata['id']);
 
+        $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
+        $course = $DB->get_record('course', array('id'=>$cm->course));
+        
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'import');
 
@@ -364,7 +368,7 @@ class view_import_form extends moodleform {
             $mform->addElement('header', 'groupuser_import', get_string('groupuser_import',
                                                                         'grouptool'));
 
-            $grps = groups_get_all_groups($COURSE->id);
+            $grps = groups_get_all_groups($course->id);
             $options = array('none'=>get_string('choose'));
             foreach ($grps as $grp) {
                 $options[$grp->id] = $grp->name;
@@ -441,7 +445,6 @@ class grouptool {
      *
      * If cmid is set create the cm, course, checkmark objects.
      *
-     * @global object $COURSE
      * @global object $DB
      * @param int $cmid the current course module id - not set for new grouptools
      * @param object $grouptool usually null, but if we have it we pass it to save db access
@@ -449,7 +452,7 @@ class grouptool {
      * @param object $course usually null, but if we have it we pass it to save db access
      */
     public function __construct($cmid='staticonly', $grouptool=null, $cm=null, $course=null) {
-        global $COURSE, $DB;
+        global $DB;
 
         if ($cmid == 'staticonly') {
             //use static functions only!
@@ -468,8 +471,6 @@ class grouptool {
 
         if ($course) {
             $this->course = $course;
-        } else if ($this->cm->course == $COURSE->id) {
-            $this->course = $COURSE;
         } else if (! $this->course = $DB->get_record('course', array('id'=>$this->cm->course))) {
             print_error('invalidid', 'grouptool');
         }
@@ -1078,8 +1079,6 @@ class grouptool {
         if ($courseid == null) {
             if (isset($this->course->id)) {
                 $courseid = $this->course->id;
-            } else if (isset($COURSE->id)) {
-                $courseid = $COURSE->id;
             } else {
                 print_error('coursemisconf');
             }
@@ -1163,16 +1162,15 @@ class grouptool {
     /**
      * Outputs the content of the administration tab and manages actions taken in this tab
      *
-     * @global object $COURSE
      * @global object $SESSION
      * @global object $OUTPUT
      * @global object $PAGE
      */
     public function view_administration() {
-        global $COURSE, $SESSION, $OUTPUT, $PAGE;
+        global $SESSION, $OUTPUT, $PAGE;
 
         $id = $this->cm->id;
-        $context = CONTEXT_COURSE::instance($COURSE->id);
+        $context = context_course::instance($this->course->id);
         /// Get applicable roles
         $rolenames = array();
         if ($roles = get_profile_roles($context)) {
@@ -4053,14 +4051,13 @@ EOS;
      *
      * @global object $OUTPUT
      * @global object $CFG
-     * @global object $COURSE
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group (groupid not agroupid!)
      * @param bool $data_only optional return object with raw data not html-fragment-string
      * @return string|object either html-fragment representing table or raw data as object
      */
     public function group_overview_table($groupingid = 0, $groupid = 0, $data_only = false) {
-        global $OUTPUT, $CFG, $COURSE;
+        global $OUTPUT, $CFG;
         if (!$data_only) {
             $return = "";
             $downloadurl = new moodle_url('/mod/grouptool/download.php', array('id'=>$this->cm->id,
@@ -4154,7 +4151,7 @@ EOS;
                 foreach ($agrp->registered as $reg_entry) {
                     if (!$data_only) {
                         $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $reg_entry->user_id.'&course='.$COURSE->id,
+                                $reg_entry->user_id.'&course='.$this->course->id,
                                 'title' => fullname($userinfo[$reg_entry->user_id]));
                         $userlink = html_writer::tag('a', fullname($userinfo[$reg_entry->user_id]),
                                                      $userlinkattr);
@@ -4218,7 +4215,7 @@ EOS;
                     } else {
                         if (!$data_only) {
                             $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                    $memberid.'&course='.$COURSE->id,
+                                    $memberid.'&course='.$this->course->id,
                                     'title' => fullname($userinfo[$memberid]));
                             $userlink = html_writer::tag('a', fullname($userinfo[$memberid]),
                                                          $userlinkattr);
@@ -4268,7 +4265,7 @@ EOS;
                         $rank = new html_table_cell($queue_entry->rank);
                         $rank->attributes['class'] = 'rank';
                         $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $queue_entry->user_id.'&course='.$COURSE->id,
+                                $queue_entry->user_id.'&course='.$this->course->id,
                                 'title' => fullname($userinfo[$queue_entry->user_id]));
                         $userlink = html_writer::tag('a',
                                                      fullname($userinfo[$queue_entry->user_id]),
@@ -5330,7 +5327,6 @@ EOS;
      *
      * @global object $OUTPUT
      * @global object $CFG
-     * @global object $COURSE
      * @global object $DB
      * @global object $PAGE
      * @global object $SESSION
@@ -5343,7 +5339,7 @@ EOS;
      */
     public function userlist_table($groupingid = 0, $groupid = 0, $orderby = array(),
                                    $collapsed = array(), $data_only = false) {
-        global $OUTPUT, $CFG, $COURSE, $DB, $PAGE, $SESSION;
+        global $OUTPUT, $CFG, $DB, $PAGE, $SESSION;
         $return = "";
 
         $context = context_module::instance($this->cm->id);

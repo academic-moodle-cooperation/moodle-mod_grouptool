@@ -45,9 +45,18 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function definition() {
 
-        global $CFG, $COURSE, $DB, $PAGE;
+        global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
+        if($update = optional_param('update', 0, PARAM_INT)) {
+            $cm = get_coursemodule_from_id('grouptool', $update);
+            $course = $DB->get_record('course', array('id'=>$cm->course));
+        } else if($course = optional_param('course', 0, PARAM_INT)) {
+            $course = $DB->get_record('course', array('id'=>$course));
+        } else {
+            $course = 0;
+        }
+        
         //-------------------------------------------------------------------------------
         // Adding the "general" fieldset, where all the common settings are showed
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -234,7 +243,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
                 "$CFG->dirroot/mod/grouptool/sortlist.php",
                 'MoodleQuickForm_sortlist');
         //get groupdata
-        $coursegroups = groups_get_all_groups($COURSE->id, null, null, "id");
+        $coursegroups = groups_get_all_groups($course->id, null, null, "id");
         if (is_array($coursegroups) && !empty($coursegroups)) {
             $groups = array();
             foreach ($coursegroups as $group) {
@@ -270,7 +279,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         if ($nogroups != 1) {
             $options = array();
-            $options['classes'] = groups_get_all_groupings($COURSE->id);
+            $options['classes'] = groups_get_all_groupings($course->id);
             $options['add_fields'] = array();
             $options['add_fields']['grpsize'] = new stdClass();
             $options['add_fields']['grpsize']->name = 'grpsize';
