@@ -30,16 +30,16 @@
 
 /** sortable grouplist styles **/
 
-div.sortlist_container {
+.path-mod-grouptool div.sortlist_container {
     overflow:auto;
 }
 
-div.drag_area {
+.path-mod-grouptool div.drag_area {
     overflow:auto;
     margin-right:5px;
 }
 
-div.checkbox_controls {
+.path-mod-grouptool div.checkbox_controls {
     padding:10px;
     max-height:350px;
     overflow:auto;
@@ -50,31 +50,31 @@ div.checkbox_controls {
     margin-right:5px;
 }
 
-div.checkbox_controls .checkbox_controls_header {
+.path-mod-grouptool div.checkbox_controls .checkbox_controls_header {
     text-align:center;
     font-weight:bold;
 }
 
-div.checkbox_controls .checkbox_control {
+.path-mod-grouptool div.checkbox_controls .checkbox_control {
     text-align:right;
 
 }
 
-div.checkbox_controls .checkbox_control .check_name {
+.path-mod-grouptool div.checkbox_controls .checkbox_control .check_name {
     float:left;
     text-align:left;
     display:inline-block;
     clear:both;
 }
 
-div.checkbox_controls .checkbox_control button.select_all,
-div.checkbox_controls .checkbox_control button.select_none,
-div.checkbox_controls .checkbox_control button.toggle_selection {
+.path-mod-grouptool div.checkbox_controls .checkbox_control button.select_all,
+.path-mod-grouptool div.checkbox_controls .checkbox_control button.select_none,
+.path-mod-grouptool div.checkbox_controls .checkbox_control button.toggle_selection {
     clear:none;
     margin-left:2px;
 }
 
-ul.drag_list {
+.path-mod-grouptool ul.drag_list {
     display:inline;
     /*display:inline-block;*/
     white-space:nowrap;
@@ -83,29 +83,29 @@ ul.drag_list {
     list-style-type:none;
 }
 
-.draggable_item {
+.path-mod-grouptool .draggable_item {
     margin-top:1px;
     margin-bottom:1px;
     font-size:10px;
     valign:middle;
 }
 
-.draggable_item table {
+.path-mod-grouptool .draggable_item table {
     border:solid 1px black;
     background:#dddddd;
 }
 
-.draggable_item .checkbox_container {
+.path-mod-grouptool .draggable_item .checkbox_container {
     margin-left:3px;
     margin-right:5px;
     vertical-align:middle;
 }
 
-.draggable_item .checkbox_status {
+.path-mod-grouptool .draggable_item .checkbox_status {
 
 }
 
-.draggable_item .grpname, .draggable_item .addfield {
+.path-mod-grouptool .draggable_item .grpname, .draggable_item .addfield {
     font-weight:bold;
     width:20em;
     font-size:1.6em;
@@ -114,7 +114,7 @@ ul.drag_list {
     white-space:wrap;
 }
 
-.draggable_item .grpsize {
+.path-mod-grouptool .draggable_item .grpsize {
     margin-left:20px;
     margin-right:2px;
     text-align:middle;
@@ -123,62 +123,62 @@ ul.drag_list {
     font-size:1.2em;
 }
 
-.draggable_item .grpsize input {
+.path-mod-grouptool .draggable_item .grpsize input {
     margin-right:5px;
     margin-left:5px;
 }
 
-.draggable_item .buttons {
+.path-mod-grouptool .draggable_item .buttons {
     margin-right:0em;
     margin-left:5px;
     vertical-align:middle;
 }
 
-.draggable_item .buttons input[type=image], .draggable_item .buttons img {
+.path-mod-grouptool .draggable_item .buttons input[type=image], .draggable_item .buttons img {
     height:40px;
     background-color: transparent !important;/*#34637f;*/
 }
 
-.js_invisible {
+.path-mod-grouptool .js_invisible {
     display: none;
 }
 
-.centered {
+.path-mod-grouptool .centered {
     text-align:center;
 }
 
-.centeredblock {
+.path-mod-grouptool .centeredblock {
     margin-left:auto;
     margin-right:auto;
     text-align:left;
 }
-.coloredrows.grading_gradingtable {
+.path-mod-grouptool .coloredrows.grading_gradingtable {
     margin-left:auto;
     margin-right:auto;
     display:table;
 }
-.coloredrows.grading_previewtable {
+.path-mod-grouptool .coloredrows.grading_previewtable {
     margin-left:auto;
     margin-right:auto;
     display:table;
 }
-.coloredrows.grading_previewtable td[rowspan] {
+.path-mod-grouptool .coloredrows.grading_previewtable td[rowspan] {
     text-align:center;
     background-color: #FAFAFA;
 }
 
-.coloredrows.grading_previewtable td {
+.path-mod-grouptool .coloredrows.grading_previewtable td {
     vertical-align:middle;
 }
 
-.coloredrows.grading_previewtable .firstgrouprow {
+.path-mod-grouptool .coloredrows.grading_previewtable .firstgrouprow {
     border-top:1.5px solid black;
 }
-.indent {
+.path-mod-grouptool .indent {
     margin-left:2em;
 }
 
-.gradeinfo {
+.path-mod-grouptool .gradeinfo {
     display:inline-block;
     text-align:left;
     color:black;
@@ -186,41 +186,41 @@ ul.drag_list {
     text-decoration:none;
 }
 
-.agrplist {
+.path-mod-grouptool .agrplist {
     max-height: 250px;
     overflow: auto;
 }
 
 /*styles for view->registration*/
 
-.group {
+.path-mod-grouptool .group {
     max-height: 200px;
     overflow: auto;
 }
 
-.group.registered, .group.registered legend {
+.path-mod-grouptool .group.registered, .group.registered legend {
     background: #99ff99;
 }
-.group.queued, .group.queued legend {
+.path-mod-grouptool .group.queued, .group.queued legend {
     background: #ffcc99;
 }
-.group.full, .group.full legend {
+.path-mod-grouptool .group.full, .group.full legend {
     background: #ffcccc;
 }
-.group.empty, .group.empty legend {
+.path-mod-grouptool .group.empty, .group.empty legend {
     background: transparent;
 }
-.group {
+.path-mod-grouptool .group {
     vertical-align:middle;
 }
 
-#registration_form fieldset.group div {
+.path-mod-grouptool #registration_form fieldset.group div {
     overflow:hidden;
     height:auto;
     max-height:auto;
 }
 
-.group .unregbutton {
+.path-mod-grouptool .group .unregbutton {
     vertical-align:middle;
     display:inline;
     margin-left:1em;
@@ -229,7 +229,7 @@ ul.drag_list {
     margin-bottom:0.25em;
 }
 
-.group .regbutton {
+.path-mod-grouptool .group .regbutton {
     vertical-align:middle;
     display:inline;
     margin-left:1em;
@@ -238,7 +238,7 @@ ul.drag_list {
     margin-bottom:0.25em;
 }
 
-.group .unqueuebutton {
+.path-mod-grouptool .group .unqueuebutton {
     vertical-align:middle;
     display:inline;
     margin-left:1em;
@@ -247,7 +247,7 @@ ul.drag_list {
     margin-bottom:0.25em;
 }
 
-.group .queuebutton {
+.path-mod-grouptool .group .queuebutton {
     vertical-align:middle;
     display:inline;
     margin-left:1em;
@@ -256,25 +256,25 @@ ul.drag_list {
     margin-bottom:0.25em;
 }
 
-.group .rank {
+.path-mod-grouptool .group .rank {
     vertical-align:middle;
     display:inline;
     margin-left:1em;
     margin-right:1em;
 }
 
-.group .showmembers {
+.path-mod-grouptool .group .showmembers {
     vertical-align:middle;
     margin-left:1em;
     margin-right:1em;
 }
-.group .queued {
+.path-mod-grouptool .group .queued {
     vertical-align:middle;
     margin-left:1em;
     margin-right:1em;
 }
 
-.group .fillratio {
+.path-mod-grouptool .group .fillratio {
     vertical-align:middle;
     margin-left:1em;
     margin-right:1em;
@@ -296,89 +296,89 @@ ul.drag_list {
     background-color:#FFCC99;
 }
 
-.overviewtable {
+.path-mod-grouptool .overviewtable {
     margin-left:auto;
     margin-right:auto;
 }
 
-.groupcontainer.uptodate {
+.path-mod-grouptool .groupcontainer.uptodate {
 
 }
 
-.groupcontainer.outdated {
+.path-mod-grouptool .groupcontainer.outdated {
     border-color: #FFCC99;
     background-color: #EEEEEE;
 }
 
-.grouptool_overview_filter form, .grouptool_overview_filter div {
+.path-mod-grouptool .grouptool_overview_filter form, .grouptool_overview_filter div {
     display: inline;
 }
 
-.grouptool_userlist_filter form, .grouptool_userlist_filter div {
+.path-mod-grouptool .grouptool_userlist_filter form, .grouptool_userlist_filter div {
     display: inline;
 }
 
-.userlist td, .userlist th {
+.path-mod-grouptool .userlist td, .userlist th {
     vertical-align:middle;
 }
 
-.userlist th {
+.path-mod-grouptool .userlist th {
     white-space:nowrap;
 }
-.userlist th div {
+.path-mod-grouptool .userlist th div {
     display:inline;
 }
 
-.userlist .collapselink {
+.path-mod-grouptool .userlist .collapselink {
     margin-left:3px;
     vertical-align:middle;
 }
 
-.groupinfo {
+.path-mod-grouptool .groupinfo {
     margin-left:auto;
     margin-right:auto;
 }
 
-.queue {
+.path-mod-grouptool .queue {
     bgcolor: #eeeeee;
     color: #999999;
 }
 
-.registered {
+.path-mod-grouptool .registered {
 
 }
 
-.moodlereg {
+.path-mod-grouptool .moodlereg {
     font-weight:bold;
 }
 
-.no_queues, .no_registrations {
+.path-mod-grouptool .no_queues, .no_registrations {
     text-align:center;
 }
 
-.mform .fieldsetsimulation {
+.path-mod-grouptool .mform .fieldsetsimulation {
     border: 1px solid #D9D9D9;
     margin-left: 10px;
     margin-right: 10px;
 }
 
-.mform .fcontainer .checkboxcontroller {
+.path-mod-grouptool .mform .fcontainer .checkboxcontroller {
     margin-left: 1em;
     margin-top: 1em;
 }
 
-.mform .fcontainer .groupselectiontitle {
+.path-mod-grouptool .mform .fcontainer .groupselectiontitle {
     font-weight: bold;
     margin-left: 1em;
     margin-top: 1em;
 }
 
-.mform .fcontainer .simpletext {
+.path-mod-grouptool .mform .fcontainer .simpletext {
     margin-left: 1em;
     margin-top: 1em;
 }
 
-.title {
+.path-mod-grouptool .title {
     whitespace:nowrap;
     font-weight:bold;
 }
