@@ -27,40 +27,40 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * MODE_GROUPS_AMOUNT - group creation mode where amount of groups is defined
+ * GROUPTOOL_GROUPS_AMOUNT - group creation mode where amount of groups is defined
  */
-define('MODE_GROUPS_AMOUNT', 1);
+define('GROUPTOOL_GROUPS_AMOUNT', 1);
 /**
- * MODE_MEMBERS_AMOUNT - group creation mode where amount of groupmembers is defined
+ * GROUPTOOL_MEMBERS_AMOUNT - group creation mode where amount of groupmembers is defined
  */
-define('MODE_MEMBERS_AMOUNT', 2);
+define('GROUPTOOL_MEMBERS_AMOUNT', 2);
 /**
- * MODE_1_PERSON_GROUPS - group creation mode where a single group is created for each user
+ * GROUPTOOL_1_PERSON_GROUPS - group creation mode where a single group is created for each user
  */
-define('MODE_1_PERSON_GROUPS', 0);
+define('GROUPTOOL_1_PERSON_GROUPS', 0);
 /**
- * AUTOGROUP_MIN_RATIO - means minimum member count is 70% in the smallest group
+ * GROUPTOOL_AUTOGROUP_MIN_RATIO - means minimum member count is 70% in the smallest group
  */
-if (!defined('AUTOGROUP_MIN_RATIO')) {
-    define('AUTOGROUP_MIN_RATIO', 0.7);
+if (!defined('GROUPTOOL_AUTOGROUP_MIN_RATIO')) {
+    define('GROUPTOOL_AUTOGROUP_MIN_RATIO', 0.7);
 }
 
-if (!defined('BREAK_EVEN_POINT')) {
+if (!defined('GROUPTOOL_BEP')) {
     /**
-     * BREAK_EVEN_POINT - use new implementation of parsing groupnames with @ if current groups
-     * number is larger than BREAK_EVEN_POINT
+     * GROUPTOOL_BEP - use new implementation of parsing groupnames with @ if current groups
+     * number is larger than GROUPTOOL_BEP
      * new implementation is faster for large numbers
      * old style = linear - new style = estimated 15 instructions per stage --> 15 * log(x,25)
      * break even point estimated < 12 --> @30 we are on the secure side...
      */
-    define('BREAK_EVEN_POINT', 30);
+    define('GROUPTOOL_BEP', 30);
 }
 
 /**
  * IE_7_IS_DEAD - disable workarounds for IE7-problems?
  * still quite alive, so we need some hacks :(
  */
-define('IE7_IS_DEAD', 0);
+define('GROUPTOOL_IE7_IS_DEAD', 0);
 
 /**
  * GROUPTOOL_FILTER_ALL - no filter at all...
@@ -74,39 +74,39 @@ define('GROUPTOOL_FILTER_ALL', 0);
 define('GROUPTOOL_FILTER_NONCONFLICTING', -1);
 
 /**
- * FORMAT_PDF - get PDF-File
+ * GROUPTOOL_PDF - get PDF-File
  */
-define('FORMAT_PDF', 0);
+define('GROUPTOOL_PDF', 0);
 /**
- * FORMAT_TXT - get TXT-File
+ * GROUPTOOL_TXT - get TXT-File
  */
-define('FORMAT_TXT', 1);
+define('GROUPTOOL_TXT', 1);
 /**
- * FORMAT_XLS - get XLS-File
+ * GROUPTOOL_XLS - get XLS-File
  */
-define('FORMAT_XLS', 2);
+define('GROUPTOOL_XLS', 2);
 /**
- * FORMAT_ODS - get ODS-File
+ * GROUPTOOL_ODS - get ODS-File
  */
-define('FORMAT_ODS', 3);
+define('GROUPTOOL_ODS', 3);
 /**
- * FORMAT_RAW - get raw data - just for development
+ * GROUPTOOL_RAW - get raw data - just for development
  */
-define('FORMAT_RAW', -1);
+define('GROUPTOOL_RAW', -1);
 /*
- * OUTPUT_NEWLINE - Windows style newlines
+ * GROUPTOOL_NL - Windows style newlines
  * otherwise we get problems with windows users and txt-files (UNIX \n, MAC \r)
  */
-define('OUTPUT_NEWLINE', "\r\n");
+define('GROUPTOOL_NL', "\r\n");
 
 /**
- * STATUS_OUTDATED - active group's registrations are not consistent with moodle-group's
+ * GROUPTOOL_OUTDATED - active group's registrations are not consistent with moodle-group's
  */
-define('STATUS_OUTDATED', 0);
+define('GROUPTOOL_OUTDATED', 0);
 /**
- * STATUS_UPTODATE - active group's registrations are consistent with moodle-group's registrations
+ * GROUPTOOL_UPTODATE - active group's registrations are consistent with moodle-group's registrations
  */
-define('STATUS_UPTODATE', 1);
+define('GROUPTOOL_UPTODATE', 1);
 
 /**
  * GROUPTOOL_FOLLOW - follow changes via eventhandler

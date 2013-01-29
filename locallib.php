@@ -112,29 +112,29 @@ class view_admin_form extends moodleform {
             $radioarray[] = $mform->createElement('radio', 'mode', '',
                                                             get_string('define_amount_groups',
                                                                        'grouptool'),
-                                                            MODE_GROUPS_AMOUNT);
+                                                            GROUPTOOL_GROUPS_AMOUNT);
             $radioarray[] = $mform->createElement('radio', 'mode', '',
                                                             get_string('define_amount_members',
                                                                        'grouptool'),
-                                                            MODE_MEMBERS_AMOUNT);
+                                                            GROUPTOOL_MEMBERS_AMOUNT);
             $radioarray[] = $mform->createElement('radio', 'mode', '',
                                                             get_string('create_1_person_groups',
                                                                        'grouptool'),
-                                                            MODE_1_PERSON_GROUPS);
+                                                            GROUPTOOL_1_PERSON_GROUPS);
             $mform->addGroup($radioarray, 'modearray',
                              get_string('groupcreationmode', 'grouptool'),
                              html_writer::empty_tag('br'), false);
-            $mform->setDefault('mode', MODE_GROUPS_AMOUNT);
+            $mform->setDefault('mode', GROUPTOOL_GROUPS_AMOUNT);
             $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
             $mform->addElement('text', 'amount', get_string('group_or_member_count', 'grouptool'),
                                array('size'=>'4'));
-            $mform->disabledIf('amount', 'mode', 'eq', MODE_1_PERSON_GROUPS);
+            $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->setDefault('amount', 2);
 
             $mform->addElement('checkbox', 'nosmallgroups', get_string('nosmallgroups', 'group'));
             $mform->addHelpButton('nosmallgroups', 'nosmallgroups', 'grouptool');
-            $mform->disabledIf('nosmallgroups', 'mode', 'noteq', MODE_MEMBERS_AMOUNT);
+            $mform->disabledIf('nosmallgroups', 'mode', 'noteq', GROUPTOOL_MEMBERS_AMOUNT);
             $mform->setAdvanced('nosmallgroups');
 
             $options = array('no'        => get_string('noallocation', 'group'),
@@ -144,7 +144,7 @@ class view_admin_form extends moodleform {
                     'idnumber'  => get_string('byidnumber', 'group'));
             $mform->addElement('select', 'allocateby', get_string('allocateby', 'group'), $options);
             $mform->setDefault('allocateby', 'random');
-            $mform->disabledIf('allocateby', 'mode', 'eq', MODE_1_PERSON_GROUPS);
+            $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->setAdvanced('allocateby');
 
             $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'grouptool'),
@@ -611,7 +611,7 @@ class grouptool {
         }
 
         if (strstr($name_scheme, '@') !== false) { // Convert $groupnumber to a character series
-            if ($groupnumber > BREAK_EVEN_POINT) {
+            if ($groupnumber > GROUPTOOL_BEP) {
                 $next_tempnumber = $groupnumber;
                 $string = "";
                 $orda = ord('A');
@@ -1190,7 +1190,7 @@ class grouptool {
                 //create Groups
                 $data = $SESSION->grouptool->view_administration;
                 switch ($data->mode) {
-                    case MODE_GROUPS_AMOUNT:
+                    case GROUPTOOL_GROUPS_AMOUNT:
                         /// Allocate members from the selected role to groups
                         switch ($data->allocateby) {
                             case 'no':
@@ -1214,7 +1214,7 @@ class grouptool {
                         $userpergrp = floor($usercnt/$numgrps);
                         $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
-                    case MODE_MEMBERS_AMOUNT:
+                    case GROUPTOOL_MEMBERS_AMOUNT:
                         /// Allocate members from the selected role to groups
                         switch ($data->allocateby) {
                             case 'no':
@@ -1242,7 +1242,7 @@ class grouptool {
                              *  reduce the number of groups
                              */
                             $missing = $userpergrp * $numgrps - $usercnt;
-                            if ($missing > $userpergrp * (1-AUTOGROUP_MIN_RATIO)) {
+                            if ($missing > $userpergrp * (1-GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
                                 // spread the users from the last small group
                                 $numgrps--;
                                 $userpergrp = floor($usercnt/$numgrps);
@@ -1250,7 +1250,7 @@ class grouptool {
                         }
                         $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
-                    case MODE_1_PERSON_GROUPS:
+                    case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid);
                         if (!isset($data->groupingname)) {
@@ -1296,7 +1296,7 @@ class grouptool {
                 $data = $SESSION->grouptool->view_administration;
                 $preview = "";
                 switch ($data->mode) {
-                    case MODE_GROUPS_AMOUNT:
+                    case GROUPTOOL_GROUPS_AMOUNT:
                         /// Allocate members from the selected role to groups
                         switch ($data->allocateby) {
                             case 'no':
@@ -1321,7 +1321,7 @@ class grouptool {
                         list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
                                                                       $numgrps, true);
                         break;
-                    case MODE_MEMBERS_AMOUNT:
+                    case GROUPTOOL_MEMBERS_AMOUNT:
                         /// Allocate members from the selected role to groups
                         switch ($data->allocateby) {
                             case 'no':
@@ -1349,7 +1349,7 @@ class grouptool {
                              *  reduce the number of groups
                              */
                             $missing = $userpergrp * $numgrps - $usercnt;
-                            if ($missing > $userpergrp * (1-AUTOGROUP_MIN_RATIO)) {
+                            if ($missing > $userpergrp * (1-GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
                                 // spread the users from the last small group
                                 $numgrps--;
                                 $userpergrp = floor($usercnt/$numgrps);
@@ -1358,7 +1358,7 @@ class grouptool {
                         list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
                                                                       $numgrps, true);
                         break;
-                    case MODE_1_PERSON_GROUPS:
+                    case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid);
                         if (!isset($data->groupingname)) {
@@ -1707,7 +1707,7 @@ EOS;
                         $row[] = html_writer::tag('div', get_string('not_graded_by_me',
                                                                     'grouptool'));
                     } else {
-                        if (IE7_IS_DEAD) {
+                        if (GROUPTOOL_IE7_IS_DEAD) {
                             $row[] = html_writer::tag('button',
                                                       get_string('copygrade', 'grouptool'),
                                                       array('type'  => 'submit',
@@ -2132,7 +2132,7 @@ EOS;
                     $selected = unserialize($selected);
                 }
             } else {
-                if (IE7_IS_DEAD) {
+                if (GROUPTOOL_IE7_IS_DEAD) {
                     $source = optional_param('source', null, PARAM_INT);
                 } else {
                     /*
@@ -4082,10 +4082,10 @@ EOS;
 
         if (!$data_only && count($agrps)) {
             //global-downloadlinks
-            $txturl = new moodle_url($downloadurl, array('format'=>FORMAT_TXT));
-            $xlsurl = new moodle_url($downloadurl, array('format'=>FORMAT_XLS));
-            $pdfurl = new moodle_url($downloadurl, array('format'=>FORMAT_PDF));
-            $odsurl = new moodle_url($downloadurl, array('format'=>FORMAT_ODS));
+            $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
+            $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
+            $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
+            $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
             $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
                                               array('class'=>'title')).'&nbsp;'.
                              html_writer::link($txturl, '.TXT').'&nbsp;'.
@@ -4319,16 +4319,16 @@ EOS;
                 if ((count($agrp->queued) > 0) || (count($agrp->registered) > 0)) {
                     $urltxt = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => FORMAT_TXT));
+                                                   'format'  => GROUPTOOL_TXT));
                     $urlxls = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => FORMAT_XLS));
+                                                   'format'  => GROUPTOOL_XLS));
                     $urlpdf = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => FORMAT_PDF));
+                                                   'format'  => GROUPTOOL_PDF));
                     $urlods = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => FORMAT_ODS));
+                                                   'format'  => GROUPTOOL_ODS));
 
                     $downloadlinks = html_writer::tag('span', get_string('download').":",
                                                       array('class'=>'title')).'&nbsp;'.
@@ -4339,7 +4339,7 @@ EOS;
                     $groupdata .= html_writer::tag('div', $downloadlinks,
                                                    array('class'=>'download group'));
                 }
-                if ($sync_status[1][$agrp->agrp_id]->status == STATUS_UPTODATE) {
+                if ($sync_status[1][$agrp->agrp_id]->status == GROUPTOOL_UPTODATE) {
                     $return .= $OUTPUT->box($groupdata, 'generalbox groupcontainer uptodate');
                 } else {
                     $return .= $OUTPUT->box($groupdata, 'generalbox groupcontainer outdated');
@@ -4546,7 +4546,7 @@ EOS;
         } else {
             $lines[] = get_string('no_data_to_display', 'grouptool');
         }
-        $filecontent = implode(OUTPUT_NEWLINE, $lines);
+        $filecontent = implode(GROUPTOOL_NL, $lines);
 
         $coursename = $this->course->fullname; // course name
         $timeavailable = $this->grouptool->timeavailable; //available from:
@@ -4970,9 +4970,9 @@ EOS;
         $return = $DB->get_records_sql($sql, array($grouptoolid));
 
         foreach ($return as $key => $group) {
-            $return[$key]->status = ($group->grptoolregs > $group->mdlregs) ? STATUS_OUTDATED
-                                                                            : STATUS_UPTODATE;
-            $out_of_sync |= ($return[$key]->status == STATUS_OUTDATED);
+            $return[$key]->status = ($group->grptoolregs > $group->mdlregs) ? GROUPTOOL_OUTDATED
+                                                                            : GROUPTOOL_UPTODATE;
+            $out_of_sync |= ($return[$key]->status == GROUPTOOL_OUTDATED);
         }
         return array($out_of_sync, $return);
     }
@@ -5428,10 +5428,10 @@ EOS;
 
         if (!$data_only) {
 
-            $txturl = new moodle_url($downloadurl, array('format'=>FORMAT_TXT));
-            $xlsurl = new moodle_url($downloadurl, array('format'=>FORMAT_XLS));
-            $pdfurl = new moodle_url($downloadurl, array('format'=>FORMAT_PDF));
-            $odsurl = new moodle_url($downloadurl, array('format'=>FORMAT_ODS));
+            $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
+            $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
+            $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
+            $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
             $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
                                               array('class'=>'title')).'&nbsp;'.
                     html_writer::link($txturl, '.TXT').'&nbsp;'.
@@ -5827,7 +5827,7 @@ EOS;
         } else {
             $lines[] = get_string('no_data_to_display', 'grouptool');
         }
-        $filecontent = implode(OUTPUT_NEWLINE, $lines);
+        $filecontent = implode(GROUPTOOL_NL, $lines);
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
