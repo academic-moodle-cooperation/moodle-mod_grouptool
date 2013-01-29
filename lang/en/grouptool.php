@@ -263,6 +263,7 @@ $string['nonconflicting'] = 'without conflicts';
 $string['nosmallgroups'] = 'Prevent small groups';
 $string['nosmallgroups_help'] = 'If enabled ensures that each group is at least filled by 70% of it\'s size! If a (or more precise the last) group would be filled less than 70% the users for this group get spread over the other groups, causing them to have more members than specified!';
 $string['noregistrationdue'] = 'Registration\'s always open!';
+$string['not_allowed_to_show_members'] = 'You have no permission to view this information!';
 $string['not_in_queue_or_registered'] = '{$a->username} is neither registered nor queued in group {$a->groupname}';
 $string['not_permitted'] = 'not permitted';
 $string['not_registered'] = 'You\'re not yet registered!';

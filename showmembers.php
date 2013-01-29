@@ -33,9 +33,23 @@ $ajax       = optional_param('ajax', 0, PARAM_BOOL);
 
 $sm = get_string_manager();
 
+$group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.courseid as courseid,
+                                     agrp.id as agrpid, agrp.grpsize as size,
+                                     agrp.grouptool_id as grouptoolid
+                              FROM {grouptool_agrps} AS agrp
+                                LEFT JOIN {groups} AS grp ON agrp.group_id = grp.id
+                              WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
+$grouptool = $DB->get_record('grouptool', array('id'=>$group->grouptoolid), '*', MUST_EXIST);
+                              
 $PAGE->set_url('/mod/grouptool/showmembers.php');
 $PAGE->set_pagelayout('popup');
-$PAGE->set_context(context_system::instance());
+$coursecontext = context_course::instance($group->courseid);
+$PAGE->set_context($coursecontext);
+
+$cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $group->courseid);
+$context = context_module::instance($cm->id);
+
+require_login($cm->course, true, $cm);
 
 if ($ajax) {
     @header('Content-Type: text/plain; charset=utf-8');
@@ -43,59 +57,58 @@ if ($ajax) {
     echo $OUTPUT->header();
 }
 
-$group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname,
-                                     agrp.id as agrpid, agrp.grpsize as size
-                              FROM {grouptool_agrps} AS agrp
-                                LEFT JOIN {groups} AS grp ON agrp.group_id = grp.id
-                              WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
-
 echo $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
-
-echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
-$moodlereg = groups_get_members($group->grpid, 'u.id');
-
-$regsql = "SELECT reg.user_id as id, user.firstname as firstname, user.lastname as lastname,
-                  user.idnumber as idnumber
-           FROM {grouptool_registered} as reg
-               LEFT JOIN {user} as user ON reg.user_id = user.id
-           WHERE reg.agrp_id = ?
-           ORDER BY timestamp ASC";
-if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
-    echo html_writer::tag('div', get_string('no_registrations', 'grouptool'),
+if(!has_capability('mod/grouptool:view_registrations', $context)
+          && !$grouptool->show_members){
+    echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
                           array('class'=>'reg'));
 } else {
-    echo html_writer::start_tag('ul');
-    foreach ($regs as $user) {
-        if (!in_array($user->id, $moodlereg)) {
-            echo html_writer::tag('li', fullname($user).
-                                        ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
-                                  array('class'=>'registered'));
-        } else {
-            echo html_writer::tag('li', fullname($user).
-                                        ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
-                                  array('class'=>'moodlereg'));
-        }
-    }
-    echo html_writer::end_tag('ul');
-}
+    echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
+    $moodlereg = groups_get_members($group->grpid, 'u.id');
 
-echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
-$queuesql = "SELECT queue.user_id as id, user.firstname as firstname, user.lastname as lastname,
-                    user.idnumber as idnumber
-             FROM {grouptool_queued} as queue
-                 LEFT JOIN {user} as user ON queue.user_id = user.id
-             WHERE queue.agrp_id = ?
-             ORDER BY timestamp ASC";
-if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
-    echo html_writer::tag('div', get_string('nobody_queued', 'grouptool'), array('class'=>'queue'));
-} else {
-    echo html_writer::start_tag('ol');
-    foreach ($queue as $user) {
-        echo html_writer::tag('li', fullname($user).
-                                    ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
-                              array('class'=>'queue'));
+    $regsql = "SELECT reg.user_id as id, user.firstname as firstname, user.lastname as lastname,
+                      user.idnumber as idnumber
+               FROM {grouptool_registered} as reg
+                   LEFT JOIN {user} as user ON reg.user_id = user.id
+               WHERE reg.agrp_id = ?
+               ORDER BY timestamp ASC";
+    if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
+        echo html_writer::tag('div', get_string('no_registrations', 'grouptool'),
+                              array('class'=>'reg'));
+    } else {
+        echo html_writer::start_tag('ul');
+        foreach ($regs as $user) {
+            if (!in_array($user->id, $moodlereg)) {
+                echo html_writer::tag('li', fullname($user).
+                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                                      array('class'=>'registered'));
+            } else {
+                echo html_writer::tag('li', fullname($user).
+                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                                      array('class'=>'moodlereg'));
+            }
+        }
+        echo html_writer::end_tag('ul');
     }
-    echo html_writer::end_tag('ol');
+
+    echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
+    $queuesql = "SELECT queue.user_id as id, user.firstname as firstname, user.lastname as lastname,
+                        user.idnumber as idnumber
+                 FROM {grouptool_queued} as queue
+                     LEFT JOIN {user} as user ON queue.user_id = user.id
+                 WHERE queue.agrp_id = ?
+                 ORDER BY timestamp ASC";
+    if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
+        echo html_writer::tag('div', get_string('nobody_queued', 'grouptool'), array('class'=>'queue'));
+    } else {
+        echo html_writer::start_tag('ol');
+        foreach ($queue as $user) {
+            echo html_writer::tag('li', fullname($user).
+                                        ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                                  array('class'=>'queue'));
+        }
+        echo html_writer::end_tag('ol');
+    }
 }
 
 if (!$ajax) {

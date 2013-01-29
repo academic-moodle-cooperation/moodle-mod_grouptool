@@ -263,6 +263,7 @@ $string['nonconflicting'] = 'konfliktfrei';
 $string['nosmallgroups'] = 'Verhindere kleine Gruppen';
 $string['nosmallgroups_help'] = 'Wenn aktiviert, wird sichergestellt, dass jede Gruppe zumindest zu 70% der angegebenen Größe gefüllt ist! Die Benutzer/innen der unter Umständen vorhandenen letzten kleineren Gruppe, werden auf die übrigen Gruppen aufgeteilt. Es kann daher vorkommen, dass diese Gruppen mehr Mitglieder als spezifiziert haben!';
 $string['noregistrationdue'] = 'Anmeldung ist immer möglich!';
+$string['not_allowed_to_show_members'] = 'Sie haben keine Berechtigung diese Information anzuzeigen!';
 $string['not_in_queue_or_registered'] = '{$a->username} ist weder in der Gruppe {$a->groupname} angemeldet noch in deren Warteliste gereiht.';
 $string['not_permitted'] = 'nicht erlaubt';
 $string['not_registered'] = 'Sie sind noch nirgends angemeldet!';
