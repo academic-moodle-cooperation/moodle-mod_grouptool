@@ -100,6 +100,7 @@ $string['choose_min_max_text'] = 'Sie müssen zwischen {$a->min} und {$a->max} G
 $string['choose_targetgroup'] = 'Import in Gruppe';
 $string['chooseactivity'] = 'Sie müssen eine Aktivität auswählen, bevor Daten angezeigt werden können!';
 $string['create_1_person_groups'] = '1-Personen-Gruppen erstellen';
+$string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89).';
 $string['createGroups'] = 'Gruppen erstellen';
 $string['createGroupings'] = 'Gruppierungen erstellen';
 $string['create_groups_confirm'] = 'Gruppen erstellen, wie in der Vorschau gezeigt?';
@@ -126,6 +127,7 @@ $string['define_amount_groups'] = 'Gruppenanzahl festlegen';
 $string['define_amount_members'] = 'Mitgliederanzahl festlegen';
 $string['delete_reference'] = 'lösche aus in der Grupenverwaltung';
 $string['determinismerror'] = 'Das "Verfügbar bis" Datum, darf nicht vor dem "Verfügbar von" Datum oder in der Vergangenheit liegen!';
+$string['digits'] = 'Mindestanzahl Stellen';
 $string['disabled'] = 'deaktiviert';
 $string['drag'] = 'verschiebe';
 $string['due'] = 'Gruppenverwaltung Deadline';
@@ -175,6 +177,7 @@ definiere Anzahl an Gruppenmitgliedern - Hier werden die ideale Gruppenmitglieds
 Wenn Daten für einen Benutzer nicht vorhanden sind, wird der Tag durch TagnameXX ersetzt (wobei XX für die laufende Gruppennummer steht).
 </li>
 </ul>';
+$string['groupfromtodigits'] = 'Von, Bis &amp; Stellen im Namen:';
 $string['groupinfo'] = 'Gruppeninformationen';
 $string['grouping_exists_error_prev'] = 'Kann Gruppierung nicht anlegen, da bereits eine Gruppierung mit diesem Namen existiert!';
 $string['grouping_exists_error'] = 'Konnte Gruppierung nicht anlegen, da bereits eine Gruppierung mit diesem Namen existiert!';

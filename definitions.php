@@ -25,7 +25,11 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+/**
+ * GROUPTOOL_FROMTO_GROUPS - group creation mode where just groups with a starting and
+ * ending number are created - no user allocation
+ */
+define('GROUPTOOL_FROMTO_GROUPS', 3);
 /**
  * GROUPTOOL_GROUPS_AMOUNT - group creation mode where amount of groups is defined
  */

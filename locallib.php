@@ -123,6 +123,10 @@ class view_admin_form extends moodleform {
                                                             get_string('create_1_person_groups',
                                                                        'grouptool'),
                                                             GROUPTOOL_1_PERSON_GROUPS);
+            $radioarray[] = $mform->createElement('radio', 'mode', '',
+                                                            get_string('create_fromto_groups',
+                                                                       'grouptool'),
+                                                            GROUPTOOL_FROMTO_GROUPS);
             $mform->addGroup($radioarray, 'modearray',
                              get_string('groupcreationmode', 'grouptool'),
                              html_writer::empty_tag('br'), false);
@@ -132,11 +136,30 @@ class view_admin_form extends moodleform {
             $mform->addElement('text', 'amount', get_string('group_or_member_count', 'grouptool'),
                                array('size'=>'4'));
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
+            $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setDefault('amount', 2);
+            
+            $fromto = array();
+            $fromto[] = $mform->createElement('text', 'from', get_string('from'));
+            $mform->setDefault('from', 0);
+            $mform->setType('from', PARAM_INT);
+            $fromto[] = $mform->createElement('text', 'to', get_string('to'));
+            $mform->setDefault('to', 0);
+            $mform->setType('to', PARAM_INT);
+            $fromto[] = $mform->createElement('text', 'digits', get_string('digits', 'grouptool'));
+            $mform->setDefault('digits', 2);
+            $mform->setType('digits', PARAM_INT);
+            $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
+                             array(' - ', ' '.get_string('digits', 'grouptool').' '), false);
+            $mform->disabledIf('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledIf('to', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledIf('digits', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->setAdvanced('fromto');
 
             $mform->addElement('checkbox', 'nosmallgroups', get_string('nosmallgroups', 'group'));
             $mform->addHelpButton('nosmallgroups', 'nosmallgroups', 'grouptool');
             $mform->disabledIf('nosmallgroups', 'mode', 'noteq', GROUPTOOL_MEMBERS_AMOUNT);
+            $mform->disabledIf('nosmallgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setAdvanced('nosmallgroups');
 
             $options = array('no'        => get_string('noallocation', 'group'),
@@ -147,6 +170,7 @@ class view_admin_form extends moodleform {
             $mform->addElement('select', 'allocateby', get_string('allocateby', 'group'), $options);
             $mform->setDefault('allocateby', 'random');
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
+            $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setAdvanced('allocateby');
 
             $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'grouptool'),
@@ -898,6 +922,131 @@ class grouptool {
         }
     }
 
+        /**
+     * Create moodle-groups and also create non-active entries for the created groups
+     * for this instance
+     *
+     * @global object $DB
+     * @global object $PAGE
+     * @global object $USER
+     * @param object $data data from administration-form with all settings for group creation
+     * @param bool $only_preview optional only show preview of created groups
+     * @return array ( 0 => error, 1 => message )
+     */
+    private function create_fromto_groups($data, $only_preview = false) {
+        global $DB, $PAGE, $USER;
+
+        require_capability('mod/grouptool:create_groups', $this->context);
+
+        $groups = array();
+
+        //every member is there, so we can parse the name
+        for ($i=$data->from; $i<=$data->to; $i++) {
+            $groups[$i] = $this->groups_parse_name(trim($data->namingscheme), $i-1, null, $data->digits);
+        }
+        if ($only_preview) {
+            $error = false;
+            $table = new html_table();
+            $table->head  = array(get_string('groupscount', 'group', ($data->to-$data->from)));
+            $table->size  = array('100%');
+            $table->align = array('left');
+            $table->width = '40%';
+
+            $table->data  = array();
+
+            foreach ($groups as $group) {
+                $line = array();
+                if (groups_get_group_by_name($this->course->id, $group)) {
+                    $error = true;
+                    $line[] = '<span class="notifyproblem">'.
+                              get_string('groupnameexists', 'group', $group).'</span>';
+                    $error = get_string('groupnameexists', 'group', $group);
+                } else {
+                    $line[] = $group;
+                }
+
+                $table->data[] = $line;
+            }
+            return array(0 => $error, 1 => html_writer::table($table));
+
+        } else {
+            $grouping = null;
+            $createdgrouping = null;
+            $createdgroups = array();
+            $failed = false;
+
+            // prepare grouping
+            if (!empty($data->grouping)) {
+                if ($data->grouping < 0) {
+                    $grouping = new stdClass();
+                    $grouping->courseid = $this->course->id;
+                    $grouping->name     = trim($data->groupingname);
+                    $grouping->id = groups_create_grouping($grouping);
+                    $createdgrouping = $grouping->id;
+                } else {
+                    $grouping = groups_get_grouping($data->grouping);
+                }
+            }
+
+            // Save the groups data
+            foreach ($groups as $key => $group) {
+                if (groups_get_group_by_name($this->course->id, $group)) {
+                    $error = get_string('groupnameexists', 'group', $group);
+                    $failed = true;
+                    break;
+                }
+                $newgroup = new stdClass();
+                $newgroup->courseid = $this->course->id;
+                $newgroup->name     = $group;
+                $groupid = groups_create_group($newgroup);
+                //insert into agrp-table
+                $new_agrp = new stdClass();
+                $new_agrp->group_id = $groupid;
+                $new_agrp->grouptool_id = $this->grouptool->id;
+                $new_agrp->sort_order = 999999;
+                $new_agrp->active = 0;
+                $attr = array('grouptool_id' => $this->grouptool->id,
+                              'group_id'     => $groupid);
+                if (!$DB->record_exists('grouptool_agrps', $attr)) {
+                    $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
+                } else {
+                    $new_agrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
+                }
+                $createdgroups[] = $groupid;
+                if ($grouping) {
+                    groups_assign_grouping($grouping->id, $groupid);
+                }
+            }
+
+            if ($failed) {
+                foreach ($createdgroups as $groupid) {
+                    groups_delete_group($groupid);
+                }
+                if ($createdgrouping) {
+                    groups_delete_grouping($createdgrouping);
+                }
+            } else {
+                if ($grouping) {
+                    add_to_log($this->grouptool->course,
+                            'grouptool', 'create groups',
+                            "view.php?id=".$this->grouptool->id."&tab=overview&groupingid=".
+                            $grouping->id,
+                            'create groups in grouping:'.$grouping->name.
+                            ' namescheme:'.$data->namingscheme.' allocate-by:'.$data->allocateby.
+                            ' numgroups:'.$numgrps.' user/grp:'.$userpergrp);
+                } else {
+                    add_to_log($this->grouptool->course,
+                            'grouptool', 'create groups',
+                            "view.php?id=".$this->grouptool->id."&tab=overview",
+                            'create groups namescheme:'.$data->namingscheme.
+                            ' allocate-by:'.$data->allocateby.' numgroups:'.$numgrps.
+                            ' user/grp:'.$userpergrp);
+                }
+            }
+        }
+    }
+
+    
     /**
      * Create a moodle group for each of the users in $users
      *
@@ -1266,6 +1415,12 @@ class grouptool {
                                                                               $data->groupingname);
                         $preview = $prev;
                         break;
+                    case GROUPTOOL_FROMTO_GROUPS:
+                        if (!isset($data->groupingname)) {
+                            $data->groupingname = null;
+                        }
+                        list($error, $preview) = $this->create_fromto_groups($data);
+                        break;
                 }
             }
             if (isset($SESSION->grouptool->view_administration->createGroupings)) {
@@ -1374,6 +1529,12 @@ class grouptool {
                                                                               $data->groupingname,
                                                                               true);
                         $preview = $prev;
+                        break;
+                    case GROUPTOOL_FROMTO_GROUPS:
+                        if (!isset($data->groupingname)) {
+                            $data->groupingname = null;
+                        }
+                        list($error, $preview) = $this->create_fromto_groups($data, true);
                         break;
                 }
                 $preview = html_writer::tag('div', $preview, array('class'=>'centered'));

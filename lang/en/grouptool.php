@@ -100,6 +100,7 @@ $string['choose_min_max_text'] = 'You have to choose between {$a->min} and {$a->
 $string['choose_targetgroup'] = 'Import into group';
 $string['chooseactivity'] = 'You have to choose an activity before data can be displayed!';
 $string['create_1_person_groups'] = 'Create 1 person groups';
+$string['create_fromto_groups'] = 'Create groups with numbers from an intervall (i.e. from 34 to 89).';
 $string['createGroups'] = 'Create groups';
 $string['createGroupings'] = 'Create groupings';
 $string['create_groups_confirm'] = 'Continue to create groups as previewed above?';
@@ -126,6 +127,7 @@ $string['define_amount_groups'] = 'define number of groups';
 $string['define_amount_members'] = 'define number of groupmembers';
 $string['delete_reference'] = 'delete from grouptool';
 $string['determinismerror'] = 'The due date can\'t be before the available from date or in the past.';
+$string['digits'] = 'minimum digits';
 $string['disabled'] = 'disabled';
 $string['drag'] = 'move';
 $string['due'] = 'Grouptool due';
@@ -175,6 +177,7 @@ create 1-person-groups - here a group for each chosen user is created. Besides #
 If some data is missing the tag will be replaced by tagnameXX where XX stands for the number of the group.
 </li>
 </ul>';
+$string['groupfromtodigits'] = 'From, To &amp; Digits in Names:';
 $string['groupinfo'] = 'Group information';
 $string['grouping_exists_error_prev'] = 'Can\'t create grouping because there already exists a grouping with this name!';
 $string['grouping_exists_error'] = 'Couldn\'t create grouping because there already exists a grouping with this name!';
