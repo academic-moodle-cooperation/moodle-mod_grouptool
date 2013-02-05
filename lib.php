@@ -218,6 +218,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
 
     //register students if immediate registration has been turned on
     if ($grouptool->immediate_reg) {
+        require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
         $instance = new grouptool($grouptool->coursemodule, $grouptool);
         $instance->push_registrations();
     }
