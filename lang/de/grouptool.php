@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English strings for grouptool
+ * German strings for grouptool
  *
  * @package       mod
  * @subpackage    grouptool
@@ -90,7 +90,7 @@ $string['change_group'] = 'Gruppe wechseln';
 $string['change_group_to'] = 'Soll mit Gruppenwechsel zu {$a->groupname} fortgefahren werden?';
 $string['change_group_to_success'] = 'Gruppenwechsel erfolgreich! {$a->username} ist nun in der Gruppe {$a->groupname} registriert!';
 $string['you_change_group_to_success'] = 'Ihr Gruppenwechsel war erfolgreich! Sie sind nun in der Gruppe {$a->groupname} registriert!';
-$string['checkbox_control_header'] = 'Gruppen/ruppierungen auswählen';
+$string['checkbox_control_header'] = 'Gruppen/Gruppierungen auswählen';
 $string['choose_group'] = 'Sie müssen eine Zielgruppe auswählen!';
 $string['choose_max'] = 'Maximalanzahl zu wählender Gruppen';
 $string['choose_min'] = 'Mindestanzahl zu wählender Gruppen';
