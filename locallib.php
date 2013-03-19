@@ -87,6 +87,7 @@ class view_admin_form extends moodleform {
 
             $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
             $course = $DB->get_record('course', array('id'=>$cm->course));
+			$grouptool = $DB->get_record('grouptool', array('id'=>$cm->instance), '*', MUST_EXIST);
             $context = context_course::instance($cm->course);
 
             if (has_capability('moodle/cohort:view', $context)) {
@@ -168,7 +169,11 @@ class view_admin_form extends moodleform {
                     'lastname'  => get_string('bylastname', 'group'),
                     'idnumber'  => get_string('byidnumber', 'group'));
             $mform->addElement('select', 'allocateby', get_string('allocateby', 'group'), $options);
-            $mform->setDefault('allocateby', 'random');
+			if($grouptool->allow_reg) {
+				$mform->setDefault('allocateby', 'no');
+			} else {
+				$mform->setDefault('allocateby', 'random');
+			}
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setAdvanced('allocateby');
@@ -865,7 +870,11 @@ class grouptool {
                 $new_agrp->group_id = $groupid;
                 $new_agrp->grouptool_id = $this->grouptool->id;
                 $new_agrp->sort_order = 999999;
-                $new_agrp->active = 0;
+				if($this->grouptool->allow_reg == true) {
+					$new_agrp->active = 1;
+				} else {
+					$new_agrp->active = 0;
+				}
                 $attr = array('grouptool_id' => $this->grouptool->id,
                               'group_id'     => $groupid);
                 if (!$DB->record_exists('grouptool_agrps', $attr)) {
@@ -1004,7 +1013,11 @@ class grouptool {
                 $new_agrp->group_id = $groupid;
                 $new_agrp->grouptool_id = $this->grouptool->id;
                 $new_agrp->sort_order = 999999;
-                $new_agrp->active = 0;
+				if($this->grouptool->allow_reg == true) {
+					$new_agrp->active = 1;
+				} else {
+					$new_agrp->active = 0;
+				}
                 $attr = array('grouptool_id' => $this->grouptool->id,
                               'group_id'     => $groupid);
                 if (!$DB->record_exists('grouptool_agrps', $attr)) {
@@ -1026,6 +1039,7 @@ class grouptool {
                     groups_delete_grouping($createdgrouping);
                 }
             } else {
+				$numgrps = $data->to - $data->from + 1;
                 if ($grouping) {
                     add_to_log($this->grouptool->course,
                             'grouptool', 'create groups',
@@ -1033,14 +1047,14 @@ class grouptool {
                             $grouping->id,
                             'create groups in grouping:'.$grouping->name.
                             ' namescheme:'.$data->namingscheme.' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' user/grp:'.$userpergrp);
+                            ' numgroups:'.$numgrps.' from:'.$data->from.' to:'.$data->to);
                 } else {
                     add_to_log($this->grouptool->course,
                             'grouptool', 'create groups',
                             "view.php?id=".$this->grouptool->id."&tab=overview",
                             'create groups namescheme:'.$data->namingscheme.
-                            ' allocate-by:'.$data->allocateby.' numgroups:'.$numgrps.
-                            ' user/grp:'.$userpergrp);
+                            ' allocate-by:'.$data->allocateby.
+                            ' numgroups:'.$numgrps.' from:'.$data->from.' to:'.$data->to);
                 }
             }
         }
@@ -1145,7 +1159,11 @@ class grouptool {
                 $new_agrp->group_id = $groupid;
                 $new_agrp->grouptool_id = $this->grouptool->id;
                 $new_agrp->sort_order = 999999;
-                $new_agrp->active = 0;
+                if($this->grouptool->allow_reg == true) {
+					$new_agrp->active = 1;
+				} else {
+					$new_agrp->active = 0;
+				}
                 if (!$DB->record_exists('grouptool_agrps',
                                         array('grouptool_id' => $this->grouptool->id,
                                               'group_id'     => $groupid))) {
