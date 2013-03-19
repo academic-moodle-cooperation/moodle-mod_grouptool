@@ -3623,7 +3623,7 @@ EOS;
             $unreg = optional_param_array('unreg', null, PARAM_INT);
             if ($unreg != null) {
                 $agrpid = array_keys($unreg);
-                $agrpid = reset();
+                $agrpid = reset($agrpid);
                 $action = 'unreg';
             }
             $resolvequeues = optional_param('resolve_queues', 0, PARAM_BOOL);
