@@ -302,15 +302,14 @@ class mod_grouptool_mod_form extends moodleform_mod {
                 $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_individual',
                                    'notchecked');
             }
+			/*init enhancements JS*/
+			$PAGE->requires->yui_module('moodle-mod_grouptool-enhancements',
+										'M.mod_grouptool.init_enhancements',
+										null);
         } else {
             $mform->addElement('sortlist', 'grouplist', array());
             $mform->setDefault('grouplist', null);
         }
-
-        /*init enhancements JS*/
-        $PAGE->requires->yui_module('moodle-mod_grouptool-enhancements',
-                'M.mod_grouptool.init_enhancements',
-                null);
 
         //-------------------------------------------------------------------------------
         // add standard elements, common to all modules
