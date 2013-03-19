@@ -313,18 +313,18 @@ class view_admin_form extends moodleform {
                 $mform->addElement('sortlist', 'grouplist', $options);
                 $mform->setDefault('grouplist', $groupdata);
                 //add disabledIfs for all Groupsize-Fields
-                $use_size = 1;
+                $use_size = $grouptool->use_size;
                 $mform->addElement('hidden', 'use_size');
                 $mform->setDefault('use_size', $use_size);
-                $use_individual = 1;
+                $use_individual = $grouptool->use_individual;
                 $mform->addElement('hidden', 'use_individual');
                 $mform->setDefault('use_individual', $use_individual);
 
                 foreach ($groupdata as $key => $group) {
                     $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_size',
-                                       'notchecked');
+                                       'eq', 0);
                     $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_individual',
-                                       'notchecked');
+                                       'eq', 0);
                 }
             } else {
                 $mform->addElement('sortlist', 'grouplist', array());
