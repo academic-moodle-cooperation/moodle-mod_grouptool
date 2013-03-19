@@ -176,7 +176,6 @@ class view_admin_form extends moodleform {
 			}
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-            $mform->setAdvanced('allocateby');
 
             $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'grouptool'),
                                array('size'=>'64'));
