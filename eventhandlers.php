@@ -48,6 +48,10 @@ function group_add_member_handler($data) {
     if (! $grouptools = $DB->get_records_sql($sql, $params)) {
         return true;
     }
+	
+	$agrpssql = "SELECT agrps.grouptool_id AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} AS agrps
+    WHERE agrps.group_id = :groupid";
+    $agrp = $DB->get_records_sql($agrpssql, array('groupid' => $data->groupid));
 
     $regsql = "SELECT reg.agrp_id AS id
             FROM {grouptool_agrps} AS agrps
