@@ -609,7 +609,7 @@ class grouptool {
             } else if ($continue instanceof moodle_url) {
                 $continue = new single_button($continue, get_string('continue'), 'post');
             } else {
-                throw new coding_exception('The continue param to $OUTPUT->confirm() must be either a'.
+                throw new coding_exception('The continue param to grouptool::confirm() must be either a'.
                                            ' URL (string/moodle_url) or a single_button instance.');
             }
         }
@@ -622,7 +622,7 @@ class grouptool {
             } else if ($cancel == null) {
                 $cancel = null;
             } else {
-                throw new coding_exception('The cancel param to $OUTPUT->confirm() must be either a'.
+                throw new coding_exception('The cancel param to grouptool::confirm() must be either a'.
                                            ' URL (string/moodle_url), single_button instance or null.');
             }
         }
@@ -1616,12 +1616,12 @@ class grouptool {
                     $text = get_string('create_groups_confirm_problem', 'grouptool');
                     $continue = "view.php?id=$id&tab=administration&confirm=true";
                     $cancel = "view.php?id=$id&tab=administration";
-                    $confirmboxcontent =  $OUTPUT->confirm($text, $continue, $cancel);
+                    $confirmboxcontent =  $this->confirm($text, $continue, $cancel);
                 } else {
                     $text = get_string('create_groups_confirm', 'grouptool');
                     $continue = "view.php?id=$id&tab=administration&confirm=true";
                     $cancel = "view.php?id=$id&tab=administration";
-                    $confirmboxcontent =  $OUTPUT->confirm($text, $continue, $cancel);
+                    $confirmboxcontent =  $this->confirm($text, $continue, $cancel);
                 }
                 echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
                      $OUTPUT->box($preview, 'generalbox').
@@ -1643,7 +1643,11 @@ class grouptool {
                 }
                 $continue = "view.php?id=$id&tab=administration&confirm=1";
                 $cancel = "view.php?id=$id&tab=administration";
-                $confirmboxcontent =  $OUTPUT->confirm($confirmtext, $continue, $cancel);
+                if($error) {
+					$confirmboxcontent = $this->confirm($confirmtext, $cancel);
+				} else {
+					$confirmboxcontent =  $this->confirm($confirmtext, $continue, $cancel);
+				}
                 echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
                      $OUTPUT->box($preview, 'generalbox').
                      $confirmboxcontent;
@@ -2460,10 +2464,10 @@ EOS;
                             'source'=>serialize($source)));
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
-                        echo $preview.$OUTPUT->confirm(get_string('copy_grades_overwrite_confirm',
+                        echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm',
                                                        'grouptool'), $continue, $cancel);
                     } else {
-                        echo $preview.$OUTPUT->confirm(get_string('copy_grades_confirm',
+                        echo $preview.$this->confirm(get_string('copy_grades_confirm',
                                                        'grouptool'), $continue, $cancel);
                     }
                 } else {
@@ -2508,10 +2512,10 @@ EOS;
                             'source'=>serialize($source)));
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
-                        echo $preview.$OUTPUT->confirm(get_string('copy_grades_overwrite_confirm',
+                        echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm',
                                                                   'grouptool'), $continue, $cancel);
                     } else {
-                        echo $preview.$OUTPUT->confirm(get_string('copy_grades_confirm',
+                        echo $preview.$this->confirm(get_string('copy_grades_confirm',
                                                                   'grouptool'), $continue, $cancel);
                     }
                 } else {
