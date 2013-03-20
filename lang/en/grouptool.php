@@ -210,7 +210,7 @@ $string['grouptool:view_registrations'] = 'View who\'s registered/queued in whic
 $string['groupuser_import'] = 'Import Groupusers';
 $string['group_not_in_grouping'] = 'Chosen group is not Member of chosen grouping!';
 $string['group_or_member_count'] = 'Group/Member count';
-$string['grpsizezeroerror'] = 'Groupsize has to be a positive integer (>= 1).';
+$string['grpsizezeroerror'] = 'Groupsize has to be a positive integer (>= 1)';
 $string['ifgroupdeleted'] = 'If groups get deleted';
 $string['ifgroupdeleted_help'] = 'Should deleted groups be recreated for the grouptool-instance or should the references in grouptool (additional group-data, registrations and queue) be deleted?';
 $string['ifmemberadded'] = 'If groupmembers get added';
@@ -293,6 +293,7 @@ $string['queued'] = 'Queued';
 $string['queued_in_group_info'] = '{$a->username} queued in group {$a->groupname}';
 $string['queued_on_rank'] = 'queued on rank #{$a}';
 $string['queues'] = 'Queues';
+$string['queuesizeerror'] = 'Max queue entries have to be a positive integer (>= 1)';
 $string['queues_max'] = 'max simultaneous queue-places';
 $string['queues_max_help'] = 'Limits the maximum simultaneous queue entries for each person in this grouptool.';
 $string['queueing_is'] = 'Queueing is';

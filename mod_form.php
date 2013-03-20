@@ -327,9 +327,15 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['timedue']) && ($data['timedue'] <= $data['timeavailable'])) {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
         }
+		
 		if (!empty($data['use_size']) && ($data['grpsize'] <= 0) && empty($data['use_individual'])) {
 			$errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
 		}
+		
+		if(!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
+			$errors['queues_max'] = get_string('queuesizeerror', 'grouptool');
+		}
+		
 		if(!empty($data['use_size']) && !empty($data['use_individual'])) {
 			foreach($data['grouplist'] as $group_id => $curgroup) {
 				if(clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {

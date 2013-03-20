@@ -210,7 +210,7 @@ $string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe a
 $string['groupuser_import'] = 'Importiere Gruppenmitglieder';
 $string['group_not_in_grouping'] = 'Gewählte Gruppe ist nicht in gewählter Gruppierung!';
 $string['group_or_member_count'] = 'Gruppen- bzw. Mitgliederanzahl';
-$string['grpsizezeroerror'] = 'Gruppengröße muss größer gleich 1 sein (positive Integerzahl).';
+$string['grpsizezeroerror'] = 'Gruppengröße muss größer gleich 1 sein (positive Integerzahl)';
 $string['ifgroupdeleted'] = 'Wenn Kursgruppen gelöscht werden';
 $string['ifgroupdeleted_help'] = 'Sollen gelöschte Kursgruppen für die Gruppenverwaltung wiederhergestellt oder alle Referenzen (aktive Gruppe/Anmeldungen/Warteliste) gelöscht werden?';
 $string['ifmemberadded'] = 'Wenn Mitglieder hinzugefügt werden';
@@ -293,6 +293,7 @@ $string['queued'] = 'in Warteliste';
 $string['queued_in_group_info'] = '{$a->username} in Warteliste von {$a->groupname}';
 $string['queued_on_rank'] = 'in Warteliste auf Platz #{$a}';
 $string['queues'] = 'Wartelisten';
+$string['queuesizeerror'] = 'Maximale Warteplätze müssen ganzzahlig und positive sein (>= 1)';
 $string['queues_max'] = 'max Plätze in Wartelisten';
 $string['queues_max_help'] = 'Begrenzt die gleichzeitig einnehmbaren Plätze in Wartelisten pro Benutzer in diesem Grouptool.';
 $string['queueing_is'] = 'Wartelisten sind';
