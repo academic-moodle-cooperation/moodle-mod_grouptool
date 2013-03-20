@@ -755,7 +755,9 @@ class grouptool {
         global $DB, $PAGE, $USER;
 
         require_capability('mod/grouptool:create_groups', $this->context);
-
+		
+		$names_to_use = array();
+		
         /// Allocate members from the selected role to groups
         $usercnt = count($users);
         switch ($data->allocateby) {
@@ -832,13 +834,14 @@ class grouptool {
 
             foreach ($groups as $group) {
                 $line = array();
-                if (groups_get_group_by_name($this->course->id, $group['name'])) {
+                if (groups_get_group_by_name($this->course->id, $group['name']) || in_array($group['name'], $names_to_use)) {
                     $error = true;
                     $line[] = '<span class="notifyproblem">'.
                               get_string('groupnameexists', 'group', $group['name']).'</span>';
                     $error = get_string('groupnameexists', 'group', $group['name']);
                 } else {
                     $line[] = $group['name'];
+					$names_to_use[] = $group['name'];
                 }
                 if ($data->allocateby != 'no') {
                     $unames = array();
