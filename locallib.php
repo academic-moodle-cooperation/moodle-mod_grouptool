@@ -2694,7 +2694,7 @@ EOS;
      */
     private function get_active_groups($include_regs=false, $include_queues=false, $agrpid=0,
                                        $groupid=0, $groupingid=0, $indexbygroup=true) {
-        global $DB, $PAGE;
+        global $DB, $PAGE, $CFG;
 
         require_capability('mod/grouptool:view_groups', $this->context);
 
