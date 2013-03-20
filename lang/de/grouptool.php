@@ -142,6 +142,7 @@ $string['filters_legend'] = 'Filtere Daten';
 $string['followchanges'] = 'folge Änderungen';
 $string['found_multiple'] = 'Kann Nutzer/in nicht einwandfrei identifizieren, mehrere Treffer:';
 $string['free'] = 'frei';
+$string['fromgttoerror'] = 'Bis-Wert muss größer oder gleich dem Von-Wert sein';
 $string['fullgroup'] = 'Gruppe ist voll';
 $string['general_information'] = 'Allgemeine Informationen';
 $string['global_userstats'] = '{$a->reg_users} von {$a->users} Nutzern sind angemeldet. {$a->notreg_users} (noch) ohne Anmeldung.';
@@ -245,6 +246,7 @@ $string['moodlesync_help'] = 'Wie sich die Gruppenverwaltung verhalten soll, wen
 $string['movedown'] = 'nach unten verschieben';
 $string['moveup'] = 'nach oben verschieben';
 $string['must_specify_groupingname'] = 'Sie müssen einen Namen für die Gruppierung angeben!';
+$string['mustbegt0'] = 'Muss ganzzahlig und größer oder gleich 0 sein (>= 0)';
 $string['mustbegtoeqmin'] = 'Muss größer als das oder gleich dem Minimum sein!';
 $string['mustbeposint'] = 'Muss eine positive ganze Zahl sein (>= 1)';
 $string['mygroups_only_label'] = 'zeige nur Quellen, die ich bewertet habe';

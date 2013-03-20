@@ -142,6 +142,7 @@ $string['filters_legend'] = 'Filter data';
 $string['followchanges'] = 'follow changes';
 $string['found_multiple'] = 'Can\'t identify uniquely, found multiple users:';
 $string['free'] = 'free';
+$string['fromgttoerror'] = 'to-value has to be greater than or equal from-value';
 $string['fullgroup'] = 'Group is full';
 $string['general_information'] = 'General information';
 $string['global_userstats'] = '{$a->reg_users} of {$a->users} users are registered. {$a->notreg_users} still without registration.';
@@ -245,6 +246,7 @@ $string['moodlesync_help'] = 'How grouptools should behave if moodle groupmember
 $string['movedown'] = 'move 1 down';
 $string['moveup'] = 'move 1 up';
 $string['must_specify_groupingname'] = 'You have to provide a name for the grouping!';
+$string['mustbegt0'] = 'Must be an integer greater than or equal 0 (>= 0)';
 $string['mustbegtoeqmin'] = 'Has to be greater than or equal the minimum';
 $string['mustbeposint'] = 'Has to be a positive Integer (>= 1).';
 $string['mygroups_only_label'] = 'show only sources entries I graded';

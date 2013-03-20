@@ -360,6 +360,42 @@ class view_admin_form extends moodleform {
 			&& (($data['mode'] == GROUPTOOL_GROUPS_AMOUNT) || ($data['mode'] == GROUPTOOL_MEMBERS_AMOUNT))) {
 			$errors['amount'] = get_string('amounterror', 'grouptool');
 		}
+		if(!empty($data['createGroups'])
+			&& ($data['mode'] == GROUPTOOL_FROMTO_GROUPS)) {
+			if($data['from'] > $data['to']) {
+				$errors['fromto'] = get_string('fromgttoerror', 'grouptool');
+			}
+			if($data['from'] < 0) {
+				if(isset($errors['fromto'])) {
+					$errors['fromto'] .= html_writer::empty_tag('br').
+										 get_string('from').': '.
+										 get_string('mustbegt0', 'grouptool');
+				} else {
+					$errors['fromto'] = get_string('from').': '.
+										get_string('mustbegt0', 'grouptool');
+				}
+			}
+			if($data['to'] < 0) {
+				if(isset($errors['fromto'])) {
+					$errors['fromto'] .= html_writer::empty_tag('br').
+										 get_string('to').': '.
+										 get_string('mustbegt0', 'grouptool');
+				} else {
+					$errors['fromto'] = get_string('to').': '.
+										get_string('mustbegt0', 'grouptool');
+				}
+			}
+			if($data['digits'] < 0) {
+				if(isset($errors['fromto'])) {
+					$errors['fromto'] .= html_writer::empty_tag('br').
+										 get_string('digits', 'grouptool').': '.
+										 get_string('mustbegt0', 'grouptool');
+				} else {
+					$errors['fromto'] = get_string('digits', 'grouptool').': '.
+										get_string('mustbegt0', 'grouptool');
+				}
+			}
+		}
 		if(!empty($data['saveagrps'])
 		   && (!empty($data['use_size']) && !empty($data['use_individual']))) {
 			foreach($data['grouplist'] as $group_id => $curgroup) {
