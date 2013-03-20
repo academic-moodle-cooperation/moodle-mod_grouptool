@@ -348,6 +348,22 @@ class mod_grouptool_mod_form extends moodleform_mod {
 			}
 		}
 		
+		if(!empty($data['allow_multiple']) && ($data['choose_min'] <= 0)) {
+			$errors['choose_min'] = get_string('mustbeposint', 'grouptool');
+		}
+		
+		if(!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {
+			$errors['choose_max'] = get_string('mustbeposint', 'grouptool');
+		}
+		
+		if(!empty($data['allow_multiple']) && ($data['choose_min'] > $data['choose_max'])) {
+			if(isset($errors['choose_max'])) {
+				$errors['choose_max'] .= html_writer::empty_tag('br').get_string('mustbegtoeqmin', 'grouptool');
+			} else {
+				$errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
+			}
+		}
+		
         return array_merge($parent_errors, $errors);
     }
 }

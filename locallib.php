@@ -138,6 +138,7 @@ class view_admin_form extends moodleform {
                                array('size'=>'4'));
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+			$mform->setType('amount', PARAM_INT);
             $mform->setDefault('amount', 2);
             
             $fromto = array();
@@ -354,6 +355,11 @@ class view_admin_form extends moodleform {
                  && (empty($data['groupingname']) || $data['groupingname'] == "")) {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
+		if (!empty($data['createGroups'])
+			&& ($data['amount'] <= 0)
+			&& (($data['mode'] == GROUPTOOL_GROUPS_AMOUNT) || ($data['mode'] == GROUPTOOL_MEMBERS_AMOUNT))) {
+			$errors['amount'] = get_string('amounterror', 'grouptool');
+		}
 		if(!empty($data['saveagrps'])
 		   && (!empty($data['use_size']) && !empty($data['use_individual']))) {
 			foreach($data['grouplist'] as $group_id => $curgroup) {

@@ -245,6 +245,8 @@ $string['moodlesync_help'] = 'Wie sich die Gruppenverwaltung verhalten soll, wen
 $string['movedown'] = 'nach unten verschieben';
 $string['moveup'] = 'nach oben verschieben';
 $string['must_specify_groupingname'] = 'Sie müssen einen Namen für die Gruppierung angeben!';
+$string['mustbegtoeqmin'] = 'Muss größer als das oder gleich dem Minimum sein!';
+$string['mustbeposint'] = 'Muss eine positive ganze Zahl sein (>= 1)';
 $string['mygroups_only_label'] = 'zeige nur Quellen, die ich bewertet habe';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>

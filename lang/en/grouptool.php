@@ -245,6 +245,8 @@ $string['moodlesync_help'] = 'How grouptools should behave if moodle groupmember
 $string['movedown'] = 'move 1 down';
 $string['moveup'] = 'move 1 up';
 $string['must_specify_groupingname'] = 'You have to provide a name for the grouping!';
+$string['mustbegtoeqmin'] = 'Has to be greater than or equal the minimum';
+$string['mustbeposint'] = 'Has to be a positive Integer (>= 1).';
 $string['mygroups_only_label'] = 'show only sources entries I graded';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>
