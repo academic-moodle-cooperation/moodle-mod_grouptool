@@ -354,6 +354,18 @@ class view_admin_form extends moodleform {
                  && (empty($data['groupingname']) || $data['groupingname'] == "")) {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
+		if(!empty($data['saveagrps'])
+		   && (!empty($data['use_size']) && !empty($data['use_individual']))) {
+			foreach($data['grouplist'] as $group_id => $curgroup) {
+				if(clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {
+					if(!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
+						$errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
+					} else {
+						$errors['grouplist'] .= ', '.$curgroup['name'];
+					}
+				}
+			}
+		}
         return array_merge($parent_errors, $errors);
     }
 }

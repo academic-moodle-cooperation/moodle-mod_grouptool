@@ -210,6 +210,7 @@ $string['grouptool:view_registrations'] = 'View who\'s registered/queued in whic
 $string['groupuser_import'] = 'Import Groupusers';
 $string['group_not_in_grouping'] = 'Chosen group is not Member of chosen grouping!';
 $string['group_or_member_count'] = 'Group/Member count';
+$string['grpsizezeroerror'] = 'Groupsize has to be a positive integer (>= 1).';
 $string['ifgroupdeleted'] = 'If groups get deleted';
 $string['ifgroupdeleted_help'] = 'Should deleted groups be recreated for the grouptool-instance or should the references in grouptool (additional group-data, registrations and queue) be deleted?';
 $string['ifmemberadded'] = 'If groupmembers get added';

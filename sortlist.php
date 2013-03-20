@@ -298,9 +298,9 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         $this->_refresh_element_order();
         $this->_refresh_active_state();
         if (!$sorted) {
-            return $this->_value;
+            return $this->_clean_addfields($this->_value);
         }
-        $elementdata = $this->_value;
+        $elementdata = $this->_clean_addfields($this->_value);
         uasort($elementdata, array(&$this, "cmp"));
         return $elementdata;
     } // end func getValue
@@ -557,6 +557,24 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         }
     } //end func _findValue
 
+	private function _clean_addfields($data) {
+		if(!is_array($data)) {
+			return $data;
+		}
+		
+		foreach($data as $id => $group) {
+			foreach($this->_options['add_fields'] as $key => $fielddata) {
+				if(empty($fielddata->param_type)) {
+					$fielddata->param_type = PARAM_TEXT;
+				}
+				if(isset($data[$id][$fielddata->name])) {
+					$data[$id][$fielddata->name] = clean_param($group[$fielddata->name], $fielddata->param_type);
+				}
+			}
+		}
+		return $data;
+	}
+	
     // }}}
     // {{{ onQuickFormEvent()
 
@@ -583,9 +601,9 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
             case 'updateValue':
                 // constant values override both default and submitted ones
                 // default values are overriden by submitted
-                $value = $this->_findValue($caller->_constantValues);
+                $value = $this->_clean_addfields($this->_findValue($caller->_constantValues));
                 if (null === $value) {
-                    $value = $this->_findValue($caller->_submitValues);
+                    $value = $this->_clean_addfields($this->_findValue($caller->_submitValues));
                     // let the form-handling-php belief there was no submission
                     // if it was just a moveup/movedown submit
                     if (optional_param_array('moveup', 0, PARAM_INT)
@@ -599,7 +617,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                         $caller->_flagSubmitted = false;
                     }
                     if (null === $value) {
-                        $value = $this->_findValue($caller->_defaultValues);
+                        $value = $this->_clean_addfields($this->_findValue($caller->_defaultValues));
                     }
                 }
                 if (null !== $value) {
@@ -623,7 +641,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return void
      */
     public function accept(&$renderer, $required=false, $error=null) {
-        $renderer->_templates[$this->getName()] = '{element}';
+        $renderer->_templates[$this->getName()] = '<div class="qfelement<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div>';
         $renderer->renderElement($this, $required, $error);
     } // end func accept
 
@@ -666,6 +684,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         if (null === $value) {
             $value = $this->getValue();
         }
+		$value = $this->_clean_addfields($value);
         return $this->_prepareValue($value, $assoc);
     }
 

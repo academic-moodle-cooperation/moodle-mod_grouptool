@@ -291,6 +291,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $options['add_fields']['grpsize']->label = get_string('groupsize', 'grouptool');
             $options['add_fields']['grpsize']->type = 'text';
             $options['add_fields']['grpsize']->attr = array('size' => '3');
+			$options['add_fields']['grpsize']->param_type = PARAM_INT;
             $options['all_string'] = get_string('all').' '.get_string('groups');
             $mform->addElement('sortlist', 'grouplist', $options);
             $mform->setDefault('grouplist', $groupdata);
@@ -301,6 +302,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
                                    'notchecked');
                 $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_individual',
                                    'notchecked');
+				$mform->setType('grouplist['.$group['id'].'][grpsize]', PARAM_INT);
             }
 			/*init enhancements JS*/
 			$PAGE->requires->yui_module('moodle-mod_grouptool-enhancements',
@@ -325,6 +327,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['timedue']) && ($data['timedue'] <= $data['timeavailable'])) {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
         }
+		if (!empty($data['use_size']) && ($data['grpsize'] <= 0) && empty($data['use_individual'])) {
+			$errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
+		}
+		if(!empty($data['use_size']) && !empty($data['use_individual'])) {
+			foreach($data['grouplist'] as $group_id => $curgroup) {
+				if(clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {
+					if(!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
+						$errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
+					} else {
+						$errors['grouplist'] .= ', '.$curgroup['name'];
+					}
+				}
+			}
+		}
+		
         return array_merge($parent_errors, $errors);
     }
 }
