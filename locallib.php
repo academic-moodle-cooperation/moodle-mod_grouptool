@@ -1910,12 +1910,12 @@ EOS;
                     'grade',
                     'feedback',
                     'copybutton');
-            $tableheaders = array('',
+            $tableheaders = array(get_string('target', 'grouptool'),
                     get_string('fullname'),
                     get_string('idnumber'),
                     get_string('grade'),
                     get_string('feedback'),
-                    get_string('copygrade', 'grouptool'));
+                    get_string('source', 'grouptool'));
 
             $groupmembers = groups_get_members($filter);
             //get grading info for all groupmembers
