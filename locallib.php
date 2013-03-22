@@ -2290,13 +2290,13 @@ EOS;
                 $group_rows[0]->cells[0]->rowspan = count($group_rows);
                 $previewtable->data = $group_rows;
             } else {
-                $info .= $nameinfo.html_writer::end_tag('div').
+                $info .= $nameinfo.html_writer::end_tag('div');
                 $details = array('student' => fullname($sourceuser),
                                  'teacher' => fullname($orig_teacher),
                                  'date' => userdate($source_grade->get_dategraded(),
                                                     get_string('strftimedatetimeshort')),
                                  'feedback' => $source_grade->feedback);
-                html_writer::tag('div', get_string('grade').": ".
+                $info .= html_writer::tag('div', get_string('grade').": ".
                                         $formatted_grade.html_writer::empty_tag('br').
                                         format_text(get_string('copied_grade_feedback', 'grouptool',
                                                                $details),
