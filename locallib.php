@@ -1827,7 +1827,9 @@ EOS;
 
                 $user_with_grades = array();
                 foreach ($groupmembers as $key => $groupmember) {
-                    if (!empty($grading_info->items[0]->grades[$groupmember->id]->dategraded)) {
+                    if (!empty($grading_info->items[0]->grades[$groupmember->id]->dategraded)
+						&& (!$mygroups_only
+							|| $grading_info->items[0]->grades[$groupmember->id]->usermodified == $USER->id)) {
                         $user_with_grades[] = $key;
                     }
                 }
@@ -1980,8 +1982,14 @@ EOS;
                 return $OUTPUT->box($OUTPUT->notification(get_string('no_data_to_display',
                                                                      'grouptool'), 'notifyproblem'),
                                     'generalbox centered');
-            } else {
+            } else if ($filter == GROUPTOOL_FILTER_NONCONFLICTING) {
                 return $OUTPUT->box($OUTPUT->notification(get_string('no_conflictfree_to_display',
+                                                                     'grouptool'), 'notifyproblem'),
+                                    'centered').
+                $this->get_grading_table($activity, $mygroups_only, $incomplete_only,
+                                         GROUPTOOL_FILTER_ALL, $selected, $missingsource);
+            } else {
+                return $OUTPUT->box($OUTPUT->notification(get_string('no_groupmembers_to_display',
                                                                      'grouptool'), 'notifyproblem'),
                                     'centered').
                 $this->get_grading_table($activity, $mygroups_only, $incomplete_only,
@@ -2329,7 +2337,7 @@ EOS;
      * @global object $USER
      */
     public function view_grading() {
-        global $SESSION, $PAGE, $CFG, $OUTPUT, $USER;
+        global $SESSION, $PAGE, $CFG, $OUTPUT, $USER, $DB;
 
         if (!has_capability('mod/grouptool:grade', $this->context)
                 && !has_capability('mod/groputool:grade_own_groups', $this->context)) {
@@ -2653,7 +2661,11 @@ EOS;
                              "0"  => get_string('all'));
             $groups = groups_get_all_groups($this->course->id, null, null, 'id, name');
             foreach ($groups as $key => $group) {
-                $options[$key] = $group->name;
+				$membercount = $DB->count_records('groups_members', array('groupid'=>$group->id));
+				if($membercount == 0) {
+					continue;
+				}
+                $options[$key] = $group->name.' ('.$membercount.')';
             }
 
             $filter_element = html_writer::select($options, 'filter', $filter, false);
@@ -5493,6 +5505,16 @@ EOS;
         }
 
         if (!empty($agrpsql)) {
+			if(key_exists("regs", $orderby)) {
+				$reg_order = "ORDER BY grps.name ".($orderby['regs'] ? 'ASC' : 'DESC');
+			} else {
+				$reg_order = "";
+			}
+			if(key_exists("queues", $orderby)) {
+				$queue_order = "ORDER BY grps.name ".($orderby['queues'] ? 'ASC' : 'DESC');
+			} else {
+				$queue_order = "";
+			}
             $sqljoin = " LEFT JOIN {grouptool_registered} AS reg ON u.id = reg.user_id
                                                                  AND reg.agrp_id ".$agrpsql.
                        " LEFT JOIN {grouptool_queued} AS queue ON u.id = queue.user_id
