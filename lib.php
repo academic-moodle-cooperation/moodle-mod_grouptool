@@ -832,7 +832,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
             $attrib = array('title'=>$strgrouptool, 'href'=>$CFG->wwwroot.
                                                             '/mod/grouptool/view.php?id='.
                                                             $grouptool->coursemodule);
-            if ($grouptool->visible) {
+            if (!$grouptool->visible
+				|| (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
                 $attrib['class']='dimmed';
             }
             list($colorclass, $nused) = grouptool_display_lateness(time(), $grouptool->timedue);
