@@ -836,7 +836,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
 				|| (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
                 $attrib['class']='dimmed';
             }
-            list($colorclass, $nused) = grouptool_display_lateness(time(), $grouptool->timedue);
+            list($cc, $nused) = grouptool_display_lateness(time(), $grouptool->timedue);
             $str .= html_writer::tag('div', $strgrouptool.': '.
                     html_writer::tag('a', $grouptool->name, $attrib),
                     array('class'=>'name'));
@@ -847,7 +847,6 @@ function grouptool_print_overview($courses, &$htmlarray) {
                                                 html_writer::tag('span', userdate($ta)), $attr);
             }
             if ($grouptool->timedue) {
-                $cc = $colorclass;
                 $str .= html_writer::tag('div', $strduedate.': '.
                                                 html_writer::tag('span',
                                                                  userdate($grouptool->timedue),
@@ -892,8 +891,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                         }
                         $details .= html_writer::tag('div',
                                 html_writer::tag('div',
-                                        get_string($string_label, 'grouptool', $missing),
-                                        array('class'=>$colorclass)).' '.
+                                        get_string($string_label, 'grouptool', $missing)).' '.
                                 get_string('registrations', 'grouptool').': '.$temp_str,
                                 array('class'=>'registered'));
                     } else {
@@ -912,8 +910,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                     }
                     $details .= html_writer::tag('div',
                             html_writer::tag('div',
-                                    get_string($string_label, 'grouptool', $missing),
-                                    array('class'=>$colorclass)).
+                                    get_string($string_label, 'grouptool', $missing)).
                             get_string('registrations', 'grouptool').': '.
                             get_string('not_registered', 'grouptool'),
                             array('class'=>'registered'));
