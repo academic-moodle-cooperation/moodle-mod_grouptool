@@ -244,7 +244,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
     if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'grouptool',
                                    'instance'=>$grouptool->id, 'eventtype'=>'availablefrom'))) {
         $calendarevent = calendar_event::load($event->id);
-        $calendarevent->update($event);
+        $calendarevent->update($event, false);
     } else {
         $event->courseid     = $grouptool->course;
         $event->groupid      = 0;
@@ -262,6 +262,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
 
     if (($grouptool->timedue != 0)) {
         unset($event->id);
+		unset($calendarevent);
         if ($grouptool->allow_reg) {
             $event->name = get_string('registration_period_end', 'grouptool').' '.$grouptool->name;
         } else {
@@ -277,7 +278,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
                                         'instance'=>$grouptool->id, 'eventtype'=>'due'))) {
 
             $calendarevent = calendar_event::load($event->id);
-            $calendarevent->update($event);
+            $calendarevent->update($event, false);
         } else {
             calendar_event::create($event);
         }
