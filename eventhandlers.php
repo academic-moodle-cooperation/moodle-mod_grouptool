@@ -88,7 +88,9 @@ function group_add_member_handler($data) {
 function group_remove_member_handler($data) {
     global $DB;
 
-    $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course
+    $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
+							{grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allow_multiple,
+							{grouptool}.choose_max
             FROM {grouptool}
                 RIGHT JOIN {grouptool_agrps} AS agrp ON agrp.grouptool_id = {grouptool}.id
             WHERE agrp.group_id = ?";
@@ -112,6 +114,43 @@ function group_remove_member_handler($data) {
                               'userid'      => $data->userid,
                               'groupid'     => $data->groupid))) {
                     $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
+					
+					//get next queued user and put him in the group (and delete queue entry
+                    if (!empty($grouptool->use_queue)) {
+                        $sql = "SELECT *
+                        FROM {grouptool_queued}
+                        WHERE agrp_id = ?
+                        ORDER BY timestamp ASC
+                        LIMIT 1";
+                        $record = $DB->get_record_sql($sql, array($agrp[$grouptool->id]->id));
+                        $new_record = clone $record;
+                        unset($new_record->id);
+                        $new_record->modified_by = $new_record->user_id;
+                        $DB->insert_record('grouptool_registered', $new_record);
+                        if (!empty($grouptool->immediate_reg)) {
+                            groups_add_member($data->groupid, $new_record->user_id);
+                        }
+                        $allow_m = $grouptool->allow_multiple;
+						$agrps = $DB->get_fieldset_sql("SELECT id
+														FROM {grouptool_agrps} as agrps
+														WHERE agrps.grouptool_id = :grptlid",
+														array('grptlid' => $grouptool->id));
+						list($sql, $params) = $DB->get_in_or_equal($agrps);
+						$usrregcnt = $DB->count_records_select('grouptool_registered',
+															   ' user_id = ?
+																AND agrp_id '.$sql,
+															   array_merge(array($new_record->user_id), $params));
+                        $max = $grouptool->choose_max;
+                        if (($allow_m && ($usrregcnt >= $max)) || !$allow_m) {
+                            $DB->delete_records_select('grouptool_queued',
+                                                       ' user_id = ? AND agrp_id '.$sql,
+                                                       array_merge(array($new_record->user_id),
+                                                                   $params));
+                        } else {
+							$DB->delete_records('grouptool_queued', array('user_id' => $new_record->user_id,
+																		 'agrp_id' => $agrp[$grouptool->id]->id));
+						}
+					}
                     add_to_log($grouptool->course,
                             'grouptool', 'unregister',
                             "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->groupid,
