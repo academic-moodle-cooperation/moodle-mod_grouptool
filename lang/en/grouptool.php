@@ -26,16 +26,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['active'] = 'active';
+$string['active'] = 'Active';
 $string['add_member'] = 'Add {$a->fullname} to group {$a->group}';
 $string['added_member'] = 'Added {$a->fullname} to group {$a->group}';
 $string['administration'] = 'Administration';
-$string['administration_alt'] = 'Group(ing) creation, and settings for active Groups of this instance';
+$string['administration_alt'] = 'Group(ing) creation, and settings for active groups of this instance';
 $string['agroups'] = 'Active groups';
 $string['all_groups_full'] = 'User with ID {$a} could not be registered in any group because all groups are full!';
 $string['allowed'] = 'Allowed';
 $string['allow_multiple'] = 'Multiple registrations';
-$string['allow_multiple_help'] = 'Enable students to register in more than 1 group at the same time. You have to specify how many groups they have to choose at least (= Min groups to choose) and how many groups they are allowed to choose maximum (= Max groups to choose).';
+$string['allow_multiple_help'] = 'Enable students to register in more than 1 group at the same time. You have to specify how many groups they have to choose at least (= min groups to choose) and how many groups they are allowed to choose maximum (= max groups to choose).';
 $string['allow_reg'] = 'Enable selfregistration';
 $string['allow_reg_help'] = 'Enable selfregistration for students so they can register themselves in the active groups, which are chosen below.';
 $string['allow_unreg'] = 'Allow unregistration';
@@ -45,7 +45,7 @@ $string['already_queued'] = '{$a->username} is already queued in group {$a->grou
 $string['already_registered'] = '{$a->username} is already registered in group {$a->groupname}!';
 $string['you_are_already_queued'] = 'You are already queued in group {$a->groupname}!';
 $string['you_are_already_registered'] = 'You are already registered in group {$a->groupname}!';
-$string['asterisk_marks_moodle_registrations'] = 'Users with leading asterisk (*) are already registered respective in Moodle-Group';
+$string['asterisk_marks_moodle_registrations'] = 'Users with leading asterisk (*) are already registered in the respective Moodle-Group';
 $string['availabledate'] = 'Available from';
 $string['cant_enrol'] = 'Can\'t enrol user automatically in course.';
 $string['cfg_admin_head'] = 'Default settings in view administration';
@@ -72,7 +72,7 @@ $string['cfg_ifmemberremoved'] = 'If groupmembers are removed';
 $string['cfg_ifmemberremoved_desc'] = 'Should grouptool registrations be deleted if users are deleted from the corresponding moodle-group?';
 $string['cfg_immediate_reg'] = 'Immediate registration';
 $string['cfg_immediate_reg_desc'] = 'Should every registration be passed through to the moodle-groups?';
-$string['cfg_max_queues'] = 'Max simultaneous queued';
+$string['cfg_max_queues'] = 'Max simultaneous queues per user';
 $string['cfg_max_queues_desc'] = 'Determines in how many different groups a user can be queued at the same time by default.';
 $string['cfg_moodlesync_head'] = 'Syncronisation behaviour';
 $string['cfg_moodlesync_head_info'] = 'How grouptools should behave if moodle groupmembers are added/deleted or single groups are deleted';
@@ -112,9 +112,9 @@ $string['copied_grade_feedback'] = 'Groupgrading<br />
 +Graded by: {$a->teacher}<br />
 +Original Date/Time: {$a->date}<br />
 <div class="indent">{$a->feedback}</div>';
-$string['copy'] = 'copy';
-$string['copy_chosen'] = 'copy chosen';
-$string['copygrade'] = 'copy grade';
+$string['copy'] = 'Copy';
+$string['copy_chosen'] = 'Copy chosen';
+$string['copygrade'] = 'Copy grade';
 $string['copy_refgrades_feedback'] = 'Copy reference grades and feedback for selected groups other group members';
 $string['copy_grade_confirm'] = 'Continue copying this grade?';
 $string['copy_grade_overwrite_confirm'] = 'Continue copying this grade? Existing previous grades will be overwritten!';
@@ -123,13 +123,13 @@ $string['copy_grades_overwrite_confirm'] = 'Continue copying these grades? Exist
 $string['copy_grades_success'] = 'The following grades where successfully updated:';
 $string['copy_grades_errors'] = 'At least 1 error occured during copying of grades:';
 $string['could_not_add'] = 'Could not add {$a->fullname} to group {$a->group}';
-$string['define_amount_groups'] = 'define number of groups';
-$string['define_amount_members'] = 'define number of groupmembers';
-$string['delete_reference'] = 'delete from grouptool';
+$string['define_amount_groups'] = 'Define number of groups';
+$string['define_amount_members'] = 'Define number of groupmembers';
+$string['delete_reference'] = 'Delete from grouptool';
 $string['determinismerror'] = 'The due date can\'t be before the available from date or in the past.';
-$string['digits'] = 'minimum digits';
-$string['disabled'] = 'disabled';
-$string['drag'] = 'move';
+$string['digits'] = 'Minimum digits';
+$string['disabled'] = 'Disabled';
+$string['drag'] = 'Move';
 $string['due'] = 'Grouptool due';
 $string['duedate'] = 'Due date';
 $string['duedateno'] = 'No due date';
@@ -137,38 +137,38 @@ $string['early'] = '{$a} early';
 $string['error_getting_data'] = 'Error while getting groupdata! Either none or more than 1 group where returned!';
 $string['userlist'] = 'Userlist';
 $string['userlist_alt'] = 'View list of users and their registrations. Export data about users and their groups in different formats (PDF, plain text, Excel, etc.).';
-$string['feedbackplural'] = 'feedbacks';
+$string['feedbackplural'] = 'Deedbacks';
 $string['filters_legend'] = 'Filter data';
-$string['followchanges'] = 'follow changes';
+$string['followchanges'] = 'Dollow changes';
 $string['found_multiple'] = 'Can\'t identify uniquely, found multiple users:';
-$string['free'] = 'free';
-$string['fromgttoerror'] = 'to-value has to be greater than or equal from-value';
+$string['free'] = 'Free';
+$string['fromgttoerror'] = 'To-value has to be greater than or equal from-value';
 $string['fullgroup'] = 'Group is full';
 $string['general_information'] = 'General information';
 $string['global_userstats'] = '{$a->reg_users} of {$a->users} users are registered. {$a->notreg_users} still without registration.';
 $string['grading'] = 'Grading';
 $string['grading_activity_title'] = 'Activity';
-$string['grading_alt'] = 'Tools for copying grades from 1 groupmember to all others in the group, either for 1 group or for all groups.';
-$string['grading_filter_select_title'] = 'Group or Groups';
+$string['grading_alt'] = 'Tools for copying grades from 1 groupmember to all others in the group, either for 1 group or for a set of groups.';
+$string['grading_filter_select_title'] = 'Group or groups';
 $string['grading_filter_select_title_help'] = 'Choose which group or groups to use:<ul><li>without conflicts - all groups, in which only 1 groupmember got graded for the chosen activity</li><li>all - all groups</li><li>"groupname" - only the specifically selected group</li></ul>';
-$string['grading_grouping_select_title'] = 'Filter Grouping';
+$string['grading_grouping_select_title'] = 'Filter grouping';
 $string['group_assign_error_prev'] = 'Can\'t assign group!';
 $string['group_assign_error'] = 'Couldn\'t assign group!';
 $string['groupcreation'] = 'Group creation';
 $string['groupcreationmode'] = 'Mode';
 $string['groupcreationmode_help'] = 'Choose how groups should be created:<br />
 <ul>
-<li>define number of groups - You choose users from which role to use for group creation and enter the desired amount of groups in Group/Member count textfield. In name scheme you can enter a name scheme for the groups using
+<li>Define number of groups - You choose users from which role to use for group creation and enter the desired amount of groups in Group/Member count textfield. In name scheme you can enter a name scheme for the groups using
 <ul>
 <li># (will be replaced with the group-number) and</li>
 <li>@ (will be replaced with a letter-representation of the groupnumber)</li>
 </ul>
 Then the chosen users get spread on the desired amount of groups.</li>
 <li>
-define number of groupmembers - Here you tell the grouptool how many members each group should ideally have. The needed amount of groups will be calculated automatically. If you check prevent last small group the users in this group get spread on the others if the last groups fill-ratio lies under 70%.
+Define number of groupmembers - Here you tell the grouptool how many members each group should ideally have. The needed amount of groups will be calculated automatically. If you check prevent last small group the users in this group get spread on the others if the last groups fill-ratio lies under 70%.
 </li>
 <li>
-create 1-person-groups - here a group for each chosen user is created. Besides # and @ you can use the following tags which will be replaced with the users data:
+Create 1-person-groups - here a group for each chosen user is created. Besides # and @ you can use the following tags which will be replaced with the users data:
 <ul>
 <li>[username] - the user\'s username</li>
 <li>[firstname] - the user\'s first name</li>
@@ -177,8 +177,11 @@ create 1-person-groups - here a group for each chosen user is created. Besides #
 </ul>
 If some data is missing the tag will be replaced by tagnameXX where XX stands for the number of the group.
 </li>
+<li>
+Create groups with numbers from an intervall (i.e. from 34 to 89) - use this mode to create (missing) groups (i.e. Group 4, Group 5, Group 6). Just insert limits and how many digits you wish to use at least for the names (i.e. 1, 01, 001, 0001...).
+</li>
 </ul>';
-$string['groupfromtodigits'] = 'From, To &amp; Digits in Names:';
+$string['groupfromtodigits'] = 'From, to &amp; digits in groupnames:';
 $string['groupinfo'] = 'Group information';
 $string['grouping_exists_error_prev'] = 'Can\'t create grouping because there already exists a grouping with this name!';
 $string['grouping_exists_error'] = 'Couldn\'t create grouping because there already exists a grouping with this name!';
@@ -192,7 +195,7 @@ $string['group_places_help'] = 'The field ‘group place’ informs (separated b
 $string['groupoverview'] = 'Group overview';
 $string['groupselection'] = 'Group selection';
 $string['groupselection_help'] = 'Choose the groups/persons for which you wish to copy the chosen reference-grade and -feedback by activating the corresponding checkboxes. If only 1 group is displayed you select the source for copying chosen grade by using the corresponding button right of the entry.';
-$string['groupsize'] = 'groupsize';
+$string['groupsize'] = 'Groupsize';
 $string['grouptool'] = 'Grouptool';
 $string['grouptoolfieldset'] = 'Instance settings';
 $string['grouptoolname'] = 'Grouptool Name';
@@ -208,8 +211,8 @@ $string['grouptool:register_students'] = 'Register students in an active group u
 $string['grouptool:view_description'] = 'View grouptools description';
 $string['grouptool:view_groups'] = 'View active groups';
 $string['grouptool:view_registrations'] = 'View who\'s registered/queued in which active group using grouptool';
-$string['groupuser_import'] = 'Import Groupusers';
-$string['group_not_in_grouping'] = 'Chosen group is not Member of chosen grouping!';
+$string['groupuser_import'] = 'Import groupusers';
+$string['group_not_in_grouping'] = 'Chosen group is not member of chosen grouping!';
 $string['group_or_member_count'] = 'Group/Member count';
 $string['grpsizezeroerror'] = 'Groupsize has to be a positive integer (>= 1)';
 $string['ifgroupdeleted'] = 'If groups get deleted';
@@ -218,38 +221,38 @@ $string['ifmemberadded'] = 'If groupmembers get added';
 $string['ifmemberadded_help'] = 'Should new groupmembers added via moodle be also registered in grouptool or be ignored?';
 $string['ifmemberremoved'] = 'If groupmembers get removed';
 $string['ifmemberremoved_help'] = 'Should grouptool registrations be deleted if users are deleted from the corresponding moodle-group';
-$string['ignorechanges'] = 'ignore changes';
+$string['ignorechanges'] = 'Ignore changes';
 $string['ignored_not_found_users'] = 'At least one user could not be added to the group!';
 $string['ignoring_not_found_users'] = 'At least one user has not been found in database. All those users will be ignored!';
-$string['immediate_reg'] = 'immediate Registrations';
+$string['immediate_reg'] = 'Immediate registrations';
 $string['immediate_reg_help'] = 'If enabled the (un)registrations will be forwarded to the moodle-system. If not enabled the registrations get cached in grouptool and can be pushed to the moodle-system by the teacher.';
 $string['import'] = 'Import';
 $string['importbutton'] = 'Import users';
-$string['import_desc'] = 'Import users via List of Id-Numbers into certain groups';
+$string['import_desc'] = 'Import users via list of ID-numbers into certain groups';
 $string['import_user'] = 'Import {$a->fullname} ({$a->idnumber}) in group {$a->groupname} succeeded.';
 $string['import_user_prev'] = 'Import {$a->fullname} ({$a->idnumber}) in group {$a->groupname}.';
 $string['import_user_problem'] = 'Problem during import of {$a->fullname}({$a->idnumber} - {$a->id}) in group {$a->groupname}.';
-$string['incomplete_only_label'] = 'show only groups with missing grades';
+$string['incomplete_only_label'] = 'Show only groups with missing grades';
 $string['intro'] = 'Description';
 $string['landscape'] = 'Landscape';
 $string['late'] = '{$a} late';
-$string['maxmembers'] = 'global groupsize';
+$string['maxmembers'] = 'Global groupsize';
 $string['max_queues_reached'] = 'Maximum queues reached!';
 $string['max_regs_reached'] = 'Maximum registrations reached!';
 $string['messageprovider:grouptool_moveupreg'] = 'Registration by moving up the queue';
 $string['missing_source_selection'] = 'No source selected!';
 $string['modulename'] = 'Grouptool';
 $string['modulenameplural'] = 'Grouptools';
-$string['modulename_help'] = 'The grouptool-module serves different kind of group-related tasks:<ul><li>It allows to create groups in different modes (amount of groups/groupmembers, single-person-groups) as well as groupings for each group.</li><li>Furthermore it can be used to give students the possibility to register themselves to certain groups during a defined period.</li><li>The module also has the ability of group-grading - i.e. copying activity grades from 1 groupmember to other groupmembers.</li><li>Import of users into groups via list of idnumbers</li><li>overview over every coursegroup including all registrations, members, queues, etc. And the ability to export this data into different files-formats (PDF/XLS/ODS/TXT).</li><li>Exportable list of all course-users including their registrations, queues, etc.</li></ul>';
+$string['modulename_help'] = 'The grouptool-module serves different kind of group-related tasks:<ul><li>It allows to create groups in different modes (amount of groups/groupmembers, single-person-groups, interval of groups) as well as groupings for each group.</li><li>Furthermore it can be used to give students the possibility to register themselves to certain groups during a defined period.</li><li>The module also has the ability of group-grading - i.e. copying activity grades from 1 groupmember to other groupmembers.</li><li>Import of users into groups via list of ID-numbers</li><li>overview over every coursegroup including all registrations, members, queues, etc. And the ability to export this data into different files-formats (PDF/XLS/ODS/TXT).</li><li>Exportable list of all course-users including their registrations, queues, etc.</li></ul>';
 $string['moodlesync'] = 'Behaviour on changes in moodle';
 $string['moodlesync_help'] = 'How grouptools should behave if moodle groupmembers are added/deleted or single groups are deleted';
-$string['movedown'] = 'move 1 down';
-$string['moveup'] = 'move 1 up';
+$string['movedown'] = 'Move 1 down';
+$string['moveup'] = 'Move 1 up';
 $string['must_specify_groupingname'] = 'You have to provide a name for the grouping!';
 $string['mustbegt0'] = 'Must be an integer greater than or equal 0 (>= 0)';
 $string['mustbegtoeqmin'] = 'Has to be greater than or equal the minimum';
-$string['mustbeposint'] = 'Has to be a positive Integer (>= 1).';
-$string['mygroups_only_label'] = 'show only sources entries I graded';
+$string['mustbeposint'] = 'Has to be a positive integer (>= 1).';
+$string['mygroups_only_label'] = 'Show only sources entries I graded';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>
 <span class="tag idnumber">[idnumber]</span>
@@ -263,30 +266,30 @@ $string['no_grades_present'] = 'No grades to show';
 $string['no_groupmembers_to_display'] = 'No groupmembers to display. So we try to display all groups instead!';
 $string['no_groups_to_display'] = 'No groups to display!';
 $string['no_queues_to_resolve'] = 'No queues present to resolve!';
-$string['no_registrations'] = 'no registrations';
+$string['no_registrations'] = 'No registrations';
 $string['no_target_selected'] = 'There\'s no destination for the copy operation selected. You must select at least 1 destination!';
 $string['noaccess'] = 'You have no access to this module (maybe you do not belong to the right group?)!';
-$string['nobody_queued'] = 'nobody queued';
+$string['nobody_queued'] = 'Nobody queued';
 $string['nogrouptools'] = 'There are no grouptools!';
-$string['nonconflicting'] = 'without conflicts';
+$string['nonconflicting'] = 'Without conflicts';
 $string['nosmallgroups'] = 'Prevent small groups';
 $string['nosmallgroups_help'] = 'If enabled ensures that each group is at least filled by 70% of it\'s size! If a (or more precise the last) group would be filled less than 70% the users for this group get spread over the other groups, causing them to have more members than specified!';
 $string['noregistrationdue'] = 'Registration\'s always open!';
 $string['not_allowed_to_show_members'] = 'You have no permission to view this information!';
 $string['not_graded_by_me'] = 'Graded by another user';
 $string['not_in_queue_or_registered'] = '{$a->username} is neither registered nor queued in group {$a->groupname}';
-$string['not_permitted'] = 'not permitted';
+$string['not_permitted'] = 'Not permitted';
 $string['not_registered'] = 'You\'re not yet registered!';
 $string['you_are_not_in_queue_or_registered'] = 'You are neither registered nor queued in group {$a->groupname}';
 $string['nothing_to_push'] = 'Nothing to push!';
-$string['nowhere_queued'] = 'not queued';
+$string['nowhere_queued'] = 'Not queued';
 $string['number_of_students'] = 'Number of Students';
-$string['occupied'] = 'occupied';
-$string['orientation'] = 'PDF-Orientation';
+$string['occupied'] = 'Occupied';
+$string['orientation'] = 'PDF-orientation';
 $string['overview'] = 'Overview';
 $string['overview_alt'] = 'Overview over groups and groupmembers';
 $string['overwrite_label'] = 'Overwrite existing grades';
-$string['pluginadministration'] = 'Grouptool Administration';
+$string['pluginadministration'] = 'Grouptool administration';
 $string['pluginname'] = 'Grouptool';
 $string['portrait'] = 'Portrait';
 $string['preview'] = 'Preview';
@@ -297,16 +300,16 @@ $string['queue_you_in_group'] = 'Proceed queueing you in group {$a->groupname}?'
 $string['queue_you_in_group_success'] = 'Successfully queued you in group {$a->groupname}!';
 $string['queued'] = 'Queued';
 $string['queued_in_group_info'] = '{$a->username} queued in group {$a->groupname}';
-$string['queued_on_rank'] = 'queued on rank #{$a}';
+$string['queued_on_rank'] = 'Queued on rank #{$a}';
 $string['queues'] = 'Queues';
 $string['queuesizeerror'] = 'Max queue entries have to be a positive integer (>= 1)';
-$string['queues_max'] = 'max simultaneous queue-places';
+$string['queues_max'] = 'Max simultaneous queue-places';
 $string['queues_max_help'] = 'Limits the maximum simultaneous queue entries for each person in this grouptool.';
 $string['queueing_is'] = 'Queueing is';
 $string['rank'] = 'Rank';
-$string['recreate_group'] = 'recreate group';
+$string['recreate_group'] = 'Recreate group';
 $string['reference_grade_feedback'] = 'Reference-grade / Feedback';
-$string['refresh_table_button'] = 'refresh preview';
+$string['refresh_table_button'] = 'Refresh preview';
 $string['reg_in_full_group'] = 'Can\'t register {$a->username} in group {$a->groupname} because it\'s full!';
 $string['reg_you_in_full_group'] = 'Can\'t register you in group {$a->groupname} because it\'s full!';
 $string['reg_not_open'] = 'The registration is not possible at the moment. Maybe the deadline\'s over or it was not allowed at all.';
@@ -336,34 +339,34 @@ $string['reset_transparent_unreg'] = 'Unreg all pushed groupmembers';
 $string['reset_transparent_unreg_help'] = 'Remove all users from those groups which are represented by active grouptool-groups';
 $string['resolve_queue_legend'] = 'Resolve queues';
 $string['resolve_queue_title'] = 'Resolve pending queues';
-$string['resolve_queue'] = 'resolve queues';
+$string['resolve_queue'] = 'Resolve queues';
 $string['selected'] = 'Selected';
-$string['select_all'] = 'all';
-$string['select_none'] = 'none';
-$string['select_inverse'] = 'inverse';
+$string['select_all'] = 'All';
+$string['select_none'] = 'None';
+$string['select_inverse'] = 'Inverse';
 $string['selectfromcohort'] = 'Select members from cohort';
 $string['selfregistration'] = 'Registration';
 $string['selfregistration_alt'] = 'Register to one or more groups (depending on settings)';
-$string['show_members'] = 'show groupmembers';
+$string['show_members'] = 'Show groupmembers';
 $string['show_members_help'] = 'If enabled students can see who\'s already registered in a group.';
-$string['size'] = 'groupsize';
+$string['size'] = 'Groupsize';
 $string['size_grp'] = 'Groupsize settings';
 $string['size_grp_help'] = 'If groupsize is activated the maximum members for each group get limited (set for the whole instance via textfield). If additionally the "individual size" is activated, the groupsize for each group can be defined in the following list.';
-$string['skipped'] = 'skipped';
+$string['skipped'] = 'Skipped';
 $string['source'] = 'Source';
 $string['source_missing'] = 'There\'s no source to copy from!';
 $string['sources_missing'] = 'There\'s at least 1 group without a chosen source to copy from!';
 $string['sortlist_no_data'] = 'There are no groups present at the moment!';
 $string['status'] = 'Status';
-$string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> registered in Moodle-Group and Grouptool</li><li><span style="font-weight:bold">?</span> registered in Moodle-Group but not in Grouptool</li><li><span style="font-weight:bold">+</span> registered in Grouptool but not in Moodle-Group</li><li><span style="font-weight:bold">1, 2, 3...</span> queued in Moodle-Group</li></ul>';
+$string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li><li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li><li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li><li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li></ul>';
 $string['switched_to_all_groups'] = 'Changed groupfilter to all groups!';
 $string['tags'] = 'Available tags';
-$string['tags_help'] = 'You can use this tags to define the name scheme. Each of this tags will be replaced in the final groupnames. The tags in [] are related to the users data and the # and @ symbols will be replaced through the groups serial number. If JavaScript is enabled you can simply click on the tags to append them to the name-scheme. Please consider that the group names have to be unique in each course and therefore you may have to alter the name scheme until conflict-free.';
+$string['tags_help'] = 'You can use this tags to define the name scheme. Each of this tags will be replaced in the final groupnames. The tags in [] are related to the users data and the # and @ symbols will be replaced through the groups serial number. If JavaScript is enabled you can simply click on the tags to append them to the name-scheme. Please consider that the group names have to be unique in each course and therefore you may have to alter the name scheme until it\'s conflict-free.';
 $string['target'] = 'Target';
 $string['too_many_queue_places'] = 'Can\'t queue {$a->username} in group {$a->groupname} because {$a->username} is already queued in too many groups!';
 $string['you_have_too_many_queue_places'] = 'Can\'t queue you in group {$a->groupname} because you are already queued in too many groups!';
-$string['total'] = 'total';
-$string['unqueue'] = 'remove from queue';
+$string['total'] = 'Total';
+$string['unqueue'] = 'Remove from queue';
 $string['unqueue_from_group'] = 'Continue removing {$a->username} from the queue of group {$a->groupname}?';
 $string['unqueue_from_group_success'] = 'Successfully removed {$a->username} from the queue of group {$a->groupname}!';
 $string['unqueue_you_from_group'] = 'Continue removing you from the queue of group {$a->groupname}?';
@@ -377,14 +380,14 @@ $string['unreg_is'] = 'Unregistration';
 $string['updatemdlgrps'] = 'Register in moodle-groups';
 $string['update_grouplist_success'] = 'Successfully updated active groups!';
 $string['userlist'] = 'Userlist';
-$string['userlist_help'] = 'List of ID-Numbers separated by one or more of those characters <ul><li>[,] comma</li><li>[;] semicolon</li><li>[ ] space</li><li>[\n] newline</li><li>[\r] carriage return</li><li>[\t] tabulator</li></ul>';
+$string['userlist_help'] = 'List of ID-numbers separated by one or more of the following characters <ul><li>[,] comma</li><li>[;] semicolon</li><li>[ ] space</li><li>[\n] newline</li><li>[\r] carriage return</li><li>[\t] tabulator</li></ul>';
 $string['user_move_prev'] = 'User with ID {$a->user_id} will be moved from group {$a->agrp_id} to {$a->current_grp} ({$a->current_text})';
 $string['user_moved'] = 'User with ID {$a->user_id} has been moved from group {$a->agrp_id} to {$a->current_grp} ({$a->current_text})';
 $string['user_not_found'] = 'User {$a} couldn\'t be found!';
 $string['use_all_or_chosen'] = 'Use all or selected';
 $string['use_all_or_chosen_help'] = 'Select "All" to create a grouping for evey course group. Use "Selected" to create groupings for checked groups only.';
-$string['use_individual'] = 'use individual size per group';
+$string['use_individual'] = 'Use individual size per group';
 $string['use_individual_help'] = 'Override global groupsize with individual value for each group. These get set via the sortable grouplist on the bottom.';
-$string['use_size'] = 'activate';
-$string['use_queue'] = 'use queues';
+$string['use_size'] = 'Activate';
+$string['use_queue'] = 'Use queues';
 $string['use_queue_help'] = 'If queues are enabled, students who try to register in a full group, get queued until someone unregisters from the very same group. After the deadline the teacher has the ability to move students to other groups if they are still queued, where groups are filled using the current sort order of the group list. You should define a maximum number of groups in whom a user can be queued.';
