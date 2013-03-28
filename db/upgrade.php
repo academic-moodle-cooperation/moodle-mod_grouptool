@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is made for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@
  * it cannot do itself, it will tell you what you need to do.  The commands in
  * here will all be database-neutral, using the functions defined in DLL libraries.
  *
- * @package       mod
- * @subpackage    grouptool
- * @copyright     2012 onwards Philipp Hager {@link e0803285@gmail.com}
+ * @package       mod_grouptool
+ * @author        Philipp Hager (e0803285@gmail.com)
+ * @copyright     2012 onwards TSC TU Vienna
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

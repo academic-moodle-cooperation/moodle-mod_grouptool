@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is made for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,15 +17,14 @@
 /**
  * Backup task definition
  *
- * @package       mod
- * @subpackage    grouptool
- * @copyright     2012 onwards Philipp Hager {@link e0803285@gmail.com}
+ * @package       mod_grouptool
+ * @author        Philipp Hager (e0803285@gmail.com)
+ * @copyright     2012 onwards TSC TU Vienna
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
 
 // Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/backup_grouptool_stepslib.php');
