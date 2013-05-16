@@ -656,38 +656,6 @@ function grouptool_cron () {
 }
 
 /**
- * Returns an array of users who are participanting in this grouptool
- *
- * Must return an array of users who are participants for a given instance
- * of grouptool. Must include every user involved in the instance,
- * independient of his role (student, teacher, admin...). The returned
- * objects must contain at least id property.
- * See other modules as example.
- *
- * @param int $grouptoolid ID of an instance of this module
- * @return boolean|array false if no participants, array of objects otherwise
- */
-function grouptool_get_participants($grouptoolid) {
-    global $DB;
-
-    if (!$agrps = $DB->get_fieldset_select('grouptool_agrps', 'id', 'grouptool_id = ?',
-                                          array($grouptoolid))) {
-        return false;
-    }
-    list($agrps_sql, $params) = $DB->get_in_or_equal($agrps);
-    $regs = $DB->get_fieldset_select('grouptool_registered', 'user_id', 'agrp_id '.$agrps_sql,
-                                     $params);
-    $queues = $DB->get_fieldset_select('grouptool_queued', 'user_id', 'agrp_id '.$agrps_sql,
-                                       $params);
-
-    foreach ($queues as $queue) {
-        $regs[$queue] = $queue;
-    }
-
-    return $regs;
-}
-
-/**
  * Returns all other caps used in the module
  *
  * @example return array('moodle/site:accessallgroups');
