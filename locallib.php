@@ -139,19 +139,23 @@ class view_admin_form extends moodleform {
                                array('size'=>'4'));
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-            $mform->setType('amount', PARAM_INT);
+            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            //$mform->setType('amount', PARAM_INT);
             $mform->setDefault('amount', 2);
 
             $fromto = array();
             $fromto[] = $mform->createElement('text', 'from', get_string('from'));
             $mform->setDefault('from', 0);
-            $mform->setType('from', PARAM_INT);
+            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            //$mform->setType('from', PARAM_INT);
             $fromto[] = $mform->createElement('text', 'to', get_string('to'));
             $mform->setDefault('to', 0);
-            $mform->setType('to', PARAM_INT);
+            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            //$mform->setType('to', PARAM_INT);
             $fromto[] = $mform->createElement('text', 'digits', get_string('digits', 'grouptool'));
             $mform->setDefault('digits', 2);
-            $mform->setType('digits', PARAM_INT);
+            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            //$mform->setType('digits', PARAM_INT);
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
                              array(' - ', ' '.get_string('digits', 'grouptool').' '), false);
             $mform->disabledIf('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
@@ -366,7 +370,7 @@ class view_admin_form extends moodleform {
             if ($data['from'] > $data['to']) {
                 $errors['fromto'] = get_string('fromgttoerror', 'grouptool');
             }
-            if ($data['from'] < 0) {
+            if ((clean_param($data['from'], PARAM_INT) < 0) || !ctype_digit($data['from'])) {
                 if (isset($errors['fromto'])) {
                     $errors['fromto'] .= html_writer::empty_tag('br').
                                          get_string('from').': '.
@@ -376,7 +380,7 @@ class view_admin_form extends moodleform {
                                         get_string('mustbegt0', 'grouptool');
                 }
             }
-            if ($data['to'] < 0) {
+            if ((clean_param($data['to'], PARAM_INT) < 0) || !ctype_digit($data['to'])) {
                 if (isset($errors['fromto'])) {
                     $errors['fromto'] .= html_writer::empty_tag('br').
                                          get_string('to').': '.
@@ -386,7 +390,7 @@ class view_admin_form extends moodleform {
                                         get_string('mustbegt0', 'grouptool');
                 }
             }
-            if ($data['digits'] < 0) {
+            if ((clean_param($data['digits'], PARAM_INT) < 0) || !ctype_digit($data['digits'])) {
                 if (isset($errors['fromto'])) {
                     $errors['fromto'] .= html_writer::empty_tag('br').
                                          get_string('digits', 'grouptool').': '.
@@ -1010,13 +1014,14 @@ class grouptool {
         $groups = array();
 
         // Every member is there, so we can parse the name!
-        for ($i=$data->from; $i<=$data->to; $i++) {
-            $groups[$i] = $this->groups_parse_name(trim($data->namingscheme), $i-1, null, $data->digits);
+        for ($i=clean_param($data->from, PARAM_INT); $i<=clean_param($data->to, PARAM_INT); $i++) {
+            $groups[$i] = $this->groups_parse_name(trim($data->namingscheme), $i-1, null, clean_param($data->digits, PARAM_INT));
         }
         if ($only_preview) {
             $error = false;
             $table = new html_table();
-            $table->head  = array(get_string('groupscount', 'group', ($data->to-$data->from)));
+            $table->head  = array(get_string('groupscount', 'group',
+                                  (clean_param($data->to, PARAM_INT)-clean_param($data->from, PARAM_INT))));
             $table->size  = array('100%');
             $table->align = array('left');
             $table->width = '40%';
@@ -1099,7 +1104,7 @@ class grouptool {
                     groups_delete_grouping($createdgrouping);
                 }
             } else {
-                $numgrps = $data->to - $data->from + 1;
+                $numgrps = clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT) + 1;
                 if ($grouping) {
                     add_to_log($this->grouptool->course,
                             'grouptool', 'create groups',
@@ -1107,14 +1112,14 @@ class grouptool {
                             $grouping->id,
                             'create groups in grouping:'.$grouping->name.
                             ' namescheme:'.$data->namingscheme.' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' from:'.$data->from.' to:'.$data->to);
+                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.clean_param($data->to, PARAM_INT));
                 } else {
                     add_to_log($this->grouptool->course,
                             'grouptool', 'create groups',
                             "view.php?id=".$this->grouptool->id."&tab=overview",
                             'create groups namescheme:'.$data->namingscheme.
                             ' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' from:'.$data->from.' to:'.$data->to);
+                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.clean_param($data->to, PARAM_INT));
                 }
             }
         }
