@@ -98,25 +98,6 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
                "view.php?g=".$return,
                '');
 
-    if (!empty($grouptool->grouplist) && is_array($grouptool->grouplist)
-       && count($grouptool->grouplist) > 0) {
-        // Add grouptools additional group-data!
-        foreach ($grouptool->grouplist as $groupid => $groupdata) {
-            $dataobj = new stdClass();
-            $dataobj->grouptool_id = $return;
-            $dataobj->group_id = $groupid;
-            $dataobj->sort_order = $groupdata['sort_order'];
-            if (isset($groupdata['grpsize'])) {
-                $dataobj->grpsize = $groupdata['grpsize'];
-            }
-            $dataobj->active = $groupdata['active'];
-            $DB->insert_record('grouptool_agrps', $dataobj);
-        }
-        add_to_log($grouptool->course, 'grouptool', 'update agrps',
-                "view.php?id=".$return."&tab=overview",
-                'via form');
-    }
-
     require_once($CFG->dirroot.'/calendar/lib.php');
     $event = new stdClass;
     if ($grouptool->allow_reg) {
@@ -193,32 +174,6 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
             'grouptool', 'update',
             "view.php?id=".$grouptool->id,
             '');
-
-    if (!empty($grouptool->grouplist) && is_array($grouptool->grouplist)
-            && (count($grouptool->grouplist) > 0)) {
-        $agrpids = $DB->get_records('grouptool_agrps', array('grouptool_id' => $grouptool->id),
-                                    '', 'group_id, id');
-        // Update grouptools additional group-data!
-        foreach ($grouptool->grouplist as $groupid => $groupdata) {
-            $dataobj = new stdClass();
-            $dataobj->grouptool_id = $grouptool->id;
-            $dataobj->group_id = $groupid;
-            $dataobj->sort_order = $groupdata['sort_order'];
-            if (isset($groupdata['grpsize'])) {
-                $dataobj->grpsize = $groupdata['grpsize'];
-            }
-            $dataobj->active = $groupdata['active'];
-            if (key_exists($groupid, $agrpids)) {
-                $dataobj->id = $agrpids[$groupid]->id;
-                $DB->update_record('grouptool_agrps', $dataobj);
-            } else {
-                $dataobj->id = $DB->insert_record('grouptool_agrps', $dataobj, true);
-            }
-        }
-        add_to_log($grouptool->course, 'grouptool', 'update agrps',
-                "view.php?id=".$grouptool->id."&tab=overview",
-                'via form', $cmid);
-    }
 
     // Register students if immediate registration has been turned on!
     if ($grouptool->immediate_reg) {
