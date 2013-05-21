@@ -5466,7 +5466,7 @@ EOS;
         global $DB, $PAGE, $OUTPUT;
 
         // After which table-fields can we sort?
-        $sortable = array('firstname', 'lastname', 'idnumber', 'email', 'grpname');
+        $sortable = array('firstname', 'lastname', 'idnumber', 'email');
 
         $return = new stdClass();
 
@@ -5754,10 +5754,7 @@ EOS;
                 $email = new html_table_cell($this->collapselink($collapsed, 'email'));
             }
             if (!in_array('registrations', $collapsed)) {
-                $registrationslink = html_writer::link(new moodle_url($PAGE->url,
-                                                                      array('tsort'=>'grpname')),
-                                                  get_string('registrations', 'grouptool').
-                                                  $this->pic_if_sorted($orderby, 'grpname'));
+                $registrationslink = get_string('registrations', 'grouptool');
                 $registrations = new html_table_cell($registrationslink.
                                                      $this->collapselink($collapsed,
                                                                          'registrations'));
@@ -5766,10 +5763,7 @@ EOS;
                                                                          'registrations'));
             }
             if (!in_array('queues', $collapsed)) {
-                $queueslink = html_writer::link(new moodle_url($PAGE->url,
-                                                               array('tsort'=>'grpname')),
-                                                  get_string('queues', 'grouptool').
-                                                  $this->pic_if_sorted($orderby, 'grpname'));
+                $queueslink = get_string('queues', 'grouptool');
                 $queues = new html_table_cell($queueslink.
                                               $this->collapselink($collapsed, 'queues'));
             } else {
