@@ -361,9 +361,9 @@ class view_admin_form extends moodleform {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
         if (!empty($data['createGroups'])
-            && ($data['amount'] <= 0)
+            && ((clean_param($data['amount'], PARAM_INT) <= 0) || !ctype_digit($data['amount']))
             && (($data['mode'] == GROUPTOOL_GROUPS_AMOUNT) || ($data['mode'] == GROUPTOOL_MEMBERS_AMOUNT))) {
-            $errors['amount'] = get_string('amounterror', 'grouptool');
+            $errors['amount'] = get_string('mustbeposint', 'grouptool');
         }
         if (!empty($data['createGroups'])
             && ($data['mode'] == GROUPTOOL_FROMTO_GROUPS)) {
@@ -1556,7 +1556,7 @@ class grouptool {
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
-                        $numgrps    = $data->amount;
+                        $numgrps    = clean_param($data->amount, PARAM_INT);
                         $userpergrp = floor($usercnt/$numgrps);
                         list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
                                                                       $numgrps, true);
@@ -1582,8 +1582,8 @@ class grouptool {
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt/$data->amount);
-                        $userpergrp = $data->amount;
-                        if (!empty($data->nosmallgroups) and $usercnt % $data->amount != 0) {
+                        $userpergrp = clean_param($data->amount, PARAM_INT);
+                        if (!empty($data->nosmallgroups) and $usercnt % clean_param($data->amount, PARAM_INT) != 0) {
                             /*
                              *  If there would be one group with a small number of member
                              *  reduce the number of groups
