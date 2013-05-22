@@ -241,6 +241,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         } else {
             unset($event->id);
             $event->courseid = $grouptool->course;
+            //we've got some permission issues with calendar_event::create() so we work around that
             $calev = new calendar_event($event);
             $calev->update($event, false);
         }
@@ -741,7 +742,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
     require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
-        return array();
+        return;
     }
 
     if (!$grouptools = get_all_instances_in_courses('grouptool', $courses)) {
@@ -790,7 +791,6 @@ function grouptool_print_overview($courses, &$htmlarray) {
         $details = '';
         if (has_capability('mod/grouptool:register', $context)
                 || has_capability('mod/grouptool:view_registrations', $context)) {
-            // Student mymoodle output!
             $instance = new grouptool($grouptool->coursemodule, $grouptool);
             $userstats = $instance->get_registration_stats($USER->id);
         }
@@ -869,8 +869,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
 
         }
 
-        if (($grouptool->allow_reg && has_capability('mod/grouptool:view_registrations', $context))
-                || has_capability('mod/grouptool:register', $context)) {
+        if ($grouptool->allow_reg && (has_capability('mod/grouptool:view_registrations', $context)
+                                      || has_capability('mod/grouptool:register', $context))) {
             $str .= html_writer::tag('div', $details, array('class'=>'details'));
             $str = html_writer::tag('div', $str, array('class'=>'grouptool overview'));
             if (empty($htmlarray[$grouptool->course]['grouptool'])) {
