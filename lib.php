@@ -239,7 +239,10 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
             $calendarevent = calendar_event::load($event->id);
             $calendarevent->update($event, false);
         } else {
-            calendar_event::create($event);
+            unset($event->id);
+            $event->courseid = $grouptool->course;
+            $calev = new calendar_event($event);
+            $calev->update($event, false);
         }
 
     } else if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
