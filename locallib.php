@@ -1619,15 +1619,13 @@ class grouptool {
                         break;
                 }
                 $preview = html_writer::tag('div', $preview, array('class'=>'centered'));
+                $continue = "view.php?id=$id&tab=administration&confirm=true";
+                $cancel = "view.php?id=$id&tab=administration";
                 if ($error) {
                     $text = get_string('create_groups_confirm_problem', 'grouptool');
-                    $continue = "view.php?id=$id&tab=administration&confirm=true";
-                    $cancel = "view.php?id=$id&tab=administration";
-                    $confirmboxcontent =  $this->confirm($text, $continue, $cancel);
+                    $confirmboxcontent =  $this->confirm($text, $cancel);
                 } else {
                     $text = get_string('create_groups_confirm', 'grouptool');
-                    $continue = "view.php?id=$id&tab=administration&confirm=true";
-                    $cancel = "view.php?id=$id&tab=administration";
                     $confirmboxcontent =  $this->confirm($text, $continue, $cancel);
                 }
                 echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
@@ -1643,16 +1641,13 @@ class grouptool {
                 $SESSION->grouptool->view_administration = $fromform;
                 list($error, $preview) = $this->create_group_groupings(null, true);
                 $preview = html_writer::tag('div', $preview, array('class'=>'centered'));
-                if (!$error) {
-                    $confirmtext = get_string('create_groupings_confirm', 'grouptool');
-                } else {
-                    $confirmtext = get_string('create_groupings_confirm_problem', 'grouptool');
-                }
                 $continue = "view.php?id=$id&tab=administration&confirm=1";
                 $cancel = "view.php?id=$id&tab=administration";
                 if ($error) {
+                    $confirmtext = get_string('create_groupings_confirm_problem', 'grouptool');
                     $confirmboxcontent = $this->confirm($confirmtext, $cancel);
                 } else {
+                    $confirmtext = get_string('create_groupings_confirm', 'grouptool');
                     $confirmboxcontent =  $this->confirm($confirmtext, $continue, $cancel);
                 }
                 echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
