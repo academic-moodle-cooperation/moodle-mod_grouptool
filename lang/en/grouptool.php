@@ -271,6 +271,7 @@ $string['no_groups_to_display'] = 'No groups to display!';
 $string['no_queues_to_resolve'] = 'No queues present to resolve!';
 $string['no_registrations'] = 'No registrations';
 $string['no_target_selected'] = 'There\'s no destination for the copy operation selected. You must select at least 1 destination!';
+$string['no_users_to_display'] = 'No users to display!';
 $string['noaccess'] = 'You have no access to this module (maybe you do not belong to the right group?)!';
 $string['nobody_queued'] = 'Nobody queued';
 $string['nogrouptools'] = 'There are no grouptools!';

@@ -271,6 +271,7 @@ $string['no_groupmembers_to_display'] = 'Keine Gruppenmitglieder zum Anzeigen vo
 $string['no_queues_to_resolve'] = 'Keine Warteliste aufzulösen!';
 $string['no_registrations'] = 'Keine Anmeldungen';
 $string['no_target_selected'] = 'Es wurde kein Ziel für den Kopiervorgang gewählt! Es muss zumindest 1 Ziel gewählt werden!';
+$string['no_users_to_display'] = 'Keine Nutzer anzuzeigen!';
 $string['noaccess'] = 'Sie haben keinen Zugriff auf dieses Modul! Es ist möglich, dass Sie nicht zur richtigen Gruppe gehören.';
 $string['nobody_queued'] = 'Keine Wartelisteneinträge';
 $string['nogrouptools'] = 'Es gibt keine Gruppenverwaltungen!';

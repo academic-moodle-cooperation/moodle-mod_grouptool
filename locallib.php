@@ -5730,13 +5730,13 @@ EOS;
         if (!empty($users)) {
             $users = array_keys($users);
             $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
-
         } else {
             if (!$data_only) {
                 $return .= $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display',
                                                                          'grouptool'),
                                                               'notifyproblem'),
                                         'centered generalbox');
+                return $return;
             } else {
                 return get_string('no_users_to_display', 'grouptool');
             }
@@ -5822,105 +5822,107 @@ EOS;
                           'queues'        => get_string('queues', 'grouptool'));
         }
         $rows = array();
-        foreach ($userdata as $user) {
-            if (!$data_only) {
-                $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
-                                           array('id'     => $user->id,
-                                                 'course' => $this->course->id));
-                if (!in_array('picture', $collapsed)) {
-                    $picture = html_writer::link($userlink, $OUTPUT->user_picture($user));
+        if(!empty($userdata)) {
+            foreach ($userdata as $user) {
+                if (!$data_only) {
+                    $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
+                                               array('id'     => $user->id,
+                                                     'course' => $this->course->id));
+                    if (!in_array('picture', $collapsed)) {
+                        $picture = html_writer::link($userlink, $OUTPUT->user_picture($user));
+                    } else {
+                        $picture = "";
+                    }
+                    if (!in_array('fullname', $collapsed)) {
+                        $fullname = html_writer::link($userlink, fullname($user));
+                    } else {
+                        $fullname = "";
+                    }
+                    if (!in_array('idnumber', $collapsed)) {
+                        $idnumber = $user->idnumber;
+                    } else {
+                        $idnumber = "";
+                    }
+                    if (!in_array('email', $collapsed)) {
+                        $email = $user->email;
+                    } else {
+                        $email = "";
+                    }
+                    if (!in_array('registrations', $collapsed)) {
+                        if (!empty($user->regs)) {
+                            $regs = explode(',', $user->regs);
+                            $registrations = array();
+                            foreach ($regs as $reg) {
+                                $grouplink = new moodle_url($PAGE->url,
+                                                            array('tab'     => 'overview',
+                                                                  'groupid' => $groupinfo[$reg]->id));
+                                $registrations[] = html_writer::link($grouplink,
+                                                                     $groupinfo[$reg]->name);
+                            }
+                        } else {
+                            $registrations = array('-');
+                        }
+                        $registrations = implode(html_writer::empty_tag('br'), $registrations);
+                    } else {
+                        $registrations = "";
+                    }
+                    if (!in_array('queues', $collapsed)) {
+                        if (!empty($user->queues)) {
+                            $queues = explode(',', $user->queues);
+                            $queueentries = array();
+                            foreach ($queues as $queue) {
+                                $grouplink = new moodle_url($PAGE->url,
+                                                            array('tab'     => 'overview',
+                                                                  'groupid' => $groupinfo[$queue]->id));
+                                $rank = $this->get_rank_in_queue($queue, $user->id);
+                                if (empty($rank)) {
+                                    $rank = '*';
+                                }
+                                $queueentries[] = html_writer::link($grouplink,
+                                                                    "(".$rank.") ".
+                                                                    $groupinfo[$queue]->name);
+                            }
+                        } else {
+                            $queueentries = array('-');
+                        }
+                        $queueentries = implode(html_writer::empty_tag('br'), $queueentries);
+                    } else {
+                        $queueentries = "";
+                    }
+                    $rows[] = array($picture, $fullname, $idnumber, $email, $registrations,
+                                    $queueentries);
                 } else {
-                    $picture = "";
-                }
-                if (!in_array('fullname', $collapsed)) {
-                    $fullname = html_writer::link($userlink, fullname($user));
-                } else {
-                    $fullname = "";
-                }
-                if (!in_array('idnumber', $collapsed)) {
+                    $fullname = fullname($user);
                     $idnumber = $user->idnumber;
-                } else {
-                    $idnumber = "";
-                }
-                if (!in_array('email', $collapsed)) {
                     $email = $user->email;
-                } else {
-                    $email = "";
-                }
-                if (!in_array('registrations', $collapsed)) {
                     if (!empty($user->regs)) {
                         $regs = explode(',', $user->regs);
                         $registrations = array();
                         foreach ($regs as $reg) {
-                            $grouplink = new moodle_url($PAGE->url,
-                                                        array('tab'     => 'overview',
-                                                              'groupid' => $groupinfo[$reg]->id));
-                            $registrations[] = html_writer::link($grouplink,
-                                                                 $groupinfo[$reg]->name);
+                            $registrations[] = $groupinfo[$reg]->name;
                         }
                     } else {
-                        $registrations = array('-');
+                        $registrations = array();
                     }
-                    $registrations = implode(html_writer::empty_tag('br'), $registrations);
-                } else {
-                    $registrations = "";
-                }
-                if (!in_array('queues', $collapsed)) {
                     if (!empty($user->queues)) {
                         $queues = explode(',', $user->queues);
                         $queueentries = array();
                         foreach ($queues as $queue) {
-                            $grouplink = new moodle_url($PAGE->url,
-                                                        array('tab'     => 'overview',
-                                                              'groupid' => $groupinfo[$queue]->id));
                             $rank = $this->get_rank_in_queue($queue, $user->id);
                             if (empty($rank)) {
                                 $rank = '*';
                             }
-                            $queueentries[] = html_writer::link($grouplink,
-                                                                "(".$rank.") ".
-                                                                $groupinfo[$queue]->name);
+                            $queueentries[] = array('rank'=>$rank, 'name'=>$groupinfo[$queue]->name);
                         }
                     } else {
-                        $queueentries = array('-');
+                        $queueentries = array();
                     }
-                    $queueentries = implode(html_writer::empty_tag('br'), $queueentries);
-                } else {
-                    $queueentries = "";
+                    $rows[] = array('name'          => $fullname,
+                                    'idnumber'      => $idnumber,
+                                    'email'         => $email,
+                                    'registrations' => $registrations,
+                                    'queues'        => $queueentries);
                 }
-                $rows[] = array($picture, $fullname, $idnumber, $email, $registrations,
-                                $queueentries);
-            } else {
-                $fullname = fullname($user);
-                $idnumber = $user->idnumber;
-                $email = $user->email;
-                if (!empty($user->regs)) {
-                    $regs = explode(',', $user->regs);
-                    $registrations = array();
-                    foreach ($regs as $reg) {
-                        $registrations[] = $groupinfo[$reg]->name;
-                    }
-                } else {
-                    $registrations = array();
-                }
-                if (!empty($user->queues)) {
-                    $queues = explode(',', $user->queues);
-                    $queueentries = array();
-                    foreach ($queues as $queue) {
-                        $rank = $this->get_rank_in_queue($queue, $user->id);
-                        if (empty($rank)) {
-                            $rank = '*';
-                        }
-                        $queueentries[] = array('rank'=>$rank, 'name'=>$groupinfo[$queue]->name);
-                    }
-                } else {
-                    $queueentries = array();
-                }
-                $rows[] = array('name'          => $fullname,
-                                'idnumber'      => $idnumber,
-                                'email'         => $email,
-                                'registrations' => $registrations,
-                                'queues'        => $queueentries);
             }
         }
         if (!$data_only) {
