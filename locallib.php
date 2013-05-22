@@ -404,7 +404,7 @@ class view_admin_form extends moodleform {
         if (!empty($data['saveagrps'])
            && (!empty($data['use_size']) && !empty($data['use_individual']))) {
             foreach ($data['grouplist'] as $group_id => $curgroup) {
-                if (clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {
+                if ((clean_param($curgroup['grpsize'], PARAM_INT) <= 0) || !ctype_digit($curgroup['grpsize'])) {
                     if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
                         $errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
                     } else {

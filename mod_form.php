@@ -130,7 +130,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
                                         array('size'=>'5'));
         $size[] = $mform->createElement('checkbox', 'use_size', '', get_string('use_size',
                                                                                'grouptool'));
-        $mform->setType('grpsize', PARAM_INT);
+        //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+        //$mform->setType('grpsize', PARAM_INT);
         $mform->setDefault('grpsize',
                            (!empty($CFG->grouptool_grpsize) ? $CFG->grouptool_grpsize : 3));
         $mform->setType('use_size', PARAM_BOOL);
@@ -260,24 +261,14 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
         }
 
-        if (!empty($data['use_size']) && ($data['grpsize'] <= 0) && empty($data['use_individual'])) {
+        if (!empty($data['use_size'])
+            && (($data['grpsize'] <= 0) || !ctype_digit($data['grpsize']))
+            && empty($data['use_individual'])) {
             $errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
         }
 
         if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
             $errors['queues_max'] = get_string('queuesizeerror', 'grouptool');
-        }
-
-        if (!empty($data['use_size']) && !empty($data['use_individual'])) {
-            foreach ($data['grouplist'] as $group_id => $curgroup) {
-                if (clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {
-                    if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
-                        $errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
-                    } else {
-                        $errors['grouplist'] .= ', '.$curgroup['name'];
-                    }
-                }
-            }
         }
 
         if (!empty($data['allow_multiple']) && ($data['choose_min'] <= 0)) {
