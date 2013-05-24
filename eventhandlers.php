@@ -343,7 +343,11 @@ function group_created_handler($data) {
         $new_agrp = new StdClass();
         $new_agrp->grouptool_id = $grouptool->id;
         $new_agrp->group_id = $data->id;
-        $new_agrp->sort_order = $sortorder[$grouptool->id]->max+1;
+        if(!array_key_exists($grouptool->id, $sortorder)) {
+            $new_agrp->sort_order = 1;
+        } else {
+            $new_agrp->sort_order = $sortorder[$grouptool->id]->max+1;
+        }
         if ($grouptool->allow_reg == 1) {
             $new_agrp->active = 1;
         }

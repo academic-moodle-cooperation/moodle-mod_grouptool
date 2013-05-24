@@ -55,6 +55,7 @@ $capabilities = array(
                 'contextlevel' => CONTEXT_COURSE,
                 'legacy' => array(
                         'editingteacher' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
                         'manager' => CAP_ALLOW,
                 )
         ),
