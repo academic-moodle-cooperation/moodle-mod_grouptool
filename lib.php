@@ -795,41 +795,21 @@ function grouptool_print_overview($courses, &$htmlarray) {
             $userstats = $instance->get_registration_stats($USER->id);
         }
 
-        if (has_capability('mod/grouptool:register', $context)) {
-            if ($grouptool->allow_reg) {
-                if (count($userstats->registered)) {
-                    $temp_str = "";
-                    foreach ($userstats->registered as $registration) {
-                        $ts = $registration->timestamp;
-                        list($colorclass, $text) = grouptool_display_lateness($ts,
-                                                                              $grouptool->timedue);
-                        if ($temp_str != "") {
-                            $temp_str .= '; ';
-                        }
-                        $temp_str .= html_writer::tag('span', $registration->grpname.' '.$text);
+        if (has_capability('mod/grouptool:register', $context) && $grouptool->allow_reg) {
+            if (count($userstats->registered)) {
+                $temp_str = "";
+                foreach ($userstats->registered as $registration) {
+                    $ts = $registration->timestamp;
+                    list($colorclass, $text) = grouptool_display_lateness($ts,
+                                                                          $grouptool->timedue);
+                    if ($temp_str != "") {
+                        $temp_str .= '; ';
                     }
-                    if (($grouptool->allow_multiple &&
-                            (count($userstats->registered) < $grouptool->choose_min))
-                            || (!$grouptool->allow_multiple && !count($userstats->registered))) {
-                        if ($grouptool->allow_multiple) {
-                            $missing = ($grouptool->choose_min-count($userstats->registered));
-                            $string_label = ($missing > 1) ? 'registrations_missing'
-                                                           : 'registration_missing';
-                        } else {
-                            $missing = 1;
-                            $string_label = 'registration_missing';
-                        }
-                        $details .= html_writer::tag('div',
-                                html_writer::tag('div',
-                                        get_string($string_label, 'grouptool', $missing)).' '.
-                                get_string('registrations', 'grouptool').': '.$temp_str,
-                                array('class'=>'registered'));
-                    } else {
-                        $details .= html_writer::tag('div',
-                                get_string('registrations', 'grouptool').': '.$temp_str,
-                                array('class'=>'registered'));
-                    }
-                } else {
+                    $temp_str .= html_writer::tag('span', $registration->grpname.' '.$text);
+                }
+                if (($grouptool->allow_multiple &&
+                        (count($userstats->registered) < $grouptool->choose_min))
+                        || (!$grouptool->allow_multiple && !count($userstats->registered))) {
                     if ($grouptool->allow_multiple) {
                         $missing = ($grouptool->choose_min-count($userstats->registered));
                         $string_label = ($missing > 1) ? 'registrations_missing'
@@ -840,25 +820,43 @@ function grouptool_print_overview($courses, &$htmlarray) {
                     }
                     $details .= html_writer::tag('div',
                             html_writer::tag('div',
-                                    get_string($string_label, 'grouptool', $missing)).
-                            get_string('registrations', 'grouptool').': '.
-                            get_string('not_registered', 'grouptool'),
+                                    get_string($string_label, 'grouptool', $missing)).' '.
+                            get_string('registrations', 'grouptool').': '.$temp_str,
+                            array('class'=>'registered'));
+                } else {
+                    $details .= html_writer::tag('div',
+                            get_string('registrations', 'grouptool').': '.$temp_str,
                             array('class'=>'registered'));
                 }
-                if (count($userstats->queued)) {
-                    $temp_str = "";
-                    foreach ($userstats->queued as $queue) {
-                        list($colorclass, $text) = grouptool_display_lateness($queue->timestamp,
-                                                                              $grouptool->timedue);
-                        if ($temp_str != "") {
-                            $temp_str .= ", ";
-                        }
-                        $temp_str .= html_writer::tag('span', $queue->grpname.' ('.$queue->rank.')',
-                                                      array('class'=>$colorclass));
-                    }
-                    $details .= html_writer::tag('div', get_string('queues', 'grouptool').': '.
-                            $temp_str, array('class'=>'queued'));
+            } else {
+                if ($grouptool->allow_multiple) {
+                    $missing = ($grouptool->choose_min-count($userstats->registered));
+                    $string_label = ($missing > 1) ? 'registrations_missing'
+                                                   : 'registration_missing';
+                } else {
+                    $missing = 1;
+                    $string_label = 'registration_missing';
                 }
+                $details .= html_writer::tag('div',
+                        html_writer::tag('div',
+                                get_string($string_label, 'grouptool', $missing)).
+                        get_string('registrations', 'grouptool').': '.
+                        get_string('not_registered', 'grouptool'),
+                        array('class'=>'registered'));
+            }
+            if (count($userstats->queued)) {
+                $temp_str = "";
+                foreach ($userstats->queued as $queue) {
+                    list($colorclass, $text) = grouptool_display_lateness($queue->timestamp,
+                                                                          $grouptool->timedue);
+                    if ($temp_str != "") {
+                        $temp_str .= ", ";
+                    }
+                    $temp_str .= html_writer::tag('span', $queue->grpname.' ('.$queue->rank.')',
+                                                  array('class'=>$colorclass));
+                }
+                $details .= html_writer::tag('div', get_string('queues', 'grouptool').': '.
+                        $temp_str, array('class'=>'queued'));
             }
         }
 
@@ -869,9 +867,11 @@ function grouptool_print_overview($courses, &$htmlarray) {
 
         }
 
-        if ($grouptool->allow_reg && (has_capability('mod/grouptool:view_registrations', $context)
+        if ((has_capability('mod/grouptool:view_registrations', $context)
                                       || has_capability('mod/grouptool:register', $context))) {
-            $str .= html_writer::tag('div', $details, array('class'=>'details'));
+            if($grouptool->allow_reg) {
+                $str .= html_writer::tag('div', $details, array('class'=>'details'));
+            }
             $str = html_writer::tag('div', $str, array('class'=>'grouptool overview'));
             if (empty($htmlarray[$grouptool->course]['grouptool'])) {
                 $htmlarray[$grouptool->course]['grouptool'] = $str;
