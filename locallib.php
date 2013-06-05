@@ -474,6 +474,9 @@ class view_import_form extends moodleform {
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');
 
+            $mform->addElement('advcheckbox', 'forceregistration', '', '&nbsp;'.get_string('forceregistration', 'grouptool'));
+            $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
+            
             $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }
     }
@@ -3056,9 +3059,9 @@ EOS;
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid);
-        $groupdata = current($groupdata);
-        $message->groupname = $groupdata->name;
         if (count($groupdata) == 1) {
+            $groupdata = current($groupdata);
+            $message->groupname = $groupdata->name;
             if ($this->get_rank_in_queue($groupdata->registered, $userid) != false) {
                 // We're sorry, but user's already registered in this group!
                 if ($userid != $USER->id) {
@@ -3172,11 +3175,13 @@ EOS;
                             && ($regcnt >= $this->grouptool->choose_max))
                             || !$this->grouptool->allow_multiple) {
                             $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                            $agrpids = array_keys($agrps);
-                            list($sql, $params) = $DB->get_in_or_equal($agrpids);
-                            $DB->delete_records_select('grouptool_queued',
-                                                       ' user_id = ? AND agrp_id '.$sql,
-                                                       array_merge(array($userid), $params));
+                            if(count($agrps) > 0) {
+                                $agrpids = array_keys($agrps);
+                                list($sql, $params) = $DB->get_in_or_equal($agrpids);
+                                $DB->delete_records_select('grouptool_queued',
+                                                           ' user_id = ? AND agrp_id '.$sql,
+                                                           array_merge(array($userid), $params));
+                            }
                         }
                         if ($userid != $USER->id) {
                             return array(false,
@@ -3264,6 +3269,9 @@ EOS;
         foreach ($agrps as $current) {
             $keys[] = $current->agrp_id;
         }
+        if(count($keys) == 0) {
+            return 0;
+        }
         list($sql, $params) = $DB->get_in_or_equal($keys);
         $params = array_merge(array($userid), $params);
         return $DB->count_records_sql('SELECT count(id)
@@ -3293,6 +3301,9 @@ EOS;
         $keys = array();
         foreach ($agrps as $current) {
             $keys[] = $current->agrp_id;
+        }
+        if(count($keys) == 0) {
+            return 0;
         }
         list($sql, $params) = $DB->get_in_or_equal($keys);
         $params = array_merge(array($userid), $params);
@@ -4147,17 +4158,32 @@ EOS;
      * @param bool $preview_only optional preview only, don't take any action
      * @return array ($error, $message)
      */
-    public function import($group, $data, $preview_only = false) {
+    public function import($group, $data, $forceregistration = false, $preview_only = false) {
         global $DB, $OUTPUT, $CFG, $PAGE;
 
         $message = "";
         $error = false;
         $users = preg_split("/[ ,;\t\n\r]+/", $data);
+        //prevent selection of all users if one of the above defined characters are in the beginning
+        foreach($users as $key => $user) {
+            if(empty($user)) {
+                unset($users[$key]);
+            }
+        }
         $groupinfo = groups_get_group($group);
         $imported = array();
         $columns = $DB->get_columns('user');
         if (empty($field) || !key_exists($field, $columns)) {
             $field = 'idnumber';
+        }
+        $agrp = $DB->get_field('grouptool_agrps', 'id', array('grouptool_id'=>$this->grouptool->id,
+                                                              'group_id' => $group), IGNORE_MISSING);
+        if(!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $this->grouptool->id,
+                                                        'group_id' => $group,
+                                                        'active' => 1))) {
+            $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning',
+                                                         'grouptool', $groupinfo->name),
+                                              array('notifyproblem'));
         }
         foreach ($users as $user) {
             $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
@@ -4232,6 +4258,21 @@ EOS;
                         $message .= html_writer::tag('div', get_string('import_user', 'grouptool',
                                                                        $data), $attr);
                     }
+                    if ($forceregistration && empty($agrp)) {
+                        $newgrpdata = $DB->get_record_sql('SELECT MAX(sort_order), MAX(grpsize)
+                                                           FROM grouptool_agrps
+                                                           WHERE grouptool_id = ?',
+                                                          array($this->grouptool->id));
+                        //insert agrp-entry for this group (even if it's not active)
+                        $agrp = $DB->insert_record('grouptool_agrps', array('grouptool_id' => $this->grouptool->id,
+                                                                    'group_id' => $group,
+                                                                    'active' => 0,
+                                                                    'sort_order' => $newgrpdata->sort_order+1,
+                                                                    'grpsize' => $newgrpdata->grpsize));
+                    }
+                    if ($forceregistration && !empty($agrp)) {
+                        $this->register_in_agrp($agrp, $userinfo->id);
+                    }
                 } else if ($userinfo) {
                     $attr = array('class'=>'prevsuccess');
                     $message .= html_writer::tag('div', get_string('import_user_prev', 'grouptool',
@@ -4267,10 +4308,11 @@ EOS;
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             $group = required_param('group', PARAM_INT);
             $data = required_param('data', PARAM_RAW);
+            $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
             if (!empty($data)) {
                 $data = unserialize($data);
             }
-            list($error, $message) = $this->import($group, $data);
+            list($error, $message) = $this->import($group, $data, $forceregistration);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'),
@@ -4283,12 +4325,14 @@ EOS;
 
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
-            list($error, $confirmmessage) = $this->import($fromform->group, $fromform->data, true);
+            list($error, $confirmmessage) = $this->import($fromform->group, $fromform->data,
+                                                          $fromform->forceregistration, true);
 
             $attr = array(
-                    'confirm' => '1',
-                    'group' => $fromform->group,
-                    'data' => serialize($fromform->data));
+                    'confirm'           => '1',
+                    'group'             => $fromform->group,
+                    'data'              => serialize($fromform->data),
+                    'forceregistration' => $fromform->forceregistration);
 
             $continue = new moodle_url($PAGE->url, $attr);
             $cancel = new moodle_url($PAGE->url);
