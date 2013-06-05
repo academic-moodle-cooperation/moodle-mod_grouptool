@@ -31,8 +31,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
 require_once($CFG->libdir.'/formslib.php');
-require_once("$CFG->dirroot/mod/grouptool/lib.php");
-require_once("$CFG->dirroot/group/lib.php");
+require_once($CFG->dirroot.'/mod/grouptool/lib.php');
+require_once($CFG->dirroot.'/group/lib.php');
 require_once($CFG->dirroot.'/cohort/lib.php');
 require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->libdir.'/grade/grade_grade.php');
