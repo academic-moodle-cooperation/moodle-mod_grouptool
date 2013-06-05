@@ -27,9 +27,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-// Because it exists (must)
+// Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/backup_grouptool_stepslib.php');
-// Because it exists (optional)
+// Because it exists (optional)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/backup_grouptool_settingslib.php');
 
 /**
@@ -42,14 +42,14 @@ class backup_grouptool_activity_task extends backup_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity!
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // Grouptool only has one structure step
+        // Grouptool only has one structure step!
         $this->add_step(new backup_grouptool_activity_structure_step('grouptool_structure',
                 'grouptool.xml'));
     }
@@ -63,10 +63,10 @@ class backup_grouptool_activity_task extends backup_activity_task {
 
         $base = preg_quote($CFG->wwwroot, "/");
 
-        // Link to the list of checkmarkss
+        // Link to the list of grouptools.
         $search="/(".$base."\/mod\/grouptool\/index.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@GROUPTOOLINDEX*$2@$', $content);
-        // Link to checkmark view by moduleid
+        // Link to grouptool view by moduleid.
         $search="/(".$base."\/mod\/grouptool\/view.php\?id\=)([0-9]+)/";
         $content= preg_replace($search, '$@GROUPTOOLVIEWBYID*$2@$', $content);
 

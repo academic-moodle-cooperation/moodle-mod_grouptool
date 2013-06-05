@@ -33,9 +33,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__).'/definitions.php');
 
-////////////////////////////////////////////////////////////////////////////////
-// Moodle core API                                                            //
-////////////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ * Moodle core API                                                             *
+ *******************************************************************************/
 
 /**
  * Returns the information on whether the module supports a feature
@@ -46,12 +46,18 @@ require_once(dirname(__FILE__).'/definitions.php');
  */
 function grouptool_supports($feature) {
     switch($feature) {
-        case FEATURE_MOD_INTRO:         return true;
-        case FEATURE_GROUPS:            return true;
-        case FEATURE_GROUPINGS:         return true;
-        case FEATURE_GROUPMEMBERSONLY:  return true;
-        case FEATURE_BACKUP_MOODLE2:    return true;
-        default:                        return null;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        default:
+            return null;
     }
 }
 
@@ -91,11 +97,9 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
                "view.php?g=".$return,
                '');
 
-    # You may have to add extra stuff in here #
-
     if (!empty($grouptool->grouplist) && is_array($grouptool->grouplist)
        && count($grouptool->grouplist) > 0) {
-        //add grouptools additional group-data
+        // Add grouptools additional group-data!
         foreach ($grouptool->grouplist as $groupid => $groupdata) {
             $dataobj = new stdClass();
             $dataobj->grouptool_id = $return;
@@ -184,7 +188,6 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         $grouptool->allow_multiple = 0;
     }
 
-    # You may have to add extra stuff in here #
     add_to_log($grouptool->course,
             'grouptool', 'update',
             "view.php?id=".$grouptool->id,
@@ -194,7 +197,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
             && (count($grouptool->grouplist) > 0)) {
         $agrpids = $DB->get_records('grouptool_agrps', array('grouptool_id' => $grouptool->id),
                                     '', 'group_id, id');
-        //update grouptools additional group-data
+        // Update grouptools additional group-data!
         foreach ($grouptool->grouplist as $groupid => $groupdata) {
             $dataobj = new stdClass();
             $dataobj->grouptool_id = $grouptool->id;
@@ -216,7 +219,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
                 'via form', $cmid);
     }
 
-    //register students if immediate registration has been turned on
+    // Register students if immediate registration has been turned on!
     if ($grouptool->immediate_reg) {
         require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
         $instance = new grouptool($grouptool->coursemodule, $grouptool);
@@ -262,7 +265,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
 
     if (($grouptool->timedue != 0)) {
         unset($event->id);
-		unset($calendarevent);
+        unset($calendarevent);
         if ($grouptool->allow_reg) {
             $event->name = get_string('registration_period_end', 'grouptool').' '.$grouptool->name;
         } else {
@@ -315,14 +318,14 @@ function grouptool_delete_instance($id) {
             "view.php?id=".$grouptool->course,
             '');
 
-    # Delete any dependent records here #
-
-    //get all agrp-ids for this grouptool-instance
+    // Get all agrp-ids for this grouptool-instance!
     if ($DB->record_exists('grouptool_agrps', array('grouptool_id' => $id))) {
         $ids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptool_id = ?", array($id));
 
-        //delete all entries in grouptool_agrps, grouptool_queued, grouptool_registered
-        //with correct grouptool_id or agrps_id
+        /*
+         * delete all entries in grouptool_agrps, grouptool_queued, grouptool_registered
+         * with correct grouptool_id or agrps_id
+         */
         if (is_array($ids)) {
             list($sql, $params) = $DB->get_in_or_equal($ids);
             $DB->delete_records_select('grouptool_queued', "agrp_id ".$sql, $params);
@@ -398,7 +401,7 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
 
     $userfields = user_picture::fields('u', array('email'), 'userid');
 
-    //sql for all the regs and queues in 1 washup :)
+    // SQL for all the regs and queues in 1 washup!
     $sql = "
     SELECT uni.id, agrp.grouptool_id AS grouptoolid, uni.type, uni.timestamp,
            grp.name, ".$userfields." FROM
@@ -475,7 +478,6 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
         $data->groupname = $entry->name;
         switch($entry->type) {
             case 'reg':
-                //@todo language string!
                 echo "<div class=\"registered\">".
                      get_string('registered_in_group_info', 'grouptool', $data)."</div>";
                 break;
@@ -493,7 +495,7 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
         $return |= true;
     }
 
-    return $return;  //  True if anything was printed, otherwise false
+    return $return;  // True if anything was printed, otherwise false!
 }
 
 /**
@@ -517,7 +519,7 @@ function grouptool_get_recent_mod_activity(&$activities, &$index, $timestart, $c
     global $CFG, $DB;
 
     $course = $DB->get_records('course', array('id'=>$courseid));
-    
+
     $context = context_course::instance($courseid);
     $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
 
@@ -525,7 +527,7 @@ function grouptool_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $cm = $modinfo->cms[$cmid];
 
-    /// find out current groups mode
+    // Find current groupmode out!
     $groupmode = groups_get_activity_groupmode($cm);
     $currentgroup = groups_get_activity_group($cm, true);
 
@@ -549,7 +551,7 @@ function grouptool_get_recent_mod_activity(&$activities, &$index, $timestart, $c
 
     $userfields = user_picture::fields('u', null, 'userid');
 
-    //sql for all the regs and queues in 1 washup :)
+    // SQL for all the regs and queues in 1 washup!
     $sql = "
 SELECT uni.id, 'grouptool' AS type, agrp.grouptool_id AS grouptoolid,
        uni.type as actiontype, uni.timestamp, grp.name, ".$userfields." FROM
@@ -694,9 +696,9 @@ function grouptool_get_extra_capabilities() {
     return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames');
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Navigation API                                                             //
-////////////////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+ * Navigation API                                                              *
+ *******************************************************************************/
 /**
  * Extends the global navigation tree by adding grouptool nodes if there is a relevant content
  *
@@ -723,7 +725,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
         $navref->add(get_string('grading', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id'=>$cm->id, 'tab'=>'grading')));
     }
-    //groupmode?
+    // Groupmode?
     $gmok = true;
     if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
         $gmok = $gmok && groups_has_membership($cm);
@@ -778,17 +780,17 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
         $colorclass = 'early';
         $timeremaining = ' ('.html_writer::tag('span', format_time($time),
                                                array('class'=>'early')).')';
-    } else if ($time >= 7*24*60*60) { // more than 7 days
+    } else if ($time >= 7*24*60*60) { // More than 7 days?
         $colorclass = 'early';
         $timeremaining = ' ('.html_writer::tag('span', get_string('early', 'grouptool',
                                                                   format_time($time)),
                                                array('class'=>'early')).')';
-    } else if ($time >= 24*60*60) { // more than 1 day (less than 7 days)
+    } else if ($time >= 24*60*60) { // More than 1 day (less than 7 days)?
         $colorclass = 'soon';
         $timeremaining = ' ('.html_writer::tag('span', get_string('early', 'grouptool',
                                                                   format_time($time)),
                                                array('class'=>'soon')).')';
-    } else if ($time >= 0) { // in future but less than 1 day
+    } else if ($time >= 0) { // In future but less than 1 day?
         $colorclass = 'today';
         $timeremaining = ' ('.html_writer::tag('span', get_string('early', 'grouptool',
                                                                   format_time($time)),
@@ -834,7 +836,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                                                             '/mod/grouptool/view.php?id='.
                                                             $grouptool->coursemodule);
             if (!$grouptool->visible
-				|| (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
+                || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
                 $attrib['class']='dimmed';
             }
             list($cc, $nused) = grouptool_display_lateness(time(), $grouptool->timedue);
@@ -861,7 +863,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
         $details = '';
         if (has_capability('mod/grouptool:register', $context)
                 || has_capability('mod/grouptool:view_registrations', $context)) {
-            //student mymoodle output
+            // Student mymoodle output!
             $instance = new grouptool($grouptool->coursemodule, $grouptool);
             $userstats = $instance->get_registration_stats($USER->id);
         }
@@ -964,7 +966,7 @@ function grouptool_reset_userdata($data) {
     global $CFG, $DB;
 
     if (!$DB->count_records('grouptool', array('course'=>$data->courseid))) {
-        return array(); // no grouptools present
+        return array(); // No grouptools present!
     }
 
     $componentstr = get_string('modulenameplural', 'grouptool');

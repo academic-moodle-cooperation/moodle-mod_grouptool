@@ -27,7 +27,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // Course.
 
 $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
@@ -66,7 +66,7 @@ if ($course->format == 'weeks') {
 
 foreach ($grouptools as $grouptool) {
 
-    //info
+    // Just some info.
     $context = context_module::instance($grouptool->coursemodule, MUST_EXIST);
 
     $strgrouptool = get_string('grouptool', 'grouptool');
@@ -102,7 +102,7 @@ foreach ($grouptools as $grouptool) {
     $details = '';
     if (has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_registrations', $context)) {
-        //student mymoodle output
+        // It's similar to the student mymoodle output!
         $instance = new grouptool($grouptool->coursemodule, $grouptool);
         $userstats = $instance->get_registration_stats($USER->id);
     }

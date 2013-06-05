@@ -31,8 +31,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $DB;
-//@todo using standard-action-pattern add/delete/update/view + additional info
-//if we don't our filter-abilities in log-view are very restricted...
+/* It's not fully compatible with core this way so we should use standard style.
+ * @todo using standard-action-pattern add/delete/update/view + additional info
+ * If we don't, our filter-abilities in log-view are very restricted!
+ */
 $logs = array(
         array('module'   => 'grouptool',
               'action'   => 'add',
@@ -46,8 +48,6 @@ $logs = array(
               'action'   => 'delete',
               'mtable'   => 'grouptool',
               'field'    => 'name'),
-
-        //array('module' => 'grouptool', 'action'=> 'view all'),
 
         array('module'   => 'grouptool',
               'action'   => 'view administration',

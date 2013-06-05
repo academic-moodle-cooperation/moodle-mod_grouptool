@@ -16,7 +16,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-/**
+/*
  * Admin-Settings for grouptool
  *
  * @package       mod
@@ -34,83 +34,83 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('grouptool_view_administration',
             get_string('cfg_admin_head', 'grouptool'),
             get_string('cfg_admin_head_info', 'grouptool')));
-    //name scheme
+    // Standard name scheme?
     $settings->add(new admin_setting_configtext('grouptool_name_scheme',
             get_string('cfg_name_scheme', 'grouptool'),
             get_string('cfg_name_scheme_desc', 'grouptool'),
             get_string('group').' #'));
 
-    //----------------------------------------------------------------------------
+    /*-----------------------------------------------------------------*/
     $settings->add(new admin_setting_heading('grouptool_instance',
             get_string('cfg_instance_head', 'grouptool'),
             get_string('cfg_instance_head_info', 'grouptool')));
 
-    //enable selfregistration
+    // Enable selfregistration?
     $settings->add(new admin_setting_configcheckbox('grouptool_allow_reg',
             get_string('cfg_allow_reg', 'grouptool'),
             get_string('cfg_allow_reg_desc', 'grouptool'),
             1, $yes='1', $no='0'));
 
-    //show groupmembers
+    // Show groupmembers?
     $settings->add(new admin_setting_configcheckbox('grouptool_show_members',
             get_string('cfg_show_members', 'grouptool'),
             get_string('cfg_show_members_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //immediate registrations
+    // Activate immediate registrations?
     $settings->add(new admin_setting_configcheckbox('grouptool_immediate_reg',
             get_string('cfg_immediate_reg', 'grouptool'),
             get_string('cfg_immediate_reg_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //allow unregistration
+    // Allow unregistration?
     $settings->add(new admin_setting_configcheckbox('grouptool_allow_unreg',
             get_string('cfg_allow_unreg', 'grouptool'),
             get_string('cfg_allow_unreg_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //groupsize
+    // Standard groupsize?
     $settings->add(new admin_setting_configtext('grouptool_grpsize',
             get_string('cfg_grpsize', 'grouptool'),
             get_string('cfg_grpsize_desc', 'grouptool'),
             '3'));
 
-    //groupsize activate
+    // Use groupsize?
     $settings->add(new admin_setting_configcheckbox('grouptool_use_size',
             get_string('cfg_use_size', 'grouptool'),
             get_string('cfg_use_size_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //use individual size per group
+    // Use individual size per group?
     $settings->add(new admin_setting_configcheckbox('grouptool_use_individual',
             get_string('cfg_use_individual', 'grouptool'),
             get_string('cfg_use_individual_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //use queues
+    // Use queues?
     $settings->add(new admin_setting_configcheckbox('grouptool_use_queue',
             get_string('cfg_use_queue', 'grouptool'),
             get_string('cfg_use_queue_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //max simultaneous queue-places
+    // Max simultaneous queue-places?
     $settings->add(new admin_setting_configtext('grouptool_max_queues',
             get_string('cfg_max_queues', 'grouptool'),
             get_string('cfg_max_queues_desc', 'grouptool'),
             '1'));
 
-    //multiple registrations
+    // Multiple registrations?
     $settings->add(new admin_setting_configcheckbox('grouptool_allow_multiple',
             get_string('cfg_allow_multiple', 'grouptool'),
             get_string('cfg_allow_multiple_desc', 'grouptool'),
             0, $yes='1', $no='0'));
 
-    //min groups to choose
+    // Min groups to choose?
     $settings->add(new admin_setting_configtext('grouptool_choose_max',
             get_string('cfg_choose_max', 'grouptool'),
             get_string('cfg_choose_max_desc', 'grouptool'),
             '1'));
-    //max groups to choose
+    // Max groups to choose?
     $settings->add(new admin_setting_configtext('grouptool_choose_min',
             get_string('cfg_choose_min', 'grouptool'),
             get_string('cfg_choose_min_desc', 'grouptool'),

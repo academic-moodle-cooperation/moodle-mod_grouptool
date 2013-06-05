@@ -35,8 +35,6 @@ require_once($CFG->libdir . '/formslib.php');
  */
 class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
 
-    // {{{ properties
-
     /**
      * Label of the field
      * @var       string
@@ -67,7 +65,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @since     1.0
      * @access    private
      */
-    public $_flagFrozen = false;
+    public $_flagfrozen = false;
 
     /**
      * Does the element support persistant data when frozen
@@ -75,7 +73,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @since     1.3
      * @access    private
      */
-    public $_persistantFreeze = false;
+    public $_persistantfreeze = false;
 
     /**
      * Options for the element
@@ -102,9 +100,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public $_wrap = array('', '');
 
-    // }}}
-    // {{{ constructor
-
     /**
      * Class constructor
      *
@@ -114,12 +109,12 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @param    array   Options to control the element's display
      * @param    mixed   Either a typical HTML attribute string or an associative array
      */
-    public function __construct($elementName = null, $options = array(), $attributes = null) {
-        $this->HTML_QuickForm_element($elementName, '', $attributes);
-        $this->_persistantFreeze = true;
+    public function __construct($elementname = null, $options = array(), $attributes = null) {
+        $this->HTML_QuickForm_element($elementname, '', $attributes);
+        $this->_persistantfreeze = true;
         $this->_appendName = true;
         $this->_type = 'sortlist';
-        // set the options, do not bother setting bogus ones
+        // Set the options, do not bother setting bogus ones!
         if (is_array($options)) {
             foreach ($options as $name => $value) {
                 if (isset($this->_options[$name])) {
@@ -133,9 +128,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         }
     }
 
-    // }}}
-    // {{{ apiVersion()
-
     /**
      * Returns the current API version
      *
@@ -145,10 +137,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function apiVersion() {
         return 2.0;
-    } // end func apiVersion
-
-    // }}}
-    // {{{ getType()
+    }
 
     /**
      * Returns element type
@@ -159,10 +148,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function getType() {
         return $this->_type;
-    } // end func getType
-
-    // }}}
-    // {{{ setName()
+    }
 
     /**
      * Sets the input field name
@@ -174,10 +160,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function setName($name) {
         $this->_name = $name;
-    } //end func setName
-
-    // }}}
-    // {{{ getName()
+    }
 
     /**
      * Returns the element name
@@ -189,10 +172,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function getName() {
         return $this->_name;
-    } //end func getName
-
-    // }}}
-    // {{{ swapElements()
+    }
 
     /**
      * swaps 2 list-elements
@@ -205,15 +185,12 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
             $temp = $this->_value[$a]['sort_order'];
             $this->_value[$a]['sort_order'] = $this->_value[$b]['sort_order'];
             $this->_value[$b]['sort_order'] = $temp;
-            //reorder Elements
+            // Reorder Elements!
             uasort($this->_value, array(&$this, "cmp"));
         } else {
             print_error('Item swap not possible, 1 of the Elements doesn\'t exist!');
         }
     }
-
-    // }}}
-    // {{{ move1up()
 
     /**
      * moves an Element 1 step up
@@ -230,9 +207,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         $this->_swapElements($index, $otherindex);
     }
 
-    // }}}
-    // {{{ move1down()
-
     /**
      * moves an Element 1 step down
      *
@@ -248,9 +222,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         $this->_swapElements($index, $otherindex);
     }
 
-    // }}}
-    // {{{ setValue()
-
     /**
      * Sets the value of the form element
      *
@@ -264,28 +235,18 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         if (is_array($value) && ($value != null)) {
             uasort($this->_value, array(&$this, "cmp"));
         }
-    } // end func setValue
-
-    // }}}
-    // {{{ grpcmp()
+    }
 
     /**
      * compares if two groups are in correct order
      */
     public function cmp($element1, $element2) {
         if ($element1['sort_order'] == $element2['sort_order']) {
-            //if (strcmp($element1['name'],$element2['name'])) {
             return 0;
-            /*} else {
-             return strcmp($element1['name'],$element2['name']) >= 0 ? +1 : -1;
-            }*/
         } else {
             return $element1['sort_order'] > $element2['sort_order'] ? +1 : -1;
         }
     }
-
-    // }}}
-    // {{{ getValue()
 
     /**
      * Returns the value of the form element
@@ -303,10 +264,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         $elementdata = $this->_clean_addfields($this->_value);
         uasort($elementdata, array(&$this, "cmp"));
         return $elementdata;
-    } // end func getValue
-
-    // }}}
-    // {{{ freeze()
+    }
 
     /**
      * Freeze the element so that only its value is returned
@@ -315,11 +273,8 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return    void
      */
     public function freeze() {
-        $this->_flagFrozen = true;
-    } //end func freeze
-
-    // }}}
-    // {{{ unfreeze()
+        $this->_flagfrozen = true;
+    }
 
     /**
      * Unfreezes the element so that it becomes editable
@@ -329,11 +284,8 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @since  3.2.4
      */
     public function unfreeze() {
-        $this->_flagFrozen = false;
+        $this->_flagfrozen = false;
     }
-
-    // }}}
-    // {{{ getFrozenHtml()
 
     /**
      * Returns the value of field without HTML tags
@@ -346,22 +298,19 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         $value = $this->getValue();
         return ('' != $value? htmlspecialchars($value): '&nbsp;') .
         $this->_getPersistantData();
-    } //end func getFrozenHtml
-
-    // }}}
-    // {{{ _getPersistantData()
+    }
 
     /**
-     * Used by getFrozenHtml() to pass the element's value if _persistantFreeze is on
+     * Used by getFrozenHtml() to pass the element's value if _persistantfreeze is on
      *
      * @access private
      * @return string
      */
     public function _getPersistantData() {
-        if (!$this->_persistantFreeze) {
+        if (!$this->_persistantfreeze) {
             return '';
         } else {
-            //generate draggable items - each representing 1 group
+            // Generate draggable items - each representing 1 group!
             $items = "";
             $name = $this->getName(true);
             $groupdata = $this->getValue();
@@ -471,9 +420,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         }
     }
 
-    // }}}
-    // {{{ isFrozen()
-
     /**
      * Returns whether or not the element is frozen
      *
@@ -482,11 +428,8 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return    bool
      */
     public function isFrozen() {
-        return $this->_flagFrozen;
-    } // end func isFrozen
-
-    // }}}
-    // {{{ setPersistantFreeze()
+        return $this->_flagfrozen;
+    }
 
     /**
      * Sets wether an element value should be kept in an hidden field
@@ -498,11 +441,8 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return    void
      */
     public function setPersistantFreeze($persistant=false) {
-        $this->_persistantFreeze = $persistant;
-    } //end func setPersistantFreeze
-
-    // }}}
-    // {{{ setLabel()
+        $this->_persistantfreeze = $persistant;
+    }
 
     /**
      * Sets display text for the element
@@ -514,10 +454,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function setLabel($label) {
         $this->_label = $label;
-    } //end func setLabel
-
-    // }}}
-    // {{{ getLabel()
+    }
 
     /**
      * Returns display text for the element
@@ -528,10 +465,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function getLabel() {
         return $this->_label;
-    } //end func getLabel
-
-    // }}}
-    // {{{ _findValue()
+    }
 
     /**
      * Tries to find the element value from the values array
@@ -540,43 +474,40 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @access    private
      * @return    mixed
      */
-    public function _findValue(&$values, $elementName = null) {
+    public function _findValue(&$values, $elementname = null) {
         if (empty($values)) {
             return null;
         }
-        if ($elementName == null) {
-            $elementName = $this->getName();
+        if ($elementname == null) {
+            $elementname = $this->getName();
         }
-        if (isset($values[$elementName])) {
-            return $values[$elementName];
-        } else if (strpos($elementName, '[')) {
-            $myVar = "['" . str_replace(array(']', '['), array('', "']['"), $elementName) . "']";
-            return eval("return (isset(\$values$myVar)) ? \$values$myVar : null;");
+        if (isset($values[$elementname])) {
+            return $values[$elementname];
+        } else if (strpos($elementname, '[')) {
+            $myvar = "['" . str_replace(array(']', '['), array('', "']['"), $elementname) . "']";
+            return eval("return (isset(\$values$myvar)) ? \$values$myvar : null;");
         } else {
             return null;
         }
-    } //end func _findValue
+    }
 
-	private function _clean_addfields($data) {
-		if(!is_array($data)) {
-			return $data;
-		}
-		
-		foreach($data as $id => $group) {
-			foreach($this->_options['add_fields'] as $key => $fielddata) {
-				if(empty($fielddata->param_type)) {
-					$fielddata->param_type = PARAM_TEXT;
-				}
-				if(isset($data[$id][$fielddata->name])) {
-					$data[$id][$fielddata->name] = clean_param($group[$fielddata->name], $fielddata->param_type);
-				}
-			}
-		}
-		return $data;
-	}
-	
-    // }}}
-    // {{{ onQuickFormEvent()
+    private function _clean_addfields($data) {
+        if (!is_array($data)) {
+            return $data;
+        }
+
+        foreach ($data as $id => $group) {
+            foreach ($this->_options['add_fields'] as $key => $fielddata) {
+                if (empty($fielddata->param_type)) {
+                    $fielddata->param_type = PARAM_TEXT;
+                }
+                if (isset($data[$id][$fielddata->name])) {
+                    $data[$id][$fielddata->name] = clean_param($group[$fielddata->name], $fielddata->param_type);
+                }
+            }
+        }
+        return $data;
+    }
 
     /**
      * Called by HTML_QuickForm whenever form event is made on this element
@@ -599,18 +530,22 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 $this->onQuickFormEvent('updateValue', null, $caller);
                 break;
             case 'updateValue':
-                // constant values override both default and submitted ones
-                // default values are overriden by submitted
+                /*
+                 * constant values override both default and submitted ones
+                 * default values are overriden by submitted
+                 */
                 $value = $this->_clean_addfields($this->_findValue($caller->_constantValues));
                 if (null === $value) {
                     $value = $this->_clean_addfields($this->_findValue($caller->_submitValues));
-                    // let the form-handling-php belief there was no submission
-                    // if it was just a moveup/movedown submit
+                    /*
+                     * let the form-handling-php belief there was no submission
+                     * if it was just a moveup/movedown submit
+                     */
                     if (optional_param_array('moveup', 0, PARAM_INT)
                             || optional_param_array('movedown', 0, PARAM_INT)) {
                         $caller->_flagSubmitted = false;
                     }
-                    //same for the checkbox-controller buttons
+                    // Same for the checkbox-controller buttons!
                     if (optional_param_array('select_class', 0, PARAM_INT)
                             || optional_param_array('deselect_class', 0, PARAM_INT)
                             || optional_param_array('toggle_class', 0, PARAM_INT)) {
@@ -626,10 +561,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 break;
         }
         return true;
-    } // end func onQuickFormEvent
-
-    // }}}
-    // {{{ accept()
+    }
 
     /**
      * Accepts a renderer
@@ -641,12 +573,11 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return void
      */
     public function accept(&$renderer, $required=false, $error=null) {
-        $renderer->_templates[$this->getName()] = '<div class="qfelement<!-- BEGIN error --> error<!-- END error -->"><!-- BEGIN error --><span class="error">{error}</span><br /><!-- END error -->{element}</div>';
+        $renderer->_templates[$this->getName()] = '<div class="qfelement<!-- BEGIN error --> error<!-- END error -->">'.
+                                                  '<!-- BEGIN error --><span class="error">{error}</span><br />'.
+                                                  '<!-- END error -->{element}</div>';
         $renderer->renderElement($this, $required, $error);
-    } // end func accept
-
-    // }}}
-    // {{{ _generateId()
+    }
 
     /**
      * Automatically generates and assigns an 'id' attribute for the element.
@@ -668,9 +599,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         $this->updateAttributes(array('id' => $id));
     }
 
-    // }}}
-    // {{{ exportValue()
-
     /**
      * Returns a 'safe' element's value
      *
@@ -684,12 +612,9 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         if (null === $value) {
             $value = $this->getValue();
         }
-		$value = $this->_clean_addfields($value);
+        $value = $this->_clean_addfields($value);
         return $this->_prepareValue($value, $assoc);
     }
-
-    // }}}
-    // {{{ _prepareValue()
 
     /**
      * Used by exportValue() to prepare the value for returning
@@ -717,8 +642,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         }
     }
 
-    // }}}
-
     /**
      * Sets the element type
      *
@@ -730,7 +653,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
     public function setType($type) {
         $this->_type = $type;
         $this->updateAttributes(array('type'=>$type));
-    } // end func setType
+    }
 
     /**
      * updates the element active-state if corresponding params are set
@@ -812,11 +735,11 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         if (empty($this->_value) || !array($this->_value) || count($this->_value) == 0) {
             return get_string('sortlist_no_data', 'grouptool');
         }
-        if ($this->_flagFrozen) {
+        if ($this->_flagfrozen) {
             return $this->getFrozenHtml();
         } else {
 
-            //generate draggable items - each representing 1 group
+            // Generate draggable items - each representing 1 group!
             $dragable_items = "";
             $name = $this->getName(true);
             $show_members_str = get_string('show_members', 'grouptool');
@@ -949,7 +872,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
 
             $dragable_list = html_writer::tag('ul', $dragable_items, array('class'=>'drag_list'));
 
-            //generate groupings-controls to select/deselect groupings
+            // Generate groupings-controls to select/deselect groupings!
             $checkbox_control_title = get_string('checkbox_control_header', 'grouptool');
             $checkbox_control_title = html_writer::tag('div', $checkbox_control_title,
                                                        array('class'=>'checkbox_controls_header'));
@@ -960,7 +883,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                                                                      'grouptool'));
             $checkbox_control_elements = array();
 
-            //static controlelements for all elements!
+            // Static controlelements for all elements!
             $this->_noSubmitButtons[]='select[all]';
             $check_all_link = html_writer::tag('button', $select_all,
                                                array('name'  => 'select_class[0]',
@@ -1036,14 +959,11 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
             $content .= html_writer::tag('div', $dragable_list, array('class'=>'drag_area'));
 
             $html = html_writer::tag('div', $content, array('class'=>'sortlist_container'));
-            /*init JS*/
+            // Init JS!
             $PAGE->requires->yui_module('moodle-mod_grouptool-sortlist',
                     'M.mod_grouptool.init_sortlist',
                     null);
             return $html;
         }
-    } //end func toHtml
-
-
-    // }}}
-} // end class MoodleQuickform_sortgrplist}
+    }
+}

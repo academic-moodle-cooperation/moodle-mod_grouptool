@@ -43,21 +43,21 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
         e.preventDefault();
 
         switch(newstate) {
-        	case 'checked': //check
-        		checkboxes.set('checked', 'checked');
-        		break;
-        	case 'unchecked': //uncheck
-        		checkboxes.set('checked', '');
-        		break;
-        	default: //toggle by default
-        		checkboxes.each(function(current, index, nodelist) {
-            		if(current.get('checked')) {
-            			current.set('checked', '');
-            		} else {
-            			current.set('checked', 'checked');
-            		}
-        		})
-        		break;
+            case 'checked': //check
+                checkboxes.set('checked', 'checked');
+                break;
+            case 'unchecked': //uncheck
+                checkboxes.set('checked', '');
+                break;
+            default: //toggle by default
+                checkboxes.each(function(current, index, nodelist) {
+                    if(current.get('checked')) {
+                        current.set('checked', '');
+                    } else {
+                        current.set('checked', 'checked');
+                    }
+                })
+                break;
         }
     }
 

@@ -26,7 +26,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// Because it exists (must)
+// Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_stepslib.php');
 
 /**
@@ -39,14 +39,14 @@ class restore_grouptool_activity_task extends restore_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity!
     }
 
     /**
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // Choice only has one structure step
+        // Grouptool only has one structure step!
         $this->add_step(new restore_grouptool_activity_structure_step('grouptool_structure',
                                                                       'grouptool.xml'));
     }
@@ -87,8 +87,9 @@ class restore_grouptool_activity_task extends restore_activity_task {
      */
     static public function define_restore_log_rules() {
         $rules = array();
-        /*@todo change to using standard-action-pattern add/delete/update/view
-         *+ additional info {@link ../../db/log.php}
+        /*
+         * @todo change to using standard-action-pattern add/delete/update/view
+         * + additional info {@link ../../db/log.php}
          */
         $rules[] = new restore_log_rule('grouptool', 'add', 'view.php?id={course_module}',
                                         '{grouptool}');

@@ -39,9 +39,9 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-// course_module ID, or
+// Do we get course_module ID?
 $id = optional_param('id', 0, PARAM_INT);
-// grouptool instance ID - it should be named as the first character of the module
+// Or do we get grouptool instance ID?
 $g  = optional_param('g', 0, PARAM_INT);
 
 if ($id) {
@@ -61,7 +61,7 @@ if ($id) {
 
 require_login($course, true, $cm);
 $context = get_context_instance(CONTEXT_MODULE, $cm->id);
-/// Print the page header
+// Print the page header!
 $PAGE->set_url('/mod/grouptool/view.php', array('id' => $cm->id));
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($grouptool->name));
@@ -69,16 +69,16 @@ $PAGE->set_heading(format_string($course->fullname));
 
 $instance = new grouptool($cm->id, $grouptool, $cm, $course);
 
-// Output starts here
+// Output starts here!
 echo $OUTPUT->header();
 
-//groupmode?
+// Groupmode?
 $gmok = true;
 if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
     $gmok = $gmok && groups_has_membership($cm);
 }
 
-// Print tabs according to users capabilities
+// Print tabs according to users capabilities!
 $inactive = null;
 $activetwo = null;
 $tabs = array();
@@ -148,7 +148,7 @@ if (count($row) > 1) {
     }
 
     if (!isset($SESSION->mod_grouptool->currenttab)) {
-        // set standard-tab according to users capabilities
+        // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:create_groups', $context)
                 || has_capability('mod/grouptool:create_groupings', $context)
                 || has_capability('mod/grouptool:register_students', $context)) {
@@ -173,7 +173,7 @@ if (count($row) > 1) {
 
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
 
-$tab = $SESSION->mod_grouptool->currenttab; //shortcut
+$tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
 add_to_log($course->id, 'grouptool', 'view '.$tab, "view.php?id={$id}&tab={$tab}",
            $instance->get_name(), $id);
 
@@ -207,5 +207,5 @@ switch($tab) {
         break;
 }
 
-// Finish the page
+// Finish the page!
 echo $OUTPUT->footer();

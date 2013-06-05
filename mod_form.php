@@ -48,20 +48,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
         global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
-        if($update = optional_param('update', 0, PARAM_INT)) {
+        if ($update = optional_param('update', 0, PARAM_INT)) {
             $cm = get_coursemodule_from_id('grouptool', $update);
             $course = $DB->get_record('course', array('id'=>$cm->course));
-        } else if($course = optional_param('course', 0, PARAM_INT)) {
+        } else if ($course = optional_param('course', 0, PARAM_INT)) {
             $course = $DB->get_record('course', array('id'=>$course));
         } else {
             $course = 0;
         }
-        
-        //-------------------------------------------------------------------------------
-        // Adding the "general" fieldset, where all the common settings are showed
+
+        /* -------------------------------------------------------------------------------
+         * Adding the "general" fieldset, where all the common settings are showed
+         */
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        // Adding the standard "name" field
+        // Adding the standard "name" field!
         $mform->addElement('text', 'name', get_string('grouptoolname', 'grouptool'),
                            array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
@@ -73,7 +74,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'grouptoolname', 'grouptool');
 
-        // Adding the standard "intro" and "introformat" fields
+        // Adding the standard "intro" and "introformat" fields!
         $this->add_intro_editor();
 
         $mform->addElement('date_time_selector', 'timeavailable',
@@ -83,11 +84,14 @@ class mod_grouptool_mod_form extends moodleform_mod {
                            array('optional'=>true));
         $mform->setDefault('timedue', date('U', strtotime('+1week 23:55', time())));
 
-        //-------------------------------------------------------------------------------
+        /*
+         * ---------------------------------------------------------
+         */
 
-        //-------------------------------------------------------------------------------
-        // Adding the "grouptool" fieldset, where all individual-settings are made
-        // (except of active-groups)
+        /* -------------------------------------------------------------------------------
+         * Adding the "grouptool" fieldset, where all individual-settings are made
+         * (except of active-groups)
+         */
         $mform->addElement('header', 'grouptoolfieldset', get_string('grouptoolfieldset',
                                                                      'grouptool'));
 
@@ -187,11 +191,15 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->disabledIf('choose_max', 'allow_multiple', 'notchecked');
         $mform->disabledIf('choose_max', 'allow_reg', 'equal', 1);
         $mform->setAdvanced('choose_max');
-        //-------------------------------------------------------------------------------
 
-        //-------------------------------------------------------------------------------
-        // Adding the "moodlesync" fieldset, where all settings influencing behaviour
-        // if groups/groupmembers are added/deleted in moodle are made
+        /*
+         * ---------------------------------------------------------
+         */
+
+        /* -------------------------------------------------------------------------------
+         * Adding the "moodlesync" fieldset, where all settings influencing behaviour
+         * if groups/groupmembers are added/deleted in moodle are made
+         */
         $mform->addElement('header', 'moodlesync', get_string('moodlesync', 'grouptool'));
         $mform->addHelpButton('moodlesync', 'moodlesync', 'grouptool');
 
@@ -228,21 +236,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
                                                  GROUPTOOL_RECREATE_GROUP));
         $mform->setAdvanced('ifgroupdeleted');
 
-        //-------------------------------------------------------------------------------
+        /*
+         * ---------------------------------------------------------
+         */
 
-        //-------------------------------------------------------------------------------
-        // Adding the "active groups" fieldset, where all the group-settings are made
+        /* -------------------------------------------------------------------------------
+         * Adding the "active groups" fieldset, where all the group-settings are made
+         */
         $mform->addElement('header', 'agroups', get_string('agroups', 'grouptool'));
 
-        /***************************************
-         * INSERT CUSTOM ELEMENT HERE
-        **************************************/
-        // Register our custom form control
+        // Register our custom form control!
         $nogroups = 0;
         MoodleQuickForm::registerElementType('sortlist',
                 "$CFG->dirroot/mod/grouptool/sortlist.php",
                 'MoodleQuickForm_sortlist');
-        //get groupdata
+        // Get groupdata!
         $coursegroups = groups_get_all_groups($course->id, null, null, "id");
         if (is_array($coursegroups) && !empty($coursegroups)) {
             $groups = array();
@@ -260,13 +268,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
                   WHERE grp.id ".$grps_sql."
                   GROUP BY grp.id
                   ORDER BY sort_order ASC, name ASC", $params);
-            // convert to multidimensional array and replace comma separated string through array
-            //  for each classes list
+            /*
+             * convert to multidimensional array and replace comma separated string through array
+             * for each classes list
+             */
             $running_index = 1;
             foreach ($groupdata as $key => $group) {
-                //if ($groupdata[$key]->sort_order == NULL) {
                 $groupdata[$key]->sort_order = $running_index;
-                //}
                 $running_index++;
                 $groupdata[$key] = (array)$group;
                 $groupdata[$key]['classes'] = explode(",", $groupdata[$key]['classes']);
@@ -291,33 +299,35 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $options['add_fields']['grpsize']->label = get_string('groupsize', 'grouptool');
             $options['add_fields']['grpsize']->type = 'text';
             $options['add_fields']['grpsize']->attr = array('size' => '3');
-			$options['add_fields']['grpsize']->param_type = PARAM_INT;
+            $options['add_fields']['grpsize']->param_type = PARAM_INT;
             $options['all_string'] = get_string('all').' '.get_string('groups');
             $mform->addElement('sortlist', 'grouplist', $options);
             $mform->setDefault('grouplist', $groupdata);
-            //add disabledIfs for all Groupsize-Fields
+            // Add disabledIfs for all Groupsize-Fields!
 
             foreach ($groupdata as $key => $group) {
                 $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_size',
                                    'notchecked');
                 $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_individual',
                                    'notchecked');
-				$mform->setType('grouplist['.$group['id'].'][grpsize]', PARAM_INT);
+                $mform->setType('grouplist['.$group['id'].'][grpsize]', PARAM_INT);
             }
-			/*init enhancements JS*/
-			$PAGE->requires->yui_module('moodle-mod_grouptool-enhancements',
-										'M.mod_grouptool.init_enhancements',
-										null);
+            // Init enhancements JS!
+            $PAGE->requires->yui_module('moodle-mod_grouptool-enhancements',
+                                        'M.mod_grouptool.init_enhancements',
+                                        null);
         } else {
             $mform->addElement('sortlist', 'grouplist', array());
             $mform->setDefault('grouplist', null);
         }
 
-        //-------------------------------------------------------------------------------
-        // add standard elements, common to all modules
+        /* ------------------------------------------------------------------------------
+         * add standard elements, common to all modules
+         */
         $this->standard_coursemodule_elements();
-        //-------------------------------------------------------------------------------
-        // add standard buttons, common to all modules
+        /* ------------------------------------------------------------------------------
+         * add standard buttons, common to all modules
+         */
         $this->add_action_buttons();
     }
 
@@ -327,43 +337,43 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['timedue']) && ($data['timedue'] <= $data['timeavailable'])) {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
         }
-		
-		if (!empty($data['use_size']) && ($data['grpsize'] <= 0) && empty($data['use_individual'])) {
-			$errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
-		}
-		
-		if(!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
-			$errors['queues_max'] = get_string('queuesizeerror', 'grouptool');
-		}
-		
-		if(!empty($data['use_size']) && !empty($data['use_individual'])) {
-			foreach($data['grouplist'] as $group_id => $curgroup) {
-				if(clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {
-					if(!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
-						$errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
-					} else {
-						$errors['grouplist'] .= ', '.$curgroup['name'];
-					}
-				}
-			}
-		}
-		
-		if(!empty($data['allow_multiple']) && ($data['choose_min'] <= 0)) {
-			$errors['choose_min'] = get_string('mustbeposint', 'grouptool');
-		}
-		
-		if(!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {
-			$errors['choose_max'] = get_string('mustbeposint', 'grouptool');
-		}
-		
-		if(!empty($data['allow_multiple']) && ($data['choose_min'] > $data['choose_max'])) {
-			if(isset($errors['choose_max'])) {
-				$errors['choose_max'] .= html_writer::empty_tag('br').get_string('mustbegtoeqmin', 'grouptool');
-			} else {
-				$errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
-			}
-		}
-		
+
+        if (!empty($data['use_size']) && ($data['grpsize'] <= 0) && empty($data['use_individual'])) {
+            $errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
+        }
+
+        if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
+            $errors['queues_max'] = get_string('queuesizeerror', 'grouptool');
+        }
+
+        if (!empty($data['use_size']) && !empty($data['use_individual'])) {
+            foreach ($data['grouplist'] as $group_id => $curgroup) {
+                if (clean_param($curgroup['grpsize'], PARAM_INT) <= 0) {
+                    if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
+                        $errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
+                    } else {
+                        $errors['grouplist'] .= ', '.$curgroup['name'];
+                    }
+                }
+            }
+        }
+
+        if (!empty($data['allow_multiple']) && ($data['choose_min'] <= 0)) {
+            $errors['choose_min'] = get_string('mustbeposint', 'grouptool');
+        }
+
+        if (!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {
+            $errors['choose_max'] = get_string('mustbeposint', 'grouptool');
+        }
+
+        if (!empty($data['allow_multiple']) && ($data['choose_min'] > $data['choose_max'])) {
+            if (isset($errors['choose_max'])) {
+                $errors['choose_max'] .= html_writer::empty_tag('br').get_string('mustbegtoeqmin', 'grouptool');
+            } else {
+                $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
+            }
+        }
+
         return array_merge($parent_errors, $errors);
     }
 }

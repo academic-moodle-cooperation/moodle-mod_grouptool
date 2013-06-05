@@ -45,7 +45,7 @@ $groupid = optional_param('groupid', 0, PARAM_INT);
 $PAGE->url->param('groupingid', $groupingid);
 $PAGE->url->param('groupid', $groupid);
 
-//tab determines which table to download (userlist or group overview)
+// Tab determines which table to download (userlist or group overview)!
 switch (required_param('tab', PARAM_ALPHA)) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');

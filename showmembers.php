@@ -40,7 +40,7 @@ $group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.c
                                 LEFT JOIN {groups} AS grp ON agrp.group_id = grp.id
                               WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id'=>$group->grouptoolid), '*', MUST_EXIST);
-                              
+
 $PAGE->set_url('/mod/grouptool/showmembers.php');
 $PAGE->set_pagelayout('popup');
 $coursecontext = context_course::instance($group->courseid);
@@ -58,8 +58,8 @@ if ($ajax) {
 }
 
 echo $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
-if(!has_capability('mod/grouptool:view_registrations', $context)
-          && !$grouptool->show_members){
+if (!has_capability('mod/grouptool:view_registrations', $context)
+          && !$grouptool->show_members) {
     echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
                           array('class'=>'reg'));
 } else {

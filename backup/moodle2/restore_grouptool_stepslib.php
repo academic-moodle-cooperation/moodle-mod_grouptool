@@ -51,7 +51,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
             $paths[] = $queue;
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -67,9 +67,9 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->timecreated = time();
 
-        // insert the checkmark record
+        // Insert the checkmark record!
         $newitemid = $DB->insert_record('grouptool', $data);
-        // immediately after inserting "activity" record, call this
+        // Immediately after inserting "activity" record, call this!
         $this->apply_activity_instance($newitemid);
     }
 
@@ -115,7 +115,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
     }
 
     protected function after_execute() {
-        //Add grouptool related files, no need to match by itemname (jst internally handled context)
+        // Add grouptool related files, no need to match by itemname (jst internally handled context)!
         $this->add_related_files('mod_grouptool', 'intro', null);
     }
 }

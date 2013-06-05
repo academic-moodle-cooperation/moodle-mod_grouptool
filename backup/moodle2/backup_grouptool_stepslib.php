@@ -33,10 +33,10 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
 
     protected function define_structure() {
 
-        // To know if we are including userinfo
+        // Are we including userinfo?
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define each element separated
+        // Define each element separated!
         $grouptool = new backup_nested_element('grouptool', array('id'), array(
                 'name', 'intro', 'introformat', 'timecreated', 'timemodified', 'timedue',
                 'timeavailable', 'show_members', 'allow_reg', 'immediate_reg', 'allow_unreg',
@@ -52,7 +52,7 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
         $queue = new backup_nested_element('queue', array('id'), array(
                 'agrp_id', 'user_id', 'timestamp'));
 
-        // Build the tree
+        // We begin building the tree.
         $grouptool->add_child($agrps);
         $agrps->add_child($agrp);
         $agrp->add_child($registrations);
@@ -60,17 +60,17 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
         $agrp->add_child($queues);
         $queues->add_child($queue);
 
-        // Define sources
+        // We define sources.
         $grouptool->set_source_table('grouptool', array('id' => backup::VAR_ACTIVITYID));
         $agrp->set_source_table('grouptool_agrps', array('grouptool_id' => backup::VAR_PARENTID));
-        // All the rest of elements only happen if we are including user info
+        // All the rest of elements only happen if we are including user info!
         if ($userinfo) {
             $registration->set_source_table('grouptool_registered',
                                             array('agrp_id' => backup::VAR_PARENTID));
             $queue->set_source_table('grouptool_queued', array('agrp_id' => backup::VAR_PARENTID));
         }
 
-        // Define id annotations
+        // We define id annotations.
         $agrp->annotate_ids('group', 'group_id');
 
         $registration->annotate_ids('user', 'user_id');
@@ -78,10 +78,10 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
 
         $queue->annotate_ids('user', 'user_id');
 
-        // Define file annotations
-        $grouptool->annotate_files('mod_grouptool', 'intro', null); // This file area hasn't itemid
+        // We define file annotations.
+        $grouptool->annotate_files('mod_grouptool', 'intro', null); // This file area has no itemid!
 
-        // Return the root element (checkmark), wrapped into standard activity structure
+        // We return the root element (grouptool), wrapped into standard activity structure.
         return $this->prepare_activity_structure($grouptool);
     }
 }

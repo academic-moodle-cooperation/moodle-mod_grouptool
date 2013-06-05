@@ -27,37 +27,37 @@
 defined('MOODLE_INTERNAL') || die();
 
 $handlers = array (
-        //groupid, userid
+        // We get groupid, userid with this handler.
         'groups_member_added' => array (
                 'handlerfile'      => '/mod/grouptool/eventhandlers.php',
                 'handlerfunction'  => 'group_add_member_handler',
                 'schedule'         => 'instant'
         ),
-        //groupid, userid
+        // We get groupid, userid with this handler.
         'groups_member_removed' => array (
                 'handlerfile'      => '/mod/grouptool/eventhandlers.php',
                 'handlerfunction'  => 'group_remove_member_handler',
                 'schedule'         => 'instant'
         ),
-        //courseid, userid - user deleted from all coursegroups
+        // We get courseid, userid with this handler (user deleted from all coursegroups).
         'groups_members_removed' => array (
                 'handlerfile'      => '/mod/grouptool/eventhandlers.php',
                 'handlerfunction'  => 'groups_remove_member_handler',
                 'schedule'         => 'instant'
         ),
-        //id, courseid, name, description, timecreated, timemodified, picture
+        // We get id, courseid, name, description, timecreated, timemodified, picture with this handler.
         'groups_group_deleted' => array (
                 'handlerfile'      => '/mod/grouptool/eventhandlers.php',
                 'handlerfunction'  => 'group_deleted_handler',
                 'schedule'         => 'instant'
         ),
-        //courseid (as plain integer) - delete all groups in a course
+        // We get courseid (as plain integer) with this handler (delete all groups in a course).
         'groups_groups_deleted' => array(
                 'handlerfile'      => '/mod/grouptool/eventhandlers.php',
                 'handlerfunction'  => 'groups_deleted_handler',
                 'schedule'         => 'instant'
         ),
-        //id, courseid, name, description, timecreated, timemodified, picture
+        // We get id, courseid, name, description, timecreated, timemodified, picture with this handler.
         'groups_group_created' => array(
                 'handlerfile'      => '/mod/grouptool/eventhandlers.php',
                 'handlerfunction'  => 'group_created_handler',

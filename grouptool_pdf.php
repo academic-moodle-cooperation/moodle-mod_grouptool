@@ -28,7 +28,7 @@
 
 require_once('../../lib/pdflib.php');
 
-define('NORMLINEHEIGHT', 12); //8
+define('NORMLINEHEIGHT', 12);
 
 class grouptool_pdf extends pdf {
     /** @var string[] $header1 defines what's in the upper row of page-header **/
@@ -140,10 +140,10 @@ class grouptool_pdf extends pdf {
      * Header() helper method to actually print the page header in the PDF
      */
     public function Header() {
-        // Set font
+        // Set font.
         $this->SetFont('', '');
 
-        // Title
+        // Title.
 
         $header = $this->header1;
 
@@ -154,7 +154,7 @@ class grouptool_pdf extends pdf {
             $oldfontsize = $this->getFontSize();
             $this->setFontSize('12');
 
-            // first row
+            // First row.
             $border = 0;
             $height = 4;
             $this->SetFont('', 'B');
@@ -165,7 +165,7 @@ class grouptool_pdf extends pdf {
             $this->MultiCell(41*$scale, $height, $header[1], $border, 'R', 0, 0, null, null, true,
                              1, false, false, $height, 'M', true);
 
-            //spacer
+            // Spacer!
             $this->MultiCell(15*$scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
                              false, false, $height, 'M', true);
 
@@ -178,7 +178,7 @@ class grouptool_pdf extends pdf {
             $this->MultiCell(46*$scale, $height, $header[3], $border, 'R', 0, 0, null, null, true,
                              1, false, false, $height, 'M', true);
 
-            //spacer
+            // Spacer!
             $this->MultiCell(15*$scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
                              false, false, $height, 'M', true);
 
@@ -188,7 +188,7 @@ class grouptool_pdf extends pdf {
 
             $this->Ln();
 
-            // second row
+            // Second row.
             $height = 4;
             $header = $this->header2;
 
@@ -200,7 +200,7 @@ class grouptool_pdf extends pdf {
             $this->MultiCell(41*$scale, $height, $header[1], $border, 'R', 0, 0, null, null, true,
                              1, false, false, $height, 'M', true);
 
-            //spacer
+            // Spacer!
             $this->MultiCell(15*$scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
                              false, false, $height, 'M', true);
 
@@ -212,7 +212,7 @@ class grouptool_pdf extends pdf {
             $this->MultiCell(46*$scale, $height, $header[3], $border, 'R', 0, 0, null, null, true,
                              1, false, false, $height, 'M', true);
 
-            //spacer
+            // Spacer!
             $this->MultiCell(15*$scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
                              false, false, $height, 'M', true);
 
@@ -239,7 +239,7 @@ class grouptool_pdf extends pdf {
                                      $moodlemembers = array()) {
         $scale = $this->getPageWidth() / 210;
 
-        //calculate height
+        // Calculate height.
         $this->setFontSize(1.25*NORMLINEHEIGHT);
         $big_height = $this->getStringHeight(0, 'testtext');
         $this->setFontSize(1.0*NORMLINEHEIGHT);
@@ -247,31 +247,31 @@ class grouptool_pdf extends pdf {
 
         $height = $big_height+$normal_height+(count($registration)+count($queue)+1)*$normal_height;
 
-        //move to next page if too high
+        // Move to next page if too high.
         $this->checkPageBreak($height);
 
-        // Color and font restoration
+        // Color and font restoration!
         $this->setDrawColor(0);
         $this->SetFillColor(0xe8, 0xe8, 0xe8);
         $this->SetTextColor(0);
         $this->SetFont('');
 
-        //groupname
+        // Insert groupname!
         $this->setFontSize(1.25*NORMLINEHEIGHT);
         $this->MultiCell(0, $big_height, $groupname, 0, 'L', false, 1, null, null, true, 1, true,
                          false, $big_height, 'M', true);
         $this->ln();
 
-        //groupinfo
+        // Insert groupinfo!
         $this->setFontSize(1.0*NORMLINEHEIGHT);
         $this->MultiCell(0, $normal_height, $groupinfo, 0, 'L', false, 1, null, null, true, 1,
                          true, false, $normal_height, 'M', true);
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth()-$margins['left']-$margins['right'];
         $this->ln();
-        //registrations & queue table
+        // Insert registrations & queue tables!
         if (count($registration)) {
-            //print table-header
+            // Print table-header!
             $this->SetFont('', 'B');
             $this->Multicell(0.1*$writewidth, $normal_height, get_string('status', 'grouptool'),
                              'RB', 'C', true, 0, null, null, true, 1, true, false, $normal_height,
@@ -395,18 +395,18 @@ class grouptool_pdf extends pdf {
 
         $this->setFontSize(1.0*NORMLINEHEIGHT);
 
-        //get row-height
+        // Get row-height!
         if (!$getheightonly) {
             $height = $this->add_userdata($name, $idnumber, $email, $registrations, $queues,
                                           $header, true);
-            //move to next page if too high
+            // Move to next page if too high!
             $this->checkPageBreak($height);
 
         } else {
-            // store current object
+            // Store current object!
             $this->startTransaction();
 
-            // store starting values
+            // Store starting values!
             $start_y = $this->GetY();
 
             $start_page = $this->getPage();
@@ -448,7 +448,7 @@ class grouptool_pdf extends pdf {
         foreach ($basic_widths as $column => $width) {
             $widths[$column] = $basic_widths[$column]*($totalwidth/$collapsed_width)*$writewidth;
         }
-        //set the last column to stretch over the rest of the page
+        // Set the last column to stretch over the rest of the page!
         end($widths);
         $widths[key($widths)] = 0;
 
@@ -543,7 +543,7 @@ class grouptool_pdf extends pdf {
         }
         $this->ln($height);
         if ($getheightonly) {
-            // restore previous object
+            // Restore previous object!
             $this->rollbackTransaction(true);
             return $height;
         }
