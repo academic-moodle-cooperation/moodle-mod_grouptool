@@ -131,7 +131,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $size[] = $mform->createElement('checkbox', 'use_size', '', get_string('use_size',
                                                                                'grouptool'));
         //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
-        //$mform->setType('grpsize', PARAM_INT);
+        $mform->setType('grpsize', PARAM_RAW);
         $mform->setDefault('grpsize',
                            (!empty($CFG->grouptool_grpsize) ? $CFG->grouptool_grpsize : 3));
         $mform->setType('use_size', PARAM_BOOL);

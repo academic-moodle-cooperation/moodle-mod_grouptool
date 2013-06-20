@@ -63,10 +63,12 @@ class view_admin_form extends moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
+        $mform->setType('id', PARAM_INT);
         $this->context = context_module::instance($this->_customdata['id']);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'administration');
+        $mform->setType('tab', PARAM_TEXT);
 
         if (has_capability('mod/grouptool:create_groups', $this->context)) {
             /* -------------------------------------------------------------------------------
@@ -140,22 +142,22 @@ class view_admin_form extends moodleform {
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
-            //$mform->setType('amount', PARAM_INT);
+            $mform->setType('amount', PARAM_RAW);
             $mform->setDefault('amount', 2);
 
             $fromto = array();
             $fromto[] = $mform->createElement('text', 'from', get_string('from'));
             $mform->setDefault('from', 0);
             //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
-            //$mform->setType('from', PARAM_INT);
+            $mform->setType('from', PARAM_RAW);
             $fromto[] = $mform->createElement('text', 'to', get_string('to'));
             $mform->setDefault('to', 0);
             //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
-            //$mform->setType('to', PARAM_INT);
+            $mform->setType('to', PARAM_RAW);
             $fromto[] = $mform->createElement('text', 'digits', get_string('digits', 'grouptool'));
             $mform->setDefault('digits', 2);
             //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
-            //$mform->setType('digits', PARAM_INT);
+            $mform->setType('digits', PARAM_RAW);
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
                              array(' - ', ' '.get_string('digits', 'grouptool').' '), false);
             $mform->disabledIf('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
@@ -188,6 +190,7 @@ class view_admin_form extends moodleform {
             $namingstd = (isset($CFG->grouptool_name_scheme) ? $CFG->grouptool_name_scheme
                                                              : get_string('group', 'group').' #');
             $mform->setDefault('namingscheme', $namingstd);
+            $mform->setType('namingscheme', PARAM_RAW);
 
             $mform->addElement('static', 'tags', get_string('tags', 'grouptool'),
                                get_string('name_scheme_tags', 'grouptool'));
@@ -322,9 +325,11 @@ class view_admin_form extends moodleform {
                 $use_size = $grouptool->use_size;
                 $mform->addElement('hidden', 'use_size');
                 $mform->setDefault('use_size', $use_size);
+                $mform->setType('use_size', PARAM_BOOL);
                 $use_individual = $grouptool->use_individual;
                 $mform->addElement('hidden', 'use_individual');
                 $mform->setDefault('use_individual', $use_individual);
+                $mform->setType('use_individual', PARAM_BOOL);
 
                 foreach ($groupdata as $key => $group) {
                     $mform->disabledIf('grouplist['.$group['id'].'][grpsize]', 'use_size',
@@ -441,6 +446,7 @@ class view_import_form extends moodleform {
 
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
+        $mform->setType('id', PARAM_INT);
         $this->context = context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
@@ -448,6 +454,7 @@ class view_import_form extends moodleform {
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'import');
+        $mform->setType('tab', PARAM_TEXT);
 
         if (has_capability('mod/grouptool:register_students', $this->context)) {
             /* -------------------------------------------------------------------------------
