@@ -173,6 +173,12 @@
 .path-mod-grouptool .coloredrows.grading_previewtable .firstgrouprow {
     border-top:1.5px solid black;
 }
+
+.path-mod-grouptool .generalbox.tumargin {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 .path-mod-grouptool .indent {
     margin-left:2em;
 }

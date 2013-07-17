@@ -111,7 +111,7 @@ $string['copied_grade_feedback'] = 'Groupgrading<br />
 +Submission from: {$a->student}<br />
 +Graded by: {$a->teacher}<br />
 +Original Date/Time: {$a->date}<br />
-<div class="indent">{$a->feedback}</div>';
++Feedback: {$a->feedback}';
 $string['copy'] = 'Copy';
 $string['copy_chosen'] = 'Copy chosen';
 $string['copygrade'] = 'Copy grade';

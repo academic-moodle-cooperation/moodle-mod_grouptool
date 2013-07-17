@@ -111,7 +111,7 @@ $string['copied_grade_feedback'] = 'Gruppenbenotung<br />
 +Abgabe von: {$a->student}<br />
 +Note von: {$a->teacher}<br />
 +Original Datum/Zeit: {$a->date}<br />
-<div class="indent">{$a->feedback}</div>';
++Feedback: {$a->feedback}';
 $string['copy'] = 'Übertragen';
 $string['copy_chosen'] = 'Übertrage Gewählte';
 $string['copygrade'] = 'Bewertung kopieren';

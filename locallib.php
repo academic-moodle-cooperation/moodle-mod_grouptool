@@ -2565,11 +2565,11 @@ EOS;
             if ($error) {
                 echo $OUTPUT->box($OUTPUT->notification(get_string('copy_grades_errors',
                                                                    'grouptool'),
-                                                        'notifyproblem').$info, 'generalbox');
+                                                        'notifyproblem').$info, 'generalbox tumargin');
             } else {
                 echo $OUTPUT->box($OUTPUT->notification(get_string('copy_grades_success',
                                                                    'grouptool'),
-                                                        'notifysuccess').$info, 'generalbox');
+                                                        'notifysuccess').$info, 'generalbox tumargin');
             }
         }
 
