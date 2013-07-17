@@ -76,7 +76,7 @@ echo $OUTPUT->header();
 // Groupmode?
 $gmok = true;
 if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
-    $gmok = $gmok && groups_has_membership($cm);
+    $gmok = $gmok && (groups_has_membership($cm) || !$cm->groupmembersonly);
 }
 
 // Print tabs according to users capabilities!
