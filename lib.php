@@ -117,19 +117,19 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
     }
     $event->visible      = instance_is_visible('grouptool', $grouptool);
     $event->timeduration = 0;
-
+    $dueevent = clone($event);
     calendar_event::create($event);
 
     if ($grouptool->timedue != 0) {
-        unset($event->id);
+        unset($dueevent->id);
         if ($grouptool->allow_reg) {
-            $event->name = get_string('registration_period_end', 'grouptool').' '.$grouptool->name;
+            $dueevent->name = get_string('registration_period_end', 'grouptool').' '.$grouptool->name;
         } else {
-            $event->name = $grouptool->name.' '.get_string('duedate', 'grouptool');
+            $dueevent->name = $grouptool->name.' '.get_string('duedate', 'grouptool');
         }
-        $event->timestart = $grouptool->timedue;
-        $event->eventtype = 'due';
-        calendar_event::create($event);
+        $dueevent->timestart = $grouptool->timedue;
+        $dueevent->eventtype = 'deadline';
+        calendar_event::create($dueevent);
     }
 
     return $return;
@@ -224,7 +224,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
             $event->name = $grouptool->name.' '.get_string('duedate', 'grouptool');
         }
         $event->timestart = $grouptool->timedue;
-        $event->eventtype    = 'due';
+        $event->eventtype    = 'deadline';
         /*
          *  For activity module's events, this can be used to set the alternative text of the
          *  event icon. Set it to 'pluginname' unless you have a better string.
