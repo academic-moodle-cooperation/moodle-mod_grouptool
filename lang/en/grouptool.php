@@ -65,7 +65,7 @@ $string['cfg_choose_min_desc'] = 'How many groups have users to choose minimum b
 $string['cfg_grpsize'] = 'Global standard groupsize';
 $string['cfg_grpsize_desc'] = 'Standard groupsize used everywhere in grouptool';
 $string['cfg_ifgroupdeleted'] = 'If groups get deleted';
-$string['cfg_ifgroupdeleted_desc'] = 'Should deleted groups be recreated for the grouptool-instance or should the references in grouptool (incl. group-data, registrations and queue) be deleted?';
+$string['cfg_ifgroupdeleted_desc'] = 'Should deleted groups be recreated for the grouptool-instance or should the references in grouptool (incl. group-data, registrations and queue) be deleted? Note: If you select "recreate group", then groups wills be recreated automatically after deletion under "Course administration / Users / Groups".';
 $string['cfg_ifmemberadded'] = 'If groupmembers are added';
 $string['cfg_ifmemberadded_desc'] = 'Should new groupmembers added via moodle be also registered in grouptool or be ignored?';
 $string['cfg_ifmemberremoved'] = 'If groupmembers are removed';
@@ -219,7 +219,7 @@ $string['group_not_in_grouping'] = 'Chosen group is not member of chosen groupin
 $string['group_or_member_count'] = 'Group/Member count';
 $string['grpsizezeroerror'] = 'Groupsize has to be a positive integer (>= 1)';
 $string['ifgroupdeleted'] = 'If groups get deleted';
-$string['ifgroupdeleted_help'] = 'Should deleted groups be recreated for the grouptool-instance or should the references in grouptool (additional group-data, registrations and queue) be deleted?';
+$string['ifgroupdeleted_help'] = 'Should deleted groups be recreated for the grouptool-instance or should the references in grouptool (additional group-data, registrations and queue) be deleted? Note: If you select "recreate group", then groups wills be recreated automatically after deletion under "Course administration / Users / Groups".';
 $string['ifmemberadded'] = 'If groupmembers get added';
 $string['ifmemberadded_help'] = 'Should new groupmembers added via moodle be also registered in grouptool or be ignored?';
 $string['ifmemberremoved'] = 'If groupmembers get removed';
