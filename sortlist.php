@@ -342,7 +342,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                         'type' => 'hidden',
                         'value' => $group['sort_order'],
                         'class' => 'sort_order');
-                $moveup_attr = array( 'src'=>$CFG->wwwroot.'/mod/grouptool/pix/moveup.png',
+                $moveup_attr = array( 'src'=>$OUTPUT->pix_url('i/up'),
                         'alt'=>$move_up_str,
                         'type'=>'image',
                         'name'=>'moveup['.$id.']',
@@ -352,7 +352,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                     $moveup_attr['style'] = "visibility:hidden;";
                 }
                 $moveup_button = html_writer::empty_tag('input', $moveup_attr);
-                $movedown_attr = array( 'src'=>$CFG->wwwroot.'/mod/grouptool/pix/movedown.png',
+                $movedown_attr = array( 'src'=>$OUTPUT->pix_url('i/down'),
                         'alt'=>$move_down_str,
                         'type'=>'image',
                         'name'=>'movedown['.$id.']',
@@ -787,7 +787,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                         array(
                                 'href'=>'somewhere',
                                 'title'=>$show_members_str));
-                $moveup_attr = array( 'src'=>$CFG->wwwroot.'/mod/grouptool/pix/moveup.png',
+                $moveup_attr = array( 'src'=>$OUTPUT->pix_url('i/up'),
                         'alt'=>$move_up_str,
                         'type'=>'image',
                         'name'=>'moveup['.$id.']',
@@ -797,7 +797,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                     $moveup_attr['style'] = "visibility:hidden;";
                 }
                 $moveup_button = html_writer::empty_tag('input', $moveup_attr);
-                $movedown_attr = array( 'src'=>$CFG->wwwroot.'/mod/grouptool/pix/movedown.png',
+                $movedown_attr = array( 'src'=>$OUTPUT->pix_url('i/down'),
                         'alt'=>$move_down_str,
                         'type'=>'image',
                         'name'=>'movedown['.$id.']',
@@ -808,7 +808,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 }
                 $movedown_button = html_writer::empty_tag('input', $movedown_attr);
                 $drag_button = html_writer::empty_tag('img', array(
-                        'src'=>$CFG->wwwroot.'/mod/grouptool/pix/drag.png',
+                        'src'=>$OUTPUT->pix_url('i/dragdrop'),
                         'alt'=>$drag_str,
                         'class' => 'drag_image js_invisible'));
                 $name_attr = array( 'name'=>$namebase.'[name]',
