@@ -3919,16 +3919,16 @@ EOS;
                                                          array('class'=>'fitem'));
             }
 
+            $timedue = html_writer::tag('div', get_string('registrationdue', 'grouptool'),
+                                        array('class'=>'fitemtitle'));
             if (!empty($this->grouptool->timedue)) {
-                $timedue = html_writer::tag('div', get_string('registrationdue', 'grouptool'),
-                                            array('class'=>'fitemtitle')).
-                           html_writer::tag('div',
-                                            userdate($this->grouptool->timedue,
-                                                     get_string('strftimedatetime')),
-                                            array('class'=>'felement'));
+                $timedue .= html_writer::tag('div',
+                                             userdate($this->grouptool->timedue,
+                                                      get_string('strftimedatetime')),
+                                             array('class'=>'felement'));
             } else {
-                $timedue = html_writer::tag('div', get_string('noregistrationdue', 'grouptool'),
-                                            array('class'=>'felement'));
+                $timedue .= html_writer::tag('div', get_string('noregistrationdue', 'grouptool'),
+                                             array('class'=>'felement'));
             }
             $general_information .= html_writer::tag('div', $timedue, array('class'=>'fitem'));
 
