@@ -4102,12 +4102,20 @@ EOS;
                             }
                         } else if (empty($this->grouptool->allow_multiple)
                                       && !empty($this->grouptool->allow_unreg)) {
-                            $label = get_string('change_group', 'grouptool');
-                            $button_attr = array('type'=>'submit',
-                                    'name'=>'reg['.$group->agrp_id.']',
-                                    'value'=>$group->agrp_id,
-                                    'class'=>'regbutton');
-                            $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                            if (($this->grouptool->use_size) && ($registered >= $group->grpsize)
+                                 && !$this->grouptool->use_queue) {
+                                $grouphtml .= html_writer::tag('div',
+                                                               get_string('fullgroup',
+                                                                          'grouptool'),
+                                                               array('class'=>'rank'));
+                            } else {
+                                $label = get_string('change_group', 'grouptool');
+                                $button_attr = array('type'=>'submit',
+                                        'name'=>'reg['.$group->agrp_id.']',
+                                        'value'=>$group->agrp_id,
+                                        'class'=>'regbutton');
+                                $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                            }
                         } else {
                             $grouphtml .= html_writer::tag('div',
                                     get_string('max_regs_reached',
