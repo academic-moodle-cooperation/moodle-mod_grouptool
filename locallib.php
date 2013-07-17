@@ -411,7 +411,8 @@ class view_admin_form extends moodleform {
             foreach ($data['grouplist'] as $group_id => $curgroup) {
                 if ((clean_param($curgroup['grpsize'], PARAM_INT) <= 0) || !ctype_digit($curgroup['grpsize'])) {
                     if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
-                        $errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.$curgroup['name'];
+                        $errors['grouplist'] = get_string('grpsizezeroerror', 'grouptool').' '.
+                                               get_string('error_at', 'grouptool').' '.$curgroup['name'];
                     } else {
                         $errors['grouplist'] .= ', '.$curgroup['name'];
                     }

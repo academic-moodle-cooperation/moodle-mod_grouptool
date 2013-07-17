@@ -134,6 +134,7 @@ $string['due'] = 'Gruppenverwaltung Deadline';
 $string['duedate'] = 'Verfügbar bis';
 $string['duedateno'] = 'Keine Deadline';
 $string['early'] = '{$a} rechtzeitig';
+$string['error_at'] = 'Fehler bei';
 $string['error_getting_data'] = 'Fehler beim Auslesen der Gruppendaten! Entweder keine oder mehrere Gruppen wurden zurückgegeben!';
 $string['userlist'] = 'Teilnehmer/innenliste';
 $string['userlist_alt'] = 'Zeige Liste aller Teilnehmer/innen und deren Anmeldungen. Exportiere Daten über Nutzer und deren Gruppen in verschiedene Formate (PDF, plain text, Excel, etc.).';

@@ -134,6 +134,7 @@ $string['due'] = 'Grouptool due';
 $string['duedate'] = 'Due date';
 $string['duedateno'] = 'No due date';
 $string['early'] = '{$a} early';
+$string['error_at'] = 'Error at';
 $string['error_getting_data'] = 'Error while getting groupdata! Either none or more than 1 group where returned!';
 $string['userlist'] = 'Userlist';
 $string['userlist_alt'] = 'View list of users and their registrations. Export data about users and their groups in different formats (PDF, plain text, Excel, etc.).';
