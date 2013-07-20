@@ -346,7 +346,7 @@ function grouptool_user_complete($course, $user, $mod, $grouptool) {
  * @return boolean
  */
 function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB, $OUTPUT, $USER;
 
     $return = false;
 
@@ -354,6 +354,7 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
 
     $params['timestart'] = $timestart;
     $params['courseid'] = $course->id;
+    $params['curuserid'] = $USER->id;
 
     $userfields = user_picture::fields('u', array('email'), 'userid');
 
@@ -377,7 +378,7 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
 
     WHERE {grouptool}.course = :courseid
         AND 'timestamp' > :timestart
-
+        AND (({grouptool}.show_members) OR (userid = :curuserid))
     ORDER BY uni.timestamp ASC";
 
     if (!$entries = $DB->get_records_sql($sql, $params)) {
@@ -472,14 +473,14 @@ function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
  */
 function grouptool_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid,
                                            $userid=0, $groupid=0) {
-    global $CFG, $DB;
+    global $CFG, $DB, $USER;
 
     $course = $DB->get_records('course', array('id'=>$courseid));
 
     $context = context_course::instance($courseid);
     $accessallgroups = has_capability('moodle/site:accessallgroups', $context);
 
-    $modinfo =& get_fast_modinfo($course);
+    $modinfo =& get_fast_modinfo($courseid);
 
     $cm = $modinfo->cms[$cmid];
 
@@ -522,11 +523,13 @@ SELECT uni.id, 'grouptool' AS type, agrp.grouptool_id AS grouptoolid,
 ) AS uni
 INNER JOIN {grouptool_agrps} AS agrp ON agrpid = agrp.id
     INNER JOIN {groups} AS grp ON grp.id = agrp.group_id
+LEFT JOIN {grouptool} AS grptl ON agrp.grouptool_id = grptl.id
 LEFT JOIN {user} AS u ON u.id = userid
 WHERE (uni.timestamp > :timestart)
+  AND (grptl.show_members OR (userid = :curuserid))
   AND (agrp.grouptool_id = :grptoolid)".$groupselect.$userselect.
     " ORDER BY uni.timestamp ASC";
-
+    $params['curuserid'] = $USER->id;
     if (!$entries = $DB->get_records_sql($sql, $params)) {
         return;
     }
