@@ -1166,8 +1166,8 @@ class grouptool {
         $digits = ceil(log10(count($users)));
         foreach ($users as $user) {
             $groups[$i] = array();
-            $groups[$i]['name']    = $this->groups_parse_name(trim($name_scheme), $i, $user,
-                                                              $digits);
+            $groups[$i]['name']   = $this->groups_parse_name(trim($name_scheme), $i, $user,
+                                                             $digits);
             $groups[$i]['member'] = $user;
             $i++;
         }
@@ -1182,15 +1182,17 @@ class grouptool {
             $table->width = '90%';
 
             $table->data  = array();
-
+            $groupnames = array();
             foreach ($groups as $group) {
                 $line = array();
-                if (groups_get_group_by_name($this->course->id, $group['name'])) {
+                if (groups_get_group_by_name($this->course->id, $group['name'])
+                     || in_array($group['name'], $groupnames)) {
                     $error = true;
                     $line[] = '<span class="notifyproblem">'.
                               get_string('groupnameexists', 'group', $group['name']).'</span>';
                     $error = get_string('groupnameexists', 'group', $group['name']);
                 } else {
+                    $groupnames[] = $group['name'];
                     $line[] = $group['name'];
                 }
                 $line[] = fullname($group['member'], true);
