@@ -239,7 +239,7 @@ class view_admin_form extends moodleform {
                 $mform->addElement('submit', 'createGroupings', get_string('createGroupings',
                                                                            'grouptool'));
             } else {
-                $mform->addElement('html', html_writer::tag('div', get_string('sortlist_no_data',
+                $mform->addElement('static', html_writer::tag('div', get_string('sortlist_no_data',
                                                                               'grouptool')));
             }
 
@@ -339,6 +339,8 @@ class view_admin_form extends moodleform {
                 }
             } else {
                 $mform->addElement('sortlist', 'grouplist', array());
+                $mform->setExpanded('groupsettings');
+                $mform->setExpanded('groupingscreateHeader');
                 $mform->setDefault('grouplist', null);
             }
 
