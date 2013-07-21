@@ -348,9 +348,7 @@ function group_created_handler($data) {
         } else {
             $new_agrp->sort_order = $sortorder[$grouptool->id]->max+1;
         }
-        if ($grouptool->allow_reg == 1) {
-            $new_agrp->active = 1;
-        }
+        $new_agrp->active = 0;
         if (!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $grouptool->id,
                                                          'group_id'     => $data->id))) {
             $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp);
