@@ -69,10 +69,11 @@ if ($ADMIN->fulltree) {
             0, $yes='1', $no='0'));
 
     // Standard groupsize?
-    $settings->add(new admin_setting_configtext('grouptool_grpsize',
+    $groupsize = new admin_setting_configtext('grouptool_grpsize',
             get_string('cfg_grpsize', 'grouptool'),
             get_string('cfg_grpsize_desc', 'grouptool'),
-            '3'));
+            '3', PARAM_INT);
+    $settings->add($groupsize);
 
     // Use groupsize?
     $settings->add(new admin_setting_configcheckbox('grouptool_use_size',
@@ -93,10 +94,11 @@ if ($ADMIN->fulltree) {
             0, $yes='1', $no='0'));
 
     // Max simultaneous queue-places?
-    $settings->add(new admin_setting_configtext('grouptool_max_queues',
+    $maxqueues = new admin_setting_configtext('grouptool_max_queues',
             get_string('cfg_max_queues', 'grouptool'),
             get_string('cfg_max_queues_desc', 'grouptool'),
-            '1'));
+            '1', PARAM_INT);
+    $settings->add($maxqueues);
 
     // Multiple registrations?
     $settings->add(new admin_setting_configcheckbox('grouptool_allow_multiple',
@@ -105,15 +107,18 @@ if ($ADMIN->fulltree) {
             0, $yes='1', $no='0'));
 
     // Min groups to choose?
-    $settings->add(new admin_setting_configtext('grouptool_choose_max',
-            get_string('cfg_choose_max', 'grouptool'),
-            get_string('cfg_choose_max_desc', 'grouptool'),
-            '1'));
-    // Max groups to choose?
-    $settings->add(new admin_setting_configtext('grouptool_choose_min',
+    $mingroups = new admin_setting_configtext('grouptool_choose_min',
             get_string('cfg_choose_min', 'grouptool'),
             get_string('cfg_choose_min_desc', 'grouptool'),
-            '1'));
+            '1', PARAM_INT);
+    $settings->add($mingroups);
+    
+    // Max groups to choose?
+    $maxgroups = new admin_setting_configtext('grouptool_choose_max',
+            get_string('cfg_choose_max', 'grouptool'),
+            get_string('cfg_choose_max_desc', 'grouptool'),
+            '1', PARAM_INT);
+    $settings->add($maxgroups);
 
     $settings->add(new admin_setting_heading('grouptool_moodlesync',
             get_string('cfg_moodlesync_head', 'grouptool'),
