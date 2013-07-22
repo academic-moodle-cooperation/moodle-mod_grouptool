@@ -4073,8 +4073,8 @@ EOS;
                                  && has_capability('mod/grouptool:register', $this->context)) {
                         if ( (!empty($this->grouptool->allow_multiple)
                                 && ($this->get_user_reg_count() < $this->grouptool->choose_max))
-                                || (empty($this->grouptool->allow_multiple)
-                                        && ($this->get_user_reg_count() == 0)) ) {
+                             || (empty($this->grouptool->allow_multiple)
+                                && ($this->get_user_reg_count() == 0)) ) {
                             if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
                                 if ($this->grouptool->use_queue) {
                                     $user_queues = $this->get_user_queues_count();
@@ -4108,6 +4108,7 @@ EOS;
                                 $grouphtml .= html_writer::tag('button', $label, $button_attr);
                             }
                         } else if (empty($this->grouptool->allow_multiple)
+                                      && ($this->get_user_reg_count() <= 1)
                                       && !empty($this->grouptool->allow_unreg)) {
                             if (($this->grouptool->use_size) && ($registered >= $group->grpsize)
                                  && !$this->grouptool->use_queue) {
