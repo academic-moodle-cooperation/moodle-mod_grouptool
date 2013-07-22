@@ -70,7 +70,8 @@ GROUP BY reg.user_id) as regcnts';
         } else {
             $course = 0;
         }
-
+        $mform->addElement('hidden', 'max_regs', $max_regs);
+        $mform->setType('max_regs', PARAM_INT);
         /* -------------------------------------------------------------------------------
          * Adding the "general" fieldset, where all the common settings are showed
          */
@@ -277,6 +278,7 @@ GROUP BY reg.user_id) as regcnts';
     }
 
     public function validation($data, $files) {
+        global $DB;
         $parent_errors = parent::validation($data, $files);
         $errors = array();
         if (!empty($data['timedue']) && ($data['timedue'] <= $data['timeavailable'])) {
@@ -287,6 +289,28 @@ GROUP BY reg.user_id) as regcnts';
             && (($data['grpsize'] <= 0) || !ctype_digit($data['grpsize']))
             && empty($data['use_individual'])) {
             $errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
+        }
+        if(!empty($data['instance'])) {
+            $sql = '
+     SELECT MAX(regcnt)
+        FROM (
+      SELECT COUNT(reg.id) as regcnt
+        FROM {grouptool_registered} as reg
+        JOIN {grouptool_agrps} as agrps ON reg.agrp_id = agrps.id
+       WHERE agrps.grouptool_id = :grouptoolid
+    GROUP BY reg.agrp_id) as regcnts';
+            $params = array('grouptoolid' => $data['instance']);
+            $max_grp_regs = $DB->get_field_sql($sql, $params);
+        } else {
+            $max_grp_regs = 0;
+        }
+        if (!empty($data['use_size']) && ($data['grpsize'] < $max_grp_regs)
+            && empty($data['use_individual'])) {
+            if(empty($errors['size_grp'])) {
+                $errors['size_grp'] = get_string('toomanyregs', 'grouptool');
+            } else {
+                $errors['size_grp'] .= get_string('toomanyregs', 'grouptool');
+            }
         }
 
         if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {

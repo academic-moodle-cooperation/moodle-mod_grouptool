@@ -363,6 +363,7 @@ class view_admin_form extends moodleform {
      *               or an empty array if everything is OK.
      */
     public function validation($data, $files) {
+        global $DB;
         $parent_errors = parent::validation($data, $files);
         $errors = array();
         if (!empty($data['createGroups']) && $data['grouping'] == "-1"
@@ -412,6 +413,16 @@ class view_admin_form extends moodleform {
         }
         if (!empty($data['saveagrps'])
            && (!empty($data['use_size']) && !empty($data['use_individual']))) {
+            $sql = '
+   SELECT agrps.group_id as id, COUNT(reg.id) as regcnt
+     FROM {grouptool_agrps} as agrps
+LEFT JOIN {grouptool_registered} as reg ON reg.agrp_id = agrps.id
+    WHERE agrps.grouptool_id = :grouptoolid
+ GROUP BY agrps.group_id';
+            $cm = get_coursemodule_from_id('grouptool', $data['id']);
+            $params = array('grouptoolid' => $cm->instance);
+            $regs = $DB->get_records_sql_menu($sql, $params);
+            $toomanyregs = '';
             foreach ($data['grouplist'] as $group_id => $curgroup) {
                 if ((clean_param($curgroup['grpsize'], PARAM_INT) <= 0) || !ctype_digit($curgroup['grpsize'])) {
                     if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
@@ -420,7 +431,16 @@ class view_admin_form extends moodleform {
                     } else {
                         $errors['grouplist'] .= ', '.$curgroup['name'];
                     }
+                } else if ($curgroup['grpsize'] < $regs[$group_id]) {
+                    if (empty($toomanyregs)) {
+                        $toomanyregs = get_string('toomanyregs', 'grouptool');
+                    }
                 }
+            }
+            if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
+                $errors['grouplist'] = $toomanyregs;
+            } else {
+                $errors['grouplist'] .= html_writer::empty_tag('br').$toomanyregs;
             }
         }
         return array_merge($parent_errors, $errors);
