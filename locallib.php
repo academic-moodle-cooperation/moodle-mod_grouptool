@@ -196,9 +196,11 @@ class view_admin_form extends moodleform {
                                get_string('name_scheme_tags', 'grouptool'));
             $mform->addHelpButton('tags', 'tags', 'grouptool');
             // Init JS!
+            $PAGE->requires->string_for_js('showmore', 'form');
+            $PAGE->requires->string_for_js('showless', 'form');
             $PAGE->requires->yui_module('moodle-mod_grouptool-administration',
                     'M.mod_grouptool.init_administration',
-                    null);
+                    array(array('fromto_mode'=>GROUPTOOL_FROMTO_GROUPS)));
 
             $options = array('0' => get_string('no'));
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
