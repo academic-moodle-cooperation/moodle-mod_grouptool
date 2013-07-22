@@ -50,10 +50,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         global $CFG, $DB, $PAGE;
         $mform = $this->_form;
-
+        $max_regs = 0;
         if ($update = optional_param('update', 0, PARAM_INT)) {
             $cm = get_coursemodule_from_id('grouptool', $update);
             $course = $DB->get_record('course', array('id'=>$cm->course));
+            $grouptool = $DB->get_record('grouptool', array('id'=>$cm->instance));
+            $sql = '
+ SELECT MAX(regcnt)
+    FROM (
+  SELECT COUNT(reg.id) as regcnt
+    FROM {grouptool_registered} as reg
+    JOIN {grouptool_agrps} as agrps ON reg.agrp_id = agrps.id
+   WHERE agrps.grouptool_id = :grouptoolid
+GROUP BY reg.user_id) as regcnts';
+            $params = array('grouptoolid' => $cm->instance);
+            $max_regs = $DB->get_field_sql($sql, $params);
         } else if ($course = optional_param('course', 0, PARAM_INT)) {
             $course = $DB->get_record('course', array('id'=>$course));
         } else {
@@ -169,13 +180,24 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->disabledIf('queues_max', 'allow_reg', 'equal', 1);
         $mform->setAdvanced('queues_max');
 
+        //prevent user from unsetting if user is registered in multiple groups
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
+        if($max_regs > 1) {
+            $mform->addElement('hidden', 'multreg', 1);
+            $mform->addElement('html', html_writer::empty_tag('input', array('name'  => 'allow_multiple',
+                                                                             'value' => $grouptool->allow_multiple,
+                                                                             'type'  => 'hidden')));
+        } else {
+            $mform->addElement('hidden', 'multreg', 0);
+        }
+        $mform->setType('multreg', PARAM_BOOL);
         $mform->setType('allow_multiple', PARAM_BOOL);
-        $mform->setDefault('allow_multiple',
-                           (!empty($CFG->grouptool_allow_multiple) ? $CFG->grouptool_allow_multiple
-                                                                   : 0));
+        $allowmultipledefault = (!empty($CFG->grouptool_allow_multiple) ? $CFG->grouptool_allow_multiple
+                                                                        : 0);
+        $mform->setDefault('allow_multiple', $allowmultipledefault);
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
-        $mform->disabledIf('allow_multiple', 'allow_reg', 'equal', 1);
+        $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
+        $mform->disabledIf('allow_multiple', 'multreg', 'eq', 1);
         $mform->setAdvanced('allow_multiple');
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
