@@ -198,6 +198,49 @@
 
 /*styles for view->registration*/
 
+#memberspopupbox {
+    background: #ffffff;
+}
+
+#memberspopupbox .yui3-widget-hd {
+    background: -moz-linear-gradient(center top , #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent;
+    border-bottom: 1px solid #BBBBBB;
+    border-radius: 10px 10px 0 0;
+    color: #333333;
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: 1px;
+    margin: 0;
+    padding: 5px;
+    text-align: center;
+    text-shadow: 1px 1px 1px #FFFFFF;
+}
+
+#memberspopupbox .yui3-widget-bd {
+    color: #555555;
+    font-size: 12px;
+    line-height: 2em;
+    overflow: auto;
+    padding: 1em;
+}
+
+#memberspopupbox .yui3-widget-ft {
+    background-color: #FFFFFF;
+    font-size: 12px;
+    margin: 0.7em 1em;
+    padding: 0;
+    text-align: right;
+}
+
+#memberspopupbox .yui3-overlay-content {
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: 5px 5px 20px 0 #666666;
+    margin-left: -3px;
+    margin-top: -3px;
+}
+
 .path-mod-grouptool .group {
     max-height: 200px;
     overflow: auto;

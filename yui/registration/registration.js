@@ -60,7 +60,7 @@ YUI.add('moodle-mod_grouptool-registration', function(Y) {
                         this.overlay = new Y.Overlay({
                             headerContent: closebtn,
                             bodyContent: '',
-                            id: 'helppopupbox',
+                            id: 'memberspopupbox',
                             width:'400px',
                             centered : true,
                             visible : false,
@@ -82,71 +82,71 @@ YUI.add('moodle-mod_grouptool-registration', function(Y) {
                                 !oTarget.compareTo(boundingBox) &&
                                 !boundingBox.contains(oTarget)) {
                                     this.overlay.hide();
-                                }
-                            }, this);
-
-                            Y.on("key", this.close, closebtn , "down:13", this);
-                            closebtn.on('click', this.close, this);
-                        },
-
-                        close : function(e) {
-                            e.preventDefault();
-                            this.contentlink.focus();
-                            this.overlay.hide();
-                        },
-
-                        display : function(event, args) {
-                            this.contentlink = args.node;
-                            this.overlay.set('bodyContent', Y.Node.create('<img src="'+M.cfg.loadingicon+'" class="spinner" />'));
-
-                            var fullurl = args.url;
-                            if (!args.url.match(/https?:\/\//)) {
-                                fullurl = M.cfg.wwwroot + args.url;
                             }
+                        }, this);
 
-                            var ajaxurl = fullurl + '&ajax=1';
+                        Y.on("key", this.close, closebtn , "down:13", this);
+                            closebtn.on('click', this.close, this);
+                    },
 
-                            var cfg = {
-                                method: 'get',
-                                context : this,
-                                on: {
-                                    success: function(id, o, node) {
-                                        this.display_callback(o.responseText);
-                                    },
-                                    failure: function(id, o, node) {
-                                        var debuginfo = o.statusText;
-                                        if (M.cfg.developerdebug) {
-                                            o.statusText += ' (' + ajaxurl + ')';
-                                        }
-                                        this.display_callback('bodyContent',debuginfo);
-                                    }
-                                }
-                            };
+                    close : function(e) {
+                        e.preventDefault();
+                        this.contentlink.focus();
+                        this.overlay.hide();
+                    },
 
-                            Y.io(ajaxurl, cfg);
-                            this.overlay.show();
+                    display : function(event, args) {
+                        this.contentlink = args.node;
+                        this.overlay.set('bodyContent', Y.Node.create('<img src="'+M.cfg.loadingicon+'" class="spinner" />'));
 
-                            Y.one('#closeoverlay').focus();
-                        },
-
-                        display_callback : function(content) {
-                            this.overlay.set('bodyContent', content);
-                        },
-
-                        hideContent : function() {
-                            this.overlay.hide();
+                        var fullurl = args.url;
+                        if (!args.url.match(/https?:\/\//)) {
+                            fullurl = M.cfg.wwwroot + args.url;
                         }
-                    };
-                    members_overlay.init();
-                    M.mod_grouptool.overlay_instance = members_overlay;
-                    M.mod_grouptool.overlay_instance.display(event, args);
-                });
-            } else {
-                M.mod_grouptool.overlay_instance.display(event, args);
-            }
-        };
 
-        M.mod_grouptool.init_registration = function(config) { //'config' contains the parameter values
+                        var ajaxurl = fullurl + '&ajax=1';
+
+                        var cfg = {
+                            method: 'get',
+                            context : this,
+                            on: {
+                                success: function(id, o, node) {
+                                    this.display_callback(o.responseText);
+                                },
+                                failure: function(id, o, node) {
+                                    var debuginfo = o.statusText;
+                                    if (M.cfg.developerdebug) {
+                                        o.statusText += ' (' + ajaxurl + ')';
+                                    }
+                                    this.display_callback('bodyContent',debuginfo);
+                                }
+                            }
+                        };
+
+                        Y.io(ajaxurl, cfg);
+                        this.overlay.show();
+
+                        Y.one('#closeoverlay').focus();
+                    },
+
+                    display_callback : function(content) {
+                        this.overlay.set('bodyContent', content);
+                    },
+
+                    hideContent : function() {
+                        this.overlay.hide();
+                    }
+                };
+                members_overlay.init();
+                M.mod_grouptool.overlay_instance = members_overlay;
+                M.mod_grouptool.overlay_instance.display(event, args);
+            });
+        } else {
+            M.mod_grouptool.overlay_instance.display(event, args);
+        }
+    };
+
+    M.mod_grouptool.init_registration = function(config) { //'config' contains the parameter values
 
         return new registration(config); //'config' contains the parameter values
     };
