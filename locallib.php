@@ -915,9 +915,15 @@ class grouptool {
                 $line = array();
                 if (groups_get_group_by_name($this->course->id, $group['name']) || in_array($group['name'], $names_to_use)) {
                     $error = true;
-                    $line[] = '<span class="notifyproblem">'.
-                              get_string('groupnameexists', 'group', $group['name']).'</span>';
-                    $error = get_string('groupnameexists', 'group', $group['name']);
+                    if(in_array($group['name'], $names_to_use)) {
+                        $line[] = '<span class="notifyproblem">'.
+                                  get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
+                        $error = get_string('nameschemenotunique', 'grouptool', $group['name']);
+                    } else {
+                        $line[] = '<span class="notifyproblem">'.
+                                  get_string('groupnameexists', 'group', $group['name']).'</span>';
+                        $error = get_string('groupnameexists', 'group', $group['name']);
+                    }
                 } else {
                     $line[] = $group['name'];
                     $names_to_use[] = $group['name'];
@@ -1067,9 +1073,15 @@ class grouptool {
                 $line = array();
                 if (groups_get_group_by_name($this->course->id, $group) || in_array($group, $createdgroups)) {
                     $error = true;
-                    $line[] = '<span class="notifyproblem">'.
-                              get_string('groupnameexists', 'group', $group).'</span>';
-                    $error = get_string('groupnameexists', 'group', $group);
+                    if(in_array($group, $createdgroups)) {
+                        $line[] = '<span class="notifyproblem">'.
+                                  get_string('nameschemenotunique', 'grouptool', $group).'</span>';
+                        $error = get_string('nameschemenotunique', 'grouptool', $group);
+                    } else {
+                        $line[] = '<span class="notifyproblem">'.
+                                  get_string('groupnameexists', 'group', $group).'</span>';
+                        $error = get_string('groupnameexists', 'group', $group);
+                    }
                     $createdgroups[] = $group;
                 } else {
                     $line[] = $group;
@@ -1214,9 +1226,15 @@ class grouptool {
                 if (groups_get_group_by_name($this->course->id, $group['name'])
                      || in_array($group['name'], $groupnames)) {
                     $error = true;
-                    $line[] = '<span class="notifyproblem">'.
-                              get_string('groupnameexists', 'group', $group['name']).'</span>';
-                    $error = get_string('groupnameexists', 'group', $group['name']);
+                    if(in_array($group['name'], $groupnames)) {
+                        $line[] = '<span class="notifyproblem">'.
+                                  get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
+                        $error = get_string('nameschemenotunique', 'grouptool', $group['name']);
+                    } else {
+                        $line[] = '<span class="notifyproblem">'.
+                                  get_string('groupnameexists', 'group', $group['name']).'</span>';
+                        $error = get_string('groupnameexists', 'group', $group['name']);
+                    }
                 } else {
                     $groupnames[] = $group['name'];
                     $line[] = $group['name'];
