@@ -87,6 +87,10 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
     if (!isset($grouptool->allow_multiple)) {
         $grouptool->allow_multiple = 0;
     }
+    
+    $grouptool->grpsize = clean_param($grouptool->grpsize, PARAM_INT);
+    $grouptool->choose_min = clean_param($grouptool->choose_min, PARAM_INT);
+    $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
 
     $return = $DB->insert_record('grouptool', $grouptool);
     add_to_log($grouptool->course,
@@ -165,6 +169,10 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
     if (!isset($grouptool->allow_multiple)) {
         $grouptool->allow_multiple = 0;
     }
+
+    $grouptool->grpsize = clean_param($grouptool->grpsize, PARAM_INT);
+    $grouptool->choose_min = clean_param($grouptool->choose_min, PARAM_INT);
+    $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
 
     add_to_log($grouptool->course,
             'grouptool', 'update',
