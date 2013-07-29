@@ -814,7 +814,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                     if ($temp_str != "") {
                         $temp_str .= '; ';
                     }
-                    $temp_str .= html_writer::tag('span', $registration->grpname.' '.$text);
+                    $temp_str .= html_writer::tag('span', $registration->grpname);
                 }
                 if (($grouptool->allow_multiple &&
                         (count($userstats->registered) < $grouptool->choose_min))
@@ -839,7 +839,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 }
             } else {
                 if ($grouptool->allow_multiple) {
-                    $missing = ($grouptool->choose_min-count($userstats->registered));
+                    $missing = $grouptool->choose_min;
                     $string_label = ($missing > 1) ? 'registrations_missing'
                                                    : 'registration_missing';
                 } else {
