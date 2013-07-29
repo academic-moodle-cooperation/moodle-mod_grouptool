@@ -27,6 +27,13 @@
 
 /** General Styles **/
 
+/** administration styles **/
+
+.path-mod-grouptool .error [for=id_digits] {
+    /*let the digits label stay black - doesn't work right now*/
+    color:#000000 !important;
+}
+
 /** sortable grouplist styles **/
 
 .path-mod-grouptool div.sortlist_container {
