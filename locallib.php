@@ -1050,7 +1050,7 @@ class grouptool {
 
         // Every member is there, so we can parse the name!
         for ($i=clean_param($data->from, PARAM_INT); $i<=clean_param($data->to, PARAM_INT); $i++) {
-            $groups[$i] = $this->groups_parse_name(trim($data->namingscheme), $i-1, null, clean_param($data->digits, PARAM_INT));
+            $groups[] = $this->groups_parse_name(trim($data->namingscheme), $i-1, null, clean_param($data->digits, PARAM_INT));
         }
         if ($only_preview) {
             $error = false;
@@ -1062,16 +1062,18 @@ class grouptool {
             $table->width = '40%';
 
             $table->data  = array();
-
+            $createdgroups = array();
             foreach ($groups as $group) {
                 $line = array();
-                if (groups_get_group_by_name($this->course->id, $group)) {
+                if (groups_get_group_by_name($this->course->id, $group) || in_array($group, $createdgroups)) {
                     $error = true;
                     $line[] = '<span class="notifyproblem">'.
                               get_string('groupnameexists', 'group', $group).'</span>';
                     $error = get_string('groupnameexists', 'group', $group);
+                    $createdgroups[] = $group;
                 } else {
                     $line[] = $group;
+                    $createdgroups[] = $group;
                 }
 
                 $table->data[] = $line;
