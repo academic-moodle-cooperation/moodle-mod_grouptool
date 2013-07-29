@@ -90,7 +90,7 @@ GROUP BY reg.user_id) as regcnts';
         $mform->addHelpButton('name', 'grouptoolname', 'grouptool');
 
         // Adding the standard "intro" and "introformat" fields!
-        $this->add_intro_editor();
+        $this->add_intro_editor(true, get_string('description', 'grouptool'));
 
         $mform->addElement('date_time_selector', 'timeavailable',
                            get_string('availabledate', 'grouptool'), array('optional'=>true));

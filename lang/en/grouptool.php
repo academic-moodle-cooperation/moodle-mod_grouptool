@@ -126,6 +126,7 @@ $string['could_not_add'] = 'Could not add {$a->fullname} to group {$a->group}';
 $string['define_amount_groups'] = 'Define number of groups';
 $string['define_amount_members'] = 'Define number of groupmembers';
 $string['delete_reference'] = 'Delete from grouptool';
+$string['description'] = 'Description';
 $string['determinismerror'] = 'The due date can\'t be before the available from date or in the past.';
 $string['digits'] = 'Minimum digits';
 $string['disabled'] = 'Disabled';

@@ -52,7 +52,9 @@ function grouptool_supports($feature) {
         case FEATURE_GROUPINGS:         return true;
         case FEATURE_GROUPMEMBERSONLY:  return true;
         case FEATURE_BACKUP_MOODLE2:    return true;
+        case FEATURE_IDNUMBER:          return true;
         case FEATURE_MOD_INTRO:         return true;
+        case FEATURE_SHOW_DESCRIPTION:  return true;
 
         default:                        return false;
     }

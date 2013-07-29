@@ -126,6 +126,7 @@ $string['could_not_add'] = 'Konnte {$a->fullname} nicht zu Gruppe {$a->group} hi
 $string['define_amount_groups'] = 'Gruppenanzahl festlegen';
 $string['define_amount_members'] = 'Mitgliederanzahl festlegen';
 $string['delete_reference'] = 'Lösche aus der Gruppenverwaltung';
+$string['description'] = 'Beschreibung';
 $string['determinismerror'] = 'Das "Verfügbar bis" Datum, darf nicht vor dem "Verfügbar von" Datum oder in der Vergangenheit liegen!';
 $string['digits'] = 'Mindestanzahl Stellen';
 $string['disabled'] = 'Deaktiviert';
