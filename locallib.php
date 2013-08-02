@@ -3988,35 +3988,46 @@ EOS;
                                 array('class'=>'felement')),
                         array('class'=>'fitem'));
             } else {
-                $general_information .= html_writer::tag('div', html_writer::tag('div',
-                        get_string('unreg_is', 'grouptool'),
-                        array('class'=>'fitemtitle')).
-                        html_writer::tag('div',
-                                get_string('not_permitted', 'grouptool'),
-                                array('class'=>'felement')),
-                        array('class'=>'fitem'));
+                $general_information .= html_writer::tag('div',
+                                                         html_writer::tag('div',
+                                                                          get_string('unreg_is',
+                                                                                     'grouptool'),
+                                                                          array('class'=>'fitemtitle')).
+                                                         html_writer::tag('div',
+                                                                          get_string('not_permitted',
+                                                                                     'grouptool'),
+                                                                          array('class'=>'felement')),
+                                                         array('class'=>'fitem'));
             }
 
-            if (!empty($this->grouptool->allowmultiple)) {
+            if (!empty($this->grouptool->allow_multiple)) {
+                $minmaxtitle = html_writer::tag('div',
+                                                get_string('choose_minmax_title', 'grouptool'),
+                                                array('class' => 'fitemtitle'));
                 if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
-                    $data = array(  'min'=>$this->grouptool->choose_min,
-                            'max'=>$this->grouptool->choose_max);
-                    $general_information .= html_writer::tag('div',
-                            get_string('choose_min_max_text', 'grouptool', $data),
-                            array('class'=>'fitem choose_min choose_max'));
+                    $data = array('min' => $this->grouptool->choose_min,
+                                  'max' => $this->grouptool->choose_max);
+                    $minmaxtext = html_writer::tag('div',
+                                                   get_string('choose_min_max_text', 'grouptool',
+                                                              $data),
+                                                   array('class' => 'felement'));
+                    $class = ' choose_min choose_max';
                 } else if ($this->grouptool->choose_min) {
-                    $general_information .= html_writer::tag('div',
-                            get_string('choose_min_text',
-                                    'grouptool',
-                                    $this->grouptool->choose_min),
-                            array('class'=>'fitem choose_min'));
+                    $minmaxtext = html_writer::tag('div',
+                                                    get_string('choose_min_text', 'grouptool',
+                                                               $this->grouptool->choose_min),
+                                                    array('class '=> 'felement'));
+                    $class = ' choose_min';
                 } else if ($this->grouptool->choose_max) {
-                    $general_information .= html_writer::tag('div',
-                            get_string('choose_max_text',
-                                    'grouptool',
-                                    $this->grouptool->choose_max),
-                            array('class'=>'fitem choose_max'));
+                    $minmaxtext = html_writer::tag('div',
+                                                    get_string('choose_max_text', 'grouptool',
+                                                               $this->grouptool->choose_max),
+                                                    array('class' => 'felement'));
+                    $class = ' choose_max';
                 }
+                $general_information .= html_writer::tag('div',
+                                                         $minmaxtitle.$minmaxtext,
+                                                         array('class'=>'fitem '.$class));
             }
 
             if (!empty($this->grouptool->use_queue)) {
