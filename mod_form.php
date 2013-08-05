@@ -271,6 +271,10 @@ GROUP BY reg.user_id) as regcnts';
          * add standard elements, common to all modules
          */
         $this->standard_coursemodule_elements();
+        
+        $mform->setConstant('groupmode', VISIBLEGROUPS);
+        $mform->freeze('groupmode');
+        
         /* ------------------------------------------------------------------------------
          * add standard buttons, common to all modules
          */
