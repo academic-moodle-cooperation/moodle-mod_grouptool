@@ -311,6 +311,7 @@ $string['queued'] = 'Queued';
 $string['queued_in_group_info'] = '{$a->username} queued in group {$a->groupname}';
 $string['queued_on_rank'] = 'Queued on rank #{$a}';
 $string['queues'] = 'Queues';
+$string['queuespresent'] = 'Queues are allready present! These will be deleted if you continue. To continue hit the save button again!';
 $string['queuesizeerror'] = 'Max queue entries have to be a positive integer (>= 1)';
 $string['queues_max'] = 'Max simultaneous queue-places';
 $string['queues_max_help'] = 'Limits the maximum simultaneous queue entries for each person in this grouptool.';

@@ -70,6 +70,7 @@ GROUP BY reg.user_id) as regcnts';
         } else {
             $course = 0;
         }
+
         $mform->addElement('hidden', 'max_regs', $max_regs);
         $mform->setType('max_regs', PARAM_INT);
         /* -------------------------------------------------------------------------------
@@ -315,9 +316,17 @@ GROUP BY reg.user_id) as regcnts';
     GROUP BY reg.user_id) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $max_user_regs = $DB->get_field_sql($sql, $params);
+            $sql = '
+      SELECT COUNT(queue.id) as queue
+        FROM {grouptool_queued} as queue
+        JOIN {grouptool_agrps} as agrps ON queue.agrp_id = agrps.id
+       WHERE agrps.grouptool_id = :grouptoolid';
+            $params = array('grouptoolid' => $data['instance']);
+            $queues = $DB->get_field_sql($sql, $params);
         } else {
             $max_grp_regs = 0;
             $max_user_regs = 0;
+            $queues = 0;
         }
         if (!empty($data['use_size']) && ($data['grpsize'] < $max_grp_regs)
             && empty($data['use_individual'])) {
@@ -326,6 +335,10 @@ GROUP BY reg.user_id) as regcnts';
             } else {
                 $errors['size_grp'] .= get_string('toomanyregs', 'grouptool');
             }
+        }
+
+        if($queues && empty($data['use_queue']) && empty($data['warningconfirm'])) {
+//            $errors['use_queue'] = get_string('queuespresent', 'grouptool');
         }
 
         if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {

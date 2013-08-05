@@ -311,6 +311,7 @@ $string['queued'] = 'In Warteliste';
 $string['queued_in_group_info'] = '{$a->username} in Warteliste von {$a->groupname}';
 $string['queued_on_rank'] = 'In Warteliste auf Platz #{$a}';
 $string['queues'] = 'Wartelisten';
+$string['queuespresent'] = 'Queues are allready present! These will be deleted if you continue. To continue hit the save button again!';
 $string['queuesizeerror'] = 'Maximale Warteplätze müssen ganzzahlig und positive sein (>= 1)';
 $string['queues_max'] = 'Max Plätze in Wartelisten';
 $string['queues_max_help'] = 'Begrenzt die gleichzeitig einnehmbaren Plätze in Wartelisten pro Benutzer in diesem Grouptool.';
