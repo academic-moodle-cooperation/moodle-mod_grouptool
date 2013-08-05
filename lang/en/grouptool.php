@@ -373,6 +373,7 @@ $string['tags_help'] = 'You can use this tags to define the name scheme. Each of
 $string['target'] = 'Target';
 $string['too_many_queue_places'] = 'Can\'t queue {$a->username} in group {$a->groupname} because {$a->username} is already queued in too many groups!';
 $string['toomanyregs'] = 'Attention: In at least one group there are more groupmembers than specified by the desired new groupsize.<br />Reduce the groupmembers in the groups before changing the groupsize.';
+$string['toomanyregspresent'] = 'At least 1 user is registered in too many groups, therefore the maximum groups to choose has to be at least {$a}.';
 $string['you_have_too_many_queue_places'] = 'Can\'t queue you in group {$a->groupname} because you are already queued in too many groups!';
 $string['total'] = 'Total';
 $string['unqueue'] = 'Remove from queue';

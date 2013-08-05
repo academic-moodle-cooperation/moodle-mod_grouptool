@@ -185,9 +185,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
         if($max_regs > 1) {
             $mform->addElement('hidden', 'multreg', 1);
-            $mform->addElement('html', html_writer::empty_tag('input', array('name'  => 'allow_multiple',
-                                                                             'value' => $grouptool->allow_multiple,
-                                                                             'type'  => 'hidden')));
         } else {
             $mform->addElement('hidden', 'multreg', 0);
         }
@@ -198,7 +195,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('allow_multiple', $allowmultipledefault);
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
         $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
-        $mform->disabledIf('allow_multiple', 'multreg', 'eq', 1);
         $mform->setAdvanced('allow_multiple');
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
@@ -206,8 +202,7 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setType('choose_min', PARAM_INT);
         $mform->setDefault('choose_min',
                            (!empty($CFG->grouptool_choose_min) ? $CFG->grouptool_choose_min : 1));
-        $mform->disabledIf('choose_min', 'allow_multiple', 'notchecked');
-        $mform->disabledIf('choose_min', 'allow_reg', 'equal', 1);
+        $mform->disabledIf('choose_min', 'allow_reg', 'eq', 0);
         $mform->setAdvanced('choose_min');
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
@@ -215,10 +210,15 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setType('choose_max', PARAM_INT);
         $mform->setDefault('choose_max',
                            (!empty($CFG->grouptool_choose_max) ? $CFG->grouptool_choose_max : 1));
-        $mform->disabledIf('choose_max', 'allow_multiple', 'notchecked');
-        $mform->disabledIf('choose_max', 'allow_reg', 'equal', 1);
+        $mform->disabledIf('choose_max', 'allow_reg', 'eq', 0);
         $mform->setAdvanced('choose_max');
-
+        if($max_regs > 1) {
+            //$mform->setConstant('allow_multiple', $allowmultipledefault);
+            $mform->freeze('allow_multiple');
+        } else {
+            $mform->disabledIf('choose_max', 'allow_multiple', 'notchecked');
+            $mform->disabledIf('choose_min', 'allow_multiple', 'notchecked');
+        }
         /*
          * ---------------------------------------------------------
          */
@@ -305,8 +305,19 @@ GROUP BY reg.user_id) as regcnts';
     GROUP BY reg.agrp_id) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $max_grp_regs = $DB->get_field_sql($sql, $params);
+            $sql = '
+     SELECT MAX(regcnt)
+        FROM (
+      SELECT COUNT(reg.id) as regcnt
+        FROM {grouptool_registered} as reg
+        JOIN {grouptool_agrps} as agrps ON reg.agrp_id = agrps.id
+       WHERE agrps.grouptool_id = :grouptoolid
+    GROUP BY reg.user_id) as regcnts';
+            $params = array('grouptoolid' => $data['instance']);
+            $max_user_regs = $DB->get_field_sql($sql, $params);
         } else {
             $max_grp_regs = 0;
+            $max_user_regs = 0;
         }
         if (!empty($data['use_size']) && ($data['grpsize'] < $max_grp_regs)
             && empty($data['use_individual'])) {
@@ -331,9 +342,21 @@ GROUP BY reg.user_id) as regcnts';
 
         if (!empty($data['allow_multiple']) && ($data['choose_min'] > $data['choose_max'])) {
             if (isset($errors['choose_max'])) {
-                $errors['choose_max'] .= html_writer::empty_tag('br').get_string('mustbegtoeqmin', 'grouptool');
+                $errors['choose_max'] .= html_writer::empty_tag('br').
+                                         get_string('mustbegtoeqmin', 'grouptool');
             } else {
                 $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
+            }
+        }
+        
+        if (!empty($data['allow_multiple']) && ($data['choose_max'] < $max_user_regs)) {
+            if (isset($errors['choose_max'])) {
+                $errors['choose_max'] .= html_writer::empty_tag('br').
+                                         get_string('toomanyregspresent', 'grouptool',
+                                                    $max_user_regs);
+            } else {
+                $errors['choose_max'] = get_string('toomanyregspresent', 'grouptool',
+                                                   $max_user_regs);
             }
         }
 
