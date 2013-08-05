@@ -4259,6 +4259,35 @@ EOS;
                                                          'grouptool', $groupinfo->name),
                                               array('notifyproblem'));
         }
+        $sql = '     SELECT agrps.id as id, agrps.group_id as grpid, COUNT(regs.id) as regs,
+                            grptl.use_individual as indi, grptl.grpsize as globalsize, agrps.grpsize as size,
+                            grptl.name as instancename
+                       FROM {grouptool_agrps} as agrps
+                       JOIN {grouptool} as grptl ON agrps.grouptool_id = grptl.id
+                  LEFT JOIN {grouptool_registered} as regs ON agrps.id = regs.agrp_id
+                      WHERE agrps.group_id = :grpid
+                        AND grptl.use_size = 1
+                   GROUP BY agrps.id
+                   ';
+        $agrps = $DB->get_records_sql($sql, array('grpid'=>$group));
+        $usercnt = count($users);
+        foreach($agrps as $cur) {
+            if($cur->indi) {
+                if($cur->regs+$usercnt > $cur->size) {
+                    $message .= html_writer::tag('div',
+                                                 $OUTPUT->notification(get_string('overflowwarning',
+                                                                                  'grouptool', $cur),
+                                                                       'notifyproblem'));
+                }
+            } else {
+                if($cur->regs+$usercnt > $cur->globalsize) {
+                    $message .= html_writer::tag('div',
+                                                 $OUTPUT->notification(get_string('overflowwarning',
+                                                                                  'grouptool', $cur),
+                                                                       'notifyproblem'));
+                }
+            }
+        }
         foreach ($users as $user) {
             $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
             $userinfo = $DB->get_records_sql($sql, array('userpattern'=>'%'.$user));

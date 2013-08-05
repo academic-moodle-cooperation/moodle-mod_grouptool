@@ -294,6 +294,7 @@ $string['nowhere_queued'] = 'Keine Wartelisteneinträge';
 $string['number_of_students'] = 'Anzahl an Benutzer/innen';
 $string['occupied'] = 'Belegt';
 $string['orientation'] = 'PDF-Ausrichtung';
+$string['overflowwarning'] = 'Wenn Sie fortfahren wird die Gruppengröße in der Instanz {$a->instancename} überschritten!';
 $string['overview'] = 'Überblick';
 $string['overview_alt'] = 'Überblick über Gruppen und deren Anmeldungen';
 $string['overwrite_label'] = 'Überschreibe vorhandene Bewertungen';

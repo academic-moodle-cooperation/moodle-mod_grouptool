@@ -294,6 +294,7 @@ $string['nowhere_queued'] = 'Not queued';
 $string['number_of_students'] = 'Number of students';
 $string['occupied'] = 'Occupied';
 $string['orientation'] = 'PDF-orientation';
+$string['overflowwarning'] = 'If you continue importing the groupsize in instance {$a->instancename} will be exceeded!';
 $string['overview'] = 'Overview';
 $string['overview_alt'] = 'Overview over groups and groupmembers';
 $string['overwrite_label'] = 'Overwrite existing grades';
