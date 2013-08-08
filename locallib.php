@@ -269,8 +269,7 @@ class view_admin_form extends moodleform {
                 $groupdata = (array)$DB->get_records_sql("
                         SELECT grp.id AS id, grp.name AS name,
                                agrp.grpsize AS grpsize, agrp.active AS active,
-                               agrp.sort_order AS sort_order,
-                               GROUP_CONCAT(grpgs.id SEPARATOR ',') AS classes
+                               agrp.sort_order AS sort_order
                         FROM {groups} AS grp
                         LEFT JOIN {grouptool_agrps} as agrp
                              ON agrp.group_id = grp.id AND agrp.grouptool_id = ?
@@ -292,7 +291,10 @@ class view_admin_form extends moodleform {
                     $groupdata[$key] = (array)$group;
                     $pattern = "#[^a-zA-Z0-9]#";
                     $replace = "";
-                    $groupdata[$key]['classes'] = explode(",", $groupdata[$key]['classes']);
+                    $groupdata[$key]['classes'] = $DB->get_fieldset_select('groupings_groups',
+                                                                           'groupingid',
+                                                                           ' groupid = ?',
+                                                                           array($key));
                     foreach ($groupdata[$key]['classes'] as $classkey => $class) {
                         $groupdata[$key]['classes'][$classkey] = 'class'.$class;
                     }
@@ -431,7 +433,7 @@ LEFT JOIN {grouptool_registered} as reg ON reg.agrp_id = agrps.id
                     } else {
                         $errors['grouplist'] .= ', '.$curgroup['name'];
                     }
-                } else if ($curgroup['grpsize'] < $regs[$group_id]) {
+                } else if (!empty($regs[$group_id]) && $curgroup['grpsize'] < $regs[$group_id]) {
                     if (empty($toomanyregs)) {
                         $toomanyregs = get_string('toomanyregs', 'grouptool');
                     }
@@ -2853,8 +2855,7 @@ EOS;
             $idstring = "agrp.id as agrp_id, grp.id as id";
         }
         $groupdata = $DB->get_records_sql("
-                SELECT ".$idstring.", grp.name AS name,".$size_sql." agrp.sort_order AS sort_order,
-                       GROUP_CONCAT(grpgs.id SEPARATOR ',') AS classes
+                SELECT ".$idstring.", grp.name AS name,".$size_sql." agrp.sort_order AS sort_order
                 FROM {groups} AS grp LEFT JOIN {grouptool_agrps} as agrp ON agrp.group_id = grp.id
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} AS grpgs ON {groupings_groups}.groupingid = grpgs.id
@@ -2862,6 +2863,17 @@ EOS;
                      $agrpid_where.$groupid_where.$groupingid_where."
                 GROUP BY grp.id
                 ORDER BY sort_order ASC, name ASC", $params);
+        foreach ($groupdata as $key => $group) {
+            $groupingids = $DB->get_fieldset_select('groupings_groups',
+                                                    'groupingid',
+                                                    'groupid = ?',
+                                                    array($group->id));
+            if(!empty($groupingids)) {
+                $groupdata[$key]->classes = implode(',', $groupingids);
+            } else {
+                $groupdata[$key]->classes = '';
+            }
+        }
 
         if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
                 || ($this->grouptool->use_queue && $include_queues)
@@ -4482,7 +4494,7 @@ EOS;
         $agrps = $this->get_active_groups(true, true, 0, $groupid, $groupingid);
         $groupids = array_keys($agrps);
         $groupinfo = groups_get_all_groups($this->grouptool->course);
-        $userinfo = get_enrolled_users($this->context, "mod/grouptool:register");
+        $userinfo = get_enrolled_users($this->context);
         $sync_status = $this->get_sync_status();
         $context = context_module::instance($this->cm->id);
         if ((!$data_only && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
