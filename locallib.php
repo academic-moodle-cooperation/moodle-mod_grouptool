@@ -77,7 +77,6 @@ class view_admin_form extends moodleform {
             $mform->addElement('header', 'group_creation', get_string('groupcreation',
                                                                       'grouptool'));
 
-            // Adding the standard "name" field.
             $options = array(0=>get_string('all'));
             $options += $this->_customdata['roles'];
             $mform->addElement('select', 'roleid', get_string('selectfromrole', 'group'), $options);
