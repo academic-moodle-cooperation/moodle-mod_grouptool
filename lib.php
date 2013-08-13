@@ -1034,3 +1034,95 @@ function grouptool_reset_course_form_defaults($course) {
                  'reset_grouptool_agrps'            => 0,
                  'reset_grouptool_transparent_unreg'=> 0);
 }
+
+/**
+ * Copy Assign Grades from one user to another user (in assign_grade table)
+ */
+function grouptool_copy_assign_grades($id, $fromid, $toid) {
+    global $DB;
+    
+    $source = $DB->get_records('assign_grades', array('assignment'=>$id, 'userid'=>$fromid),
+                               'id DESC', '*', 0, 1, MUST_EXIST);
+    if(!is_array($toid)) {
+        $toid = array($toid);
+    }
+    $source = reset($source);
+    $user = $DB->get_record('user', array('id'=>$source->userid));
+    $grader = $DB->get_record('user', array('id'=>$source->grader));
+    //get corresponding feedback
+    $feedbackcomment = $DB->get_record('assignfeedback_comments', array('assignment'=>$id, 'grade'=>$source->id));
+    $feedbackfile = $DB->get_record('assignfeedback_file', array('assignment'=>$id, 'grade'=>$source->id));
+    foreach ($toid as $cur_id) {
+        $record = clone $source;
+        $record->userid = $cur_id;
+        unset($record->id);
+        if($record->id = $DB->get_field('assign_grades', 'id', array('assignment'=>$id, 'userid'=>$cur_id,
+                                                                     'attemptnumber'=>$source->attemptnumber))) {
+            $DB->update_record('assign_grades', $record);
+            if ($feedbackcomment) {
+                $newfeedbackcomment = clone $feedbackcomment;
+                unset($newfeedbackcomment->id);
+                $newfeedbackcomment->grade = $record->id;
+                $newfeedbackcomment->assignment = $id;
+                $details = array('student'  => fullname($user),
+                                 'teacher'  => fullname($grader),
+                                 'date'     => userdate($source->timemodified,
+                                                        get_string('strftimedatetimeshort')),
+                                 'feedback' => $newfeedbackcomment->commenttext);
+                $newfeedbackcomment->commenttext = format_text(get_string('copied_grade_feedback',
+                                                                          'grouptool',
+                                                                          $details),
+                                                               $newfeedbackcomment->commentformat);
+                if($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', array('assignment'=>$id, 'grade'=>$record->id))) {
+                    $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
+                } else {
+                    $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
+                }
+            }
+            if ($feedbackfile) {
+                $newfeedbackfile = clone $feedbackfile;
+                unset($newfeedbackfile->id);
+                $newfeedbackfile->grade = $record->id;
+                $newfeedbackfile->assignment = $id;
+                if($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', array('assignment'=>$id, 'grade'=>$record->id))) {
+                    $DB->update_record('assignfeedback_file', $newfeedbackfile);
+                } else {
+                    $DB->insert_record('assignfeedback_file', $newfeedbackfile);
+                }
+            }
+        } else {
+            $gradeid = $DB->insert_record('assign_grades', $record);
+            if ($feedbackcomment) {
+                $newfeedbackcomment = clone $feedbackcomment;
+                unset($newfeedbackcomment->id);
+                $newfeedbackcomment->grade = $gradeid;
+                $newfeedbackcomment->assignment = $id;
+                $details = array('student'  => fullname($user),
+                                 'teacher'  => fullname($grader),
+                                 'date'     => userdate($source->timemodified,
+                                                        get_string('strftimedatetimeshort')),
+                                 'feedback' => $newfeedbackcomment->commenttext);
+                $newfeedbackcomment->commenttext = format_text(get_string('copied_grade_feedback',
+                                                                          'grouptool',
+                                                                          $details),
+                                                               $newfeedbackcomment->commentformat);
+                if($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', array('assignment'=>$id, 'grade'=>$gradeid))) {
+                    $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
+                } else {
+                    $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
+                }
+            }
+            if ($feedbackfile) {
+                $newfeedbackfile = clone $feedbackfile;
+                unset($newfeedbackfile->id);
+                $newfeedbackfile->grade = $gradeid;
+                $newfeedbackfile->assignment = $id;
+                if($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', array('assignment'=>$id, 'grade'=>$gradeid))) {
+                    $DB->update_record('assignfeedback_file', $newfeedbackfile);
+                } else {
+                    $DB->insert_record('assignfeedback_file', $newfeedbackfile);
+                }
+            }
+        }
+    }
+}

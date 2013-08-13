@@ -2206,6 +2206,10 @@ EOS;
                         }
                         $group_rows[] = $row;
                     } else {
+                        if (function_exists ('grouptool_copy_'.$cm_to_use->modname.'_grades')) {
+                            $copyfunction = 'grouptool_copy_'.$cm_to_use->modname.'_grades';
+                            $copyfunction($cm_to_use->instance, $source_grade->userid, $current_grade->userid);
+                        }
                         if ($current_grade->id) {
                             $noerror = $current_grade->update();
                         } else {
@@ -2340,6 +2344,10 @@ EOS;
                     }
                     $current_grade->set_overridden(true, false);
                     $fullname = fullname($targetusers[$current_grade->userid]);
+                    if (function_exists ('grouptool_copy_'.$cm_to_use->name.'_grades')) {
+                        $copyfunction = 'grouptool_copy_'.$cm_to_use->name.'_grades';
+                        $copyfunction($cm_to_use->instance, $source_grade->userid, $current_grade->userid);
+                    }
                     if ($noerror) {
                         $nameinfo .= html_writer::tag('span',
                                                        '✓&nbsp;'.$fullname,
