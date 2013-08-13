@@ -258,6 +258,59 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->delete(true);
     }
+    
+    $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
+    foreach ($coursegroups as $groupid) {
+        if(!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $grouptool->instance,
+                                                        'group_id'     => $groupid))) {
+            $record = new stdClass();
+            $record->grouptool_id = $grouptool->instance;
+            $record->group_id = $groupid;
+            $record->sort_order = 9999999;
+            $record->grpsize = $grouptool->grpsize;
+            $record->active = 0;
+            $DB->insert_record('grouptool_agrps', $record);
+        }
+    }
+    if ($agrps = $DB->get_records('grouptool_agrps', array('grouptool_id' => $grouptool->instance))) {
+        list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps));
+        $groupregs = $DB->get_records_sql_menu('SELECT agrp_id, COUNT(id)
+                                                  FROM {grouptool_registered}
+                                                 WHERE agrp_id '.$agrpsql.
+                                             'GROUP BY agrp_id', $params);
+        foreach($agrps as $agrpid => $agrp) {
+            $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ?
+                                                           $grouptool->grpsize :
+                                                           $agrp->grpsize;
+            $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
+            $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
+            $sql = "SELECT queued.id as id, queued.agrp_id as agrp_id, queued.timestamp as timestamp, queued.user_id as user_id, (COUNT(DISTINCT reg.id) < ?) as priority, COUNT(DISTINCT reg.id) as regs
+                                  FROM {grouptool_queued} AS queued
+                                  JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
+                                 WHERE queued.agrp_id = ? AND reg.agrp_id ".$agrpsql."
+                              GROUP BY queued.id
+                              ORDER BY priority DESC, 'timestamp' ASC";
+            if($records = $DB->get_records_sql($sql, array_merge(array($min, $agrpid),
+                                                                 $params))) {
+                foreach ($records as $id => $record) {
+                    if(($groupregs[$agrpid] >= $size) && !empty($grouptool->use_size)) {
+                        // Group is full!
+                        break;
+                    }
+                    if($record->regs >= $max) {
+                        // User got too many regs!
+                        continue;
+                    }
+                    unset($record->id);
+                    $DB->insert_record('grouptool_registered', $record);
+                    if (!empty($grouptool->immediate_reg)) {
+                        groups_add_member($agrp->id, $record->user_id);
+                    }
+                    $DB->delete_records('grouptool_queued', array('id'=>$id));
+                }
+            }
+        }
+    }
 
     return $DB->update_record('grouptool', $grouptool);
 }
