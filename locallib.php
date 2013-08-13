@@ -3175,22 +3175,37 @@ EOS;
                 }
             }
 
-            if (($userqueues == 1 && $userregs == $max-1) || ($max == 1)) {
+            if (($userqueues == 1 && $userregs == $max-1) || ($userqueues+$userregs == 1 && $max == 1)) {
                 //groupchange!
                 if(empty($grouptool->allow_unreg)) {
                     return array(true, get_string('unreg_not_allowed', 'grouptool'));
                 }
 
                 if ($preview_only) {
-                    if ($userid != $USER->id) {
+                    if (!$this->grouptool->use_size
+                        || (count($groupdata->registered) < $groupdata->grpsize)
+                        || ($this->grouptool->use_queue
+                            && $userqueues < $this->grouptool->queues_max)) {
                         return array(-1,
                                      get_string('change_group_to', 'grouptool', $message));
-                    } else {
-                        return array(-1,
-                                     get_string('you_change_group_to', 'grouptool',
-                                                $message));
+                    } else if (!$this->grouptool->use_queue) {
+                        //group is full!
+                        if ($userid != $USER->id) {
+                            return array(1, get_string('reg_in_full_group', 'grouptool'));
+                        } else {
+                            return array(1, get_string('reg_you_in_full_group', 'grouptool'));
+                        }
+                    } else if ($userqueues >= $this->grouptool->queues_max) {
+                        if ($userid != $USER->id) {
+                            return array(1, get_string('too_many_queue_places', 'grouptool'));
+                        } else {
+                            return array(1, get_string('you_have_too_many_queue_places', 'grouptool'));
+                        }
                     }
-                } else {
+                } else if (!$this->grouptool->use_size
+                           || (count($groupdata->registered) < $groupdata->grpsize)
+                           || ($this->grouptool->use_queue
+                               && $userqueues-1 < $this->grouptool->queues_max)) {
                     $record = new stdClass();
                     $record->agrp_id = $agrpid;
                     $record->user_id = $userid;
@@ -3204,22 +3219,46 @@ EOS;
                         $DB->delete_records_select('grouptool_registered',
                                                    "user_id = ? AND agrp_id ".$agrpsql, $params);
                     }
-                    $DB->insert_record('grouptool_registered', $record);
-                    if ($this->grouptool->immediate_reg) {
-                        groups_add_member($groupdata->id, $userid);
+                    if (!$this->grouptool->use_size
+                        || (count($groupdata->registered) < $groupdata->grpsize)) {
+                        $DB->insert_record('grouptool_registered', $record);
+                        if ($this->grouptool->immediate_reg) {
+                            groups_add_member($groupdata->id, $userid);
+                        }
+                        add_to_log($this->grouptool->course,
+                                'grouptool', 'add registration',
+                                "view.php?id=".$this->grouptool->id.
+                                "&tab=overview&agrpid=".$agrpid,
+                                'register user:'.$userid.' in agrpid:'.$agrpid);
+                    } else if ($this->grouptool->use_queue
+                               && $userqueues-1 < $this->grouptool->queues_max) {
+                        $DB->insert_record('grouptool_queued', $record);
+                        add_to_log($this->grouptool->course,
+                                   'grouptool', 'add queue',
+                                   "view.php?id=".$this->grouptool->id.
+                                   "&tab=overview&agrpid=".$agrpid,
+                                   'queue user:'.$userid.' in agrpid:'.$agrpid);
+                    } else if (!$this->grouptool->use_queue) {
+                        //group is full!
+                        if ($userid != $USER->id) {
+                            return array(1, get_string('reg_in_full_group', 'grouptool'));
+                        } else {
+                            return array(1, get_string('reg_you_in_full_group', 'grouptool'));
+                        }
+                    } else  if ($userqueues-1 >= $this->grouptool->queues_max) {
+                        if ($userid != $USER->id) {
+                            return array(1, get_string('too_many_queue_places', 'grouptool'));
+                        } else {
+                            return array(1, get_string('you_have_too_many_queue_places', 'grouptool'));
+                        }
                     }
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'add registration',
-                            "view.php?id=".$this->grouptool->id.
-                            "&tab=overview&agrpid=".$agrpid,
-                            'queue user:'.$userid.' in agrpid:'.$agrpid);
                     if ($userid != $USER->id) {
                         return array(-1,
-                                     get_string('queue_in_group_success', 'grouptool',
+                                     get_string('change_group_to_success', 'grouptool',
                                                 $message));
                     } else {
                         return array(-1,
-                                     get_string('queue_you_in_group_success', 'grouptool',
+                                     get_string('you_change_group_to_success', 'grouptool',
                                                 $message));
                     }
                 }
@@ -4242,11 +4281,11 @@ EOS;
                             if ($reg_open) {
                                 $grouphtml .= html_writer::tag('button', $label, $button_attr);
                             }
-                            $grouphtml .= html_writer::tag('span',
-                                                           get_string('registered_on_rank',
-                                                                      'grouptool', $reg_rank),
-                                                           array('class'=>'rank'));
                         }
+                        $grouphtml .= html_writer::tag('span',
+                                                       get_string('registered_on_rank',
+                                                                  'grouptool', $reg_rank),
+                                                       array('class'=>'rank'));
                     } else if (!empty($group->queued)
                         && $this->get_rank_in_queue($group->queued, $userid) != false) {
                         // We're sorry, but user's already queued in this group!
@@ -4259,24 +4298,49 @@ EOS;
                             if ($reg_open) {
                                 $grouphtml .= html_writer::tag('button', $label, $button_attr);
                             }
-                            $grouphtml .= html_writer::tag('span',
-                                                           get_string('queued_on_rank',
-                                                                      'grouptool', $queue_rank),
-                                                           array('class'=>'rank'));
                         }
+                        $grouphtml .= html_writer::tag('span',
+                                                       get_string('queued_on_rank',
+                                                                  'grouptool', $queue_rank),
+                                                       array('class'=>'rank'));
                     } else if ($this->grpmarked($group->agrp_id)) {
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('grp_marked', 'grouptool'),
                                                        array('class'=>'rank'));
                     } else if ($this->grouptool->allow_unreg
-                               && (($userqueues == 1 && $userregs == $max-1) || ($userregs+$userqueues == 1 && $max == 1))) {
-                        //groupchange!
-                        $label = get_string('change_group', 'grouptool');
-                        $button_attr = array('type'=>'submit',
-                                             'name'=>'reg['.$group->agrp_id.']',
-                                             'value'=>$group->agrp_id,
-                                             'class'=>'regbutton');
-                        $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                               && (($userqueues == 1 && $userregs == $max-1)
+                                   || ($userregs+$userqueues == 1 && $max == 1))) {
+                        if (!$this->grouptool->use_size
+                            || (count($group->registered) < $group->grpsize)
+                            || ($this->grouptool->use_queue
+                                && (count($group->registered) >= $group->grpsize)
+                                && $userqueues < $this->grouptool->queues_max)) {
+                            //groupchange!
+                            $label = get_string('change_group', 'grouptool');
+                            if ($this->grouptool->use_size 
+                                && count($group->registered) >= $group->grpsize) {
+                                    $label .= ' ('.get_string('queue', 'grouptool').')';
+                            }
+                            $button_attr = array('type'=>'submit',
+                                                 'name'=>'reg['.$group->agrp_id.']',
+                                                 'value'=>$group->agrp_id,
+                                                 'class'=>'regbutton');
+                            $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                        } else if ($this->grouptool->use_queue
+                                   && (count($group->registered) >= $group->grpsize)
+                                   && $userqueues >= $this->grouptool->queues_max) {
+                            //too many queues
+                            $grouphtml .= html_writer::tag('div',
+                                                           get_string('max_queues_reached',
+                                                                      'grouptool'),
+                                                                      array('class'=>'rank'));
+                        } else {
+                            //group is full!
+                            $grouphtml .= html_writer::tag('div',
+                                                           get_string('fullgroup',
+                                                                      'grouptool'),
+                                                                      array('class'=>'rank'));
+                        }
                     } else if ($userregs+$userqueues < $max) {
                         if (!$this->grouptool->use_size || (count($group->registered) < $group->grpsize)) {
                             //register button
