@@ -4269,7 +4269,7 @@ EOS;
                                                        get_string('grp_marked', 'grouptool'),
                                                        array('class'=>'rank'));
                     } else if ($this->grouptool->allow_unreg
-                               && (($userqueues == 1 && $userregs == $max-1) || ($max == 1))) {
+                               && (($userqueues == 1 && $userregs == $max-1) || ($userregs+$userqueues == 1 && $max == 1))) {
                         //groupchange!
                         $label = get_string('change_group', 'grouptool');
                         $button_attr = array('type'=>'submit',
