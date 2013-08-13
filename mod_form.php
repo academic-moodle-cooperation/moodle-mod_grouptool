@@ -242,7 +242,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('ifmemberadded', (!empty($CFG->grouptool_ifmemberadded) ?
                                                  $CFG->grouptool_ifmemberadded :
                                                  GROUPTOOL_IGNORE));
-        $mform->setAdvanced('ifmemberadded');
 
         $mform->addElement('select', 'ifmemberremoved', get_string('ifmemberremoved', 'grouptool'),
                            $options);
@@ -251,7 +250,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('ifmemberremoved', (!empty($CFG->grouptool_ifmemberremoved) ?
                                                  $CFG->grouptool_ifmemberremoved :
                                                  GROUPTOOL_IGNORE));
-        $mform->setAdvanced('ifmemberremoved');
 
         $options = array( GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
                           GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'));
@@ -262,7 +260,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('ifgroupdeleted', (!empty($CFG->grouptool_ifgroupdeleted) ?
                                                  $CFG->grouptool_ifgroupdeleted :
                                                  GROUPTOOL_RECREATE_GROUP));
-        $mform->setAdvanced('ifgroupdeleted');
 
         /*
          * ---------------------------------------------------------
