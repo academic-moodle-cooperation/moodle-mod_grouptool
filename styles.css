@@ -190,6 +190,10 @@
     margin-left:2em;
 }
 
+.path-mod-grouptool div.box1embottom {
+    margin-bottom: 1em;
+}
+
 .path-mod-grouptool .gradeinfo {
     display:inline-block;
     text-align:left;

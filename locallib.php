@@ -2238,17 +2238,19 @@ EOS;
                     }
                     $previewtable->data = array_merge($previewtable->data, $group_rows);
                 } else {
-                    $info .= html_writer::tag('div', $groups[$group]->name." (".
-                                                     count($groupmembers)."): ".$groupinfo);
+                    $grpinfo = "";
+                    $grpinfo .= html_writer::tag('div', $groups[$group]->name." (".
+                                                        count($groupmembers)."): ".$groupinfo);
                     $data = array('student' => fullname($sourceusers[$source[$group]]),
                                   'teacher' => fullname($orig_teacher),
                                   'date'    => userdate($source_grade->get_dategraded(),
                                                         get_string('strftimedatetimeshort')),
                                   'feedback' => $source_grade->feedback);
                     $temp = get_string('copied_grade_feedback', 'grouptool', $data);
-                    $info .= html_writer::tag('div', $formatted_grade.html_writer::empty_tag('br').
-                                                     format_text($temp,
-                                                                 $source_grade->feedbackformat));
+                    $grpinfo .= html_writer::tag('div', $formatted_grade.html_writer::empty_tag('br').
+                                                        format_text($temp,
+                                                                    $source_grade->feedbackformat));
+                    $info .= html_writer::tag('div', $grpinfo, array('class'=>'box1embottom'));
                     add_to_log($this->grouptool->course,
                               'grouptool', 'grade group',
                               "view.php?id=".$this->grouptool->id."&tab=grading&activity=".
