@@ -141,7 +141,7 @@
 }
 
 .path-mod-grouptool .draggable_item .buttons input[type=image], .draggable_item .buttons img {
-    height:40px;
+    height:20px;
     background-color: transparent !important;/*#34637f;*/
 }
 
