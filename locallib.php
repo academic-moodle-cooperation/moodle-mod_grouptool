@@ -3262,9 +3262,8 @@ EOS;
             if ($userregs+$userqueues >= $max) {
                 return array(1, get_string('too_many_regs', 'grouptool'));
             }
-
+            $marks = isset($SESSION->grouptool->marks) ? count($SESSION->grouptool->marks) : 0;
             if ($grouptool->use_size) {
-                $marks = isset($SESSION->grouptool->marks) ? count($SESSION->grouptool->marks) : 0;
                 if (count($groupdata->registered) < $groupdata->grpsize) {
                     //register
                     if ($preview_only) {
@@ -3443,6 +3442,96 @@ EOS;
                         return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                     } else {
                         return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
+                    }
+                }
+            } else {
+                //register him 
+                if ($preview_only) {
+                    if ($userid != $USER->id) {
+                        return array(false,
+                                     get_string('register_in_group', 'grouptool', $message));
+                    } else {
+                        return array(false,
+                                     get_string('register_you_in_group', 'grouptool',
+                                                $message));
+                    }
+                } else if ($this->grouptool->allow_multiple
+                           && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
+                    //cache data until enough registrations are made
+                    if(!isset($SESSION->grouptool->marks)) {
+                        $SESSION->grouptool->marks = array();
+                    }
+                    $record = new stdClass();
+                    $record->agrp_id = $agrpid;
+                    $record->grp_id = $groupdata->id;
+                    $record->user_id = $userid;
+                    $record->timestamp = time();
+                    $record->modified_by = $USER->id;
+                    $record->type = 'reg';
+                    $SESSION->grouptool->marks[] = $record;
+                    if ($userid != $USER->id) {
+                        return array(false,
+                                     get_string('place_allocated_in_group_success', 'grouptool',
+                                                $message));
+                    } else {
+                        return array(false,
+                                     get_string('your_place_allocated_in_group_success', 'grouptool',
+                                                $message));
+                    }
+                } else {
+                    if ($this->grouptool->allow_multiple) {
+                        //enough registrations have been made, save them
+                        if(isset($SESSION->grouptool->marks)) {
+                            foreach ($SESSION->grouptool->marks as $cur) {
+                                if ($cur->type == 'reg') {
+                                    unset($cur->type);
+                                    $DB->insert_record('grouptool_registered', $cur);
+                                    if ($this->grouptool->immediate_reg) {
+                                        groups_add_member($cur->grp_id, $cur->user_id);
+                                    }
+                                } else {
+                                    unset($cur->type);
+                                    $DB->insert_record('grouptool_queued', $cur);
+                                }
+                            }
+                            unset($SESSION->grouptool->marks);
+                        }
+                    }
+                    $record = new stdClass();
+                    $record->agrp_id = $agrpid;
+                    $record->user_id = $userid;
+                    $record->timestamp = time();
+                    $record->modified_by = $USER->id;
+                    $DB->insert_record('grouptool_registered', $record);
+                    add_to_log($this->grouptool->course,
+                            'grouptool', 'add registration',
+                            "view.php?id=".$this->grouptool->id."&tab=overview&agrpid=".$agrpid,
+                            'register user:'.$userid.' in agrpid:'.$agrpid);
+                    if ($this->grouptool->immediate_reg) {
+                        groups_add_member($groupdata->id, $userid);
+                    }
+
+                    $regcnt = $this->get_user_reg_count(0, $userid);
+                    if (($this->grouptool->allow_multiple
+                        && ($regcnt >= $this->grouptool->choose_max))
+                        || !$this->grouptool->allow_multiple) {
+                        $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
+                        if(count($agrps) > 0) {
+                            $agrpids = array_keys($agrps);
+                            list($sql, $params) = $DB->get_in_or_equal($agrpids);
+                            $DB->delete_records_select('grouptool_queued',
+                                                       ' user_id = ? AND agrp_id '.$sql,
+                                                       array_merge(array($userid), $params));
+                        }
+                    }
+                    if ($userid != $USER->id) {
+                        return array(false,
+                                     get_string('register_in_group_success', 'grouptool',
+                                                $message));
+                    } else {
+                        return array(false,
+                                     get_string('register_you_in_group_success', 'grouptool',
+                                                $message));
                     }
                 }
             }
