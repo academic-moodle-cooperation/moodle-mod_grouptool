@@ -112,12 +112,10 @@ foreach ($grouptools as $grouptool) {
             if (count($userstats->registered)) {
                 $temp_str = "";
                 foreach ($userstats->registered as $registration) {
-                    list($colorclass, $text) = grouptool_display_lateness($registration->timestamp,
-                                                                          $grouptool->timedue);
                     if ($temp_str != "") {
                         $temp_str .= '; ';
                     }
-                    $temp_str .= html_writer::tag('span', $registration->grpname.' '.$text);
+                    $temp_str .= html_writer::tag('span', $registration->grpname);
                 }
                 if (($grouptool->allow_multiple &&
                         (count($userstats->registered) < $grouptool->choose_min))
