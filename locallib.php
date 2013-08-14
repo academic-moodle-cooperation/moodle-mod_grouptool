@@ -2934,6 +2934,10 @@ EOS;
             return array(true, get_string('reg_not_open', 'grouptool'));
         }
 
+        if (empty($this->grouptool->allow_unreg)) {
+            return array(true, get_string('unreg_not_allowed', 'grouptool'));
+        }
+
         $message = new stdClass();
         if ($userid != $USER->id) {
             $userdata = $DB->get_record('user', array('id'=>$userid));
@@ -2943,6 +2947,21 @@ EOS;
         $groupdata = reset($groupdata);
         $message->groupname = $groupdata->name;
 
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptool_id = ?", array($this->grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $DB->count_records_select('grouptool_registered', "user_id = ? AND agrp_id ".$agrpsql, $params);
+        $userqueues = $DB->count_records_select('grouptool_queued', "user_id = ? AND agrp_id ".$agrpsql, $params);
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        if ($userregs+$userqueues <= $min) {
+            if ($userid == $USER->id) {
+                return array(true, get_string('you_have_too_less_regs', 'grouptool', $message));
+            } else {
+                return array(true, get_string('user_has_too_less_regs', 'grouptool', $message));
+            }
+        }
+        
         if ($groupdata) {
             if ($this->get_rank_in_queue($groupdata->registered, $userid) != false) {
                 // He is registered!
@@ -3307,7 +3326,7 @@ EOS;
                                         unset($cur->type);
                                         $DB->insert_record('grouptool_registered', $cur);
                                         if ($this->grouptool->immediate_reg) {
-                                            groups_add_member($cur->id, $cur->user_id);
+                                            groups_add_member($cur->grp_id, $cur->user_id);
                                         }
                                     } else {
                                         unset($cur->type);
@@ -3405,7 +3424,7 @@ EOS;
                                         unset($cur->type);
                                         $DB->insert_record('grouptool_registered', $cur);
                                         if ($this->grouptool->immediate_reg) {
-                                            groups_add_member($cur->id, $cur->user_id);
+                                            groups_add_member($cur->grp_id, $cur->user_id);
                                         }
                                     } else {
                                         unset($cur->type);
@@ -4362,7 +4381,7 @@ EOS;
                                     'name'=>'unreg['.$group->agrp_id.']',
                                     'value'=>$group->agrp_id,
                                     'class'=>'unregbutton');
-                            if ($reg_open) {
+                            if ($reg_open && ($userregs+$userqueues > $min)) {
                                 $grouphtml .= html_writer::tag('button', $label, $button_attr);
                             }
                         }
@@ -4379,7 +4398,7 @@ EOS;
                                     'name'=>'unreg['.$group->agrp_id.']',
                                     'value'=>$group->agrp_id,
                                     'class'=>'unregbutton');
-                            if ($reg_open) {
+                            if ($reg_open && ($userregs+$userqueues > $min)) {
                                 $grouphtml .= html_writer::tag('button', $label, $button_attr);
                             }
                         }
