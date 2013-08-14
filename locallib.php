@@ -3186,9 +3186,9 @@ EOS;
                     } else if (!$this->grouptool->use_queue) {
                         //group is full!
                         if ($userid != $USER->id) {
-                            return array(1, get_string('reg_in_full_group', 'grouptool'));
+                            return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                         } else {
-                            return array(1, get_string('reg_you_in_full_group', 'grouptool'));
+                            return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
                         }
                     } else if ($userqueues >= $this->grouptool->queues_max) {
                         if ($userid != $USER->id) {
@@ -3236,9 +3236,9 @@ EOS;
                     } else if (!$this->grouptool->use_queue) {
                         //group is full!
                         if ($userid != $USER->id) {
-                            return array(1, get_string('reg_in_full_group', 'grouptool'));
+                            return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                         } else {
-                            return array(1, get_string('reg_you_in_full_group', 'grouptool'));
+                            return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
                         }
                     } else  if ($userqueues-1 >= $this->grouptool->queues_max) {
                         if ($userid != $USER->id) {
@@ -3440,9 +3440,9 @@ EOS;
                 } else {
                     //group is full!
                     if ($userid != $USER->id) {
-                        return array(1, get_string('reg_in_full_group', 'grouptool'));
+                        return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                     } else {
-                        return array(1, get_string('reg_you_in_full_group', 'grouptool'));
+                        return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
                     }
                 }
             }
