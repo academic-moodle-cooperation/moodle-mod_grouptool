@@ -106,9 +106,9 @@ $string['create_fromto_groups'] = 'Create groups with numbers from an intervall 
 $string['createGroups'] = 'Create groups';
 $string['createGroupings'] = 'Create groupings';
 $string['create_groups_confirm'] = 'Continue to create groups as previewed above?';
-$string['create_groups_confirm_problem'] = 'At least 1 error occured (refer to preview above)!<br />NO CHANGES will be made!<br />There are already groups with names as given in name scheme. Please use a different name scheme!';
+$string['create_groups_confirm_problem'] = 'When trying to create the new groups based on the given name schema conflicts are encountered - see preview - Moodle groups must have unique names. The conflict can be due to existing groups with the same name or a syntax error in the naming scheme (... eg. empty, missing # symbol).';
 $string['create_groupings_confirm'] = 'Continue to create groupings as previewed above?';
-$string['create_groupings_confirm_problem'] = 'At least 1 error occured (refer to preview above)!<br />NO CHANGES will be made!';
+$string['create_groupings_confirm_problem'] = 'At least 1 error occured (refer to preview above)!';
 $string['copied_grade_feedback'] = 'Groupgrading<br />
 +Submission from: {$a->student}<br />
 +Graded by: {$a->teacher}<br />

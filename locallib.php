@@ -918,11 +918,9 @@ class grouptool {
                     if(in_array($group['name'], $names_to_use)) {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
-                        $error = get_string('nameschemenotunique', 'grouptool', $group['name']);
                     } else {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('groupnameexists', 'group', $group['name']).'</span>';
-                        $error = get_string('groupnameexists', 'group', $group['name']);
                     }
                 } else {
                     $line[] = $group['name'];
@@ -961,10 +959,10 @@ class grouptool {
 
             // Save the groups data!
             foreach ($groups as $key => $group) {
-                if (groups_get_group_by_name($this->course->id, $group['name'])) {
+                if (@groups_get_group_by_name($this->course->id, $group['name'])) {
                     $error = get_string('groupnameexists', 'group', $group['name']);
                     $failed = true;
-                    break;
+                    continue;
                 }
                 $newgroup = new stdClass();
                 $newgroup->courseid = $this->course->id;
@@ -1076,13 +1074,10 @@ class grouptool {
                     if(in_array($group, $createdgroups)) {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('nameschemenotunique', 'grouptool', $group).'</span>';
-                        $error = get_string('nameschemenotunique', 'grouptool', $group);
                     } else {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('groupnameexists', 'group', $group).'</span>';
-                        $error = get_string('groupnameexists', 'group', $group);
                     }
-                    $createdgroups[] = $group;
                 } else {
                     $line[] = $group;
                     $createdgroups[] = $group;
@@ -1229,11 +1224,9 @@ class grouptool {
                     if(in_array($group['name'], $groupnames)) {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
-                        $error = get_string('nameschemenotunique', 'grouptool', $group['name']);
                     } else {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('groupnameexists', 'group', $group['name']).'</span>';
-                        $error = get_string('groupnameexists', 'group', $group['name']);
                     }
                 } else {
                     $groupnames[] = $group['name'];
@@ -1675,12 +1668,14 @@ class grouptool {
                         break;
                 }
                 $preview = html_writer::tag('div', $preview, array('class'=>'centered'));
-                $continue = "view.php?id=$id&tab=administration&confirm=true";
-                $cancel = "view.php?id=$id&tab=administration";
                 if ($error) {
                     $text = get_string('create_groups_confirm_problem', 'grouptool');
-                    $confirmboxcontent =  $this->confirm($text, $cancel);
+                    $url = new moodle_url("view.php?id=$id&tab=administration");
+                    $back = new single_button($url, get_string('back'), 'post');
+                    $confirmboxcontent =  $this->confirm($text, $back);
                 } else {
+                    $continue = "view.php?id=$id&tab=administration&confirm=true";
+                    $cancel = "view.php?id=$id&tab=administration";
                     $text = get_string('create_groups_confirm', 'grouptool');
                     $confirmboxcontent =  $this->confirm($text, $continue, $cancel);
                 }

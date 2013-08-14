@@ -106,9 +106,9 @@ $string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bi
 $string['createGroups'] = 'Gruppen erstellen';
 $string['createGroupings'] = 'Gruppierungen erstellen';
 $string['create_groups_confirm'] = 'Gruppen erstellen, wie in der Vorschau gezeigt?';
-$string['create_groups_confirm_problem'] = 'Mindestens 1 Fehler ist aufgetreten (siehe Vorschau)!<br />Es werden KEINE Änderungen vorgenommen!<br />Es existieren bereits Gruppen mit Namen, die aus dem Namensschema erzeugt wurden. Bitte wählen Sie ein anderes Namensschema!';
+$string['create_groups_confirm_problem'] = 'Beim Versuch die neuen Gruppen anhand des vorgegebenen Namenschemas anzulegen sind Konflikte aufgetreten - siehe Vorschau - Moodle Gruppen müssen eineindeutige Namen haben. Der Konflikt kann an bereits bestehenden Gruppen mit gleichem Namen oder einem Syntaxfehler im Namensschema (zb. leer, fehlendes #-Symbol, ...) liegen.';
 $string['create_groupings_confirm'] = 'Gruppierungen erstellen, wie in der Vorschau gezeigt?';
-$string['create_groupings_confirm_problem'] = 'Zumindest 1 Fehler ist aufgetreten (siehe Vorschau)!<br />Es werden KEINE Änderungen vorgenommen!';
+$string['create_groupings_confirm_problem'] = 'Zumindest 1 Fehler ist aufgetreten (siehe Vorschau)!';
 $string['copied_grade_feedback'] = 'Gruppenbenotung<br />
 +Abgabe von: {$a->student}<br />
 +Note von: {$a->teacher}<br />
