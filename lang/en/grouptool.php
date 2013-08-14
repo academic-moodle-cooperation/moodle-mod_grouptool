@@ -267,7 +267,7 @@ $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag username">[username]</span>
 <span class="tag alpha">@</span>
 <span class="tag number">#</span>';
-$string['nameschemenotunique'] = 'Groupnames from this name scheme are not unique ({$a}). Please choose another one or use # or @ to create unique groupnames.';
+$string['nameschemenotunique'] = 'Groupnames from this name scheme are not unique ({$a}). Please choose another one or use # (numeric index) or @ (alphabetic index) to create unique groupnames.';
 $string['namingscheme'] = 'Name scheme';
 $string['no_conflictfree_to_display'] = 'No conflict-free groups to display. So we try to display all instead!';
 $string['no_data_to_display'] = 'No group(s) data to display!';

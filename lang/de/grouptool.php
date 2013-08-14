@@ -267,7 +267,7 @@ $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag username">[username]</span>
 <span class="tag alpha">@</span>
 <span class="tag number">#</span>';
-$string['nameschemenotunique'] = 'Gruppennamen, die aus diesem Namensschema erzeugt werden, sind nicht einzigartig ({$a}). Bitte wählen sie ein anderes Namensschema oder benutzen sie # oder @ um eindeutige Gruppennamen zu erzeugen.';
+$string['nameschemenotunique'] = 'Gruppennamen, die aus diesem Namensschema erzeugt werden, sind nicht einzigartig ({$a}). Bitte wählen sie ein anderes Namensschema oder benutzen sie # (laufende Nummer) oder @ (alphabetische Repräsentation) um eindeutige Gruppennamen zu erzeugen.';
 $string['namingscheme'] = 'Namensschema';
 $string['no_conflictfree_to_display'] = 'Keine konfliktfreien Gruppen anzuzeigen. Stattdessen alle angezeigt!';
 $string['no_data_to_display'] = 'Keine Gruppendaten anzuzeigen!';
