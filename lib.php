@@ -272,6 +272,28 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
             $DB->insert_record('grouptool_agrps', $record);
         }
     }
+
+    //we have to override the functions fetching of data, because it's not updated yet
+    grouptool_update_queues($grouptool);
+
+    return $DB->update_record('grouptool', $grouptool);
+}
+
+/**
+ * function looks through all the queues and moves users from queue to reg if theres place
+ *
+ * @param object|int grouptool or grouptoolid
+ */
+function grouptool_update_queues($grouptool = 0) {
+    global $DB;
+    
+    //update queues and move users from queue to reg if there's place
+    if(!is_object($grouptool)) {
+        $grouptool = $DB->get_records('grouptool', array('id'=>$grouptool), MUST_EXIST);
+    } else {
+        $grouptool->instance = $grouptool->id;
+    }
+
     if ($agrps = $DB->get_records('grouptool_agrps', array('grouptool_id' => $grouptool->instance))) {
         list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps));
         $groupregs = $DB->get_records_sql_menu('SELECT agrp_id, COUNT(id)
@@ -293,7 +315,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
             if($records = $DB->get_records_sql($sql, array_merge(array($min, $agrpid),
                                                                  $params))) {
                 foreach ($records as $id => $record) {
-                    if(($groupregs[$agrpid] >= $size) && !empty($grouptool->use_size)) {
+                    if(!empty($grouptool->use_size) && ($groupregs[$agrpid] >= $size)) {
                         // Group is full!
                         break;
                     }
@@ -302,17 +324,23 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
                         continue;
                     }
                     unset($record->id);
-                    $DB->insert_record('grouptool_registered', $record);
-                    if (!empty($grouptool->immediate_reg)) {
-                        groups_add_member($agrp->id, $record->user_id);
+                    if(!$DB->record_exists('grouptool_registered', array('agrp_id' => $agrpid,
+                                                                         'user_id' => $record->user_id))) {
+                        unset($record->priority);
+                        unset($record->regs);
+                        $record->modified_by = 0;
+                        $DB->insert_record('grouptool_registered', $record);
+                        if (!empty($grouptool->immediate_reg)) {
+                            groups_add_member($agrp->group_id, $record->user_id);
+                        }
                     }
-                    $DB->delete_records('grouptool_queued', array('id'=>$id));
+                    $DB->delete_records('grouptool_queued', array('agrp_id' => $agrpid,
+                                                                  'user_id' => $record->user_id));
+                    $groupregs[$agrpid]++;
                 }
             }
         }
     }
-
-    return $DB->update_record('grouptool', $grouptool);
 }
 
 /**

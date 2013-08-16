@@ -68,11 +68,14 @@ function group_add_member_handler($data) {
             $reg->user_id = $data->userid;
             $reg->timestamp = time();
             $reg->modified_by = 0; // There's no way we can get the teachers id!
-            $DB->insert_record('grouptool_registered', $reg);
-            add_to_log($grouptool->course,
-                       'grouptool', 'register',
-                       "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->groupid,
-                       'via event agrp='.$grouptool->agrpid.' user='.$data->userid);
+            if(!$DB->record_exists('grouptool_registered', array('agrp_id'=>$reg->agrp_id,
+                                                                 'user_id'=>$reg->user_id))) {
+                $DB->insert_record('grouptool_registered', $reg);
+                add_to_log($grouptool->course,
+                           'grouptool', 'register',
+                           "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->groupid,
+                           'via event agrp='.$grouptool->agrpid.' user='.$data->userid);
+            }
         }
     }
     return true;

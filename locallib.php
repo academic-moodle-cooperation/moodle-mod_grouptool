@@ -348,7 +348,7 @@ class view_admin_form extends moodleform {
             }
 
             if (has_capability('mod/grouptool:create_groups', $this->context) && ($nogroups != 1)) {
-                $mform->addElement('submit', 'saveagrps', get_string('savechanges'));
+                $mform->addElement('submit', 'updateActiveGroups', get_string('savechanges'));
             }
         }
     }
@@ -412,7 +412,7 @@ class view_admin_form extends moodleform {
                 }
             }
         }
-        if (!empty($data['saveagrps'])
+        if (!empty($data['updateActiveGroups'])
            && (!empty($data['use_size']) && !empty($data['use_individual']))) {
             $sql = '
    SELECT agrps.group_id as id, COUNT(reg.id) as regcnt
@@ -438,10 +438,12 @@ LEFT JOIN {grouptool_registered} as reg ON reg.agrp_id = agrps.id
                     }
                 }
             }
-            if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
-                $errors['grouplist'] = $toomanyregs;
-            } else {
-                $errors['grouplist'] .= html_writer::empty_tag('br').$toomanyregs;
+            if($toomanyregs != '') {
+                if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
+                    $errors['grouplist'] = $toomanyregs;
+                } else {
+                    $errors['grouplist'] .= html_writer::empty_tag('br').$toomanyregs;
+                }
             }
         }
         return array_merge($parent_errors, $errors);
@@ -809,6 +811,9 @@ class grouptool {
                     $dataobj->id = $DB->insert_record('grouptool_agrps', $dataobj, true);
                 }
             }
+
+            grouptool_update_queues($this->grouptool);
+
             add_to_log($this->grouptool->course, 'grouptool', 'update agrps',
                     "view.php?id=".$this->grouptool->id."&tab=overview",
                     'via form', $this->cm->id);
@@ -1705,7 +1710,7 @@ class grouptool {
                      $OUTPUT->box($preview, 'generalbox').
                      $confirmboxcontent;
 
-            } else if (isset($fromform->saveagrps) && !empty($fromform->grouplist)) {
+            } else if (isset($fromform->updateActiveGroups)) {
                 if (has_capability('mod/grouptool:create_groupings', $this->context)
                         || has_capability('mod/grouptool:create_groups', $this->context)) {
                     // Update active-groups data!
@@ -1725,7 +1730,6 @@ class grouptool {
         } else {
             $mform->display();
         }
-
     }
 
     /**
