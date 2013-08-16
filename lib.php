@@ -138,6 +138,20 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
         calendar_event::create($dueevent);
     }
 
+    $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
+    foreach ($coursegroups as $groupid) {
+        if(!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $return,
+                                                        'group_id'     => $groupid))) {
+            $record = new stdClass();
+            $record->grouptool_id = $return;
+            $record->group_id = $groupid;
+            $record->sort_order = 9999999;
+            $record->grpsize = $grouptool->grpsize;
+            $record->active = 0;
+            $DB->insert_record('grouptool_agrps', $record);
+        }
+    }
+    
     return $return;
 }
 

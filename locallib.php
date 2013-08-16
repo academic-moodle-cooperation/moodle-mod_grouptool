@@ -308,11 +308,9 @@ class view_admin_form extends moodleform {
                 $options['add_fields'] = array();
                 $options['add_fields']['grpsize'] = new stdClass();
                 $options['add_fields']['grpsize']->name = 'grpsize';
-                if (isset($CFG->grouptool->grpsize)) {
-                    $options['add_fields']['grpsize']->stdvalue = $CFG->grouptool->grpsize;
-                } else {
-                    $options['add_fields']['grpsize']->stdvalue = '3';
-                }
+                $options['add_fields']['grpsize']->stdvalue = $grouptool->grpsize ?
+                                                              $grouptool->grpsize :
+                                                              $CFG->grouptool_grpsize;
                 if (!empty($this->_customdata['show_grpsize'])) {
                     $options['add_fields']['grpsize']->label = get_string('groupsize', 'grouptool');
                     $options['add_fields']['grpsize']->type = 'text';
