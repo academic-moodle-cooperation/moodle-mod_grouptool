@@ -320,14 +320,18 @@ function grouptool_update_queues($grouptool = 0) {
                                                            $agrp->grpsize;
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
-            $sql = "SELECT queued.id as id, queued.agrp_id as agrp_id, queued.timestamp as timestamp, queued.user_id as user_id, (COUNT(DISTINCT reg.id) < ?) as priority, COUNT(DISTINCT reg.id) as regs
+            $sql = "SELECT queued.id as id, queued.agrp_id as agrp_id, queued.timestamp as timestamp, queued.user_id as user_id, (regs < ?) as priority, reg.regs as regs
                                   FROM {grouptool_queued} AS queued
-                                  JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
-                                 WHERE queued.agrp_id = ? AND reg.agrp_id ".$agrpsql."
+                             LEFT JOIN (SELECT user_id, COUNT(DISTINCT id) as regs
+                                         FROM {grouptool_registered}
+                                        WHERE agrp_id ".$agrpsql."
+                                     GROUP BY user_id) AS reg ON queued.user_id = reg.user_id
+                                 WHERE queued.agrp_id = ?
                               GROUP BY queued.id
                               ORDER BY priority DESC, 'timestamp' ASC";
-            if($records = $DB->get_records_sql($sql, array_merge(array($min, $agrpid),
-                                                                 $params))) {
+
+            if($records = $DB->get_records_sql($sql, array_merge(array($min),
+                                                                 $params, array($agrpid)))) {
                 foreach ($records as $id => $record) {
                     if(!empty($grouptool->use_size) && ($groupregs[$agrpid] >= $size)) {
                         // Group is full!
