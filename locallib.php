@@ -4770,7 +4770,7 @@ EOS;
      * @return string|object either html-fragment representing table or raw data as object
      */
     public function group_overview_table($groupingid = 0, $groupid = 0, $data_only = false) {
-        global $OUTPUT, $CFG;
+        global $OUTPUT, $CFG, $DB;
         if (!$data_only) {
             $return = "";
             $downloadurl = new moodle_url('/mod/grouptool/download.php', array('id'=>$this->cm->id,
@@ -4862,6 +4862,9 @@ EOS;
 
             if (count($agrp->registered) >= 1) {
                 foreach ($agrp->registered as $reg_entry) {
+                    if(!array_key_exists($reg_entry->user_id, $userinfo)) {
+                        $userinfo[$reg_entry->user_id] = $DB->get_record('user', array('id'=>$reg_entry->user_id));
+                    }
                     if (!$data_only) {
                         $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
                                 $reg_entry->user_id.'&course='.$this->course->id,
@@ -4922,6 +4925,9 @@ EOS;
 
             if (count($agrp->moodle_members) >= 1) {
                 foreach ($agrp->moodle_members as $memberid => $member) {
+                    if(!array_key_exists($memberid, $userinfo)) {
+                        $userinfo[$memberid] = $DB->get_record('user', array('id'=>$memberid));
+                    }
                     if ((count($agrp->registered) >= 1)
                              && $this->get_rank_in_queue($agrp->registered, $memberid)) {
                         continue;
@@ -4972,6 +4978,9 @@ EOS;
 
             if (count($agrp->queued) >= 1) {
                 foreach ($agrp->queued as $queue_entry) {
+                    if(!array_key_exists($queue_entry->user_id, $userinfo)) {
+                        $userinfo[$queue_entry->user_id] = $DB->get_record('user', array('id'=>$queue_entry->user_id));
+                    }
                     $queue_entry->rank = $this->get_rank_in_queue($agrp->queued,
                                                                   $queue_entry->user_id);
                     if (!$data_only) {
