@@ -986,7 +986,13 @@ class grouptool {
                 if (!$DB->record_exists('grouptool_agrps', $attr)) {
                     $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
                 } else {
+                    /* This is also the case if eventhandlers work properly
+                     * because group gets allready created in eventhandler
+                     */
                     $new_agrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
+                    if ($this->grouptool->allow_reg == true) {
+                        $DB->set_field('grouptool_agrps', 'active', 1, array('id'=>$new_agrp->id));
+                    }
                 }
                 $createdgroups[] = $groupid;
                 foreach ($group['members'] as $user) {
@@ -1135,7 +1141,13 @@ class grouptool {
                 if (!$DB->record_exists('grouptool_agrps', $attr)) {
                     $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
                 } else {
+                    /* This is also the case if eventhandlers work properly
+                     * because group gets allready created in eventhandler
+                     */
                     $new_agrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
+                    if ($this->grouptool->allow_reg == true) {
+                        $DB->set_field('grouptool_agrps', 'active', 1, array('id'=>$new_agrp->id));
+                    }
                 }
                 $createdgroups[] = $groupid;
                 if ($grouping) {
@@ -1286,9 +1298,15 @@ class grouptool {
                                               'group_id'     => $groupid))) {
                     $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
                 } else {
+                    /* This is also the case if eventhandlers work properly
+                     * because group gets allready created in eventhandler
+                     */
                     $new_agrp->id = $DB->get_field('grouptool_agrps', 'id',
                                                    array('grouptool_id' => $this->grouptool->id,
                                                          'group_id'     => $groupid));
+                    if ($this->grouptool->allow_reg == true) {
+                        $DB->set_field('grouptool_agrps', 'active', 1, array('id'=>$new_agrp->id));
+                    }
                 }
                 $createdgroups[] = $groupid;
                 groups_add_member($groupid, $group['member']->id);
