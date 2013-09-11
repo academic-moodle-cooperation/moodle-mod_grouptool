@@ -3156,8 +3156,9 @@ EOS;
         }
 
         $reg_open = ($this->grouptool->allow_reg
-                && (($this->grouptool->timedue == 0)
-                        || (time() < $this->grouptool->timedue)));
+                    && (($this->grouptool->timedue == 0)
+                        || (time() < $this->grouptool->timedue))
+                    && ($this->grouptool->timeavailable < time()));
 
         if (!$reg_open && !has_capability('mod/grouptool:register_students', $this->context)) {
             return array(true, get_string('reg_not_open', 'grouptool'));
@@ -4041,10 +4042,10 @@ EOS;
         $userid = $USER->id;
 
         $reg_open = ($this->grouptool->allow_reg
-                        && (($this->grouptool->timedue == 0)
-                                || (time() < $this->grouptool->timedue))
-                        && (($this->grouptool->timeavailable == 0)
-                                || (time() > $this->grouptool->timeavailable)));
+                     && (($this->grouptool->timedue == 0)
+                         || (time() < $this->grouptool->timedue))
+                     && (time() > $this->grouptool->timeavailable));
+
         // Process submitted form!
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed!
@@ -4443,11 +4444,12 @@ EOS;
                     } else if ($this->grouptool->allow_unreg
                                && (($userqueues == 1 && $userregs == $max-1)
                                    || ($userregs+$userqueues == 1 && $max == 1))) {
-                        if (!$this->grouptool->use_size
-                            || (count($group->registered) < $group->grpsize)
-                            || ($this->grouptool->use_queue
-                                && (count($group->registered) >= $group->grpsize)
-                                && $userqueues < $this->grouptool->queues_max)) {
+                        if ($reg_open
+                            && (!$this->grouptool->use_size
+                                || (count($group->registered) < $group->grpsize)
+                                || ($this->grouptool->use_queue
+                                    && (count($group->registered) >= $group->grpsize)
+                                    && $userqueues < $this->grouptool->queues_max))) {
                             //groupchange!
                             $label = get_string('change_group', 'grouptool');
                             if ($this->grouptool->use_size 
@@ -4459,7 +4461,7 @@ EOS;
                                                  'value'=>$group->agrp_id,
                                                  'class'=>'regbutton');
                             $grouphtml .= html_writer::tag('button', $label, $button_attr);
-                        } else if ($this->grouptool->use_queue
+                        } else if ($reg_open && $this->grouptool->use_queue
                                    && (count($group->registered) >= $group->grpsize)
                                    && $userqueues >= $this->grouptool->queues_max) {
                             //too many queues
@@ -4467,14 +4469,14 @@ EOS;
                                                            get_string('max_queues_reached',
                                                                       'grouptool'),
                                                                       array('class'=>'rank'));
-                        } else {
+                        } else if ($reg_open) {
                             //group is full!
                             $grouphtml .= html_writer::tag('div',
                                                            get_string('fullgroup',
                                                                       'grouptool'),
                                                                       array('class'=>'rank'));
                         }
-                    } else if ($userregs+$userqueues < $max) {
+                    } else if ($reg_open && ($userregs+$userqueues < $max)) {
                         if (!$this->grouptool->use_size || (count($group->registered) < $group->grpsize)) {
                             //register button
                             $label = get_string('register', 'grouptool');
@@ -4507,7 +4509,7 @@ EOS;
                                                                       'grouptool'),
                                                                       array('class'=>'rank'));
                         }
-                    } else {
+                    } else if ($reg_open) {
                         $grouphtml .= html_writer::tag('div',
                                                        get_string('max_regs_reached',
                                                                   'grouptool'),
