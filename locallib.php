@@ -3250,8 +3250,18 @@ EOS;
                         $DB->delete_records_select('grouptool_queued',
                                                    "user_id = ? AND agrp_id ".$agrpsql, $params);
                     } else if ($userregs == 1) {
+                        $oldgrp = $DB->get_field_sql("SELECT agrp.group_id
+                                                        FROM {grouptool_registered} as reg
+                                                        JOIN {grouptool_agrps} as agrp ON agrp.id = reg.agrp_id
+                                                       WHERE reg.user_id = ? AND reg.agrp_id ".$agrpsql,
+                                                     $params, MUST_EXIST);
                         $DB->delete_records_select('grouptool_registered',
                                                    "user_id = ? AND agrp_id ".$agrpsql, $params);
+                        if(!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
+                            groups_remove_member($oldgrp, $userid);
+                        } else if (empty($oldgrp)) {
+                            //error, old group not found ?!?
+                        }
                     }
                     if (!$this->grouptool->use_size
                         || (count($groupdata->registered) < $groupdata->grpsize)) {
