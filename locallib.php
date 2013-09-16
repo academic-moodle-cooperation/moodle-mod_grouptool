@@ -5760,7 +5760,7 @@ EOS;
      * @return array($error, $message)
      */
     public function push_registrations($groupid=0, $groupingid=0, $previewonly=false) {
-        global $DB;
+        global $DB, $CFG;
         $userinfo = get_enrolled_users($this->context);
         $return = array();
         // Get active groups filtered by group_id, grouping_id, grouptoolid!
@@ -5768,11 +5768,45 @@ EOS;
         foreach ($agrps as $groupid => $agrp) {
             foreach ($agrp->registered as $reg) {
                 $info = new stdClass();
-                $info->fullname = fullname($userinfo[$reg->user_id]);
-                $info->group = $agrp->name;
+                if(!key_exists($reg->user_id, $userinfo)) {
+                    $userinfo[$reg->user_id] = $DB->get_record('user', array('id'=>$reg->user_id));
+                }
+                $info->username = fullname($userinfo[$reg->user_id]);
+                $info->groupname = $agrp->name;
                 if (!groups_is_member($groupid, $reg->user_id)) {
                     // Add to group if is not already!
                     if (!$previewonly) {
+                        if (!is_enrolled($this->context, $reg->user_id)) {
+                            /*
+                             * if user's not enrolled already we force manual enrollment in course,
+                             * so we can add the user to the group
+                             */
+                            require_once($CFG->dirroot.'/enrol/manual/locallib.php');
+                            require_once($CFG->libdir.'/accesslib.php');
+                            if (!$enrol_manual = enrol_get_plugin('manual')) {
+                                throw new coding_exception('Can not instantiate enrol_manual');
+                            }
+                            if (!$instance = $DB->get_record('enrol', array('courseid'=>$this->course->id,
+                                                                            'enrol'=>'manual'),
+                                                             '*', IGNORE_MISSING)) {
+                                if ($instanceid = $enrol_manual->add_default_instance($this->course)) {
+                                    $instance = $DB->get_record('enrol',
+                                                                array('courseid' => $this->course->id,
+                                                                      'enrol'    => 'manual'), '*',
+                                                                MUST_EXIST);
+                                }
+                            }
+                            if ($instance != false) {
+                                $archroles = get_archetype_roles('student');
+                                $archrole = array_shift($archroles);
+                                $enrol_manual->enrol_user($instance, $reg->user_id, $archrole->id, time());
+                            } else {
+                                $message .= html_writer::tag('div',
+                                                             $OUTPUT->notification(get_string('cant_enrol',
+                                                                                              'grouptool'),
+                                                             'notifyproblem'));
+                            }
+                        }
                         if (groups_add_member($groupid, $reg->user_id)) {
                             $return[] = html_writer::tag('div',
                                                          get_string('added_member', 'grouptool',
@@ -5782,7 +5816,7 @@ EOS;
                             $return[] = html_writer::tag('div',
                                                          get_string('could_not_add', 'grouptool',
                                                                     $info),
-                                                         array('class'=>'notifysuccess'));
+                                                         array('class'=>'notifyproblem'));
                         }
                     } else {
                         $return[] = html_writer::tag('div', get_string('add_member', 'grouptool',
