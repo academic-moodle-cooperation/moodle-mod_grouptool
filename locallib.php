@@ -3141,7 +3141,7 @@ EOS;
      * @param bool $preview_only optional don't act, just return a preview
      * @return array ($error, $message)
      */
-    private function register_in_agrp($agrpid=0, $userid=0, $preview_only=false) {
+    private function register_in_agrp($agrpid=0, $userid=0, $preview_only=false, $movefromqueue=false) {
         global $USER, $PAGE, $DB, $SESSION;
 
         $grouptool = $this->grouptool;
@@ -3191,7 +3191,7 @@ EOS;
                 }
             }
 
-            if (!empty($groupdata->queued)
+            if (empty($movefromqueue) && !empty($groupdata->queued)
                 && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
                 // We're sorry, but user's already queued in this group!
                 if ($userid != $USER->id) {
@@ -3210,7 +3210,9 @@ EOS;
                 }
             }
 
-            if (($userqueues == 1 && $userregs == $max-1) || ($userqueues+$userregs == 1 && $max == 1)) {
+            if (empty($movefromqueue)
+                && ($userqueues == 1 && $userregs == $max-1)
+                || ($userqueues+$userregs == 1 && $max == 1)) {
                 //groupchange!
                 if(empty($grouptool->allow_unreg)) {
                     return array(true, get_string('unreg_not_allowed', 'grouptool'));
@@ -3309,7 +3311,8 @@ EOS;
                 }
             }
 
-            if ($userregs+$userqueues >= $max) {
+            if ((empty($movefromqueue) && $userregs+$userqueues >= $max)
+                 || (!empty($movefromqueue) && $userregs+$userqueues-1 >= $max)) {
                 return array(1, get_string('too_many_regs', 'grouptool'));
             }
             $marks = isset($SESSION->grouptool->marks) ? count($SESSION->grouptool->marks) : 0;
@@ -3325,7 +3328,7 @@ EOS;
                                          get_string('register_you_in_group', 'grouptool',
                                                     $message));
                         }
-                    } else if ($this->grouptool->allow_multiple
+                    } else if (empty($movefromqueue) && $this->grouptool->allow_multiple
                                && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
                         //cache data until enough registrations are made
                         if(!isset($SESSION->grouptool->marks)) {
@@ -3857,7 +3860,7 @@ EOS;
                 $queue_entries = $DB->get_records_sql("
                     SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
                     FROM {grouptool_queued} AS queued
-                    JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
+                    LEFT JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
                     ".$queued_sql."
                    GROUP BY queued.id
                     ORDER BY priority DESC, queued.timestamp ASC",
@@ -3876,13 +3879,14 @@ EOS;
         }
 
         // Get group entries (sorted by sort-order)!
-        $groupsdata = $DB->get_records_sql("SELECT agrp.*,
-                COUNT(DISTINCT reg.id) as registered
-                FROM {grouptool_agrps} as agrp
-                LEFT JOIN {grouptool_registered} as reg ON reg.agrp_id = agrp.id
-                WHERE agrp.grouptool_id = ?".$agrps_sql."
-                GROUP BY agrp.id
-                ORDER BY agrp.sort_order ASC", $agrps_params);
+        $groupsdata = $DB->get_records_sql("
+                SELECT agrp.id as id, agrp.group_id as group_id, agrp.grpsize as size,
+                       COUNT(DISTINCT reg.id) as registered
+                  FROM {grouptool_agrps} as agrp
+             LEFT JOIN {grouptool_registered} as reg ON reg.agrp_id = agrp.id
+                 WHERE agrp.grouptool_id = ?".$agrps_sql."
+              GROUP BY agrp.id
+              ORDER BY agrp.sort_order ASC", $agrps_params);
 
         if (!empty($groupsdata) && !empty($queue_entries)) {
             // Get first group in row!
@@ -3898,7 +3902,7 @@ EOS;
                     $planned->{$queue->user_id} = array();
                 }
                 if (!empty($cur_group)) {
-                    while ((!empty($grouptool->use_size) && !empty($cur_group->grpsize))
+                    while (!empty($cur_group) && (!empty($grouptool->use_size) && !empty($cur_group->grpsize))
                             && ($cur_group->grpsize <= $cur_group->registered)) {
                         // Groups full --> next!
                         $cur_group = next($groupsdata);
@@ -3909,11 +3913,12 @@ EOS;
                                                                        'grouptool',
                                                                        $queue->user_id),
                                                             array('class'=>'error'));
+                        } else {
+                            $cur_group->grpsize = ($grouptool->use_individual
+                                                       && !empty($cur_group->grpsize)) ?
+                                                   $cur_group->size :
+                                                   $grouptool->grpsize;
                         }
-                        $cur_group->grpsize = ($grouptool->use_individual
-                                                   && !empty($cur_group->grpsize)) ?
-                                               $cur_group->grpsize :
-                                               $grouptool->grpsize;
                     }
                 } else {
                     $error = true;
@@ -3928,6 +3933,7 @@ EOS;
                         $i = 0;
                         list($cur_error, $cur_text) = $this->register_in_agrp($cur_group->id,
                                                                               $queue->user_id,
+                                                                              true,
                                                                               true);
                         if (in_array($cur_group->id, $planned->{$queue->user_id})) {
                             $cur_error = true;
@@ -3945,6 +3951,7 @@ EOS;
                             }
                             list($cur_error, $cur_text) = $this->register_in_agrp($cur_group->id,
                                                                                   $queue->user_id,
+                                                                                  true,
                                                                                   true);
                             if (in_array($cur_group->id, $planned->{$queue->user_id})) {
                                 $cur_error = true;
@@ -3971,29 +3978,45 @@ EOS;
                     } else {
                         $i = 0;
                         list($cur_error, $cur_text) = $this->register_in_agrp($cur_group->id,
-                                                                              $queue->user_id);
+                                                                              $queue->user_id,
+                                                                              false,
+                                                                              true);
                         while ($cur_error != 0) {
                             $i++;
                             $cur_group = next($groupsdata);
+                            if(empty($cur_group)) {
+                                break;
+                            }
                             list($cur_error, $cur_text) = $this->register_in_agrp($cur_group->id,
-                                                                                  $queue->user_id);
+                                                                                  $queue->user_id,
+                                                                                  false,
+                                                                                  true);
                         }
-                        $class = $cur_error ? 'error': 'success';
-                        $data = new stdClass();
-                        $data->user_id = $queue->user_id;
-                        $data->agrp_id = $queue->agrp_id;
-                        $data->current_grp = $cur_group->id;
-                        $data->current_text = $cur_text;
-                        $movedtext = get_string('user_moved', 'grouptool', $data);
-                        $returntext .= html_writer::tag('div', $movedtext, array('class'=>$class));
-                        $cur_group->registered++;
-                        $error = $error || $cur_error;
-                        $attr = array('id'      => $queue->id,
-                                      'user_id' => $queue->user_id,
-                                      'agrp_id' => $queue->agrp_id);
-                        $DB->delete_records('grouptool_queued', $attr);
-                        if ($DB->record_exists('grouptool_queued', $attr)) {
-                            $returntext .= "Could not delete!";
+                        if(!empty($cur_group)) {
+                            $class = $cur_error ? 'error': 'success';
+                            $data = new stdClass();
+                            $data->user_id = $queue->user_id;
+                            $data->agrp_id = $queue->agrp_id;
+                            $data->current_grp = $cur_group->id;
+                            $data->current_text = $cur_text;
+                            $movedtext = get_string('user_moved', 'grouptool', $data);
+                            $returntext .= html_writer::tag('div', $movedtext, array('class'=>$class));
+                            $cur_group->registered++;
+                            $error = $error || $cur_error;
+                            $attr = array('id'      => $queue->id,
+                                          'user_id' => $queue->user_id,
+                                          'agrp_id' => $queue->agrp_id);
+                            $DB->delete_records('grouptool_queued', $attr);
+                            if ($DB->record_exists('grouptool_queued', $attr)) {
+                                $returntext .= "Could not delete!";
+                            }
+                        } else {
+                            $returntext .= html_writer::tag('div',
+                                                            get_string('all_groups_full',
+                                                                       'grouptool',
+                                                                       $queue->user_id),
+                                                            array('class'=>'error'));
+                            return array(true, $returntext);
                         }
                     }
                 }

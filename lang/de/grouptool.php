@@ -380,6 +380,7 @@ $string['target'] = 'Ziel';
 $string['too_many_queue_places'] = 'Kann {$a->username} nicht in Warteliste der Gruppe {$a->groupname} eintragen, weil {$a->username} bereits in zu vielen Wartelisten eingetragen ist!';
 $string['toomanyregspresent'] = 'Zumindest 1 Nutzer ist in zu vielen Gruppen angemeldet, daher kann die maximale Anzahl zu wählender Gruppen nicht geringer als {$a} eingestellt werden.';
 $string['toomanyregs'] = 'Achtung! In mindestens einer der Gruppen wird die eingetragene Gruppengröße bereits überschritten.<br />Bevor Sie die neuen Einstellungen der Gruppengröße speichern können, reduzieren Sie die Anzahl der angemeldeten Teilnehmer/innen in den Gruppen.';
+$string['too_many_regs'] = 'Nutzer ist bereits in zu vielen Gruppen angemeldet!';
 $string['you_have_too_many_queue_places'] = 'Kann Sie nicht in Warteliste der Gruppe {$a->groupname} eintragen, weil Sie bereits in zu vielen Wartelisten eingetragen sind!';
 $string['total'] = 'Gesamt';
 $string['unqueue'] = 'Aus Warteliste austragen';
