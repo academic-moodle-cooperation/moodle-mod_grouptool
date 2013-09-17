@@ -122,16 +122,20 @@ function group_remove_member_handler($data) {
 
                     // Get next queued user and put him in the group (and delete queue entry)!
                     if (!empty($grouptool->use_queue)) {
+                        $agrpids = $DB->get_fieldset_sql('SELECT id FROM {grouptool_agrps} WHERE grouptool_id = ?', array($grouptool->id));
+                        list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
                         $sql = "SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
                                   FROM {grouptool_queued} AS queued
-                                  JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
-                                 WHERE queued.agrp_id = ? AND reg.agrp_id = ?
+                             LEFT JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
+                                                                     AND reg.agrp_id ".$agrpssql."
+                                 WHERE queued.agrp_id = ?
                               GROUP BY queued.id
                               ORDER BY priority DESC, timestamp ASC
                                  LIMIT 1";
-                        $record = $DB->get_record_sql($sql, array($grouptool->choose_max,
-                                                                  $agrp[$grouptool->id]->id,
-                                                                  $agrp[$grouptool->id]->id));
+                        $params = array_merge(array($grouptool->choose_max),
+                                              $agrpsparam,
+                                              array($agrp[$grouptool->id]->id));
+                        $record = $DB->get_record_sql($sql, $params);
                         if(is_object($record)) {
                             $new_record = clone $record;
                             unset($new_record->id);
