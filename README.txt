@@ -15,11 +15,11 @@
 # 1040 Wien
 # http://tsc.tuwien.ac.at/
 # ---------------------------------------------------------------
-# FOR Moodle 2.2.1+
+# FOR Moodle 2.5+
 # ---------------------------------------------------------------
 
 README.txt
-v.2012-05-22
+v.2013081600
 
 
 Grouptool-Module
@@ -49,7 +49,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle <2.2.1 or later>
+    Moodle <2.5 or later>
 
 INSTALLATION 
 ================================================================================
@@ -59,11 +59,30 @@ INSTALLATION
    The langfiles normaly can be left into the folder mod/grouptool/lang.
    All languages should be encoded with utf8.
 
-    After it you have to run the admin-page of moodle (http://your-moodle-site/admin)
-    in your browser. You have to loged in as admin before.
+    After it you have to run the admin-page of moodle
+	http://your-moodle-site/admin) in your browser. 
+	You have to logged in as admin before.
     The installation process will be displayed on the screen.
     That's all.
 
 
 CHANGELOG
 ================================================================================
+v 2013081600
+--------------------------------------------------------------------------------
+- minimum groups to choose is now a requirement:
+  The registrations will be saved only if the minimum amount of groups to choose
+  has been chosen. Furthermore will every unregistration from groups be
+  prevented if the amount of registrations is under the lower limit.
+- new iconset:
+  Due to the change to SVG-icons, grouptool got a new activity icon and now uses
+  the moodle action-icon-set as actionbuttons.
+- it is now possible to show the description directly on the coursepage
+- groupgrading now allows also to write the grade directly to assignment-
+  and checkmark-instances (additionally to the standard writing to gradebook)
+- block "recent activities" won't show private information anymore
+- start of registration/end of registration events:
+  these are now 2 separate events instead of a single one to prevent it from
+  blocking all other events
+- show groupmembers has got now it's own CSS copying moodle's design
+- various bugfixes, layout improvements, language improvements
