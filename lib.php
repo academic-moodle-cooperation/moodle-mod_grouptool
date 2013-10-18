@@ -55,6 +55,7 @@ function grouptool_supports($feature) {
         case FEATURE_IDNUMBER:          return true;
         case FEATURE_MOD_INTRO:         return true;
         case FEATURE_SHOW_DESCRIPTION:  return true;
+        case FEATURE_MOD_ARCHETYPE:     return MOD_ARCHETYPE_OTHER;
 
         default:                        return false;
     }
