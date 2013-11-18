@@ -4610,6 +4610,7 @@ EOS;
                   LEFT JOIN {grouptool_registered} as regs ON agrps.id = regs.agrp_id
                       WHERE agrps.group_id = :grpid
                         AND grptl.use_size = 1
+                        AND agrps.active = 1
                    GROUP BY agrps.id
                    ';
         $agrps = $DB->get_records_sql($sql, array('grpid'=>$group));
