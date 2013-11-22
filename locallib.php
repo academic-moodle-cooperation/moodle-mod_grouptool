@@ -509,6 +509,7 @@ class view_import_form extends moodleform {
 
             $mform->addElement('advcheckbox', 'forceregistration', '', '&nbsp;'.get_string('forceregistration', 'grouptool'));
             $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
+            $mform->setDefault('forceregistration', $CFG->grouptool_force_importreg);
             
             $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }

@@ -147,4 +147,13 @@ if ($ADMIN->fulltree) {
             get_string('cfg_ifgroupdeleted_desc', 'grouptool'),
             GROUPTOOL_RECREATE_GROUP,
             $options));
+
+    $settings->add(new admin_setting_heading('grouptool_addinstanceset',
+            get_string('cfg_addinstanceset_head', 'grouptool'),
+            get_string('cfg_addinstanceset_head_info', 'grouptool')));
+
+    $settings->add(new admin_setting_configcheckbox('grouptool_force_importreg',
+            get_string('cfg_force_importreg', 'grouptool'),
+            get_string('cfg_force_importreg_desc', 'grouptool'),
+            0, $yes='1', $no='0'));
 }
