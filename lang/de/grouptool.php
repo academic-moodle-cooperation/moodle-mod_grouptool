@@ -42,6 +42,7 @@ $string['allow_unreg'] = 'Abmeldung zulassen';
 $string['allow_unreg_help'] = 'Ermöglicht Studenten sich von Gruppen ab- bzw. zu anderen Gruppen umzumelden, solange sie sich innerhalb eines (optionalen) Zeitlimits befinden.';
 $string['already_marked'] = 'Diese Gruppe wurde bereits zur Anmeldung markiert!';
 $string['already_member'] = '{$a->username} ist bereits Mitglied von Gruppe {$a->groupname}';
+$string['already_occupied'] = 'Der Gruppenplatz in Gruppe {$a->grpname} wurde bereits an einen Benutzer vergeben, der die Anmeldung schneller durchführte. Bitte wählen Sie eine andere Gruppe aus!';
 $string['already_queued'] = '{$a->username} ist bereits in der Warteliste von Gruppe {$a->groupname}!';
 $string['already_registered'] = '{$a->username} ist bereits in Gruppe {$a->groupname} registriert!';
 $string['you_are_already_queued'] = 'Sie sind bereits in der Warteliste von Gruppe {$a->groupname}!';

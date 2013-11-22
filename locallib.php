@@ -2911,9 +2911,14 @@ EOS;
 
                 $groupdata[$key]->registered = null;
                 if ($include_regs) {
-                    $attr = array('agrp_id'=>$currentgroup->agrp_id);
-                    $groupdata[$key]->registered = (array)$DB->get_records('grouptool_registered',
-                                                                           $attr);
+                    $params = array('agrpid'=>$currentgroup->agrp_id);
+                    $where = "agrp_id = :agrpid AND modified_by >= 0";
+                    $groupdata[$key]->registered = $DB->get_records_select('grouptool_registered',
+                                                                           $where, $params);
+                    $params['modifierid'] = -1;
+                    $where = "agrp_id = :agrpid AND modified_by = :modifierid";
+                    $groupdata[$key]->marked = $DB->get_records_select('grouptool_registered',
+                                                                       $where, $params);
                     $groupdata[$key]->moodle_members = groups_get_members($currentgroup->id);
                 }
             }
@@ -3201,7 +3206,7 @@ EOS;
                 }
             }
 
-            if (isset($SESSION->grouptool->marks) && $this->grpmarked($groupdata->agrp_id)) {
+            if ($this->grpmarked($groupdata->agrp_id, $userid)) {
                 //allready marked for registration
                 if ($userid != $USER->id) {
                     return array(true, get_string('already_marked', 'grouptool', $message));
@@ -3315,7 +3320,8 @@ EOS;
                  || (!empty($movefromqueue) && $userregs+$userqueues-1 >= $max)) {
                 return array(1, get_string('too_many_regs', 'grouptool'));
             }
-            $marks = isset($SESSION->grouptool->marks) ? count($SESSION->grouptool->marks) : 0;
+            //get users marks
+            $marks = $this->count_user_marks($userid);
             if ($grouptool->use_size) {
                 if (count($groupdata->registered) < $groupdata->grpsize) {
                     //register
@@ -3331,17 +3337,12 @@ EOS;
                     } else if (empty($movefromqueue) && $this->grouptool->allow_multiple
                                && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
                         //cache data until enough registrations are made
-                        if(!isset($SESSION->grouptool->marks)) {
-                            $SESSION->grouptool->marks = array();
-                        }
                         $record = new stdClass();
                         $record->agrp_id = $agrpid;
-                        $record->grp_id = $groupdata->id;
                         $record->user_id = $userid;
                         $record->timestamp = time();
-                        $record->modified_by = $USER->id;
-                        $record->type = 'reg';
-                        $SESSION->grouptool->marks[] = $record;
+                        $record->modified_by = -1;
+                        $DB->insert_record('grouptool_registered', $record);
                         if ($userid != $USER->id) {
                             return array(false,
                                          get_string('place_allocated_in_group_success', 'grouptool',
@@ -3354,20 +3355,22 @@ EOS;
                     } else {
                         if ($this->grouptool->allow_multiple) {
                             //enough registrations have been made, save them
-                            if(isset($SESSION->grouptool->marks)) {
-                                foreach ($SESSION->grouptool->marks as $cur) {
+                            if(!empty($marks)) {
+                                $usermarks = $this->get_user_marks($userid);
+                                foreach($usermarks as $cur) {
                                     if ($cur->type == 'reg') {
                                         unset($cur->type);
-                                        $DB->insert_record('grouptool_registered', $cur);
+                                        $cur->modified_by = $USER->id;
+                                        $DB->update_record('grouptool_registered', $cur);
                                         if ($this->grouptool->immediate_reg) {
-                                            groups_add_member($cur->grp_id, $cur->user_id);
+                                            groups_add_member($cur->group_id, $cur->user_id);
                                         }
                                     } else {
                                         unset($cur->type);
                                         $DB->insert_record('grouptool_queued', $cur);
                                     }
                                 }
-                                unset($SESSION->grouptool->marks);
+                                $this->delete_user_marks($userid);
                             }
                         }
                         $record = new stdClass();
@@ -3416,7 +3419,7 @@ EOS;
                             return array(1, get_string('you_have_too_many_queue_places', 'grouptool'));
                         }
                     }
-                    $marks = isset($SESSION->grouptool->marks) ? count($SESSION->grouptool->marks) : 0;
+                    $marks = $this->count_user_marks($userid);
                     if ($preview_only) {
                         if ($userid != $USER->id) {
                             return array(-1,
@@ -3429,17 +3432,13 @@ EOS;
                     } else if ($this->grouptool->allow_multiple
                                && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
                         //cache data until enough registrations are made
-                        if(!isset($SESSION->grouptool->marks)) {
-                            $SESSION->grouptool->marks = array();
-                        }
                         $record = new stdClass();
                         $record->agrp_id = $agrpid;
                         $record->grp_id = $groupdata->id;
                         $record->user_id = $userid;
                         $record->timestamp = time();
-                        $record->modified_by = $USER->id;
-                        $record->type = 'queue';
-                        $SESSION->grouptool->marks[] = $record;
+                        $record->modified_by = -1;
+                        $DB->inset_record('grouptool_registered', $record);
                         if ($userid != $USER->id) {
                             return array(false,
                                          get_string('place_allocated_in_group_success', 'grouptool',
@@ -3451,21 +3450,24 @@ EOS;
                         }
                     } else {
                         if ($this->grouptool->allow_multiple) {
-                            if(isset($SESSION->grouptool->marks)) {
+                            if(!empty($marks)) {
                                 //enough registrations have been made, save them
-                                foreach ($SESSION->grouptool->marks as $cur) {
+                                $usermarks = $this->get_user_marks($userid);
+                                foreach($usermarks as $cur) {
                                     if ($cur->type == 'reg') {
                                         unset($cur->type);
-                                        $DB->insert_record('grouptool_registered', $cur);
+                                        unset($cur->group_id);
+                                        $cur->modified_by = $USER->id;
+                                        $DB->update_record('grouptool_registered', $cur);
                                         if ($this->grouptool->immediate_reg) {
-                                            groups_add_member($cur->grp_id, $cur->user_id);
+                                            groups_add_member($cur->group_id, $cur->user_id);
                                         }
                                     } else {
                                         unset($cur->type);
                                         $DB->insert_record('grouptool_queued', $cur);
                                     }
                                 }
-                                unset($SESSION->grouptool->marks);
+                                $this->delete_user_marks($userid);
                             }
                         }
                         $record = new stdClass();
@@ -3511,17 +3513,13 @@ EOS;
                 } else if ($this->grouptool->allow_multiple
                            && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
                     //cache data until enough registrations are made
-                    if(!isset($SESSION->grouptool->marks)) {
-                        $SESSION->grouptool->marks = array();
-                    }
                     $record = new stdClass();
                     $record->agrp_id = $agrpid;
                     $record->grp_id = $groupdata->id;
                     $record->user_id = $userid;
                     $record->timestamp = time();
-                    $record->modified_by = $USER->id;
-                    $record->type = 'reg';
-                    $SESSION->grouptool->marks[] = $record;
+                    $record->modified_by = -1;
+                    $DB->insert_record('grouptool_registered', $record);
                     if ($userid != $USER->id) {
                         return array(false,
                                      get_string('place_allocated_in_group_success', 'grouptool',
@@ -3534,20 +3532,22 @@ EOS;
                 } else {
                     if ($this->grouptool->allow_multiple) {
                         //enough registrations have been made, save them
-                        if(isset($SESSION->grouptool->marks)) {
-                            foreach ($SESSION->grouptool->marks as $cur) {
+                        if($marks) {
+                            $usermarks = $this->get_user_marks($userid);
+                            foreach($usermarks as $cur) {
                                 if ($cur->type == 'reg') {
                                     unset($cur->type);
-                                    $DB->insert_record('grouptool_registered', $cur);
+                                    $cur->modified_by = $USER->id;
+                                    $DB->update_record('grouptool_registered', $cur);
                                     if ($this->grouptool->immediate_reg) {
-                                        groups_add_member($cur->grp_id, $cur->user_id);
+                                        groups_add_member($cur->group_id, $cur->user_id);
                                     }
                                 } else {
                                     unset($cur->type);
                                     $DB->insert_record('grouptool_queued', $cur);
                                 }
                             }
-                            unset($SESSION->grouptool->marks);
+                            $this->delete_user_marks($userid);
                         }
                     }
                     $record = new stdClass();
@@ -4021,20 +4021,82 @@ EOS;
         return array($error, $returntext);
         }
 
-    public function grpmarked($agrp_id, $userid=0) {
-        global $SESSION;
-        if(!isset($SESSION->grouptool)) {
-            $SESSION->grouptool = new stdClass();
+    public function get_user_marks($userid=0) {
+        global $DB, $USER, $OUTPUT;
+        
+        if(empty($userid)) {
+            $userid = $USER->id;
         }
-        if(!isset($SESSION->grouptool->marks) || !is_array($SESSION->grouptool->marks)) {
-            return false;
-        }
-        foreach($SESSION->grouptool->marks as $cur) {
-            if($cur->agrp_id == $agrp_id) {
-                return true;
+        
+        $agrps = $DB->get_fieldset_select('grouptool_agrps', 'id',
+                                          'grouptool_id = ?',
+                                          array($this->cm->instance));
+        
+        list($agrpssql, $params) = $DB->get_in_or_equal($agrps);
+        $params[] = $userid;
+        
+        $sql = 'SELECT reg.id, reg.agrp_id, reg.user_id, reg.timestamp,
+                       agrp.group_id
+                  FROM {grouptool_registered} as reg
+                  JOIN {grouptool_agrps} as agrp ON reg.agrp_id = agrp.id
+                 WHERE reg.agrp_id '.$agrpssql.'
+                   AND modified_by = -1
+                   AND user_id = ?';
+        
+        $marks = $DB->get_records_sql($sql, $params);
+        $groupdata = $this->get_active_groups(true, true);
+        foreach($marks as $id => $cur) {
+            if($this->grouptool->use_size) {
+                if (count($groupdata[$cur->group_id]->registered) < $groupdata[$cur->group_id]->grpsize) {
+                    $marks[$id]->type = 'reg';
+                } else if ($this->grouptool->use_queue) {
+                    $marks[$id]->type = 'queue';
+                } else {
+                    // Place occupied in the meanwhile, must look for another group
+                    $info = new stdClass();
+                    $info->grpname = groups_get_group_name($cur->group_id);
+                    echo $OUTPUT->notification(get_string('already_occupied',
+                                                          'grouptool', $info),
+                                               'notifyproblem');
+                    $DB->delete_records('grouptool_registered', array('id'=>$id));
+                    unset($marks[$id]);
+                }
+            } else {
+                $marks[$id]->type = 'reg';
             }
         }
-        return false;
+
+        return $marks;
+    }
+    
+    public function delete_user_marks($userid=0) {
+        global $DB;
+        
+        $marks = $this->get_user_marks($userid);
+        if(!empty($marks)) {
+            list($select, $params) = $DB->get_in_or_equal(array_keys($marks));
+            $select = 'id '.$select;
+            $DB->delete_records_select('grouptool_registered', $select, $params);
+        }
+    }
+    
+    public function count_user_marks($userid=0) {
+        $marks = $this->get_user_marks($userid);
+
+        return count($marks);
+    }
+
+    public function grpmarked($agrp_id, $userid=0) {
+        global $DB, $USER;
+
+        if(empty($userid)) {
+            $userid = $USER->id;
+        }
+
+        return $DB->record_exists('grouptool_registered',
+                                  array('agrp_id' => $agrp_id,
+                                        'user_id' => $userid,
+                                        'modified_by' => -1));
     }
     
     /**

@@ -42,6 +42,7 @@ $string['allow_unreg'] = 'Allow unregistration';
 $string['allow_unreg_help'] = 'Enable students to unregister from or change to other groups before (optional) the due-date.';
 $string['already_marked'] = 'This group was allready marked for registration!';
 $string['already_member'] = '{$a->username} is already member of group {$a->groupname}';
+$string['already_occupied'] = 'The place in group {$a->grpname} is allready occupied because another user completed the registration faster. Please look for another group!';
 $string['already_queued'] = '{$a->username} is already queued in group {$a->groupname}!';
 $string['already_registered'] = '{$a->username} is already registered in group {$a->groupname}!';
 $string['you_are_already_queued'] = 'You are already queued in group {$a->groupname}!';
