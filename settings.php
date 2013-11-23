@@ -30,6 +30,10 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot.'/mod/grouptool/lib.php');
     require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
 
+    $settings->add(new admin_setting_configcheckbox('grouptool_requiremodintro',
+            get_string('requiremodintro', 'admin'),
+            get_string('configrequiremodintro', 'admin'), 1));
+    
     $settings->add(new admin_setting_heading('grouptool_view_administration',
             get_string('cfg_admin_head', 'grouptool'),
             get_string('cfg_admin_head_info', 'grouptool')));
