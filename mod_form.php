@@ -111,6 +111,7 @@ GROUP BY reg.user_id) as regcnts';
          */
         $mform->addElement('header', 'grouptoolfieldset', get_string('grouptoolfieldset',
                                                                      'grouptool'));
+        $mform->setExpanded('grouptoolfieldset');
 
         $mform->addElement('selectyesno', 'allow_reg', get_string('allow_reg', 'grouptool'));
         $mform->setDefault('allow_reg',
