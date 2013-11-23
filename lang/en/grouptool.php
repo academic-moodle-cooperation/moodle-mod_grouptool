@@ -251,6 +251,7 @@ $string['incomplete_only_label'] = 'Show only groups with missing grades';
 $string['intro'] = 'Description';
 $string['landscape'] = 'Landscape';
 $string['late'] = '{$a} late';
+$string['loading'] = 'loading...';
 $string['maxmembers'] = 'Global groupsize';
 $string['max_queues_reached'] = 'Maximum queues reached!';
 $string['max_regs_reached'] = 'Maximum registrations reached!';

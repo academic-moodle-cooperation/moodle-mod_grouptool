@@ -251,6 +251,7 @@ $string['incomplete_only_label'] = 'Zeige nur Gruppen mit fehlenden Bewertungen'
 $string['intro'] = 'Beschreibung';
 $string['landscape'] = 'Querformat';
 $string['late'] = '{$a} zu spät';
+$string['loading'] = 'Lade...';
 $string['maxmembers'] = 'Globale Gruppengröße';
 $string['max_queues_reached'] = 'Maximale Wartelistenplätze erreicht!';
 $string['max_regs_reached'] = 'Maximale Anmeldungen erreicht!';

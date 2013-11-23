@@ -4443,6 +4443,7 @@ EOS;
 
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
+
                 // Prepare formular-content for registration-action!
                 foreach ($groups as $key => $group) {
                     $registered = count($group->registered);
@@ -5915,25 +5916,26 @@ EOS;
     private function render_members_link($agrpid, $groupname) {
         global $CFG, $PAGE;
 
+        // Init Members-Popup-JS
+        $PAGE->requires->yui_module('moodle-mod_grouptool-memberspopup', 'M.mod_grouptool.init_memberspopup');
+        $PAGE->requires->strings_for_js(array(
+            'loading',
+        ), 'grouptool');
+        
         $output = get_string('show_members', 'grouptool');
 
         // Now create the link around it - we need https on loginhttps pages!
         $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php',
                               array('agrpid'  => $agrpid,
-                                    'lang'    => current_language()));
+                                    'contextid' => $this->context->id));
 
         $attributes = array('href'=>$url, 'title'=>get_string('show_members', 'grouptool'));
         $id = html_writer::random_id('showmembers');
         $attributes['id'] = $id;
         $output = html_writer::tag('a', $output, $attributes);
 
-        $PAGE->requires->yui_module('moodle-mod_grouptool-registration',
-                                    'M.mod_grouptool.add_overlay',
-                                    array(array('id'=>$id, 'url'=>$url->out(false),
-                                                'groupname'=>$groupname)));
-
         // And finally wrap in a span!
-        return html_writer::tag('span', $output, array('class' => 'showmembers'));
+        return html_writer::tag('span', $output, array('class' => 'showmembers memberstooltip'));
     }
 
     /**

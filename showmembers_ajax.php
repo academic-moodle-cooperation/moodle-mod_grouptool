@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Displays List of Groupmembers in a new page
+ * Displays List of Groupmembers via AJAX call
  * Based upon help.php for displaying help-strings!
  *
  * @package       mod_grouptool
@@ -25,10 +25,33 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('AJAX_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir .'/grouplib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
+$contextid = required_param('contextid', PARAM_INT);
+//$userid = required_param('user', PARAM_INT);
+$lang   = optional_param('lang', 'en', PARAM_LANG);
+
+// We don't actually modify the session here as we have NO_MOODLE_COOKIES set.
+//$SESSION->lang = $lang;
+
+//if session has expired and its an ajax request so we cant do a page redirect
+if( !isloggedin() ){
+    $result = new stdClass();
+    $result->error = get_string('sessionerroruser', 'error');
+    echo json_encode($result);
+    die();
+}
+
+list($context, $course, $cm) = get_context_info_array($contextid);
+require_login($course, false, $cm);
+
+$contextid = null;//now we have a context object throw away the id from the user
+$PAGE->set_context($context);
+$PAGE->set_url('/mod/grouptool/showmembers_ajax.php', array('contextid' => $context->id,
+                                                            'agrpid'    => $agrpid));
 
 $group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.courseid as courseid,
                                      agrp.id as agrpid, agrp.grpsize as size,
@@ -38,24 +61,14 @@ $group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.c
                               WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id'=>$group->grouptoolid), '*', MUST_EXIST);
 
-$PAGE->set_url('/mod/grouptool/showmembers.php');
-$coursecontext = context_course::instance($group->courseid);
-$PAGE->set_context($coursecontext);
-
-$cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $group->courseid);
-$context = context_module::instance($cm->id);
-
-require_login($cm->course, true, $cm);
-
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
+//$text = $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
+$text = '';
 if (!has_capability('mod/grouptool:view_registrations', $context)
           && !$grouptool->show_members) {
-    echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
-                          array('class'=>'reg'));
+    $text .= html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
+                              array('class'=>'reg'));
 } else {
-    echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
+    $text .= $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
     $moodlereg = groups_get_members($group->grpid, 'u.id');
 
     $regsql = "SELECT reg.user_id as id, user.firstname as firstname, user.lastname as lastname,
@@ -65,25 +78,25 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
                WHERE reg.agrp_id = ?
                ORDER BY timestamp ASC";
     if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
-        echo html_writer::tag('div', get_string('no_registrations', 'grouptool'),
-                              array('class'=>'reg'));
+        $text .= html_writer::tag('div', get_string('no_registrations', 'grouptool'),
+                                  array('class'=>'reg'));
     } else {
-        echo html_writer::start_tag('ul');
+        $text .= html_writer::start_tag('ul');
         foreach ($regs as $user) {
             if (!in_array($user->id, $moodlereg)) {
-                echo html_writer::tag('li', fullname($user).
-                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
-                                      array('class'=>'registered'));
+                $text .= html_writer::tag('li', fullname($user).
+                                                ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                                          array('class'=>'registered'));
             } else {
-                echo html_writer::tag('li', fullname($user).
-                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
-                                      array('class'=>'moodlereg'));
+                $text .= html_writer::tag('li', fullname($user).
+                                                ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                                          array('class'=>'moodlereg'));
             }
         }
-        echo html_writer::end_tag('ul');
+        $text .= html_writer::end_tag('ul');
     }
 
-    echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
+    $text .= $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
     $queuesql = "SELECT queue.user_id as id, user.firstname as firstname, user.lastname as lastname,
                         user.idnumber as idnumber
                  FROM {grouptool_queued} as queue
@@ -91,16 +104,18 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
                  WHERE queue.agrp_id = ?
                  ORDER BY timestamp ASC";
     if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
-        echo html_writer::tag('div', get_string('nobody_queued', 'grouptool'), array('class'=>'queue'));
+        $text .= html_writer::tag('div', get_string('nobody_queued', 'grouptool'), array('class'=>'queue'));
     } else {
-        echo html_writer::start_tag('ol');
+        $text .= html_writer::start_tag('ol');
         foreach ($queue as $user) {
-            echo html_writer::tag('li', fullname($user).
-                                        ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
-                                  array('class'=>'queue'));
+            $text .= html_writer::tag('li', fullname($user).
+                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                                      array('class'=>'queue'));
         }
-        echo html_writer::end_tag('ol');
+        $text .= html_writer::end_tag('ol');
     }
 }
-
-echo $OUTPUT->footer();
+$result = new stdClass();
+$result->heading = $group->grpname;
+$result->text = $text;
+echo json_encode($result);
