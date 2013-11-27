@@ -79,9 +79,14 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->grouptool_id = $this->get_new_parentid('grouptool');
+        if(isset($data->group_id)) {
+            $data->groupid = $data->group_id;
+            unset($data->group_id);
+        }
+        
+        $data->grouptoolid = $this->get_new_parentid('grouptool');
 
-        $data->group_id = $this->get_mappingid('group', $data->group_id);
+        $data->groupid = $this->get_mappingid('group', $data->groupid);
 
         $newitemid = $DB->insert_record('grouptool_agrps', $data);
         $this->set_mapping('grouptool_agrp', $oldid, $newitemid);
@@ -93,8 +98,13 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->agrp_id = $this->get_new_parentid('grouptool_agrp');
-        $data->user_id = $this->get_mappingid('user', $data->user_id);
+        if(isset($data->user_id)) {
+            $data->userid = $data->user_id;
+            unset($data->user_id);
+        }
+
+        $data->agrpid = $this->get_new_parentid('grouptool_agrp');
+        $data->userid = $this->get_mappingid('user', $data->userid);
         $data->modified_by = $this->get_mappingid('user', $data->modified_by);
 
         $newitemid = $DB->insert_record('grouptool_registered', $data);
@@ -107,8 +117,13 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
 
-        $data->agrp_id = $this->get_new_parentid('grouptool_agrp');
-        $data->user_id = $this->get_mappingid('user', $data->user_id);
+        if(isset($data->user_id)) {
+            $data->userid = $data->user_id;
+            unset($data->user_id);
+        }
+        
+        $data->agrpid = $this->get_new_parentid('grouptool_agrp');
+        $data->userid = $this->get_mappingid('user', $data->userid);
 
         $newitemid = $DB->insert_record('grouptool_queued', $data);
         $this->set_mapping('agrp_queue', $oldid, $newitemid);

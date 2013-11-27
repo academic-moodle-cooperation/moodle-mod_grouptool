@@ -60,9 +60,9 @@ class mod_grouptool_mod_form extends moodleform_mod {
     FROM (
   SELECT COUNT(reg.id) as regcnt
     FROM {grouptool_registered} as reg
-    JOIN {grouptool_agrps} as agrps ON reg.agrp_id = agrps.id
-   WHERE agrps.grouptool_id = :grouptoolid
-GROUP BY reg.user_id) as regcnts';
+    JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+   WHERE agrps.grouptoolid = :grouptoolid
+GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $cm->instance);
             $max_regs = $DB->get_field_sql($sql, $params);
         } else if ($course = optional_param('course', 0, PARAM_INT)) {
@@ -324,9 +324,9 @@ GROUP BY reg.user_id) as regcnts';
         FROM (
       SELECT COUNT(reg.id) as regcnt
         FROM {grouptool_registered} as reg
-        JOIN {grouptool_agrps} as agrps ON reg.agrp_id = agrps.id
-       WHERE agrps.grouptool_id = :grouptoolid
-    GROUP BY reg.agrp_id) as regcnts';
+        JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+       WHERE agrps.grouptoolid = :grouptoolid
+    GROUP BY reg.agrpid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $max_grp_regs = $DB->get_field_sql($sql, $params);
             $sql = '
@@ -334,16 +334,16 @@ GROUP BY reg.user_id) as regcnts';
         FROM (
       SELECT COUNT(reg.id) as regcnt
         FROM {grouptool_registered} as reg
-        JOIN {grouptool_agrps} as agrps ON reg.agrp_id = agrps.id
-       WHERE agrps.grouptool_id = :grouptoolid
-    GROUP BY reg.user_id) as regcnts';
+        JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+       WHERE agrps.grouptoolid = :grouptoolid
+    GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $max_user_regs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT COUNT(queue.id) as queue
         FROM {grouptool_queued} as queue
-        JOIN {grouptool_agrps} as agrps ON queue.agrp_id = agrps.id
-       WHERE agrps.grouptool_id = :grouptoolid';
+        JOIN {grouptool_agrps} as agrps ON queue.agrpid = agrps.id
+       WHERE agrps.grouptoolid = :grouptoolid';
             $params = array('grouptoolid' => $data['instance']);
             $queues = $DB->get_field_sql($sql, $params);
         } else {

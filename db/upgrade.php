@@ -294,6 +294,131 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2013112300, 'grouptool');
     }
+    
+    if ($oldversion < 2013112700) {
+        //Rename fields in grouptool_agrps
+    
+        // Define key grouptool_id (foreign) to be dropped form grouptool_agrps.
+        $table = new xmldb_table('grouptool_agrps');
+        $key = new xmldb_key('grouptool_id', XMLDB_KEY_FOREIGN, array('grouptool_id'), 'grouptool', array('id'));
+        // Launch drop key grouptool_id.
+        $dbman->drop_key($table, $key);
+        $key = new xmldb_key('group_id', XMLDB_KEY_FOREIGN, array('group_id'), 'groups', array('id'));
+        // Launch drop key group_id.
+        $dbman->drop_key($table, $key);
+        $index = new xmldb_index('grouptool-group', XMLDB_INDEX_UNIQUE, array('grouptool_id', 'group_id'));
+        // Conditionally launch drop index grouptool-group.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        
+        $field = new xmldb_field('grouptool_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+        // Launch rename field grouptool_id.
+        $dbman->rename_field($table, $field, 'grouptoolid');
+        $field = new xmldb_field('group_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'grouptool_id');
+        // Launch rename field group_id.
+        $dbman->rename_field($table, $field, 'groupid');
+        
+        //restore keys and index
+        $key = new xmldb_key('grouptoolid', XMLDB_KEY_FOREIGN, array('grouptoolid'), 'grouptool', array('id'));
+        // Launch add key grouptoolid.
+        $dbman->add_key($table, $key);
+        $key = new xmldb_key('groupid', XMLDB_KEY_FOREIGN, array('groupid'), 'groups', array('id'));
+        // Launch add key groupid.
+        $dbman->add_key($table, $key);
+        $index = new xmldb_index('grouptool-group', XMLDB_INDEX_UNIQUE, array('grouptoolid', 'groupid'));
+        // Conditionally launch add index grouptool-group.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        upgrade_mod_savepoint(true, 2013112700, 'grouptool');
+    }
+    
+    if ($oldversion < 2013112701) {
+        //Rename fields in grouptool_registered
+    
+        // Define key agrp_id (foreign) to be dropped form grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps', array('id'));
+        // Launch drop key agrp_id.
+        $dbman->drop_key($table, $key);
+        // Define key user_id (foreign) to be dropped form grouptool_registered.
+        $key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+        // Launch drop key user_id.
+        $dbman->drop_key($table, $key);
+         // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
+        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, array('agrp_id', 'user_id'));
+        // Conditionally launch drop index agrp_id-user_id.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        
+        $field = new xmldb_field('agrp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+        // Launch rename field agrp_id.
+        $dbman->rename_field($table, $field, 'agrpid');
+        $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'grouptool_id');
+        // Launch rename field user_id.
+        $dbman->rename_field($table, $field, 'userid');
+        
+        //restore keys and index
+        $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, array('agrpid'), 'grouptool_agrps', array('id'));
+        // Launch add key agrpid.
+        $dbman->add_key($table, $key);
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        // Launch add key userid.
+        $dbman->add_key($table, $key);
+        $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, array('agrpid', 'userid'));
+        // Conditionally launch add index agrpiduserid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        upgrade_mod_savepoint(true, 2013112701, 'grouptool');
+    }
+    
+    if ($oldversion < 2013112702) {
+        //Rename fields in grouptool_queued
+    
+        $table = new xmldb_table('grouptool_queued');
+        // Define key agrp_id (foreign) to be dropped form grouptool_queued.
+        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps', array('id'));
+        // Launch drop key agrp_id.
+        $dbman->drop_key($table, $key);
+        // Define key user_id (foreign) to be dropped form grouptool_registered.
+        $key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+        // Launch drop key user_id.
+        $dbman->drop_key($table, $key);
+         // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
+        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, array('agrp_id', 'user_id'));
+        // Conditionally launch drop index agrp_id-user_id.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+        
+        $field = new xmldb_field('agrp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
+        // Launch rename field agrp_id.
+        $dbman->rename_field($table, $field, 'agrpid');
+        $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'grouptool_id');
+        // Launch rename field user_id.
+        $dbman->rename_field($table, $field, 'userid');
+        
+        //restore keys and index
+        $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, array('agrpid'), 'grouptool_agrps', array('id'));
+        // Launch add key agrpid.
+        $dbman->add_key($table, $key);
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        // Launch add key userid.
+        $dbman->add_key($table, $key);
+        $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, array('agrpid', 'userid'));
+        // Conditionally launch add index agrpiduserid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+        
+        upgrade_mod_savepoint(true, 2013112702, 'grouptool');
+    }
+    
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

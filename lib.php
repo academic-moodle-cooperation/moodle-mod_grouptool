@@ -141,11 +141,11 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
-        if(!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $return,
-                                                        'group_id'     => $groupid))) {
+        if(!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $return,
+                                                        'groupid'     => $groupid))) {
             $record = new stdClass();
-            $record->grouptool_id = $return;
-            $record->group_id = $groupid;
+            $record->grouptoolid = $return;
+            $record->groupid = $groupid;
             $record->sort_order = 9999999;
             $record->grpsize = $grouptool->grpsize;
             $record->active = 0;
@@ -276,11 +276,11 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
     
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
-        if(!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $grouptool->instance,
-                                                        'group_id'     => $groupid))) {
+        if(!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->instance,
+                                                        'groupid'     => $groupid))) {
             $record = new stdClass();
-            $record->grouptool_id = $grouptool->instance;
-            $record->group_id = $groupid;
+            $record->grouptoolid = $grouptool->instance;
+            $record->groupid = $groupid;
             $record->sort_order = 9999999;
             $record->grpsize = $grouptool->grpsize;
             $record->active = 0;
@@ -309,25 +309,25 @@ function grouptool_update_queues($grouptool = 0) {
         $grouptool->instance = $grouptool->id;
     }
 
-    if ($agrps = $DB->get_records('grouptool_agrps', array('grouptool_id' => $grouptool->instance))) {
+    if ($agrps = $DB->get_records('grouptool_agrps', array('grouptoolid' => $grouptool->instance))) {
         list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps));
-        $groupregs = $DB->get_records_sql_menu('SELECT agrp_id, COUNT(id)
+        $groupregs = $DB->get_records_sql_menu('SELECT agrpid, COUNT(id)
                                                   FROM {grouptool_registered}
-                                                 WHERE agrp_id '.$agrpsql.
-                                             'GROUP BY agrp_id', $params);
+                                                 WHERE agrpid '.$agrpsql.
+                                             'GROUP BY agrpid', $params);
         foreach($agrps as $agrpid => $agrp) {
             $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ?
                                                            $grouptool->grpsize :
                                                            $agrp->grpsize;
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
-            $sql = "SELECT queued.id as id, queued.agrp_id as agrp_id, queued.timestamp as timestamp, queued.user_id as user_id, (regs < ?) as priority, reg.regs as regs
+            $sql = "SELECT queued.id as id, queued.agrpid as agrpid, queued.timestamp as timestamp, queued.userid as userid, (regs < ?) as priority, reg.regs as regs
                                   FROM {grouptool_queued} AS queued
-                             LEFT JOIN (SELECT user_id, COUNT(DISTINCT id) as regs
+                             LEFT JOIN (SELECT userid, COUNT(DISTINCT id) as regs
                                          FROM {grouptool_registered}
-                                        WHERE agrp_id ".$agrpsql."
-                                     GROUP BY user_id) AS reg ON queued.user_id = reg.user_id
-                                 WHERE queued.agrp_id = ?
+                                        WHERE agrpid ".$agrpsql."
+                                     GROUP BY userid) AS reg ON queued.userid = reg.userid
+                                 WHERE queued.agrpid = ?
                               GROUP BY queued.id
                               ORDER BY priority DESC, 'timestamp' ASC";
 
@@ -343,18 +343,18 @@ function grouptool_update_queues($grouptool = 0) {
                         continue;
                     }
                     unset($record->id);
-                    if(!$DB->record_exists('grouptool_registered', array('agrp_id' => $agrpid,
-                                                                         'user_id' => $record->user_id))) {
+                    if(!$DB->record_exists('grouptool_registered', array('agrpid' => $agrpid,
+                                                                         'userid' => $record->userid))) {
                         unset($record->priority);
                         unset($record->regs);
                         $record->modified_by = 0;
                         $DB->insert_record('grouptool_registered', $record);
                         if (!empty($grouptool->immediate_reg)) {
-                            groups_add_member($agrp->group_id, $record->user_id);
+                            groups_add_member($agrp->groupid, $record->userid);
                         }
                     }
-                    $DB->delete_records('grouptool_queued', array('agrp_id' => $agrpid,
-                                                                  'user_id' => $record->user_id));
+                    $DB->delete_records('grouptool_queued', array('agrpid' => $agrpid,
+                                                                  'userid' => $record->userid));
                     $groupregs[$agrpid]++;
                 }
             }
@@ -385,17 +385,17 @@ function grouptool_delete_instance($id) {
             '');
 
     // Get all agrp-ids for this grouptool-instance!
-    if ($DB->record_exists('grouptool_agrps', array('grouptool_id' => $id))) {
-        $ids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptool_id = ?", array($id));
+    if ($DB->record_exists('grouptool_agrps', array('grouptoolid' => $id))) {
+        $ids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", array($id));
 
         /*
          * delete all entries in grouptool_agrps, grouptool_queued, grouptool_registered
-         * with correct grouptool_id or agrps_id
+         * with correct grouptoolid or agrps_id
          */
         if (is_array($ids)) {
             list($sql, $params) = $DB->get_in_or_equal($ids);
-            $DB->delete_records_select('grouptool_queued', "agrp_id ".$sql, $params);
-            $DB->delete_records_select('grouptool_registered', "agrp_id ".$sql, $params);
+            $DB->delete_records_select('grouptool_queued', "agrpid ".$sql, $params);
+            $DB->delete_records_select('grouptool_registered', "agrpid ".$sql, $params);
             $DB->delete_records_select('grouptool_agrps', "id ".$sql, $params);
         }
     }
@@ -819,16 +819,16 @@ function grouptool_reset_userdata($data) {
     $componentstr = get_string('modulenameplural', 'grouptool');
     $status = array();
 
-    $grouptool_ids = $DB->get_fieldset_select('grouptool', 'id', 'course = ?',
+    $grouptoolids = $DB->get_fieldset_select('grouptool', 'id', 'course = ?',
                                               array($data->courseid));
 
-    $agrps = $DB->get_records_list('grouptool_agrps', 'grouptool_id', $grouptool_ids);
+    $agrps = $DB->get_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
 
     if (!empty($data->reset_grouptool_transparent_unreg)) {
         require_once($CFG->dirroot.'/group/lib.php');
-        $reg_data = $DB->get_records_list('grouptool_registered', 'agrp_id', array_keys($agrps));
+        $reg_data = $DB->get_records_list('grouptool_registered', 'agrpid', array_keys($agrps));
         foreach ($reg_data as $registration) {
-            groups_remove_member($agrps[$registration->agrp_id]->group_id, $registration->user_id);
+            groups_remove_member($agrps[$registration->agrpid]->groupid, $registration->userid);
         }
         $status[] = array('component'    => $componentstr,
                           'item'         => get_string('reset_transparent_unreg', 'grouptool'),
@@ -836,21 +836,21 @@ function grouptool_reset_userdata($data) {
     }
 
     if (!empty($data->reset_grouptool_queues) || !empty($data->reset_grouptool_agrps)) {
-        $DB->delete_records_list('grouptool_queued', 'agrp_id', array_keys($agrps));
+        $DB->delete_records_list('grouptool_queued', 'agrpid', array_keys($agrps));
         $status[] = array('component'    => $componentstr,
                           'item'         => get_string('reset_queues', 'grouptool'),
                           'error'        => false);
     }
 
     if (!empty($data->reset_grouptool_registrations) || !empty($data->reset_grouptool_agrps)) {
-        $DB->delete_records_list('grouptool_registered', 'agrp_id', array_keys($agrps));
+        $DB->delete_records_list('grouptool_registered', 'agrpid', array_keys($agrps));
         $status[] = array('component' => $componentstr,
                           'item'      => get_string('reset_registrations', 'grouptool'),
                           'error'     => false);
     }
 
     if (!empty($data->reset_grouptool_agrps)) {
-        $DB->delete_records_list('grouptool_agrps', 'grouptool_id', $grouptool_ids);
+        $DB->delete_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
         $status[] = array('component'    => $componentstr,
                           'item'         => get_string('reset_agrps', 'grouptool'),
                           'error'        => false);

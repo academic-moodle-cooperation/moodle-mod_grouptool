@@ -45,13 +45,13 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
                 'queues_max', 'allow_multiple', 'choose_min', 'choose_max'));
         $agrps = new backup_nested_element('agrps');
         $agrp = new backup_nested_element('agrp', array('id'), array(
-                'grouptool_id', 'group_id', 'sort_order', 'grpsize', 'active'));
+                'grouptoolid', 'groupid', 'sort_order', 'grpsize', 'active'));
         $registrations = new backup_nested_element('registrations');
         $registration = new backup_nested_element('registration', array('id'), array(
-                'agrp_id', 'user_id', 'timestamp', 'modified_by'));
+                'agrpid', 'userid', 'timestamp', 'modified_by'));
         $queues = new backup_nested_element('queues');
         $queue = new backup_nested_element('queue', array('id'), array(
-                'agrp_id', 'user_id', 'timestamp'));
+                'agrpid', 'userid', 'timestamp'));
 
         // We begin building the tree.
         $grouptool->add_child($agrps);
@@ -63,21 +63,21 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
 
         // We define sources.
         $grouptool->set_source_table('grouptool', array('id' => backup::VAR_ACTIVITYID));
-        $agrp->set_source_table('grouptool_agrps', array('grouptool_id' => backup::VAR_PARENTID));
+        $agrp->set_source_table('grouptool_agrps', array('grouptoolid' => backup::VAR_PARENTID));
         // All the rest of elements only happen if we are including user info!
         if ($userinfo) {
             $registration->set_source_table('grouptool_registered',
-                                            array('agrp_id' => backup::VAR_PARENTID));
-            $queue->set_source_table('grouptool_queued', array('agrp_id' => backup::VAR_PARENTID));
+                                            array('agrpid' => backup::VAR_PARENTID));
+            $queue->set_source_table('grouptool_queued', array('agrpid' => backup::VAR_PARENTID));
         }
 
         // We define id annotations.
-        $agrp->annotate_ids('group', 'group_id');
+        $agrp->annotate_ids('group', 'groupid');
 
-        $registration->annotate_ids('user', 'user_id');
+        $registration->annotate_ids('user', 'userid');
         $registration->annotate_ids('user', 'modified_by');
 
-        $queue->annotate_ids('user', 'user_id');
+        $queue->annotate_ids('user', 'userid');
 
         // We define file annotations.
         $grouptool->annotate_files('mod_grouptool', 'intro', null); // This file area has no itemid!

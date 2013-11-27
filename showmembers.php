@@ -32,9 +32,9 @@ $agrpid = required_param('agrpid', PARAM_INT);
 
 $group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.courseid as courseid,
                                      agrp.id as agrpid, agrp.grpsize as size,
-                                     agrp.grouptool_id as grouptoolid
+                                     agrp.grouptoolid as grouptoolid
                               FROM {grouptool_agrps} AS agrp
-                                LEFT JOIN {groups} AS grp ON agrp.group_id = grp.id
+                                LEFT JOIN {groups} AS grp ON agrp.groupid = grp.id
                               WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id'=>$group->grouptoolid), '*', MUST_EXIST);
 
@@ -58,11 +58,11 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
     echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
     $moodlereg = groups_get_members($group->grpid, 'u.id');
 
-    $regsql = "SELECT reg.user_id as id, user.firstname as firstname, user.lastname as lastname,
+    $regsql = "SELECT reg.userid as id, user.firstname as firstname, user.lastname as lastname,
                       user.idnumber as idnumber
                FROM {grouptool_registered} as reg
-                   LEFT JOIN {user} as user ON reg.user_id = user.id
-               WHERE reg.agrp_id = ?
+                   LEFT JOIN {user} as user ON reg.userid = user.id
+               WHERE reg.agrpid = ?
                ORDER BY timestamp ASC";
     if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
         echo html_writer::tag('div', get_string('no_registrations', 'grouptool'),
@@ -84,11 +84,11 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
     }
 
     echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
-    $queuesql = "SELECT queue.user_id as id, user.firstname as firstname, user.lastname as lastname,
+    $queuesql = "SELECT queue.userid as id, user.firstname as firstname, user.lastname as lastname,
                         user.idnumber as idnumber
                  FROM {grouptool_queued} as queue
-                     LEFT JOIN {user} as user ON queue.user_id = user.id
-                 WHERE queue.agrp_id = ?
+                     LEFT JOIN {user} as user ON queue.userid = user.id
+                 WHERE queue.agrpid = ?
                  ORDER BY timestamp ASC";
     if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
         echo html_writer::tag('div', get_string('nobody_queued', 'grouptool'), array('class'=>'queue'));

@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/grouptool/db" VERSION="20120729" COMMENT="XMLDB file for Moodle mod/grouptool"
+<XMLDB PATH="mod/grouptool/db" VERSION="20131127" COMMENT="XMLDB file for Moodle mod/grouptool"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="grouptool" COMMENT="grouptool instances" NEXT="grouptool_agrps">
+    <TABLE NAME="grouptool" COMMENT="grouptool instances">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Course grouptool activity belongs to" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="intro"/>
-        <FIELD NAME="intro" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the grouptool activity" PREVIOUS="name" NEXT="introformat"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)" PREVIOUS="intro" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="introformat" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="timedue"/>
-        <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timemodified" NEXT="timeavailable"/>
-        <FIELD NAME="timeavailable" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="timedue" NEXT="show_members"/>
-        <FIELD NAME="show_members" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timeavailable" NEXT="allow_reg"/>
-        <FIELD NAME="allow_reg" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="show_members" NEXT="immediate_reg"/>
-        <FIELD NAME="immediate_reg" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="allow_reg" NEXT="allow_unreg"/>
-        <FIELD NAME="allow_unreg" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="immediate_reg" NEXT="grpsize"/>
-        <FIELD NAME="grpsize" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="global groupsize for this instance" PREVIOUS="allow_unreg" NEXT="use_size"/>
-        <FIELD NAME="use_size" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grpsize" NEXT="use_individual"/>
-        <FIELD NAME="use_individual" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="use_size" NEXT="use_queue"/>
-        <FIELD NAME="use_queue" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="use_individual" NEXT="queues_max"/>
-        <FIELD NAME="queues_max" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="use_queue" NEXT="allow_multiple"/>
-        <FIELD NAME="allow_multiple" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="queues_max" NEXT="choose_min"/>
-        <FIELD NAME="choose_min" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="allow_multiple" NEXT="choose_max"/>
-        <FIELD NAME="choose_max" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" PREVIOUS="choose_min" NEXT="ifmemberadded"/>
-        <FIELD NAME="ifmemberadded" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="add registration in grouptool if member is added to moodle-group" PREVIOUS="choose_max" NEXT="ifmemberremoved"/>
-        <FIELD NAME="ifmemberremoved" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="remove registration if member is removed from moodle-group" PREVIOUS="ifmemberadded" NEXT="ifgroupdeleted"/>
-        <FIELD NAME="ifgroupdeleted" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="delete active group (and all registrations and queue) if moodle-group get's deleted or recreate the moodle-group so it's further useable by grouptool (groupmembers in moodle won't get restored)" PREVIOUS="ifmemberremoved"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course grouptool activity belongs to"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name field for moodle instances"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the grouptool activity"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timedue" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timeavailable" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="show_members" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="allow_reg" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="immediate_reg" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="allow_unreg" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="grpsize" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="global groupsize for this instance"/>
+        <FIELD NAME="use_size" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="use_individual" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="use_queue" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="queues_max" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="allow_multiple" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="choose_min" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="choose_max" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ifmemberadded" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="add registration in grouptool if member is added to moodle-group"/>
+        <FIELD NAME="ifmemberremoved" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="remove registration if member is removed from moodle-group"/>
+        <FIELD NAME="ifgroupdeleted" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="delete active group (and all registrations and queue) if moodle-group get's deleted or recreate the moodle-group so it's further useable by grouptool (groupmembers in moodle won't get restored)"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="course" UNIQUE="false" FIELDS="course" NEXT="timedue"/>
-        <INDEX NAME="timedue" UNIQUE="false" FIELDS="timedue" PREVIOUS="course" NEXT="timeavailable"/>
-        <INDEX NAME="timeavailable" UNIQUE="false" FIELDS="timeavailable" PREVIOUS="timedue"/>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="timedue" UNIQUE="false" FIELDS="timedue"/>
+        <INDEX NAME="timeavailable" UNIQUE="false" FIELDS="timeavailable"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="grouptool_agrps" COMMENT="table containing active groups for each grouptool instance" PREVIOUS="grouptool" NEXT="grouptool_registered">
+    <TABLE NAME="grouptool_agrps" COMMENT="table containing active groups for each grouptool instance">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="grouptool_id"/>
-        <FIELD NAME="grouptool_id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="id" NEXT="group_id"/>
-        <FIELD NAME="group_id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="grouptool_id" NEXT="sort_order"/>
-        <FIELD NAME="sort_order" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" PREVIOUS="group_id" NEXT="grpsize"/>
-        <FIELD NAME="grpsize" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="local groupsize" PREVIOUS="sort_order" NEXT="active"/>
-        <FIELD NAME="active" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grpsize"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="grouptoolid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sort_order" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="grpsize" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="local groupsize"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="grouptool_id"/>
-        <KEY NAME="grouptool_id" TYPE="foreign" FIELDS="grouptool_id" REFTABLE="grouptool" REFFIELDS="id" PREVIOUS="primary" NEXT="group_id"/>
-        <KEY NAME="group_id" TYPE="foreign" FIELDS="group_id" REFTABLE="groups" REFFIELDS="id" PREVIOUS="grouptool_id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="grouptoolid" TYPE="foreign" FIELDS="grouptoolid" REFTABLE="grouptool" REFFIELDS="id"/>
+        <KEY NAME="groupid" TYPE="foreign" FIELDS="groupid" REFTABLE="groups" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="grouptool-group" UNIQUE="true" FIELDS="grouptool_id, group_id"/>
+        <INDEX NAME="grouptoolid-groupid" UNIQUE="true" FIELDS="grouptoolid, groupid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="grouptool_registered" COMMENT="contains all registrations in grouptool" PREVIOUS="grouptool_agrps" NEXT="grouptool_queued">
+    <TABLE NAME="grouptool_registered" COMMENT="contains all registrations in grouptool">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="agrp_id"/>
-        <FIELD NAME="agrp_id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="user_id"/>
-        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="agrp_id" NEXT="timestamp"/>
-        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="user_id" NEXT="modified_by"/>
-        <FIELD NAME="modified_by" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timestamp"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="agrpid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="modified_by" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="agrp_id"/>
-        <KEY NAME="agrp_id" TYPE="foreign" FIELDS="agrp_id" REFTABLE="grouptool_agrps" REFFIELDS="id" PREVIOUS="primary" NEXT="user_id"/>
-        <KEY NAME="user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id" PREVIOUS="agrp_id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="agrpid" TYPE="foreign" FIELDS="agrpid" REFTABLE="grouptool_agrps" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="timestamp" UNIQUE="false" FIELDS="timestamp" NEXT="agrp_id-user_id"/>
-        <INDEX NAME="agrp_id-user_id" UNIQUE="true" FIELDS="agrp_id, user_id" PREVIOUS="timestamp"/>
+        <INDEX NAME="agrpid-userid" UNIQUE="true" FIELDS="agrpid, userid"/>
+        <INDEX NAME="timestamp" UNIQUE="false" FIELDS="timestamp"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="grouptool_queued" COMMENT="temporary contains all queued registrations - should be empty or very small most of the time" PREVIOUS="grouptool_registered">
+    <TABLE NAME="grouptool_queued" COMMENT="temporary contains all queued registrations - should be empty or very small most of the time">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="agrp_id"/>
-        <FIELD NAME="agrp_id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="user_id"/>
-        <FIELD NAME="user_id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="agrp_id" NEXT="timestamp"/>
-        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="user_id"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="agrpid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="agrp_id"/>
-        <KEY NAME="agrp_id" TYPE="foreign" FIELDS="agrp_id" REFTABLE="grouptool_agrps" REFFIELDS="id" PREVIOUS="primary" NEXT="user_id"/>
-        <KEY NAME="user_id" TYPE="foreign" FIELDS="user_id" REFTABLE="user" REFFIELDS="id" PREVIOUS="agrp_id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="agrpid" TYPE="foreign" FIELDS="agrpid" REFTABLE="grouptool_agrps" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="agrp_id-user_id" UNIQUE="true" FIELDS="agrp_id, user_id" NEXT="timestamp"/>
-        <INDEX NAME="timestamp" UNIQUE="false" FIELDS="timestamp" PREVIOUS="agrp_id-user_id"/>
+        <INDEX NAME="agrpid-userid" UNIQUE="true" FIELDS="agrpid, userid"/>
+        <INDEX NAME="timestamp" UNIQUE="false" FIELDS="timestamp"/>
       </INDEXES>
     </TABLE>
   </TABLES>

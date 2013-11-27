@@ -44,32 +44,32 @@ function group_add_member_handler($data) {
     $sql = "SELECT DISTINCT grpt.id, grpt.ifmemberadded, grpt.course,
                             agrp.id as agrpid
             FROM {grouptool} as grpt
-            JOIN {grouptool_agrps} AS agrp ON agrp.grouptool_id = grpt.id
-            WHERE (agrp.group_id = ?) AND (agrp.active = ?) AND (grpt.ifmemberadded = ?)";
+            JOIN {grouptool_agrps} AS agrp ON agrp.grouptoolid = grpt.id
+            WHERE (agrp.groupid = ?) AND (agrp.active = ?) AND (grpt.ifmemberadded = ?)";
     $params = array($data->groupid, 1, GROUPTOOL_FOLLOW);
     if (! $grouptools = $DB->get_records_sql($sql, $params)) {
         return true;
     }
 
-    $agrpssql = "SELECT agrps.grouptool_id AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} AS agrps
-    WHERE agrps.group_id = :groupid";
+    $agrpssql = "SELECT agrps.grouptoolid AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} AS agrps
+    WHERE agrps.groupid = :groupid";
     $agrp = $DB->get_records_sql($agrpssql, array('groupid' => $data->groupid));
 
-    $regsql = "SELECT reg.agrp_id AS id
+    $regsql = "SELECT reg.agrpid AS id
             FROM {grouptool_agrps} AS agrps
-            INNER JOIN {grouptool_registered} as reg ON agrps.id = reg.agrp_id
-            WHERE agrps.group_id = :groupid AND reg.user_id = :userid";
+            INNER JOIN {grouptool_registered} as reg ON agrps.id = reg.agrpid
+            WHERE agrps.groupid = :groupid AND reg.userid = :userid";
     $regs = $DB->get_records_sql($regsql, array('groupid' => $data->groupid,
                                                 'userid'  => $data->userid));
     foreach ($grouptools as $grouptool) {
         if (!key_exists($grouptool->agrpid, $regs)) {
             $reg = new stdClass();
-            $reg->agrp_id = $agrp[$grouptool->id]->id;
-            $reg->user_id = $data->userid;
+            $reg->agrpid = $agrp[$grouptool->id]->id;
+            $reg->userid = $data->userid;
             $reg->timestamp = time();
             $reg->modified_by = 0; // There's no way we can get the teachers id!
-            if(!$DB->record_exists('grouptool_registered', array('agrp_id'=>$reg->agrp_id,
-                                                                 'user_id'=>$reg->user_id))) {
+            if(!$DB->record_exists('grouptool_registered', array('agrpid'=>$reg->agrpid,
+                                                                 'userid'=>$reg->userid))) {
                 $DB->insert_record('grouptool_registered', $reg);
                 add_to_log($grouptool->course,
                            'grouptool', 'register',
@@ -96,24 +96,24 @@ function group_remove_member_handler($data) {
     $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
                             {grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allow_multiple,
                             {grouptool}.choose_max
-            FROM {grouptool}
-                RIGHT JOIN {grouptool_agrps} AS agrp ON agrp.grouptool_id = {grouptool}.id
-            WHERE agrp.group_id = ?";
+                       FROM {grouptool}
+                 RIGHT JOIN {grouptool_agrps} AS agrp ON agrp.grouptoolid = {grouptool}.id
+                      WHERE agrp.groupid = ?";
     $params = array($data->groupid);
     if (! $grouptools = $DB->get_records_sql($sql, $params)) {
         return true;
     }
-    $sql = "SELECT agrps.grouptool_id AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} AS agrps
-            WHERE agrps.group_id = :groupid";
+    $sql = "SELECT agrps.grouptoolid AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} AS agrps
+            WHERE agrps.groupid = :groupid";
     $agrp = $DB->get_records_sql($sql, array('groupid' => $data->groupid));
     foreach ($grouptools as $grouptool) {
         switch($grouptool->ifmemberremoved) {
             case GROUPTOOL_FOLLOW:
                 $sql = "SELECT reg.id AS id FROM {grouptool_agrps} AS agrps
-                INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrp_id
-                WHERE reg.user_id = :userid
-                        AND agrps.grouptool_id = :grouptoolid
-                        AND agrps.group_id = :groupid";
+                 INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrpid
+                      WHERE reg.userid = :userid
+                        AND agrps.grouptoolid = :grouptoolid
+                        AND agrps.groupid = :groupid";
                 if ($regs = $DB->get_records_sql($sql,
                         array('grouptoolid' => $grouptool->id,
                               'userid'      => $data->userid,
@@ -122,13 +122,13 @@ function group_remove_member_handler($data) {
 
                     // Get next queued user and put him in the group (and delete queue entry)!
                     if (!empty($grouptool->use_queue)) {
-                        $agrpids = $DB->get_fieldset_sql('SELECT id FROM {grouptool_agrps} WHERE grouptool_id = ?', array($grouptool->id));
+                        $agrpids = $DB->get_fieldset_sql('SELECT id FROM {grouptool_agrps} WHERE grouptoolid = ?', array($grouptool->id));
                         list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
                         $sql = "SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
                                   FROM {grouptool_queued} AS queued
-                             LEFT JOIN {grouptool_registered} AS reg ON queued.user_id = reg.user_id
-                                                                     AND reg.agrp_id ".$agrpssql."
-                                 WHERE queued.agrp_id = ?
+                             LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid
+                                                                     AND reg.agrpid ".$agrpssql."
+                                 WHERE queued.agrpid = ?
                               GROUP BY queued.id
                               ORDER BY priority DESC, timestamp ASC
                                  LIMIT 1";
@@ -139,30 +139,30 @@ function group_remove_member_handler($data) {
                         if(is_object($record)) {
                             $new_record = clone $record;
                             unset($new_record->id);
-                            $new_record->modified_by = $new_record->user_id;
+                            $new_record->modified_by = $new_record->userid;
                             $DB->insert_record('grouptool_registered', $new_record);
                             if (!empty($grouptool->immediate_reg)) {
-                                groups_add_member($data->groupid, $new_record->user_id);
+                                groups_add_member($data->groupid, $new_record->userid);
                             }
                             $allow_m = $grouptool->allow_multiple;
                             $agrps = $DB->get_fieldset_sql("SELECT id
                                                             FROM {grouptool_agrps} as agrps
-                                                            WHERE agrps.grouptool_id = :grptlid",
+                                                            WHERE agrps.grouptoolid = :grptlid",
                                                             array('grptlid' => $grouptool->id));
                             list($sql, $params) = $DB->get_in_or_equal($agrps);
                             $usrregcnt = $DB->count_records_select('grouptool_registered',
-                                                                   ' user_id = ?
-                                                                    AND agrp_id '.$sql,
-                                                                   array_merge(array($new_record->user_id), $params));
+                                                                   ' userid = ?
+                                                                    AND agrpid '.$sql,
+                                                                   array_merge(array($new_record->userid), $params));
                             $max = $grouptool->choose_max;
                             if (($allow_m && ($usrregcnt >= $max)) || !$allow_m) {
                                 $DB->delete_records_select('grouptool_queued',
-                                                           ' user_id = ? AND agrp_id '.$sql,
-                                                           array_merge(array($new_record->user_id),
+                                                           ' userid = ? AND agrpid '.$sql,
+                                                           array_merge(array($new_record->userid),
                                                                        $params));
                             } else {
-                                $DB->delete_records('grouptool_queued', array('user_id' => $new_record->user_id,
-                                                                             'agrp_id' => $agrp[$grouptool->id]->id));
+                                $DB->delete_records('grouptool_queued', array('userid' => $new_record->userid,
+                                                                             'agrpid' => $agrp[$grouptool->id]->id));
                             }
                         }
                     }
@@ -204,8 +204,8 @@ function groups_remove_member_handler($data) {
         switch($grouptool->ifmemberremoved) {
             case GROUPTOOL_FOLLOW:
                 $sql = "SELECT reg.id AS id FROM {grouptool_agrps} AS agrps
-                        INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrp_id
-                        WHERE reg.user_id = :userid AND agrps.grouptool_id = :grouptoolid";
+                        INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrpid
+                        WHERE reg.userid = :userid AND agrps.grouptoolid = :grouptoolid";
                 if ($regs = $DB->get_records_sql($sql,
                                                 array('grouptoolid' => $grouptool->id,
                                                       'userid'      => $data->userid))) {
@@ -257,13 +257,13 @@ function group_deleted_handler($data) {
                     $new_id = $DB->insert_record('groups', $data, true);
                     if ($new_id !== false) {
                         // Delete auto-inserted agrp.
-                        if ($DB->record_exists('grouptool_agrps', array('group_id'=>$new_id))) {
-                            $DB->delete_records('grouptool_agrps', array('group_id'=>$new_id));
+                        if ($DB->record_exists('grouptool_agrps', array('groupid'=>$new_id))) {
+                            $DB->delete_records('grouptool_agrps', array('groupid'=>$new_id));
                         }
                         // Update reference.
-                        if ($DB->record_exists('grouptool_agrps', array('group_id'=>$data->id))) {
-                            $DB->set_field('grouptool_agrps', 'group_id', $new_id,
-                                           array('group_id'=>$data->id));
+                        if ($DB->record_exists('grouptool_agrps', array('groupid'=>$data->id))) {
+                            $DB->set_field('grouptool_agrps', 'groupid', $new_id,
+                                           array('groupid'=>$data->id));
                         }
                         $group_recreated = true;
                         add_to_log($data->courseid,
@@ -275,23 +275,23 @@ function group_deleted_handler($data) {
                         return false;
                         $agrpids = array_merge($agrpids,
                                                $DB->get_fieldset_select('grouptool_agrps', 'id',
-                                                                        "group_id = ?",
+                                                                        "groupid = ?",
                                                                         array($data->id)));
                     }
                 }
                 break;
             case GROUPTOOL_DELETE_REF:
                 if ($agrpid = $DB->get_field('grouptool_agrps', 'id',
-                                             array('group_id'     => $data->id,
-                                                   'grouptool_id' => $grouptool->id))) {
+                                             array('groupid'     => $data->id,
+                                                   'grouptoolid' => $grouptool->id))) {
                     $agrpids[] = $agrpid;
                 }
                 break;
         }
     }
     if (count($agrpids) > 0) {
-        $DB->delete_records_list('grouptool_registered', 'agrp_id', $agrpids);
-        $DB->delete_records_list('grouptool_queued', 'agrp_id', $agrpids);
+        $DB->delete_records_list('grouptool_registered', 'agrpid', $agrpids);
+        $DB->delete_records_list('grouptool_queued', 'agrpid', $agrpids);
         $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);
         add_to_log($data->courseid,
                 'course', 'delete grouptool references',
@@ -316,14 +316,14 @@ function groups_deleted_handler($courseid) {
     global $DB;
 
     // Delete all active-groups from grouptool including all connected registrations and queues.
-    $grouptool_ids = $DB->get_records_list('grouptool', 'course', array($courseid), 'id ASC', 'id');
-    $agrps = $DB->get_records_list('grouptool_agrps', 'grouptool_id', $grouptool_ids);
+    $grouptoolids = $DB->get_records_list('grouptool', 'course', array($courseid), 'id ASC', 'id');
+    $agrps = $DB->get_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
     // We gotta log this actions! @todo logging!
-    $DB->delete_records_list('grouptool_queued', 'agrp_id', array_keys($agrps));
+    $DB->delete_records_list('grouptool_queued', 'agrpid', array_keys($agrps));
 
-    $DB->delete_records_list('grouptool_registered', 'agrp_id', array_keys($agrps));
+    $DB->delete_records_list('grouptool_registered', 'agrpid', array_keys($agrps));
 
-    $DB->delete_records_list('grouptool_agrps', 'grouptool_id', $grouptool_ids);
+    $DB->delete_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
     add_to_log($courseid,
             'course', 'delete grouptool references',
             "view.php?id=".$courseid,
@@ -349,21 +349,21 @@ function group_created_handler($data) {
     if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
         return true;
     }
-    $sortorder = $DB->get_records_sql("SELECT agrp.grouptool_id, MAX(agrp.sort_order) AS max
+    $sortorder = $DB->get_records_sql("SELECT agrp.grouptoolid, MAX(agrp.sort_order) AS max
                                           FROM {grouptool_agrps} AS agrp
-                                          GROUP BY agrp.grouptool_id");
+                                          GROUP BY agrp.grouptoolid");
     foreach ($grouptools as $cmid => $grouptool) {
         $new_agrp = new StdClass();
-        $new_agrp->grouptool_id = $grouptool->id;
-        $new_agrp->group_id = $data->id;
+        $new_agrp->grouptoolid = $grouptool->id;
+        $new_agrp->groupid = $data->id;
         if(!array_key_exists($grouptool->id, $sortorder)) {
             $new_agrp->sort_order = 1;
         } else {
             $new_agrp->sort_order = $sortorder[$grouptool->id]->max+1;
         }
         $new_agrp->active = 0;
-        if (!$DB->record_exists('grouptool_agrps', array('grouptool_id' => $grouptool->id,
-                                                         'group_id'     => $data->id))) {
+        if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->id,
+                                                         'groupid'     => $data->id))) {
             $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp);
             add_to_log($data->courseid, 'grouptool', 'update agrps',
                        "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->id,
