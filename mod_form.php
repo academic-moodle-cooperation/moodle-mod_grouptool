@@ -145,14 +145,12 @@ GROUP BY reg.user_id) as regcnts';
                                                                   : 0));
         $mform->addHelpButton('immediate_reg', 'immediate_reg', 'grouptool');
         $mform->disabledIf('immediate_reg', 'allow_reg', 'equal', 1);
-        $mform->setAdvanced('immediate_reg');
 
         $mform->addElement('selectyesno', 'allow_unreg', get_string('allow_unreg', 'grouptool'));
         $mform->setDefault('allow_unreg',
                            (!empty($CFG->grouptool_allow_unreg) ? $CFG->grouptool_allow_unreg : 0));
         $mform->addHelpButton('allow_unreg', 'allow_unreg', 'grouptool');
         $mform->disabledIf('allow_unreg', 'allow_reg', 'equal', 1);
-        $mform->setAdvanced('allow_unreg');
 
         $size = array();
         $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'),
@@ -180,23 +178,37 @@ GROUP BY reg.user_id) as regcnts';
         $mform->disabledIf('use_individual', 'allow_reg', 'equal', 1);
         $mform->disabledIf('use_individual', 'use_size', 'notchecked');
 
-        $mform->addElement('checkbox', 'use_queue', get_string('use_queue', 'grouptool'));
+
+        /*
+         * ---------------------------------------------------------------------
+         */
+
+        /* ---------------------------------------------------------------------
+         * Adding the queue and multiple registrations fieldset,
+         * where all settings related to queues and multiple registrations
+         * are made (except of active-groups)
+         */
+        $mform->addElement('header', 'queue_and_multiple_reg',
+                           get_string('queue_and_multiple_reg_title', 'grouptool'));
+        
+        $queue = array();
+        $queue[] = $mform->createElement('text', 'queues_max',
+                                         get_string('queues_max', 'grouptool'),
+                                         array('size'=>'3'));
+        $queue[] = $mform->createElement('checkbox', 'use_queue', '',
+                                         get_string('use_queue', 'grouptool'));
+        $mform->addGroup($queue, 'queue_grp',
+                         get_string('queues_max', 'grouptool'), ' ', false);
         $mform->setType('use_queue', PARAM_BOOL);
         $mform->setDefault('use_queue',
                            (!empty($CFG->grouptool_use_queue) ? $CFG->grouptool_use_queue : 0));
-        $mform->addHelpButton('use_queue', 'use_queue', 'grouptool');
         $mform->disabledIf('use_queue', 'allow_reg', 'equal', 1);
-        $mform->setAdvanced('use_queue');
-
-        $mform->addElement('text', 'queues_max', get_string('queues_max', 'grouptool'),
-                           array('size'=>'3'));
         $mform->setType('queues_max', PARAM_INT);
         $mform->setDefault('queues_max',
                            (!empty($CFG->grouptool_queues_max) ? $CFG->groutpoo_queues_max : 1));
-        $mform->addHelpButton('queues_max', 'queues_max', 'grouptool');
+        $mform->addHelpButton('queue_grp', 'queuesgrp', 'grouptool');
         $mform->disabledIf('queues_max', 'use_queue', 'notchecked');
         $mform->disabledIf('queues_max', 'allow_reg', 'equal', 1);
-        $mform->setAdvanced('queues_max');
 
         //prevent user from unsetting if user is registered in multiple groups
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
@@ -212,7 +224,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('allow_multiple', $allowmultipledefault);
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
         $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
-        $mform->setAdvanced('allow_multiple');
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            array('size'=>'3'));
@@ -220,7 +231,6 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('choose_min',
                            (!empty($CFG->grouptool_choose_min) ? $CFG->grouptool_choose_min : 1));
         $mform->disabledIf('choose_min', 'allow_reg', 'eq', 0);
-        $mform->setAdvanced('choose_min');
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
                            array('size'=>'3'));
@@ -228,7 +238,7 @@ GROUP BY reg.user_id) as regcnts';
         $mform->setDefault('choose_max',
                            (!empty($CFG->grouptool_choose_max) ? $CFG->grouptool_choose_max : 1));
         $mform->disabledIf('choose_max', 'allow_reg', 'eq', 0);
-        $mform->setAdvanced('choose_max');
+
         if($max_regs > 1) {
             //$mform->setConstant('allow_multiple', $allowmultipledefault);
             $mform->freeze('allow_multiple');
