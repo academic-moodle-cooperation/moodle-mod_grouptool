@@ -4428,8 +4428,8 @@ EOS;
                         array('class'=>'clearfix'));
 
                 // Intro-text if set!
-                if ($this->grouptool->intro) {
-                    // Conditions to show the intro can change to look for own settings or whatever?
+                if (($reg_open || $this->grouptool->alwaysshowdescription)
+                    && $this->grouptool->intro) {
                     $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
                     $formcontent .= html_writer::tag('fieldset', html_writer::tag('legend',
                             get_string('intro', 'grouptool')).

@@ -94,12 +94,26 @@ GROUP BY reg.user_id) as regcnts';
         $this->add_intro_editor($CFG->grouptool_requiremodintro,
                                 get_string('description', 'grouptool'));
 
-        $mform->addElement('date_time_selector', 'timeavailable',
-                           get_string('availabledate', 'grouptool'), array('optional'=>true));
-        $mform->setDefault('timeavailable', strtotime('now', time()));
-        $mform->addElement('date_time_selector', 'timedue', get_string('duedate', 'grouptool'),
-                           array('optional'=>true));
+                                
+        $mform->addElement('header', 'availability', get_string('availability', 'assign'));
+        $mform->setExpanded('availability', true);
+
+        $name = get_string('availabledate', 'grouptool');
+        $options = array('optional'=>true);
+        $mform->addElement('date_time_selector', 'timeavailable', $name, $options);
+        $mform->addHelpButton('timeavailable', 'availabledate', 'grouptool');
+        $mform->setDefault('timeavailable', time());
+
+        $name = get_string('duedate', 'grouptool');
+        $mform->addElement('date_time_selector', 'timedue', $name, array('optional'=>true));
+        $mform->addHelpButton('timedue', 'duedate', 'grouptool');
         $mform->setDefault('timedue', date('U', strtotime('+1week 23:55', time())));
+
+        $name = get_string('alwaysshowdescription', 'grouptool');
+        $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
+        $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'grouptool');
+        $mform->setDefault('alwaysshowdescription', 1);
+        $mform->disabledIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
 
         /*
          * ---------------------------------------------------------

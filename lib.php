@@ -415,6 +415,37 @@ function grouptool_delete_instance($id) {
 }
 
 /**
+ * Add a get_coursemodule_info function in case any grouptool type wants to add 'extra' information
+ * for the course (see resource).
+ *
+ * Given a course_module object, this function returns any "extra" information that may be needed
+ * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
+ *
+ * @param stdClass $coursemodule The coursemodule object (record).
+ * @return cached_cm_info An object on information that the courses
+ *                        will know about (most noticeably, an icon).
+ */
+function grouptool_get_coursemodule_info($coursemodule) {
+    global $CFG, $DB;
+
+    $dbparams = array('id'=>$coursemodule->instance);
+    $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
+    if (! $grouptool = $DB->get_record('grouptool', $dbparams, $fields)) {
+        return false;
+    }
+
+    $result = new cached_cm_info();
+    $result->name = $grouptool->name;
+    if ($coursemodule->showdescription) {
+        if ($grouptool->alwaysshowdescription || time() > $grouptool->allowregistrationsfromdate) {
+            // Convert intro to html. Do not filter cached version, filters run at display time.
+            $result->content = format_module_intro('grouptool', $grouptool, $coursemodule->id, false);
+        }
+    }
+    return $result;
+}
+
+/**
  * Returns a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
@@ -830,7 +861,7 @@ function grouptool_reset_userdata($data) {
 
 /**
  * Implementation of the function for printing the form elements that control
- * whether the course reset functionality affects the checkmark.
+ * whether the course reset functionality affects the grouptool.
  * @param $mform form passed by reference
  */
 function grouptool_reset_course_form_definition(&$mform) {

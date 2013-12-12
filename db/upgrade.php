@@ -279,6 +279,21 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached!
         upgrade_mod_savepoint(true, 2012072900, 'grouptool');
     }
+    
+    if ($oldversion < 2013112300) {
+
+        // Define field alwaysshowdescription to be added to grouptool.
+        $table = new xmldb_table('grouptool');
+        $field = new xmldb_field('alwaysshowdescription', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'introformat');
+
+        // Conditionally launch add field alwaysshowdescription.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2013112300, 'grouptool');
+    }
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
