@@ -541,7 +541,7 @@ function grouptool_cron () {
  * @return array
  */
 function grouptool_get_extra_capabilities() {
-    return array('moodle/site:accessallgroups', 'moodle/site:viewfullnames');
+    return array('moodle/course:managegroups');
 }
 
 /*******************************************************************************

@@ -422,6 +422,7 @@ $string['use_individual'] = 'Use individual size per group';
 $string['use_individual_help'] = 'Override global groupsize with individual value for each group. These get set via the sortable grouplist on the bottom.';
 $string['use_size'] = 'Activate';
 $string['use_queue'] = 'Use queues';
+$string['viewmoodlegroups'] = 'To Moodle groups';
 $string['you_are_already_marked'] = 'You marked this group allready for registration!';
 $string['you_have_too_less_regs'] = 'Unregistration/unqueue not possible because you\'re registered/queued in too less groups!';
 $string['your_place_allocated_in_group_success'] = 'You successfully marked group {$a->groupname} for registration';

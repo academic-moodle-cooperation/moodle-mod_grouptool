@@ -36,6 +36,15 @@
 
 /** sortable grouplist styles **/
 
+.path-mod-grouptool .tabtree {
+    margin-bottom:0px;
+}
+
+.path-mod-grouptool .moodlegrpslnk {
+    margin-bottom:3.5em;
+    text-align:right;
+}
+
 .path-mod-grouptool div.sortlist_container {
     overflow:auto;
 }

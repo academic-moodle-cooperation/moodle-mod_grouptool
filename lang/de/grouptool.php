@@ -423,6 +423,7 @@ $string['use_individual'] = 'Benutze individuelle Gruppengrößen';
 $string['use_individual_help'] = 'Überschreibe globale Gruppengröße mit individuellen Werten für jede Gruppe. Diese werden per Gruppenliste weiter unten gesetzt.';
 $string['use_size'] = 'Aktivieren';
 $string['use_queue'] = 'Benutze Wartelisten';
+$string['viewmoodlegroups'] = 'Zu den Moodle Gruppen';
 $string['you'] = 'Sie';
 $string['you_are_already_marked'] = 'Sie haben die Gruppe {$a->groupname} bereits erfolgreich zur Anmeldung markiert!';
 $string['you_have_too_less_regs'] = 'Eine Abmeldung ist nicht möglich, weil Sie in zu wenigen Gruppen angemeldet sind';

@@ -172,6 +172,16 @@ if (count($row) > 1) {
     $tab = 'noaccess';
 }
 
+$context = context_course::instance($course->id);
+if (has_capability('moodle/course:managegroups', $context)) {
+    // Print link to moodle groups
+    $url = new moodle_url('/group/index.php', array('id'=>$course->id));
+    $grpslnk = html_writer::link($url,
+                                 get_string('viewmoodlegroups', 'grouptool'));
+    echo html_writer::tag('div', $grpslnk, array('class'=>'moodlegrpslnk'));
+    echo html_writer::tag('div', '', array('class'=>'clearer'));
+}
+
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
 
 $tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
