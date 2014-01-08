@@ -591,7 +591,6 @@ class grouptool {
         } else if (! $this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
             print_error('invalidcoursemodule');
         }
-
         $this->context = context_module::instance($this->cm->id);
 
         if ($course) {
@@ -3336,7 +3335,7 @@ EOS;
                                                     $message));
                         }
                     } else if (empty($movefromqueue) && $this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
+                               && ($this->grouptool->choose_min > ($marks+$userregs+$userqueues))) {
                         //cache data until enough registrations are made
                         $record = new stdClass();
                         $record->agrpid = $agrpid;
@@ -3431,7 +3430,7 @@ EOS;
                                                     $message));
                         }
                     } else if ($this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
+                               && ($this->grouptool->choose_min > ($marks+$userregs+$userqueues))) {
                         //cache data until enough registrations are made
                         $record = new stdClass();
                         $record->agrpid = $agrpid;
@@ -3439,7 +3438,7 @@ EOS;
                         $record->userid = $userid;
                         $record->timestamp = time();
                         $record->modified_by = -1;
-                        $DB->inset_record('grouptool_registered', $record);
+                        $DB->insert_record('grouptool_registered', $record);
                         if ($userid != $USER->id) {
                             return array(false,
                                          get_string('place_allocated_in_group_success', 'grouptool',
