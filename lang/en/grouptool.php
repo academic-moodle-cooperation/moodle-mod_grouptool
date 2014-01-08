@@ -394,6 +394,7 @@ $string['too_many_queue_places'] = 'Can\'t queue {$a->username} in group {$a->gr
 $string['toomanyregs'] = 'Attention: In at least one group there are more groupmembers than specified by the desired new groupsize.<br />Reduce the groupmembers in the groups before changing the groupsize.';
 $string['too_many_regs'] = 'User is registered/queued in too many groups allready!';
 $string['toomanyregspresent'] = 'At least 1 user is registered in too many groups, therefore the maximum groups to choose has to be at least {$a}.';
+$string['toolessregspresent'] = 'At least 1 user is registered in too less groups, therefore the minimum groups to choose has to be at max {$a}.';
 $string['you_have_too_many_queue_places'] = 'Can\'t queue you in group {$a->groupname} because you are already queued in too many groups!';
 $string['total'] = 'Total';
 $string['unqueue'] = 'Remove from queue';

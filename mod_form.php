@@ -340,6 +340,17 @@ GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $max_user_regs = $DB->get_field_sql($sql, $params);
             $sql = '
+     SELECT MIN(regcnt)
+        FROM (
+      SELECT COUNT(reg.id) as regcnt
+        FROM {grouptool_registered} as reg
+        JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+       WHERE agrps.grouptoolid = :grouptoolid
+    GROUP BY reg.userid) as regcnts
+       WHERE regcnt > 0';
+            $params = array('grouptoolid' => $data['instance']);
+            $min_user_regs = $DB->get_field_sql($sql, $params);
+            $sql = '
       SELECT COUNT(queue.id) as queue
         FROM {grouptool_queued} as queue
         JOIN {grouptool_agrps} as agrps ON queue.agrpid = agrps.id
@@ -349,6 +360,7 @@ GROUP BY reg.userid) as regcnts';
         } else {
             $max_grp_regs = 0;
             $max_user_regs = 0;
+            $min_user_regs = 0;
             $queues = 0;
         }
         if (!empty($data['use_size']) && ($data['grpsize'] < $max_grp_regs)
@@ -393,6 +405,18 @@ GROUP BY reg.userid) as regcnts';
             } else {
                 $errors['choose_max'] = get_string('toomanyregspresent', 'grouptool',
                                                    $max_user_regs);
+            }
+        }
+
+        if (!empty($data['allow_multiple']) && !empty($min_user_regs)
+            && ($data['choose_min'] > $min_user_regs)) {
+            if (isset($errors['choose_min'])) {
+                $errors['choose_min'] .= html_writer::empty_tag('br').
+                                         get_string('toolessregspresent', 'grouptool',
+                                                    $min_user_regs);
+            } else {
+                $errors['choose_min'] = get_string('toolessregspresent', 'grouptool',
+                                                   $min_user_regs);
             }
         }
 
