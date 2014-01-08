@@ -437,9 +437,11 @@ function grouptool_get_coursemodule_info($coursemodule) {
     $result = new cached_cm_info();
     $result->name = $grouptool->name;
     if ($coursemodule->showdescription) {
-        if ($grouptool->alwaysshowdescription || time() > $grouptool->allowregistrationsfromdate) {
+        if ($grouptool->alwaysshowdescription || (time() > $grouptool->timeavailable)) {
             // Convert intro to html. Do not filter cached version, filters run at display time.
             $result->content = format_module_intro('grouptool', $grouptool, $coursemodule->id, false);
+        } else {
+            unset($result->content);
         }
     }
     return $result;

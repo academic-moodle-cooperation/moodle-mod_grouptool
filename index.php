@@ -200,7 +200,11 @@ foreach ($grouptools as $grouptool) {
                 format_string($grouptool->name, true));
     }
 
-    $intro = $grouptool->intro ? $grouptool->intro : "";
+    if ($grouptool->alwaysshowdescription || (time() > $grouptool->timeavailable)) {
+        $intro = $grouptool->intro ? $grouptool->intro : "";
+    } else {
+        $intro = '';
+    }
 
     if ($course->format == 'weeks' or $course->format == 'topics') {
         $table->data[] = array($grouptool->section, $link, $info, $intro);
