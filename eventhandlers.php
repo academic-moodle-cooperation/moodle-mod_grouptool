@@ -259,7 +259,7 @@ function groups_remove_member_handler($data) {
         return true;
     }
 
-    foreach ($grouptools as $cmid => $grouptool) {
+    foreach ($grouptools as $grouptool) {
         switch($grouptool->ifmemberremoved) {
             case GROUPTOOL_FOLLOW:
                 $sql = "SELECT reg.id AS id FROM {grouptool_agrps} AS agrps
@@ -274,7 +274,7 @@ function groups_remove_member_handler($data) {
                             'course', 'unregister',
                             "view.php?id=".$data->courseid,
                             'via event course='.$data->courseid.' user='.$data->userid,
-                            $cmid);
+                            $grouptool->coursemodule);
                 }
                 break;
             default:
@@ -308,7 +308,8 @@ function group_deleted_handler($data) {
 
     $group_recreated = false;
     $agrpids = array();
-    foreach ($grouptools as $cmid => $grouptool) {
+    foreach ($grouptools as $grouptool) {
+        $cmid = $grouptool->coursemodule;
         switch($grouptool->ifgroupdeleted) {
             default:
             case GROUPTOOL_RECREATE_GROUP:
@@ -324,6 +325,11 @@ function group_deleted_handler($data) {
                             $DB->set_field('grouptool_agrps', 'groupid', $new_id,
                                            array('groupid'=>$data->id));
                         }
+                        if ($grouptool->immediate_reg) {
+                            require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+                            $instance = new grouptool($cmid, $grouptool);
+                            $instance->push_registrations();
+                        }
                         $group_recreated = true;
                         add_to_log($data->courseid,
                                    'course', 'create recreate grouptool group',
@@ -336,6 +342,12 @@ function group_deleted_handler($data) {
                                                $DB->get_fieldset_select('grouptool_agrps', 'id',
                                                                         "groupid = ?",
                                                                         array($data->id)));
+                    }
+                } else {
+                    if ($grouptool->immediate_reg) {
+                        require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+                        $instance = new grouptool($cmid, $grouptool);
+                        $instance->push_registrations();
                     }
                 }
                 break;
@@ -411,7 +423,7 @@ function group_created_handler($data) {
     $sortorder = $DB->get_records_sql("SELECT agrp.grouptoolid, MAX(agrp.sort_order) AS max
                                           FROM {grouptool_agrps} AS agrp
                                           GROUP BY agrp.grouptoolid");
-    foreach ($grouptools as $cmid => $grouptool) {
+    foreach ($grouptools as $grouptool) {
         $new_agrp = new StdClass();
         $new_agrp->grouptoolid = $grouptool->id;
         $new_agrp->groupid = $data->id;
@@ -426,7 +438,7 @@ function group_created_handler($data) {
             $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp);
             add_to_log($data->courseid, 'grouptool', 'update agrps',
                        "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->id,
-                       'via event course='.$data->courseid.' agrp='.$new_agrp->id, $cmid);
+                       'via event course='.$data->courseid.' agrp='.$new_agrp->id, $grouptool->coursemodule);
         }
     }
     return true;

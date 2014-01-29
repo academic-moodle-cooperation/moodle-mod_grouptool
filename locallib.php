@@ -576,7 +576,7 @@ class grouptool {
      * @param object $cm usually null, but if we have it we pass it to save db access
      * @param object $course usually null, but if we have it we pass it to save db access
      */
-    public function __construct($cmid='staticonly', $grouptool=null, $cm=null, $course=null) {
+    public function __construct($cmid, $grouptool=null, $cm=null, $course=null) {
         global $DB;
 
         if ($cmid == 'staticonly') {
