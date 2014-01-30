@@ -91,11 +91,11 @@ function group_add_member_handler($data) {
  * @return bool true if success
  */
 function group_remove_member_handler($data) {
-    global $DB;
+    global $DB, $CFG;
 
     $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
                             {grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allow_multiple,
-                            {grouptool}.choose_max
+                            {grouptool}.choose_max, {grouptool}.name
                        FROM {grouptool}
                  RIGHT JOIN {grouptool_agrps} AS agrp ON agrp.grouptoolid = {grouptool}.id
                       WHERE agrp.groupid = ?";
@@ -155,6 +155,65 @@ function group_remove_member_handler($data) {
                                                                     AND agrpid '.$sql,
                                                                    array_merge(array($new_record->userid), $params));
                             $max = $grouptool->choose_max;
+                            
+                            // Get belonging course!
+                            $course = $DB->get_record('course', array('id'=>$grouptool->course));
+                            // Get CM!
+                            $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $course->id);
+                            $message = new stdClass();
+                            $userdata = $DB->get_record('user', array('id'=>$new_record->userid));
+                            $message->username = fullname($userdata);
+                            $groupdata = $DB->get_record('grouptool_agrps', array('id'=>$agrp[$grouptool->id]->id));
+                            $groupdata->name = $DB->get_field('groups', 'name', array('id'=>$groupdata->groupid));
+                            $message->groupname = $groupdata->name;
+
+                            $strgrouptools = get_string("modulenameplural", "grouptool");
+                            $strgrouptool  = get_string("modulename", "grouptool");
+                            $postsubject = $course->shortname.': '.$strgrouptools.': '.
+                                           format_string($grouptool->name, true);
+                            $posttext  = $course->shortname.' -> '.$strgrouptools.' -> '.
+                                         format_string($grouptool->name, true)."\n";
+                            $posttext .= "----------------------------------------------------------\n";
+                            $posttext .= get_string("register_you_in_group_successmail",
+                                                    "grouptool", $message)."\n";
+                            $posttext .= "----------------------------------------------------------\n";
+                            $usermailformat = $DB->get_field('user', 'mailformat',
+                                                             array('id'=>$new_record->userid));
+                            if ($usermailformat == 1) {  // HTML!
+                                $posthtml = "<p><font face=\"sans-serif\">";
+                                $posthtml = "<a href=\"".$CFG->wwwroot."/course/view.php?id=".
+                                            $course->id."\">".$course->shortname."</a> ->";
+                                $posthtml = "<a href=\"".$CFG->wwwroot."/mod/grouptool/index.php?id=".
+                                            $course->id."\">".$strgrouptools."</a> ->";
+                                $posthtml = "<a href=\"".$CFG->wwwroot."/mod/grouptool/view.php?id=".
+                                            $cm->id."\">".format_string($grouptool->name,
+                                                                              true)."</a></font></p>";
+                                $posthtml .= "<hr /><font face=\"sans-serif\">";
+                                $posthtml .= "<p>".get_string("register_you_in_group_successmailhtml",
+                                                              "grouptool", $message)."</p>";
+                                $posthtml .= "</font><hr />";
+                            } else {
+                                $posthtml = "";
+                            }
+                            $messageuser = $DB->get_record('user', array('id'=>$new_record->userid));
+                            $eventdata = new stdClass();
+                            $eventdata->modulename       = 'grouptool';
+                            $eventdata->userfrom         = $messageuser;
+                            $eventdata->userto           = $messageuser;
+                            $eventdata->subject          = $postsubject;
+                            $eventdata->fullmessage      = $posttext;
+                            $eventdata->fullmessageformat = FORMAT_PLAIN;
+                            $eventdata->fullmessagehtml  = $posthtml;
+                            $eventdata->smallmessage     = get_string('register_you_in_group_success',
+                                                                      'grouptool', $message);
+                            $eventdata->name            = 'grouptool_moveupreg';
+                            $eventdata->component       = 'mod_grouptool';
+                            $eventdata->notification    = 1;
+                            $eventdata->contexturl      = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
+                                                          $cm->id;
+                            $eventdata->contexturlname  = $grouptool->name;
+                            message_send($eventdata);
+
                             if (($allow_m && ($usrregcnt >= $max)) || !$allow_m) {
                                 $DB->delete_records_select('grouptool_queued',
                                                            ' userid = ? AND agrpid '.$sql,
