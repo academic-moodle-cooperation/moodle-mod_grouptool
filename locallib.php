@@ -6280,6 +6280,51 @@ EOS;
         $sql = "SELECT u.id FROM {user} u ".
                "LEFT JOIN ($esql) eu ON eu.id=u.id ".
                "WHERE u.deleted = 0 AND eu.id=u.id ";
+        if (!empty($groupingid)) {
+            //get all groupings groups
+            $groups = groups_get_all_groups($this->course->id, 0, $groupingid);
+            $groupingsusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id');
+            if (empty($groupingusers)) {
+                $groupingusers = array();
+            } else {
+                $groupingusers = array_keys($groupingusers);
+            }
+            list($groupssql, $groupsparams) = $DB->get_in_or_equal(array_keys($groups));
+            $groupingusers2 = $DB->get_fieldset_sql("
+            SELECT DISTINCT u.id
+              FROM {user} as u
+         LEFT JOIN {grouptool_registered} as reg ON u.id = reg.userid
+         LEFT JOIN {grouptool_queued} as queue ON u.id = queue.userid
+         LEFT JOIN {grouptool_agrps} as agrp ON reg.agrpid = agrp.id OR queue.agrpid = agrp.id
+             WHERE agrp.groupid ".$groupssql, $groupsparams);
+            $groupingusers = array_merge($groupingusers, $groupingusers2);
+            list($userssql, $groupingparams) = $DB->get_in_or_equal($groupingusers, SQL_PARAMS_NAMED);
+            //extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group
+            $sql .= " AND u.id ".$userssql;
+            $params = array_merge($params, $groupingparams);
+        }
+        if (!empty($groupid)) {
+            //same as with groupingid but just with 1 group
+            //get all group members
+            $groupusers = groups_get_members($groupid, 'DISTINCT u.id');
+            if (empty($groupusers)) {
+                $groupusers = array();
+            } else {
+                $groupusers = array_keys($groupusers);
+            }
+            $groupusers2 = $DB->get_fieldset_sql("
+            SELECT DISTINCT u.id
+              FROM {user} as u
+         LEFT JOIN {grouptool_registered} as reg ON u.id = reg.userid
+         LEFT JOIN {grouptool_queued} as queue ON u.id = queue.userid
+         LEFT JOIN {grouptool_agrps} as agrp ON reg.agrpid = agrp.id OR queue.agrpid = agrp.id
+             WHERE agrp.groupid = ?", array($groupid));
+            $groupusers = array_merge($groupusers, $groupusers2);
+            list($userssql, $groupparams) = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
+            //extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group
+            $sql .= " AND u.id ".$userssql;
+            $params = array_merge($params, $groupparams);
+        }
         $users = $DB->get_records_sql($sql, $params);
 
         if (!empty($users)) {
