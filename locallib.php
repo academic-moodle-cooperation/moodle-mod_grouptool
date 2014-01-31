@@ -4878,11 +4878,13 @@ EOS;
         global $OUTPUT, $CFG, $DB;
         if (!$data_only) {
             $return = "";
+            $orientation = optional_param('orientation', 0, PARAM_BOOL);
             $downloadurl = new moodle_url('/mod/grouptool/download.php', array('id'=>$this->cm->id,
-                    'groupingid'=>$groupingid,
-                    'groupid'=>$groupid,
-                    'sesskey'=>sesskey(),
-                    'tab'=>'overview'));
+                    'groupingid'  => $groupingid,
+                    'groupid'     => $groupid,
+                    'orientation' => $orientation,
+                    'sesskey'     => sesskey(),
+                    'tab'         => 'overview'));
         } else {
             $return = array();
         }
@@ -5196,7 +5198,8 @@ EOS;
         $pdf = new grouptool_pdf();
 
         // Set orientation (P/L)!
-        $pdf->setPageOrientation("P");
+        $orientation = (optional_param('orientation', 0, PARAM_BOOL) == 0) ? 'P' : 'L';
+        $pdf->setPageOrientation($orientation);
 
         // Set document information!
         $pdf->SetCreator('TUWEL');
@@ -5261,7 +5264,7 @@ EOS;
 
         // Set font!
         $pdf->SetFont('freeserif', '');
-        $pdf->addPage('P', 'A4', false, false);
+        $pdf->addPage($orientation, 'A4', false, false);
         if (count($data) > 0) {
 
             foreach ($data as $group) {
@@ -5949,9 +5952,11 @@ EOS;
 
         $groupid = optional_param('groupid', 0, PARAM_INT);
         $groupingid = optional_param('groupingid', 0, PARAM_INT);
-        $url = new moodle_url($PAGE->url, array('sesskey'=>sesskey(),
-                                                'groupid'=>$groupid,
-                                                'groupingid'=>$groupingid));
+        $orientation = optional_param('orientation', 0, PARAM_BOOL);
+        $url = new moodle_url($PAGE->url, array('sesskey'     => sesskey(),
+                                                'groupid'     => $groupid,
+                                                'groupingid'  => $groupingid,
+                                                'orientation' => $orientation));
 
             // Process submitted form!
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
@@ -6024,6 +6029,10 @@ EOS;
             }
             $groupselect = new single_select($url, 'groupid', $options, $groupid, false);
 
+            $options = array(0 => get_string('portrait', 'grouptool'),
+                             1 => get_string('landscape', 'grouptool'));
+            $orientationselect = new single_select($url, 'orientation', $options, $orientation, false);
+
             $sync_status = $this->get_sync_status();
 
             if ($sync_status[0]) {
@@ -6043,7 +6052,10 @@ EOS;
                                   array('class'=>'centered grouptool_overview_filter')).
                  html_writer::tag('div', get_string('group', 'group').'&nbsp;'.
                                          $OUTPUT->render($groupselect),
-                                  array('class'=>'centered grouptool_overview_filter'));
+                                  array('class'=>'centered grouptool_overview_filter')).
+                 html_writer::tag('div', get_string('orientation', 'grouptool').'&nbsp;'.
+                                         $OUTPUT->render($orientationselect),
+                                  array('class'=>'centered grouptool_userlist_filter'));
 
             echo $this->group_overview_table($groupingid, $groupid);
         }
