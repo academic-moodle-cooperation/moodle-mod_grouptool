@@ -6310,7 +6310,12 @@ EOS;
          LEFT JOIN {grouptool_agrps} as agrp ON reg.agrpid = agrp.id OR queue.agrpid = agrp.id
              WHERE agrp.groupid ".$groupssql, $groupsparams);
             $groupingusers = array_merge($groupingusers, $groupingusers2);
-            list($userssql, $groupingparams) = $DB->get_in_or_equal($groupingusers, SQL_PARAMS_NAMED);
+            if (empty($groupingusers)) {
+                $userssql = " = :groupingparam";
+                $groupingparams = array('groupingparam' => -1);
+            } else {
+                list($userssql, $groupingparams) = $DB->get_in_or_equal($groupingusers, SQL_PARAMS_NAMED);
+            }
             //extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group
             $sql .= " AND u.id ".$userssql;
             $params = array_merge($params, $groupingparams);
@@ -6332,7 +6337,12 @@ EOS;
          LEFT JOIN {grouptool_agrps} as agrp ON reg.agrpid = agrp.id OR queue.agrpid = agrp.id
              WHERE agrp.groupid = ?", array($groupid));
             $groupusers = array_merge($groupusers, $groupusers2);
-            list($userssql, $groupparams) = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
+            if (empty($groupusers)) {
+                $userssql = " = :groupparam";
+                $groupparams = array('groupparam' => -1);
+            } else {
+                list($userssql, $groupparams) = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
+            }
             //extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group
             $sql .= " AND u.id ".$userssql;
             $params = array_merge($params, $groupparams);
