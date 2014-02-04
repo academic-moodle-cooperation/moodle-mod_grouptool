@@ -4427,7 +4427,8 @@ EOS;
                         array('class'=>'clearfix'));
 
                 // Intro-text if set!
-                if (($reg_open || $this->grouptool->alwaysshowdescription)
+                if (($this->grouptool->alwaysshowdescription
+                     || (time() > $this->grouptool->timeavailable))
                     && $this->grouptool->intro) {
                     $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
                     $formcontent .= html_writer::tag('fieldset', html_writer::tag('legend',
