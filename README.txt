@@ -1,26 +1,32 @@
-# ---------------------------------------------------------------
-# This software is provided under the GNU General Public License
-# http://www.gnu.org/licenses/gpl.html
-# with Copyright © 2012 onwards
-#
-# Dipl.-Ing. Andreas Hruska
-# andreas.hruska@tuwien.ac.at
-# 
-# Dipl.-Ing. Mag. rer.soc.oec. Katarzyna Potocka
-# katarzyna.potocka@tuwien.ac.at
-# 
-# Vienna University of Technology
-# Teaching Support Center
-# Gußhausstraße 28/E015
-# 1040 Wien
-# http://tsc.tuwien.ac.at/
+// This file is part of mod_grouptool for Moodle - http://moodle.org/
+//
+// It is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// It is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * README.txt
+ * @version       2014-02-24
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 # ---------------------------------------------------------------
 # FOR Moodle 2.5+
 # ---------------------------------------------------------------
-
-README.txt
-v.2013081600
-
 
 Grouptool-Module
 ===============
@@ -68,21 +74,3 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
-v 2013081600
---------------------------------------------------------------------------------
-- minimum groups to choose is now a requirement:
-  The registrations will be saved only if the minimum amount of groups to choose
-  has been chosen. Furthermore will every unregistration from groups be
-  prevented if the amount of registrations is under the lower limit.
-- new iconset:
-  Due to the change to SVG-icons, grouptool got a new activity icon and now uses
-  the moodle action-icon-set as actionbuttons.
-- it is now possible to show the description directly on the coursepage
-- groupgrading now allows also to write the grade directly to assignment-
-  and checkmark-instances (additionally to the standard writing to gradebook)
-- block "recent activities" won't show private information anymore
-- start of registration/end of registration events:
-  these are now 2 separate events instead of a single one to prevent it from
-  blocking all other events
-- show groupmembers has got now it's own CSS copying moodle's design
-- various bugfixes, layout improvements, language improvements
