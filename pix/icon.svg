@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1"
+	 id="svg2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" inkscape:version="0.48.4 r9939" sodipodi:docname="grouptool_icon.svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px"
+	 viewBox="-416.5 301.5 24 24" enable-background="new -416.5 301.5 24 24" xml:space="preserve">
+<sodipodi:namedview  id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:zoom="14.008079" inkscape:cx="35.947414" inkscape:cy="5.9443538" showgrid="false" inkscape:window-height="998" inkscape:window-maximized="1" inkscape:pageshadow="2" inkscape:current-layer="layer1" inkscape:window-y="-8" inkscape:document-units="px" inkscape:window-width="1680" inkscape:pageopacity="0.0" inkscape:window-x="-8">
+	</sodipodi:namedview>
+<g id="layer1" transform="translate(0,-1020.3622)" inkscape:label="Layer 1" inkscape:groupmode="layer">
+	
+		<radialGradient id="path3856-2_1_" cx="44043.3281" cy="51668.5234" r="93.992" gradientTransform="matrix(0.0427 0 0 0.0382 -2278.436 -637.4443)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#FEBA12"/>
+		<stop  offset="1" style="stop-color:#F57C20"/>
+	</radialGradient>
+	
+		<path id="path3856-2" inkscape:connector-curvature="0" fill="url(#path3856-2_1_)" stroke="#000000" stroke-width="0.2646" stroke-linecap="round" stroke-linejoin="round" d="
+		M-396.411,1333.699c-2.159,0-3.911,2.563-3.911,5.727c0,0.433,0.033,0.853,0.096,1.257h7.631c0.063-0.404,0.096-0.824,0.096-1.257
+		C-392.5,1336.264-394.252,1333.699-396.411,1333.699z"/>
+	
+		<radialGradient id="path3861-4_1_" cx="44065.1328" cy="44875.8945" r="74.3513" gradientTransform="matrix(0.0427 0 0 0.0439 -2278.436 -640.3192)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#FFE2AF"/>
+		<stop  offset="1" style="stop-color:#EC9B60"/>
+	</radialGradient>
+	
+		<path id="path3861-4" sodipodi:type="arc" sodipodi:cx="302.85715" sodipodi:cy="363.79074" sodipodi:rx="94.285713" sodipodi:ry="97.14286" fill="url(#path3861-4_1_)" stroke="#000000" stroke-width="0.2646" stroke-linecap="round" stroke-linejoin="round" d="
+		M-393.338,1331.278c0,1.748-1.375,3.167-3.072,3.167c-1.695,0-3.071-1.418-3.071-3.166c0,0,0,0,0-0.001
+		c-0.001-1.749,1.374-3.166,3.07-3.166C-394.713,1328.112-393.338,1329.528-393.338,1331.278L-393.338,1331.278z"/>
+	
+		<radialGradient id="path3856-2-7_1_" cx="44160.5938" cy="51668.5234" r="94.002" gradientTransform="matrix(0.0427 0 0 0.0382 -2299.6221 -637.4443)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#FEBA12"/>
+		<stop  offset="1" style="stop-color:#F57C20"/>
+	</radialGradient>
+	
+		<path id="path3856-2-7" inkscape:connector-curvature="0" fill="url(#path3856-2-7_1_)" stroke="#000000" stroke-width="0.2646" stroke-linecap="round" stroke-linejoin="round" d="
+		M-412.589,1333.699c-2.16,0-3.911,2.563-3.911,5.727c0,0.433,0.033,0.853,0.095,1.257h7.633c0.063-0.404,0.095-0.824,0.095-1.257
+		C-408.677,1336.264-410.428,1333.699-412.589,1333.699z"/>
+	
+		<radialGradient id="path3861-4-6_1_" cx="44182.4258" cy="44875.8945" r="74.3593" gradientTransform="matrix(0.0427 0 0 0.0439 -2299.6221 -640.3192)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#FFE2AF"/>
+		<stop  offset="1" style="stop-color:#EC9B60"/>
+	</radialGradient>
+	
+		<path id="path3861-4-6" sodipodi:type="arc" sodipodi:cx="302.85715" sodipodi:cy="363.79074" sodipodi:rx="94.285713" sodipodi:ry="97.14286" fill="url(#path3861-4-6_1_)" stroke="#000000" stroke-width="0.2646" stroke-linecap="round" stroke-linejoin="round" d="
+		M-409.515,1331.278c0,1.748-1.375,3.167-3.073,3.167c-1.698,0-3.073-1.418-3.073-3.166c0,0,0,0,0-0.001
+		c0-1.749,1.375-3.166,3.072-3.166C-410.891,1328.112-409.515,1329.528-409.515,1331.278L-409.515,1331.278z"/>
+	
+		<radialGradient id="path3856-7_1_" cx="28909.4844" cy="34802.1719" r="94.0014" gradientTransform="matrix(0.0636 0 0 0.057 -2245.3271 -646.6641)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#008ABF"/>
+		<stop  offset="1" style="stop-color:#005581"/>
+	</radialGradient>
+	
+		<path id="path3856-7" inkscape:connector-curvature="0" fill="url(#path3856-7_1_)" stroke="#000000" stroke-width="0.3942" stroke-linecap="round" stroke-linejoin="round" d="
+		M-404.519,1332.82c-3.218,0-5.828,3.821-5.828,8.533c0,0.643,0.05,1.27,0.143,1.874h11.372c0.088-0.604,0.141-1.231,0.141-1.874
+		C-398.693,1336.64-401.301,1332.82-404.519,1332.82z"/>
+	
+		<radialGradient id="path3861-6_1_" cx="28931.293" cy="30201.6543" r="74.3693" gradientTransform="matrix(0.0636 0 0 0.0655 -2245.3271 -650.9601)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#FFE2AF"/>
+		<stop  offset="1" style="stop-color:#EC9B60"/>
+	</radialGradient>
+	
+		<path id="path3861-6" sodipodi:type="arc" sodipodi:cx="302.85715" sodipodi:cy="363.79074" sodipodi:rx="94.285713" sodipodi:ry="97.14286" fill="url(#path3861-6_1_)" stroke="#000000" stroke-width="0.3942" stroke-linecap="round" stroke-linejoin="round" d="
+		M-399.941,1329.214c0.002,2.605-2.048,4.719-4.578,4.719c-2.528,0-4.578-2.111-4.578-4.717l0,0c0-2.605,2.048-4.718,4.578-4.718
+		C-401.989,1324.498-399.941,1326.61-399.941,1329.214L-399.941,1329.214z"/>
+</g>
+</svg>
