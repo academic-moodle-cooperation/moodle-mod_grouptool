@@ -57,7 +57,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
     }
 
     protected function process_grouptool($data) {
-        global $DB;
+        global $DB, $CFG;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -67,6 +67,17 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->timecreated = time();
+        
+        // Due to an old bug it can happen that these settings haven't been backed up!
+        if(!isset($data->ifmemberadded)) {
+            $data->ifmemberadded = $CFG->grouptool_ifmemberadded;
+        }
+        if (!isset($data->ifmemberremoved)) {
+            $data->ifmemberremoved = $CFG->grouptool_ifmemberremoved;
+        }
+        if (!isset($data->ifgroupdeleted)) {
+            $data->ifgroupdeleted = $CFG->grouptool_ifgroupdeleted;
+        }
 
         // Insert the checkmark record!
         $newitemid = $DB->insert_record('grouptool', $data);
