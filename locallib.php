@@ -5375,9 +5375,8 @@ EOS;
         $filecontent = implode(GROUPTOOL_NL, $lines);
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
+        
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -5707,9 +5706,7 @@ EOS;
         require_once($CFG->libdir . "/odslib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -5744,9 +5741,7 @@ EOS;
         require_once($CFG->libdir . "/excellib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -6714,9 +6709,7 @@ EOS;
         ob_start();
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         $return = "";
         $lines = array();
@@ -6976,9 +6969,7 @@ EOS;
         require_once($CFG->libdir . "/odslib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         $workbook = new MoodleODSWorkbook("-");
 
@@ -7017,9 +7008,7 @@ EOS;
         require_once($CFG->libdir . "/excellib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         $workbook = new MoodleExcelWorkbook("-");
 

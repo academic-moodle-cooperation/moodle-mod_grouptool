@@ -54,6 +54,7 @@ $string['you_are_already_registered'] = 'You are already registered in group {$a
 $string['asterisk_marks_moodle_registrations'] = 'Users with leading asterisk (*) are already registered in the respective Moodle-Group';
 $string['availabledate'] = 'Registration start';
 $string['availabledate_help'] = 'Begin of the registration period. After this date students are able to register themselves in the selected groups (if enabled).';
+$string['availabledateno'] = 'Always available';
 $string['cant_enrol'] = 'Can\'t enrol user automatically in course.';
 $string['cfg_addinstanceset_head'] = 'Additional Instance Settings';
 $string['cfg_addinstanceset_head_info'] = 'Additional settings for grouptool.';

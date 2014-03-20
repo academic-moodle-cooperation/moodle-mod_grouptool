@@ -74,14 +74,18 @@ class grouptool_pdf extends pdf {
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
-        $this->header1[3] = userdate($timeavailable);
+        $this->header1[3] = empty($timeavailable) ?
+                            get_string('availabledateno', 'grouptool') :
+                            userdate($timeavailable);
         $this->header1[4] = get_string('groupoverview', 'grouptool');
 
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
-        $this->header2[3] = userdate($timedue);
+        $this->header2[3] = empty($timedue) ?
+                            get_string('duedateno', 'grouptool') :
+                            userdate($timedue);
         $this->header2[4] = $viewname;
     }
 
@@ -100,14 +104,18 @@ class grouptool_pdf extends pdf {
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
-        $this->header1[3] = userdate($timeavailable);
+        $this->header1[3] = empty($timeavailable) ?
+                            get_string('availabledateno', 'grouptool') :
+                            userdate($timeavailable);
         $this->header1[4] = get_string('userlist', 'grouptool');
 
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
-        $this->header2[3] = userdate($timedue);
+        $this->header2[3] = empty($timedue) ?
+                            get_string('duedateno', 'grouptool') :
+                            userdate($timedue);
         $this->header2[4] = $viewname;
     }
 
@@ -126,14 +134,18 @@ class grouptool_pdf extends pdf {
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
-        $this->header1[3] = userdate($timeavailable);
+        $this->header1[3] = empty($timeavailable) ?
+                            get_string('availabledateno', 'grouptool') :
+                            userdate($timeavailable);
         $this->header1[4] = get_string('overview', 'grouptool');
 
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'checkmark').":";
-        $this->header2[3] = userdate($timedue);
+        $this->header1[3] = empty($timedue) ?
+                            get_string('duedateno', 'grouptool') :
+                            userdate($timedue);
         $this->header2[4] = $viewname;
     }
 
