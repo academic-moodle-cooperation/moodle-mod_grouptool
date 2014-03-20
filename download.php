@@ -81,6 +81,16 @@ switch (required_param('tab', PARAM_ALPHA)) {
                         $cm->id);
                 echo $instance->download_overview_xls($groupid, $groupingid);
                 break;
+            case GROUPTOOL_XLSX:
+                $PAGE->url->param('format', GROUPTOOL_XLSX);
+                add_to_log($cm->course,
+                        'grouptool', 'export',
+                        "download.php?id=".$cmid."&groupingid=".$groupingid.
+                        "&groupid=".$groupid."&tab=overview&format=".GROUPTOOL_XLSX,
+                        get_string('overview', 'grouptool').' XLSX',
+                        $cm->id);
+                echo $instance->download_overview_xlsx($groupid, $groupingid);
+                break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
                 add_to_log($cm->course,
@@ -128,6 +138,16 @@ switch (required_param('tab', PARAM_ALPHA)) {
                         get_string('userlist', 'grouptool').' XLS',
                         $cm->id);
                 echo $instance->download_userlist_xls($groupid, $groupingid);
+                break;
+            case GROUPTOOL_XLSX:
+                $PAGE->url->param('format', GROUPTOOL_XLSX);
+                add_to_log($cm->course,
+                        'grouptool', 'export',
+                        "download.php?id=".$cmid."&groupingid=".$groupingid.
+                        "&groupid=".$groupid."&tab=userlist&format=".GROUPTOOL_XLSX,
+                        get_string('userlist', 'grouptool').' XLSX',
+                        $cm->id);
+                echo $instance->download_userlist_xlsx($groupid, $groupingid);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
