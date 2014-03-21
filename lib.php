@@ -557,7 +557,7 @@ function grouptool_get_extra_capabilities() {
  */
 function grouptool_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module,
                                      cm_info $cm) {
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
     if (has_capability('mod/grouptool:create_groups', $context)
             || has_capability('mod/grouptool:create_groupings', $context)
             || has_capability('mod/grouptool:register_students', $context)) {

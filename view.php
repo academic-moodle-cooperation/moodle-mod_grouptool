@@ -63,7 +63,7 @@ if ($id) {
 
 
 require_login($course, true, $cm);
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 // Print the page header!
 $PAGE->set_url('/mod/grouptool/view.php', array('id' => $cm->id));
 $PAGE->set_context($context);
