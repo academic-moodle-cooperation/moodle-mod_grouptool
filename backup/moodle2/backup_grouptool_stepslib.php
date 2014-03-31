@@ -43,7 +43,8 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
                 'timecreated', 'timemodified', 'timedue', 'timeavailable',
                 'show_members', 'allow_reg', 'immediate_reg', 'allow_unreg',
                 'grpsize', 'use_size', 'use_individual', 'use_queue',
-                'queues_max', 'allow_multiple', 'choose_min', 'choose_max'));
+                'queues_max', 'allow_multiple', 'choose_min', 'choose_max',
+                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted'));
         $agrps = new backup_nested_element('agrps');
         $agrp = new backup_nested_element('agrp', array('id'), array(
                 'grouptoolid', 'groupid', 'sort_order', 'grpsize', 'active'));

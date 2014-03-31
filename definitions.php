@@ -100,6 +100,11 @@ define('GROUPTOOL_XLS', 2);
 define('GROUPTOOL_ODS', 3);
 
 /**
+ * GROUPTOOL_XLSX - get XLSX-File
+ */
+define('GROUPTOOL_XLSX', 4);
+
+/**
  * GROUPTOOL_RAW - get raw data - just for development
  */
 define('GROUPTOOL_RAW', -1);

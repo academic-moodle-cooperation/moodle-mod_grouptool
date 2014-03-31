@@ -54,6 +54,7 @@ $string['you_are_already_registered'] = 'Sie sind bereits in der Gruppe {$a->gro
 $string['asterisk_marks_moodle_registrations'] = 'Benutzer mit führendem Asterisk/Stern sind bereits in den entsprechenden Moodle-Gruppen angemeldet.';
 $string['availabledate'] = 'Anmeldebeginn';
 $string['availabledate_help'] = 'Beginn des Anmeldezeitraums. Nach diesem Datum ist es Studenten möglich sich selbst zu den ausgewählten Gruppen anzumelden (falls dies zugelassen ist).';
+$string['availabledateno'] = 'Immer verfügbar';
 $string['cant_enrol'] = 'Kann Nutzer nicht automatisch in Kurs einschreiben.';
 $string['cfg_addinstanceset_head'] = 'Weitere Instanzeinstellungen';
 $string['cfg_addinstanceset_head_info'] = 'Weitere Instanzeinstellungen für die Gruppenverwaltung.';

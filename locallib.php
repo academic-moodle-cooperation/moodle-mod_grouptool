@@ -4896,12 +4896,14 @@ EOS;
         if ((!$data_only && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
             // Global-downloadlinks!
             $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
+            $xlsxurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLSX));
             $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
             $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
             $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
             $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
                                               array('class'=>'title')).'&nbsp;'.
                              html_writer::link($txturl, '.TXT').'&nbsp;'.
+                             html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
                              html_writer::link($xlsurl, '.XLS').'&nbsp;'.
                              html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                              html_writer::link($odsurl, '.ODS');
@@ -5143,6 +5145,9 @@ EOS;
                     $urltxt = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
                                                    'format'  => GROUPTOOL_TXT));
+                    $urlxlsx = new moodle_url($downloadurl,
+                                             array('groupid' => $groupinfo[$agrp->id]->id,
+                                                   'format'  => GROUPTOOL_XLSX));
                     $urlxls = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
                                                    'format'  => GROUPTOOL_XLS));
@@ -5156,6 +5161,7 @@ EOS;
                     $downloadlinks = html_writer::tag('span', get_string('download').":",
                                                       array('class'=>'title')).'&nbsp;'.
                                      html_writer::link($urltxt, '.TXT').'&nbsp;'.
+                                     html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
                                      html_writer::link($urlxls, '.XLS').'&nbsp;'.
                                      html_writer::link($urlpdf, '.PDF').'&nbsp;'.
                                      html_writer::link($urlods, '.ODS');
@@ -5375,9 +5381,8 @@ EOS;
         $filecontent = implode(GROUPTOOL_NL, $lines);
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
+        
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -5407,14 +5412,12 @@ EOS;
      */
     private function overview_fill_workbook(&$workbook, $groups) {
         if (count($groups) > 0) {
-            if (is_a($workbook, 'MoodleExcelWorkbook')) {
-                $column_width = array( 7, 22, 14, 17); // Unit: mm!
-            } else {
-                $column_width = array(54, 159, 103, 124); // Unit: px!
-            }
+
+            $column_width = array( 7, 22, 14, 17); // Unit: mm!
+
             if (count($groups)>1) {
                 // General information? unused at the moment!
-                $all_groups_worksheet =& $workbook->add_worksheet(get_string('all'));
+                $all_groups_worksheet = $workbook->add_worksheet(get_string('all'));
                 // The standard column widths: 7 - 22 - 14 - 17!
                 $all_groups_worksheet->set_column(0, 0, $column_width[0]);
                 $all_groups_worksheet->set_column(1, 1, $column_width[1]);
@@ -5425,7 +5428,7 @@ EOS;
                 $general_sheet = false;
             }
 
-            $legend_worksheet =& $workbook->add_worksheet(get_string('status', 'grouptool').' '.
+            $legend_worksheet = $workbook->add_worksheet(get_string('status', 'grouptool').' '.
                                                           get_string('help'));
             $legend_worksheet->write_string(0, 0, get_string('status', 'grouptool').' '.
                                                   get_string('help'));
@@ -5446,7 +5449,7 @@ EOS;
             $headline_prop = array(    'size' => 14,
                     'bold' => 1,
                     'align' => 'center');
-            $headline_format =& $workbook->add_format($headline_prop);
+            $headline_format = $workbook->add_format($headline_prop);
             $groupinfo_prop1 = array(  'size' => 10,
                     'bold' => 1,
                     'align' => 'left');
@@ -5454,8 +5457,8 @@ EOS;
             unset($groupinfo_prop2['bold']);
             $groupinfo_prop2['italic'] = true;
             $groupinfo_prop2['align'] = 'right';
-            $groupinfo_format1 =& $workbook->add_format($groupinfo_prop1);
-            $groupinfo_format2 =& $workbook->add_format($groupinfo_prop2);
+            $groupinfo_format1 = $workbook->add_format($groupinfo_prop1);
+            $groupinfo_format2 = $workbook->add_format($groupinfo_prop2);
             $reg_head_prop = array(    'size' => 10,
                     'align' => 'center',
                     'bold' => 1,
@@ -5466,32 +5469,32 @@ EOS;
             $queue_entry_prop['italic'] = true;
             $queue_entry_prop['color'] = 'grey';
 
-            $reg_head_format =& $workbook->add_format($reg_head_prop);
+            $reg_head_format = $workbook->add_format($reg_head_prop);
             $reg_head_format->set_right(1);
-            $reg_head_last =& $workbook->add_format($reg_head_prop);
+            $reg_head_last = $workbook->add_format($reg_head_prop);
 
-            $reg_entry_format =& $workbook->add_format($reg_entry_prop);
+            $reg_entry_format = $workbook->add_format($reg_entry_prop);
             $reg_entry_format->set_right(1);
             $reg_entry_format->set_top(1);
             $reg_entry_format->set_bottom(0);
-            $reg_entry_last =& $workbook->add_format($reg_entry_prop);
+            $reg_entry_last = $workbook->add_format($reg_entry_prop);
             $reg_entry_last->set_top(1);
-            $no_reg_entries_format =& $workbook->add_format($reg_entry_prop);
+            $no_reg_entries_format = $workbook->add_format($reg_entry_prop);
             $no_reg_entries_format->set_align('center');
-            $queue_entry_format =& $workbook->add_format($queue_entry_prop);
+            $queue_entry_format = $workbook->add_format($queue_entry_prop);
             $queue_entry_format->set_right(1);
             $queue_entry_format->set_top(1);
             $queue_entry_format->set_bottom(false);
-            $queue_entry_last =& $workbook->add_format($queue_entry_prop);
+            $queue_entry_last = $workbook->add_format($queue_entry_prop);
             $queue_entry_last->set_top(1);
-            $no_queue_entries_format =& $workbook->add_format($queue_entry_prop);
+            $no_queue_entries_format = $workbook->add_format($queue_entry_prop);
             $no_queue_entries_format->set_align('center');
 
             // Start row for groups general sheet!
             $j = 0;
             foreach ($groups as $key => $group) {
                 // Add worksheet for each group!
-                $group_worksheets[$key] =& $workbook->add_worksheet($group->name);
+                $group_worksheets[$key] = $workbook->add_worksheet($group->name);
 
                 // The standard-column-widths: 7 - 22 - 14 - 17!
                 $group_worksheets[$key]->set_column(0, 0, $column_width[0]);
@@ -5707,9 +5710,7 @@ EOS;
         require_once($CFG->libdir . "/odslib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -5744,9 +5745,7 @@ EOS;
         require_once($CFG->libdir . "/excellib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -5758,13 +5757,48 @@ EOS;
             $filename = $coursename . '_' . $grouptoolname . '_' .
                     get_string('group').' '.get_string('overview', 'grouptool');
         }
-        $workbook = new MoodleExcelWorkbook("-");
+        $workbook = new MoodleExcelWorkbook("-", 'excel5');
 
         $groups = $this->group_overview_table($groupingid, $groupid, true);
 
         $this->overview_fill_workbook($workbook, $groups);
 
         $workbook->send($filename.'.xls');
+        $workbook->close();
+    }
+    
+    /**
+     * outputs generated xlsx-file for overview (forces download)
+     *
+     * @global object $CFG
+     * @param int $groupid optional get only this group
+     * @param int $groupingid optional get only this grouping
+     */
+    public function download_overview_xlsx($groupid = 0, $groupingid = 0) {
+        global $CFG;
+
+        require_once($CFG->libdir . "/excellib.class.php");
+
+        $coursename = $this->course->fullname;
+        $grouptoolname = $this->grouptool->name;
+
+        if (!empty($groupid)) {
+            $filename = $coursename . '_' . $grouptoolname . '_' .
+                    groups_get_group_name($groupid).'_'.get_string('overview', 'grouptool');
+        } else if (!empty($groupingid)) {
+            $filename = $coursename . '_' . $grouptoolname . '_' .
+                    groups_get_grouping_name($groupingid).'_'.get_string('overview', 'grouptool');
+        } else {
+            $filename = $coursename . '_' . $grouptoolname . '_' .
+                    get_string('group').' '.get_string('overview', 'grouptool');
+        }
+        $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
+
+        $groups = $this->group_overview_table($groupingid, $groupid, true);
+
+        $this->overview_fill_workbook($workbook, $groups);
+
+        $workbook->send($filename);
         $workbook->close();
     }
 
@@ -6366,12 +6400,14 @@ EOS;
         if (!$data_only) {
             if (has_capability('mod/grouptool:export', $context)) {
                 $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
+                $xlsxurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLSX));
                 $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
                 $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
                 $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
                 $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
                                                   array('class'=>'title')).'&nbsp;'.
                         html_writer::link($txturl, '.TXT').'&nbsp;'.
+                        html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
                         html_writer::link($xlsurl, '.XLS').'&nbsp;'.
                         html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                         html_writer::link($odsurl, '.ODS');
@@ -6714,9 +6750,7 @@ EOS;
         ob_start();
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         $return = "";
         $lines = array();
@@ -6801,14 +6835,12 @@ EOS;
         global $SESSION;
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         if (count($data) > 0) {
-            if (is_a($workbook, 'MoodleExcelWorkbook')) {
-                $column_width = array(26.71, 15.29, 29.86, 47, 7.29, 47); // Unit: mm!
-            } else {
-                $column_width = array(192, 112, 214, 334, 56, 334); // Unit: px!
-            }
+
+            $column_width = array(26.71, 15.29, 29.86, 47, 7.29, 47); // Unit: mm!
+
             if (count($data)>1) {
                 // General information? unused at the moment!
-                $worksheet =& $workbook->add_worksheet(get_string('all'));
+                $worksheet = $workbook->add_worksheet(get_string('all'));
                 if (is_a($worksheet, 'Moodle_Excel_Worksheet')) {
                     if ($orientation) {
                         $worksheet->pear_excel_worksheet->setLandscape();
@@ -6837,19 +6869,19 @@ EOS;
                     'HAlign' => 'center',
                     'bottom' => 2,
                     'VAlign' => 'vcenter');
-            $headline_format =& $workbook->add_format($headline_prop);
+            $headline_format = $workbook->add_format($headline_prop);
             $headline_format->set_right(1);
             $headline_format->set_align('center');
             $headline_format->set_align('vcenter');
-            $headline_last =& $workbook->add_format($headline_prop);
+            $headline_last = $workbook->add_format($headline_prop);
             $headline_last->set_align('center');
             $headline_last->set_align('vcenter');
             $headline_last->set_left(1);
-            $headline_nb =& $workbook->add_format($headline_prop);
+            $headline_nb = $workbook->add_format($headline_prop);
             $headline_nb->set_align('center');
             $headline_nb->set_align('vcenter');
             unset($headline_prop['bottom']);
-            $headline_nbb =& $workbook->add_format($headline_prop);
+            $headline_nbb = $workbook->add_format($headline_prop);
             $headline_nbb->set_align('center');
             $headline_nbb->set_align('vcenter');
 
@@ -6859,21 +6891,21 @@ EOS;
             $queue_entry_prop['italic'] = true;
             $queue_entry_prop['color'] = 'grey';
 
-            $reg_entry_format =& $workbook->add_format($reg_entry_prop);
+            $reg_entry_format = $workbook->add_format($reg_entry_prop);
             $reg_entry_format->set_right(1);
             $reg_entry_format->set_align('vcenter');
-            $reg_entry_last =& $workbook->add_format($reg_entry_prop);
+            $reg_entry_last = $workbook->add_format($reg_entry_prop);
             $reg_entry_last->set_align('vcenter');
-            $no_reg_entries_format =& $workbook->add_format($reg_entry_prop);
+            $no_reg_entries_format = $workbook->add_format($reg_entry_prop);
             $no_reg_entries_format->set_align('center');
             $no_reg_entries_format->set_align('vcenter');
             $no_reg_entries_format->set_right(1);
-            $queue_entry_format =& $workbook->add_format($queue_entry_prop);
+            $queue_entry_format = $workbook->add_format($queue_entry_prop);
             $queue_entry_format->set_right(1);
             $queue_entry_format->set_align('vcenter');
-            $queue_entry_last =& $workbook->add_format($queue_entry_prop);
+            $queue_entry_last = $workbook->add_format($queue_entry_prop);
             $queue_entry_last->set_align('vcenter');
-            $no_queue_entries_format =& $workbook->add_format($queue_entry_prop);
+            $no_queue_entries_format = $workbook->add_format($queue_entry_prop);
             $no_queue_entries_format->set_align('center');
             $no_queue_entries_format->set_align('vcenter');
 
@@ -6976,9 +7008,7 @@ EOS;
         require_once($CFG->libdir . "/odslib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
         $workbook = new MoodleODSWorkbook("-");
 
@@ -7002,6 +7032,45 @@ EOS;
     }
 
     /**
+     * outputs generated xlsx-file for userlist (forces download)
+     *
+     * @global object $CFG
+     * @param int $groupid optional get only this group
+     * @param int $groupingid optional get only this grouping
+     * @param array $orderby optional current order-by array
+     * @param array $collapsed optional current array with collapsed columns
+     */
+    public function download_userlist_xlsx($groupid = 0, $groupingid = 0, $orderby=array(),
+                                          $collapsed=array()) {
+        global $CFG;
+
+        require_once($CFG->libdir . "/excellib.class.php");
+
+        $coursename = $this->course->fullname;
+        $grouptoolname = $this->grouptool->name;
+
+        $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
+
+        $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
+
+        $this->userlist_fill_workbook($workbook, $data);
+
+        if (!empty($groupid)) {
+            $filename = $coursename . '_' . $grouptoolname . '_' .
+                    groups_get_group_name($groupid).'_'.get_string('userlist', 'grouptool');
+        } else if (!empty($groupingid)) {
+            $filename = $coursename . '_' . $grouptoolname . '_' .
+                    groups_get_grouping_name($groupingid).'_'.get_string('userlist', 'grouptool');
+        } else {
+            $filename = $coursename . '_' . $grouptoolname . '_' .
+                    get_string('userlist', 'grouptool');
+        }
+
+        $workbook->send($filename);
+        $workbook->close();
+    }
+    
+    /**
      * outputs generated xls-file for userlist (forces download)
      *
      * @global object $CFG
@@ -7017,11 +7086,9 @@ EOS;
         require_once($CFG->libdir . "/excellib.class.php");
 
         $coursename = $this->course->fullname;
-        $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
-        $timedue = $this->grouptool->timedue;
 
-        $workbook = new MoodleExcelWorkbook("-");
+        $workbook = new MoodleExcelWorkbook("-", 'excel5');
 
         $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
 
