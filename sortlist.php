@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * sortlist.php
@@ -25,7 +25,7 @@
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 global $CFG;
 require_once($CFG->libdir . '/pear/HTML/QuickForm/element.php');
 require_once($CFG->libdir . '/formslib.php');
@@ -84,7 +84,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * should be displayed
      *
      */
-    public $_options = array('classes'=>array(), 'add_fields'=>array(), 'all_string'=>'All');
+    public $_options = array('classes' => array(), 'add_fields' => array(), 'all_string' => 'All');
 
     /**
      * value
@@ -247,7 +247,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         if ($element1['sort_order'] == $element2['sort_order']) {
             return 0;
         } else {
-            return $element1['sort_order'] > $element2['sort_order'] ? +1 : -1;
+            return $element1['sort_order'] > $element2['sort_order'] ? 1 : -1;
         }
     }
 
@@ -299,8 +299,8 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function getFrozenHtml() {
         $value = $this->getValue();
-        return ('' != $value? htmlspecialchars($value): '&nbsp;') .
-        $this->_getPersistantData();
+        return ('' != $value ? htmlspecialchars($value) : '&nbsp;').
+               $this->_getPersistantData();
     }
 
     /**
@@ -327,97 +327,96 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 }
 
                 $namebase = $name.'['.$id.']';
-                $chkbox_attr = array(
+                $chkboxattr = array(
                         'name'     => $namebase.'[active]',
                         'type'     => 'checkbox',
                         'disabled' => 'disabled',
                         'value'    => $group['active']);
                 if ($group['active']) {
-                    $chkbox_attr['checked'] = 'checked';
-                } else if (isset($chkbox_attr['checked'])) {
-                    unset($chkbox_attr['checked']);
+                    $chkboxattr['checked'] = 'checked';
+                } else if (isset($chkboxattr['checked'])) {
+                    unset($chkboxattr['checked']);
                 }
-                $advchkbox_attr = $chkbox_attr;
-                $advchkbox_attr['value'] = $group['active'];
-                $advchkbox_attr['type'] = 'hidden';
-                $hidden_attr = array(
-                        'name' => $namebase.'[sort_order]',
-                        'type' => 'hidden',
-                        'value' => $group['sort_order'],
-                        'class' => 'sort_order');
-                $moveup_attr = array( 'src'=>$OUTPUT->pix_url('i/up'),
-                        'alt'=>$move_up_str,
-                        'type'=>'image',
-                        'name'=>'moveup['.$id.']',
-                        'disabled'=>'disabled',
-                        'class'=>'moveupbutton');
+                $advchkboxattr = $chkboxattr;
+                $advchkboxattr['value'] = $group['active'];
+                $advchkboxattr['type'] = 'hidden';
+                $hiddenattr = array('name'  => $namebase.'[sort_order]',
+                                    'type'  => 'hidden',
+                                    'value' => $group['sort_order'],
+                                    'class' => 'sort_order');
+                $moveupattr = array('src'      => $OUTPUT->pix_url('i/up'),
+                                    'alt'      => $moveupstr,
+                                    'type'     => 'image',
+                                    'name'     => 'moveup['.$id.']',
+                                    'disabled' => 'disabled',
+                                    'class'    => 'moveupbutton');
                 if ($id == $firstkey) {
-                    $moveup_attr['style'] = "visibility:hidden;";
+                    $moveupattr['style'] = "visibility:hidden;";
                 }
-                $moveup_button = html_writer::empty_tag('input', $moveup_attr);
-                $movedown_attr = array( 'src'=>$OUTPUT->pix_url('i/down'),
-                        'alt'=>$move_down_str,
-                        'type'=>'image',
-                        'name'=>'movedown['.$id.']',
-                        'disabled'=>'disabled',
-                        'class'=>'movedownbutton');
-                $this->_noSubmitButtons[]='movedown['.$id.']';
+                $moveupbutton = html_writer::empty_tag('input', $moveupattr);
+                $movedownattr = array('src'      => $OUTPUT->pix_url('i/down'),
+                                      'alt'      => $movedownstr,
+                                      'type'     => 'image',
+                                      'name'     => 'movedown['.$id.']',
+                                      'disabled' => 'disabled',
+                                      'class'    => 'movedownbutton');
+                $this->_noSubmitButtons[] = 'movedown['.$id.']';
                 if ($id == $lastkey) {
-                    $movedown_attr['style'] = "visibility:hidden;";
+                    $movedownattr['style'] = "visibility:hidden;";
                 }
-                $movedown_button = html_writer::empty_tag('input', $movedown_attr);
-                $name_attr = array( 'name'=>$namebase.'[name]',
-                        'type'=>'hidden',
-                        'value'=>$group['name']);
-                $nameblock = $group['name'].html_writer::empty_tag('input', $name_attr);
-                $temp = html_writer::empty_tag('input', $advchkbox_attr).
-                        html_writer::empty_tag('input', $chkbox_attr);
-                $left = html_writer::tag('span', $temp, array('class'=>'checkbox_container'));
+                $movedownbutton = html_writer::empty_tag('input', $movedownattr);
+                $nameattr = array('name'  => $namebase.'[name]',
+                                  'type'  => 'hidden',
+                                  'value' => $group['name']);
+                $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
+                $temp = html_writer::empty_tag('input', $advchkboxattr).
+                        html_writer::empty_tag('input', $chkboxattr);
+                $left = html_writer::tag('span', $temp, array('class' => 'checkbox_container'));
                 $left .= "\n\t";
                 $left .= html_writer::tag('span', $nameblock.
-                                                  html_writer::empty_tag('input', $hidden_attr),
-                                          array('class'=>'grpname'));
+                                                  html_writer::empty_tag('input', $hiddenattr),
+                                          array('class' => 'grpname'));
                 $left .= "\n\t";
-                $left = html_writer::tag('div', $left, array('class'=>'left'));
-                $additional_fields = "";
+                $left = html_writer::tag('div', $left, array('class' => 'left'));
+                $additionalfields = "";
                 foreach ($this->_options['add_fields'] as $key => $fielddata) {
                     if (!isset($group[$fielddata->name]) || $group[$fielddata->name] == null) {
                         $group[$fielddata->name] = $fielddata->stdvalue;
                     }
                     $attr = array(
-                            'name' => $namebase."[$fielddata->name]",
-                            'type' => $fielddata->type,
+                            'name'     => $namebase."[$fielddata->name]",
+                            'type'     => $fielddata->type,
                             'disabled' => 'disabled',
-                            'value' => $group[$fielddata->name]);
+                            'value'    => $group[$fielddata->name]);
                     $attr = array_merge($attr, $fielddata->attr);
                     $label = html_writer::tag('label', $fielddata->label,
-                                              array('for'=>$namebase."[$fielddata->name]"));
+                                              array('for' => $namebase."[$fielddata->name]"));
                     $element = html_writer::empty_tag('input', $attr);
-                    $additional_fields .= html_writer::tag('span', $label.$element,
-                                                           array('class'=>$fielddata->name))."\n\t";
+                    $additionalfields .= html_writer::tag('span', $label.$element,
+                                                           array('class' => $fielddata->name))."\n\t";
                 }
 
-                $right = html_writer::tag('div', $additional_fields.
+                $right = html_writer::tag('div', $additionalfields.
                         html_writer::tag('span', "\n\t\t".
-                                $moveup_button."&nbsp;\n\t\t".
-                                $movedown_button."&nbsp;\n\t\t".
-                                $drag_button."\n\t",
-                                array('class'=>'buttons'))."\n\t",
-                        array('class'=>'right'));
-                $item_content = $right.$left;
+                                $moveupbutton."&nbsp;\n\t\t".
+                                $movedownbutton."&nbsp;\n\t\t".
+                                $dragbutton."\n\t",
+                                array('class' => 'buttons'))."\n\t",
+                        array('class' => 'right'));
+                $itemcontent = $right.$left;
 
-                $dragable_items .= "\n".
-                                   html_writer::tag('li',
-                                                    "\n\t".$item_content."\n",
-                                                    array('class'=>'draggable_item')).
-                                   "\n";
+                $dragableitems .= "\n".
+                                  html_writer::tag('li',
+                                                   "\n\t".$itemcontent."\n",
+                                                   array('class' => 'draggable_item')).
+                                  "\n";
             }
 
-            $dragable_list = html_writer::tag('ul', $dragable_items, array('class'=>'drag_list'));
+            $dragablelist = html_writer::tag('ul', $dragableitems, array('class' => 'drag_list'));
 
-            $content = html_writer::tag('div', $dragable_list, array('class'=>'drag_area'));
+            $content = html_writer::tag('div', $dragablelist, array('class' => 'drag_area'));
 
-            $html = html_writer::tag('div', $content, array('class'=>'sortlist_container'));
+            $html = html_writer::tag('div', $content, array('class' => 'sortlist_container'));
 
             return $html;
         }
@@ -655,7 +654,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function setType($type) {
         $this->_type = $type;
-        $this->updateAttributes(array('type'=>$type));
+        $this->updateAttributes(array('type' => $type));
     }
 
     /**
@@ -743,12 +742,12 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         } else {
 
             // Generate draggable items - each representing 1 group!
-            $dragable_items = "";
+            $dragableitems = "";
             $name = $this->getName(true);
-            $show_members_str = get_string('show_members', 'grouptool');
-            $move_up_str = get_string('moveup', 'grouptool');
-            $move_down_str = get_string('movedown', 'grouptool');
-            $drag_str = get_string('drag', 'grouptool');
+            $showmembersstr = get_string('show_members', 'grouptool');
+            $moveupstr = get_string('moveup', 'grouptool');
+            $movedownstr = get_string('movedown', 'grouptool');
+            $dragstr = get_string('drag', 'grouptool');
             $groupdata = $this->getValue();
             $firstkey = key($groupdata);
             end($groupdata);
@@ -767,74 +766,73 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                         $group['classes'] = array();
                     }
                 }
-                $chkbox_attr = array(
-                        'name' => $namebase.'[active]',
-                        'type' => 'checkbox',
+                $chkboxattr = array(
+                        'name'  => $namebase.'[active]',
+                        'type'  => 'checkbox',
                         'class' => 'checkbox_status '.implode(' ', $group['classes']),
                         'value' => 1);
                 if ($group['active']) {
-                    $chkbox_attr['checked'] = 'checked';
-                } else if (isset($chkbox_attr['checked'])) {
-                    unset($chkbox_attr['checked']);
+                    $chkboxattr['checked'] = 'checked';
+                } else if (isset($chkboxattr['checked'])) {
+                    unset($chkboxattr['checked']);
                 }
-                $advchkbox_attr = $chkbox_attr;
-                $advchkbox_attr['value'] = 0;
-                $advchkbox_attr['type'] = 'hidden';
-                $hidden_attr = array(
-                        'name' => $namebase.'[sort_order]',
-                        'type' => 'hidden',
+                $advchkboxattr = $chkboxattr;
+                $advchkboxattr['value'] = 0;
+                $advchkboxattr['type'] = 'hidden';
+                $hiddenattr = array(
+                        'name'  => $namebase.'[sort_order]',
+                        'type'  => 'hidden',
                         'value' => (!empty($group['sort_order']) ? $group['sort_order'] : 999999),
                         'class' => 'sort_order');
 
-                $show_members_link = html_writer::tag('a', $show_members_str,
-                        array(
-                                'href'=>'somewhere',
-                                'title'=>$show_members_str));
-                $moveup_attr = array( 'src'=>$OUTPUT->pix_url('i/up'),
-                        'alt'=>$move_up_str,
-                        'type'=>'image',
-                        'name'=>'moveup['.$id.']',
-                        'class'=>'moveupbutton');
-                $this->_noSubmitButtons[]='moveup['.$id.']';
+                $showmemberslink = html_writer::tag('a', $showmembersstr,
+                                                    array('href' => 'somewhere',
+                                                          'title' => $showmembersstr));
+                $moveupattr = array('src'   => $OUTPUT->pix_url('i/up'),
+                                    'alt'   => $moveupstr,
+                                    'type'  => 'image',
+                                    'name'  => 'moveup['.$id.']',
+                                    'class' => 'moveupbutton');
+                $this->_noSubmitButtons[] = 'moveup['.$id.']';
                 if ($id == $firstkey) {
-                    $moveup_attr['style'] = "visibility:hidden;";
+                    $moveupattr['style'] = "visibility:hidden;";
                 }
-                $moveup_button = html_writer::empty_tag('input', $moveup_attr);
-                $movedown_attr = array( 'src'=>$OUTPUT->pix_url('i/down'),
-                        'alt'=>$move_down_str,
-                        'type'=>'image',
-                        'name'=>'movedown['.$id.']',
-                        'class'=>'movedownbutton');
-                $this->_noSubmitButtons[]='movedown['.$id.']';
+                $moveupbutton = html_writer::empty_tag('input', $moveupattr);
+                $movedownattr = array('src'   => $OUTPUT->pix_url('i/down'),
+                                      'alt'   => $movedownstr,
+                                      'type'  => 'image',
+                                      'name'  => 'movedown['.$id.']',
+                                      'class' => 'movedownbutton');
+                $this->_noSubmitButtons[] = 'movedown['.$id.']';
                 if ($id == $lastkey) {
-                    $movedown_attr['style'] = "visibility:hidden;";
+                    $movedownattr['style'] = "visibility:hidden;";
                 }
-                $movedown_button = html_writer::empty_tag('input', $movedown_attr);
-                $drag_button = html_writer::empty_tag('img', array(
-                        'src'=>$OUTPUT->pix_url('i/dragdrop'),
-                        'alt'=>$drag_str,
-                        'class' => 'drag_image js_invisible'));
-                $name_attr = array( 'name'=>$namebase.'[name]',
-                        'type'=>'hidden',
-                        'value'=>$group['name']);
+                $movedownbutton = html_writer::empty_tag('input', $movedownattr);
+                $dragbutton = html_writer::empty_tag('img',
+                                                     array('src'   => $OUTPUT->pix_url('i/dragdrop'),
+                                                           'alt'   => $dragstr,
+                                                           'class' => 'drag_image js_invisible'));
+                $nameattr = array('name'  => $namebase.'[name]',
+                                  'type'  => 'hidden',
+                                  'value' => $group['name']);
                 if (strlen($group['name']) > 25) {
                     $nameblock = substr($group['name'], 0, 17).'...'.substr($group['name'], -5, 5).
-                                 html_writer::empty_tag('input', $name_attr);
+                                 html_writer::empty_tag('input', $nameattr);
                 } else {
-                    $nameblock = $group['name'].html_writer::empty_tag('input', $name_attr);
+                    $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
                 }
 
                 $rows = array();
-                $row = array( new html_table_cell(html_writer::empty_tag('input', $advchkbox_attr).
-                                                  html_writer::empty_tag('input', $chkbox_attr)),
+                $row = array( new html_table_cell(html_writer::empty_tag('input', $advchkboxattr).
+                                                  html_writer::empty_tag('input', $chkboxattr)),
                               new html_table_cell($nameblock.
-                                                  html_writer::empty_tag('input', $hidden_attr)),
-                              new html_table_cell($moveup_button),
-                              new html_table_cell($movedown_button),
-                              new html_table_cell($drag_button));
+                                                  html_writer::empty_tag('input', $hiddenattr)),
+                              new html_table_cell($moveupbutton),
+                              new html_table_cell($movedownbutton),
+                              new html_table_cell($dragbutton));
                 $rows[0] = new html_table_row($row);
 
-                $additional_fields = array();
+                $additionalfields = array();
                 foreach ($this->_options['add_fields'] as $key => $fielddata) {
                     if (!isset($group[$fielddata->name]) || $group[$fielddata->name] == null) {
                         $group[$fielddata->name] = $fielddata->stdvalue;
@@ -847,125 +845,124 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                     $attr['id'] = html_writer::random_id($name);
                     if (!empty($fielddata->label)) {
                         $labelhtml = html_writer::tag('label', $fielddata->label,
-                                                      array('for'=>$attr['id']));
+                                                      array('for' => $attr['id']));
                     } else {
                         $labelhtml = "";
                     }
                     $currentfield = $labelhtml.html_writer::empty_tag('input', $attr);
-                    $additional_fields[] = $currentfield;
+                    $additionalfields[] = $currentfield;
                     $cell = new html_table_cell($currentfield);
                     $cell->attributes['class'] = $fielddata->name." addfield";
                     $rows[] = new html_table_row(array($cell));
                 }
-                $rows[0]->cells[0]->rowspan = count($additional_fields)+1;
+                $rows[0]->cells[0]->rowspan = count($additionalfields) + 1;
                 $rows[0]->cells[0]->attributes['class'] = 'checkbox_container';
                 $rows[0]->cells[1]->attributes['class'] = 'grpname';
-                $rows[0]->cells[2]->rowspan = count($additional_fields)+1;
+                $rows[0]->cells[2]->rowspan = count($additionalfields) + 1;
                 $rows[0]->cells[2]->attributes['class'] = 'buttons';
-                $rows[0]->cells[3]->rowspan = count($additional_fields)+1;
+                $rows[0]->cells[3]->rowspan = count($additionalfields) + 1;
                 $rows[0]->cells[3]->attributes['class'] = 'buttons';
-                $rows[0]->cells[4]->rowspan = count($additional_fields)+1;
+                $rows[0]->cells[4]->rowspan = count($additionalfields) + 1;
                 $rows[0]->cells[4]->attributes['class'] = 'buttons';
 
                 $table->data = $rows;
-                $item_content = html_writer::table($table);
-                $dragable_items .= "\n".html_writer::tag('li', "\n\t".$item_content."\n",
-                                                         array('class'=>'draggable_item'))."\n";
+                $itemcontent = html_writer::table($table);
+                $dragableitems .= "\n".html_writer::tag('li', "\n\t".$itemcontent."\n",
+                                                         array('class' => 'draggable_item'))."\n";
             }
 
-            $dragable_list = html_writer::tag('ul', $dragable_items, array('class'=>'drag_list'));
+            $dragablelist = html_writer::tag('ul', $dragableitems, array('class' => 'drag_list'));
 
             // Generate groupings-controls to select/deselect groupings!
-            $checkbox_control_title = get_string('checkbox_control_header', 'grouptool');
-            $checkbox_control_title = html_writer::tag('div', $checkbox_control_title,
-                                                       array('class'=>'checkbox_controls_header'));
+            $checkboxcontroltitle = get_string('checkbox_control_header', 'grouptool');
+            $checkboxcontroltitle = html_writer::tag('div', $checkboxcontroltitle,
+                                                       array('class' => 'checkbox_controls_header'));
 
-            $select_all = html_writer::tag('span', get_string('select_all', 'grouptool'));
-            $select_none = html_writer::tag('span', get_string('select_none', 'grouptool'));
-            $inverse_selection = html_writer::tag('span', get_string('select_inverse',
+            $selectall = html_writer::tag('span', get_string('select_all', 'grouptool'));
+            $selectnone = html_writer::tag('span', get_string('select_none', 'grouptool'));
+            $inverseselection = html_writer::tag('span', get_string('select_inverse',
                                                                      'grouptool'));
-            $checkbox_control_elements = array();
+            $checkboxcontrolelements = array();
 
             // Static controlelements for all elements!
-            $this->_noSubmitButtons[]='select[all]';
-            $check_all_link = html_writer::tag('button', $select_all,
-                                               array('name'  => 'select_class[0]',
-                                                     'value' => 'all',
-                                                     'type'  => 'submit',
-                                                     'title' => strip_tags($select_all),
-                                                     'class' => 'select_all'));
-            $this->_noSubmitButtons[]='deselect[all]';
-            $check_none_link = html_writer::tag('button', $select_none,
-                                                array('name'  => 'deselect_class[0]',
+            $this->_noSubmitButtons[] = 'select[all]';
+            $checkalllink = html_writer::tag('button', $selectall,
+                                             array('name'  => 'select_class[0]',
+                                                   'value' => 'all',
+                                                   'type'  => 'submit',
+                                                   'title' => strip_tags($selectall),
+                                                   'class' => 'select_all'));
+            $this->_noSubmitButtons[] = 'deselect[all]';
+            $checknonelink = html_writer::tag('button', $selectnone,
+                                              array('name'  => 'deselect_class[0]',
+                                                    'value' => 'all',
+                                                    'type'  => 'submit',
+                                                    'title' => strip_tags($selectnone),
+                                                    'class' => 'select_none'));
+            $this->_noSubmitButtons[] = 'toggle[all]';
+            $checktogglelink = html_writer::tag('button', $inverseselection,
+                                                array('name'  => 'toggle_class[0]',
                                                       'value' => 'all',
                                                       'type'  => 'submit',
-                                                      'title' => strip_tags($select_none),
-                                                      'class' => 'select_none'));
-            $this->_noSubmitButtons[]='toggle[all]';
-            $check_toggle_link = html_writer::tag('button', $inverse_selection,
-                                                  array('name'  => 'toggle_class[0]',
-                                                        'value' => 'all',
-                                                        'type'  => 'submit',
-                                                        'title' => strip_tags($inverse_selection),
-                                                        'class' => 'toggle_selection'));
-            $check_name = html_writer::tag('span', $this->_options['all_string'],
-                                           array('class'=>'name'));
-            $attr = array('class'=>'checkbox_control checkbox_status');
-            $checkbox_control_elements[] = html_writer::tag('div', $check_name.$check_all_link.
-                                                                   $check_none_link.
-                                                                   $check_toggle_link,
-                                                            $attr);
+                                                      'title' => strip_tags($inverseselection),
+                                                      'class' => 'toggle_selection'));
+            $checkname = html_writer::tag('span', $this->_options['all_string'],
+                                          array('class' => 'name'));
+            $attr = array('class' => 'checkbox_control checkbox_status');
+            $checkboxcontrolelements[] = html_writer::tag('div',
+                                                          $checkname.$checkalllink.$checknonelink.
+                                                          $checktogglelink,
+                                                          $attr);
 
             if (!empty($this->_options['classes']) && is_array($this->_options['classes'])) {
                 foreach ($this->_options['classes'] as $key => $class) {
-                    $this->_noSubmitButtons[]='select['.$class->id.']';
+                    $this->_noSubmitButtons[] = 'select['.$class->id.']';
                     $selectname = 'select_class['.$class->id.']';
-                    $check_all_link = html_writer::tag('button', $select_all,
-                                                       array('name'  => $selectname,
-                                                             'value' => $class->id,
-                                                             'type'  => 'submit',
-                                                             'title' => strip_tags($select_all),
-                                                             'class' => 'select_all'));
-                    $this->_noSubmitButtons[]='deselect['.$class->id.']';
+                    $checkalllink = html_writer::tag('button', $selectall,
+                                                     array('name'  => $selectname,
+                                                           'value' => $class->id,
+                                                           'type'  => 'submit',
+                                                           'title' => strip_tags($selectall),
+                                                           'class' => 'select_all'));
+                    $this->_noSubmitButtons[] = 'deselect['.$class->id.']';
                     $deselectname = 'deselect_class['.$class->id.']';
-                    $check_none_link = html_writer::tag('button', $select_none,
-                                                        array('name'  => $deselectname,
+                    $checknonelink = html_writer::tag('button', $selectnone,
+                                                      array('name'  => $deselectname,
+                                                            'value' => $class->id,
+                                                            'type'  => 'submit',
+                                                            'title' => strip_tags($selectnone),
+                                                            'class' => 'select_none'));
+                    $this->_noSubmitButtons[] = 'toggle['.$class->id.']';
+                    $togglename = 'toggle_class['.$class->id.']';
+                    $toggletitle = strip_tags($inverseselection);
+                    $checktogglelink = html_writer::tag('button', $inverseselection,
+                                                        array('name'  => $togglename,
                                                               'value' => $class->id,
                                                               'type'  => 'submit',
-                                                              'title' => strip_tags($select_none),
-                                                              'class' => 'select_none'));
-                    $this->_noSubmitButtons[]='toggle['.$class->id.']';
-                    $togglename = 'toggle_class['.$class->id.']';
-                    $toggletitle = strip_tags($inverse_selection);
-                    $check_toggle_link = html_writer::tag('button', $inverse_selection,
-                                                          array('name'  => $togglename,
-                                                                'value' => $class->id,
-                                                                'type'  => 'submit',
-                                                                'title' => $toggletitle,
-                                                                'class' => 'toggle_selection'));
-                    $check_name = html_writer::tag('span', $class->name, array('class'=>'name'));
-                    $attr = array('class'=>'checkbox_control class'.$class->id);
-                    $checkbox_control_elements[] = html_writer::tag('div',
-                                                                    $check_name.$check_all_link.
-                                                                    $check_none_link.
-                                                                    $check_toggle_link,
-                                                                    $attr);
+                                                              'title' => $toggletitle,
+                                                              'class' => 'toggle_selection'));
+                    $checkname = html_writer::tag('span', $class->name, array('class' => 'name'));
+                    $attr = array('class' => 'checkbox_control class'.$class->id);
+                    $checkboxcontrolelements[] = html_writer::tag('div',
+                                                                  $checkname.$checkalllink.$checknonelink.
+                                                                  $checktogglelink,
+                                                                  $attr);
                 }
             }
 
-            $checkbox_controls = $checkbox_control_title.implode("", $checkbox_control_elements);
+            $checkboxcontrols = $checkboxcontroltitle.implode("", $checkboxcontrolelements);
             $content = "";
-            if (!empty($checkbox_controls)) {
-                $content .= html_writer::tag('div', $checkbox_controls,
-                                             array('class'=>'checkbox_controls'));
+            if (!empty($checkboxcontrols)) {
+                $content .= html_writer::tag('div', $checkboxcontrols,
+                                             array('class' => 'checkbox_controls'));
             }
-            $content .= html_writer::tag('div', $dragable_list, array('class'=>'drag_area'));
+            $content .= html_writer::tag('div', $dragablelist, array('class' => 'drag_area'));
 
-            $html = html_writer::tag('div', $content, array('class'=>'sortlist_container'));
+            $html = html_writer::tag('div', $content, array('class' => 'sortlist_container'));
             // Init JS!
             $PAGE->requires->yui_module('moodle-mod_grouptool-sortlist',
-                    'M.mod_grouptool.init_sortlist',
-                    null);
+                                        'M.mod_grouptool.init_sortlist',
+                                        null);
             return $html;
         }
     }

@@ -11,7 +11,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * sortlist.js
@@ -50,7 +50,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                                                  //This is to avoid to overwrite previously loaded module with same name.
 
     M.mod_grouptool.sortlist_update_checkboxes = function(e, classname, newstate) {
-        var checkboxes = Y.all('input.'+classname);
+        var checkboxes = Y.all('input.' + classname);
 
         e.preventDefault();
 
@@ -147,7 +147,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                 current.setAttribute('value', index);
                 if(index == 0) {
                     current.ancestor('li.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
-                } else if(index == nodelist.size()-1) {
+                } else if(index == nodelist.size() - 1) {
                     current.ancestor('li.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
                 } else {
                     current.ancestor('li.draggable_item').all('.movedownbutton, .moveupbutton').setStyle('visibility', 'visible');

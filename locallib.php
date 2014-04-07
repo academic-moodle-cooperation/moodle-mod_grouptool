@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * locallib.php
@@ -75,7 +75,7 @@ class view_admin_form extends moodleform {
             $mform->addElement('header', 'group_creation', get_string('groupcreation',
                                                                       'grouptool'));
 
-            $options = array(0=>get_string('all'));
+            $options = array(0 => get_string('all'));
             $options += $this->_customdata['roles'];
             $mform->addElement('select', 'roleid', get_string('selectfromrole', 'group'), $options);
             $student = get_archetype_roles('student');
@@ -86,14 +86,14 @@ class view_admin_form extends moodleform {
             }
 
             $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-            $course = $DB->get_record('course', array('id'=>$cm->course));
-            $grouptool = $DB->get_record('grouptool', array('id'=>$cm->instance), '*', MUST_EXIST);
+            $course = $DB->get_record('course', array('id' => $cm->course));
+            $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
             $context = context_course::instance($cm->course);
 
             if (has_capability('moodle/cohort:view', $context)) {
                 $options = cohort_get_visible_list($course);
                 if ($options) {
-                    $options = array(0=>get_string('anycohort', 'cohort')) + $options;
+                    $options = array(0 => get_string('anycohort', 'cohort')) + $options;
                     $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
                                                                         'grouptool'), $options);
                     $mform->setDefault('cohortid', '0');
@@ -111,7 +111,7 @@ class view_admin_form extends moodleform {
             $mform->addElement('hidden', 'seed');
             $mform->setType('seed', PARAM_INT);
 
-            $radioarray=array();
+            $radioarray = array();
             $radioarray[] = $mform->createElement('radio', 'mode', '',
                                                             get_string('define_amount_groups',
                                                                        'grouptool'),
@@ -135,25 +135,37 @@ class view_admin_form extends moodleform {
             $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
             $mform->addElement('text', 'amount', get_string('group_or_member_count', 'grouptool'),
-                               array('size'=>'4'));
+                               array('size' => '4'));
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            /*
+             * We have to clean this params by ourselves afterwards otherwise we get problems
+             * with texts getting mapped to 0
+             */
             $mform->setType('amount', PARAM_RAW);
             $mform->setDefault('amount', 2);
 
             $fromto = array();
             $fromto[] = $mform->createElement('text', 'from', get_string('from'));
             $mform->setDefault('from', 0);
-            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            /*
+             * We have to clean this params by ourselves afterwards otherwise we get problems
+             * with texts getting mapped to 0
+             */
             $mform->setType('from', PARAM_RAW);
             $fromto[] = $mform->createElement('text', 'to', get_string('to'));
             $mform->setDefault('to', 0);
-            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            /*
+             * We have to clean this params by ourselves afterwards otherwise we get problems
+             * with texts getting mapped to 0
+             */
             $mform->setType('to', PARAM_RAW);
             $fromto[] = $mform->createElement('text', 'digits', get_string('digits', 'grouptool'));
             $mform->setDefault('digits', 2);
-            //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+            /*
+             * We have to clean this params by ourselves afterwards otherwise we get problems
+             * with texts getting mapped to 0
+             */
             $mform->setType('digits', PARAM_RAW);
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
                              array(' - ', ' '.get_string('digits', 'grouptool').' '), false);
@@ -183,9 +195,10 @@ class view_admin_form extends moodleform {
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
 
             $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'grouptool'),
-                               array('size'=>'64'));
-            $namingstd = (isset($CFG->grouptool_name_scheme) ? $CFG->grouptool_name_scheme
-                                                             : get_string('group', 'group').' #');
+                               array('size' => '64'));
+            $namingstd = (isset($CFG->grouptool_name_scheme) ?
+                          $CFG->grouptool_name_scheme : get_string('group', 'group').
+                          ' #');
             $mform->setDefault('namingscheme', $namingstd);
             $mform->setType('namingscheme', PARAM_RAW);
 
@@ -197,7 +210,7 @@ class view_admin_form extends moodleform {
             $PAGE->requires->string_for_js('showless', 'form');
             $PAGE->requires->yui_module('moodle-mod_grouptool-administration',
                     'M.mod_grouptool.init_administration',
-                    array(array('fromto_mode'=>GROUPTOOL_FROMTO_GROUPS)));
+                    array(array('fromto_mode' => GROUPTOOL_FROMTO_GROUPS)));
 
             $options = array('0' => get_string('no'));
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
@@ -260,7 +273,7 @@ class view_admin_form extends moodleform {
                 foreach ($coursegroups as $group) {
                     $groups[] = $group->id;
                 }
-                list($grps_sql, $params) = $DB->get_in_or_equal($groups);
+                list($grpssql, $params) = $DB->get_in_or_equal($groups);
                 $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
                 $params = array_merge(array($cm->instance), $params);
                 $groupdata = (array)$DB->get_records_sql("
@@ -274,17 +287,17 @@ class view_admin_form extends moodleform {
                              ON {groupings_groups}.groupid = grp.id
                         LEFT JOIN {groupings} AS grpgs
                              ON {groupings_groups}.groupingid = grpgs.id
-                        WHERE grp.id ".$grps_sql."
+                        WHERE grp.id ".$grpssql."
                         GROUP BY grp.id
                         ORDER BY sort_order ASC, name ASC", $params);
                 /*
                  * convert to multidimensional array and replace comma separated string
                  * through array for each classes list
                  */
-                $running_index = 1;
+                $runningidx = 1;
                 foreach ($groupdata as $key => $group) {
-                    $groupdata[$key]->sort_order = $running_index;
-                    $running_index++;
+                    $groupdata[$key]->sort_order = $runningidx;
+                    $runningidx++;
                     $groupdata[$key] = (array)$group;
                     $pattern = "#[^a-zA-Z0-9]#";
                     $replace = "";
@@ -321,13 +334,13 @@ class view_admin_form extends moodleform {
                 $mform->addElement('sortlist', 'grouplist', $options);
                 $mform->setDefault('grouplist', $groupdata);
                 // Add disabledIfs for all Groupsize-Fields!
-                $use_size = $grouptool->use_size;
+                $usesize = $grouptool->use_size;
                 $mform->addElement('hidden', 'use_size');
-                $mform->setDefault('use_size', $use_size);
+                $mform->setDefault('use_size', $usesize);
                 $mform->setType('use_size', PARAM_BOOL);
-                $use_individual = $grouptool->use_individual;
+                $useindividual = $grouptool->use_individual;
                 $mform->addElement('hidden', 'use_individual');
-                $mform->setDefault('use_individual', $use_individual);
+                $mform->setDefault('use_individual', $useindividual);
                 $mform->setType('use_individual', PARAM_BOOL);
 
                 foreach ($groupdata as $key => $group) {
@@ -361,7 +374,7 @@ class view_admin_form extends moodleform {
      */
     public function validation($data, $files) {
         global $DB;
-        $parent_errors = parent::validation($data, $files);
+        $parenterrors = parent::validation($data, $files);
         $errors = array();
         if (!empty($data['createGroups']) && $data['grouping'] == "-1"
                  && (empty($data['groupingname']) || $data['groupingname'] == "")) {
@@ -434,7 +447,7 @@ LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id
                     }
                 }
             }
-            if($toomanyregs != '') {
+            if ($toomanyregs != '') {
                 if (!isset($errors['grouplist']) || ($errors['grouplist'] == '')) {
                     $errors['grouplist'] = $toomanyregs;
                 } else {
@@ -442,7 +455,7 @@ LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id
                 }
             }
         }
-        return array_merge($parent_errors, $errors);
+        return array_merge($parenterrors, $errors);
     }
 }
 
@@ -474,7 +487,7 @@ class view_import_form extends moodleform {
         $this->context = context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-        $course = $DB->get_record('course', array('id'=>$cm->course));
+        $course = $DB->get_record('course', array('id' => $cm->course));
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'import');
@@ -488,7 +501,7 @@ class view_import_form extends moodleform {
                                                                         'grouptool'));
 
             $grps = groups_get_all_groups($course->id);
-            $options = array('none'=>get_string('choose'));
+            $options = array('none' => get_string('choose'));
             foreach ($grps as $grp) {
                 $options[$grp->id] = $grp->name;
             }
@@ -498,9 +511,9 @@ class view_import_form extends moodleform {
             $mform->addRule('group', null, 'required', null, 'client');
 
             $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'),
-                    array('wrap'=>'virtual',
-                            'rows'=>'20',
-                            'cols'=>'50'));
+                    array('wrap' => 'virtual',
+                          'rows' => '20',
+                          'cols' => '50'));
             $mform->addHelpButton('data', 'userlist', 'grouptool');
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');
@@ -508,7 +521,7 @@ class view_import_form extends moodleform {
             $mform->addElement('advcheckbox', 'forceregistration', '', '&nbsp;'.get_string('forceregistration', 'grouptool'));
             $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
             $mform->setDefault('forceregistration', $CFG->grouptool_force_importreg);
-            
+
             $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }
     }
@@ -593,14 +606,14 @@ class grouptool {
 
         if ($course) {
             $this->course = $course;
-        } else if (! $this->course = $DB->get_record('course', array('id'=>$this->cm->course))) {
+        } else if (! $this->course = $DB->get_record('course', array('id' => $this->cm->course))) {
             print_error('invalidid', 'grouptool');
         }
 
         if ($grouptool) {
             $this->grouptool = $grouptool;
         } else if (! $this->grouptool = $DB->get_record('grouptool',
-                                                        array('id'=>$this->cm->instance))) {
+                                                        array('id' => $this->cm->instance))) {
             print_error('invalidid', 'grouptool');
         }
 
@@ -671,7 +684,7 @@ class grouptool {
 
         $output = $OUTPUT->box_start('generalbox', 'notice');
         $output .= html_writer::tag('p', $message);
-        $cancel =  ($cancel != null) ? $OUTPUT->render($cancel) : "";
+        $cancel = ($cancel != null) ? $OUTPUT->render($cancel) : "";
         $output .= html_writer::tag('div', $OUTPUT->render($continue) . $cancel,
                                     array('class' => 'buttons'));
         $output .= $OUTPUT->box_end();
@@ -681,17 +694,17 @@ class grouptool {
     /**
      * Parse a group name for characters to replace
      *
-     * @param string $name_scheme The scheme used for building group names
+     * @param string $namescheme The scheme used for building group names
      * @param int $groupnumber The number of the group to be used in the parsed format string
      * @param object|array $members optional object or array of objects containing data of members
      *                              for the tags to be replaced with
      * @return string the parsed format string
      */
-    private function groups_parse_name($name_scheme, $groupnumber, $members = null, $digits = 0) {
+    private function groups_parse_name($namescheme, $groupnumber, $members = null, $digits = 0) {
 
         $tags = array('firstname', 'lastname', 'idnumber', 'username');
-        $preg_search = "#\[(".implode("|", $tags).")\]#";
-        if (preg_match($preg_search, $name_scheme) > 0) {
+        $pregsearch = "#\[(".implode("|", $tags).")\]#";
+        if (preg_match($pregsearch, $namescheme) > 0) {
             if ($members != null) {
                 $data = array();
                 if (is_array($members)) {
@@ -724,50 +737,50 @@ class grouptool {
                 foreach ($tags as $key => $tag) {
                     $tags[$key] = "[".$tag."]";
                 }
-                $name_scheme = str_replace($tags, $data, $name_scheme);
+                $namescheme = str_replace($tags, $data, $namescheme);
             } else {
                 foreach ($tags as $key => $tag) {
                     $tags[$key] = "[".$tag."]";
                 }
-                $name_scheme = str_replace($tags, "", $name_scheme);
+                $namescheme = str_replace($tags, "", $namescheme);
             }
         }
 
-        if (strstr($name_scheme, '@') !== false) { // Convert $groupnumber to a character series!
+        if (strstr($namescheme, '@') !== false) { // Convert $groupnumber to a character series!
             if ($groupnumber > GROUPTOOL_BEP) {
-                $next_tempnumber = $groupnumber;
+                $nexttempnumber = $groupnumber;
                 $string = "";
                 $orda = ord('A');
                 $ordz = ord('Z');
                 $return = "";
                 do {
-                    $tempnumber = $next_tempnumber;
-                    $mod = ($tempnumber) % ($ordz - $orda+1);
+                    $tempnumber = $nexttempnumber;
+                    $mod = ($tempnumber) % ($ordz - $orda + 1);
                     $letter = chr($orda + $mod);
                     $string .= $letter;
-                    $next_tempnumber = floor(($tempnumber)/($ordz - $orda +1))-1;
-                } while ($tempnumber >= ($ordz - $orda+1));
+                    $nexttempnumber = floor(($tempnumber) / ($ordz - $orda + 1)) - 1;
+                } while ($tempnumber >= ($ordz - $orda + 1));
 
-                $name_scheme = str_replace('@', strrev($string), $name_scheme);
+                $namescheme = str_replace('@', strrev($string), $namescheme);
             } else {
                 $letter = 'A';
-                for ($i=0; $i<$groupnumber; $i++) {
+                for ($i = 0; $i < $groupnumber; $i++) {
                     $letter++;
                 }
-                $name_scheme = str_replace('@', $letter, $name_scheme);
+                $namescheme = str_replace('@', $letter, $namescheme);
             }
 
         }
 
-        if (strstr($name_scheme, '#') !== false) {
+        if (strstr($namescheme, '#') !== false) {
             if ($digits != 0) {
                 $format = '%0'.$digits.'d';
             } else {
                 $format = '%d';
             }
-            $name_scheme = str_replace('#', sprintf($format, $groupnumber+1), $name_scheme);
+            $namescheme = str_replace('#', sprintf($format, $groupnumber + 1), $namescheme);
         }
-        return $name_scheme;
+        return $namescheme;
     }
 
     /**
@@ -828,15 +841,15 @@ class grouptool {
      * @param array $users which users to registrate in the created groups
      * @param int $userpergrp how many users should be registrated per group
      * @param int $numgrps how many groups should be created
-     * @param bool $only_preview optional only show preview of created groups
+     * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      */
-    private function create_groups($data, $users, $userpergrp, $numgrps, $only_preview = false) {
+    private function create_groups($data, $users, $userpergrp, $numgrps, $previewonly = false) {
         global $DB, $PAGE, $USER;
 
         require_capability('mod/grouptool:create_groups', $this->context);
 
-        $names_to_use = array();
+        $namestouse = array();
 
         // Allocate members from the selected role to groups!
         $usercnt = count($users);
@@ -864,13 +877,13 @@ class grouptool {
         $groups = array();
 
         // Allocate the users - all groups equal count first!
-        for ($i=0; $i<$numgrps; $i++) {
+        for ($i = 0; $i < $numgrps; $i++) {
             $groups[$i] = array();
             $groups[$i]['members'] = array();
             if ($data->allocateby == 'no') {
                 continue; // Do not allocate users!
             }
-            for ($j=0; $j<$userpergrp; $j++) {
+            for ($j = 0; $j < $userpergrp; $j++) {
                 if (empty($users)) {
                     break 2;
                 }
@@ -880,7 +893,7 @@ class grouptool {
         }
         // Now distribute the rest!
         if ($data->allocateby != 'no') {
-            for ($i=0; $i<$numgrps; $i++) {
+            for ($i = 0; $i < $numgrps; $i++) {
                 if (empty($users)) {
                     break 1;
                 }
@@ -890,11 +903,11 @@ class grouptool {
         }
         // Every member is there, so we can parse the name!
         $digits = ceil(log10($numgrps));
-        for ($i=0; $i<$numgrps; $i++) {
+        for ($i = 0; $i < $numgrps; $i++) {
             $groups[$i]['name']    = $this->groups_parse_name(trim($data->namingscheme), $i,
                                                               $groups[$i]['members'], $digits);
         }
-        if ($only_preview) {
+        if ($previewonly) {
             $error = false;
             $table = new html_table();
             if ($data->allocateby == 'no') {
@@ -914,9 +927,9 @@ class grouptool {
 
             foreach ($groups as $group) {
                 $line = array();
-                if (groups_get_group_by_name($this->course->id, $group['name']) || in_array($group['name'], $names_to_use)) {
+                if (groups_get_group_by_name($this->course->id, $group['name']) || in_array($group['name'], $namestouse)) {
                     $error = true;
-                    if(in_array($group['name'], $names_to_use)) {
+                    if (in_array($group['name'], $namestouse)) {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
                     } else {
@@ -925,7 +938,7 @@ class grouptool {
                     }
                 } else {
                     $line[] = $group['name'];
-                    $names_to_use[] = $group['name'];
+                    $namestouse[] = $group['name'];
                 }
                 if ($data->allocateby != 'no') {
                     $unames = array();
@@ -970,26 +983,26 @@ class grouptool {
                 $newgroup->name     = $group['name'];
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
-                $new_agrp = new stdClass();
-                $new_agrp->groupid = $groupid;
-                $new_agrp->grouptoolid = $this->grouptool->id;
-                $new_agrp->sort_order = 999999;
+                $newagrp = new stdClass();
+                $newagrp->groupid = $groupid;
+                $newagrp->grouptoolid = $this->grouptool->id;
+                $newagrp->sort_order = 999999;
                 if ($this->grouptool->allow_reg == true) {
-                    $new_agrp->active = 1;
+                    $newagrp->active = 1;
                 } else {
-                    $new_agrp->active = 0;
+                    $newagrp->active = 0;
                 }
                 $attr = array('grouptoolid' => $this->grouptool->id,
                               'groupid'     => $groupid);
                 if (!$DB->record_exists('grouptool_agrps', $attr)) {
-                    $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
+                    $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
                 } else {
                     /* This is also the case if eventhandlers work properly
                      * because group gets allready created in eventhandler
                      */
-                    $new_agrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
+                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
                     if ($this->grouptool->allow_reg == true) {
-                        $DB->set_field('grouptool_agrps', 'active', 1, array('id'=>$new_agrp->id));
+                        $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
                     }
                 }
                 $createdgroups[] = $groupid;
@@ -997,11 +1010,11 @@ class grouptool {
                     groups_add_member($groupid, $user->id);
                     $usrreg = new stdClass();
                     $usrreg->userid = $user->id;
-                    $usrreg->agrpid = $new_agrp->id;
+                    $usrreg->agrpid = $newagrp->id;
                     $usrreg->timestamp = time();
                     $usrreg->modified_by = $USER->id;
                     $attr = array('userid' => $user->id,
-                                  'agrpid' => $new_agrp->id);
+                                  'agrpid' => $newagrp->id);
                     if (!$DB->record_exists('grouptool_registered', $attr)) {
                         $DB->insert_record('grouptool_registered', $usrreg);
                     } else {
@@ -1049,10 +1062,10 @@ class grouptool {
      * @global object $PAGE
      * @global object $USER
      * @param object $data data from administration-form with all settings for group creation
-     * @param bool $only_preview optional only show preview of created groups
+     * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      */
-    private function create_fromto_groups($data, $only_preview = false) {
+    private function create_fromto_groups($data, $previewonly = false) {
         global $DB, $PAGE, $USER;
 
         require_capability('mod/grouptool:create_groups', $this->context);
@@ -1060,14 +1073,15 @@ class grouptool {
         $groups = array();
 
         // Every member is there, so we can parse the name!
-        for ($i=clean_param($data->from, PARAM_INT); $i<=clean_param($data->to, PARAM_INT); $i++) {
-            $groups[] = $this->groups_parse_name(trim($data->namingscheme), $i-1, null, clean_param($data->digits, PARAM_INT));
+        for ($i = clean_param($data->from, PARAM_INT); $i <= clean_param($data->to, PARAM_INT); $i++) {
+            $groups[] = $this->groups_parse_name(trim($data->namingscheme), $i - 1, null,
+                                                 clean_param($data->digits, PARAM_INT));
         }
-        if ($only_preview) {
+        if ($previewonly) {
             $error = false;
             $table = new html_table();
             $table->head  = array(get_string('groupscount', 'group',
-                                  (clean_param($data->to, PARAM_INT)-clean_param($data->from, PARAM_INT))));
+                                  (clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT))));
             $table->size  = array('100%');
             $table->align = array('left');
             $table->width = '40%';
@@ -1078,7 +1092,7 @@ class grouptool {
                 $line = array();
                 if (groups_get_group_by_name($this->course->id, $group) || in_array($group, $createdgroups)) {
                     $error = true;
-                    if(in_array($group, $createdgroups)) {
+                    if (in_array($group, $createdgroups)) {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('nameschemenotunique', 'grouptool', $group).'</span>';
                     } else {
@@ -1125,26 +1139,26 @@ class grouptool {
                 $newgroup->name     = $group;
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
-                $new_agrp = new stdClass();
-                $new_agrp->groupid = $groupid;
-                $new_agrp->grouptoolid = $this->grouptool->id;
-                $new_agrp->sort_order = 999999;
+                $newagrp = new stdClass();
+                $newagrp->groupid = $groupid;
+                $newagrp->grouptoolid = $this->grouptool->id;
+                $newagrp->sort_order = 999999;
                 if ($this->grouptool->allow_reg == true) {
-                    $new_agrp->active = 1;
+                    $newagrp->active = 1;
                 } else {
-                    $new_agrp->active = 0;
+                    $newagrp->active = 0;
                 }
                 $attr = array('grouptoolid' => $this->grouptool->id,
                               'groupid'     => $groupid);
                 if (!$DB->record_exists('grouptool_agrps', $attr)) {
-                    $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
+                    $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
                 } else {
                     /* This is also the case if eventhandlers work properly
                      * because group gets allready created in eventhandler
                      */
-                    $new_agrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
+                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
                     if ($this->grouptool->allow_reg == true) {
-                        $DB->set_field('grouptool_agrps', 'active', 1, array('id'=>$new_agrp->id));
+                        $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
                     }
                 }
                 $createdgroups[] = $groupid;
@@ -1169,14 +1183,16 @@ class grouptool {
                             $grouping->id,
                             'create groups in grouping:'.$grouping->name.
                             ' namescheme:'.$data->namingscheme.' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.clean_param($data->to, PARAM_INT));
+                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.
+                            clean_param($data->to, PARAM_INT));
                 } else {
                     add_to_log($this->grouptool->course,
                             'grouptool', 'create groups',
                             "view.php?id=".$this->grouptool->id."&tab=overview",
                             'create groups namescheme:'.$data->namingscheme.
                             ' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.clean_param($data->to, PARAM_INT));
+                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.
+                            clean_param($data->to, PARAM_INT));
                 }
             }
         }
@@ -1189,16 +1205,16 @@ class grouptool {
      * @global object $PAGE
      * @global object $USER
      * @param array $users array of users-objects for which to create the groups
-     * @param array $name_scheme scheme determining how to name the created groups
+     * @param array $namescheme scheme determining how to name the created groups
      * @param int $grouping -1 => create new grouping,
      *                       0 => no grouping,
      *                      >0 => assign groups to grouping with that id
      * @param string $groupingname optional name for created grouping
-     * @param bool $only_preview optional only show preview of created groups
+     * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      */
-    private function create_one_person_groups($users, $name_scheme = "[idnumber]", $grouping = 0,
-                                              $groupingname = null, $only_preview = false) {
+    private function create_one_person_groups($users, $namescheme = "[idnumber]", $grouping = 0,
+                                              $groupingname = null, $previewonly = false) {
         global $DB, $PAGE, $USER;
 
         require_capability('mod/grouptool:create_groups', $this->context);
@@ -1208,17 +1224,17 @@ class grouptool {
 
         // Prepare group data!
         $groups = array();
-        $i=0;
+        $i = 0;
         $digits = ceil(log10(count($users)));
         foreach ($users as $user) {
             $groups[$i] = array();
-            $groups[$i]['name']   = $this->groups_parse_name(trim($name_scheme), $i, $user,
+            $groups[$i]['name']   = $this->groups_parse_name(trim($namescheme), $i, $user,
                                                              $digits);
             $groups[$i]['member'] = $user;
             $i++;
         }
 
-        if ($only_preview) {
+        if ($previewonly) {
             $error = false;
             $table = new html_table();
             $table->head  = array(get_string('groupscount', 'group', $usercnt),
@@ -1234,7 +1250,7 @@ class grouptool {
                 if (groups_get_group_by_name($this->course->id, $group['name'])
                      || in_array($group['name'], $groupnames)) {
                     $error = true;
-                    if(in_array($group['name'], $groupnames)) {
+                    if (in_array($group['name'], $groupnames)) {
                         $line[] = '<span class="notifyproblem">'.
                                   get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
                     } else {
@@ -1282,39 +1298,39 @@ class grouptool {
                 $newgroup->name     = $group['name'];
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
-                $new_agrp = new stdClass();
-                $new_agrp->groupid = $groupid;
-                $new_agrp->grouptoolid = $this->grouptool->id;
-                $new_agrp->sort_order = 999999;
+                $newagrp = new stdClass();
+                $newagrp->groupid = $groupid;
+                $newagrp->grouptoolid = $this->grouptool->id;
+                $newagrp->sort_order = 999999;
                 if ($this->grouptool->allow_reg == true) {
-                    $new_agrp->active = 1;
+                    $newagrp->active = 1;
                 } else {
-                    $new_agrp->active = 0;
+                    $newagrp->active = 0;
                 }
                 if (!$DB->record_exists('grouptool_agrps',
                                         array('grouptoolid' => $this->grouptool->id,
                                               'groupid'     => $groupid))) {
-                    $new_agrp->id = $DB->insert_record('grouptool_agrps', $new_agrp, true);
+                    $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
                 } else {
                     /* This is also the case if eventhandlers work properly
                      * because group gets allready created in eventhandler
                      */
-                    $new_agrp->id = $DB->get_field('grouptool_agrps', 'id',
+                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id',
                                                    array('grouptoolid' => $this->grouptool->id,
                                                          'groupid'     => $groupid));
                     if ($this->grouptool->allow_reg == true) {
-                        $DB->set_field('grouptool_agrps', 'active', 1, array('id'=>$new_agrp->id));
+                        $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
                     }
                 }
                 $createdgroups[] = $groupid;
                 groups_add_member($groupid, $group['member']->id);
                 $usrreg = new stdClass();
                 $usrreg->userid = $group['member']->id;
-                $usrreg->agrpid = $new_agrp->id;
+                $usrreg->agrpid = $newagrp->id;
                 $usrreg->timestamp = time();
                 $usrreg->modified_by = $USER->id;
                 $attr = array('userid' => $group['member']->id,
-                              'agrpid' => $new_agrp->id);
+                              'agrpid' => $newagrp->id);
                 if (!$DB->record_exists('grouptool_registered', $attr)) {
                     $DB->insert_record('grouptool_registered', $usrreg);
                 } else {
@@ -1340,12 +1356,12 @@ class grouptool {
                               "view.php?id=".$this->grouptool->id."&tab=overview&groupingid=".
                                $grouping->id,
                               'create 1-person-groups in grouping:'.$grouping->name.
-                              ' namescheme:'.$name_scheme, $this->cm->id);
+                              ' namescheme:'.$namescheme, $this->cm->id);
                 } else {
                     add_to_log($this->grouptool->course,
                               'grouptool', 'create groups',
                               "view.php?id=".$this->grouptool->id."&tab=overview",
-                              'create 1-person-groups namescheme:'.$name_scheme,
+                              'create 1-person-groups namescheme:'.$namescheme,
                               $this->cm->id);
                 }
             }
@@ -1364,10 +1380,10 @@ class grouptool {
      * @global object $PAGE
      * @global object $OUTPUT
      * @param int $courseid optional id of course to create for
-     * @param bool $preview_only optional only show preview of created groups
+     * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      */
-    private function create_group_groupings($courseid = null, $preview_only = false) {
+    private function create_group_groupings($courseid = null, $previewonly = false) {
         global $SESSION, $PAGE, $OUTPUT;
 
         require_capability('mod/grouptool:create_groupings', $this->context);
@@ -1403,7 +1419,7 @@ class grouptool {
             $groupid = $group->id;
             if (groups_get_grouping_by_name($courseid, $group->name)) {
                 // Creation of grouping failed!
-                if ($preview_only) {
+                if ($previewonly) {
                     $text = get_string('grouping_exists_error_prev', 'grouptool');
                 } else {
                     $text = get_string('grouping_exists_error', 'grouptool');
@@ -1416,7 +1432,7 @@ class grouptool {
                 $groupingid = groups_create_grouping($group);
                 if ($groupingid) {
                     if (!groups_assign_grouping($groupingid, $groupid)) {
-                        if ($preview_only) {
+                        if ($previewonly) {
                             $text = get_string('group_assign_error_prev', 'grouptool');
                         } else {
                             $text = get_string('group_assign_error', 'grouptool');
@@ -1425,7 +1441,7 @@ class grouptool {
                         $row[] = $cell;
                         $error = true;
                     } else {
-                        if ($preview_only) {
+                        if ($previewonly) {
                             $content = $group->name;
                         } else {
                             $content = $OUTPUT->notification(get_string('grouping_creation_success',
@@ -1437,7 +1453,7 @@ class grouptool {
                         $created[] = $groupingid;
                     }
                 } else {
-                    if ($preview_only) {
+                    if ($previewonly) {
                         $text = get_string('grouping_creation_error_prev', 'grouptool');
                     } else {
                         $text = get_string('grouping_creation_error', 'grouptool');
@@ -1450,15 +1466,15 @@ class grouptool {
             $table->data[] = new html_table_row($row);
             $return = html_writer::table($table);
         }
-        if ($preview_only || ($error && !$preview_only)) { // Undo everything!
-            foreach ($created as $grouping_id) {
-                $groupings_groups = groups_get_all_groups($courseid, 0, $grouping_id);
-                foreach ($groupings_groups as $group) {
-                    groups_unassign_grouping($grouping_id, $group->id);
+        if ($previewonly || ($error && !$previewonly)) { // Undo everything!
+            foreach ($created as $groupingid) {
+                $groupingsgroups = groups_get_all_groups($courseid, 0, $groupingid);
+                foreach ($groupingsgroups as $group) {
+                    groups_unassign_grouping($groupingid, $group->id);
                 }
-                groups_delete_grouping($grouping_id);
+                groups_delete_grouping($groupingid);
             }
-        } else if (!$preview_only) {
+        } else if (!$previewonly) {
             add_to_log($this->grouptool->course,
                        'grouptool', 'create groupings',
                        "view.php?id=".$this->grouptool->id."&tab=overview",
@@ -1515,7 +1531,7 @@ class grouptool {
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
                         $numgrps    = $data->amount;
-                        $userpergrp = floor($usercnt/$numgrps);
+                        $userpergrp = floor($usercnt / $numgrps);
                         $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
                     case GROUPTOOL_MEMBERS_AMOUNT:
@@ -1538,7 +1554,7 @@ class grouptool {
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
-                        $numgrps    = ceil($usercnt/$data->amount);
+                        $numgrps    = ceil($usercnt / $data->amount);
                         $userpergrp = $data->amount;
                         if (!empty($data->nosmallgroups) and $usercnt % $data->amount != 0) {
                             /*
@@ -1546,10 +1562,10 @@ class grouptool {
                              *  reduce the number of groups
                              */
                             $missing = $userpergrp * $numgrps - $usercnt;
-                            if ($missing > $userpergrp * (1-GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
+                            if ($missing > $userpergrp * (1 - GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
                                 // Spread the users from the last small group!
                                 $numgrps--;
-                                $userpergrp = floor($usercnt/$numgrps);
+                                $userpergrp = floor($usercnt / $numgrps);
                             }
                         }
                         $this->create_groups($data, $users, $userpergrp, $numgrps);
@@ -1577,7 +1593,7 @@ class grouptool {
             if (isset($SESSION->grouptool->view_administration->createGroupings)) {
                 require_capability('mod/grouptool:create_groupings', $this->context);
                 list($error, $preview) = $this->create_group_groupings();
-                $preview = html_writer::tag('div', $preview, array('class'=>'centered'));
+                $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
                 echo $OUTPUT->box($preview, 'generalbox');
             }
             unset($SESSION->grouptool->view_administration);
@@ -1625,7 +1641,7 @@ class grouptool {
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
                         $numgrps    = clean_param($data->amount, PARAM_INT);
-                        $userpergrp = floor($usercnt/$numgrps);
+                        $userpergrp = floor($usercnt / $numgrps);
                         list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
                                                                       $numgrps, true);
                         break;
@@ -1649,7 +1665,7 @@ class grouptool {
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
-                        $numgrps    = ceil($usercnt/$data->amount);
+                        $numgrps    = ceil($usercnt / $data->amount);
                         $userpergrp = clean_param($data->amount, PARAM_INT);
                         if (!empty($data->nosmallgroups) and $usercnt % clean_param($data->amount, PARAM_INT) != 0) {
                             /*
@@ -1657,10 +1673,10 @@ class grouptool {
                              *  reduce the number of groups
                              */
                             $missing = $userpergrp * $numgrps - $usercnt;
-                            if ($missing > $userpergrp * (1-GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
+                            if ($missing > $userpergrp * (1 - GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
                                 // Spread the users from the last small group!
                                 $numgrps--;
-                                $userpergrp = floor($usercnt/$numgrps);
+                                $userpergrp = floor($usercnt / $numgrps);
                             }
                         }
                         list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
@@ -1686,17 +1702,17 @@ class grouptool {
                         list($error, $preview) = $this->create_fromto_groups($data, true);
                         break;
                 }
-                $preview = html_writer::tag('div', $preview, array('class'=>'centered'));
+                $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
                 if ($error) {
                     $text = get_string('create_groups_confirm_problem', 'grouptool');
                     $url = new moodle_url("view.php?id=$id&tab=administration");
                     $back = new single_button($url, get_string('back'), 'post');
-                    $confirmboxcontent =  $this->confirm($text, $back);
+                    $confirmboxcontent = $this->confirm($text, $back);
                 } else {
                     $continue = "view.php?id=$id&tab=administration&confirm=true";
                     $cancel = "view.php?id=$id&tab=administration";
                     $text = get_string('create_groups_confirm', 'grouptool');
-                    $confirmboxcontent =  $this->confirm($text, $continue, $cancel);
+                    $confirmboxcontent = $this->confirm($text, $continue, $cancel);
                 }
                 echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
                      $OUTPUT->box($preview, 'generalbox').
@@ -1710,7 +1726,7 @@ class grouptool {
                 }
                 $SESSION->grouptool->view_administration = $fromform;
                 list($error, $preview) = $this->create_group_groupings(null, true);
-                $preview = html_writer::tag('div', $preview, array('class'=>'centered'));
+                $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
                 $continue = "view.php?id=$id&tab=administration&confirm=1";
                 $cancel = "view.php?id=$id&tab=administration";
                 if ($error) {
@@ -1718,7 +1734,7 @@ class grouptool {
                     $confirmboxcontent = $this->confirm($confirmtext, $cancel);
                 } else {
                     $confirmtext = get_string('create_groupings_confirm', 'grouptool');
-                    $confirmboxcontent =  $this->confirm($confirmtext, $continue, $cancel);
+                    $confirmboxcontent = $this->confirm($confirmtext, $continue, $cancel);
                 }
                 echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
                      $OUTPUT->box($preview, 'generalbox').
@@ -1765,20 +1781,20 @@ class grouptool {
             $text = get_string('selectallornone', 'form');
         }
 
-        $select_value = optional_param('checkbox_controller'. $groupid, null, PARAM_INT);
+        $selectvalue = optional_param('checkbox_controller'.$groupid, null, PARAM_INT);
 
-        if ($select_value == 0 || is_null($select_value)) {
-            $new_select_value = 1;
+        if ($selectvalue == 0 || is_null($selectvalue)) {
+            $newselectvalue = 1;
         } else {
-            $new_select_value = 0;
+            $newselectvalue = 0;
         }
 
         $attr = array('type'  => 'hidden',
                       'name'  => 'checkbox_controller'.$groupid,
-                      'value' => $new_select_value);
+                      'value' => $newselectvalue);
         $hiddenstate = html_writer::empty_tag('input', $attr);
 
-        $checkbox_controller_name = 'nosubmit_checkbox_controller' . $groupid;
+        $checkboxcontrollername = 'nosubmit_checkbox_controller' . $groupid;
 
         // Prepare Javascript for submit element!
         $js = "\n//<![CDATA[\n";
@@ -1808,7 +1824,7 @@ EOS;
         $js .= "//]]>\n";
 
         require_once("$CFG->libdir/form/submitlink.php");
-        $submitlink = new MoodleQuickForm_submitlink($checkbox_controller_name, $text, $attributes);
+        $submitlink = new MoodleQuickForm_submitlink($checkboxcontrollername, $text, $attributes);
         $submitlink->_js = $js;
         $submitlink->_onclick = "html_quickform_toggle_checkboxes($groupid); return false;";
         return $hiddenstate."<div>".$submitlink->toHTML()."</div>";
@@ -1821,8 +1837,8 @@ EOS;
      * @global object $USER
      * @global object $PAGE
      * @param int $activity ID of activity to get/set grades from/for
-     * @param bool $mygroups_only limit source-grades to those given by current user
-     * @param bool $incomplete_only show only groups which have not-graded members
+     * @param bool $mygroupsonly limit source-grades to those given by current user
+     * @param bool $incompleteonly show only groups which have not-graded members
      * @param int $filter GROUPTOOL_FILTER_ALL => all groups
      *                    GROUPTOOL_FILTER_NONCONFLICTING => groups with exactly 1 graded member
      *                    >0 => id of single group
@@ -1832,12 +1848,12 @@ EOS;
      *                                      selected (just to display a clue to select a source)
      * @return string HTML Fragment containing checkbox-controller and dependencies
      */
-    private function get_grading_table($activity, $mygroups_only, $incomplete_only, $filter,
+    private function get_grading_table($activity, $mygroupsonly, $incompleteonly, $filter,
                                        $selected, $missingsource = array()) {
         global $OUTPUT, $USER, $PAGE;
 
         // If he want's to grade all he needs the corresponding capability!
-        if (!$mygroups_only) {
+        if (!$mygroupsonly) {
             require_capability('mod/grouptool:grade', $this->context);
         } else if (!has_capability('mod/grouptool:grade', $this->context)) {
             /*
@@ -1871,24 +1887,24 @@ EOS;
                     'name',
                     'gradeinfo');
             $button = html_writer::tag('button', get_string('copy', 'grouptool'),
-                    array('name'=>'copygrades',
-                            'type'=>'submit',
-                            'value'=>'true'));
+                                       array('name'  => 'copygrades',
+                                             'type'  => 'submit',
+                                             'value' => 'true'));
             $buttontext = get_string('copy_refgrades_feedback', 'grouptool');
             $tableheaders = array('',
                     get_string('name'),
                     get_string('reference_grade_feedback', 'grouptool'));
 
             $groups = groups_get_all_groups($this->course->id, 0, $grouping);
-            $cm_to_use = get_coursemodule_from_id('', $activity, $this->course->id);
+            $cmtouse = get_coursemodule_from_id('', $activity, $this->course->id);
 
             foreach ($groups as $group) {
                 $error = "";
                 $cells = array();
                 $groupmembers = groups_get_members($group->id);
                 // Get grading info for all groupmembers!
-                $grading_info = grade_get_grades($this->course->id, 'mod', $cm_to_use->modname,
-                                                 $cm_to_use->instance, array_keys($groupmembers));
+                $gradinginfo = grade_get_grades($this->course->id, 'mod', $cmtouse->modname,
+                                                 $cmtouse->instance, array_keys($groupmembers));
                 $gradeinfo = array();
                 if (in_array($group->id, $missingsource)) {
                     $error = ' error';
@@ -1896,15 +1912,15 @@ EOS;
                                                                       'grouptool'));
                 }
 
-                $user_with_grades = array();
+                $userwithgrades = array();
                 foreach ($groupmembers as $key => $groupmember) {
-                    if (!empty($grading_info->items[0]->grades[$groupmember->id]->dategraded)
-                        && (!$mygroups_only
-                            || $grading_info->items[0]->grades[$groupmember->id]->usermodified == $USER->id)) {
-                        $user_with_grades[] = $key;
+                    if (!empty($gradinginfo->items[0]->grades[$groupmember->id]->dategraded)
+                        && (!$mygroupsonly
+                            || $gradinginfo->items[0]->grades[$groupmember->id]->usermodified == $USER->id)) {
+                        $userwithgrades[] = $key;
                     }
                 }
-                if ((count($user_with_grades) != 1)
+                if ((count($userwithgrades) != 1)
                         && ($filter == GROUPTOOL_FILTER_NONCONFLICTING)) {
                     /*
                      * skip groups with more than 1 grade and groups without grade
@@ -1912,54 +1928,54 @@ EOS;
                      */
                     continue;
                 }
-                if ((count($user_with_grades) == count($groupmembers)) && ($incomplete_only == 1)) {
+                if ((count($userwithgrades) == count($groupmembers)) && ($incompleteonly == 1)) {
                     // Skip groups fully graded if it's wished!
                     continue;
                 }
-                foreach ($user_with_grades as $key) {
-                    $final_grade = $grading_info->items[0]->grades[$key];
-                    if (!empty($final_grade->dategraded)) {
-                        $grademax = $grading_info->items[0]->grademax;
-                        $final_grade->formatted_grade = round($final_grade->grade, 2) .' / ' .
+                foreach ($userwithgrades as $key) {
+                    $finalgrade = $gradinginfo->items[0]->grades[$key];
+                    if (!empty($finalgrade->dategraded)) {
+                        $grademax = $gradinginfo->items[0]->grademax;
+                        $finalgrade->formatted_grade = round($finalgrade->grade, 2) .' / ' .
                                                         round($grademax, 2);
-                        $radio_attr = array(
+                        $radioattr = array(
                                 'name' => 'source['.$group->id.']',
                                 'value' => $groupmembers[$key]->id,
                                 'type' => 'radio');
                         if (isset($source[$group->id])
                                 && $source[$group->id] == $groupmembers[$key]->id) {
-                            $radio_attr['selected'] = 'selected';
+                            $radioattr['selected'] = 'selected';
                         }
-                        if (count($user_with_grades) == 1) {
-                            $radio_attr['type'] = 'hidden';
+                        if (count($userwithgrades) == 1) {
+                            $radioattr['type'] = 'hidden';
                         }
-                        $gradeinfocont = ((count($user_with_grades) >= 1) ?
-                                            html_writer::empty_tag('input', $radio_attr) : "").
+                        $gradeinfocont = ((count($userwithgrades) >= 1) ?
+                                            html_writer::empty_tag('input', $radioattr) : "").
                                             fullname($groupmembers[$key])." (".
-                                            $final_grade->formatted_grade;
-                        if (strip_tags($final_grade->str_feedback) != "") {
+                                            $finalgrade->formatted_grade;
+                        if (strip_tags($finalgrade->str_feedback) != "") {
                             $gradeinfocont .= " ".
-                                              shorten_text(strip_tags($final_grade->str_feedback),
+                                              shorten_text(strip_tags($finalgrade->str_feedback),
                                                            15);
                         }
                         $gradeinfocont .= ")";
                         $gradeinfo[] = html_writer::tag('div', $gradeinfocont,
-                                                        array('class'=>'gradinginfo'.
-                                                                       $groupmembers[$key]->id));
+                                                        array('class' => 'gradinginfo'.
+                                                                         $groupmembers[$key]->id));
                     }
                 }
-                $select_attr = array(
+                $selectattr = array(
                         'type' => 'checkbox',
                         'name' => 'selected[]',
                         'value' => $group->id,
                         'class' => 'checkboxgroup1');
-                if ((count($groupmembers) <= 1) || count($user_with_grades) == 0) {
-                    $select_attr['disabled'] = 'disabled';
-                    unset($select_attr['checked']);
+                if ((count($groupmembers) <= 1) || count($userwithgrades) == 0) {
+                    $selectattr['disabled'] = 'disabled';
+                    unset($selectattr['checked']);
                 } else if (isset($selected[$group->id]) && $selected[$group->id] == 1) {
-                    $select_attr['checked'] = "checked";
+                    $selectattr['checked'] = "checked";
                 }
-                $select = new html_table_cell(html_writer::empty_tag('input', $select_attr));
+                $select = new html_table_cell(html_writer::empty_tag('input', $selectattr));
                 $name = new html_table_cell($group->name);
                 if (empty($gradeinfo)) {
                     $gradeinfo = new html_table_cell(get_string('no_grades_present', 'grouptool'));
@@ -1973,8 +1989,8 @@ EOS;
                                             $row->attributes['class'];
                 $data[] = $row;
             }
-            $tablepostfix = html_writer::tag('div', $buttontext, array('class'=>'center centered'));
-            $tablepostfix .= html_writer::tag('div', $button, array('class'=>'centered center'));
+            $tablepostfix = html_writer::tag('div', $buttontext, array('class' => 'center centered'));
+            $tablepostfix .= html_writer::tag('div', $button, array('class' => 'centered center'));
 
         } else if ($filter > 0) {    // Single group?
             $tablecolumns = array('select',
@@ -1992,34 +2008,34 @@ EOS;
 
             $groupmembers = groups_get_members($filter);
             // Get grading info for all groupmembers!
-            $cm_to_use = get_coursemodule_from_id('', $activity, $this->course->id);
-            $grading_info = grade_get_grades($this->course->id, 'mod', $cm_to_use->modname,
-                                             $cm_to_use->instance, array_keys($groupmembers));
-            if (isset($grading_info->items[0])) {
+            $cmtouse = get_coursemodule_from_id('', $activity, $this->course->id);
+            $gradinginfo = grade_get_grades($this->course->id, 'mod', $cmtouse->modname,
+                                             $cmtouse->instance, array_keys($groupmembers));
+            if (isset($gradinginfo->items[0])) {
                 foreach ($groupmembers as $groupmember) {
                     $row = array();
-                    $final_grade = $grading_info->items[0]->grades[$groupmember->id];
-                    $grademax = $grading_info->items[0]->grademax;
-                    $final_grade->formatted_grade = round($final_grade->grade, 2) .' / ' .
+                    $finalgrade = $gradinginfo->items[0]->grades[$groupmember->id];
+                    $grademax = $gradinginfo->items[0]->grademax;
+                    $finalgrade->formatted_grade = round($finalgrade->grade, 2) .' / ' .
                                                     round($grademax, 2);
                     $checked = (isset($selected[$groupmember->id])
                                 && ($selected[$groupmember->id] == 1)) ? true : false;
                     $row[] = html_writer::checkbox('selected[]', $groupmember->id, $checked, '',
-                                                   array('class'=>'checkbox checkboxgroup1'));
+                                                   array('class' => 'checkbox checkboxgroup1'));
                     $row[] = html_writer::tag('div',
                                               fullname($groupmember,
                                                        has_capability('moodle/site:viewfullnames',
                                                         $this->context)),
-                                              array('class'=>'fullname'.$groupmember->id));
+                                              array('class' => 'fullname'.$groupmember->id));
                     $row[] = html_writer::tag('div', $groupmember->idnumber,
-                                              array('class'=>'idnumber'.$groupmember->id));
-                    $row[] = html_writer::tag('div', $final_grade->formatted_grade,
-                                              array('class'=>'grade'.$groupmember->id));
+                                              array('class' => 'idnumber'.$groupmember->id));
+                    $row[] = html_writer::tag('div', $finalgrade->formatted_grade,
+                                              array('class' => 'grade'.$groupmember->id));
                     $row[] = html_writer::tag('div',
-                                              shorten_text(strip_tags($final_grade->str_feedback),
+                                              shorten_text(strip_tags($finalgrade->str_feedback),
                                                            15),
-                                              array('class'=>'feedback'.$groupmember->id));
-                    if ($mygroups_only && ($final_grade->usermodified != $USER->id)) {
+                                              array('class' => 'feedback'.$groupmember->id));
+                    if ($mygroupsonly && ($finalgrade->usermodified != $USER->id)) {
                         $row[] = html_writer::tag('div', get_string('not_graded_by_me',
                                                                     'grouptool'));
                     } else {
@@ -2057,13 +2073,13 @@ EOS;
                 return $OUTPUT->box($OUTPUT->notification(get_string('no_conflictfree_to_display',
                                                                      'grouptool'), 'notifyproblem'),
                                     'centered').
-                $this->get_grading_table($activity, $mygroups_only, $incomplete_only,
+                $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
                                          GROUPTOOL_FILTER_ALL, $selected, $missingsource);
             } else {
                 return $OUTPUT->box($OUTPUT->notification(get_string('no_groupmembers_to_display',
                                                                      'grouptool'), 'notifyproblem'),
                                     'centered').
-                $this->get_grading_table($activity, $mygroups_only, $incomplete_only,
+                $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
                                          GROUPTOOL_FILTER_ALL, $selected, $missingsource);
             }
         }
@@ -2080,8 +2096,8 @@ EOS;
                   html_writer::table($table).$tablepostfix;
         $return = html_writer::tag('div',
                                    html_writer::tag('div', $return,
-                                                    array('class'=>'fieldsetsimulation')),
-                                   array('class'=>'clearfix'));
+                                                    array('class' => 'fieldsetsimulation')),
+                                   array('class' => 'clearfix'));
         return $return;
     }
 
@@ -2092,21 +2108,21 @@ EOS;
      * @global object $USER
      * @global object $PAGE
      * @param int $activity ID of activity to get/set grades from/for
-     * @param bool $mygroups_only limit source-grades to those given by current user
+     * @param bool $mygroupsonly limit source-grades to those given by current user
      * @param array $selected array with ids of groups/users to copy grades to as keys
      *                        (depends on filter)
      * @param array $source optional array with ids of entries for whom no source has been
      *                                      selected (just to display a clue to select a source)
      * @param bool $overwrite optional overwrite existing grades (std: false)
-     * @param bool $preview_only optional just return preview data
+     * @param bool $previewonly optional just return preview data
      * @return array ($error, $message)
      */
-    private function copy_grades($activity, $mygroups_only, $selected, $source, $overwrite = false,
-                                 $preview_only = false) {
+    private function copy_grades($activity, $mygroupsonly, $selected, $source, $overwrite = false,
+                                 $previewonly = false) {
         global $DB, $USER, $PAGE;
         $error = false;
         // If he want's to grade all he needs the corresponding capability!
-        if (!$mygroups_only) {
+        if (!$mygroupsonly) {
             require_capability('mod/grouptool:grade', $this->context);
         } else if (!has_capability('mod/grouptool:grade', $this->context)) {
             /*
@@ -2116,20 +2132,20 @@ EOS;
             require_capability('mod/grouptool:grade_own_submission', $this->context);
         }
 
-        $cm_to_use = get_coursemodule_from_id('', $activity, $this->course->id);
-        if (!$cm_to_use) {
+        $cmtouse = get_coursemodule_from_id('', $activity, $this->course->id);
+        if (!$cmtouse) {
             return array(true, get_string('couremodule_misconfigured'));
         }
-        if ($preview_only) {
+        if ($previewonly) {
             $previewtable = new html_table();
             $previewtable->attributes['class'] = 'coloredrows grading_previewtable';
         } else {
             $info = "";
         }
 
-        $grade_item = grade_item::fetch(array('itemtype'    => 'mod',
-                                              'itemmodule'  => $cm_to_use->modname,
-                                              'iteminstance'=> $cm_to_use->instance));
+        $gradeitem = grade_item::fetch(array('itemtype'      => 'mod',
+                                              'itemmodule'   => $cmtouse->modname,
+                                              'iteminstance' => $cmtouse->instance));
 
         if (is_array($source)) { // Then we are in multigroup mode (filter = 0 || -1)!
             $sourceusers = $DB->get_records_list('user', 'id', $source);
@@ -2142,132 +2158,132 @@ EOS;
                                         get_string('grade'),
                                         get_string('feedback'));
             foreach ($selected as $group) {
-                if ($preview_only) {
-                    $group_rows = array();
+                if ($previewonly) {
+                    $grouprows = array();
                 } else {
                     $groupinfo = "";
                 }
-                $source_grade = grade_grade::fetch_users_grades($grade_item, $source[$group],
+                $sourcegrade = grade_grade::fetch_users_grades($gradeitem, $source[$group],
                                                                 false);
-                $source_grade = reset($source_grade);
-                $source_grade->load_optional_fields();
-                $orig_teacher = $DB->get_record('user', array('id'=>$source_grade->usermodified));
-                $formatted_grade = round($source_grade->finalgrade, 2) .' / ' .
-                                   round($grade_item->grademax, 2);
+                $sourcegrade = reset($sourcegrade);
+                $sourcegrade->load_optional_fields();
+                $origteacher = $DB->get_record('user', array('id' => $sourcegrade->usermodified));
+                $formattedgrade = round($sourcegrade->finalgrade, 2) .' / ' .
+                                  round($gradeitem->grademax, 2);
 
                 $groupmembers = groups_get_members($group);
-                $target_grades = grade_grade::fetch_users_grades($grade_item,
+                $targetgrades = grade_grade::fetch_users_grades($gradeitem,
                                                                  array_keys($groupmembers), true);
-                $properties_to_copy = array('rawgrade', 'finalgrade', 'feedback', 'feedbackformat');
+                $propertiestocopy = array('rawgrade', 'finalgrade', 'feedback', 'feedbackformat');
 
-                foreach ($target_grades as $current_grade) {
+                foreach ($targetgrades as $currentgrade) {
 
-                    if ($current_grade->id == $source_grade->id) {
+                    if ($currentgrade->id == $sourcegrade->id) {
                         continue;
                     }
-                    if (!$overwrite && ($current_grade->finalgrade != null)) {
-                        if ($preview_only) {
-                            $row_cells = array();
-                            if (empty($group_rows)) {
-                                $row_cells[] = new html_table_cell($groups[$group]->name."\n".
+                    if (!$overwrite && ($currentgrade->finalgrade != null)) {
+                        if ($previewonly) {
+                            $rowcells = array();
+                            if (empty($grouprows)) {
+                                $rowcells[] = new html_table_cell($groups[$group]->name."\n".
                                         html_writer::empty_tag('br').
-                                        "(".(count($groupmembers)-1).")");
+                                        "(".(count($groupmembers) - 1).")");
                             }
-                            $fullname = fullname($groupmembers[$current_grade->userid]);
-                            $row_cells[] = new html_table_cell($fullname);
+                            $fullname = fullname($groupmembers[$currentgrade->userid]);
+                            $rowcells[] = new html_table_cell($fullname);
                             $cell = new html_table_cell(get_string('skipped', 'grouptool'));
                             $cell->colspan = 2;
-                            $row_cells[] = $cell;
+                            $rowcells[] = $cell;
                             $row = new html_table_row();
-                            $row->cells = $row_cells;
-                            if (empty($group_rows)) {
+                            $row->cells = $rowcells;
+                            if (empty($grouprows)) {
                                 $row->attributes['class'] .= ' firstgrouprow';
                             }
-                            $group_rows[] = $row;
+                            $grouprows[] = $row;
                         }
                         continue;
                     }
-                    $current_grade->load_optional_fields();
-                    foreach ($properties_to_copy as $property) {
-                        $current_grade->$property = $source_grade->$property;
+                    $currentgrade->load_optional_fields();
+                    foreach ($propertiestocopy as $property) {
+                        $currentgrade->$property = $sourcegrade->$property;
                     }
                     $details = array('student'  => fullname($sourceusers[$source[$group]]),
-                                     'teacher'  => fullname($orig_teacher),
-                                     'date'     => userdate($source_grade->get_dategraded(),
+                                     'teacher'  => fullname($origteacher),
+                                     'date'     => userdate($sourcegrade->get_dategraded(),
                                                             get_string('strftimedatetimeshort')),
-                                     'feedback' => $source_grade->feedback);
-                    $current_grade->feedback = format_text(get_string('copied_grade_feedback',
+                                     'feedback' => $sourcegrade->feedback);
+                    $currentgrade->feedback = format_text(get_string('copied_grade_feedback',
                                                                       'grouptool',
                                                                       $details),
-                                                           $current_grade->feedbackformat);
-                    $current_grade->usermodified = $USER->id;
-                    if ($preview_only) {
-                        $row_cells = array();
-                        if (empty($group_rows)) {
-                            $row_cells[] = new html_table_cell($groups[$group]->name."\n".
+                                                           $currentgrade->feedbackformat);
+                    $currentgrade->usermodified = $USER->id;
+                    if ($previewonly) {
+                        $rowcells = array();
+                        if (empty($grouprows)) {
+                            $rowcells[] = new html_table_cell($groups[$group]->name."\n".
                                     html_writer::empty_tag('br').
                                     "(".count($groupmembers).")");
                         }
-                        $fullname = fullname($groupmembers[$current_grade->userid]);
-                        $row_cells[] = new html_table_cell($fullname);
-                        $row_cells[] = new html_table_cell($formatted_grade);
-                        $row_cells[] = new html_table_cell($current_grade->feedback);
+                        $fullname = fullname($groupmembers[$currentgrade->userid]);
+                        $rowcells[] = new html_table_cell($fullname);
+                        $rowcells[] = new html_table_cell($formattedgrade);
+                        $rowcells[] = new html_table_cell($currentgrade->feedback);
                         $row = new html_table_row();
-                        $row->cells = $row_cells;
-                        if (empty($group_rows)) {
+                        $row->cells = $rowcells;
+                        if (empty($grouprows)) {
                             $row->attributes['class'] .= ' firstgrouprow';
                         }
-                        $group_rows[] = $row;
+                        $grouprows[] = $row;
                     } else {
-                        if (function_exists ('grouptool_copy_'.$cm_to_use->modname.'_grades')) {
-                            $copyfunction = 'grouptool_copy_'.$cm_to_use->modname.'_grades';
-                            $copyfunction($cm_to_use->instance, $source_grade->userid, $current_grade->userid);
+                        if (function_exists ('grouptool_copy_'.$cmtouse->modname.'_grades')) {
+                            $copyfunction = 'grouptool_copy_'.$cmtouse->modname.'_grades';
+                            $copyfunction($cmtouse->instance, $sourcegrade->userid, $currentgrade->userid);
                         }
-                        if ($current_grade->id) {
-                            $noerror = $current_grade->update();
+                        if ($currentgrade->id) {
+                            $noerror = $currentgrade->update();
                         } else {
-                            $noerror = $current_grade->insert();
+                            $noerror = $currentgrade->insert();
                         }
-                        $current_grade->set_overridden(true, false);
-                        $fullname = fullname($groupmembers[$current_grade->userid]);
+                        $currentgrade->set_overridden(true, false);
+                        $fullname = fullname($groupmembers[$currentgrade->userid]);
                         if ($noerror) {
                             $groupinfo .= html_writer::tag('span',
                                                            '✓&nbsp;'.$fullname.
-                                                           " (".$formatted_grade.")",
-                                                           array('class'=>'notifysuccess'));
+                                                           " (".$formattedgrade.")",
+                                                           array('class' => 'notifysuccess'));
                         } else {
                             $error = true;
                             $groupinfo .= html_writer::tag('span',
                                                            '✗&nbsp;'.$fullname.
-                                                           " (".$formatted_grade.")",
-                                                           array('class'=>'notifyproblem'));
+                                                           " (".$formattedgrade.")",
+                                                           array('class' => 'notifyproblem'));
                         }
                     }
                 }
-                if ($preview_only) {
-                    $group_rows[0]->cells[0]->rowspan = count($group_rows);
+                if ($previewonly) {
+                    $grouprows[0]->cells[0]->rowspan = count($grouprows);
                     if (!is_array($previewtable->data)) {
                         $previewtable->data = array();
                     }
-                    $previewtable->data = array_merge($previewtable->data, $group_rows);
+                    $previewtable->data = array_merge($previewtable->data, $grouprows);
                 } else {
                     $grpinfo = "";
                     $grpinfo .= html_writer::tag('div', $groups[$group]->name." (".
                                                         count($groupmembers)."): ".$groupinfo);
                     $data = array('student' => fullname($sourceusers[$source[$group]]),
-                                  'teacher' => fullname($orig_teacher),
-                                  'date'    => userdate($source_grade->get_dategraded(),
+                                  'teacher' => fullname($origteacher),
+                                  'date'    => userdate($sourcegrade->get_dategraded(),
                                                         get_string('strftimedatetimeshort')),
-                                  'feedback' => $source_grade->feedback);
+                                  'feedback' => $sourcegrade->feedback);
                     $temp = get_string('copied_grade_feedback', 'grouptool', $data);
-                    $grpinfo .= html_writer::tag('div', $formatted_grade.html_writer::empty_tag('br').
+                    $grpinfo .= html_writer::tag('div', $formattedgrade.html_writer::empty_tag('br').
                                                         format_text($temp,
-                                                                    $source_grade->feedbackformat));
-                    $info .= html_writer::tag('div', $grpinfo, array('class'=>'box1embottom'));
+                                                                    $sourcegrade->feedbackformat));
+                    $info .= html_writer::tag('div', $grpinfo, array('class' => 'box1embottom'));
                     add_to_log($this->grouptool->course,
                               'grouptool', 'grade group',
                               "view.php?id=".$this->grouptool->id."&tab=grading&activity=".
-                              $cm_to_use->instance."&groupid=".$group."&refresh_table=1",
+                              $cmtouse->instance."&groupid=".$group."&refresh_table=1",
                               'group-grade group='.$group);
 
                 }
@@ -2275,136 +2291,136 @@ EOS;
         } else {
             $sourceuser = $DB->get_record('user', array('id' => $source));
             $targetusers = $DB->get_records_list('user', 'id', $selected);
-            $source_grade = grade_grade::fetch_users_grades($grade_item, $source, false);
-            $source_grade = reset($source_grade);
-            $orig_teacher = $DB->get_record('user', array('id'=>$source_grade->usermodified));
-            $formatted_grade = round($source_grade->finalgrade, 2) .' / ' .
-                               round($grade_item->grademax, 2);
-            $target_grades = grade_grade::fetch_users_grades($grade_item, $selected, true);
-            $properties_to_copy = array('rawgrade', 'finalgrade', 'feedback', 'feedbackformat');
-            if ($preview_only) {
-                $group_rows = array();
-                $count = in_array($source, $selected) ? count($selected)-1 : count($selected);
+            $sourcegrade = grade_grade::fetch_users_grades($gradeitem, $source, false);
+            $sourcegrade = reset($sourcegrade);
+            $origteacher = $DB->get_record('user', array('id' => $sourcegrade->usermodified));
+            $formattedgrade = round($sourcegrade->finalgrade, 2).' / ' .
+                               round($gradeitem->grademax, 2);
+            $targetgrades = grade_grade::fetch_users_grades($gradeitem, $selected, true);
+            $propertiestocopy = array('rawgrade', 'finalgrade', 'feedback', 'feedbackformat');
+            if ($previewonly) {
+                $grouprows = array();
+                $count = in_array($source, $selected) ? count($selected) - 1 : count($selected);
                 $previewtable->head = array('', get_string('fullname')." (".$count.")",
                         get_string('grade'), get_string('feedback'));
                 $previewtable->attributes['class'] = 'coloredrows grading_previewtable';
             } else {
-                $info .=html_writer::start_tag('div');
+                $info .= html_writer::start_tag('div');
                 $nameinfo = "";
             }
 
-            foreach ($target_grades as $current_grade) {
-                if ($current_grade->id == $source_grade->id) {
+            foreach ($targetgrades as $currentgrade) {
+                if ($currentgrade->id == $sourcegrade->id) {
                     continue;
                 }
-                if (!$overwrite && ($current_grade->rawgrade != null)) {
-                    if ($preview_only) {
-                        $row_cells = array();
-                        if (empty($group_rows)) {
-                            $row_cells[] = new html_table_cell(get_string('users'));
+                if (!$overwrite && ($currentgrade->rawgrade != null)) {
+                    if ($previewonly) {
+                        $rowcells = array();
+                        if (empty($grouprows)) {
+                            $rowcells[] = new html_table_cell(get_string('users'));
                         }
-                        $fullname = fullname($targetusers[$current_grade->userid]);
-                        $row_cells[] = new html_table_cell($fullname);
+                        $fullname = fullname($targetusers[$currentgrade->userid]);
+                        $rowcells[] = new html_table_cell($fullname);
                         $cell = new html_table_cell(get_string('skipped', 'grouptool'));
                         $cell->colspan = 2;
-                        $row_cells[] = $cell;
+                        $rowcells[] = $cell;
                         $row = new html_table_row();
-                        $row->cells = $row_cells;
-                        if (empty($group_rows)) {
+                        $row->cells = $rowcells;
+                        if (empty($grouprows)) {
                             $row->attributes['class'] .= ' firstgrouprow';
                         }
-                        $group_rows[] = $row;
+                        $grouprows[] = $row;
                     }
                     continue;
                 }
-                $current_grade->load_optional_fields();
-                foreach ($properties_to_copy as $property) {
-                    $current_grade->$property = $source_grade->$property;
+                $currentgrade->load_optional_fields();
+                foreach ($propertiestocopy as $property) {
+                    $currentgrade->$property = $sourcegrade->$property;
                 }
 
                 $details = array('student' => fullname($sourceuser),
-                                    'teacher' => fullname($orig_teacher),
-                                    'date' => userdate($source_grade->get_dategraded(),
+                                    'teacher' => fullname($origteacher),
+                                    'date' => userdate($sourcegrade->get_dategraded(),
                                                        get_string('strftimedatetimeshort')),
-                                    'feedback' => $source_grade->feedback);
-                $current_grade->feedback = format_text(get_string('copied_grade_feedback',
+                                    'feedback' => $sourcegrade->feedback);
+                $currentgrade->feedback = format_text(get_string('copied_grade_feedback',
                                                                   'grouptool',
                                                                   $details),
-                                                       $current_grade->feedbackformat);
-                $current_grade->usermodified   = $USER->id;
-                if ($preview_only) {
-                    $row_cells = array();
-                    if (empty($group_rows)) {
-                        $row_cells[] = new html_table_cell(get_string('users'));
+                                                       $currentgrade->feedbackformat);
+                $currentgrade->usermodified   = $USER->id;
+                if ($previewonly) {
+                    $rowcells = array();
+                    if (empty($grouprows)) {
+                        $rowcells[] = new html_table_cell(get_string('users'));
                     }
-                    $fullname = fullname($targetusers[$current_grade->userid]);
-                    $row_cells[] = new html_table_cell($fullname);
-                    $row_cells[] = new html_table_cell($formatted_grade);
-                    $row_cells[] = new html_table_cell(format_text($current_grade->feedback,
-                                                                   $current_grade->feedbackformat));
+                    $fullname = fullname($targetusers[$currentgrade->userid]);
+                    $rowcells[] = new html_table_cell($fullname);
+                    $rowcells[] = new html_table_cell($formattedgrade);
+                    $rowcells[] = new html_table_cell(format_text($currentgrade->feedback,
+                                                                   $currentgrade->feedbackformat));
                     $row = new html_table_row();
-                    $row->cells = $row_cells;
-                    if (empty($group_rows)) {
+                    $row->cells = $rowcells;
+                    if (empty($grouprows)) {
                         $row->attributes['class'] .= ' firstgrouprow';
                     }
-                    $group_rows[] = $row;
+                    $grouprows[] = $row;
                 } else {
                     if ($nameinfo != "") {
                         $nameinfo .= ", ";
                     }
-                    if ($current_grade->id) {
-                        $noerror = $current_grade->update();
+                    if ($currentgrade->id) {
+                        $noerror = $currentgrade->update();
                     } else {
-                        $noerror = $current_grade->insert();
+                        $noerror = $currentgrade->insert();
                     }
-                    $current_grade->set_overridden(true, false);
-                    $fullname = fullname($targetusers[$current_grade->userid]);
-                    if (function_exists ('grouptool_copy_'.$cm_to_use->modname.'_grades')) {
-                        $copyfunction = 'grouptool_copy_'.$cm_to_use->modname.'_grades';
-                        $copyfunction($cm_to_use->instance, $source_grade->userid, $current_grade->userid);
+                    $currentgrade->set_overridden(true, false);
+                    $fullname = fullname($targetusers[$currentgrade->userid]);
+                    if (function_exists ('grouptool_copy_'.$cmtouse->modname.'_grades')) {
+                        $copyfunction = 'grouptool_copy_'.$cmtouse->modname.'_grades';
+                        $copyfunction($cmtouse->instance, $sourcegrade->userid, $currentgrade->userid);
                     }
                     if ($noerror) {
                         $nameinfo .= html_writer::tag('span',
                                                        '✓&nbsp;'.$fullname,
-                                                       array('class'=>'notifysuccess'));
+                                                       array('class' => 'notifysuccess'));
                     } else {
                         $error = true;
                         $nameinfo .= html_writer::tag('span',
                                                        '✗&nbsp;'.$fullname,
-                                                       array('class'=>'notifyproblem'));
+                                                       array('class' => 'notifyproblem'));
                     }
                 }
             }
-            if ($preview_only) {
-                $group_rows[0]->cells[0]->rowspan = count($group_rows);
-                $previewtable->data = $group_rows;
+            if ($previewonly) {
+                $grouprows[0]->cells[0]->rowspan = count($grouprows);
+                $previewtable->data = $grouprows;
             } else {
                 $info .= $nameinfo.html_writer::end_tag('div');
                 $details = array('student' => fullname($sourceuser),
-                                 'teacher' => fullname($orig_teacher),
-                                 'date' => userdate($source_grade->get_dategraded(),
+                                 'teacher' => fullname($origteacher),
+                                 'date' => userdate($sourcegrade->get_dategraded(),
                                                     get_string('strftimedatetimeshort')),
-                                 'feedback' => $source_grade->feedback);
+                                 'feedback' => $sourcegrade->feedback);
                 $info .= html_writer::tag('div', get_string('grade').": ".
-                                        $formatted_grade.html_writer::empty_tag('br').
+                                        $formattedgrade.html_writer::empty_tag('br').
                                         format_text(get_string('copied_grade_feedback', 'grouptool',
                                                                $details),
-                                                    $source_grade->feedbackformat),
-                                                    array('class'=>'gradeinfo'));
+                                                    $sourcegrade->feedbackformat),
+                                                    array('class' => 'gradeinfo'));
             }
-            if (!$preview_only) {
+            if (!$previewonly) {
                 add_to_log($this->grouptool->course,
                         'grouptool', 'grade group',
                         "view.php?id=".$this->grouptool->id."&tab=grading&activity=".
-                        $cm_to_use->instance."&refresh_table=>1",
+                        $cmtouse->instance."&refresh_table=>1",
                         'group-grade single group users='.implode('|', $selected));
             }
         }
-        if ($preview_only) {
+        if ($previewonly) {
             return array($error, html_writer::tag('div', html_writer::table($previewtable),
-                                                  array('class'=>'centeredblock')));
+                                                  array('class' => 'centeredblock')));
         } else {
-            return array($error, html_writer::tag('div', $info, array('class'=>'centeredblock')));
+            return array($error, html_writer::tag('div', $info, array('class' => 'centeredblock')));
         }
     }
 
@@ -2426,22 +2442,22 @@ EOS;
             return;
         }
 
-        $refresh_table = optional_param('refresh_table', 0, PARAM_BOOL);
+        $refreshtable = optional_param('refresh_table', 0, PARAM_BOOL);
         $activity = optional_param('activity', null, PARAM_INT); // This is the coursemodule-ID.
 
         // Show only groups with grades given by current user!
-        $mygroups_only = optional_param('mygroups_only', null, PARAM_BOOL);
+        $mygroupsonly = optional_param('mygroups_only', null, PARAM_BOOL);
 
         if (!has_capability('mod/grouptool:grade', $this->context)) {
-            $mygroups_only = 1;
+            $mygroupsonly = 1;
         }
 
-        if ($mygroups_only != null) {
-            set_user_preference('mygroups_only', $mygroups_only, $USER->id);
+        if ($mygroupsonly != null) {
+            set_user_preference('mygroups_only', $mygroupsonly, $USER->id);
         }
 
         // Show only groups with missing grades (groups with at least 1 not-graded member)!
-        $incomplete_only = optional_param('incomplete_only', 0, PARAM_BOOL);
+        $incompleteonly = optional_param('incomplete_only', 0, PARAM_BOOL);
 
         $overwrite = optional_param('overwrite', 0, PARAM_BOOL);
 
@@ -2449,7 +2465,7 @@ EOS;
         $filter = optional_param('filter', GROUPTOOL_FILTER_NONCONFLICTING, PARAM_INT);
         // Steps: 0 = show, 1 = confirm, 2 = action!
         $step = optional_param('step', 0, PARAM_INT);
-        if ($refresh_table) { // If it was just a refresh, reset step!
+        if ($refreshtable) { // If it was just a refresh, reset step!
             $step = 0;
         }
 
@@ -2478,7 +2494,7 @@ EOS;
                     $source = reset($source);
                 }
                 $selected = optional_param_array('selected', null, PARAM_INT);
-                if (!empty($source) && !$refresh_table) {
+                if (!empty($source) && !$refreshtable) {
                     $step = 1;
                 }
             }
@@ -2496,7 +2512,7 @@ EOS;
                 $source = optional_param_array('source', array(), PARAM_INT);
                 $selected = optional_param_array('selected', array(), PARAM_INT);
                 $copygroups = optional_param('copygrades', 0, PARAM_BOOL);
-                if ($copygroups && !$refresh_table) {
+                if ($copygroups && !$refreshtable) {
                     $step = 1;
                 }
             }
@@ -2508,12 +2524,12 @@ EOS;
 
         // Reset process if some evil hacker tried to do smth!
         if (!$confirm && (!data_submitted() || !confirm_sesskey())) {
-            $refresh_table = false;
+            $refreshtable = false;
             $step = 0;
         }
 
-        if (!empty($mygroups_only)) {
-            $mygroups_only = get_user_preferences('mygroups_only', 1, $USER->id);
+        if (!empty($mygroupsonly)) {
+            $mygroupsonly = get_user_preferences('mygroups_only', 1, $USER->id);
         }
 
         $missingsource = array();
@@ -2530,27 +2546,29 @@ EOS;
                     }
                 }
                 if (!empty($selected)) {
-                    list($error, $preview) = $this->copy_grades($activity, $mygroups_only,
+                    list($error, $preview) = $this->copy_grades($activity, $mygroupsonly,
                                                                 $selected, $source, $overwrite,
                                                                 true);
-                    $continue = new moodle_url("view.php?id=".$this->cm->id, array('tab'=>'grading',
-                            'confirm'=>'true',
-                            'sesskey'=>sesskey(),
-                            'step'=>'2',
-                            'activity'=>$activity,
-                            'mygroups_only'=>$mygroups_only,
-                            'overwrite'=>$overwrite,
-                            'selected'=>serialize($selected),
-                            'source'=>serialize($source)));
-                    $cancel = new moodle_url("view.php?id=".$this->cm->id, array('tab'=>'grading',
-                            'confirm'=>'false',
-                            'sesskey'=>sesskey(),
-                            'step'=>'2',
-                            'activity'=>$activity,
-                            'mygroups_only'=>$mygroups_only,
-                            'overwrite'=>$overwrite,
-                            'selected'=>serialize($selected),
-                            'source'=>serialize($source)));
+                    $continue = new moodle_url("view.php?id=".$this->cm->id,
+                                               array('tab'           => 'grading',
+                                                     'confirm'       => 'true',
+                                                     'sesskey'       => sesskey(),
+                                                     'step'          => '2',
+                                                     'activity'      => $activity,
+                                                     'mygroups_only' => $mygroupsonly,
+                                                     'overwrite'     => $overwrite,
+                                                     'selected'      => serialize($selected),
+                                                     'source'        => serialize($source)));
+                    $cancel = new moodle_url("view.php?id=".$this->cm->id,
+                                             array('tab'           => 'grading',
+                                                   'confirm'       => 'false',
+                                                   'sesskey'       => sesskey(),
+                                                   'step'          => '2',
+                                                   'activity'      => $activity,
+                                                   'mygroups_only' => $mygroupsonly,
+                                                   'overwrite'     => $overwrite,
+                                                   'selected'      => serialize($selected),
+                                                   'source'        => serialize($source)));
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
                         echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm',
@@ -2577,28 +2595,29 @@ EOS;
                 }
 
                 if (!empty($selected) && (count($missingsource) == 0)) {
-                    list($error, $preview) = $this->copy_grades($activity, $mygroups_only,
+                    list($error, $preview) = $this->copy_grades($activity, $mygroupsonly,
                                                                 $selected, $source, $overwrite,
                                                                 true);
                     $continue = new moodle_url("view.php?id=".$this->cm->id,
-                                               array('tab'          => 'grading',
-                                                     'confirm'      => 'true',
-                                                     'sesskey'      => sesskey(),
-                                                     'activity'     => $activity,
-                                                     'mygroups_only'=> $mygroups_only,
-                                                     'overwrite'    => $overwrite,
-                                                     'step'         => '2',
-                                                     'selected'     => serialize($selected),
-                                                     'source'       => serialize($source)));
-                    $cancel = new moodle_url("view.php?id=".$this->cm->id, array('tab'=>'grading',
-                            'confirm'=>'false',
-                            'sesskey'=>sesskey(),
-                            'activity'=>$activity,
-                            'mygroups_only'=>$mygroups_only,
-                            'overwrite'=>$overwrite,
-                            'step'=>'2',
-                            'selected'=>serialize($selected),
-                            'source'=>serialize($source)));
+                                               array('tab'           => 'grading',
+                                                     'confirm'       => 'true',
+                                                     'sesskey'       => sesskey(),
+                                                     'activity'      => $activity,
+                                                     'mygroups_only' => $mygroupsonly,
+                                                     'overwrite'     => $overwrite,
+                                                     'step'          => '2',
+                                                     'selected'      => serialize($selected),
+                                                     'source'        => serialize($source)));
+                    $cancel = new moodle_url("view.php?id=".$this->cm->id,
+                                             array('tab' => 'grading',
+                                                   'confirm'       => 'false',
+                                                   'sesskey'       => sesskey(),
+                                                   'activity'      => $activity,
+                                                   'mygroups_only' => $mygroupsonly,
+                                                   'overwrite'     => $overwrite,
+                                                   'step'          => '2',
+                                                   'selected'      => serialize($selected),
+                                                   'source'        => serialize($source)));
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
                         echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm',
@@ -2628,7 +2647,7 @@ EOS;
 
         if ($step == 2) {    // Do action and continue with showing the form!
             // if there was an error?
-            list($error, $info) = $this->copy_grades($activity, $mygroups_only, $selected, $source,
+            list($error, $info) = $this->copy_grades($activity, $mygroupsonly, $selected, $source,
                                                      $overwrite);
             if ($error) {
                 echo $OUTPUT->box($OUTPUT->notification(get_string('copy_grades_errors',
@@ -2644,7 +2663,7 @@ EOS;
         if ($step != 1 || count($missingsource)) {    // Show form if step is either 0 or 2!
 
             // Prepare form content!
-            $activity_title = get_string('grading_activity_title', 'grouptool');
+            $activitytitle = get_string('grading_activity_title', 'grouptool');
 
             if ($modinfo = get_fast_modinfo($this->course)) {
                 $section = 0;
@@ -2684,124 +2703,123 @@ EOS;
                 }
             }
 
-            $hidden_elements = html_writer::empty_tag('input', array('type'  => 'hidden',
+            $hiddenelements = html_writer::empty_tag('input', array('type'   => 'hidden',
                                                                      'name'  => 'sesskey',
                                                                      'value' => sesskey()));
-            $activity_element = html_writer::select($activities, "activity", $activity);;
-            $activity_select =     html_writer::start_tag('div', array('class'=>'fitem')).
-                                   html_writer::tag('div', $activity_title,
-                                                    array('class'=>'fitemtitle')).
-                                   html_writer::tag('div', $activity_element,
-                                                    array('class'=>'felement')).
-                                   html_writer::end_tag('div');
+            $activityelement = html_writer::select($activities, "activity", $activity);;
+            $activityselect = html_writer::start_tag('div', array('class' => 'fitem')).
+                              html_writer::tag('div', $activitytitle,
+                                               array('class' => 'fitemtitle')).
+                              html_writer::tag('div', $activityelement,
+                                               array('class' => 'felement')).
+                              html_writer::end_tag('div');
 
-            $mygroups_only_title = "";
+            $mygroupsonlytitle = "";
             if (!has_capability('mod/grouptool:grade', $this->context)) {
                 $attr['disabled'] = 'disabled';
-                $mygroups_only_element = html_writer::checkbox('mygroups_only', 1, $mygroups_only,
+                $mygroupsonlyelement = html_writer::checkbox('mygroups_only', 1, $mygroupsonly,
                                                                get_string('mygroups_only_label',
                                                                           'grouptool'), $attr);
-                $attributes['type']    = 'hidden';
-                $attributes['value']   = 1;
-                $attributes['name']    = 'mygroups_only';
-                $mygroups_only_element .= html_writer::empty_tag('input', $attributes);
+                $attributes['type'] = 'hidden';
+                $attributes['value'] = 1;
+                $attributes['name'] = 'mygroups_only';
+                $mygroupsonlyelement .= html_writer::empty_tag('input', $attributes);
             } else {
-                $mygroups_only_element = html_writer::checkbox('mygroups_only', 1, $mygroups_only,
+                $mygroupsonlyelement = html_writer::checkbox('mygroups_only', 1, $mygroupsonly,
                                                                get_string('mygroups_only_label',
                                                                           'grouptool'));
             }
-            $mygroups_only_chkbox =    html_writer::start_tag('div', array('class'=>'fitem')).
-            html_writer::tag('div', ($mygroups_only_title != "" ? $mygroups_only_title : "&nbsp;"),
-                             array('class'=>'fitemtitle')).
-            html_writer::tag('div', $mygroups_only_element, array('class'=>'felement')).
-            html_writer::end_tag('div');
+            $mygroupsonlychkbox = html_writer::start_tag('div', array('class' => 'fitem')).
+                                  html_writer::tag('div', ($mygroupsonlytitle != "" ?
+                                                          $mygroupsonlytitle : "&nbsp;"),
+                                                   array('class' => 'fitemtitle')).
+                                  html_writer::tag('div', $mygroupsonlyelement,
+                                                   array('class' => 'felement')).
+                                  html_writer::end_tag('div');
 
-            $incomplete_only_title = "";
-            $incomplete_only_element = html_writer::checkbox('incomplete_only', 1, $incomplete_only,
-                                                             get_string('incomplete_only_label',
-                                                                        'grouptool'));
-            $incomplete_only_chkbox =   html_writer::start_tag('div', array('class'=>'fitem')).
-            html_writer::tag('div', ($incomplete_only_title != "" ? $incomplete_only_title
-                                                                  : "&nbsp;"),
-                             array('class'=>'fitemtitle')).
-            html_writer::tag('div', $incomplete_only_element, array('class'=>'felement')).
-            html_writer::end_tag('div');
+            $incompleteonlytitle = "";
+            $incompleteonlyelement = html_writer::checkbox('incomplete_only', 1, $incompleteonly,
+                                                           get_string('incomplete_only_label',
+                                                                      'grouptool'));
+            $incompleteonlychkbox = html_writer::start_tag('div', array('class' => 'fitem')).
+                                    html_writer::tag('div', ($incompleteonlytitle != "" ?
+                                                            $incompleteonlytitle : "&nbsp;"),
+                                                     array('class' => 'fitemtitle')).
+                                    html_writer::tag('div', $incompleteonlyelement,
+                                                     array('class' => 'felement')).
+                                    html_writer::end_tag('div');
 
-            $overwrite_title = "";
-            $overwrite_element = html_writer::checkbox('overwrite', 1, $overwrite,
-                                                       get_string('overwrite_label', 'grouptool'));
-            $overwrite_chkbox =    html_writer::start_tag('div', array('class'=>'fitem')).
-            html_writer::tag('div', ($overwrite_title != "" ? $overwrite_title : "&nbsp;"),
-                             array('class'=>'fitemtitle')).
-            html_writer::tag('div', $overwrite_element, array('class'=>'felement')).
-            html_writer::end_tag('div');
+            $overwritetitle = "";
+            $overwriteelement = html_writer::checkbox('overwrite', 1, $overwrite,
+                                                      get_string('overwrite_label', 'grouptool'));
+            $overwritechkbox = html_writer::start_tag('div', array('class' => 'fitem')).
+                               html_writer::tag('div', ($overwritetitle != "" ?
+                                                       $overwritetitle : "&nbsp;"),
+                                                array('class' => 'fitemtitle')).
+                               html_writer::tag('div', $overwriteelement,
+                                                array('class' => 'felement')).
+                               html_writer::end_tag('div');
 
-            $filter_title = get_string('grading_filter_select_title', 'grouptool').
-                            $OUTPUT->help_icon('grading_filter_select_title', 'grouptool');
+            $filtertitle = get_string('grading_filter_select_title', 'grouptool').
+                           $OUTPUT->help_icon('grading_filter_select_title', 'grouptool');
             $options = array("-1" => get_string('nonconflicting', 'grouptool'),
                              "0"  => get_string('all'));
             $groups = groups_get_all_groups($this->course->id, null, null, 'id, name');
             foreach ($groups as $key => $group) {
-                $membercount = $DB->count_records('groups_members', array('groupid'=>$group->id));
+                $membercount = $DB->count_records('groups_members', array('groupid' => $group->id));
                 if ($membercount == 0) {
                     continue;
                 }
                 $options[$key] = $group->name.' ('.$membercount.')';
             }
 
-            $filter_element = html_writer::select($options, 'filter', $filter, false);
-            $filter_select =    html_writer::start_tag('div', array('class'=>'fitem')).
-            html_writer::tag('div', $filter_title, array('class'=>'fitemtitle')).
-            html_writer::tag('div', $filter_element, array('class'=>'felement')).
-            html_writer::end_tag('div');
+            $filterelement = html_writer::select($options, 'filter', $filter, false);
+            $filterselect = html_writer::start_tag('div', array('class' => 'fitem')).
+                            html_writer::tag('div', $filtertitle, array('class' => 'fitemtitle')).
+                            html_writer::tag('div', $filterelement, array('class' => 'felement')).
+                            html_writer::end_tag('div');
 
-            $grouping_title = get_string('grading_grouping_select_title', 'grouptool');
+            $groupingtitle = get_string('grading_grouping_select_title', 'grouptool');
             $groupings = groups_get_all_groupings($this->course->id);
             $options = array();
             foreach ($groupings as $currentgrouping) {
                 $options[$currentgrouping->id] = $currentgrouping->name;
             }
-            $grouping_element = html_writer::select($options, 'grouping', $grouping,
-                                                    get_string('disabled', 'grouptool'));
-            $grouping_select =  html_writer::start_tag('div', array('class'=>'fitem')).
-            html_writer::tag('div', $grouping_title, array('class'=>'fitemtitle')).
-            html_writer::tag('div', $grouping_element, array('class'=>'felement')).
-            html_writer::end_tag('div');
+            $groupingelement = html_writer::select($options, 'grouping', $grouping,
+                                                   get_string('disabled', 'grouptool'));
+            $groupingselect = html_writer::start_tag('div', array('class' => 'fitem')).
+                              html_writer::tag('div', $groupingtitle, array('class' => 'fitemtitle')).
+                              html_writer::tag('div', $groupingelement, array('class' => 'felement')).
+                              html_writer::end_tag('div');
 
-            $refresh_title = "";
-            $refresh_element = html_writer::tag('button', get_string('refresh_table_button',
-                                                                     'grouptool'),
-                                                array('type'  => 'submit',
-                                                      'name'  => 'refresh_table',
-                                                      'value' => 'true'));
-            $refresh_button =    html_writer::start_tag('div', array('class'=>'fitem')).
-            html_writer::tag('div', ($refresh_title != "" ? $refresh_title : "&nbsp;"),
-                             array('class'=>'fitemtitle')).
-            html_writer::tag('div', $refresh_element, array('class'=>'felement')).
-            html_writer::end_tag('div');
+            $refreshtitle = "";
+            $refreshelement = html_writer::tag('button', get_string('refresh_table_button',
+                                                                    'grouptool'),
+                                               array('type'  => 'submit',
+                                                     'name'  => 'refresh_table',
+                                                     'value' => 'true'));
+            $refreshbutton = html_writer::start_tag('div', array('class' => 'fitem')).
+                             html_writer::tag('div', ($refreshtitle != "" ? $refreshtitle : "&nbsp;"),
+                                              array('class' => 'fitemtitle')).
+                             html_writer::tag('div', $refreshelement, array('class' => 'felement')).
+                             html_writer::end_tag('div');
 
             $legend = html_writer::tag('legend', get_string('filters_legend', 'grouptool'));
             $filterelements = html_writer::tag('fieldset',
-                    $legend.
-                    $activity_select.
-                    $mygroups_only_chkbox.
-                    $incomplete_only_chkbox.
-                    $overwrite_chkbox.
-                    $filter_select.
-                    $grouping_select.
-                    $refresh_button,
-
-                    array('class'=>'clearfix'));
+                                               $legend.$activityselect.$mygroupsonlychkbox.
+                                               $incompleteonlychkbox.$overwritechkbox.$filterselect.
+                                               $groupingselect.$refreshbutton,
+                                               array('class' => 'clearfix'));
             if ($filter > 0) {
-                $tablehtml = $this->get_grading_table($activity, $mygroups_only, $incomplete_only,
+                $tablehtml = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
                                                       $filter, $selected);
             } else {
-                $tablehtml = $this->get_grading_table($activity, $mygroups_only, $incomplete_only,
+                $tablehtml = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
                                                       $filter, $selected, $missingsource);
             }
 
-            $formcontent = html_writer::tag('div', $hidden_elements.$filterelements.$tablehtml,
-                                            array('class'=>'clearfix'));
+            $formcontent = html_writer::tag('div', $hiddenelements.$filterelements.$tablehtml,
+                                            array('class' => 'clearfix'));
 
             $formattr = array(
                     'method' => 'post',
@@ -2819,8 +2837,8 @@ EOS;
      *
      * @global object $DB
      * @global object $PAGE
-     * @param bool $include_regs optional include registered users in returned object
-     * @param bool $include_queues optional include queued users in returned object
+     * @param bool $includeregs optional include registered users in returned object
+     * @param bool $includequeues optional include queued users in returned object
      * @param int $agrpid optional filter by a single active-groupid from {grouptool_agrps}.id
      * @param int $groupid optional filter by a single group-id from {groups}.id
      * @param int $groupingid optional filter by a single grouping-id
@@ -2828,46 +2846,46 @@ EOS;
      *                                    instead of {grouptool_agrps}.id
      * @return array of objects containing all necessary information about chosen active groups
      */
-    private function get_active_groups($include_regs=false, $include_queues=false, $agrpid=0,
+    private function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
                                        $groupid=0, $groupingid=0, $indexbygroup=true) {
         global $DB, $PAGE, $CFG;
 
         require_capability('mod/grouptool:view_groups', $this->context);
 
-        $params = array('grouptoolid'=>$this->cm->instance);
+        $params = array('grouptoolid' => $this->cm->instance);
 
         if (!empty($agrpid)) {
-            $agrpid_where = " AND agrp.id = :agroup";
+            $agrpidwhere = " AND agrp.id = :agroup";
             $params['agroup'] = $agrpid;
         } else {
-            $agrpid_where = "";
+            $agrpidwhere = "";
         }
         if (!empty($groupid)) {
-            $groupid_where = " AND grp.id = :groupid";
+            $groupidwhere = " AND grp.id = :groupid";
             $params['groupid'] = $groupid;
         } else {
-            $groupid_where = "";
+            $groupidwhere = "";
         }
         if (!empty($groupingid)) {
-            $groupingid_where = " AND grpgs.id = :groupingid";
+            $groupingidwhere = " AND grpgs.id = :groupingid";
             $params['groupingid'] = $groupingid;
         } else {
-            $groupingid_where = "";
+            $groupingidwhere = "";
         }
 
         if (!empty($this->grouptool->use_size)) {
             if (empty($this->grouptool->use_individual)) {
-                $size_sql = " ".$this->grouptool->grpsize." AS grpsize,";
+                $sizesql = " ".$this->grouptool->grpsize." AS grpsize,";
             } else {
-                $grpsize = (!empty($this->grouptool->grpsize) ? $this->grouptool->grpsize
-                                                              : $CFG->grouptool_grpsize);
+                $grpsize = (!empty($this->grouptool->grpsize) ?
+                            $this->grouptool->grpsize : $CFG->grouptool_grpsize);
                 if (empty($grpsize)) {
                     $grpsize = 3;
                 }
-                $size_sql = " COALESCE(agrp.grpsize, ".$grpsize.") AS grpsize,";
+                $sizesql = " COALESCE(agrp.grpsize, ".$grpsize.") AS grpsize,";
             }
         } else {
-            $size_sql = "";
+            $sizesql = "";
         }
         if ($indexbygroup) {
             $idstring = "grp.id as id, agrp.id as agrpid";
@@ -2875,12 +2893,12 @@ EOS;
             $idstring = "agrp.id as agrpid, grp.id as id";
         }
         $groupdata = $DB->get_records_sql("
-                SELECT ".$idstring.", grp.name AS name,".$size_sql." agrp.sort_order AS sort_order
+                SELECT ".$idstring.", grp.name AS name,".$sizesql." agrp.sort_order AS sort_order
                 FROM {groups} AS grp LEFT JOIN {grouptool_agrps} as agrp ON agrp.groupid = grp.id
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} AS grpgs ON {groupings_groups}.groupingid = grpgs.id
                 WHERE agrp.grouptoolid = :grouptoolid AND agrp.active = 1".
-                     $agrpid_where.$groupid_where.$groupingid_where."
+                     $agrpidwhere.$groupidwhere.$groupingidwhere."
                 GROUP BY grp.id
                 ORDER BY sort_order ASC, name ASC", $params);
         foreach ($groupdata as $key => $group) {
@@ -2888,7 +2906,7 @@ EOS;
                                                     'groupingid',
                                                     'groupid = ?',
                                                     array($group->id));
-            if(!empty($groupingids)) {
+            if (!empty($groupingids)) {
                 $groupdata[$key]->classes = implode(',', $groupingids);
             } else {
                 $groupdata[$key]->classes = '';
@@ -2896,20 +2914,20 @@ EOS;
         }
 
         if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
-                || ($this->grouptool->use_queue && $include_queues)
-                || ($include_regs)) {
+                || ($this->grouptool->use_queue && $includequeues)
+                || ($includeregs)) {
 
             foreach ($groupdata as $key => $currentgroup) {
 
                 $groupdata[$key]->queued = null;
-                if ($include_queues && $this->grouptool->use_queue) {
-                    $attr = array('agrpid'=>$currentgroup->agrpid);
+                if ($includequeues && $this->grouptool->use_queue) {
+                    $attr = array('agrpid' => $currentgroup->agrpid);
                     $groupdata[$key]->queued = (array)$DB->get_records('grouptool_queued', $attr);
                 }
 
                 $groupdata[$key]->registered = null;
-                if ($include_regs) {
-                    $params = array('agrpid'=>$currentgroup->agrpid);
+                if ($includeregs) {
+                    $params = array('agrpid' => $currentgroup->agrpid);
                     $where = "agrpid = :agrpid AND modified_by >= 0";
                     $groupdata[$key]->registered = $DB->get_records_select('grouptool_registered',
                                                                            $where, $params);
@@ -2934,10 +2952,10 @@ EOS;
      * @global object $CFG
      * @param int $agrpid active-group-id to unregister/unqueue user from
      * @param int $userid user to unregister/unqueue
-     * @param bool $preview_only optional don't act, just return a preview
+     * @param bool $previewonly optional don't act, just return a preview
      * @return array ($error, $message)
      */
-    private function unregister_from_agrp($agrpid=0, $userid=0, $preview_only=false) {
+    private function unregister_from_agrp($agrpid=0, $userid=0, $previewonly=false) {
         global $USER, $PAGE, $DB, $CFG;
 
         if (empty($agrpid)) {
@@ -2949,11 +2967,11 @@ EOS;
             require_capability('mod/grouptool:register', $this->context);
         }
 
-        $reg_open = ($this->grouptool->allow_reg
-                && (($this->grouptool->timedue == 0)
-                        || (time() < $this->grouptool->timedue)));
+        $regopen = ($this->grouptool->allow_reg
+                    && (($this->grouptool->timedue == 0)
+                         || (time() < $this->grouptool->timedue)));
 
-        if (!$reg_open && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
             return array(true, get_string('reg_not_open', 'grouptool'));
         }
 
@@ -2963,7 +2981,7 @@ EOS;
 
         $message = new stdClass();
         if ($userid != $USER->id) {
-            $userdata = $DB->get_record('user', array('id'=>$userid));
+            $userdata = $DB->get_record('user', array('id' => $userid));
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid);
@@ -2977,18 +2995,18 @@ EOS;
         $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
-        if ($userregs+$userqueues <= $min) {
+        if ($userregs + $userqueues <= $min) {
             if ($userid == $USER->id) {
                 return array(true, get_string('you_have_too_less_regs', 'grouptool', $message));
             } else {
                 return array(true, get_string('user_has_too_less_regs', 'grouptool', $message));
             }
         }
-        
+
         if ($groupdata) {
             if ($this->get_rank_in_queue($groupdata->registered, $userid) != false) {
                 // He is registered!
-                if ($preview_only) {
+                if ($previewonly) {
                     if ($userid == $USER->id) {
                         return array(false, get_string('unreg_you_from_group', 'grouptool',
                                                        $message));
@@ -3010,23 +3028,23 @@ EOS;
                         ORDER BY timestamp ASC
                         LIMIT 1";
                         $record = $DB->get_record_sql($sql, array($agrpid));
-                        $new_record = clone $record;
-                        unset($new_record->id);
-                        $new_record->modified_by = $new_record->userid;
-                        $DB->insert_record('grouptool_registered', $new_record);
+                        $newrecord = clone $record;
+                        unset($newrecord->id);
+                        $newrecord->modified_by = $newrecord->userid;
+                        $DB->insert_record('grouptool_registered', $newrecord);
                         if (!empty($this->grouptool->immediate_reg)) {
-                            groups_add_member($groupdata->id, $new_record->userid);
+                            groups_add_member($groupdata->id, $newrecord->userid);
                         }
-                        $allow_m = $this->grouptool->allow_multiple;
-                        $usrregcnt = $this->get_user_reg_count(0, $new_record->userid);
+                        $allowm = $this->grouptool->allow_multiple;
+                        $usrregcnt = $this->get_user_reg_count(0, $newrecord->userid);
                         $max = $this->grouptool->choose_max;
-                        if (($allow_m && ( $usrregcnt >= $max) ) || !$allow_m) {
+                        if (($allowm && ( $usrregcnt >= $max) ) || !$allowm) {
                             $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
                             $agrpids = array_keys($agrps);
                             list($sql, $params) = $DB->get_in_or_equal($agrpids);
                             $DB->delete_records_select('grouptool_queued',
                                                        ' userid = ? AND agrpid '.$sql,
-                                                       array_merge(array($new_record->userid),
+                                                       array_merge(array($newrecord->userid),
                                                                    $params));
                         }
 
@@ -3042,7 +3060,7 @@ EOS;
                                                 "grouptool", $message)."\n";
                         $posttext .= "----------------------------------------------------------\n";
                         $usermailformat = $DB->get_field('user', 'mailformat',
-                                                         array('id'=>$new_record->userid));
+                                                         array('id' => $newrecord->userid));
                         if ($usermailformat == 1) {  // HTML!
                             $posthtml = "<p><font face=\"sans-serif\">";
                             $posthtml = "<a href=\"".$CFG->wwwroot."/course/view.php?id=".
@@ -3060,7 +3078,7 @@ EOS;
                             $posthtml = "";
                         }
 
-                        $messageuser = $DB->get_record('user', array('id'=>$new_record->userid));
+                        $messageuser = $DB->get_record('user', array('id' => $newrecord->userid));
                         $eventdata = new stdClass();
                         $eventdata->modulename       = 'grouptool';
                         $eventdata->userfrom         = $messageuser;
@@ -3080,7 +3098,7 @@ EOS;
                         $eventdata->contexturlname  = $this->grouptool->name;
 
                         message_send($eventdata);
-                        $DB->delete_records('grouptool_queued', array('id'=>$record->id));
+                        $DB->delete_records('grouptool_queued', array('id' => $record->id));
                     }
                     add_to_log($this->grouptool->course,
                             'grouptool', 'unregister',
@@ -3096,7 +3114,7 @@ EOS;
                 }
             } else if ($this->get_rank_in_queue($groupdata->queued, $userid) != false) {
                 // He is queued!
-                if ($preview_only) {
+                if ($previewonly) {
                     if ($userid == $USER->id) {
                         return array(false, get_string('unqueue_you_from_group', 'grouptool',
                                                        $message));
@@ -3105,8 +3123,8 @@ EOS;
                                                        $message));
                     }
                 } else {
-                    $DB->delete_records('grouptool_queued', array('agrpid'=>$agrpid,
-                            'userid'=>$userid));
+                    $DB->delete_records('grouptool_queued', array('agrpid' => $agrpid,
+                                                                  'userid' => $userid));
                     add_to_log($this->grouptool->course,
                             'grouptool', 'unregister',
                             "view.php?id=".$this->grouptool->id."&tab=overview&agrpid=".$agrpid,
@@ -3141,10 +3159,10 @@ EOS;
      * @global object $DB
      * @param int $agrpid active-group-id to register/queue user to
      * @param int $userid user to register/queue
-     * @param bool $preview_only optional don't act, just return a preview
+     * @param bool $previewonly optional don't act, just return a preview
      * @return array ($error, $message)
      */
-    private function register_in_agrp($agrpid=0, $userid=0, $preview_only=false, $movefromqueue=false) {
+    private function register_in_agrp($agrpid=0, $userid=0, $previewonly=false, $movefromqueue=false) {
         global $USER, $PAGE, $DB, $SESSION;
 
         $grouptool = $this->grouptool;
@@ -3158,18 +3176,18 @@ EOS;
             require_capability('mod/grouptool:register', $this->context);
         }
 
-        $reg_open = ($this->grouptool->allow_reg
+        $regopen = ($this->grouptool->allow_reg
                     && (($this->grouptool->timedue == 0)
                         || (time() < $this->grouptool->timedue))
                     && ($this->grouptool->timeavailable < time()));
 
-        if (!$reg_open && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
             return array(true, get_string('reg_not_open', 'grouptool'));
         }
 
         $message = new stdClass();
         if ($userid != $USER->id) {
-            $userdata = $DB->get_record('user', array('id'=>$userid));
+            $userdata = $DB->get_record('user', array('id' => $userid));
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid);
@@ -3205,7 +3223,7 @@ EOS;
             }
 
             if ($this->grpmarked($groupdata->agrpid, $userid)) {
-                //allready marked for registration
+                // Allready marked for registration?
                 if ($userid != $USER->id) {
                     return array(true, get_string('already_marked', 'grouptool', $message));
                 } else {
@@ -3214,14 +3232,14 @@ EOS;
             }
 
             if (empty($movefromqueue)
-                && ($userqueues == 1 && $userregs == $max-1)
-                || ($userqueues+$userregs == 1 && $max == 1)) {
-                //groupchange!
-                if(empty($grouptool->allow_unreg)) {
+                && ($userqueues == 1 && $userregs == $max - 1)
+                || ($userqueues + $userregs == 1 && $max == 1)) {
+                // Groupchange!
+                if (empty($grouptool->allow_unreg)) {
                     return array(true, get_string('unreg_not_allowed', 'grouptool'));
                 }
 
-                if ($preview_only) {
+                if ($previewonly) {
                     if (!$this->grouptool->use_size
                         || (count($groupdata->registered) < $groupdata->grpsize)
                         || ($this->grouptool->use_queue
@@ -3229,7 +3247,7 @@ EOS;
                         return array(-1,
                                      get_string('change_group_to', 'grouptool', $message));
                     } else if (!$this->grouptool->use_queue) {
-                        //group is full!
+                        // Group is full!
                         if ($userid != $USER->id) {
                             return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                         } else {
@@ -3245,14 +3263,14 @@ EOS;
                 } else if (!$this->grouptool->use_size
                            || (count($groupdata->registered) < $groupdata->grpsize)
                            || ($this->grouptool->use_queue
-                               && $userqueues-1 < $this->grouptool->queues_max)) {
+                               && $userqueues - 1 < $this->grouptool->queues_max)) {
                     $record = new stdClass();
                     $record->agrpid = $agrpid;
                     $record->userid = $userid;
                     $record->timestamp = time();
                     $record->modified_by = $USER->id;
-                    if($userqueues == 1) {
-                        //delete his queue
+                    if ($userqueues == 1) {
+                        // Delete his queue!
                         $DB->delete_records_select('grouptool_queued',
                                                    "userid = ? AND agrpid ".$agrpsql, $params);
                     } else if ($userregs == 1) {
@@ -3263,10 +3281,8 @@ EOS;
                                                      $params, MUST_EXIST);
                         $DB->delete_records_select('grouptool_registered',
                                                    "userid = ? AND agrpid ".$agrpsql, $params);
-                        if(!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
+                        if (!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
                             groups_remove_member($oldgrp, $userid);
-                        } else if (empty($oldgrp)) {
-                            //error, old group not found ?!?
                         }
                     }
                     if (!$this->grouptool->use_size
@@ -3281,7 +3297,7 @@ EOS;
                                 "&tab=overview&agrpid=".$agrpid,
                                 'register user:'.$userid.' in agrpid:'.$agrpid);
                     } else if ($this->grouptool->use_queue
-                               && $userqueues-1 < $this->grouptool->queues_max) {
+                               && $userqueues - 1 < $this->grouptool->queues_max) {
                         $DB->insert_record('grouptool_queued', $record);
                         add_to_log($this->grouptool->course,
                                    'grouptool', 'add queue',
@@ -3289,13 +3305,13 @@ EOS;
                                    "&tab=overview&agrpid=".$agrpid,
                                    'queue user:'.$userid.' in agrpid:'.$agrpid);
                     } else if (!$this->grouptool->use_queue) {
-                        //group is full!
+                        // Group is full!
                         if ($userid != $USER->id) {
                             return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                         } else {
                             return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
                         }
-                    } else  if ($userqueues-1 >= $this->grouptool->queues_max) {
+                    } else if ($userqueues - 1 >= $this->grouptool->queues_max) {
                         if ($userid != $USER->id) {
                             return array(1, get_string('too_many_queue_places', 'grouptool'));
                         } else {
@@ -3314,16 +3330,16 @@ EOS;
                 }
             }
 
-            if ((empty($movefromqueue) && $userregs+$userqueues >= $max)
-                 || (!empty($movefromqueue) && $userregs+$userqueues-1 >= $max)) {
+            if ((empty($movefromqueue) && $userregs + $userqueues >= $max)
+                 || (!empty($movefromqueue) && $userregs + $userqueues - 1 >= $max)) {
                 return array(1, get_string('too_many_regs', 'grouptool'));
             }
-            //get users marks
+            // Get users marks!
             $marks = $this->count_user_marks($userid);
             if ($grouptool->use_size) {
                 if (count($groupdata->registered) < $groupdata->grpsize) {
-                    //register
-                    if ($preview_only) {
+                    // Register!
+                    if ($previewonly) {
                         if ($userid != $USER->id) {
                             return array(false,
                                          get_string('register_in_group', 'grouptool', $message));
@@ -3333,8 +3349,8 @@ EOS;
                                                     $message));
                         }
                     } else if (empty($movefromqueue) && $this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks+$userregs+$userqueues))) {
-                        //cache data until enough registrations are made
+                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues))) {
+                        // Cache data until enough registrations are made!
                         $record = new stdClass();
                         $record->agrpid = $agrpid;
                         $record->userid = $userid;
@@ -3352,10 +3368,10 @@ EOS;
                         }
                     } else {
                         if ($this->grouptool->allow_multiple) {
-                            //enough registrations have been made, save them
-                            if(!empty($marks)) {
+                            // Enough registrations have been made, save them!
+                            if (!empty($marks)) {
                                 $usermarks = $this->get_user_marks($userid);
-                                foreach($usermarks as $cur) {
+                                foreach ($usermarks as $cur) {
                                     if ($cur->type == 'reg') {
                                         unset($cur->type);
                                         $cur->modified_by = $USER->id;
@@ -3390,7 +3406,7 @@ EOS;
                             && ($regcnt >= $this->grouptool->choose_max))
                             || !$this->grouptool->allow_multiple) {
                             $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                            if(count($agrps) > 0) {
+                            if (count($agrps) > 0) {
                                 $agrpids = array_keys($agrps);
                                 list($sql, $params) = $DB->get_in_or_equal($agrpids);
                                 $DB->delete_records_select('grouptool_queued',
@@ -3409,8 +3425,8 @@ EOS;
                         }
                     }
                 } else if ($grouptool->use_queue) {
-                    //try to queue
-                    if($userqueues >= $grouptool->queues_max) {
+                    // Try to queue!
+                    if ($userqueues >= $grouptool->queues_max) {
                         if ($userid != $USER->id) {
                             return array(1, get_string('too_many_queue_places', 'grouptool'));
                         } else {
@@ -3418,7 +3434,7 @@ EOS;
                         }
                     }
                     $marks = $this->count_user_marks($userid);
-                    if ($preview_only) {
+                    if ($previewonly) {
                         if ($userid != $USER->id) {
                             return array(-1,
                                          get_string('queue_in_group', 'grouptool', $message));
@@ -3428,8 +3444,8 @@ EOS;
                                                     $message));
                         }
                     } else if ($this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks+$userregs+$userqueues))) {
-                        //cache data until enough registrations are made
+                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues))) {
+                        // Cache data until enough registrations are made!
                         $record = new stdClass();
                         $record->agrpid = $agrpid;
                         $record->grp_id = $groupdata->id;
@@ -3448,10 +3464,10 @@ EOS;
                         }
                     } else {
                         if ($this->grouptool->allow_multiple) {
-                            if(!empty($marks)) {
-                                //enough registrations have been made, save them
+                            if (!empty($marks)) {
+                                // Enough registrations have been made, save them!
                                 $usermarks = $this->get_user_marks($userid);
-                                foreach($usermarks as $cur) {
+                                foreach ($usermarks as $cur) {
                                     if ($cur->type == 'reg') {
                                         unset($cur->type);
                                         unset($cur->groupid);
@@ -3490,7 +3506,7 @@ EOS;
                     }
 
                 } else {
-                    //group is full!
+                    // Group is full!
                     if ($userid != $USER->id) {
                         return array(1, get_string('reg_in_full_group', 'grouptool', $message));
                     } else {
@@ -3498,8 +3514,8 @@ EOS;
                     }
                 }
             } else {
-                //register him 
-                if ($preview_only) {
+                // Register him!
+                if ($previewonly) {
                     if ($userid != $USER->id) {
                         return array(false,
                                      get_string('register_in_group', 'grouptool', $message));
@@ -3509,8 +3525,8 @@ EOS;
                                                 $message));
                     }
                 } else if ($this->grouptool->allow_multiple
-                           && ($this->grouptool->choose_min > ($marks+1+$userregs+$userqueues))) {
-                    //cache data until enough registrations are made
+                           && ($this->grouptool->choose_min > ($marks + 1 + $userregs + $userqueues))) {
+                    // Cache data until enough registrations are made!
                     $record = new stdClass();
                     $record->agrpid = $agrpid;
                     $record->grp_id = $groupdata->id;
@@ -3529,10 +3545,10 @@ EOS;
                     }
                 } else {
                     if ($this->grouptool->allow_multiple) {
-                        //enough registrations have been made, save them
-                        if($marks) {
+                        // Enough registrations have been made, save them!
+                        if ($marks) {
                             $usermarks = $this->get_user_marks($userid);
-                            foreach($usermarks as $cur) {
+                            foreach ($usermarks as $cur) {
                                 if ($cur->type == 'reg') {
                                     unset($cur->type);
                                     $cur->modified_by = $USER->id;
@@ -3567,7 +3583,7 @@ EOS;
                         && ($regcnt >= $this->grouptool->choose_max))
                         || !$this->grouptool->allow_multiple) {
                         $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                        if(count($agrps) > 0) {
+                        if (count($agrps) > 0) {
                             $agrpids = array_keys($agrps);
                             list($sql, $params) = $DB->get_in_or_equal($agrpids);
                             $DB->delete_records_select('grouptool_queued',
@@ -3614,7 +3630,7 @@ EOS;
         foreach ($agrps as $current) {
             $keys[] = $current->agrpid;
         }
-        if(count($keys) == 0) {
+        if (count($keys) == 0) {
             return 0;
         }
         list($sql, $params) = $DB->get_in_or_equal($keys);
@@ -3647,7 +3663,7 @@ EOS;
         foreach ($agrps as $current) {
             $keys[] = $current->agrpid;
         }
-        if(count($keys) == 0) {
+        if (count($keys) == 0) {
             return 0;
         }
         list($sql, $params) = $DB->get_in_or_equal($keys);
@@ -3668,7 +3684,7 @@ EOS;
         if ($a->timestamp == $b->timestamp) {
             return 0;
         } else {
-            return $a->timestamp > $b->timestamp ? +1 : -1;
+            return $a->timestamp > $b->timestamp ? 1 : -1;
         }
     }
 
@@ -3688,7 +3704,7 @@ EOS;
         global $DB;
         if (is_array($data)) { // It's the queue itself!
             uasort($data, array(&$this, "cmptimestamp"));
-            $i=1;
+            $i = 1;
             foreach ($data as $entry) {
                 if ($entry->userid == $userid) {
                     return $i;
@@ -3753,36 +3769,36 @@ EOS;
             }
             $return->occupied_places += count($group->registered);
             if ($userid != 0) {
-                $reg_rank = $this->get_rank_in_queue($group->registered, $userid);
-                if (!empty($reg_rank)) {
-                    $reg_data = new stdClass();
-                    $reg_data->rank = $reg_rank;
-                    $reg_data->grpname = $group->name;
-                    $reg_data->agrpid = $group->agrpid;
+                $regrank = $this->get_rank_in_queue($group->registered, $userid);
+                if (!empty($regrank)) {
+                    $regdata = new stdClass();
+                    $regdata->rank = $regrank;
+                    $regdata->grpname = $group->name;
+                    $regdata->agrpid = $group->agrpid;
                     reset($group->registered);
                     do {
                         $current = current($group->registered);
-                        $reg_data->timestamp = $current->timestamp;
+                        $regdata->timestamp = $current->timestamp;
                         next($group->registered);
                     } while ($current->userid != $userid);
-                    $reg_data->id = $group->id;
-                    $return->registered[] = $reg_data;
+                    $regdata->id = $group->id;
+                    $return->registered[] = $regdata;
                 }
 
-                $queue_rank = $this->get_rank_in_queue($group->queued, $userid);
-                if (!empty($queue_rank)) {
-                    $queue_data = new stdClass();
-                    $queue_data->rank = $queue_rank;
-                    $queue_data->grpname = $group->name;
-                    $queue_data->agrpid = $group->agrpid;
+                $queuerank = $this->get_rank_in_queue($group->queued, $userid);
+                if (!empty($queuerank)) {
+                    $queuedata = new stdClass();
+                    $queuedata->rank = $queuerank;
+                    $queuedata->grpname = $group->name;
+                    $queuedata->agrpid = $group->agrpid;
                     reset($group->queued);
                     do {
                         $current = current($group->queued);
-                        $queue_data->timestamp = $current->timestamp;
+                        $queuedata->timestamp = $current->timestamp;
                         next($group->queued);
                     } while ($current->userid != $userid);
-                    $queue_data->id = $group->id;
-                    $return->queued[] = $queue_data;
+                    $queuedata->id = $group->id;
+                    $return->queued[] = $queuedata;
                 }
             }
         }
@@ -3791,8 +3807,8 @@ EOS;
                                    null;
         $return->users = count_enrolled_users($this->context, 'mod/grouptool:register');
 
-        $agrps = $DB->get_records('grouptool_agrps', array('grouptoolid'=>$this->cm->instance));
-        if (is_array($agrps) && count($agrps)>=1) {
+        $agrps = $DB->get_records('grouptool_agrps', array('grouptoolid' => $this->cm->instance));
+        if (is_array($agrps) && count($agrps) >= 1) {
             $agrpids = array_keys($agrps);
             list($inorequal, $params) = $DB->get_in_or_equal($agrpids);
             $sql = "SELECT count(DISTINCT userid)
@@ -3824,10 +3840,10 @@ EOS;
      * @global object $USER
      * @param string $mode optional, without function, reserved for optional later implementation
      *                     (random/alphabetical/... distribution, etc)
-     * @param bool $preview_only show only preview of actions
+     * @param bool $previewonly show only preview of actions
      * @return array ($error, $message)
      */
-    public function resolve_queues($mode = 'sortorder', $preview_only = false) {
+    public function resolve_queues($mode = 'sortorder', $previewonly = false) {
         global $OUTPUT, $DB, $USER;
         $error = false;
         $returntext = "";
@@ -3838,7 +3854,7 @@ EOS;
             $context = $this->context;
         } else {
             $cmid = get_coursemodule_from_instance('grouptool', $grouptoolid);
-            $grouptool = $DB->get_record('grouptool', array('id'=>$grouptoolid), '*', MUST_EXIST);
+            $grouptool = $DB->get_record('grouptool', array('id' => $grouptoolid), '*', MUST_EXIST);
             $context = context_module::instance($cmid->id);
         }
 
@@ -3849,29 +3865,29 @@ EOS;
         if (!empty($agrps)) {
             $agrpids = array_keys($agrps);
             list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
-            $agrps_sql = " AND agrp.id ".$agrpssql;
-            $agrps_params = array_merge(array($grouptool->id), $agrpsparam);
+            $agrpsfiltersql = " AND agrp.id ".$agrpssql;
+            $agrpsfilterparams = array_merge(array($grouptool->id), $agrpsparam);
             // Get queue-entries (sorted by timestamp)!
             if (!empty($grouptool->allow_multiple)) {
-                $queued_sql = " WHERE queued.agrpid ".$agrpssql." ";
-                $queued_params = array_merge($agrpsparam, $agrpsparam);
+                $queuedsql = " WHERE queued.agrpid ".$agrpssql." ";
+                $queuedparams = array_merge($agrpsparam, $agrpsparam);
 
-                $queue_entries = $DB->get_records_sql("
+                $queueentries = $DB->get_records_sql("
                     SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
                     FROM {grouptool_queued} AS queued
                     LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql."
-                    ".$queued_sql."
+                    ".$queuedsql."
                    GROUP BY queued.id
                     ORDER BY priority DESC, queued.timestamp ASC",
-                    array_merge(array($grouptool->choose_min), $queued_params));
+                    array_merge(array($grouptool->choose_min), $queuedparams));
             } else {
-                $queued_sql = " WHERE queued.agrpid ".$agrpssql." ";
-                $queued_params = $agrpsparam;
-                $queue_entries = $DB->get_records_sql("SELECT *, '1' as priority
+                $queuedsql = " WHERE queued.agrpid ".$agrpssql." ";
+                $queuedparams = $agrpsparam;
+                $queueentries = $DB->get_records_sql("SELECT *, '1' as priority
                                                        FROM {grouptool_queued} as queued".
-                                                       $queued_sql.
+                                                       $queuedsql.
                                                       "ORDER BY 'timestamp' ASC",
-                                                      $queued_params);
+                                                      $queuedparams);
             }
             $userregs = $DB->get_records_sql_menu('SELECT reg.userid, COUNT(DISTINCT reg.id)
                                                      FROM {grouptool_registered} as reg
@@ -3887,40 +3903,40 @@ EOS;
                        COUNT(DISTINCT reg.id) as registered
                   FROM {grouptool_agrps} as agrp
              LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrp.id
-                 WHERE agrp.grouptoolid = ?".$agrps_sql."
+                 WHERE agrp.grouptoolid = ?".$agrpsfiltersql."
               GROUP BY agrp.id
-              ORDER BY agrp.sort_order ASC", $agrps_params);
+              ORDER BY agrp.sort_order ASC", $agrpsfilterparams);
 
         $i = 0;
 
-        if (!empty($groupsdata) && !empty($queue_entries)) {
+        if (!empty($groupsdata) && !empty($queueentries)) {
             $groupsnav = array_keys($groupsdata);
-            $queuenav = array_keys($queue_entries);
+            $queuenav = array_keys($queueentries);
             $planned = new stdClass();
-            $cur_group = null;
+            $curgroup = null;
             $maxregs = !empty($this->grouptool->allow_multiple) ? $this->grouptool->choose_max : 1;
             reset($groupsdata);
-            foreach ($queue_entries as $queue) {
+            foreach ($queueentries as $queue) {
                 // Get first non-full group!
-                while (($cur_group == null)
-                       ||($cur_group->grpsize <= $cur_group->registered)) {
-                    if($cur_group === null) {
-                        $cur_group = current($groupsdata);
+                while (($curgroup == null)
+                       ||($curgroup->grpsize <= $curgroup->registered)) {
+                    if ($curgroup === null) {
+                        $curgroup = current($groupsdata);
                     } else {
-                        $cur_group = next($groupsdata);
+                        $curgroup = next($groupsdata);
                     }
-                    if($cur_group === false) {
-                        //TODO finish without having resolved queue completely because there are no places left...
+                    if ($curgroup === false) {
+                        // TODO finish without having resolved queue completely because there are no places left!
                         $error = true;
                         $returntext .= html_writer::tag('div',
                                                         get_string('all_groups_full',
                                                                    'grouptool',
                                                                    $queue->userid),
-                                                        array('class'=>'error'));
+                                                        array('class' => 'error'));
                         return array($error, $returntext);
                     } else {
-                        $cur_group->grpsize = ($grouptool->use_individual && !empty($cur_group->size)) ?
-                                               $cur_group->grpsize :
+                        $curgroup->grpsize = ($grouptool->use_individual && !empty($curgroup->size)) ?
+                                               $curgroup->grpsize :
                                                $grouptool->grpsize;
                     }
                 }
@@ -3928,81 +3944,82 @@ EOS;
                 if (!isset($planned->{$queue->userid})) {
                     $planned->{$queue->userid} = array();
                 }
-                
-                //if user has got too many regs allready
-                if($userregs[$queue->userid] >= $maxregs) {
-                    //TODO message + delete users queue places
+
+                // If user has got too many regs allready!
+                if ($userregs[$queue->userid] >= $maxregs) {
+                    // TODO message + delete users queue places!
                     $returntext .= html_writer::tag('div', get_string('too_many_regs', 'grouptool'),
-                                                    array('class'=>'error'));
+                                                    array('class' => 'error'));
                     $error = true;
-                    //continue with next user/queue-entry
+                    // Continue with next user/queue-entry!
                     continue;
                 }
-                
-                while ($DB->record_exists('grouptool_registered', array('agrpid' => $cur_group->id,
+
+                while ($DB->record_exists('grouptool_registered', array('agrpid' => $curgroup->id,
                                                                         'userid' => $queue->userid))
-                       || in_array($cur_group->id, $planned->{$queue->userid})
-                       || $cur_group->registered >= $cur_group->grpsize) {
-                    $cur_group = next($groupsdata);
+                       || in_array($curgroup->id, $planned->{$queue->userid})
+                       || $curgroup->registered >= $curgroup->grpsize) {
+                    $curgroup = next($groupsdata);
                     $i++;
-                    if($cur_group === false) {
-                        break; //no group left for this user
+                    if ($curgroup === false) {
+                        break; // No group left for this user!
                     }
                 }
- 
-                if ($cur_group !== false) {
-                    //register him
-                    //or mark as planned
-                    if($preview_only) {
-                        list($cur_error, $cur_text) = $this->register_in_agrp($cur_group->id,
-                                                                              $queue->userid,
-                                                                              true,
-                                                                              true);
-                        if(!$cur_error) {
-                            $planned->{$queue->userid}[] = $cur_group->id;
+
+                if ($curgroup !== false) {
+                    // Register him or mark as planed!
+                    if ($previewonly) {
+                        list($curerror, $curtext) = $this->register_in_agrp($curgroup->id,
+                                                                            $queue->userid,
+                                                                            true,
+                                                                            true);
+                        if (!$curerror) {
+                            $planned->{$queue->userid}[] = $curgroup->id;
                         }
-                        $class = $cur_error ? 'error': 'success';
+                        $class = $curerror ? 'error' : 'success';
                         $data = new stdClass();
                         $data->userid = $queue->userid;
                         $data->agrpid = $queue->agrpid;
-                        $data->current_grp = $cur_group->id;
-                        $data->current_text = $cur_text;
+                        $data->current_grp = $curgroup->id;
+                        $data->current_text = $curtext;
                         $movetext = get_string('user_move_prev', 'grouptool', $data);
-                        $returntext .= html_writer::tag('div', $movetext.' ('.$cur_text.')', array('class'=>$class));
+                        $returntext .= html_writer::tag('div', $movetext.' ('.$curtext.')',
+                                                        array('class' => $class));
                         if (!isset($status[$queue->userid])) {
                             $status[$queue->userid] = new stdClass();
                         }
-                        $status[$queue->userid]->error = $cur_error;
-                        $error = $error || $cur_error;
-                        $cur_group->registered++;
+                        $status[$queue->userid]->error = $curerror;
+                        $error = $error || $curerror;
+                        $curgroup->registered++;
                     } else {
-                        list($cur_error, $cur_text) = $this->register_in_agrp($cur_group->id,
-                                                          $queue->userid,
-                                                          false,
-                                                          true);
-                        $class = $cur_error ? 'error': 'success';
+                        list($curerror, $curtext) = $this->register_in_agrp($curgroup->id,
+                                                                            $queue->userid,
+                                                                            false,
+                                                                            true);
+                        $class = $curerror ? 'error' : 'success';
                         $data = new stdClass();
                         $data->userid = $queue->userid;
                         $data->agrpid = $queue->agrpid;
-                        $data->current_grp = $cur_group->id;
-                        $data->current_text = $cur_text;
+                        $data->current_grp = $curgroup->id;
+                        $data->current_text = $curtext;
                         $movedtext = get_string('user_moved', 'grouptool', $data);
-                        $returntext .= html_writer::tag('div', $movedtext.' ('.$cur_text.')', array('class'=>$class));
-                        $cur_group->registered++;
-                        $error = $error || $cur_error;
-                        $attr = array('id'      => $queue->id,
+                        $returntext .= html_writer::tag('div', $movedtext.' ('.$curtext.')',
+                                                        array('class' => $class));
+                        $curgroup->registered++;
+                        $error = $error || $curerror;
+                        $attr = array('id'     => $queue->id,
                                       'userid' => $queue->userid,
                                       'agrpid' => $queue->agrpid);
-                        //delete queue entry if successfull or print message
+                        // Delete queue entry if successfull or print message!
                         $DB->delete_records('grouptool_queued', $attr);
                         if ($DB->record_exists('grouptool_queued', $attr)) {
                             $returntext .= "Could not delete!";
                         }
                     }
                 }
-                
-                while($i !== 0) {
-                    $cur_group = previous($groupsdata);
+
+                while ($i !== 0) {
+                    $curgroup = previous($groupsdata);
                     $i--;
                 }
             }
@@ -4017,22 +4034,22 @@ EOS;
                 "view.php?id=".$grouptool->id."&tab=overview",
                 'resolve queue');
         return array($error, $returntext);
-        }
+    }
 
     public function get_user_marks($userid=0) {
         global $DB, $USER, $OUTPUT;
-        
-        if(empty($userid)) {
+
+        if (empty($userid)) {
             $userid = $USER->id;
         }
-        
+
         $agrps = $DB->get_fieldset_select('grouptool_agrps', 'id',
                                           'grouptoolid = ?',
                                           array($this->cm->instance));
-        
+
         list($agrpssql, $params) = $DB->get_in_or_equal($agrps);
         $params[] = $userid;
-        
+
         $sql = 'SELECT reg.id, reg.agrpid, reg.userid, reg.timestamp,
                        agrp.groupid
                   FROM {grouptool_registered} as reg
@@ -4040,23 +4057,23 @@ EOS;
                  WHERE reg.agrpid '.$agrpssql.'
                    AND modified_by = -1
                    AND userid = ?';
-        
+
         $marks = $DB->get_records_sql($sql, $params);
         $groupdata = $this->get_active_groups(true, true);
-        foreach($marks as $id => $cur) {
-            if($this->grouptool->use_size) {
+        foreach ($marks as $id => $cur) {
+            if ($this->grouptool->use_size) {
                 if (count($groupdata[$cur->groupid]->registered) < $groupdata[$cur->groupid]->grpsize) {
                     $marks[$id]->type = 'reg';
                 } else if ($this->grouptool->use_queue) {
                     $marks[$id]->type = 'queue';
                 } else {
-                    // Place occupied in the meanwhile, must look for another group
+                    // Place occupied in the meanwhile, must look for another group!
                     $info = new stdClass();
                     $info->grpname = groups_get_group_name($cur->groupid);
                     echo $OUTPUT->notification(get_string('already_occupied',
                                                           'grouptool', $info),
                                                'notifyproblem');
-                    $DB->delete_records('grouptool_registered', array('id'=>$id));
+                    $DB->delete_records('grouptool_registered', array('id' => $id));
                     unset($marks[$id]);
                 }
             } else {
@@ -4066,18 +4083,18 @@ EOS;
 
         return $marks;
     }
-    
+
     public function delete_user_marks($userid=0) {
         global $DB;
-        
+
         $marks = $this->get_user_marks($userid);
-        if(!empty($marks)) {
+        if (!empty($marks)) {
             list($select, $params) = $DB->get_in_or_equal(array_keys($marks));
             $select = 'id '.$select;
             $DB->delete_records_select('grouptool_registered', $select, $params);
         }
     }
-    
+
     public function count_user_marks($userid=0) {
         $marks = $this->get_user_marks($userid);
 
@@ -4087,7 +4104,7 @@ EOS;
     public function grpmarked($agrpid, $userid=0) {
         global $DB, $USER;
 
-        if(empty($userid)) {
+        if (empty($userid)) {
             $userid = $USER->id;
         }
 
@@ -4096,7 +4113,7 @@ EOS;
                                         'userid' => $userid,
                                         'modified_by' => -1));
     }
-    
+
     /**
      * view selfregistration-tab
      *
@@ -4111,7 +4128,7 @@ EOS;
 
         $userid = $USER->id;
 
-        $reg_open = ($this->grouptool->allow_reg
+        $regopen = ($this->grouptool->allow_reg
                      && (($this->grouptool->timedue == 0)
                          || (time() < $this->grouptool->timedue))
                      && (time() > $this->grouptool->timeavailable));
@@ -4119,7 +4136,7 @@ EOS;
         // Process submitted form!
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed!
-            $hide_form = 0;
+            $hideform = 0;
             $action = optional_param('action', 'reg', PARAM_ALPHA);
             if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
@@ -4146,7 +4163,7 @@ EOS;
         } else if (data_submitted() && confirm_sesskey()) {
 
             // Display confirm-dialog!
-            $hide_form = 1;
+            $hideform = 1;
             $reg = optional_param_array('reg', null, PARAM_INT);
             if ($reg != null) {
                 $agrpid = array_keys($reg);
@@ -4197,183 +4214,180 @@ EOS;
             }
             echo $this->confirm($confirmmessage, $continue, $cancel);
         } else {
-            $hide_form = 0;
+            $hideform = 0;
         }
 
-        if (empty($hide_form)) {
+        if (empty($hideform)) {
             // Show information.
             // General information first!
-            $general_information = "";
+            $generalinfo = "";
 
-            $reg_stat = $this->get_registration_stats($USER->id);
+            $regstat = $this->get_registration_stats($USER->id);
             $formcontent = "";
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
                     has_capability('mod/grouptool:register_students', $this->context)) {
-                if ($reg_stat->queued_users > 0) {
+                if ($regstat->queued_users > 0) {
                     // Insert queue-resolving button!
                     $attr = array(
-                            'type'=>'submit',
-                            'name'=>'resolve_queues',
-                            'value'=>'1');
-                    $resolve_queue_button = html_writer::tag('button',
-                            get_string('resolve_queue', 'grouptool'),
-                            $attr);
-                    $resolve_queue = html_writer::tag('div',
-                                                      get_string('resolve_queue_title',
-                                                                 'grouptool'),
-                                                      array('class' => 'fitemtitle')).
-                                     html_writer::tag('div', $resolve_queue_button,
-                                                      array('class'=>'felement'));
-                    $resolve_queue = html_writer::tag('div', $resolve_queue,
-                                                      array('class'=>'fitem'));
-                    $resolve_queue_legend = html_writer::tag('legend',
-                                                             get_string('resolve_queue_legend',
-                                                                        'grouptool'));
-                    $formcontent .= html_writer::tag('fieldset', $resolve_queue_legend.
-                            html_writer::tag('div', $resolve_queue,
-                                    array('class'=>'fcontainer')),
-                            array('class'=>'clearfix'));
+                            'type'  => 'submit',
+                            'name'  => 'resolve_queues',
+                            'value' => '1');
+                    $resolvequeuebutton = html_writer::tag('button',
+                                                           get_string('resolve_queue', 'grouptool'),
+                                                           $attr);
+                    $resolvequeue = html_writer::tag('div',
+                                                     get_string('resolve_queue_title',
+                                                                'grouptool'),
+                                                     array('class' => 'fitemtitle')).
+                                    html_writer::tag('div', $resolvequeuebutton,
+                                                     array('class' => 'felement'));
+                    $resolvequeue = html_writer::tag('div', $resolvequeue,
+                                                     array('class' => 'fitem'));
+                    $resolvequeuelegend = html_writer::tag('legend',
+                                                           get_string('resolve_queue_legend',
+                                                                      'grouptool'));
+                    $resolvequeueelement = html_writer::tag('div', $resolvequeue,
+                                                            array('class' => 'fcontainer'));
+                    $formcontent .= html_writer::tag('fieldset', $resolvequeuelegend.
+                                                                 $resolvequeueelement,
+                                                     array('class' => 'clearfix'));
                 }
             }
 
             if (!empty($this->grouptool->use_size)) {
-                $place_stats = $reg_stat->group_places.'&nbsp;'.get_string('total', 'grouptool');
+                $placestats = $regstat->group_places.'&nbsp;'.get_string('total', 'grouptool');
             } else {
-                $place_stats = '∞&nbsp;'.get_string('total', 'grouptool');
+                $placestats = '∞&nbsp;'.get_string('total', 'grouptool');
             }
-            if (($reg_stat->free_places != null) && !empty($this->grouptool->use_size)) {
-                $place_stats .= ' / '.$reg_stat->free_places.'&nbsp;'.
+            if (($regstat->free_places != null) && !empty($this->grouptool->use_size)) {
+                $placestats .= ' / '.$regstat->free_places.'&nbsp;'.
                                 get_string('free', 'grouptool');
             } else {
-                $place_stats .= ' / ∞&nbsp;'.get_string('free', 'grouptool');
+                $placestats .= ' / ∞&nbsp;'.get_string('free', 'grouptool');
             }
-            if ($reg_stat->occupied_places != null) {
-                $place_stats .= ' / '.$reg_stat->occupied_places.'&nbsp;'.
+            if ($regstat->occupied_places != null) {
+                $placestats .= ' / '.$regstat->occupied_places.'&nbsp;'.
                                 get_string('occupied', 'grouptool');
             }
-            $registration_info = html_writer::tag('div', get_string('group_places', 'grouptool').
-                                                         $OUTPUT->help_icon('group_places',
-                                                                            'grouptool'),
-                    array('class'=>'fitemtitle')).
-                    html_writer::tag('div', $place_stats,
-                            array('class'=>'felement'));
-            $general_information .= html_writer::tag('div', $registration_info,
-                                                     array('class'=>'fitem'));
+            $registrationinfo = html_writer::tag('div', get_string('group_places', 'grouptool').
+                                                        $OUTPUT->help_icon('group_places',
+                                                                           'grouptool'),
+                                                 array('class' => 'fitemtitle')).
+                                html_writer::tag('div', $placestats,
+                                                 array('class' => 'felement'));
+            $generalinfo .= html_writer::tag('div', $registrationinfo,
+                                                    array('class' => 'fitem'));
 
-            $registration_info = html_writer::tag('div', get_string('number_of_students',
-                                                                    'grouptool'),
-                                                  array('class'=>'fitemtitle')).
-                                 html_writer::tag('div', $reg_stat->users,
-                                                  array('class'=>'felement'));
-            $general_information .= html_writer::tag('div', $registration_info,
-                                                     array('class'=>'fitem'));
+            $registrationinfo = html_writer::tag('div', get_string('number_of_students',
+                                                                   'grouptool'),
+                                                 array('class' => 'fitemtitle')).
+                                html_writer::tag('div', $regstat->users,
+                                                 array('class' => 'felement'));
+            $generalinfo .= html_writer::tag('div', $registrationinfo,
+                                                     array('class' => 'fitem'));
 
             if (($this->grouptool->allow_multiple &&
-                    (count($reg_stat->registered) < $this->grouptool->choose_min))
-                    || (!$this->grouptool->allow_multiple && !count($reg_stat->registered))) {
+                    (count($regstat->registered) < $this->grouptool->choose_min))
+                    || (!$this->grouptool->allow_multiple && !count($regstat->registered))) {
                 if ($this->grouptool->allow_multiple) {
-                    $missing = ($this->grouptool->choose_min-count($reg_stat->registered));
-                    $string_label = ($missing > 1) ? 'registrations_missing'
-                                                   : 'registration_missing';
+                    $missing = ($this->grouptool->choose_min - count($regstat->registered));
+                    $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                 } else {
                     $missing = 1;
-                    $string_label = 'registration_missing';
+                    $stringlabel = 'registration_missing';
                 }
-                $missingtext = get_string($string_label, 'grouptool', $missing);
+                $missingtext = get_string($stringlabel, 'grouptool', $missing);
             } else {
                 $missingtext = "";
             }
 
-            if (!empty($reg_stat->registered)) {
-                foreach ($reg_stat->registered as $registration) {
-                    if (empty($registrations_cumulative)) {
-                        $registrations_cumulative = $registration->grpname.
-                                                    ' ('.$registration->rank.')';
+            if (!empty($regstat->registered)) {
+                foreach ($regstat->registered as $registration) {
+                    if (empty($registrationscumulative)) {
+                        $registrationscumulative = $registration->grpname.
+                                                   ' ('.$registration->rank.')';
                     } else {
-                        $registrations_cumulative .= ', '.$registration->grpname.
-                                                     ' ('.$registration->rank.')';
+                        $registrationscumulative .= ', '.$registration->grpname.
+                                                    ' ('.$registration->rank.')';
                     }
                 }
-                $registration_info = html_writer::tag('div', get_string('registrations',
-                                                                        'grouptool'),
-                                                      array('class'=>'fitemtitle')).
-                                     html_writer::tag('div', html_writer::tag('div', $missingtext).
-                                                             $registrations_cumulative,
-                                                      array('class'=>'felement'));
-                $general_information .= html_writer::tag('div', $registration_info,
-                                                         array('class'=>'fitem'));
+                $registrationinfo = html_writer::tag('div', get_string('registrations',
+                                                                       'grouptool'),
+                                                     array('class' => 'fitemtitle')).
+                                    html_writer::tag('div', html_writer::tag('div', $missingtext).
+                                                            $registrationscumulative,
+                                                     array('class' => 'felement'));
+                $generalinfo .= html_writer::tag('div', $registrationinfo, array('class' => 'fitem'));
             } else {
-                $registration_info = html_writer::tag('div', get_string('registrations',
-                                                                        'grouptool'),
-                                                      array('class'=>'fitemtitle')).
-                                     html_writer::tag('div', html_writer::tag('div', $missingtext).
-                                                             get_string('not_registered',
-                                                                        'grouptool'),
-                                                      array('class'=>'felement'));
-                $general_information .= html_writer::tag('div', $registration_info,
-                                                         array('class'=>'fitem'));
+                $registrationinfo = html_writer::tag('div', get_string('registrations',
+                                                                       'grouptool'),
+                                                     array('class' => 'fitemtitle')).
+                                    html_writer::tag('div', html_writer::tag('div', $missingtext).
+                                                            get_string('not_registered',
+                                                                       'grouptool'),
+                                                     array('class' => 'felement'));
+                $generalinfo .= html_writer::tag('div', $registrationinfo, array('class' => 'fitem'));
             }
 
-            if (!empty($reg_stat->queued)) {
-                foreach ($reg_stat->queued as $queue) {
-                    if (empty($queues_cumulative)) {
-                        $queues_cumulative = $queue->grpname.' ('.$queue->rank.')';
+            if (!empty($regstat->queued)) {
+                foreach ($regstat->queued as $queue) {
+                    if (empty($queuescumulative)) {
+                        $queuescumulative = $queue->grpname.' ('.$queue->rank.')';
                     } else {
-                        $queues_cumulative .= ', '.$queue->grpname.' ('.$queue->rank.')';
+                        $queuescumulative .= ', '.$queue->grpname.' ('.$queue->rank.')';
                     }
                 }
 
-                $registration_info = html_writer::tag('div', get_string('queues', 'grouptool'),
-                        array('class'=>'fitemtitle')).
-                        html_writer::tag('div', $queues_cumulative,
-                                array('class'=>'felement'));
-                $general_information .= html_writer::tag('div', $registration_info,
-                                                         array('class'=>'fitem'));
+                $registrationinfo = html_writer::tag('div', get_string('queues', 'grouptool'),
+                                                     array('class' => 'fitemtitle')).
+                                    html_writer::tag('div', $queuescumulative,
+                                                     array('class' => 'felement'));
+                $generalinfo .= html_writer::tag('div', $registrationinfo,
+                                                 array('class' => 'fitem'));
             }
 
             if (!empty($this->grouptool->timeavailable)) {
                 $timeavailable = html_writer::tag('div', get_string('availabledate', 'grouptool'),
-                                                  array('class'=>'fitemtitle')).
+                                                  array('class' => 'fitemtitle')).
                                  html_writer::tag('div',
                                                   userdate($this->grouptool->timeavailable,
                                                            get_string('strftimedatetime')),
-                                                  array('class'=>'felement'));
-                $general_information .= html_writer::tag('div', $timeavailable,
-                                                         array('class'=>'fitem'));
+                                                  array('class' => 'felement'));
+                $generalinfo .= html_writer::tag('div', $timeavailable,
+                                                 array('class' => 'fitem'));
             }
 
             $timedue = html_writer::tag('div', get_string('registrationdue', 'grouptool'),
-                                        array('class'=>'fitemtitle'));
+                                        array('class' => 'fitemtitle'));
             if (!empty($this->grouptool->timedue)) {
                 $timedue .= html_writer::tag('div',
                                              userdate($this->grouptool->timedue,
                                                       get_string('strftimedatetime')),
-                                             array('class'=>'felement'));
+                                             array('class' => 'felement'));
             } else {
                 $timedue .= html_writer::tag('div', get_string('noregistrationdue', 'grouptool'),
-                                             array('class'=>'felement'));
+                                             array('class' => 'felement'));
             }
-            $general_information .= html_writer::tag('div', $timedue, array('class'=>'fitem'));
+            $generalinfo .= html_writer::tag('div', $timedue, array('class' => 'fitem'));
 
             if (!empty($this->grouptool->allow_unreg)) {
-                $general_information .= html_writer::tag('div', html_writer::tag('div',
-                        get_string('unreg_is', 'grouptool'),
-                        array('class'=>'fitemtitle')).
-                        html_writer::tag('div',
-                                get_string('allowed', 'grouptool'),
-                                array('class'=>'felement')),
-                        array('class'=>'fitem'));
+                $generalinfo .= html_writer::tag('div', html_writer::tag('div',
+                                                                         get_string('unreg_is', 'grouptool'),
+                                                                         array('class' => 'fitemtitle')).
+                                                        html_writer::tag('div',
+                                                                         get_string('allowed', 'grouptool'),
+                                                                         array('class' => 'felement')),
+                                                 array('class' => 'fitem'));
             } else {
-                $general_information .= html_writer::tag('div',
-                                                         html_writer::tag('div',
-                                                                          get_string('unreg_is',
-                                                                                     'grouptool'),
-                                                                          array('class'=>'fitemtitle')).
-                                                         html_writer::tag('div',
-                                                                          get_string('not_permitted',
-                                                                                     'grouptool'),
-                                                                          array('class'=>'felement')),
-                                                         array('class'=>'fitem'));
+                $generalinfo .= html_writer::tag('div', html_writer::tag('div',
+                                                                         get_string('unreg_is',
+                                                                                    'grouptool'),
+                                                                         array('class' => 'fitemtitle')).
+                                                        html_writer::tag('div',
+                                                                         get_string('not_permitted',
+                                                                                    'grouptool'),
+                                                                         array('class' => 'felement')),
+                                                 array('class' => 'fitem'));
             }
 
             if (!empty($this->grouptool->allow_multiple)) {
@@ -4392,7 +4406,7 @@ EOS;
                     $minmaxtext = html_writer::tag('div',
                                                     get_string('choose_min_text', 'grouptool',
                                                                $this->grouptool->choose_min),
-                                                    array('class '=> 'felement'));
+                                                    array('class' => 'felement'));
                     $class = ' choose_min';
                 } else if ($this->grouptool->choose_max) {
                     $minmaxtext = html_writer::tag('div',
@@ -4401,39 +4415,41 @@ EOS;
                                                     array('class' => 'felement'));
                     $class = ' choose_max';
                 }
-                $general_information .= html_writer::tag('div',
+                $generalinfo .= html_writer::tag('div',
                                                          $minmaxtitle.$minmaxtext,
-                                                         array('class'=>'fitem '.$class));
+                                                         array('class' => 'fitem '.$class));
             }
 
             if (!empty($this->grouptool->use_queue)) {
-                $general_information .= html_writer::tag('div', html_writer::tag('div',
-                        get_string('queueing_is', 'grouptool'),
-                        array('class'=>'fitemtitle')).
-                        html_writer::tag('div',
-                                get_string('active', 'grouptool'),
-                                array('class'=>'felement')),
-                        array('class'=>'fitem'));
+                $generalinfo .= html_writer::tag('div', html_writer::tag('div',
+                                                                         get_string('queueing_is', 'grouptool'),
+                                                                         array('class' => 'fitemtitle')).
+                                                        html_writer::tag('div',
+                                                                         get_string('active', 'grouptool'),
+                                                                         array('class' => 'felement')),
+                                                 array('class' => 'fitem'));
             }
 
-            $general_info_legend = html_writer::tag('legend', get_string('general_information',
-                                                                         'grouptool'));
+            $generalinfolegend = html_writer::tag('legend', get_string('general_information',
+                                                                       'grouptool'));
             if (has_capability('mod/grouptool:view_description', $this->context)) {
-                $formcontent .= html_writer::tag('fieldset', $general_info_legend.
-                        html_writer::tag('div', $general_information,
-                                array('class'=>'fcontainer')),
-                        array('class'=>'clearfix'));
+                $formcontent .= html_writer::tag('fieldset',
+                                                 $generalinfolegend.
+                                                 html_writer::tag('div', $generalinfo,
+                                                                  array('class' => 'fcontainer')),
+                                                 array('class' => 'clearfix'));
 
                 // Intro-text if set!
                 if (($this->grouptool->alwaysshowdescription
                      || (time() > $this->grouptool->timeavailable))
                     && $this->grouptool->intro) {
                     $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
-                    $formcontent .= html_writer::tag('fieldset', html_writer::tag('legend',
-                            get_string('intro', 'grouptool')).
-                            html_writer::tag('div', $intro,
-                                    array('class'=>'fcontainer')),
-                            array('class'=>'clearfix'));
+                    $formcontent .= html_writer::tag('fieldset',
+                                                     html_writer::tag('legend',
+                                                                      get_string('intro', 'grouptool')).
+                                                     html_writer::tag('div', $intro,
+                                                                      array('class' => 'fcontainer')),
+                                                     array('class' => 'clearfix'));
                 }
             }
 
@@ -4448,25 +4464,25 @@ EOS;
                     $grpsize = ($this->grouptool->use_size) ? $group->grpsize : "∞";
                     $grouphtml = html_writer::tag('span', get_string('registered', 'grouptool').
                                                           ": ".$registered."/".$grpsize,
-                                                  array('class'=>'fillratio'));
+                                                  array('class' => 'fillratio'));
                     if ($this->grouptool->use_queue) {
                         $queued = count($group->queued);
                         $grouphtml .= html_writer::tag('span', get_string('queued', 'grouptool').
                                                                " ".$queued,
-                                                       array('class'=>'queued'));
+                                                       array('class' => 'queued'));
                     }
                     if ($this->grouptool->show_members) {
                         $grouphtml .= $this->render_members_link($group->agrpid, $group->name);
                     }
                     if (!empty($group->registered)) {
-                        $reg_rank = $this->get_rank_in_queue($group->registered, $USER->id);
+                        $regrank = $this->get_rank_in_queue($group->registered, $USER->id);
                     } else {
-                        $reg_rank = false;
+                        $regrank = false;
                     }
                     if (!empty($group->queued)) {
-                        $queue_rank = $this->get_rank_in_queue($group->queued, $USER->id);
+                        $queuerank = $this->get_rank_in_queue($group->queued, $USER->id);
                     } else {
-                        $queue_rank = false;
+                        $queuerank = false;
                     }
                     $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", array($this->grouptool->id));
                     list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
@@ -4480,117 +4496,117 @@ EOS;
                         // User is allready registered --> unreg button!
                         if ($this->grouptool->allow_unreg) {
                             $label = get_string('unreg', 'grouptool');
-                            $button_attr = array('type'=>'submit',
-                                    'name'=>'unreg['.$group->agrpid.']',
-                                    'value'=>$group->agrpid,
-                                    'class'=>'unregbutton');
-                            if ($reg_open && ($userregs+$userqueues > $min)) {
-                                $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                            $buttonattr = array('type'  => 'submit',
+                                                'name'  => 'unreg['.$group->agrpid.']',
+                                                'value' => $group->agrpid,
+                                                'class' => 'unregbutton');
+                            if ($regopen && ($userregs + $userqueues > $min)) {
+                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                             }
                         }
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('registered_on_rank',
-                                                                  'grouptool', $reg_rank),
-                                                       array('class'=>'rank'));
+                                                                  'grouptool', $regrank),
+                                                       array('class' => 'rank'));
                     } else if (!empty($group->queued)
                         && $this->get_rank_in_queue($group->queued, $userid) != false) {
                         // We're sorry, but user's already queued in this group!
                         if ($this->grouptool->allow_unreg) {
                             $label = get_string('unqueue', 'grouptool');
-                            $button_attr = array('type'=>'submit',
-                                    'name'=>'unreg['.$group->agrpid.']',
-                                    'value'=>$group->agrpid,
-                                    'class'=>'unregbutton');
-                            if ($reg_open && ($userregs+$userqueues > $min)) {
-                                $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                            $buttonattr = array('type'  => 'submit',
+                                                'name'  => 'unreg['.$group->agrpid.']',
+                                                'value' => $group->agrpid,
+                                                'class' => 'unregbutton');
+                            if ($regopen && ($userregs + $userqueues > $min)) {
+                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                             }
                         }
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('queued_on_rank',
-                                                                  'grouptool', $queue_rank),
-                                                       array('class'=>'rank'));
+                                                                  'grouptool', $queuerank),
+                                                       array('class' => 'rank'));
                     } else if ($this->grpmarked($group->agrpid)) {
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('grp_marked', 'grouptool'),
-                                                       array('class'=>'rank'));
+                                                       array('class' => 'rank'));
                     } else if ($this->grouptool->allow_unreg
-                               && (($userqueues == 1 && $userregs == $max-1)
-                                   || ($userregs+$userqueues == 1 && $max == 1))) {
-                        if ($reg_open
+                               && (($userqueues == 1 && $userregs == $max - 1)
+                                   || ($userregs + $userqueues == 1 && $max == 1))) {
+                        if ($regopen
                             && (!$this->grouptool->use_size
                                 || (count($group->registered) < $group->grpsize)
                                 || ($this->grouptool->use_queue
                                     && (count($group->registered) >= $group->grpsize)
                                     && $userqueues < $this->grouptool->queues_max))) {
-                            //groupchange!
+                            // Groupchange!
                             $label = get_string('change_group', 'grouptool');
-                            if ($this->grouptool->use_size 
+                            if ($this->grouptool->use_size
                                 && count($group->registered) >= $group->grpsize) {
                                     $label .= ' ('.get_string('queue', 'grouptool').')';
                             }
-                            $button_attr = array('type'=>'submit',
-                                                 'name'=>'reg['.$group->agrpid.']',
-                                                 'value'=>$group->agrpid,
-                                                 'class'=>'regbutton');
-                            $grouphtml .= html_writer::tag('button', $label, $button_attr);
-                        } else if ($reg_open && $this->grouptool->use_queue
+                            $buttonattr = array('type'   => 'submit',
+                                                 'name'  => 'reg['.$group->agrpid.']',
+                                                 'value' => $group->agrpid,
+                                                 'class' => 'regbutton');
+                            $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                        } else if ($regopen && $this->grouptool->use_queue
                                    && (count($group->registered) >= $group->grpsize)
                                    && $userqueues >= $this->grouptool->queues_max) {
-                            //too many queues
+                            // Too many queues!
                             $grouphtml .= html_writer::tag('div',
                                                            get_string('max_queues_reached',
                                                                       'grouptool'),
-                                                                      array('class'=>'rank'));
-                        } else if ($reg_open) {
-                            //group is full!
+                                                                      array('class' => 'rank'));
+                        } else if ($regopen) {
+                            // Group is full!
                             $grouphtml .= html_writer::tag('div',
                                                            get_string('fullgroup',
                                                                       'grouptool'),
-                                                                      array('class'=>'rank'));
+                                                                      array('class' => 'rank'));
                         }
-                    } else if ($reg_open && ($userregs+$userqueues < $max)) {
+                    } else if ($regopen && ($userregs + $userqueues < $max)) {
                         if (!$this->grouptool->use_size || (count($group->registered) < $group->grpsize)) {
-                            //register button
+                            // Register button!
                             $label = get_string('register', 'grouptool');
-                            $button_attr = array('type'=>'submit',
-                                                 'name'=>'reg['.$group->agrpid.']',
-                                                 'value'=>$group->agrpid,
-                                                 'class'=>'regbutton');
-                            $grouphtml .= html_writer::tag('button', $label, $button_attr);
+                            $buttonattr = array('type'  => 'submit',
+                                                'name'  => 'reg['.$group->agrpid.']',
+                                                'value' => $group->agrpid,
+                                                'class' => 'regbutton');
+                            $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                         } else if ($this->grouptool->use_queue) {
-                            if($userqueues < $this->grouptool->queues_max) {
-                                //queue button
+                            if ($userqueues < $this->grouptool->queues_max) {
+                                // Queue button!
                                 $label = get_string('queue', 'grouptool');
-                                $button_attr = array('type'=>'submit',
-                                        'name'=>'reg['.$group->agrpid.']',
-                                        'value'=>$group->agrpid,
-                                        'class'=>'queuebutton');
+                                $buttonattr = array('type'  => 'submit',
+                                                    'name'  => 'reg['.$group->agrpid.']',
+                                                    'value' => $group->agrpid,
+                                                    'class' => 'queuebutton');
                                 $grouphtml .= html_writer::tag('button', $label,
-                                                               $button_attr);
+                                                               $buttonattr);
                             } else {
-                                //too many queues
+                                // Too many queues!
                                 $grouphtml .= html_writer::tag('div',
                                                                get_string('max_queues_reached',
                                                                           'grouptool'),
-                                                                          array('class'=>'rank'));
+                                                                          array('class' => 'rank'));
                             }
                         } else {
-                            //group is full!
+                            // Group is full!
                             $grouphtml .= html_writer::tag('div',
                                                            get_string('fullgroup',
                                                                       'grouptool'),
-                                                                      array('class'=>'rank'));
+                                                                      array('class' => 'rank'));
                         }
-                    } else if ($reg_open) {
+                    } else if ($regopen) {
                         $grouphtml .= html_writer::tag('div',
                                                        get_string('max_regs_reached',
                                                                   'grouptool'),
-                                                                  array('class'=>'rank'));
+                                                                  array('class' => 'rank'));
                     }
                     $status = "";
-                    if ($reg_rank !== false) {
+                    if ($regrank !== false) {
                         $status = 'registered';
-                    } else if ($queue_rank !== false) {
+                    } else if ($queuerank !== false) {
                         $status = 'queued';
                     } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
                         $status = 'full';
@@ -4600,11 +4616,11 @@ EOS;
                     $formcontent .= html_writer::tag('fieldset',
                                                      html_writer::tag('legend',
                                                                       $group->name,
-                                                                      array('class'=>'groupname')).
+                                                                      array('class' => 'groupname')).
                                                      html_writer::tag('div',
                                                                       $grouphtml,
-                                                                      array('class'=>'fcontainer clearfix')),
-                                                     array('class'=>'clearfix group '.$status));
+                                                                      array('class' => 'fcontainer clearfix')),
+                                                     array('class' => 'clearfix group '.$status));
                 }
             }
 
@@ -4615,11 +4631,12 @@ EOS;
              */
             $url = new moodle_url($PAGE->url, array('sesskey' => sesskey()));
             $formcontent = html_writer::tag('div', html_writer::input_hidden_params($url).
-                                                   $formcontent, array('class'=>'clearfix'));
+                                                   $formcontent,
+                                            array('class' => 'clearfix'));
             $formattr = array(
                     'method' => 'post',
                     'action' => $url->out_omit_querystring(),
-                    'id'   => 'registration_form',
+                    'id'     => 'registration_form',
                     'class'  => 'mform');
             echo html_writer::tag('form', $formcontent, $formattr);
         }
@@ -4634,18 +4651,18 @@ EOS;
      * @global object $PAGE
      * @param int $group id of group to import into
      * @param object $data from form in import tab (textfield with idnumbers and group-selection)
-     * @param bool $preview_only optional preview only, don't take any action
+     * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
      */
-    public function import($group, $data, $forceregistration = false, $preview_only = false) {
+    public function import($group, $data, $forceregistration = false, $previewonly = false) {
         global $DB, $OUTPUT, $CFG, $PAGE;
 
         $message = "";
         $error = false;
         $users = preg_split("/[ ,;\t\n\r]+/", $data);
-        //prevent selection of all users if one of the above defined characters are in the beginning
-        foreach($users as $key => $user) {
-            if(empty($user)) {
+        // Prevent selection of all users if one of the above defined characters are in the beginning!
+        foreach ($users as $key => $user) {
+            if (empty($user)) {
                 unset($users[$key]);
             }
         }
@@ -4655,11 +4672,11 @@ EOS;
         if (empty($field) || !key_exists($field, $columns)) {
             $field = 'idnumber';
         }
-        $agrp = $DB->get_field('grouptool_agrps', 'id', array('grouptoolid'=>$this->grouptool->id,
-                                                              'groupid' => $group), IGNORE_MISSING);
-        if(!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
-                                                        'groupid' => $group,
-                                                        'active' => 1))) {
+        $agrp = $DB->get_field('grouptool_agrps', 'id', array('grouptoolid' => $this->grouptool->id,
+                                                              'groupid'     => $group), IGNORE_MISSING);
+        if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
+                                                         'groupid'     => $group,
+                                                         'active'      => 1))) {
             $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning',
                                                          'grouptool', $groupinfo->name),
                                               array('notifyproblem'));
@@ -4675,18 +4692,18 @@ EOS;
                         AND agrps.active = 1
                    GROUP BY agrps.id
                    ';
-        $agrps = $DB->get_records_sql($sql, array('grpid'=>$group));
+        $agrps = $DB->get_records_sql($sql, array('grpid' => $group));
         $usercnt = count($users);
-        foreach($agrps as $cur) {
-            if($cur->indi) {
-                if($cur->regs+$usercnt > $cur->size) {
+        foreach ($agrps as $cur) {
+            if ($cur->indi) {
+                if ($cur->regs + $usercnt > $cur->size) {
                     $message .= html_writer::tag('div',
                                                  $OUTPUT->notification(get_string('overflowwarning',
                                                                                   'grouptool', $cur),
                                                                        'notifyproblem'));
                 }
             } else {
-                if($cur->regs+$usercnt > $cur->globalsize) {
+                if ($cur->regs + $usercnt > $cur->globalsize) {
                     $message .= html_writer::tag('div',
                                                  $OUTPUT->notification(get_string('overflowwarning',
                                                                                   'grouptool', $cur),
@@ -4696,7 +4713,7 @@ EOS;
         }
         foreach ($users as $user) {
             $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-            $userinfo = $DB->get_records_sql($sql, array('userpattern'=>'%'.$user));
+            $userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user));
 
             if (empty($userinfo)) {
                 $message .= html_writer::tag('div',
@@ -4705,12 +4722,12 @@ EOS;
                                                                    'notifyproblem'));
                 $error = true;
             } else if (count($userinfo) > 1) {
-                foreach ($userinfo as $current_user) {
+                foreach ($userinfo as $currentuser) {
                     if (empty($text)) {
                         $text = get_string('found_multiple', 'grouptool').' '.
-                                fullname($current_user).' ('.$current_user->idnumber.')';
+                                fullname($currentuser).' ('.$currentuser->idnumber.')';
                     } else {
-                        $text .= ', '.fullname($current_user).' ('.$current_user->idnumber.')';
+                        $text .= ', '.fullname($currentuser).' ('.$currentuser->idnumber.')';
                     }
                 }
                 $message .= html_writer::tag('div', $OUTPUT->notification($text, 'notifyproblem'));
@@ -4724,13 +4741,13 @@ EOS;
                      */
                     require_once($CFG->dirroot.'/enrol/manual/locallib.php');
                     require_once($CFG->libdir.'/accesslib.php');
-                    if (!$enrol_manual = enrol_get_plugin('manual')) {
+                    if (!$enrolmanual = enrol_get_plugin('manual')) {
                         throw new coding_exception('Can not instantiate enrol_manual');
                     }
-                    if (!$instance = $DB->get_record('enrol', array('courseid'=>$this->course->id,
-                                                                    'enrol'=>'manual'),
+                    if (!$instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
+                                                                    'enrol'    => 'manual'),
                                                      '*', IGNORE_MISSING)) {
-                        if ($instanceid = $enrol_manual->add_default_instance($this->course)) {
+                        if ($instanceid = $enrolmanual->add_default_instance($this->course)) {
                             $instance = $DB->get_record('enrol',
                                                         array('courseid' => $this->course->id,
                                                               'enrol'    => 'manual'), '*',
@@ -4740,7 +4757,7 @@ EOS;
                     if ($instance != false) {
                         $archroles = get_archetype_roles('student');
                         $archrole = array_shift($archroles);
-                        $enrol_manual->enrol_user($instance, $userinfo->id, $archrole->id, time());
+                        $enrolmanual->enrol_user($instance, $userinfo->id, $archrole->id, time());
                     } else {
                         $message .= html_writer::tag('div',
                                                      $OUTPUT->notification(get_string('cant_enrol',
@@ -4753,15 +4770,15 @@ EOS;
                         'idnumber' => $userinfo->idnumber,
                         'fullname' => fullname($userinfo),
                         'groupname' => $groupinfo->name);
-                if (!$preview_only && $userinfo) {
-                    $attr = array('class'=>'notifysuccess');
+                if (!$previewonly && $userinfo) {
+                    $attr = array('class' => 'notifysuccess');
                     if (!groups_add_member($group, $userinfo->id)) {
                         $error = true;
                         $notifiication = $OUTPUT->notification(get_string('import_user_problem',
                                                                           'grouptool', $data),
                                                                'notifyproblem');
                         $message .= html_writer::tag('div', $notification,
-                                                     array('class'=>'error'));
+                                                     array('class' => 'error'));
                     } else {
                         $imported[] = $userinfo->id;
                         $message .= html_writer::tag('div', get_string('import_user', 'grouptool',
@@ -4772,24 +4789,25 @@ EOS;
                                                            FROM grouptool_agrps
                                                            WHERE grouptoolid = ?',
                                                           array($this->grouptool->id));
-                        //insert agrp-entry for this group (even if it's not active)
-                        $agrp = $DB->insert_record('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
-                                                                    'groupid' => $group,
-                                                                    'active' => 0,
-                                                                    'sort_order' => $newgrpdata->sort_order+1,
-                                                                    'grpsize' => $newgrpdata->grpsize));
+                        // Insert agrp-entry for this group (even if it's not active)!
+                        $agrp = $DB->insert_record('grouptool_agrps',
+                                                   array('grouptoolid' => $this->grouptool->id,
+                                                         'groupid'     => $group,
+                                                         'active'      => 0,
+                                                         'sort_order'  => $newgrpdata->sort_order + 1,
+                                                         'grpsize'     => $newgrpdata->grpsize));
                     }
                     if ($forceregistration && !empty($agrp)) {
                         $this->register_in_agrp($agrp, $userinfo->id);
                     }
                 } else if ($userinfo) {
-                    $attr = array('class'=>'prevsuccess');
+                    $attr = array('class' => 'prevsuccess');
                     $message .= html_writer::tag('div', get_string('import_user_prev', 'grouptool',
                                                                    $data), $attr);
                 }
             }
         }
-        if (!$preview_only) {
+        if (!$previewonly) {
             add_to_log($this->grouptool->course,
                     'grouptool', 'import',
                     "view.php?id=".$this->grouptool->id."&tab=overview&groupid=".$group,
@@ -4869,20 +4887,21 @@ EOS;
      * @global object $CFG
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group (groupid not agroupid!)
-     * @param bool $data_only optional return object with raw data not html-fragment-string
+     * @param bool $onlydata optional return object with raw data not html-fragment-string
      * @return string|object either html-fragment representing table or raw data as object
      */
-    public function group_overview_table($groupingid = 0, $groupid = 0, $data_only = false) {
+    public function group_overview_table($groupingid = 0, $groupid = 0, $onlydata = false) {
         global $OUTPUT, $CFG, $DB;
-        if (!$data_only) {
+        if (!$onlydata) {
             $return = "";
             $orientation = optional_param('orientation', 0, PARAM_BOOL);
-            $downloadurl = new moodle_url('/mod/grouptool/download.php', array('id'=>$this->cm->id,
-                    'groupingid'  => $groupingid,
-                    'groupid'     => $groupid,
-                    'orientation' => $orientation,
-                    'sesskey'     => sesskey(),
-                    'tab'         => 'overview'));
+            $downloadurl = new moodle_url('/mod/grouptool/download.php',
+                                          array('id'          => $this->cm->id,
+                                                'groupingid'  => $groupingid,
+                                                'groupid'     => $groupid,
+                                                'orientation' => $orientation,
+                                                'sesskey'     => sesskey(),
+                                                'tab'         => 'overview'));
         } else {
             $return = array();
         }
@@ -4891,26 +4910,26 @@ EOS;
         $groupids = array_keys($agrps);
         $groupinfo = groups_get_all_groups($this->grouptool->course);
         $userinfo = get_enrolled_users($this->context);
-        $sync_status = $this->get_sync_status();
+        $syncstatus = $this->get_sync_status();
         $context = context_module::instance($this->cm->id);
-        if ((!$data_only && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
+        if ((!$onlydata && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
             // Global-downloadlinks!
-            $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
-            $xlsxurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLSX));
-            $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
-            $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
-            $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
+            $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
+            $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
+            $xlsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLS));
+            $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
+            $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
             $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
-                                              array('class'=>'title')).'&nbsp;'.
+                                              array('class' => 'title')).'&nbsp;'.
                              html_writer::link($txturl, '.TXT').'&nbsp;'.
                              html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
                              html_writer::link($xlsurl, '.XLS').'&nbsp;'.
                              html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                              html_writer::link($odsurl, '.ODS');
-            $return .= html_writer::tag('div', $downloadlinks, array('class'=>'download all'));
+            $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
         }
         foreach ($agrps as $agrp) {
-            if (!$data_only) {
+            if (!$onlydata) {
                 $groupdata = "";
                 $groupinfos = $OUTPUT->heading($groupinfo[$agrp->id]->name, 3);
             } else {
@@ -4933,19 +4952,19 @@ EOS;
                 $size = "∞";
                 $free = '∞';
             }
-            if (!$data_only) {
+            if (!$onlydata) {
                 $groupinfos .= html_writer::tag('span', get_string('total', 'grouptool').' '.$size,
-                        array('class'=>'groupsize'));
+                                                array('class' => 'groupsize'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('registered', 'grouptool').
                                                               ' '.count($agrp->registered),
-                                                      array('class'=>'registered'));
+                                                      array('class' => 'registered'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('queued', 'grouptool').' '.
                                                               count($agrp->queued),
-                                                      array('class'=>'queued'));
+                                                      array('class' => 'queued'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('free', 'grouptool').' '.
-                                                              $free, array('class'=>'free'));
+                                                              $free, array('class' => 'free'));
 
-                $groupdata .= html_writer::tag('div', $groupinfos, array('class'=>'groupinfo'));
+                $groupdata .= html_writer::tag('div', $groupinfos, array('class' => 'groupinfo'));
 
                 $table = new html_table();
                 $table->attributes['class'] = 'overviewtable';
@@ -4968,33 +4987,34 @@ EOS;
             }
 
             if (count($agrp->registered) >= 1) {
-                foreach ($agrp->registered as $reg_entry) {
-                    if(!array_key_exists($reg_entry->userid, $userinfo)) {
-                        $userinfo[$reg_entry->userid] = $DB->get_record('user', array('id'=>$reg_entry->userid));
+                foreach ($agrp->registered as $regentry) {
+                    if (!array_key_exists($regentry->userid, $userinfo)) {
+                        $userinfo[$regentry->userid] = $DB->get_record('user',
+                                                                       array('id' => $regentry->userid));
                     }
-                    if (!$data_only) {
+                    if (!$onlydata) {
                         $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $reg_entry->userid.'&course='.$this->course->id,
-                                'title' => fullname($userinfo[$reg_entry->userid]));
-                        $userlink = html_writer::tag('a', fullname($userinfo[$reg_entry->userid]),
+                                $regentry->userid.'&course='.$this->course->id,
+                                'title' => fullname($userinfo[$regentry->userid]));
+                        $userlink = html_writer::tag('a', fullname($userinfo[$regentry->userid]),
                                                      $userlinkattr);
                         $userlink = new html_table_cell($userlink);
-                        if (!empty($userinfo[$reg_entry->userid]->idnumber)) {
+                        if (!empty($userinfo[$regentry->userid]->idnumber)) {
                             $idnumber = html_writer::tag('span',
-                                                         $userinfo[$reg_entry->userid]->idnumber,
-                                                         array('class'=>'idnumber'));
+                                                         $userinfo[$regentry->userid]->idnumber,
+                                                         array('class' => 'idnumber'));
                         } else {
-                            $idnumber = html_writer::tag('span', '-', array('class'=>'idnumber'));
+                            $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
                         }
                         $idnumber = new html_table_cell($idnumber);
-                        if (!empty($userinfo[$reg_entry->userid]->email)) {
-                            $email = html_writer::tag('span', $userinfo[$reg_entry->userid]->email,
-                                                      array('class'=>'email'));
+                        if (!empty($userinfo[$regentry->userid]->email)) {
+                            $email = html_writer::tag('span', $userinfo[$regentry->userid]->email,
+                                                      array('class' => 'email'));
                         } else {
-                            $email = html_writer::tag('span', '-', array('class'=>'email'));
+                            $email = html_writer::tag('span', '-', array('class' => 'email'));
                         }
                         $email = new html_table_cell($email);
-                        if (key_exists($reg_entry->userid, $agrp->moodle_members)) {
+                        if (key_exists($regentry->userid, $agrp->moodle_members)) {
                             $status = new html_table_cell("✔");
                         } else {
                             $status = new html_table_cell("+");
@@ -5002,18 +5022,18 @@ EOS;
                         $rows[] = new html_table_row(array($status, $userlink, $idnumber, $email));
                     } else {
                         $row = array();
-                        $row['name'] = fullname($userinfo[$reg_entry->userid]);
-                        if (!empty($userinfo[$reg_entry->userid]->idnumber)) {
-                            $row['idnumber'] = $userinfo[$reg_entry->userid]->idnumber;
+                        $row['name'] = fullname($userinfo[$regentry->userid]);
+                        if (!empty($userinfo[$regentry->userid]->idnumber)) {
+                            $row['idnumber'] = $userinfo[$regentry->userid]->idnumber;
                         } else {
                             $row['idnumber'] = '-';
                         }
-                        if (!empty($userinfo[$reg_entry->userid]->email)) {
-                            $row['email'] = $userinfo[$reg_entry->userid]->email;
+                        if (!empty($userinfo[$regentry->userid]->email)) {
+                            $row['email'] = $userinfo[$regentry->userid]->email;
                         } else {
                             $row['email'] = '-';
                         }
-                        if (key_exists($reg_entry->userid, $agrp->moodle_members)) {
+                        if (key_exists($regentry->userid, $agrp->moodle_members)) {
                             $row['status'] = "✔";
                         } else {
                             $row['status'] = "+";
@@ -5022,7 +5042,7 @@ EOS;
                     }
                 }
             } else if (count($agrp->moodle_members) == 0) {
-                if (!$data_only) {
+                if (!$onlydata) {
                     $cell = new html_table_cell(get_string('no_registrations', 'grouptool'));
                     $cell->attributes['class'] = 'no_registrations';
                     $cell->colspan = count($headcells);
@@ -5032,14 +5052,14 @@ EOS;
 
             if (count($agrp->moodle_members) >= 1) {
                 foreach ($agrp->moodle_members as $memberid => $member) {
-                    if(!array_key_exists($memberid, $userinfo)) {
-                        $userinfo[$memberid] = $DB->get_record('user', array('id'=>$memberid));
+                    if (!array_key_exists($memberid, $userinfo)) {
+                        $userinfo[$memberid] = $DB->get_record('user', array('id' => $memberid));
                     }
                     if ((count($agrp->registered) >= 1)
                              && $this->get_rank_in_queue($agrp->registered, $memberid)) {
                         continue;
                     } else {
-                        if (!$data_only) {
+                        if (!$onlydata) {
                             $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
                                     $memberid.'&course='.$this->course->id,
                                     'title' => fullname($userinfo[$memberid]));
@@ -5048,17 +5068,17 @@ EOS;
                             $userlink = new html_table_cell($userlink);
                             if (!empty($userinfo[$memberid]->idnumber)) {
                                 $idnumber = html_writer::tag('span', $userinfo[$memberid]->idnumber,
-                                                             array('class'=>'idnumber'));
+                                                             array('class' => 'idnumber'));
                             } else {
                                 $idnumber = html_writer::tag('span', '-',
-                                                             array('class'=>'idnumber'));
+                                                             array('class' => 'idnumber'));
                             }
                             $idnumber = new html_table_cell($idnumber);
                             if (!empty($userinfo[$memberid]->email)) {
                                 $email = html_writer::tag('span', $userinfo[$memberid]->email,
-                                                          array('class'=>'email'));
+                                                          array('class' => 'email'));
                             } else {
-                                $email = html_writer::tag('span', '-', array('class'=>'email'));
+                                $email = html_writer::tag('span', '-', array('class' => 'email'));
                             }
                             $email = new html_table_cell($email);
                             $status = new html_table_cell("?");
@@ -5084,41 +5104,42 @@ EOS;
             }
 
             if (count($agrp->queued) >= 1) {
-                foreach ($agrp->queued as $queue_entry) {
-                    if(!array_key_exists($queue_entry->userid, $userinfo)) {
-                        $userinfo[$queue_entry->userid] = $DB->get_record('user', array('id'=>$queue_entry->userid));
+                foreach ($agrp->queued as $queueentry) {
+                    if (!array_key_exists($queueentry->userid, $userinfo)) {
+                        $userinfo[$queueentry->userid] = $DB->get_record('user',
+                                                                         array('id' => $queueentry->userid));
                     }
-                    $queue_entry->rank = $this->get_rank_in_queue($agrp->queued,
-                                                                  $queue_entry->userid);
-                    if (!$data_only) {
-                        $rank = new html_table_cell($queue_entry->rank);
+                    $queueentry->rank = $this->get_rank_in_queue($agrp->queued,
+                                                                 $queueentry->userid);
+                    if (!$onlydata) {
+                        $rank = new html_table_cell($queueentry->rank);
                         $rank->attributes['class'] = 'rank';
                         $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $queue_entry->userid.'&course='.$this->course->id,
-                                'title' => fullname($userinfo[$queue_entry->userid]));
+                                $queueentry->userid.'&course='.$this->course->id,
+                                'title' => fullname($userinfo[$queueentry->userid]));
                         $userlink = html_writer::tag('a',
-                                                     fullname($userinfo[$queue_entry->userid]),
+                                                     fullname($userinfo[$queueentry->userid]),
                                                      $userlinkattr);
                         $userlink = new html_table_cell($userlink);
                         $userlink->attributes['class'] = 'userlink';
-                        $idnumber = new html_table_cell($userinfo[$queue_entry->userid]->idnumber);
+                        $idnumber = new html_table_cell($userinfo[$queueentry->userid]->idnumber);
                         $idnumber->attributes['class'] = 'idnumber';
-                        $email = new html_table_cell($userinfo[$queue_entry->userid]->email);
+                        $email = new html_table_cell($userinfo[$queueentry->userid]->email);
                         $email->attributes['class'] = 'email';
                         $row = new html_table_row(array($rank, $userlink, $idnumber, $email));
                         $row->attributes['class'] = 'queueentry';
                         $rows[] = $row;
                     } else {
                         $row = array();
-                        $row['rank'] = $queue_entry->rank;
-                        $row['name'] = fullname($userinfo[$queue_entry->userid]);
-                        if (!empty($userinfo[$queue_entry->userid]->idnumber)) {
-                            $row['idnumber'] = $userinfo[$queue_entry->userid]->idnumber;
+                        $row['rank'] = $queueentry->rank;
+                        $row['name'] = fullname($userinfo[$queueentry->userid]);
+                        if (!empty($userinfo[$queueentry->userid]->idnumber)) {
+                            $row['idnumber'] = $userinfo[$queueentry->userid]->idnumber;
                         } else {
                             $row['idnumber'] = '-';
                         }
-                        if (!empty($userinfo[$queue_entry->userid]->email)) {
-                            $row['email'] = $userinfo[$queue_entry->userid]->email;
+                        if (!empty($userinfo[$queueentry->userid]->email)) {
+                            $row['email'] = $userinfo[$queueentry->userid]->email;
                         } else {
                             $row['email'] = '-';
                         }
@@ -5127,7 +5148,7 @@ EOS;
                     }
                 }
             } else {
-                if (!$data_only) {
+                if (!$onlydata) {
                     $cell = new html_table_cell(get_string('nobody_queued', 'grouptool'));
                     $cell->attributes['class'] = 'no_queues';
                     $cell->colspan = count($headcells);
@@ -5136,7 +5157,7 @@ EOS;
                     $rows[] = $row;
                 }
             }
-            if (!$data_only) {
+            if (!$onlydata) {
                 $table->data = $rows;
                 $groupdata .= html_writer::table($table);
                 // Group-downloadlinks!
@@ -5159,16 +5180,16 @@ EOS;
                                                    'format'  => GROUPTOOL_ODS));
 
                     $downloadlinks = html_writer::tag('span', get_string('download').":",
-                                                      array('class'=>'title')).'&nbsp;'.
+                                                      array('class' => 'title')).'&nbsp;'.
                                      html_writer::link($urltxt, '.TXT').'&nbsp;'.
                                      html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
                                      html_writer::link($urlxls, '.XLS').'&nbsp;'.
                                      html_writer::link($urlpdf, '.PDF').'&nbsp;'.
                                      html_writer::link($urlods, '.ODS');
                     $groupdata .= html_writer::tag('div', $downloadlinks,
-                                                   array('class'=>'download group'));
+                                                   array('class' => 'download group'));
                 }
-                if ($sync_status[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
+                if ($syncstatus[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
                     $return .= $OUTPUT->box($groupdata, 'generalbox groupcontainer uptodate');
                 } else {
                     $return .= $OUTPUT->box($groupdata, 'generalbox groupcontainer outdated');
@@ -5179,9 +5200,9 @@ EOS;
         }
 
         if (count($agrps) == 0) {
-            $box_content = $OUTPUT->notification(get_string('no_data_to_display', 'grouptool'),
-                                                 'notifyproblem');
-            $return .= $OUTPUT->box($box_content, 'generalbox centered');
+            $boxcontent = $OUTPUT->notification(get_string('no_data_to_display', 'grouptool'),
+                                                'notifyproblem');
+            $return .= $OUTPUT->box($boxcontent, 'generalbox centered');
         }
         return $return;
     }
@@ -5277,10 +5298,10 @@ EOS;
                              get_string('registered', 'grouptool').' '.$group->registered.' / '.
                              get_string('queued', 'grouptool').' '.$group->queued.' / '.
                              get_string('free', 'grouptool').' '.$group->free;
-                $reg_data = $group->reg_data;
-                $queue_data = $group->queue_data;
-                $mreg_data = $group->mreg_data;
-                $pdf->add_grp_overview($groupname, $groupinfo, $reg_data, $queue_data, $mreg_data);
+                $regdata = $group->reg_data;
+                $queuedata = $group->queue_data;
+                $mregdata = $group->mreg_data;
+                $pdf->add_grp_overview($groupname, $groupinfo, $regdata, $queuedata, $mregdata);
                 $pdf->MultiCell(0, $pdf->getLastH(), '', 'B', 'L', false, 1, null, null, true, 1,
                                 true, false, $pdf->getLastH(), 'M', true);
                 $pdf->MultiCell(0, $pdf->getLastH(), '', 'T', 'L', false, 1, null, null, true, 1,
@@ -5382,7 +5403,6 @@ EOS;
 
         $coursename = $this->course->fullname;
         $grouptoolname = $this->grouptool->name;
-        
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
@@ -5413,94 +5433,94 @@ EOS;
     private function overview_fill_workbook(&$workbook, $groups) {
         if (count($groups) > 0) {
 
-            $column_width = array( 7, 22, 14, 17); // Unit: mm!
+            $columnwidth = array( 7, 22, 14, 17); // Unit: mm!
 
-            if (count($groups)>1) {
+            if (count($groups) > 1) {
                 // General information? unused at the moment!
-                $all_groups_worksheet = $workbook->add_worksheet(get_string('all'));
+                $allgroupsworksheet = $workbook->add_worksheet(get_string('all'));
                 // The standard column widths: 7 - 22 - 14 - 17!
-                $all_groups_worksheet->set_column(0, 0, $column_width[0]);
-                $all_groups_worksheet->set_column(1, 1, $column_width[1]);
-                $all_groups_worksheet->set_column(2, 2, $column_width[2]);
-                $all_groups_worksheet->set_column(3, 3, $column_width[3]);
-                $general_sheet = true;
+                $allgroupsworksheet->set_column(0, 0, $columnwidth[0]);
+                $allgroupsworksheet->set_column(1, 1, $columnwidth[1]);
+                $allgroupsworksheet->set_column(2, 2, $columnwidth[2]);
+                $allgroupsworksheet->set_column(3, 3, $columnwidth[3]);
+                $generalsheet = true;
             } else {
-                $general_sheet = false;
+                $generalsheet = false;
             }
 
-            $legend_worksheet = $workbook->add_worksheet(get_string('status', 'grouptool').' '.
-                                                          get_string('help'));
-            $legend_worksheet->write_string(0, 0, get_string('status', 'grouptool').' '.
-                                                  get_string('help'));
+            $legendworksheet = $workbook->add_worksheet(get_string('status', 'grouptool').' '.
+                                                        get_string('help'));
+            $legendworksheet->write_string(0, 0, get_string('status', 'grouptool').' '.
+                                                 get_string('help'));
             $line = 1;
             foreach (explode("</li>", get_string('status_help', 'grouptool')) as $legendline) {
                 if (strstr($legendline, "</span>")) {
                     $lineelements = explode("</span>", $legendline);
-                    $legend_worksheet->write_string($line, 0, strip_tags($lineelements[0]));
-                    $legend_worksheet->write_string($line, 1, strip_tags($lineelements[1]));
+                    $legendworksheet->write_string($line, 0, strip_tags($lineelements[0]));
+                    $legendworksheet->write_string($line, 1, strip_tags($lineelements[1]));
                     $line++;
                 }
             }
 
             // Add content for all groups!
-            $group_worksheets = array();
+            $groupworksheets = array();
 
             // Prepare formats!
-            $headline_prop = array(    'size' => 14,
+            $headlineprop = array(    'size' => 14,
                     'bold' => 1,
                     'align' => 'center');
-            $headline_format = $workbook->add_format($headline_prop);
-            $groupinfo_prop1 = array(  'size' => 10,
+            $headlineformat = $workbook->add_format($headlineprop);
+            $groupinfoprop1 = array(  'size' => 10,
                     'bold' => 1,
                     'align' => 'left');
-            $groupinfo_prop2 = $groupinfo_prop1;
-            unset($groupinfo_prop2['bold']);
-            $groupinfo_prop2['italic'] = true;
-            $groupinfo_prop2['align'] = 'right';
-            $groupinfo_format1 = $workbook->add_format($groupinfo_prop1);
-            $groupinfo_format2 = $workbook->add_format($groupinfo_prop2);
-            $reg_head_prop = array(    'size' => 10,
+            $groupinfoprop2 = $groupinfoprop1;
+            unset($groupinfoprop2['bold']);
+            $groupinfoprop2['italic'] = true;
+            $groupinfoprop2['align'] = 'right';
+            $groupinfoformat1 = $workbook->add_format($groupinfoprop1);
+            $groupinfoformat2 = $workbook->add_format($groupinfoprop2);
+            $regheadprop = array(    'size' => 10,
                     'align' => 'center',
                     'bold' => 1,
                     'bottom' => 2);
-            $reg_entry_prop = array(   'size' => 10,
+            $regentryprop = array(   'size' => 10,
                     'align' => 'left');
-            $queue_entry_prop = $reg_entry_prop;
-            $queue_entry_prop['italic'] = true;
-            $queue_entry_prop['color'] = 'grey';
+            $queueentryprop = $regentryprop;
+            $queueentryprop['italic'] = true;
+            $queueentryprop['color'] = 'grey';
 
-            $reg_head_format = $workbook->add_format($reg_head_prop);
-            $reg_head_format->set_right(1);
-            $reg_head_last = $workbook->add_format($reg_head_prop);
+            $regheadformat = $workbook->add_format($regheadprop);
+            $regheadformat->set_right(1);
+            $regheadlast = $workbook->add_format($regheadprop);
 
-            $reg_entry_format = $workbook->add_format($reg_entry_prop);
-            $reg_entry_format->set_right(1);
-            $reg_entry_format->set_top(1);
-            $reg_entry_format->set_bottom(0);
-            $reg_entry_last = $workbook->add_format($reg_entry_prop);
-            $reg_entry_last->set_top(1);
-            $no_reg_entries_format = $workbook->add_format($reg_entry_prop);
-            $no_reg_entries_format->set_align('center');
-            $queue_entry_format = $workbook->add_format($queue_entry_prop);
-            $queue_entry_format->set_right(1);
-            $queue_entry_format->set_top(1);
-            $queue_entry_format->set_bottom(false);
-            $queue_entry_last = $workbook->add_format($queue_entry_prop);
-            $queue_entry_last->set_top(1);
-            $no_queue_entries_format = $workbook->add_format($queue_entry_prop);
-            $no_queue_entries_format->set_align('center');
+            $regentryformat = $workbook->add_format($regentryprop);
+            $regentryformat->set_right(1);
+            $regentryformat->set_top(1);
+            $regentryformat->set_bottom(0);
+            $regentrylast = $workbook->add_format($regentryprop);
+            $regentrylast->set_top(1);
+            $noregentriesformat = $workbook->add_format($regentryprop);
+            $noregentriesformat->set_align('center');
+            $queueentryformat = $workbook->add_format($queueentryprop);
+            $queueentryformat->set_right(1);
+            $queueentryformat->set_top(1);
+            $queueentryformat->set_bottom(false);
+            $queueentrylast = $workbook->add_format($queueentryprop);
+            $queueentrylast->set_top(1);
+            $noqueueentriesformat = $workbook->add_format($queueentryprop);
+            $noqueueentriesformat->set_align('center');
 
             // Start row for groups general sheet!
             $j = 0;
             foreach ($groups as $key => $group) {
                 // Add worksheet for each group!
-                $group_worksheets[$key] = $workbook->add_worksheet($group->name);
+                $groupworksheets[$key] = $workbook->add_worksheet($group->name);
 
                 // The standard-column-widths: 7 - 22 - 14 - 17!
-                $group_worksheets[$key]->set_column(0, 0, $column_width[0]);
-                $group_worksheets[$key]->set_column(1, 1, $column_width[1]);
-                $group_worksheets[$key]->set_column(2, 2, $column_width[2]);
-                $group_worksheets[$key]->set_column(3, 3, $column_width[3]);
+                $groupworksheets[$key]->set_column(0, 0, $columnwidth[0]);
+                $groupworksheets[$key]->set_column(1, 1, $columnwidth[1]);
+                $groupworksheets[$key]->set_column(2, 2, $columnwidth[2]);
+                $groupworksheets[$key]->set_column(3, 3, $columnwidth[3]);
 
                 $groupname = $group->name;
                 $groupinfo = array();
@@ -5508,190 +5528,190 @@ EOS;
                 $groupinfo[] = array(get_string('registered', 'grouptool'), $group->registered);
                 $groupinfo[] = array(get_string('queued', 'grouptool'), $group->queued);
                 $groupinfo[] = array(get_string('free', 'grouptool'), $group->free);
-                $reg_data = $group->reg_data;
-                $queue_data = $group->queue_data;
-                $mreg_data = isset($group->mreg_data) ? $group->mreg_data : array();
+                $regdata = $group->reg_data;
+                $queuedata = $group->queue_data;
+                $mregdata = isset($group->mreg_data) ? $group->mreg_data : array();
                 // Groupname as headline!
-                $group_worksheets[$key]->write_string(0, 0, $groupname, $headline_format);
-                $group_worksheets[$key]->merge_cells(0, 0, 0, 3);
-                if ($general_sheet) {
-                    $all_groups_worksheet->write_string($j, 0, $groupname, $headline_format);
-                    $all_groups_worksheet->merge_cells($j, 0, $j, 3);
+                $groupworksheets[$key]->write_string(0, 0, $groupname, $headlineformat);
+                $groupworksheets[$key]->merge_cells(0, 0, 0, 3);
+                if ($generalsheet) {
+                    $allgroupsworksheet->write_string($j, 0, $groupname, $headlineformat);
+                    $allgroupsworksheet->merge_cells($j, 0, $j, 3);
                 }
 
                 // Groupinfo on top!
-                $group_worksheets[$key]->write_string(2, 0, $groupinfo[0][0], $groupinfo_format1);
-                $group_worksheets[$key]->merge_cells(2, 0, 2, 1);
-                $group_worksheets[$key]->write(2, 2, $groupinfo[0][1], $groupinfo_format2);
+                $groupworksheets[$key]->write_string(2, 0, $groupinfo[0][0], $groupinfoformat1);
+                $groupworksheets[$key]->merge_cells(2, 0, 2, 1);
+                $groupworksheets[$key]->write(2, 2, $groupinfo[0][1], $groupinfoformat2);
 
-                $group_worksheets[$key]->write_string(3, 0, $groupinfo[1][0], $groupinfo_format1);
-                $group_worksheets[$key]->merge_cells(3, 0, 3, 1);
-                $group_worksheets[$key]->write(3, 2, $groupinfo[1][1], $groupinfo_format2);
+                $groupworksheets[$key]->write_string(3, 0, $groupinfo[1][0], $groupinfoformat1);
+                $groupworksheets[$key]->merge_cells(3, 0, 3, 1);
+                $groupworksheets[$key]->write(3, 2, $groupinfo[1][1], $groupinfoformat2);
 
-                $group_worksheets[$key]->write_string(4, 0, $groupinfo[2][0], $groupinfo_format1);
-                $group_worksheets[$key]->merge_cells(4, 0, 4, 1);
-                $group_worksheets[$key]->write(4, 2, $groupinfo[2][1], $groupinfo_format2);
+                $groupworksheets[$key]->write_string(4, 0, $groupinfo[2][0], $groupinfoformat1);
+                $groupworksheets[$key]->merge_cells(4, 0, 4, 1);
+                $groupworksheets[$key]->write(4, 2, $groupinfo[2][1], $groupinfoformat2);
 
-                $group_worksheets[$key]->write_string(5, 0, $groupinfo[3][0], $groupinfo_format1);
-                $group_worksheets[$key]->merge_cells(5, 0, 5, 1);
-                $group_worksheets[$key]->write(5, 2, $groupinfo[3][1], $groupinfo_format2);
-                if ($general_sheet) {
-                    $all_groups_worksheet->write_string($j+2, 0, $groupinfo[0][0],
-                                                        $groupinfo_format1);
-                    $all_groups_worksheet->merge_cells($j+2, 0, $j+2, 1);
-                    $all_groups_worksheet->write($j+2, 2, $groupinfo[0][1], $groupinfo_format2);
+                $groupworksheets[$key]->write_string(5, 0, $groupinfo[3][0], $groupinfoformat1);
+                $groupworksheets[$key]->merge_cells(5, 0, 5, 1);
+                $groupworksheets[$key]->write(5, 2, $groupinfo[3][1], $groupinfoformat2);
+                if ($generalsheet) {
+                    $allgroupsworksheet->write_string($j + 2, 0, $groupinfo[0][0],
+                                                      $groupinfoformat1);
+                    $allgroupsworksheet->merge_cells($j + 2, 0, $j + 2, 1);
+                    $allgroupsworksheet->write($j + 2, 2, $groupinfo[0][1], $groupinfoformat2);
 
-                    $all_groups_worksheet->write_string($j+3, 0, $groupinfo[1][0],
-                                                        $groupinfo_format1);
-                    $all_groups_worksheet->merge_cells($j+3, 0, $j+3, 1);
-                    $all_groups_worksheet->write($j+3, 2, $groupinfo[1][1], $groupinfo_format2);
+                    $allgroupsworksheet->write_string($j + 3, 0, $groupinfo[1][0],
+                                                      $groupinfoformat1);
+                    $allgroupsworksheet->merge_cells($j + 3, 0, $j + 3, 1);
+                    $allgroupsworksheet->write($j + 3, 2, $groupinfo[1][1], $groupinfoformat2);
 
-                    $all_groups_worksheet->write_string($j+4, 0, $groupinfo[2][0],
-                                                        $groupinfo_format1);
-                    $all_groups_worksheet->merge_cells($j+4, 0, $j+4, 1);
-                    $all_groups_worksheet->write($j+4, 2, $groupinfo[2][1], $groupinfo_format2);
+                    $allgroupsworksheet->write_string($j + 4, 0, $groupinfo[2][0],
+                                                      $groupinfoformat1);
+                    $allgroupsworksheet->merge_cells($j + 4, 0, $j + 4, 1);
+                    $allgroupsworksheet->write($j + 4, 2, $groupinfo[2][1], $groupinfoformat2);
 
-                    $all_groups_worksheet->write_string($j+5, 0, $groupinfo[3][0],
-                                                        $groupinfo_format1);
-                    $all_groups_worksheet->merge_cells($j+5, 0, $j+5, 1);
-                    $all_groups_worksheet->write($j+5, 2, $groupinfo[3][1], $groupinfo_format2);
+                    $allgroupsworksheet->write_string($j + 5, 0, $groupinfo[3][0],
+                                                      $groupinfoformat1);
+                    $allgroupsworksheet->merge_cells($j + 5, 0, $j + 5, 1);
+                    $allgroupsworksheet->write($j + 5, 2, $groupinfo[3][1], $groupinfoformat2);
                 }
 
                 // Registrations and queue headline!
                 // First the headline!
-                $group_worksheets[$key]->write_string(7, 0, get_string('status', 'grouptool'),
-                                                      $reg_head_format);
-                $group_worksheets[$key]->write_string(7, 1, get_string('fullname'),
-                                                      $reg_head_format);
-                $group_worksheets[$key]->write_string(7, 2, get_string('idnumber'),
-                                                      $reg_head_format);
-                $group_worksheets[$key]->write_string(7, 3, get_string('email'), $reg_head_last);
-                if ($general_sheet) {
-                    $all_groups_worksheet->write_string($j+7, 0, get_string('status', 'grouptool'),
-                                                        $reg_head_format);
-                    $all_groups_worksheet->write_string($j+7, 1, get_string('fullname'),
-                                                        $reg_head_format);
-                    $all_groups_worksheet->write_string($j+7, 2, get_string('idnumber'),
-                                                        $reg_head_format);
-                    $all_groups_worksheet->write_string($j+7, 3, get_string('email'),
-                                                        $reg_head_last);
+                $groupworksheets[$key]->write_string(7, 0, get_string('status', 'grouptool'),
+                                                      $regheadformat);
+                $groupworksheets[$key]->write_string(7, 1, get_string('fullname'),
+                                                      $regheadformat);
+                $groupworksheets[$key]->write_string(7, 2, get_string('idnumber'),
+                                                      $regheadformat);
+                $groupworksheets[$key]->write_string(7, 3, get_string('email'), $regheadlast);
+                if ($generalsheet) {
+                    $allgroupsworksheet->write_string($j + 7, 0, get_string('status', 'grouptool'),
+                                                      $regheadformat);
+                    $allgroupsworksheet->write_string($j + 7, 1, get_string('fullname'),
+                                                      $regheadformat);
+                    $allgroupsworksheet->write_string($j + 7, 2, get_string('idnumber'),
+                                                      $regheadformat);
+                    $allgroupsworksheet->write_string($j + 7, 3, get_string('email'),
+                                                      $regheadlast);
                 }
 
                 // Now the registrations!
                 $i = 0;
-                if (!empty($reg_data)) {
-                    foreach ($reg_data as $reg) {
-                        if ($i==0) {
-                            $reg_entry_format->set_top(2);
+                if (!empty($regdata)) {
+                    foreach ($regdata as $reg) {
+                        if ($i == 0) {
+                            $regentryformat->set_top(2);
                         } else if ($i == 1) {
-                            $reg_entry_format->set_top(1);
+                            $regentryformat->set_top(1);
                         }
-                        $group_worksheets[$key]->write_string(8+$i, 0, $reg['status'],
-                                                              $reg_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 1, $reg['name'],
-                                                              $reg_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 2, $reg['idnumber'],
-                                                              $reg_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 3, $reg['email'],
-                                                              $reg_entry_last);
-                        if ($general_sheet) {
-                            $all_groups_worksheet->write_string($j+8+$i, 0, $reg['status'],
-                                                                $reg_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 1, $reg['name'],
-                                                                $reg_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 2, $reg['idnumber'],
-                                                                $reg_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 3, $reg['email'],
-                                                                $reg_entry_last);
+                        $groupworksheets[$key]->write_string(8 + $i, 0, $reg['status'],
+                                                             $regentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 1, $reg['name'],
+                                                             $regentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 2, $reg['idnumber'],
+                                                             $regentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 3, $reg['email'],
+                                                             $regentrylast);
+                        if ($generalsheet) {
+                            $allgroupsworksheet->write_string($j + 8 + $i, 0, $reg['status'],
+                                                              $regentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 1, $reg['name'],
+                                                              $regentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 2, $reg['idnumber'],
+                                                              $regentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 3, $reg['email'],
+                                                              $regentrylast);
                         }
                         $i++;
                     }
-                } else if (count($mreg_data) == 0) {
-                    $group_worksheets[$key]->write_string(8+$i, 0,
+                } else if (count($mregdata) == 0) {
+                    $groupworksheets[$key]->write_string(8 + $i, 0,
+                                                         get_string('no_registrations',
+                                                                    'grouptool'),
+                                                         $noregentriesformat);
+                    $groupworksheets[$key]->merge_cells(8 + $i, 0, 8 + $i, 3);
+                    if ($generalsheet) {
+                        $allgroupsworksheet->write_string($j + 8 + $i, 0,
                                                           get_string('no_registrations',
                                                                      'grouptool'),
-                                                          $no_reg_entries_format);
-                    $group_worksheets[$key]->merge_cells(8+$i, 0, 8+$i, 3);
-                    if ($general_sheet) {
-                        $all_groups_worksheet->write_string($j+8+$i, 0,
-                                                            get_string('no_registrations',
-                                                                       'grouptool'),
-                                                            $no_reg_entries_format);
-                        $all_groups_worksheet->merge_cells($j+8+$i, 0, $j+8+$i, 3);
+                                                          $noregentriesformat);
+                        $allgroupsworksheet->merge_cells($j + 8 + $i, 0, $j + 8 + $i, 3);
                     }
                     $i++;
                 }
 
-                if (count($mreg_data) >= 1) {
-                    foreach ($mreg_data as $mreg) {
-                        if ($i==0) {
-                            $reg_entry_format->set_top(2);
+                if (count($mregdata) >= 1) {
+                    foreach ($mregdata as $mreg) {
+                        if ($i == 0) {
+                            $regentryformat->set_top(2);
                         } else if ($i == 1) {
-                            $reg_entry_format->set_top(1);
+                            $regentryformat->set_top(1);
                         }
-                        $group_worksheets[$key]->write_string(8+$i, 0, '?', $reg_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 1, $mreg['name'],
-                                                              $reg_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 2, $mreg['idnumber'],
-                                                              $reg_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 3, $mreg['email'],
-                                                              $reg_entry_last);
-                        if ($general_sheet) {
-                            $all_groups_worksheet->write_string($j+8+$i, 0, '?',
-                                                                $reg_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 1, $mreg['name'],
-                                                                $reg_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 2, $mreg['idnumber'],
-                                                                $reg_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 3, $mreg['email'],
-                                                                $reg_entry_last);
+                        $groupworksheets[$key]->write_string(8 + $i, 0, '?', $regentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 1, $mreg['name'],
+                                                             $regentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 2, $mreg['idnumber'],
+                                                             $regentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 3, $mreg['email'],
+                                                             $regentrylast);
+                        if ($generalsheet) {
+                            $allgroupsworksheet->write_string($j + 8 + $i, 0, '?',
+                                                              $regentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 1, $mreg['name'],
+                                                              $regentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 2, $mreg['idnumber'],
+                                                              $regentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 3, $mreg['email'],
+                                                              $regentrylast);
                         }
                         $i++;
                     }
                 }
                 // Don't forget the queue!
-                if (!empty($queue_data)) {
-                    foreach ($queue_data as $queue) {
-                        if ($i==0) {
-                            $reg_entry_format->set_top(2);
+                if (!empty($queuedata)) {
+                    foreach ($queuedata as $queue) {
+                        if ($i == 0) {
+                            $regentryformat->set_top(2);
                         } else if ($i == 1) {
-                            $reg_entry_format->set_top(1);
+                            $regentryformat->set_top(1);
                         }
-                        $group_worksheets[$key]->write(8+$i, 0, $queue['rank'],
-                                                       $queue_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 1, $queue['name'],
-                                                              $queue_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 2, $queue['idnumber'],
-                                                              $queue_entry_format);
-                        $group_worksheets[$key]->write_string(8+$i, 3, $queue['email'],
-                                                              $queue_entry_last);
-                        if ($general_sheet) {
-                            $all_groups_worksheet->write_string($j+8+$i, 0, $queue['rank'],
-                                                                $queue_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 1, $queue['name'],
-                                                                $queue_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 2, $queue['idnumber'],
-                                                                $queue_entry_format);
-                            $all_groups_worksheet->write_string($j+8+$i, 3, $queue['email'],
-                                                                $queue_entry_last);
+                        $groupworksheets[$key]->write(8 + $i, 0, $queue['rank'],
+                                                      $queueentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 1, $queue['name'],
+                                                             $queueentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 2, $queue['idnumber'],
+                                                             $queueentryformat);
+                        $groupworksheets[$key]->write_string(8 + $i, 3, $queue['email'],
+                                                             $queueentrylast);
+                        if ($generalsheet) {
+                            $allgroupsworksheet->write_string($j + 8 + $i, 0, $queue['rank'],
+                                                              $queueentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 1, $queue['name'],
+                                                              $queueentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 2, $queue['idnumber'],
+                                                              $queueentryformat);
+                            $allgroupsworksheet->write_string($j + 8 + $i, 3, $queue['email'],
+                                                              $queueentrylast);
                         }
                         $i++;
                     }
                 } else {
-                    $group_worksheets[$key]->write_string(8+$i, 0,
-                                                          get_string('nobody_queued', 'grouptool'),
-                                                          $no_queue_entries_format);
-                    $group_worksheets[$key]->merge_cells(8+$i, 0, 8+$i, 3);
-                    if ($general_sheet) {
-                        $all_groups_worksheet->write_string($j+8+$i, 0,
-                                                            get_string('nobody_queued',
-                                                                       'grouptool'),
-                                                            $no_queue_entries_format);
-                        $all_groups_worksheet->merge_cells($j+8+$i, 0, $j+8+$i, 3);
+                    $groupworksheets[$key]->write_string(8 + $i, 0,
+                                                         get_string('nobody_queued', 'grouptool'),
+                                                         $noqueueentriesformat);
+                    $groupworksheets[$key]->merge_cells(8 + $i, 0, 8 + $i, 3);
+                    if ($generalsheet) {
+                        $allgroupsworksheet->write_string($j + 8 + $i, 0,
+                                                          get_string('nobody_queued',
+                                                                     'grouptool'),
+                                                          $noqueueentriesformat);
+                        $allgroupsworksheet->merge_cells($j + 8 + $i, 0, $j + 8 + $i, 3);
                     }
                     $i++;
                 }
-                $j += 9+$i;    // 1 row space between groups!
+                $j += 9 + $i;    // One row space between groups!
             }
 
         }
@@ -5766,7 +5786,7 @@ EOS;
         $workbook->send($filename.'.xls');
         $workbook->close();
     }
-    
+
     /**
      * outputs generated xlsx-file for overview (forces download)
      *
@@ -5812,7 +5832,7 @@ EOS;
      */
     private function get_sync_status($grouptoolid = 0) {
         global $DB;
-        $out_of_sync = false;
+        $outofsync = false;
 
         if (empty($grouptoolid)) {
             $grouptoolid = $this->grouptool->id;
@@ -5830,11 +5850,11 @@ EOS;
         $return = $DB->get_records_sql($sql, array($grouptoolid));
 
         foreach ($return as $key => $group) {
-            $return[$key]->status = ($group->grptoolregs > $group->mdlregs) ? GROUPTOOL_OUTDATED
-                                                                            : GROUPTOOL_UPTODATE;
-            $out_of_sync |= ($return[$key]->status == GROUPTOOL_OUTDATED);
+            $return[$key]->status = ($group->grptoolregs > $group->mdlregs) ?
+                                    GROUPTOOL_OUTDATED : GROUPTOOL_UPTODATE;
+            $outofsync |= ($return[$key]->status == GROUPTOOL_OUTDATED);
         }
-        return array($out_of_sync, $return);
+        return array($outofsync, $return);
     }
 
     /**
@@ -5855,8 +5875,8 @@ EOS;
         foreach ($agrps as $groupid => $agrp) {
             foreach ($agrp->registered as $reg) {
                 $info = new stdClass();
-                if(!key_exists($reg->userid, $userinfo)) {
-                    $userinfo[$reg->userid] = $DB->get_record('user', array('id'=>$reg->userid));
+                if (!key_exists($reg->userid, $userinfo)) {
+                    $userinfo[$reg->userid] = $DB->get_record('user', array('id' => $reg->userid));
                 }
                 $info->username = fullname($userinfo[$reg->userid]);
                 $info->groupname = $agrp->name;
@@ -5870,13 +5890,13 @@ EOS;
                              */
                             require_once($CFG->dirroot.'/enrol/manual/locallib.php');
                             require_once($CFG->libdir.'/accesslib.php');
-                            if (!$enrol_manual = enrol_get_plugin('manual')) {
+                            if (!$enrolmanual = enrol_get_plugin('manual')) {
                                 throw new coding_exception('Can not instantiate enrol_manual');
                             }
-                            if (!$instance = $DB->get_record('enrol', array('courseid'=>$this->course->id,
-                                                                            'enrol'=>'manual'),
+                            if (!$instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
+                                                                            'enrol'    => 'manual'),
                                                              '*', IGNORE_MISSING)) {
-                                if ($instanceid = $enrol_manual->add_default_instance($this->course)) {
+                                if ($instanceid = $enrolmanual->add_default_instance($this->course)) {
                                     $instance = $DB->get_record('enrol',
                                                                 array('courseid' => $this->course->id,
                                                                       'enrol'    => 'manual'), '*',
@@ -5886,7 +5906,7 @@ EOS;
                             if ($instance != false) {
                                 $archroles = get_archetype_roles('student');
                                 $archrole = array_shift($archroles);
-                                $enrol_manual->enrol_user($instance, $reg->userid, $archrole->id, time());
+                                $enrolmanual->enrol_user($instance, $reg->userid, $archrole->id, time());
                             } else {
                                 $message .= html_writer::tag('div',
                                                              $OUTPUT->notification(get_string('cant_enrol',
@@ -5898,22 +5918,22 @@ EOS;
                             $return[] = html_writer::tag('div',
                                                          get_string('added_member', 'grouptool',
                                                                     $info),
-                                                         array('class'=>'notifysuccess'));
+                                                         array('class' => 'notifysuccess'));
                         } else {
                             $return[] = html_writer::tag('div',
                                                          get_string('could_not_add', 'grouptool',
                                                                     $info),
-                                                         array('class'=>'notifyproblem'));
+                                                         array('class' => 'notifyproblem'));
                         }
                     } else {
                         $return[] = html_writer::tag('div', get_string('add_member', 'grouptool',
                                                                        $info),
-                                                     array('class'=>'notifysuccess'));
+                                                     array('class' => 'notifysuccess'));
                     }
                 } else {
                     $return[] = html_writer::tag('div', get_string('already_member', 'grouptool',
                                                                    $info),
-                                                 array('class'=>'ignored'));
+                                                 array('class' => 'ignored'));
                 }
             }
         }
@@ -5951,20 +5971,20 @@ EOS;
     private function render_members_link($agrpid, $groupname) {
         global $CFG, $PAGE;
 
-        // Init Members-Popup-JS
+        // Init Members-Popup-JS!
         $PAGE->requires->yui_module('moodle-mod_grouptool-memberspopup', 'M.mod_grouptool.init_memberspopup');
         $PAGE->requires->strings_for_js(array(
             'loading',
         ), 'grouptool');
-        
+
         $output = get_string('show_members', 'grouptool');
 
         // Now create the link around it - we need https on loginhttps pages!
         $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php',
-                              array('agrpid'  => $agrpid,
+                              array('agrpid'    => $agrpid,
                                     'contextid' => $this->context->id));
 
-        $attributes = array('href'=>$url, 'title'=>get_string('show_members', 'grouptool'));
+        $attributes = array('href' => $url, 'title' => get_string('show_members', 'grouptool'));
         $id = html_writer::random_id('showmembers');
         $attributes['id'] = $id;
         $output = html_writer::tag('a', $output, $attributes);
@@ -5993,7 +6013,7 @@ EOS;
             // Process submitted form!
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed?!
-            $hide_form = 0;
+            $hideform = 0;
             $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
             if ($pushtomdl) {
                 list($error, $message) = $this->push_registrations($groupid, $groupingid);
@@ -6005,7 +6025,7 @@ EOS;
             }
         } else if (data_submitted() && confirm_sesskey()) {
             // Display confirm-dialog!
-            $hide_form = 1;
+            $hideform = 1;
 
             $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
             if ($pushtomdl) {
@@ -6026,15 +6046,15 @@ EOS;
                 }
                 echo $this->confirm($message, $continue, $cancel);
             } else {
-                $hide_form = 0;
+                $hideform = 0;
             }
         } else {
-            $hide_form = 0;
+            $hideform = 0;
         }
 
-        if (!$hide_form) {
+        if (!$hideform) {
             $groupings = groups_get_all_groupings($this->course->id);
-            $options = array(0=>get_string('all'));
+            $options = array(0 => get_string('all'));
             if (count($groupings)) {
                 foreach ($groupings as $grouping) {
                     $options[$grouping->id] = $grouping->name;
@@ -6043,7 +6063,7 @@ EOS;
             $groupingselect = new single_select($url, 'groupingid', $options, $groupingid, false);
 
             $groups = $this->get_active_groups(true, true, 0, 0, $groupingid);
-            $options = array(0=>get_string('all'));
+            $options = array(0 => get_string('all'));
             if (count($groups)) {
                 foreach ($groups as $group) {
                     $options[$group->id] = $group->name;
@@ -6065,14 +6085,14 @@ EOS;
                              1 => get_string('landscape', 'grouptool'));
             $orientationselect = new single_select($url, 'orientation', $options, $orientation, false);
 
-            $sync_status = $this->get_sync_status();
+            $syncstatus = $this->get_sync_status();
 
-            if ($sync_status[0]) {
+            if ($syncstatus[0]) {
                 /*
                  * Out of sync? --> show button to get registrations from grouptool to moodle
                  * (just register not already registered persons and let the others be)
                  */
-                $url = new moodle_url($PAGE->url, array('pushtomdl'=>1, 'sesskey'=>sesskey()));
+                $url = new moodle_url($PAGE->url, array('pushtomdl' => 1, 'sesskey' => sesskey()));
                 $button = new single_button($url, get_string('updatemdlgrps', 'grouptool'));
                 echo $OUTPUT->box(html_writer::empty_tag('br').
                                   $OUTPUT->render($button).
@@ -6081,13 +6101,13 @@ EOS;
 
             echo html_writer::tag('div', get_string('grouping', 'group').'&nbsp;'.
                                          $OUTPUT->render($groupingselect),
-                                  array('class'=>'centered grouptool_overview_filter')).
+                                  array('class' => 'centered grouptool_overview_filter')).
                  html_writer::tag('div', get_string('group', 'group').'&nbsp;'.
                                          $OUTPUT->render($groupselect),
-                                  array('class'=>'centered grouptool_overview_filter')).
+                                  array('class' => 'centered grouptool_overview_filter')).
                  html_writer::tag('div', get_string('orientation', 'grouptool').'&nbsp;'.
                                          $OUTPUT->render($orientationselect),
-                                  array('class'=>'centered grouptool_userlist_filter'));
+                                  array('class' => 'centered grouptool_userlist_filter'));
 
             echo $this->group_overview_table($groupingid, $groupid);
         }
@@ -6147,8 +6167,7 @@ EOS;
                         $orderbystring .= " ORDER BY";
                     }
                     $orderbystring .= " ".$field." ".
-                                      ((!empty($direction) && $direction == 'ASC')  ? 'ASC'
-                                                                                    : 'DESC');
+                                      ((!empty($direction) && $direction == 'ASC') ? 'ASC' : 'DESC');
                 } else {
                     unset($orderby[$field]);
                 }
@@ -6157,14 +6176,14 @@ EOS;
 
         if (!empty($agrpsql)) {
             if (key_exists("regs", $orderby)) {
-                $reg_order = "ORDER BY grps.name ".($orderby['regs'] ? 'ASC' : 'DESC');
+                $regorder = "ORDER BY grps.name ".($orderby['regs'] ? 'ASC' : 'DESC');
             } else {
-                $reg_order = "";
+                $regorder = "";
             }
             if (key_exists("queues", $orderby)) {
-                $queue_order = "ORDER BY grps.name ".($orderby['queues'] ? 'ASC' : 'DESC');
+                $queueorder = "ORDER BY grps.name ".($orderby['queues'] ? 'ASC' : 'DESC');
             } else {
-                $queue_order = "";
+                $queueorder = "";
             }
             $sqljoin = " LEFT JOIN {grouptool_registered} AS reg ON u.id = reg.userid
                                                                  AND reg.agrpid ".$agrpsql.
@@ -6176,13 +6195,12 @@ EOS;
         } else {
             $sqljoin = "";
         }
-        $sqljoinreg =
-                   (!empty($agrpsql) ?  : "");
+        $sqljoinreg = (!empty($agrpsql) ? : "");
         $sql = "SELECT $ufields".
-               (!empty($agrpsql) ? ", GROUP_CONCAT(DISTINCT reg.agrpid SEPARATOR ',') as regs"
-                                 : ", null as regs").
-               (!empty($agrpsql) ? ", GROUP_CONCAT(DISTINCT queue.agrpid SEPARATOR ',') as queues"
-                                 : ", null as queues").
+               (!empty($agrpsql) ?
+                ", GROUP_CONCAT(DISTINCT reg.agrpid SEPARATOR ',') as regs" : ", null as regs").
+               (!empty($agrpsql) ?
+                ", GROUP_CONCAT(DISTINCT queue.agrpid SEPARATOR ',') as queues" : ", null as queues").
               // Just to have a good name for sorting!
               (!empty($agrpsql) ? ", grps.name AS grpname" : "" ).
               " FROM {user} AS u".
@@ -6232,14 +6250,14 @@ EOS;
     private function collapselink($collapsed = array(), $search) {
         global $PAGE, $OUTPUT;
         if (in_array($search, $collapsed)) {
-            $url = new moodle_url($PAGE->url, array('tshow'=>$search));
+            $url = new moodle_url($PAGE->url, array('tshow' => $search));
             $pic = $OUTPUT->pix_icon('t/switch_plus', 'show');
         } else {
-            $url = new moodle_url($PAGE->url, array('thide'=>$search));
+            $url = new moodle_url($PAGE->url, array('thide' => $search));
             $pic = $OUTPUT->pix_icon('t/switch_minus', 'hide');
         }
         return html_writer::tag('div', html_writer::link($url, $pic),
-                                                         array('class'=>'collapselink'));
+                                                         array('class' => 'collapselink'));
     }
 
     /**
@@ -6254,11 +6272,11 @@ EOS;
      * @param int $groupid optional get only this group (groupid not agroupid!)
      * @param array $orderby optional current order-by array
      * @param array $collapsed optional current array with collapsed columns
-     * @param bool $data_only optional return object with raw data not html-fragment-string
+     * @param bool $onlydata optional return object with raw data not html-fragment-string
      * @return string|object either html-fragment representing table or raw data as object
      */
     public function userlist_table($groupingid = 0, $groupid = 0, $orderby = array(),
-                                   $collapsed = array(), $data_only = false) {
+                                   $collapsed = array(), $onlydata = false) {
         global $OUTPUT, $CFG, $DB, $PAGE, $SESSION;
         $return = "";
 
@@ -6305,15 +6323,16 @@ EOS;
             $SESSION->mod_grouptool->userlist->collapsed = $collapsed;
         }
 
-        if (!$data_only) {
+        if (!$onlydata) {
             $return = "";
             $orientation = optional_param('orientation', 0, PARAM_BOOL);
-            $downloadurl = new moodle_url('/mod/grouptool/download.php', array('id'=>$this->cm->id,
-                    'groupingid'=>$groupingid,
-                    'groupid'=>$groupid,
-                    'orientation'=>$orientation,
-                    'sesskey'=>sesskey(),
-                    'tab'=>'userlist'));
+            $downloadurl = new moodle_url('/mod/grouptool/download.php',
+                                          array('id'          => $this->cm->id,
+                                                'groupingid'  => $groupingid,
+                                                'groupid'     => $groupid,
+                                                'orientation' => $orientation,
+                                                'sesskey'     => sesskey(),
+                                                'tab'         => 'userlist'));
         } else {
             $return = array();
         }
@@ -6325,7 +6344,7 @@ EOS;
                "LEFT JOIN ($esql) eu ON eu.id=u.id ".
                "WHERE u.deleted = 0 AND eu.id=u.id ";
         if (!empty($groupingid)) {
-            //get all groupings groups
+            // Get all groupings groups!
             $groups = groups_get_all_groups($this->course->id, 0, $groupingid);
             $groupingsusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id');
             if (empty($groupingusers)) {
@@ -6348,13 +6367,13 @@ EOS;
             } else {
                 list($userssql, $groupingparams) = $DB->get_in_or_equal($groupingusers, SQL_PARAMS_NAMED);
             }
-            //extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group
+            // Extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group!
             $sql .= " AND u.id ".$userssql;
             $params = array_merge($params, $groupingparams);
         }
         if (!empty($groupid)) {
-            //same as with groupingid but just with 1 group
-            //get all group members
+            // Same as with groupingid but just with 1 group!
+            // Get all group members!
             $groupusers = groups_get_members($groupid, 'DISTINCT u.id');
             if (empty($groupusers)) {
                 $groupusers = array();
@@ -6375,7 +6394,7 @@ EOS;
             } else {
                 list($userssql, $groupparams) = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
             }
-            //extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group
+            // Extend sql to only include people registered in moodle-group/grouptool-group or queued in grouptool group!
             $sql .= " AND u.id ".$userssql;
             $params = array_merge($params, $groupparams);
         }
@@ -6385,7 +6404,7 @@ EOS;
             $users = array_keys($users);
             $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
         } else {
-            if (!$data_only) {
+            if (!$onlydata) {
                 $return .= $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display',
                                                                          'grouptool'),
                                                               'notifyproblem'),
@@ -6397,21 +6416,21 @@ EOS;
         }
         $groupinfo = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
 
-        if (!$data_only) {
+        if (!$onlydata) {
             if (has_capability('mod/grouptool:export', $context)) {
-                $txturl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_TXT));
-                $xlsxurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLSX));
-                $xlsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_XLS));
-                $pdfurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_PDF));
-                $odsurl = new moodle_url($downloadurl, array('format'=>GROUPTOOL_ODS));
+                $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
+                $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
+                $xlsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLS));
+                $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
+                $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
                 $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
-                                                  array('class'=>'title')).'&nbsp;'.
+                                                  array('class' => 'title')).'&nbsp;'.
                         html_writer::link($txturl, '.TXT').'&nbsp;'.
                         html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
                         html_writer::link($xlsurl, '.XLS').'&nbsp;'.
                         html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                         html_writer::link($odsurl, '.ODS');
-                $return .= html_writer::tag('div', $downloadlinks, array('class'=>'download all'));
+                $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
             }
 
             $table = new html_table();
@@ -6420,11 +6439,11 @@ EOS;
             $picture = new html_table_cell($this->collapselink($collapsed, 'picture'));
             if (!in_array('fullname', $collapsed)) {
                 $firstnamelink = html_writer::link(new moodle_url($PAGE->url,
-                                                                  array('tsort'=>'firstname')),
+                                                                  array('tsort' => 'firstname')),
                                                    get_string('firstname').
                                                    $this->pic_if_sorted($orderby, 'firstname'));
                 $surnamelink = html_writer::link(new moodle_url($PAGE->url,
-                                                                array('tsort'=>'lastname')),
+                                                                array('tsort' => 'lastname')),
                                                   get_string('lastname').
                                                   $this->pic_if_sorted($orderby, 'lastname'));
                 $fullname = html_writer::tag('div', get_string('fullname').
@@ -6437,7 +6456,7 @@ EOS;
             }
             if (!in_array('idnumber', $collapsed)) {
                 $idnumberlink = html_writer::link(new moodle_url($PAGE->url,
-                                                                 array('tsort'=>'idnumber')),
+                                                                 array('tsort' => 'idnumber')),
                                                   get_string('idnumber').
                                                   $this->pic_if_sorted($orderby, 'idnumber'));
                 $idnumber = new html_table_cell($idnumberlink.$this->collapselink($collapsed,
@@ -6446,9 +6465,9 @@ EOS;
                 $idnumber = new html_table_cell($this->collapselink($collapsed, 'idnumber'));
             }
             if (!in_array('email', $collapsed)) {
-                $emaillink = html_writer::link(new moodle_url($PAGE->url, array('tsort'=>'email')),
-                                                  get_string('email').
-                                                  $this->pic_if_sorted($orderby, 'email'));
+                $emaillink = html_writer::link(new moodle_url($PAGE->url, array('tsort' => 'email')),
+                                               get_string('email').
+                                               $this->pic_if_sorted($orderby, 'email'));
                 $email = new html_table_cell($emaillink.$this->collapselink($collapsed, 'email'));
             } else {
                 $email = new html_table_cell($this->collapselink($collapsed, 'email'));
@@ -6478,9 +6497,9 @@ EOS;
                           'queues'        => get_string('queues', 'grouptool'));
         }
         $rows = array();
-        if(!empty($userdata)) {
+        if (!empty($userdata)) {
             foreach ($userdata as $user) {
-                if (!$data_only) {
+                if (!$onlydata) {
                     $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
                                                array('id'     => $user->id,
                                                      'course' => $this->course->id));
@@ -6568,7 +6587,8 @@ EOS;
                             if (empty($rank)) {
                                 $rank = '*';
                             }
-                            $queueentries[] = array('rank'=>$rank, 'name'=>$groupinfo[$queue]->name);
+                            $queueentries[] = array('rank' => $rank,
+                                                    'name' => $groupinfo[$queue]->name);
                         }
                     } else {
                         $queueentries = array();
@@ -6581,7 +6601,7 @@ EOS;
                 }
             }
         }
-        if (!$data_only) {
+        if (!$onlydata) {
             $table->data = $rows;
             return $return.html_writer::table($table);
         } else {
@@ -6689,17 +6709,17 @@ EOS;
             $name = $user['name'];
             $idnumber = $user['idnumber'];
             $email = $user['email'];
-            $reg_data = $user['registrations'];
-            $queue_data = $user['queues'];
-            $pdf->add_userdata($name, $idnumber, $email, $reg_data, $queue_data, true);
+            $regdata = $user['registrations'];
+            $queuedata = $user['queues'];
+            $pdf->add_userdata($name, $idnumber, $email, $regdata, $queuedata, true);
             while (next($data)) {
                 $user = current($data);
                 $name = $user['name'];
                 $idnumber = $user['idnumber'];
                 $email = $user['email'];
-                $reg_data = $user['registrations'];
-                $queue_data = $user['queues'];
-                $pdf->add_userdata($name, $idnumber, $email, $reg_data, $queue_data);
+                $regdata = $user['registrations'];
+                $queuedata = $user['queues'];
+                $pdf->add_userdata($name, $idnumber, $email, $regdata, $queuedata);
             }
         } else {
             $pdf->MultiCell(0, $pdf->getLastH(), get_string('no_data_to_display', 'grouptool'),
@@ -6768,9 +6788,9 @@ EOS;
                 } else {
                     $rows = max(array(1, count($user['registrations']), count($user['queues'])));
 
-                    for ($i=0; $i<$rows; $i++) {
+                    for ($i = 0; $i < $rows; $i++) {
                         $line = "";
-                        if ($i==0) {
+                        if ($i == 0) {
                             $line = $user['name']."\t".$user['idnumber']."\t".$user['email'];
                         } else {
                             $line = "\t\t";
@@ -6836,9 +6856,9 @@ EOS;
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         if (count($data) > 0) {
 
-            $column_width = array(26.71, 15.29, 29.86, 47, 7.29, 47); // Unit: mm!
+            $columnwidth = array(26.71, 15.29, 29.86, 47, 7.29, 47); // Unit: mm!
 
-            if (count($data)>1) {
+            if (count($data) > 1) {
                 // General information? unused at the moment!
                 $worksheet = $workbook->add_worksheet(get_string('all'));
                 if (is_a($worksheet, 'Moodle_Excel_Worksheet')) {
@@ -6851,139 +6871,139 @@ EOS;
 
                 // Standard column widths: 7 - 22 - 14 - 17!
                 $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(0, 0, $column_width[0], null, $hidden);
+                $worksheet->set_column(0, 0, $columnwidth[0], null, $hidden);
                 $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(1, 1, $column_width[1], null, $hidden);
+                $worksheet->set_column(1, 1, $columnwidth[1], null, $hidden);
                 $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(2, 2, $column_width[2], null, $hidden);
+                $worksheet->set_column(2, 2, $columnwidth[2], null, $hidden);
                 $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(3, 3, $column_width[3], null, $hidden);
+                $worksheet->set_column(3, 3, $columnwidth[3], null, $hidden);
                 $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(4, 4, $column_width[4], null, $hidden);
-                $worksheet->set_column(5, 5, $column_width[5], null, $hidden);
+                $worksheet->set_column(4, 4, $columnwidth[4], null, $hidden);
+                $worksheet->set_column(5, 5, $columnwidth[5], null, $hidden);
             }
 
             // Prepare formats!
-            $headline_prop = array(    'size' => 12,
+            $headlineprop = array(    'size' => 12,
                     'bold' => 1,
                     'HAlign' => 'center',
                     'bottom' => 2,
                     'VAlign' => 'vcenter');
-            $headline_format = $workbook->add_format($headline_prop);
-            $headline_format->set_right(1);
-            $headline_format->set_align('center');
-            $headline_format->set_align('vcenter');
-            $headline_last = $workbook->add_format($headline_prop);
-            $headline_last->set_align('center');
-            $headline_last->set_align('vcenter');
-            $headline_last->set_left(1);
-            $headline_nb = $workbook->add_format($headline_prop);
-            $headline_nb->set_align('center');
-            $headline_nb->set_align('vcenter');
-            unset($headline_prop['bottom']);
-            $headline_nbb = $workbook->add_format($headline_prop);
-            $headline_nbb->set_align('center');
-            $headline_nbb->set_align('vcenter');
+            $headlineformat = $workbook->add_format($headlineprop);
+            $headlineformat->set_right(1);
+            $headlineformat->set_align('center');
+            $headlineformat->set_align('vcenter');
+            $headlinelast = $workbook->add_format($headlineprop);
+            $headlinelast->set_align('center');
+            $headlinelast->set_align('vcenter');
+            $headlinelast->set_left(1);
+            $headlinenb = $workbook->add_format($headlineprop);
+            $headlinenb->set_align('center');
+            $headlinenb->set_align('vcenter');
+            unset($headlineprop['bottom']);
+            $headlinenbb = $workbook->add_format($headlineprop);
+            $headlinenbb->set_align('center');
+            $headlinenbb->set_align('vcenter');
 
-            $reg_entry_prop = array(   'size' => 10,
+            $regentryprop = array(   'size' => 10,
                     'align' => 'left');
-            $queue_entry_prop = $reg_entry_prop;
-            $queue_entry_prop['italic'] = true;
-            $queue_entry_prop['color'] = 'grey';
+            $queueentryprop = $regentryprop;
+            $queueentryprop['italic'] = true;
+            $queueentryprop['color'] = 'grey';
 
-            $reg_entry_format = $workbook->add_format($reg_entry_prop);
-            $reg_entry_format->set_right(1);
-            $reg_entry_format->set_align('vcenter');
-            $reg_entry_last = $workbook->add_format($reg_entry_prop);
-            $reg_entry_last->set_align('vcenter');
-            $no_reg_entries_format = $workbook->add_format($reg_entry_prop);
-            $no_reg_entries_format->set_align('center');
-            $no_reg_entries_format->set_align('vcenter');
-            $no_reg_entries_format->set_right(1);
-            $queue_entry_format = $workbook->add_format($queue_entry_prop);
-            $queue_entry_format->set_right(1);
-            $queue_entry_format->set_align('vcenter');
-            $queue_entry_last = $workbook->add_format($queue_entry_prop);
-            $queue_entry_last->set_align('vcenter');
-            $no_queue_entries_format = $workbook->add_format($queue_entry_prop);
-            $no_queue_entries_format->set_align('center');
-            $no_queue_entries_format->set_align('vcenter');
+            $regentryformat = $workbook->add_format($regentryprop);
+            $regentryformat->set_right(1);
+            $regentryformat->set_align('vcenter');
+            $regentrylast = $workbook->add_format($regentryprop);
+            $regentrylast->set_align('vcenter');
+            $noregentriesformat = $workbook->add_format($regentryprop);
+            $noregentriesformat->set_align('center');
+            $noregentriesformat->set_align('vcenter');
+            $noregentriesformat->set_right(1);
+            $queueentryformat = $workbook->add_format($queueentryprop);
+            $queueentryformat->set_right(1);
+            $queueentryformat->set_align('vcenter');
+            $queueentrylast = $workbook->add_format($queueentryprop);
+            $queueentrylast->set_align('vcenter');
+            $noqueueentriesformat = $workbook->add_format($queueentryprop);
+            $noqueueentriesformat->set_align('center');
+            $noqueueentriesformat->set_align('vcenter');
 
             // Start row for groups general sheet!
             $j = 0;
             foreach ($data as $key => $user) {
                 if ($key == 0) {
                     // Headline!
-                    $worksheet->write_string($j, 0, $user['name'], $headline_format);
-                    $worksheet->write_blank($j+1, 0, $headline_format);
-                    $worksheet->merge_cells($j, 0, $j+1, 0);
-                    $worksheet->write_string($j, 1, $user['idnumber'], $headline_format);
-                    $worksheet->write_blank($j+1, 1, $headline_format);
-                    $worksheet->merge_cells($j, 1, $j+1, 1);
-                    $worksheet->write_string($j, 2, $user['email'], $headline_format);
-                    $worksheet->write_blank($j+1, 2, $headline_format);
-                    $worksheet->merge_cells($j, 2, $j+1, 2);
-                    $worksheet->write_string($j, 3, $user['registrations'], $headline_format);
-                    $worksheet->write_blank($j+1, 3, $headline_format);
-                    $worksheet->merge_cells($j, 3, $j+1, 3);
-                    $worksheet->write_string($j, 4, $user['queues'], $headline_nbb);
-                    $worksheet->write_blank($j, 5, $headline_nbb);
+                    $worksheet->write_string($j, 0, $user['name'], $headlineformat);
+                    $worksheet->write_blank($j + 1, 0, $headlineformat);
+                    $worksheet->merge_cells($j, 0, $j + 1, 0);
+                    $worksheet->write_string($j, 1, $user['idnumber'], $headlineformat);
+                    $worksheet->write_blank($j + 1, 1, $headlineformat);
+                    $worksheet->merge_cells($j, 1, $j + 1, 1);
+                    $worksheet->write_string($j, 2, $user['email'], $headlineformat);
+                    $worksheet->write_blank($j + 1, 2, $headlineformat);
+                    $worksheet->merge_cells($j, 2, $j + 1, 2);
+                    $worksheet->write_string($j, 3, $user['registrations'], $headlineformat);
+                    $worksheet->write_blank($j + 1, 3, $headlineformat);
+                    $worksheet->merge_cells($j, 3, $j + 1, 3);
+                    $worksheet->write_string($j, 4, $user['queues'], $headlinenbb);
+                    $worksheet->write_blank($j, 5, $headlinenbb);
                     $worksheet->merge_cells($j, 4, $j, 5);
-                    $worksheet->write_string($j+1, 4, get_string('rank', 'grouptool'),
-                                             $headline_last);
-                    $worksheet->write_string($j+1, 5, get_string('group', 'group'), $headline_nb);
+                    $worksheet->write_string($j + 1, 4, get_string('rank', 'grouptool'),
+                                             $headlinelast);
+                    $worksheet->write_string($j + 1, 5, get_string('group', 'group'), $headlinenb);
                     $rows = 2;
                 } else {
 
                     $rows = max(array(1, count($user['registrations']), count($user['queues'])));
 
-                    $worksheet->write_string($j, 0, $user['name'], $reg_entry_format);
+                    $worksheet->write_string($j, 0, $user['name'], $regentryformat);
                     if ($rows > 1) {
-                        $worksheet->merge_cells($j, 0, $j+$rows-1, 0);
+                        $worksheet->merge_cells($j, 0, $j + $rows - 1, 0);
                     }
 
-                    $worksheet->write_string($j, 1, $user['idnumber'], $reg_entry_format);
+                    $worksheet->write_string($j, 1, $user['idnumber'], $regentryformat);
                     if ($rows > 1) {
-                        $worksheet->merge_cells($j, 1, $j+$rows-1, 1);
+                        $worksheet->merge_cells($j, 1, $j + $rows - 1, 1);
                     }
 
-                    $worksheet->write_string($j, 2, $user['email'], $reg_entry_format);
+                    $worksheet->write_string($j, 2, $user['email'], $regentryformat);
                     if ($rows > 1) {
-                        $worksheet->merge_cells($j, 2, $j+$rows-1, 2);
+                        $worksheet->merge_cells($j, 2, $j + $rows - 1, 2);
                     }
 
-                    for ($i=0; $i<$rows; $i++) {
-                        if ($i!=0) {
-                            $worksheet->write_blank($j+$i, 0, $reg_entry_format);
-                            $worksheet->write_blank($j+$i, 1, $reg_entry_format);
-                            $worksheet->write_blank($j+$i, 2, $reg_entry_format);
+                    for ($i = 0; $i < $rows; $i++) {
+                        if ($i != 0) {
+                            $worksheet->write_blank($j + $i, 0, $regentryformat);
+                            $worksheet->write_blank($j + $i, 1, $regentryformat);
+                            $worksheet->write_blank($j + $i, 2, $regentryformat);
                         }
                         if ((count($user['registrations']) == 0) && ($i == 0)) {
                             $worksheet->write_string($j, 3, get_string('no_registrations',
                                                                        'grouptool'),
-                                                     $no_reg_entries_format);
+                                                     $noregentriesformat);
                             if ($rows > 1) {
-                                $worksheet->merge_cells($j, 3, $j+$rows-1, 3);
+                                $worksheet->merge_cells($j, 3, $j + $rows - 1, 3);
                             }
                         } else if (key_exists($i, $user['registrations'])) {
-                            $worksheet->write_string($j+$i, 3, $user['registrations'][$i],
-                                                     $reg_entry_format);
+                            $worksheet->write_string($j + $i, 3, $user['registrations'][$i],
+                                                     $regentryformat);
                         } else {
-                            $worksheet->write_blank($j+$i, 3, $reg_entry_format);
+                            $worksheet->write_blank($j + $i, 3, $regentryformat);
                         }
                         if ((count($user['queues']) == 0) && ($i == 0)) {
                             $worksheet->write_string($j, 4, get_string('nowhere_queued',
                                                                        'grouptool'),
-                                                     $no_queue_entries_format);
-                            $worksheet->merge_cells($j, 4, $j+$rows-1, 5);
+                                                     $noqueueentriesformat);
+                            $worksheet->merge_cells($j, 4, $j + $rows - 1, 5);
                         } else if (key_exists($i, $user['queues'])) {
-                            $worksheet->write_number($j+$i, 4, $user['queues'][$i]['rank'],
-                                                     $queue_entry_last);
-                            $worksheet->write_string($j+$i, 5, $user['queues'][$i]['name'],
-                                                     $queue_entry_last);
+                            $worksheet->write_number($j + $i, 4, $user['queues'][$i]['rank'],
+                                                     $queueentrylast);
+                            $worksheet->write_string($j + $i, 5, $user['queues'][$i]['name'],
+                                                     $queueentrylast);
                         } else {
-                            $worksheet->write_blank($j+$i, 4, $queue_entry_last);
-                            $worksheet->write_blank($j+$i, 5, $queue_entry_last);
+                            $worksheet->write_blank($j + $i, 4, $queueentrylast);
+                            $worksheet->write_blank($j + $i, 5, $queueentrylast);
                         }
                     }
                 }
@@ -7069,7 +7089,7 @@ EOS;
         $workbook->send($filename);
         $workbook->close();
     }
-    
+
     /**
      * outputs generated xls-file for userlist (forces download)
      *
@@ -7122,13 +7142,13 @@ EOS;
         $groupingid = optional_param('groupingid', 0, PARAM_INT);
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
 
-        $url = new moodle_url($PAGE->url, array('sesskey'=>sesskey(),
-                                                'groupid'=>$groupid,
-                                                'groupingid'=>$groupingid,
-                                                'orientation'=>$orientation));
+        $url = new moodle_url($PAGE->url, array('sesskey'     => sesskey(),
+                                                'groupid'     => $groupid,
+                                                'groupingid'  => $groupingid,
+                                                'orientation' => $orientation));
 
         $groupings = groups_get_all_groupings($this->course->id);
-        $options = array(0=>get_string('all'));
+        $options = array(0 => get_string('all'));
         if (count($groupings)) {
             foreach ($groupings as $grouping) {
                 $options[$grouping->id] = $grouping->name;
@@ -7137,7 +7157,7 @@ EOS;
         $groupingselect = new single_select($url, 'groupingid', $options, $groupingid, false);
 
         $groups = $this->get_active_groups(true, true, 0, 0, $groupingid);
-        $options = array(0=>get_string('all'));
+        $options = array(0 => get_string('all'));
         if (count($groups)) {
             foreach ($groups as $group) {
                 $options[$group->id] = $group->name;
@@ -7161,13 +7181,13 @@ EOS;
 
         echo html_writer::tag('div', get_string('grouping', 'group').'&nbsp;'.
                                      $OUTPUT->render($groupingselect),
-                              array('class'=>'centered grouptool_userlist_filter')).
+                              array('class' => 'centered grouptool_userlist_filter')).
              html_writer::tag('div', get_string('group', 'group').'&nbsp;'.
                                      $OUTPUT->render($groupselect),
-                              array('class'=>'centered grouptool_userlist_filter')).
+                              array('class' => 'centered grouptool_userlist_filter')).
              html_writer::tag('div', get_string('orientation', 'grouptool').'&nbsp;'.
                                      $OUTPUT->render($orientationselect),
-                              array('class'=>'centered grouptool_userlist_filter'));
+                              array('class' => 'centered grouptool_userlist_filter'));
 
         echo $this->userlist_table($groupingid, $groupid);
 

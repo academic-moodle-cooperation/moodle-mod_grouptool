@@ -11,7 +11,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * administration.js
@@ -23,15 +23,14 @@
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 YUI.add('moodle-mod_grouptool-administration', function(Y) {
     var ADMINISTRATIONNAME = 'moodle-mod_grouptool-administration';
     var fromto_mode = {};
     var administration = function(Y) {
         administration.superclass.constructor.apply(this, arguments);
     }
-    
-    
+
     var SELECTORS = {
             FIELDSETCONTAINSADVANCED : 'fieldset.containsadvancedelements',
             DIVFITEMADVANCED : 'div.fitem.advanced',
@@ -55,7 +54,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         initializer : function(config) { //'config' contains the parameter values
             //gets called when it's going to be pluged in
             this.fromto_mode = this.get('fromto_mode');
-            
+
             //add JS-Eventhandler for each tag
             Y.all('.tag').on('click', M.mod_grouptool.administration_add_tag);
 
@@ -68,7 +67,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             Y.one('input[name=amount]').on('change', M.mod_grouptool.administration_sizevalupdate);
             Y.one('input[name=use_individual]').on('change',
                                                    M.mod_grouptool.administration_sizevalupdate);
-            Y.one('input[name="mode"][value="'+this.fromto_mode+'"]').on('click', M.mod_grouptool.modechange);
+            Y.one('input[name="mode"][value="' + this.fromto_mode + '"]').on('click', M.mod_grouptool.modechange);
 
         }
 
@@ -104,13 +103,13 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                 } else if(classes[i] == 'alpha') {
                     var tag = '@';
                 } else {
-                    var tag = '['+classes[i]+']';
+                    var tag = '[' + classes[i] + ']';
                 }
             }
         }
         var content = targetfield.get('value');
-        targetfield.set('value', content+tag);
-        targetfield.set('defaultValue', content+tag);
+        targetfield.set('value', content + tag);
+        targetfield.set('defaultValue', content + tag);
     };
 
     M.mod_grouptool.administration_sizevalupdate = function() {
@@ -134,7 +133,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         fieldset.all(SELECTORS.DIVFITEMADVANCED).toggleClass(CSS.SHOW);
         var morelesslink = fieldset.one(SELECTORS.MORELESSLINKONLY);
         // Get corresponding hidden variable.
-        var statuselement = new Y.one('input[name=mform_showmore_'+fieldset.get('id')+']');
+        var statuselement = new Y.one('input[name=mform_showmore_' + fieldset.get('id') + ']');
         // Invert it and change the link text.
         if (statuselement.get('value') === '0') {
             statuselement.set('value', 1);
@@ -142,7 +141,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             morelesslink.addClass(CSS.SHOWLESS);
         }
     }
-    
+
     //'config' contains the parameter values
     M.mod_grouptool.init_administration = function(params) {
         return new administration(params); //'params' contains the parameter values

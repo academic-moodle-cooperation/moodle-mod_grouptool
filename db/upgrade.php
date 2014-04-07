@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/upgrade.php
@@ -40,7 +40,7 @@ function xmldb_grouptool_upgrade($oldversion) {
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
     /*
-     *	And upgrade begins here. For each one, you'll need one
+     * And upgrade begins here. For each one, you'll need one
      * block of code similar to the next one. Please, delete
      * this comment lines once this file start handling proper
      * upgrade code.
@@ -273,7 +273,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached!
         upgrade_mod_savepoint(true, 2012072900, 'grouptool');
     }
-    
+
     if ($oldversion < 2013112300) {
 
         // Define field alwaysshowdescription to be added to grouptool.
@@ -288,11 +288,11 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2013112300, 'grouptool');
     }
-    
+
     if ($oldversion < 2013112700) {
-        //Rename fields in grouptool_agrps
-    
-        // Define key grouptool_id (foreign) to be dropped form grouptool_agrps.
+        // Rename fields in grouptool_agrps!
+
+        // Define key grouptool_id (foreign) to be dropped form grouptool_agrps!
         $table = new xmldb_table('grouptool_agrps');
         $key = new xmldb_key('grouptool_id', XMLDB_KEY_FOREIGN, array('grouptool_id'), 'grouptool', array('id'));
         // Launch drop key grouptool_id.
@@ -305,15 +305,15 @@ function xmldb_grouptool_upgrade($oldversion) {
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
-        
+
         $field = new xmldb_field('grouptool_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
         // Launch rename field grouptool_id.
         $dbman->rename_field($table, $field, 'grouptoolid');
         $field = new xmldb_field('group_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'grouptool_id');
         // Launch rename field group_id.
         $dbman->rename_field($table, $field, 'groupid');
-        
-        //restore keys and index
+
+        // Restore keys and index!
         $key = new xmldb_key('grouptoolid', XMLDB_KEY_FOREIGN, array('grouptoolid'), 'grouptool', array('id'));
         // Launch add key grouptoolid.
         $dbman->add_key($table, $key);
@@ -325,13 +325,13 @@ function xmldb_grouptool_upgrade($oldversion) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         upgrade_mod_savepoint(true, 2013112700, 'grouptool');
     }
-    
+
     if ($oldversion < 2013112701) {
-        //Rename fields in grouptool_registered
-    
+        // Rename fields in grouptool_registered!
+
         // Define key agrp_id (foreign) to be dropped form grouptool_registered.
         $table = new xmldb_table('grouptool_registered');
         $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps', array('id'));
@@ -347,15 +347,15 @@ function xmldb_grouptool_upgrade($oldversion) {
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
-        
+
         $field = new xmldb_field('agrp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
         // Launch rename field agrp_id.
         $dbman->rename_field($table, $field, 'agrpid');
         $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'grouptool_id');
         // Launch rename field user_id.
         $dbman->rename_field($table, $field, 'userid');
-        
-        //restore keys and index
+
+        // Restore keys and index!
         $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, array('agrpid'), 'grouptool_agrps', array('id'));
         // Launch add key agrpid.
         $dbman->add_key($table, $key);
@@ -367,13 +367,13 @@ function xmldb_grouptool_upgrade($oldversion) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         upgrade_mod_savepoint(true, 2013112701, 'grouptool');
     }
-    
+
     if ($oldversion < 2013112702) {
-        //Rename fields in grouptool_queued
-    
+        // Rename fields in grouptool_queued!
+
         $table = new xmldb_table('grouptool_queued');
         // Define key agrp_id (foreign) to be dropped form grouptool_queued.
         $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps', array('id'));
@@ -389,15 +389,15 @@ function xmldb_grouptool_upgrade($oldversion) {
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
-        
+
         $field = new xmldb_field('agrp_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'id');
         // Launch rename field agrp_id.
         $dbman->rename_field($table, $field, 'agrpid');
         $field = new xmldb_field('user_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'grouptool_id');
         // Launch rename field user_id.
         $dbman->rename_field($table, $field, 'userid');
-        
-        //restore keys and index
+
+        // Restore keys and index!
         $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, array('agrpid'), 'grouptool_agrps', array('id'));
         // Launch add key agrpid.
         $dbman->add_key($table, $key);
@@ -409,10 +409,10 @@ function xmldb_grouptool_upgrade($oldversion) {
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         upgrade_mod_savepoint(true, 2013112702, 'grouptool');
     }
-    
+
     if ($oldversion < 2014031900) {
 
         // Define field alwaysshowdescription to be added to grouptool.
@@ -427,7 +427,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2014031900, 'grouptool');
     }
-    
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

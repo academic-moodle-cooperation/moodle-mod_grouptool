@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * index.php
@@ -77,14 +77,14 @@ foreach ($grouptools as $grouptool) {
     $str = "";
     if (has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_registrations', $context)) {
-        $attrib = array('title'=>$strgrouptool, 'href'=>$CFG->wwwroot.'/mod/grouptool/view.php?id='.
-                                                        $grouptool->coursemodule);
+        $attrib = array('title' => $strgrouptool,
+                        'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule);
         if ($grouptool->visible) {
-            $attrib['class']='dimmed';
+            $attrib['class'] = 'dimmed';
         }
         list($colorclass, $unused) = grouptool_display_lateness(time(), $grouptool->timedue);
 
-        $attr = array('class'=>'info');
+        $attr = array('class' => 'info');
         if ($grouptool->timeavailable > time()) {
             $str .= html_writer::tag('div', get_string('availabledate', 'grouptool').': '.
                     html_writer::tag('span', userdate($grouptool->timeavailable)),
@@ -93,8 +93,8 @@ foreach ($grouptools as $grouptool) {
         if ($grouptool->timedue) {
             $str .= html_writer::tag('div', $strduedate.': '.
                                             html_writer::tag('span', userdate($grouptool->timedue),
-                                                             array('class'=>(($colorclass=='late') ?
-                                                                            ' late' : ''))),
+                                                             array('class' => (($colorclass == 'late') ?
+                                                                              ' late' : ''))),
                                      $attr);
         } else {
             $str .= html_writer::tag('div', $strduedateno, $attr);
@@ -111,80 +111,78 @@ foreach ($grouptools as $grouptool) {
     if (has_capability('mod/grouptool:register', $context)) {
         if ($grouptool->allow_reg) {
             if (count($userstats->registered)) {
-                $temp_str = "";
+                $tempstr = "";
                 foreach ($userstats->registered as $registration) {
-                    if ($temp_str != "") {
-                        $temp_str .= '; ';
+                    if ($tempstr != "") {
+                        $tempstr .= '; ';
                     }
-                    $temp_str .= html_writer::tag('span', $registration->grpname);
+                    $tempstr .= html_writer::tag('span', $registration->grpname);
                 }
                 if (($grouptool->allow_multiple &&
                         (count($userstats->registered) < $grouptool->choose_min))
                         || (!$grouptool->allow_multiple && !count($userstats->registered))) {
                     if ($grouptool->allow_multiple) {
-                        $missing = ($grouptool->choose_min-count($userstats->registered));
-                        $string_label = ($missing > 1) ? 'registrations_missing'
-                                                       : 'registration_missing';
+                        $missing = ($grouptool->choose_min - count($userstats->registered));
+                        $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                     } else {
                         $missing = 1;
-                        $string_label = 'registration_missing';
+                        $stringlabel = 'registration_missing';
                     }
                     $details .= html_writer::tag('div',
                             html_writer::tag('div',
-                                    get_string($string_label, 'grouptool', $missing),
-                                    array('class'=>$colorclass)).' '.
-                            get_string('registrations', 'grouptool').': '.$temp_str,
-                            array('class'=>'registered'));
+                                    get_string($stringlabel, 'grouptool', $missing),
+                                    array('class' => $colorclass)).' '.
+                            get_string('registrations', 'grouptool').': '.$tempstr,
+                            array('class' => 'registered'));
                 } else {
                     $details .= html_writer::tag('div',
-                            get_string('registrations', 'grouptool').': '.$temp_str,
-                            array('class'=>'registered'));
+                            get_string('registrations', 'grouptool').': '.$tempstr,
+                            array('class' => 'registered'));
                 }
             } else {
                 if ($grouptool->allow_multiple) {
-                    $missing = ($grouptool->choose_min-count($userstats->registered));
-                    $string_label = ($missing > 1) ? 'registrations_missing'
-                                                   : 'registration_missing';
+                    $missing = ($grouptool->choose_min - count($userstats->registered));
+                    $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                 } else {
                     $missing = 1;
-                    $string_label = 'registration_missing';
+                    $stringlabel = 'registration_missing';
                 }
                 $details .= html_writer::tag('div',
                         html_writer::tag('div',
-                                get_string($string_label, 'grouptool', $missing),
-                                array('class'=>$colorclass)).
+                                get_string($stringlabel, 'grouptool', $missing),
+                                array('class' => $colorclass)).
                         get_string('registrations', 'grouptool').': '.
                         get_string('not_registered', 'grouptool'),
-                        array('class'=>'registered'));
+                        array('class' => 'registered'));
             }
             if (count($userstats->queued)) {
-                $temp_str = "";
+                $tempstr = "";
                 foreach ($userstats->queued as $queue) {
                     list($colorclass, $text) = grouptool_display_lateness($queue->timestamp,
                                                                           $grouptool->timedue);
-                    if ($temp_str != "") {
-                        $temp_str .= ", ";
+                    if ($tempstr != "") {
+                        $tempstr .= ", ";
                     }
-                    $temp_str .= html_writer::tag('span', $queue->grpname.' ('.$queue->rank.')',
-                                                  array('class'=>$colorclass));
+                    $tempstr .= html_writer::tag('span', $queue->grpname.' ('.$queue->rank.')',
+                                                  array('class' => $colorclass));
                 }
                 $details .= html_writer::tag('div', get_string('queues', 'grouptool').': '.
-                        $temp_str, array('class'=>'queued'));
+                        $tempstr, array('class' => 'queued'));
             }
         }
     }
 
     if (has_capability('mod/grouptool:view_registrations', $context) && $grouptool->allow_reg) {
         $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool', $userstats),
-                array('class'=>'userstats'));
+                array('class' => 'userstats'));
 
     }
 
 
     if (($grouptool->allow_reg && has_capability('mod/grouptool:view_registrations', $context))
             || has_capability('mod/grouptool:register', $context)) {
-        $str .= html_writer::tag('div', $details, array('class'=>'details'));
-        $str = html_writer::tag('div', $str, array('class'=>'grouptool overview'));
+        $str .= html_writer::tag('div', $details, array('class' => 'details'));
+        $str = html_writer::tag('div', $str, array('class' => 'grouptool overview'));
     }
 
     $info = $str;

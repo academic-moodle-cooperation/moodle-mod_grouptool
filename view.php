@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * view.php
@@ -86,7 +86,7 @@ $inactive = null;
 $activetwo = null;
 $tabs = array();
 $row = array();
-$available_tabs = array();
+$availabletabs = array();
 if (has_capability('mod/grouptool:create_groups', $context)
     || has_capability('mod/grouptool:create_groupings', $context)
     || has_capability('mod/grouptool:register_students', $context)) {
@@ -96,7 +96,7 @@ if (has_capability('mod/grouptool:create_groups', $context)
                            get_string('administration', 'grouptool'),
                            get_string('administration_alt', 'grouptool'),
                            false);
-    $available_tabs[] = 'administration';
+    $availabletabs[] = 'administration';
 }
 if (has_capability('mod/grouptool:grade', $context)
     || has_capability('mod/grouptool:grade_own_group', $context)) {
@@ -105,7 +105,7 @@ if (has_capability('mod/grouptool:grade', $context)
                            get_string('grading', 'grouptool'),
                            get_string('grading_alt', 'grouptool'),
                            false);
-    $available_tabs[] = 'grading';
+    $availabletabs[] = 'grading';
 }
 if (has_capability('mod/grouptool:register_students', $context)
         || ($gmok && has_capability('mod/grouptool:register', $context))) {
@@ -115,7 +115,7 @@ if (has_capability('mod/grouptool:register_students', $context)
                            get_string('selfregistration', 'grouptool'),
                            get_string('selfregistration_alt', 'grouptool'),
                            false);
-    $available_tabs[] = 'selfregistration';
+    $availabletabs[] = 'selfregistration';
 }
 if (has_capability('mod/grouptool:register_students', $context)) {
     $row[] = new tabobject('import',
@@ -123,7 +123,7 @@ if (has_capability('mod/grouptool:register_students', $context)) {
                            get_string('import', 'grouptool'),
                            get_string('import_desc', 'grouptool'),
                            false);
-    $available_tabs[] = 'import';
+    $availabletabs[] = 'import';
 }
 if (has_capability('mod/grouptool:view_registrations', $context)) {
     $row[] = new tabobject('overview',
@@ -131,7 +131,7 @@ if (has_capability('mod/grouptool:view_registrations', $context)) {
                            get_string('overview', 'grouptool'),
                            get_string('overview_alt', 'grouptool'),
                            false);
-    $available_tabs[] = 'overview';
+    $availabletabs[] = 'overview';
 }
 if (has_capability('mod/grouptool:view_registrations', $context)) {
     $row[] = new tabobject('userlist',
@@ -139,7 +139,7 @@ if (has_capability('mod/grouptool:view_registrations', $context)) {
                            get_string('userlist', 'grouptool'),
                            get_string('userlist_alt', 'grouptool'),
                            false);
-    $available_tabs[] = 'userlist';
+    $availabletabs[] = 'userlist';
 }
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
@@ -160,15 +160,15 @@ if (count($row) > 1) {
                        || ($gmok && has_capability('mod/grouptool:register', $context))) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         } else {
-            $SESSION->mod_grouptool->currenttab = current($available_tabs);
+            $SESSION->mod_grouptool->currenttab = current($availabletabs);
         }
     }
     $tabs[] = $row;
 
     echo print_tabs($tabs, $SESSION->mod_grouptool->currenttab, $inactive, $activetwo, true);
 } else if (count($row) == 1) {
-    $SESSION->mod_grouptool->currenttab = current($available_tabs);
-    $tab = current($available_tabs);
+    $SESSION->mod_grouptool->currenttab = current($availabletabs);
+    $tab = current($availabletabs);
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
     $tab = 'noaccess';
@@ -176,12 +176,12 @@ if (count($row) > 1) {
 
 $context = context_course::instance($course->id);
 if (has_capability('moodle/course:managegroups', $context)) {
-    // Print link to moodle groups
-    $url = new moodle_url('/group/index.php', array('id'=>$course->id));
+    // Print link to moodle groups!
+    $url = new moodle_url('/group/index.php', array('id' => $course->id));
     $grpslnk = html_writer::link($url,
                                  get_string('viewmoodlegroups', 'grouptool'));
-    echo html_writer::tag('div', $grpslnk, array('class'=>'moodlegrpslnk'));
-    echo html_writer::tag('div', '', array('class'=>'clearer'));
+    echo html_writer::tag('div', $grpslnk, array('class' => 'moodlegrpslnk'));
+    echo html_writer::tag('div', '', array('class' => 'clearer'));
 }
 
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);

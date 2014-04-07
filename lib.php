@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * lib.php
@@ -85,7 +85,7 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
     if (!isset($grouptool->allow_multiple)) {
         $grouptool->allow_multiple = 0;
     }
-    
+
     $grouptool->grpsize = clean_param($grouptool->grpsize, PARAM_INT);
     $grouptool->choose_min = clean_param($grouptool->choose_min, PARAM_INT);
     $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
@@ -136,8 +136,8 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
-        if(!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $return,
-                                                        'groupid'     => $groupid))) {
+        if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $return,
+                                                         'groupid'     => $groupid))) {
             $record = new stdClass();
             $record->grouptoolid = $return;
             $record->groupid = $groupid;
@@ -147,7 +147,7 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
             $DB->insert_record('grouptool_agrps', $record);
         }
     }
-    
+
     return $return;
 }
 
@@ -210,14 +210,16 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         $event->timestart = $grouptool->timeavailable;
     } else {
         $grouptool->timecreated = $DB->get_field('grouptool', 'timecreated',
-                                                 array('id'=>$grouptool->id));
+                                                 array('id' => $grouptool->id));
         $event->timestart = $grouptool->timecreated;
     }
     $event->visible      = instance_is_visible('grouptool', $grouptool);
     $event->timeduration = 0;
 
-    if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'grouptool',
-                                   'instance'=>$grouptool->id, 'eventtype'=>'availablefrom'))) {
+    if ($event->id = $DB->get_field('event', 'id',
+                                    array('modulename' => 'grouptool',
+                                          'instance'   => $grouptool->id,
+                                          'eventtype'  => 'availablefrom'))) {
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->update($event, false);
     } else {
@@ -249,15 +251,17 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
          *  For activity module's events, this can be used to set the alternative text of the
          *  event icon. Set it to 'pluginname' unless you have a better string.
          */
-        if ($event->id = $DB->get_field('event', 'id', array('modulename'=>'grouptool',
-                                        'instance'=>$grouptool->id, 'eventtype'=>'due'))) {
+        if ($event->id = $DB->get_field('event', 'id',
+                                        array('modulename' => 'grouptool',
+                                              'instance'   => $grouptool->id,
+                                              'eventtype'  => 'due'))) {
 
             $calendarevent = calendar_event::load($event->id);
             $calendarevent->update($event, false);
         } else {
             unset($event->id);
             $event->courseid = $grouptool->course;
-            //we've got some permission issues with calendar_event::create() so we work around that
+            // We've got some permission issues with calendar_event::create() so we work around that!
             $calev = new calendar_event($event);
             $calev->update($event, false);
         }
@@ -268,11 +272,11 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->delete(true);
     }
-    
+
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
-        if(!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->instance,
-                                                        'groupid'     => $groupid))) {
+        if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->instance,
+                                                         'groupid'     => $groupid))) {
             $record = new stdClass();
             $record->grouptoolid = $grouptool->instance;
             $record->groupid = $groupid;
@@ -283,7 +287,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         }
     }
 
-    //we have to override the functions fetching of data, because it's not updated yet
+    // We have to override the functions fetching of data, because it's not updated yet!
     grouptool_update_queues($grouptool);
 
     return $DB->update_record('grouptool', $grouptool);
@@ -296,10 +300,10 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
  */
 function grouptool_update_queues($grouptool = 0) {
     global $DB;
-    
-    //update queues and move users from queue to reg if there's place
-    if(!is_object($grouptool)) {
-        $grouptool = $DB->get_records('grouptool', array('id'=>$grouptool), MUST_EXIST);
+
+    // Update queues and move users from queue to reg if there's place!
+    if (!is_object($grouptool)) {
+        $grouptool = $DB->get_records('grouptool', array('id' => $grouptool), MUST_EXIST);
     } else {
         $grouptool->instance = $grouptool->id;
     }
@@ -310,13 +314,14 @@ function grouptool_update_queues($grouptool = 0) {
                                                   FROM {grouptool_registered}
                                                  WHERE agrpid '.$agrpsql.
                                              'GROUP BY agrpid', $params);
-        foreach($agrps as $agrpid => $agrp) {
+        foreach ($agrps as $agrpid => $agrp) {
             $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ?
                                                            $grouptool->grpsize :
                                                            $agrp->grpsize;
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
-            $sql = "SELECT queued.id as id, queued.agrpid as agrpid, queued.timestamp as timestamp, queued.userid as userid, (regs < ?) as priority, reg.regs as regs
+            $sql = "SELECT queued.id as id, queued.agrpid as agrpid, queued.timestamp as timestamp,
+                           queued.userid as userid, (regs < ?) as priority, reg.regs as regs
                                   FROM {grouptool_queued} AS queued
                              LEFT JOIN (SELECT userid, COUNT(DISTINCT id) as regs
                                          FROM {grouptool_registered}
@@ -326,20 +331,20 @@ function grouptool_update_queues($grouptool = 0) {
                               GROUP BY queued.id
                               ORDER BY priority DESC, 'timestamp' ASC";
 
-            if($records = $DB->get_records_sql($sql, array_merge(array($min),
+            if ($records = $DB->get_records_sql($sql, array_merge(array($min),
                                                                  $params, array($agrpid)))) {
                 foreach ($records as $id => $record) {
-                    if(!empty($grouptool->use_size) && ($groupregs[$agrpid] >= $size)) {
+                    if (!empty($grouptool->use_size) && ($groupregs[$agrpid] >= $size)) {
                         // Group is full!
                         break;
                     }
-                    if($record->regs >= $max) {
+                    if ($record->regs >= $max) {
                         // User got too many regs!
                         continue;
                     }
                     unset($record->id);
-                    if(!$DB->record_exists('grouptool_registered', array('agrpid' => $agrpid,
-                                                                         'userid' => $record->userid))) {
+                    if (!$DB->record_exists('grouptool_registered', array('agrpid' => $agrpid,
+                                                                          'userid' => $record->userid))) {
                         unset($record->priority);
                         unset($record->regs);
                         $record->modified_by = 0;
@@ -423,7 +428,7 @@ function grouptool_delete_instance($id) {
 function grouptool_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    $dbparams = array('id'=>$coursemodule->instance);
+    $dbparams = array('id' => $coursemodule->instance);
     $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
     if (! $grouptool = $DB->get_record('grouptool', $dbparams, $fields)) {
         return false;
@@ -562,13 +567,13 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
             || has_capability('mod/grouptool:create_groupings', $context)
             || has_capability('mod/grouptool:register_students', $context)) {
         $navref->add(get_string('administration', 'grouptool'),
-                     new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id,
-                                                                     'tab'=> 'administration')));
+                     new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                     'tab' => 'administration')));
     }
     if (has_capability('mod/grouptool:grade', $context)
             || has_capability('mod/grouptool:grade_own_group', $context)) {
         $navref->add(get_string('grading', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id'=>$cm->id, 'tab'=>'grading')));
+                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'grading')));
     }
     // Groupmode?
     $gmok = true;
@@ -584,15 +589,15 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
     }
     if (has_capability('mod/grouptool:register_students', $context)) {
         $navref->add(get_string('import', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id'=>$cm->id, 'tab'=>'import')));
+                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'import')));
     }
     if (has_capability('mod/grouptool:view_registrations', $context)) {
         $navref->add(get_string('overview', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id'=>$cm->id, 'tab'=>'overview')));
+                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
     }
     if (has_capability('mod/grouptool:view_registrations', $context)) {
         $navref->add(get_string('userlist', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id'=>$cm->id, 'tab'=>'userlist')));
+                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
     }
 }
 
@@ -624,26 +629,26 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
     if (empty($timedue)) {
         $colorclass = 'early';
         $timeremaining = ' ('.html_writer::tag('span', format_time($time),
-                                               array('class'=>'early')).')';
-    } else if ($time >= 7*24*60*60) { // More than 7 days?
+                                               array('class' => 'early')).')';
+    } else if ($time >= 7 * 24 * 60 * 60) { // More than 7 days?
         $colorclass = 'early';
         $timeremaining = ' ('.html_writer::tag('span', get_string('early', 'grouptool',
                                                                   format_time($time)),
-                                               array('class'=>'early')).')';
-    } else if ($time >= 24*60*60) { // More than 1 day (less than 7 days)?
+                                               array('class' => 'early')).')';
+    } else if ($time >= 24 * 60 * 60) { // More than 1 day (less than 7 days)?
         $colorclass = 'soon';
         $timeremaining = ' ('.html_writer::tag('span', get_string('early', 'grouptool',
                                                                   format_time($time)),
-                                               array('class'=>'soon')).')';
+                                               array('class' => 'soon')).')';
     } else if ($time >= 0) { // In future but less than 1 day?
         $colorclass = 'today';
         $timeremaining = ' ('.html_writer::tag('span', get_string('early', 'grouptool',
                                                                   format_time($time)),
-                                               array('class'=>'today')).')';
+                                               array('class' => 'today')).')';
     } else {
         $colorclass = 'late';
         $timeremaining = ' ('.html_writer::tag('span', get_string('late', 'grouptool',
-                                               format_time($time)), array('class'=>'late')).')';
+                                               format_time($time)), array('class' => 'late')).')';
     }
     return array($colorclass, $timeremaining);
 }
@@ -677,18 +682,18 @@ function grouptool_print_overview($courses, &$htmlarray) {
         $str = "";
         if (has_capability('mod/grouptool:register', $context)
                 || has_capability('mod/grouptool:view_registrations', $context)) {
-            $attrib = array('title'=>$strgrouptool, 'href'=>$CFG->wwwroot.
-                                                            '/mod/grouptool/view.php?id='.
-                                                            $grouptool->coursemodule);
+            $attrib = array('title' => $strgrouptool, 'href' => $CFG->wwwroot.
+                                                                '/mod/grouptool/view.php?id='.
+                                                                $grouptool->coursemodule);
             if (!$grouptool->visible
                 || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
-                $attrib['class']='dimmed';
+                $attrib['class'] = 'dimmed';
             }
             list($cc, $nused) = grouptool_display_lateness(time(), $grouptool->timedue);
             $str .= html_writer::tag('div', $strgrouptool.': '.
                     html_writer::tag('a', $grouptool->name, $attrib),
-                    array('class'=>'name'));
-            $attr = array('class'=>'info');
+                    array('class' => 'name'));
+            $attr = array('class' => 'info');
             if ($grouptool->timeavailable > time()) {
                 $ta = $grouptool->timeavailable;
                 $str .= html_writer::tag('div', get_string('availabledate', 'grouptool').': '.
@@ -698,8 +703,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 $str .= html_writer::tag('div', $strduedate.': '.
                                                 html_writer::tag('span',
                                                                  userdate($grouptool->timedue),
-                                                                 array('class' => (($cc=='late')?
-                                                                                     ' late':''))),
+                                                                 array('class' => (($cc == 'late') ?
+                                                                                   ' late' : ''))),
                                          $attr);
             } else {
                 $str .= html_writer::tag('div', $strduedateno, $attr);
@@ -714,82 +719,80 @@ function grouptool_print_overview($courses, &$htmlarray) {
 
         if (has_capability('mod/grouptool:register', $context) && $grouptool->allow_reg) {
             if (count($userstats->registered)) {
-                $temp_str = "";
+                $tempstr = "";
                 foreach ($userstats->registered as $registration) {
                     $ts = $registration->timestamp;
                     list($colorclass, $text) = grouptool_display_lateness($ts,
                                                                           $grouptool->timedue);
-                    if ($temp_str != "") {
-                        $temp_str .= '; ';
+                    if ($tempstr != "") {
+                        $tempstr .= '; ';
                     }
-                    $temp_str .= html_writer::tag('span', $registration->grpname);
+                    $tempstr .= html_writer::tag('span', $registration->grpname);
                 }
                 if (($grouptool->allow_multiple &&
                         (count($userstats->registered) < $grouptool->choose_min))
                         || (!$grouptool->allow_multiple && !count($userstats->registered))) {
                     if ($grouptool->allow_multiple) {
-                        $missing = ($grouptool->choose_min-count($userstats->registered));
-                        $string_label = ($missing > 1) ? 'registrations_missing'
-                                                       : 'registration_missing';
+                        $missing = ($grouptool->choose_min - count($userstats->registered));
+                        $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                     } else {
                         $missing = 1;
-                        $string_label = 'registration_missing';
+                        $stringlabel = 'registration_missing';
                     }
                     $details .= html_writer::tag('div',
                             html_writer::tag('div',
-                                    get_string($string_label, 'grouptool', $missing)).' '.
-                            get_string('registrations', 'grouptool').': '.$temp_str,
-                            array('class'=>'registered'));
+                                    get_string($stringlabel, 'grouptool', $missing)).' '.
+                            get_string('registrations', 'grouptool').': '.$tempstr,
+                            array('class' => 'registered'));
                 } else {
                     $details .= html_writer::tag('div',
-                            get_string('registrations', 'grouptool').': '.$temp_str,
-                            array('class'=>'registered'));
+                            get_string('registrations', 'grouptool').': '.$tempstr,
+                            array('class' => 'registered'));
                 }
             } else {
                 if ($grouptool->allow_multiple) {
                     $missing = $grouptool->choose_min;
-                    $string_label = ($missing > 1) ? 'registrations_missing'
-                                                   : 'registration_missing';
+                    $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                 } else {
                     $missing = 1;
-                    $string_label = 'registration_missing';
+                    $stringlabel = 'registration_missing';
                 }
                 $details .= html_writer::tag('div',
                         html_writer::tag('div',
-                                get_string($string_label, 'grouptool', $missing)).
+                                get_string($stringlabel, 'grouptool', $missing)).
                         get_string('registrations', 'grouptool').': '.
                         get_string('not_registered', 'grouptool'),
-                        array('class'=>'registered'));
+                        array('class' => 'registered'));
             }
             if (count($userstats->queued)) {
-                $temp_str = "";
+                $tempstr = "";
                 foreach ($userstats->queued as $queue) {
                     list($colorclass, $text) = grouptool_display_lateness($queue->timestamp,
                                                                           $grouptool->timedue);
-                    if ($temp_str != "") {
-                        $temp_str .= ", ";
+                    if ($tempstr != "") {
+                        $tempstr .= ", ";
                     }
-                    $temp_str .= html_writer::tag('span', $queue->grpname.' ('.$queue->rank.')',
-                                                  array('class'=>$colorclass));
+                    $tempstr .= html_writer::tag('span', $queue->grpname.' ('.$queue->rank.')',
+                                                  array('class' => $colorclass));
                 }
                 $details .= html_writer::tag('div', get_string('queues', 'grouptool').': '.
-                        $temp_str, array('class'=>'queued'));
+                        $tempstr, array('class' => 'queued'));
             }
         }
 
         if (has_capability('mod/grouptool:view_registrations', $context) && $grouptool->allow_reg) {
             $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool',
                                                            $userstats),
-                                         array('class'=>'userstats'));
+                                         array('class' => 'userstats'));
 
         }
 
         if ((has_capability('mod/grouptool:view_registrations', $context)
                                       || has_capability('mod/grouptool:register', $context))) {
-            if($grouptool->allow_reg) {
-                $str .= html_writer::tag('div', $details, array('class'=>'details'));
+            if ($grouptool->allow_reg) {
+                $str .= html_writer::tag('div', $details, array('class' => 'details'));
             }
-            $str = html_writer::tag('div', $str, array('class'=>'grouptool overview'));
+            $str = html_writer::tag('div', $str, array('class' => 'grouptool overview'));
             if (empty($htmlarray[$grouptool->course]['grouptool'])) {
                 $htmlarray[$grouptool->course]['grouptool'] = $str;
             } else {
@@ -809,7 +812,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
 function grouptool_reset_userdata($data) {
     global $CFG, $DB;
 
-    if (!$DB->count_records('grouptool', array('course'=>$data->courseid))) {
+    if (!$DB->count_records('grouptool', array('course' => $data->courseid))) {
         return array(); // No grouptools present!
     }
 
@@ -823,8 +826,8 @@ function grouptool_reset_userdata($data) {
 
     if (!empty($data->reset_grouptool_transparent_unreg)) {
         require_once($CFG->dirroot.'/group/lib.php');
-        $reg_data = $DB->get_records_list('grouptool_registered', 'agrpid', array_keys($agrps));
-        foreach ($reg_data as $registration) {
+        $regdata = $DB->get_records_list('grouptool_registered', 'agrpid', array_keys($agrps));
+        foreach ($regdata as $registration) {
             groups_remove_member($agrps[$registration->agrpid]->groupid, $registration->userid);
         }
         $status[] = array('component'    => $componentstr,
@@ -884,10 +887,10 @@ function grouptool_reset_course_form_definition(&$mform) {
  * Course reset form defaults.
  */
 function grouptool_reset_course_form_defaults($course) {
-    return array('reset_grouptool_registrations'    => 1,
-                 'reset_grouptool_queues'           => 1,
-                 'reset_grouptool_agrps'            => 0,
-                 'reset_grouptool_transparent_unreg'=> 0);
+    return array('reset_grouptool_registrations'     => 1,
+                 'reset_grouptool_queues'            => 1,
+                 'reset_grouptool_agrps'             => 0,
+                 'reset_grouptool_transparent_unreg' => 0);
 }
 
 /**
@@ -895,24 +898,28 @@ function grouptool_reset_course_form_defaults($course) {
  */
 function grouptool_copy_assign_grades($id, $fromid, $toid) {
     global $DB;
-    
-    $source = $DB->get_records('assign_grades', array('assignment'=>$id, 'userid'=>$fromid),
+
+    $source = $DB->get_records('assign_grades', array('assignment' => $id, 'userid' => $fromid),
                                'id DESC', '*', 0, 1, MUST_EXIST);
-    if(!is_array($toid)) {
+    if (!is_array($toid)) {
         $toid = array($toid);
     }
     $source = reset($source);
-    $user = $DB->get_record('user', array('id'=>$source->userid));
-    $grader = $DB->get_record('user', array('id'=>$source->grader));
-    //get corresponding feedback
-    $feedbackcomment = $DB->get_record('assignfeedback_comments', array('assignment'=>$id, 'grade'=>$source->id));
-    $feedbackfile = $DB->get_record('assignfeedback_file', array('assignment'=>$id, 'grade'=>$source->id));
-    foreach ($toid as $cur_id) {
+    $user = $DB->get_record('user', array('id' => $source->userid));
+    $grader = $DB->get_record('user', array('id' => $source->grader));
+    // Get corresponding feedback!
+    $feedbackcomment = $DB->get_record('assignfeedback_comments', array('assignment' => $id,
+                                                                        'grade'      => $source->id));
+    $feedbackfile = $DB->get_record('assignfeedback_file', array('assignment' => $id,
+                                                                 'grade'      => $source->id));
+    foreach ($toid as $curid) {
         $record = clone $source;
-        $record->userid = $cur_id;
+        $record->userid = $curid;
         unset($record->id);
-        if($record->id = $DB->get_field('assign_grades', 'id', array('assignment'=>$id, 'userid'=>$cur_id,
-                                                                     'attemptnumber'=>$source->attemptnumber))) {
+        if ($record->id = $DB->get_field('assign_grades', 'id',
+                                         array('assignment'    => $id,
+                                               'userid'        => $curid,
+                                               'attemptnumber' => $source->attemptnumber))) {
             $DB->update_record('assign_grades', $record);
             if ($feedbackcomment) {
                 $newfeedbackcomment = clone $feedbackcomment;
@@ -928,7 +935,9 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                                                                           'grouptool',
                                                                           $details),
                                                                $newfeedbackcomment->commentformat);
-                if($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', array('assignment'=>$id, 'grade'=>$record->id))) {
+                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id',
+                                                             array('assignment' => $id,
+                                                                   'grade'      => $record->id))) {
                     $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
                 } else {
                     $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
@@ -939,7 +948,9 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                 unset($newfeedbackfile->id);
                 $newfeedbackfile->grade = $record->id;
                 $newfeedbackfile->assignment = $id;
-                if($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', array('assignment'=>$id, 'grade'=>$record->id))) {
+                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id',
+                                                          array('assignment' => $id,
+                                                                'grade'      => $record->id))) {
                     $DB->update_record('assignfeedback_file', $newfeedbackfile);
                 } else {
                     $DB->insert_record('assignfeedback_file', $newfeedbackfile);
@@ -961,7 +972,9 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                                                                           'grouptool',
                                                                           $details),
                                                                $newfeedbackcomment->commentformat);
-                if($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', array('assignment'=>$id, 'grade'=>$gradeid))) {
+                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id',
+                                                             array('assignment' => $id,
+                                                                   'grade'      => $gradeid))) {
                     $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
                 } else {
                     $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
@@ -972,7 +985,9 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                 unset($newfeedbackfile->id);
                 $newfeedbackfile->grade = $gradeid;
                 $newfeedbackfile->assignment = $id;
-                if($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', array('assignment'=>$id, 'grade'=>$gradeid))) {
+                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id',
+                                                          array('assignment' => $id,
+                                                                'grade'      => $gradeid))) {
                     $DB->update_record('assignfeedback_file', $newfeedbackfile);
                 } else {
                     $DB->insert_record('assignfeedback_file', $newfeedbackfile);

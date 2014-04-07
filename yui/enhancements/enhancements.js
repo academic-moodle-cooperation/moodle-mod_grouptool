@@ -11,7 +11,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * enhancements.js
@@ -23,7 +23,7 @@
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 YUI.add('moodle-mod_grouptool-enhancements', function(Y) {
     var ENHANCEMENTSNAME = 'enhancements';
     var enhancements = function(Y) {

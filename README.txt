@@ -11,7 +11,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * README.txt
@@ -66,8 +66,8 @@ INSTALLATION
    All languages should be encoded with utf8.
 
     After it you have to run the admin-page of moodle
-	http://your-moodle-site/admin) in your browser. 
-	You have to logged in as admin before.
+    http://your-moodle-site/admin) in your browser. 
+    You have to logged in as admin before.
     The installation process will be displayed on the screen.
     That's all.
 

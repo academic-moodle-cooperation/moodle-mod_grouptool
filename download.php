@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * download.php
@@ -33,7 +33,7 @@ $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
 $context = context_module::instance($cmid);
 $PAGE->set_context($context);
-$url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', array('id'=>$cmid));
+$url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', array('id' => $cmid));
 $PAGE->set_url($url);
 $instance = new grouptool($cmid);
 

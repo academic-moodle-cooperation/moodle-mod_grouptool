@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * mod_form.php
@@ -48,11 +48,11 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         global $CFG, $DB, $PAGE;
         $mform = $this->_form;
-        $max_regs = 0;
+        $maxregs = 0;
         if ($update = optional_param('update', 0, PARAM_INT)) {
             $cm = get_coursemodule_from_id('grouptool', $update);
-            $course = $DB->get_record('course', array('id'=>$cm->course));
-            $grouptool = $DB->get_record('grouptool', array('id'=>$cm->instance));
+            $course = $DB->get_record('course', array('id' => $cm->course));
+            $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
             $sql = '
  SELECT MAX(regcnt)
     FROM (
@@ -62,14 +62,14 @@ class mod_grouptool_mod_form extends moodleform_mod {
    WHERE agrps.grouptoolid = :grouptoolid
 GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $cm->instance);
-            $max_regs = $DB->get_field_sql($sql, $params);
+            $maxregs = $DB->get_field_sql($sql, $params);
         } else if ($course = optional_param('course', 0, PARAM_INT)) {
-            $course = $DB->get_record('course', array('id'=>$course));
+            $course = $DB->get_record('course', array('id' => $course));
         } else {
             $course = 0;
         }
 
-        $mform->addElement('hidden', 'max_regs', $max_regs);
+        $mform->addElement('hidden', 'max_regs', $maxregs);
         $mform->setType('max_regs', PARAM_INT);
         /* -------------------------------------------------------------------------------
          * Adding the "general" fieldset, where all the common settings are showed
@@ -78,7 +78,7 @@ GROUP BY reg.userid) as regcnts';
 
         // Adding the standard "name" field!
         $mform->addElement('text', 'name', get_string('grouptoolname', 'grouptool'),
-                           array('size'=>'64'));
+                           array('size' => '64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -92,18 +92,17 @@ GROUP BY reg.userid) as regcnts';
         $this->add_intro_editor($CFG->grouptool_requiremodintro,
                                 get_string('description', 'grouptool'));
 
-                                
         $mform->addElement('header', 'availability', get_string('availability', 'assign'));
         $mform->setExpanded('availability', true);
 
         $name = get_string('availabledate', 'grouptool');
-        $options = array('optional'=>true);
+        $options = array('optional' => true);
         $mform->addElement('date_time_selector', 'timeavailable', $name, $options);
         $mform->addHelpButton('timeavailable', 'availabledate', 'grouptool');
         $mform->setDefault('timeavailable', time());
 
         $name = get_string('duedate', 'grouptool');
-        $mform->addElement('date_time_selector', 'timedue', $name, array('optional'=>true));
+        $mform->addElement('date_time_selector', 'timedue', $name, array('optional' => true));
         $mform->addHelpButton('timedue', 'duedate', 'grouptool');
         $mform->setDefault('timedue', date('U', strtotime('+1week 23:55', time())));
 
@@ -132,15 +131,13 @@ GROUP BY reg.userid) as regcnts';
 
         $mform->addElement('selectyesno', 'show_members', get_string('show_members', 'grouptool'));
         $mform->setDefault('show_members',
-                           (!empty($CFG->grouptool_show_members) ? $CFG->grouptool_show_members
-                                                                 : 0));
+                           (!empty($CFG->grouptool_show_members) ? $CFG->grouptool_show_members : 0));
         $mform->addHelpButton('show_members', 'show_members', 'grouptool');
 
         $mform->addElement('selectyesno', 'immediate_reg', get_string('immediate_reg',
                                                                       'grouptool'));
         $mform->setDefault('immediate_reg',
-                           (!empty($CFG->grouptool_immediate_reg) ? $CFG->grouptool_immediate_reg
-                                                                  : 0));
+                           (!empty($CFG->grouptool_immediate_reg) ? $CFG->grouptool_immediate_reg : 0));
         $mform->addHelpButton('immediate_reg', 'immediate_reg', 'grouptool');
         $mform->disabledIf('immediate_reg', 'allow_reg', 'equal', 1);
 
@@ -152,10 +149,10 @@ GROUP BY reg.userid) as regcnts';
 
         $size = array();
         $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'),
-                                        array('size'=>'5'));
+                                        array('size' => '5'));
         $size[] = $mform->createElement('checkbox', 'use_size', '', get_string('use_size',
                                                                                'grouptool'));
-        //We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0
+        // We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0!
         $mform->setType('grpsize', PARAM_RAW);
         $mform->setDefault('grpsize',
                            (!empty($CFG->grouptool_grpsize) ? $CFG->grouptool_grpsize : 3));
@@ -170,12 +167,10 @@ GROUP BY reg.userid) as regcnts';
         $mform->addElement('checkbox', 'use_individual', get_string('use_individual', 'grouptool'));
         $mform->setType('use_individual', PARAM_BOOL);
         $mform->setDefault('use_individual',
-                           (!empty($CFG->grouptool_use_individual) ? $CFG->grouptool_use_individual
-                                                                   : 0));
+                           (!empty($CFG->grouptool_use_individual) ? $CFG->grouptool_use_individual : 0));
         $mform->addHelpButton('use_individual', 'use_individual', 'grouptool');
         $mform->disabledIf('use_individual', 'allow_reg', 'equal', 1);
         $mform->disabledIf('use_individual', 'use_size', 'notchecked');
-
 
         /*
          * ---------------------------------------------------------------------
@@ -188,11 +183,11 @@ GROUP BY reg.userid) as regcnts';
          */
         $mform->addElement('header', 'queue_and_multiple_reg',
                            get_string('queue_and_multiple_reg_title', 'grouptool'));
-        
+
         $queue = array();
         $queue[] = $mform->createElement('text', 'queues_max',
                                          get_string('queues_max', 'grouptool'),
-                                         array('size'=>'3'));
+                                         array('size' => '3'));
         $queue[] = $mform->createElement('checkbox', 'use_queue', '',
                                          get_string('use_queue', 'grouptool'));
         $mform->addGroup($queue, 'queue_grp',
@@ -208,37 +203,35 @@ GROUP BY reg.userid) as regcnts';
         $mform->disabledIf('queues_max', 'use_queue', 'notchecked');
         $mform->disabledIf('queues_max', 'allow_reg', 'equal', 1);
 
-        //prevent user from unsetting if user is registered in multiple groups
+        // Prevent user from unsetting if user is registered in multiple groups!
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
-        if($max_regs > 1) {
+        if ($maxregs > 1) {
             $mform->addElement('hidden', 'multreg', 1);
         } else {
             $mform->addElement('hidden', 'multreg', 0);
         }
         $mform->setType('multreg', PARAM_BOOL);
         $mform->setType('allow_multiple', PARAM_BOOL);
-        $allowmultipledefault = (!empty($CFG->grouptool_allow_multiple) ? $CFG->grouptool_allow_multiple
-                                                                        : 0);
+        $allowmultipledefault = (!empty($CFG->grouptool_allow_multiple) ? $CFG->grouptool_allow_multiple : 0);
         $mform->setDefault('allow_multiple', $allowmultipledefault);
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
         $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
-                           array('size'=>'3'));
+                           array('size' => '3'));
         $mform->setType('choose_min', PARAM_INT);
         $mform->setDefault('choose_min',
                            (!empty($CFG->grouptool_choose_min) ? $CFG->grouptool_choose_min : 1));
         $mform->disabledIf('choose_min', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
-                           array('size'=>'3'));
+                           array('size' => '3'));
         $mform->setType('choose_max', PARAM_INT);
         $mform->setDefault('choose_max',
                            (!empty($CFG->grouptool_choose_max) ? $CFG->grouptool_choose_max : 1));
         $mform->disabledIf('choose_max', 'allow_reg', 'eq', 0);
 
-        if($max_regs > 1) {
-            //$mform->setConstant('allow_multiple', $allowmultipledefault);
+        if ($maxregs > 1) {
             $mform->freeze('allow_multiple');
         } else {
             $mform->disabledIf('choose_max', 'allow_multiple', 'notchecked');
@@ -293,10 +286,10 @@ GROUP BY reg.userid) as regcnts';
          * add standard elements, common to all modules
          */
         $this->standard_coursemodule_elements();
-        
+
         $mform->setConstant('groupmode', VISIBLEGROUPS);
         $mform->freeze('groupmode');
-        
+
         /* ------------------------------------------------------------------------------
          * add standard buttons, common to all modules
          */
@@ -305,7 +298,7 @@ GROUP BY reg.userid) as regcnts';
 
     public function validation($data, $files) {
         global $DB;
-        $parent_errors = parent::validation($data, $files);
+        $parenterrors = parent::validation($data, $files);
         $errors = array();
         if (!empty($data['timedue']) && ($data['timedue'] <= $data['timeavailable'])) {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
@@ -316,7 +309,7 @@ GROUP BY reg.userid) as regcnts';
             && empty($data['use_individual'])) {
             $errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
         }
-        if(!empty($data['instance'])) {
+        if (!empty($data['instance'])) {
             $sql = '
      SELECT MAX(regcnt)
         FROM (
@@ -326,7 +319,7 @@ GROUP BY reg.userid) as regcnts';
        WHERE agrps.grouptoolid = :grouptoolid
     GROUP BY reg.agrpid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
-            $max_grp_regs = $DB->get_field_sql($sql, $params);
+            $maxgrpregs = $DB->get_field_sql($sql, $params);
             $sql = '
      SELECT MAX(regcnt)
         FROM (
@@ -336,7 +329,7 @@ GROUP BY reg.userid) as regcnts';
        WHERE agrps.grouptoolid = :grouptoolid
     GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
-            $max_user_regs = $DB->get_field_sql($sql, $params);
+            $maxuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
      SELECT MIN(regcnt)
         FROM (
@@ -347,7 +340,7 @@ GROUP BY reg.userid) as regcnts';
     GROUP BY reg.userid) as regcnts
        WHERE regcnt > 0';
             $params = array('grouptoolid' => $data['instance']);
-            $min_user_regs = $DB->get_field_sql($sql, $params);
+            $minuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT COUNT(queue.id) as queue
         FROM {grouptool_queued} as queue
@@ -356,22 +349,18 @@ GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $queues = $DB->get_field_sql($sql, $params);
         } else {
-            $max_grp_regs = 0;
-            $max_user_regs = 0;
-            $min_user_regs = 0;
+            $maxgrpregs = 0;
+            $maxuserregs = 0;
+            $minuserregs = 0;
             $queues = 0;
         }
-        if (!empty($data['use_size']) && ($data['grpsize'] < $max_grp_regs)
+        if (!empty($data['use_size']) && ($data['grpsize'] < $maxgrpregs)
             && empty($data['use_individual'])) {
-            if(empty($errors['size_grp'])) {
+            if (empty($errors['size_grp'])) {
                 $errors['size_grp'] = get_string('toomanyregs', 'grouptool');
             } else {
                 $errors['size_grp'] .= get_string('toomanyregs', 'grouptool');
             }
-        }
-
-        if($queues && empty($data['use_queue']) && empty($data['warningconfirm'])) {
-//            $errors['use_queue'] = get_string('queuespresent', 'grouptool');
         }
 
         if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
@@ -394,30 +383,30 @@ GROUP BY reg.userid) as regcnts';
                 $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
             }
         }
-        
-        if (!empty($data['allow_multiple']) && ($data['choose_max'] < $max_user_regs)) {
+
+        if (!empty($data['allow_multiple']) && ($data['choose_max'] < $maxuserregs)) {
             if (isset($errors['choose_max'])) {
                 $errors['choose_max'] .= html_writer::empty_tag('br').
                                          get_string('toomanyregspresent', 'grouptool',
-                                                    $max_user_regs);
+                                                    $maxuserregs);
             } else {
                 $errors['choose_max'] = get_string('toomanyregspresent', 'grouptool',
-                                                   $max_user_regs);
+                                                   $maxuserregs);
             }
         }
 
-        if (!empty($data['allow_multiple']) && !empty($min_user_regs)
-            && ($data['choose_min'] > $min_user_regs)) {
+        if (!empty($data['allow_multiple']) && !empty($minuserregs)
+            && ($data['choose_min'] > $minuserregs)) {
             if (isset($errors['choose_min'])) {
                 $errors['choose_min'] .= html_writer::empty_tag('br').
                                          get_string('toolessregspresent', 'grouptool',
-                                                    $min_user_regs);
+                                                    $minuserregs);
             } else {
                 $errors['choose_min'] = get_string('toolessregspresent', 'grouptool',
-                                                   $min_user_regs);
+                                                   $minuserregs);
             }
         }
 
-        return array_merge($parent_errors, $errors);
+        return array_merge($parenterrors, $errors);
     }
 }

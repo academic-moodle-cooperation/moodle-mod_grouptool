@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * restore_grouptool_stepslib.php
@@ -67,9 +67,9 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->timeavailable = $this->apply_date_offset($data->timeavailable);
         $data->timemodified = $this->apply_date_offset($data->timemodified);
         $data->timecreated = time();
-        
+
         // Due to an old bug it can happen that these settings haven't been backed up!
-        if(!isset($data->ifmemberadded)) {
+        if (!isset($data->ifmemberadded)) {
             $data->ifmemberadded = $CFG->grouptool_ifmemberadded;
         }
         if (!isset($data->ifmemberremoved)) {
@@ -91,11 +91,11 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
 
-        if(isset($data->group_id)) {
+        if (isset($data->group_id)) {
             $data->groupid = $data->group_id;
             unset($data->group_id);
         }
-        
+
         $data->grouptoolid = $this->get_new_parentid('grouptool');
 
         $data->groupid = $this->get_mappingid('group', $data->groupid);
@@ -110,7 +110,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
 
-        if(isset($data->user_id)) {
+        if (isset($data->user_id)) {
             $data->userid = $data->user_id;
             unset($data->user_id);
         }
@@ -129,11 +129,11 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data = (object)$data;
         $oldid = $data->id;
 
-        if(isset($data->user_id)) {
+        if (isset($data->user_id)) {
             $data->userid = $data->user_id;
             unset($data->user_id);
         }
-        
+
         $data->agrpid = $this->get_new_parentid('grouptool_agrp');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
