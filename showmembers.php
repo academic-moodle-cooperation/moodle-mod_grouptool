@@ -57,9 +57,8 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
 } else {
     echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
     $moodlereg = groups_get_members($group->grpid, 'u.id');
-
-    $regsql = "SELECT reg.userid as id, user.firstname as firstname, user.lastname as lastname,
-                      user.idnumber as idnumber
+    $userfieldssql = user_picture::fields('user');
+    $regsql = "SELECT $userfieldssql, user.idnumber as idnumber
                FROM {grouptool_registered} as reg
                    LEFT JOIN {user} as user ON reg.userid = user.id
                WHERE reg.agrpid = ?
@@ -84,8 +83,8 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
     }
 
     echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
-    $queuesql = "SELECT queue.userid as id, user.firstname as firstname, user.lastname as lastname,
-                        user.idnumber as idnumber
+    $userfieldssql = user_picture::fields('user');
+    $queuesql = "SELECT $userfieldssql, user.idnumber as idnumber
                  FROM {grouptool_queued} as queue
                      LEFT JOIN {user} as user ON queue.userid = user.id
                  WHERE queue.agrpid = ?

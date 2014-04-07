@@ -943,7 +943,7 @@ class grouptool {
                 if ($data->allocateby != 'no') {
                     $unames = array();
                     foreach ($group['members'] as $user) {
-                        $unames[] = fullname($user, true);
+                        $unames[] = fullname($user);
                     }
                     $line[] = implode(', ', $unames);
                     $line[] = count($group['members']);
@@ -1261,7 +1261,7 @@ class grouptool {
                     $groupnames[] = $group['name'];
                     $line[] = $group['name'];
                 }
-                $line[] = fullname($group['member'], true);
+                $line[] = fullname($group['member']);
 
                 $table->data[] = $line;
             }
@@ -2022,10 +2022,7 @@ EOS;
                                 && ($selected[$groupmember->id] == 1)) ? true : false;
                     $row[] = html_writer::checkbox('selected[]', $groupmember->id, $checked, '',
                                                    array('class' => 'checkbox checkboxgroup1'));
-                    $row[] = html_writer::tag('div',
-                                              fullname($groupmember,
-                                                       has_capability('moodle/site:viewfullnames',
-                                                        $this->context)),
+                    $row[] = html_writer::tag('div', fullname($groupmember),
                                               array('class' => 'fullname'.$groupmember->id));
                     $row[] = html_writer::tag('div', $groupmember->idnumber,
                                               array('class' => 'idnumber'.$groupmember->id));
