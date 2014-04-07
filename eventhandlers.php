@@ -94,7 +94,7 @@ function group_remove_member_handler($data) {
     global $DB, $CFG;
 
     $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
-                            {grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allowmultiple,
+                            {grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allow_multiple,
                             {grouptool}.choose_max, {grouptool}.name
                        FROM {grouptool}
                  RIGHT JOIN {grouptool_agrps} AS agrp ON agrp.grouptoolid = {grouptool}.id
@@ -146,7 +146,7 @@ function group_remove_member_handler($data) {
                             if (!empty($grouptool->immediate_reg)) {
                                 groups_add_member($data->groupid, $newrecord->userid);
                             }
-                            $allowm = $grouptool->allowmultiple;
+                            $allowm = $grouptool->allow_multiple;
                             $agrps = $DB->get_fieldset_sql("SELECT id
                                                             FROM {grouptool_agrps} as agrps
                                                             WHERE agrps.grouptoolid = :grptlid",
