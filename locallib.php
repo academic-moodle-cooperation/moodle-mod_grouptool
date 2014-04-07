@@ -6281,12 +6281,14 @@ EOS;
         $return = "";
 
         $context = context_module::instance($this->cm->id);
-        // Handles order direction!
-        if (isset($SESSION->mod_grouptool->userlist->orderby)) {
-            $orderby = $SESSION->mod_grouptool->userlist->orderby;
-        } else {
-            $orderby = array();
+        if (!isset($SESSION->mod_grouptool->userlist)) {
+            $SESSION->mod_grouptool->userlist = new stdClass();
         }
+        // Handles order direction!
+        if (!isset($SESSION->mod_grouptool->userlist->orderby)) {
+            $SESSION->mod_grouptool->userlist->orderby = array();
+        }
+        $orderby = $SESSION->mod_grouptool->userlist->orderby;
         if ($tsort = optional_param('tsort', 0, PARAM_ALPHA)) {
             $olddir = 'DESC';
             if (key_exists($tsort, $orderby)) {
@@ -6303,11 +6305,10 @@ EOS;
         }
 
         // Handles collapsed columns!
-        if (isset($SESSION->mod_grouptool->userlist->collapsed)) {
-            $collapsed = $SESSION->mod_grouptool->userlist->collapsed;
-        } else {
-            $collapsed = array();
+        if (!isset($SESSION->mod_grouptool->userlist->collapsed)) {
+            $SESSION->mod_grouptool->userlist->collapsed = array();
         }
+        $collapsed = $SESSION->mod_grouptool->userlist->collapsed;
         if ($thide = optional_param('thide', 0, PARAM_ALPHA)) {
             if (!in_array($thide, $collapsed)) {
                 array_push($collapsed, $thide);
