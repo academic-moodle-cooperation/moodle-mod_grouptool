@@ -200,7 +200,8 @@ function group_remove_member_handler($data) {
                             $messageuser = $DB->get_record('user', array('id' => $newrecord->userid));
                             $eventdata = new stdClass();
                             $eventdata->modulename       = 'grouptool';
-                            $eventdata->userfrom         = $messageuser;
+                            $userfrom = core_user::get_noreply_user();
+                            $eventdata->userfrom         = $userfrom;
                             $eventdata->userto           = $messageuser;
                             $eventdata->subject          = $postsubject;
                             $eventdata->fullmessage      = $posttext;
