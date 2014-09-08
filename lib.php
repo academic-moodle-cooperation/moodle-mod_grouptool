@@ -403,7 +403,8 @@ function grouptool_delete_instance($id) {
         $event = new stdClass();
     }
     while ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
-                                                            'instance'   => $grouptool->id))) {
+                                                            'instance'   => $grouptool->id),
+                                        IGNORE_MULTIPLE)) {
         require_once($CFG->dirroot.'/calendar/lib.php');
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->delete(true);
