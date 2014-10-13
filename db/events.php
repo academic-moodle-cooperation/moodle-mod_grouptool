@@ -27,42 +27,42 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$handlers = array (
-        // We get groupid, userid with this handler.
-        'groups_member_added' => array (
-                'handlerfile'      => '/mod/grouptool/eventhandlers.php',
-                'handlerfunction'  => 'group_add_member_handler',
-                'schedule'         => 'instant'
+$observers = array (
+        array (
+            'eventname'    => '\core\event\group_member_added',
+            'callback'     => 'mod_grouptool_observer::group_member_added',
+            'includefile'  => '/mod/grouptool/observer.php',
+            'priority'     => 0,
+            'internal'     => true,
         ),
         // We get groupid, userid with this handler.
-        'groups_member_removed' => array (
-                'handlerfile'      => '/mod/grouptool/eventhandlers.php',
-                'handlerfunction'  => 'group_remove_member_handler',
-                'schedule'         => 'instant'
+
+        // We get groupid, userid with this handler.
+        array (
+            'eventname'    => 'core\event\group_member_removed',
+            'callback'     => 'mod_grouptool_observer::group_member_removed',
+            'includefile'  => '/mod/grouptool/observer.php',
+            'priority'     => 0,
+            'internal'     => true,
         ),
-        // We get courseid, userid with this handler (user deleted from all coursegroups).
-        'groups_members_removed' => array (
-                'handlerfile'      => '/mod/grouptool/eventhandlers.php',
-                'handlerfunction'  => 'groups_remove_member_handler',
-                'schedule'         => 'instant'
-        ),
-        // We get id, courseid, name, description, timecreated, timemodified, picture with this handler.
-        'groups_group_deleted' => array (
-                'handlerfile'      => '/mod/grouptool/eventhandlers.php',
-                'handlerfunction'  => 'group_deleted_handler',
-                'schedule'         => 'instant'
-        ),
-        // We get courseid (as plain integer) with this handler (delete all groups in a course).
-        'groups_groups_deleted' => array(
-                'handlerfile'      => '/mod/grouptool/eventhandlers.php',
-                'handlerfunction'  => 'groups_deleted_handler',
-                'schedule'         => 'instant'
+
+        array (
+            'eventname'    => 'core\event\group_deleted',
+            'callback'     => 'mod_grouptool_observer::group_deleted',
+            'includefile'  => '/mod/grouptool/observer.php',
+            'priority'     => 0,
+            'internal'     => true,
         ),
         // We get id, courseid, name, description, timecreated, timemodified, picture with this handler.
-        'groups_group_created' => array(
-                'handlerfile'      => '/mod/grouptool/eventhandlers.php',
-                'handlerfunction'  => 'group_created_handler',
-                'schedule'         => 'instant'
-        )
+        
+
+        array (
+            'eventname'    => 'core\event\group_created',
+            'callback'     => 'mod_grouptool_observer::group_created',
+            'includefile'  => '/mod/grouptool/observer.php',
+            'priority'     => 0,
+            'internal'     => true,
+        ),
+        // We get id, courseid, name, description, timecreated, timemodified, picture with this handler.
 
 );
