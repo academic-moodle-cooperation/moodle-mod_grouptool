@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_registration_push_started event.
@@ -27,6 +27,7 @@
  */
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
+
 class registration_push_started extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'u';
