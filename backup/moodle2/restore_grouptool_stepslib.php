@@ -124,6 +124,10 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
             $data->userid = $data->user_id;
             unset($data->user_id);
         }
+        if (isset($data->agrp_id)) {
+            $data->agrpid = $data->agrp_id;
+            unset($data->agrpid);
+        }
 
         $oldagrp = $data->agrpid;
         $data->agrpid = $this->get_new_parentid('grouptool_agrp');
@@ -161,6 +165,10 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         if (isset($data->user_id)) {
             $data->userid = $data->user_id;
             unset($data->user_id);
+        }
+        if (isset($data->agrp_id)) {
+            $data->agrpid = $data->agrp_id;
+            unset($data->agrpid);
         }
 
         $oldagrp = $data->agrpid;
