@@ -597,7 +597,7 @@ class grouptool {
 
         global $CFG;
 
-        if ($cm) {
+        if (!empty($cm)) {
             $this->cm = $cm;
         } else if (! $this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
             print_error('invalidcoursemodule');
@@ -823,9 +823,8 @@ class grouptool {
 
             grouptool_update_queues($this->grouptool);
 
-            add_to_log($this->grouptool->course, 'grouptool', 'update agrps',
-                    "view.php?id=".$this->grouptool->id."&tab=overview",
-                    'via form', $this->cm->id);
+            /* Trigger event */
+            \mod_grouptool\event\agrps_updated::create_convenient($this->cm, $this->grouptool)->trigger();
         }
         return true;
     }
@@ -971,6 +970,17 @@ class grouptool {
                 }
             }
 
+            // Trigger group_creation_started event.
+            $groupingid = !empty($grouping) ? $grouping->id : 0;
+            switch($data->mode) {
+                case GROUPTOOL_GROUPS_AMOUNT:
+                    \mod_grouptool\event\group_creation_started::create_groupamount($this->cm, $data->namingscheme, $data->amount, $groupingid)->trigger();
+                break;
+                case GROUPTOOL_MEMBERS_AMOUNT:
+                    \mod_grouptool\event\group_creation_started::create_memberamount($this->cm, $data->namingscheme, $data->amount, $groupingid)->trigger();
+                break;
+            }
+
             // Save the groups data!
             foreach ($groups as $key => $group) {
                 if (@groups_get_group_by_name($this->course->id, $group['name'])) {
@@ -1034,22 +1044,9 @@ class grouptool {
                     groups_delete_grouping($createdgrouping);
                 }
             } else {
-                if ($grouping) {
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'create groups',
-                            "view.php?id=".$this->grouptool->id."&tab=overview&groupingid=".
-                            $grouping->id,
-                            'create groups in grouping:'.$grouping->name.
-                            ' namescheme:'.$data->namingscheme.' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' user/grp:'.$userpergrp);
-                } else {
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'create groups',
-                            "view.php?id=".$this->grouptool->id."&tab=overview",
-                            'create groups namescheme:'.$data->namingscheme.
-                            ' allocate-by:'.$data->allocateby.' numgroups:'.$numgrps.
-                            ' user/grp:'.$userpergrp);
-                }
+                // Trigger agrps updated via groupcreation event.
+                $groupingid = !empty($grouping) ? $grouping->id : 0;
+                $event = \mod_grouptool\event\agrps_updated::create_groupcreation($this->cm, $data->namingscheme, $numgrps, $groupingid)->trigger();
             }
         }
     }
@@ -1127,6 +1124,10 @@ class grouptool {
                 }
             }
 
+            // Trigger group creation started event.
+            $groupingid = !empty($grouping->id) ? $grouping->id : 0;
+            \mod_grouptool\event\group_creation_started::create_fromto($this->cm, $data->namingscheme, $data->from, $data->to, $groupingid)->trigger();
+
             // Save the groups data!
             foreach ($groups as $key => $group) {
                 if (groups_get_group_by_name($this->course->id, $group)) {
@@ -1176,24 +1177,9 @@ class grouptool {
                 }
             } else {
                 $numgrps = clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT) + 1;
-                if ($grouping) {
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'create groups',
-                            "view.php?id=".$this->grouptool->id."&tab=overview&groupingid=".
-                            $grouping->id,
-                            'create groups in grouping:'.$grouping->name.
-                            ' namescheme:'.$data->namingscheme.' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.
-                            clean_param($data->to, PARAM_INT));
-                } else {
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'create groups',
-                            "view.php?id=".$this->grouptool->id."&tab=overview",
-                            'create groups namescheme:'.$data->namingscheme.
-                            ' allocate-by:'.$data->allocateby.
-                            ' numgroups:'.$numgrps.' from:'.clean_param($data->from, PARAM_INT).' to:'.
-                            clean_param($data->to, PARAM_INT));
-                }
+                // Trigger agrps updated via groupcreation event.
+                $groupingid = !empty($grouping) ? $grouping->id : 0;
+                \mod_grouptool\event\agrps_updated::create_groupcreation($this->cm, $data->namingscheme, $numgrps, $groupingid)->trigger();
             }
         }
     }
@@ -1286,6 +1272,10 @@ class grouptool {
                 }
             }
 
+            // Trigger group_creation_started event.
+            $groupingid = !empty($grouping) ? $grouping->id : 0;
+            \mod_grouptool\event\group_creation_started::create_person($this->cm, $namescheme, $groupingid)->trigger();
+
             // Save the groups data!
             foreach ($groups as $key => $group) {
                 if (groups_get_group_by_name($this->course->id, $group['name'])) {
@@ -1350,20 +1340,9 @@ class grouptool {
                     groups_delete_grouping($createdgrouping);
                 }
             } else {
-                if ($grouping) {
-                    add_to_log($this->grouptool->course,
-                              'grouptool', 'create groups',
-                              "view.php?id=".$this->grouptool->id."&tab=overview&groupingid=".
-                               $grouping->id,
-                              'create 1-person-groups in grouping:'.$grouping->name.
-                              ' namescheme:'.$namescheme, $this->cm->id);
-                } else {
-                    add_to_log($this->grouptool->course,
-                              'grouptool', 'create groups',
-                              "view.php?id=".$this->grouptool->id."&tab=overview",
-                              'create 1-person-groups namescheme:'.$namescheme,
-                              $this->cm->id);
-                }
+                // Trigger agrps updated via groupcreation event.
+                $groupingid = !empty($grouping) ? $grouping->id : 0;
+                \mod_grouptool\event\agrps_updated::create_groupcreation($this->cm, $namescheme, count($groups), $groupingid)->trigger();
             }
         }
     }
@@ -1475,10 +1454,8 @@ class grouptool {
                 groups_delete_grouping($groupingid);
             }
         } else if (!$previewonly) {
-            add_to_log($this->grouptool->course,
-                       'grouptool', 'create groupings',
-                       "view.php?id=".$this->grouptool->id."&tab=overview",
-                       'create groupings for groups:'.implode("|", $ids));
+            // Trigger the event!
+            \mod_grouptool\event\groupings_created::create_from_object($this->cm, $ids)->trigger();
         }
         return array(0 => $error, 1 => $return);
     }
@@ -2123,7 +2100,7 @@ EOS;
             require_capability('mod/grouptool:grade', $this->context);
         } else if (!has_capability('mod/grouptool:grade', $this->context)) {
             /*
-             * if he want's to grade his own (=submissions where he graded at least 1 group member)
+             * if he wants to grade his own (=submissions where he graded at least 1 group member)
              * he needs either capability to grade all or to grade his own at least
              */
             require_capability('mod/grouptool:grade_own_submission', $this->context);
@@ -2277,12 +2254,11 @@ EOS;
                                                         format_text($temp,
                                                                     $sourcegrade->feedbackformat));
                     $info .= html_writer::tag('div', $grpinfo, array('class' => 'box1embottom'));
-                    add_to_log($this->grouptool->course,
-                              'grouptool', 'grade group',
-                              "view.php?id=".$this->grouptool->id."&tab=grading&activity=".
-                              $cmtouse->instance."&groupid=".$group."&refresh_table=1",
-                              'group-grade group='.$group);
-
+                    // Trigger the event!
+                    $logdata = new stdClass();
+                    $logdata->groupid = $group;
+                    $logdata->cmtouse = $cmtouse->id;
+                    \mod_grouptool\event\group_graded::create_direct($this->cm, $logdata)->trigger();
                 }
             }
         } else {
@@ -2406,11 +2382,12 @@ EOS;
                                                     array('class' => 'gradeinfo'));
             }
             if (!$previewonly) {
-                add_to_log($this->grouptool->course,
-                        'grouptool', 'grade group',
-                        "view.php?id=".$this->grouptool->id."&tab=grading&activity=".
-                        $cmtouse->instance."&refresh_table=>1",
-                        'group-grade single group users='.implode('|', $selected));
+                // Trigger the event!
+                $logdata = new stdClass();
+                $logdata->source = $source;
+                $logdata->selected = $selected;
+                $logdata->cmtouse = $cmtouse->id;
+                \mod_grouptool\event\group_graded::create_without_groupid($this->cm, $logdata)->trigger();
             }
         }
         if ($previewonly) {
@@ -3012,23 +2989,31 @@ EOS;
                                                        $message));
                     }
                 } else {
+                    $records = $DB->get_records('grouptool_registered', array('agrpid' => $agrpid,
+                                                                              'userid' => $userid));
                     $DB->delete_records('grouptool_registered', array('agrpid' => $agrpid,
                                                                       'userid' => $userid));
                     if (!empty($this->grouptool->immediate_reg)) {
                         groups_remove_member($groupdata->id, $userid);
                     }
+                    foreach($records as $data) {
+                        // Trigger the event!
+                        $data->groupid = $groupdata->id;
+                        \mod_grouptool\event\registration_deleted::create_direct($this->cm, $data)->trigger();
+                    }
                     // Get next queued user and put him in the group (and delete queue entry)!
                     if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
-                        $sql = "SELECT *
-                        FROM {grouptool_queued}
-                        WHERE agrpid = ?
-                        ORDER BY timestamp ASC
-                        LIMIT 1";
+                        $sql = "SELECT queued.*, agrp.groupid
+                                  FROM {grouptool_queued} AS queued
+                                  JOIN {grouptool_agrps} AS agrp ON agrp.id = queued.agrpid
+                                 WHERE agrpid = ?
+                              ORDER BY timestamp ASC
+                                 LIMIT 1";
                         $record = $DB->get_record_sql($sql, array($agrpid));
                         $newrecord = clone $record;
                         unset($newrecord->id);
                         $newrecord->modified_by = $newrecord->userid;
-                        $DB->insert_record('grouptool_registered', $newrecord);
+                        $newrecord->id = $DB->insert_record('grouptool_registered', $newrecord);
                         if (!empty($this->grouptool->immediate_reg)) {
                             groups_add_member($groupdata->id, $newrecord->userid);
                         }
@@ -3039,10 +3024,19 @@ EOS;
                             $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
                             $agrpids = array_keys($agrps);
                             list($sql, $params) = $DB->get_in_or_equal($agrpids);
+                            $records = $DB->get_records_sql("SELECT queued.*, agrp.groupid
+                                                               FROM {grouptool_queued} as queued
+                                                               JOIN {grouptool_agrps} as agrp ON queue.agrpid = agrp.id
+                                                              WHERE userid = ? AND agrpid ".$sql,
+                                                            array_merge(array($newrecord->userid), $params));
                             $DB->delete_records_select('grouptool_queued',
                                                        ' userid = ? AND agrpid '.$sql,
                                                        array_merge(array($newrecord->userid),
                                                                    $params));
+                            foreach($records as $cur) {
+                                // Trigger the event!
+                                \mod_grouptool\event\queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
+                            }
                         }
 
                         $strgrouptools = get_string("modulenameplural", "grouptool");
@@ -3097,11 +3091,11 @@ EOS;
 
                         message_send($eventdata);
                         $DB->delete_records('grouptool_queued', array('id' => $record->id));
+
+                        // Trigger the event!
+                        // We fetched groupid above in SQL.
+                        \mod_grouptool\event\user_moved::promotion_from_queue($this->cm, $record, $newrecord)->trigger();
                     }
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'unregister',
-                            "view.php?id=".$this->grouptool->id."&tab=overview&agrpid=".$agrpid,
-                            'unregister user:'.$userid.' from agrpid:'.$agrpid);
                     if ($userid == $USER->id) {
                         return array(false, get_string('unreg_you_from_group_success', 'grouptool',
                                                        $message));
@@ -3121,12 +3115,14 @@ EOS;
                                                        $message));
                     }
                 } else {
+                    $records = $DB->get_records('grouptool_queued', array('agrpid' => $agrpid, 'userid' => $userid));
                     $DB->delete_records('grouptool_queued', array('agrpid' => $agrpid,
                                                                   'userid' => $userid));
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'unregister',
-                            "view.php?id=".$this->grouptool->id."&tab=overview&agrpid=".$agrpid,
-                            'unqueue user:'.$userid.' from agrpid:'.$agrpid);
+                    foreach ($records as $cur) {
+                        //Trigger the Event!
+                        $cur->groupid = $groupdata->id;
+                        \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur)->trigger();
+                    }
                     if ($userid == $USER->id) {
                         return array(false, get_string('unqueue_you_from_group_success',
                                                        'grouptool', $message));
@@ -3269,39 +3265,50 @@ EOS;
                     $record->modified_by = $USER->id;
                     if ($userqueues == 1) {
                         // Delete his queue!
+                        $queues = $DB->get_records_sql("SELECT queued.*, agrp.groupid
+                                                          FROM {grouptool_queued} as queued
+                                                          JOIN {grouptool_agrps} as agrp ON agrp.id = queued.agrpid
+                                                          WHERE userid = ? AND agrpid ".$agrpsql, $params);
                         $DB->delete_records_select('grouptool_queued',
                                                    "userid = ? AND agrpid ".$agrpsql, $params);
+                        foreach ($queues as $cur) {
+                            // Trigger the event!
+                            \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur);
+                        }
                     } else if ($userregs == 1) {
                         $oldgrp = $DB->get_field_sql("SELECT agrp.groupid
                                                         FROM {grouptool_registered} as reg
                                                         JOIN {grouptool_agrps} as agrp ON agrp.id = reg.agrpid
                                                        WHERE reg.userid = ? AND reg.agrpid ".$agrpsql,
                                                      $params, MUST_EXIST);
+                        $regs = $DB->get_records_select('grouptool_registered',
+                                                        "userid = ? AND agrpid ".$agrpsql, $params);
                         $DB->delete_records_select('grouptool_registered',
                                                    "userid = ? AND agrpid ".$agrpsql, $params);
                         if (!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
                             groups_remove_member($oldgrp, $userid);
                         }
+                        foreach ($regs as $cur) {
+                            // Trigger the event!
+                            $cur->groupid = $oldgrp;
+                            \mod_grouptool\event\registration_deleted::create_direct($this->cm, $cur);
+                        }
                     }
                     if (!$this->grouptool->use_size
                         || (count($groupdata->registered) < $groupdata->grpsize)) {
-                        $DB->insert_record('grouptool_registered', $record);
+                        $record->id = $DB->insert_record('grouptool_registered', $record);
                         if ($this->grouptool->immediate_reg) {
                             groups_add_member($groupdata->id, $userid);
                         }
-                        add_to_log($this->grouptool->course,
-                                'grouptool', 'add registration',
-                                "view.php?id=".$this->grouptool->id.
-                                "&tab=overview&agrpid=".$agrpid,
-                                'register user:'.$userid.' in agrpid:'.$agrpid);
+                        // Trigger the event!
+                        $record->groupid = $groupdata->id;
+                        \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
                     } else if ($this->grouptool->use_queue
                                && $userqueues - 1 < $this->grouptool->queues_max) {
-                        $DB->insert_record('grouptool_queued', $record);
-                        add_to_log($this->grouptool->course,
-                                   'grouptool', 'add queue',
-                                   "view.php?id=".$this->grouptool->id.
-                                   "&tab=overview&agrpid=".$agrpid,
-                                   'queue user:'.$userid.' in agrpid:'.$agrpid);
+                        $record->id = $DB->insert_record('grouptool_queued', $record);
+                        //Trigger the Event!
+                        $record->groupid = $groupdata->id;
+                        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();
                     } else if (!$this->grouptool->use_queue) {
                         // Group is full!
                         if ($userid != $USER->id) {
@@ -3390,14 +3397,12 @@ EOS;
                         $record->userid = $userid;
                         $record->timestamp = time();
                         $record->modified_by = $USER->id;
-                        $DB->insert_record('grouptool_registered', $record);
-                        add_to_log($this->grouptool->course,
-                                'grouptool', 'add registration',
-                                "view.php?id=".$this->grouptool->id."&tab=overview&agrpid=".$agrpid,
-                                'register user:'.$userid.' in agrpid:'.$agrpid);
+                        $record->id = $DB->insert_record('grouptool_registered', $record);
                         if ($this->grouptool->immediate_reg) {
                             groups_add_member($groupdata->id, $userid);
                         }
+                        $record->groupid = $groupdata->id;
+                        \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
 
                         $regcnt = $this->get_user_reg_count(0, $userid);
                         if (($this->grouptool->allow_multiple
@@ -3407,9 +3412,18 @@ EOS;
                             if (count($agrps) > 0) {
                                 $agrpids = array_keys($agrps);
                                 list($sql, $params) = $DB->get_in_or_equal($agrpids);
+                                $queues = $DB->get_records_sql('SELECT queued.*, agrp.groupid
+                                                                  FROM {grouptool_queued} AS queued
+                                                                  JOIN {grouptool_agrps} AS agrp ON agrp.id = queued.agrpid
+                                                                 WHERE  userid = ? AND agrpid '.$sql,
+                                                               array_merge(array($userid), $params));
                                 $DB->delete_records_select('grouptool_queued',
                                                            ' userid = ? AND agrpid '.$sql,
                                                            array_merge(array($userid), $params));
+                                foreach($queues as $cur) {
+                                    // Trigger the event!
+                                    \mod_grouptool\event\queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
+                                }
                             }
                         }
                         if ($userid != $USER->id) {
@@ -3444,6 +3458,7 @@ EOS;
                     } else if ($this->grouptool->allow_multiple
                                && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues))) {
                         // Cache data until enough registrations are made!
+                        // TODO events for place allocation?
                         $record = new stdClass();
                         $record->agrpid = $agrpid;
                         $record->grp_id = $groupdata->id;
@@ -3468,17 +3483,23 @@ EOS;
                                 foreach ($usermarks as $cur) {
                                     if ($cur->type == 'reg') {
                                         unset($cur->type);
-                                        unset($cur->groupid);
-                                        $cur->modified_by = $USER->id;
-                                        $DB->update_record('grouptool_registered', $cur);
                                         if ($this->grouptool->immediate_reg) {
                                             groups_add_member($cur->groupid, $cur->userid);
                                         }
+                                        // Premature triggering because of unsetting $cur->groupid afterwards.
+                                        \mod_grouptool\event\registration_created::create_direct($this->cm, $cur)->trigger();
+                                        unset($cur->groupid);
+                                        $cur->modified_by = $USER->id;
+                                        $DB->update_record('grouptool_registered', $cur);
                                     } else {
                                         unset($cur->type);
-                                        $DB->insert_record('grouptool_queued', $cur);
+                                        // Trigger the event!
+                                        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $cur)->trigger();
+                                        unset($cur->groupid);
+                                        $cur->id = $DB->insert_record('grouptool_queued', $cur);
                                     }
                                 }
+                                // TODO: Event for marks deletion?
                                 $this->delete_user_marks($userid);
                             }
                         }
@@ -3487,11 +3508,9 @@ EOS;
                         $record->userid = $userid;
                         $record->timestamp = time();
                         $DB->insert_record('grouptool_queued', $record);
-                        add_to_log($this->grouptool->course,
-                                'grouptool', 'register',
-                                "view.php?id=".$this->grouptool->id.
-                                "&tab=overview&agrpid=".$agrpid,
-                                'queue user:'.$userid.' in agrpid:'.$agrpid);
+                        // Trigger the event!
+                        $record->groupid = $groupdata->id;
+                        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();
                         if ($userid != $USER->id) {
                             return array(-1,
                                          get_string('queue_in_group_success', 'grouptool',
@@ -3524,6 +3543,7 @@ EOS;
                     }
                 } else if ($this->grouptool->allow_multiple
                            && ($this->grouptool->choose_min > ($marks + 1 + $userregs + $userqueues))) {
+                    //TODO Place allocation event!
                     // Cache data until enough registrations are made!
                     $record = new stdClass();
                     $record->agrpid = $agrpid;
@@ -3550,15 +3570,21 @@ EOS;
                                 if ($cur->type == 'reg') {
                                     unset($cur->type);
                                     $cur->modified_by = $USER->id;
-                                    $DB->update_record('grouptool_registered', $cur);
                                     if ($this->grouptool->immediate_reg) {
                                         groups_add_member($cur->groupid, $cur->userid);
                                     }
+                                    // Premature triggering because of unsetting $cur->groupid afterwards!
+                                    \mod_grouptool\event\registration_created::create_direct($this->cm, $cur)->trigger();
+                                    unset($cur->groupid);
+                                    $DB->update_record('grouptool_registered', $cur);
                                 } else {
                                     unset($cur->type);
                                     $DB->insert_record('grouptool_queued', $cur);
+                                    // Trigger the event!
+                                    \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $cur)->trigger();
                                 }
                             }
+                            // TODO event for deletion of users marks?
                             $this->delete_user_marks($userid);
                         }
                     }
@@ -3567,14 +3593,13 @@ EOS;
                     $record->userid = $userid;
                     $record->timestamp = time();
                     $record->modified_by = $USER->id;
-                    $DB->insert_record('grouptool_registered', $record);
-                    add_to_log($this->grouptool->course,
-                            'grouptool', 'add registration',
-                            "view.php?id=".$this->grouptool->id."&tab=overview&agrpid=".$agrpid,
-                            'register user:'.$userid.' in agrpid:'.$agrpid);
+                    $record->id = $DB->insert_record('grouptool_registered', $record);
                     if ($this->grouptool->immediate_reg) {
                         groups_add_member($groupdata->id, $userid);
                     }
+                    // Trigger the event!
+                    $record->groupid = $groupdata->id;
+                    \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
 
                     $regcnt = $this->get_user_reg_count(0, $userid);
                     if (($this->grouptool->allow_multiple
@@ -3584,9 +3609,18 @@ EOS;
                         if (count($agrps) > 0) {
                             $agrpids = array_keys($agrps);
                             list($sql, $params) = $DB->get_in_or_equal($agrpids);
+                            $queues = $DB->get_records_sql('SELECT queued.*, agrp.groupid
+                                                              FROM {grouptool_queued} AS queued
+                                                              JOIN {grouptool_agrps} AS agrp ON queued.agrpid = agrp.id
+                                                             WHERE queued.userid = ? AND queued.agrpid '.$sql,
+                                                           array_merge(array($userid), $params));
                             $DB->delete_records_select('grouptool_queued',
                                                        ' userid = ? AND agrpid '.$sql,
                                                        array_merge(array($userid), $params));
+                            foreach($queues as $cur) {
+                                // Trigger the event!
+                                \mod_grouptool\event\queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
+                            }
                         }
                     }
                     if ($userid != $USER->id) {
@@ -3846,6 +3880,9 @@ EOS;
         $error = false;
         $returntext = "";
 
+        // Trigger event!
+        \mod_grouptool\event\dequeuing_started::create_from_object($this->cm)->trigger();
+
         if (empty($grouptoolid)) {
             $grouptoolid = $this->grouptool->id;
             $grouptool = $this->grouptool;
@@ -3897,7 +3934,7 @@ EOS;
 
         // Get group entries (sorted by sort-order)!
         $groupsdata = $DB->get_records_sql("
-                SELECT agrp.id as id, agrp.groupid as groupid, agrp.grpsize as size,
+                SELECT agrp.id as id, agrp.groupid as groupid, agrp.grpsize as grpsize,
                        COUNT(DISTINCT reg.id) as registered
                   FROM {grouptool_agrps} as agrp
              LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrp.id
@@ -3924,7 +3961,6 @@ EOS;
                         $curgroup = next($groupsdata);
                     }
                     if ($curgroup === false) {
-                        // TODO finish without having resolved queue completely because there are no places left!
                         $error = true;
                         $returntext .= html_writer::tag('div',
                                                         get_string('all_groups_full',
@@ -3933,7 +3969,7 @@ EOS;
                                                         array('class' => 'error'));
                         return array($error, $returntext);
                     } else {
-                        $curgroup->grpsize = ($grouptool->use_individual && !empty($curgroup->size)) ?
+                        $curgroup->grpsize = ($grouptool->use_individual && !empty($curgroup->grpsize)) ?
                                                $curgroup->grpsize :
                                                $grouptool->grpsize;
                     }
@@ -3944,8 +3980,7 @@ EOS;
                 }
 
                 // If user has got too many regs allready!
-                if ($userregs[$queue->userid] >= $maxregs) {
-                    // TODO message + delete users queue places!
+                if (!empty($userregs[$queue->userid]) && ($userregs[$queue->userid] >= $maxregs)) {
                     $returntext .= html_writer::tag('div', get_string('too_many_regs', 'grouptool'),
                                                     array('class' => 'error'));
                     $error = true;
@@ -4009,7 +4044,18 @@ EOS;
                                       'userid' => $queue->userid,
                                       'agrpid' => $queue->agrpid);
                         // Delete queue entry if successfull or print message!
+                        $queues = $DB->get_records('grouptool_queued', $attr);
                         $DB->delete_records('grouptool_queued', $attr);
+
+                        // Log user moved!
+                        $queue->groupid = $DB->get_field('grouptool_agrps', 'groupid', array('id'=>$queue->agrpid), MUST_EXIST);
+                        $to = new stdClass();
+                        $to->agrpid = $curgroup->id;
+                        $to->userid = $queue->userid;
+                        $to->groupid = $DB->get_field('grouptool_agrps', 'groupid', array('id'=>$curgroup->id), MUST_EXIST);
+						$to->id = $DB->get_field('grouptool_registered', 'id', array('agrpid' => $to->agrpid, 'userid' => $to->userid), MUST_EXIST);
+                        \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
+
                         if ($DB->record_exists('grouptool_queued', $attr)) {
                             $returntext .= "Could not delete!";
                         }
@@ -4017,7 +4063,7 @@ EOS;
                 }
 
                 while ($i !== 0) {
-                    $curgroup = previous($groupsdata);
+                    $curgroup = prev($groupsdata);
                     $i--;
                 }
             }
@@ -4027,10 +4073,7 @@ EOS;
             $returntext = get_string('no_queues_to_resolve', 'grouptool');
             $error = false;
         }
-        add_to_log($grouptool->course,
-                'grouptool', 'resolve queue',
-                "view.php?id=".$grouptool->id."&tab=overview",
-                'resolve queue');
+
         return array($error, $returntext);
     }
 
@@ -4653,7 +4696,7 @@ EOS;
      * @return array ($error, $message)
      */
     public function import($group, $data, $forceregistration = false, $previewonly = false) {
-        global $DB, $OUTPUT, $CFG, $PAGE;
+        global $DB, $OUTPUT, $CFG, $PAGE, $USER;
 
         $message = "";
         $error = false;
@@ -4709,24 +4752,24 @@ EOS;
                 }
             }
         }
-		$importfields = explode(',', empty($CFG->grouptool_importfields)?'username,idnumber':$CFG->grouptool_importfields);
+        $importfields = explode(',', empty($CFG->grouptool_importfields)?'username,idnumber':$CFG->grouptool_importfields);
         foreach ($users as $user) {
-			foreach ($importfields as $field) {
-				$sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-				$userinfo = $DB->get_records_sql($sql, array('userpattern' => $user));
-				if (empty($userinfo)) {
-					$userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user));
-				}
-				if (empty($userinfo)) {
-					$userinfo = $DB->get_records_sql($sql, array('userpattern' => $user.'%'));
-				}
-				if (empty($userinfo)) {
-					$userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user.'%'));
-				}
-				if (!empty($userinfo) && count($userinfo) == 1) {
-					break;
-				}
-			}
+            foreach ($importfields as $field) {
+                $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
+                $userinfo = $DB->get_records_sql($sql, array('userpattern' => $user));
+                if (empty($userinfo)) {
+                    $userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user));
+                }
+                if (empty($userinfo)) {
+                    $userinfo = $DB->get_records_sql($sql, array('userpattern' => $user.'%'));
+                }
+                if (empty($userinfo)) {
+                    $userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user.'%'));
+                }
+                if (!empty($userinfo) && count($userinfo) == 1) {
+                    break;
+                }
+            }
 
             if (empty($userinfo)) {
                 $message .= html_writer::tag('div',
@@ -4803,15 +4846,29 @@ EOS;
                                                            WHERE grouptoolid = ?',
                                                           array($this->grouptool->id));
                         // Insert agrp-entry for this group (even if it's not active)!
-                        $agrp = $DB->insert_record('grouptool_agrps',
-                                                   array('grouptoolid' => $this->grouptool->id,
-                                                         'groupid'     => $group,
-                                                         'active'      => 0,
-                                                         'sort_order'  => $newgrpdata->sort_order + 1,
-                                                         'grpsize'     => $newgrpdata->grpsize));
+                        $agrp = new stdClass();
+                        $agrp->grouptoolid = $this->grouptool->id;
+                        $agrp->groupid = $group;
+                        $agrp->active = 0;
+                        $agrp->sort_order = $newgrpdata->sortorder + 1;
+                        $agrp->grpsize = $newgrpdata->grpsize;
+                        $agrp->id = $DB->insert_record('grouptool_agrps', $agrp);
+                        \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp)->trigger();
+                        $agrp = $agrp->id;
                     }
                     if ($forceregistration && !empty($agrp)) {
-                        $this->register_in_agrp($agrp, $userinfo->id);
+                        $reg = new stdClass();
+                        $reg->agrpid = $agrp;
+                        $reg->userid = $userinfo->id;
+                        $reg->timestamp = time();
+                        $reg->modified_by = $USER->id;
+                        //We don't need to log creation of registration, because we log import as whole!
+                        $reg->id = $DB->insert_record('grouptool_registered', $reg);
+
+                        \mod_grouptool\event\user_imported::import_forced($this->cm, $reg->id, $agrp, $group, $userinfo->id)->trigger();
+                    } else if (!$forceregistration) {
+                        // Trigger the event!
+                        \mod_grouptool\event\user_imported::import($this->cm, $group, $userinfo->id)->trigger();
                     }
                 } else if ($userinfo) {
                     $attr = array('class' => 'prevsuccess');
@@ -4820,12 +4877,7 @@ EOS;
                 }
             }
         }
-        if (!$previewonly) {
-            add_to_log($this->grouptool->course,
-                    'grouptool', 'import',
-                    "view.php?id=".$this->grouptool->id."&tab=overview&groupid=".$group,
-                    'import users:'.implode("|", $imported).' in group:'.$group);
-        }
+
         return array($error, $message);
     }
 
@@ -5881,6 +5933,10 @@ EOS;
      */
     public function push_registrations($groupid=0, $groupingid=0, $previewonly=false) {
         global $DB, $CFG;
+
+        // Trigger the event!
+        \mod_grouptool\event\registration_push_started::create_from_object($this->cm)->trigger();
+
         $userinfo = get_enrolled_users($this->context);
         $return = array();
         // Get active groups filtered by groupid, grouping_id, grouptoolid!
@@ -5952,17 +6008,9 @@ EOS;
         }
         switch (count($return)) {
             default:
-                add_to_log($this->grouptool->course,
-                        'grouptool', 'push registrations',
-                        "view.php?id=".$this->grouptool->id."&tab=overview",
-                        'push registrations');
                 return array(false, implode("<br />\n", $return));
                 break;
             case 1:
-                add_to_log($this->grouptool->course,
-                        'grouptool', 'push registrations',
-                        "view.php?id=".$this->grouptool->id."&tab=overview",
-                        'push registrations');
                 return array(false, current($return));
                 break;
             case 0:

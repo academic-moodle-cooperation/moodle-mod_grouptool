@@ -15,24 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version.php
- * Defines the version of grouptool
- * This code fragment is called by moodle_needs_upgrading() and
- * /admin/index.php
+ * The mod_grouptool_viewed event.
  *
  * @package       mod_grouptool
+ * @since         Moodle 2.7
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Philipp Hager
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
+class course_module_viewed extends \core\event\course_module_viewed {
+    protected function init() {
+        $this->data['objecttable'] = 'grouptool';
+        parent::init();
+    }
 
-$module->version  = 2014090803;
-$module->release   = "2014-09-08";       // User-friendly version number.
-$module->maturity  = MATURITY_STABLE;
-$module->requires  = 2013101800;         // Requires this Moodle version!
-$module->cron      = 0;                  // Period for cron to check this module (secs).
-$module->component = 'mod_grouptool';    // To check on upgrade, that module sits in correct place.
+    /**
+     * Get URL related to the action.
+     *
+     * @return \moodle_url
+     */
+    public function get_url() {
+        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => $this->data['other']['tab']));
+    }
+
+    /**
+     * Return the legacy event log data.
+     *
+     * @return array|null
+     */
+    protected function get_legacy_logdata() {
+        return array($this->courseid, $this->objecttable, 'view', 'view.php?id=' . $this->contextinstanceid, $this->objectid.' || '.$this->data['other']['name'],
+                     $this->contextinstanceid);
+    }
+}

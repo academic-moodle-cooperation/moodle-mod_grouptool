@@ -46,59 +46,86 @@ $groupid = optional_param('groupid', 0, PARAM_INT);
 $PAGE->url->param('groupingid', $groupingid);
 $PAGE->url->param('groupid', $groupid);
 
+$tab = required_param('tab', PARAM_ALPHA);
+$format = required_param('format', PARAM_INT);
+switch($format) {
+    case GROUPTOOL_PDF:
+        $format_readable = 'PDF';
+    break;
+    case GROUPTOOL_TXT:
+        $format_readable = 'TXT';
+    break;
+    case GROUPTOOL_XLS:
+        $format_readable = 'XLS';
+    break;
+    case GROUPTOOL_XLSX:
+        $format_readable = 'XLSX';
+    break;
+    case GROUPTOOL_ODS:
+        $format_readable = 'ODS';
+    break;
+    default:
+        $format_readable = 'unknown';
+}
+
+/* Trigger the log event before delivering the download! */
+switch($tab) {
+    case 'overview':
+        // Trigger overview event.
+        $event = \mod_grouptool\event\overview_exported::create(array(
+            'objectid' => $cm->instance,
+            'context'  => context_module::instance($cm->id),
+            'other'    => array(
+                'tab' => $tab,
+                'format_readable' => $format_readable,
+                'format' => $format,
+                'groupid' => $groupid,
+                'groupingid' => $groupingid,
+            ),
+        ));
+        $event->trigger();
+    break;
+    case 'userlist':
+        // Trigger userlist event.
+        $event = \mod_grouptool\event\userlist_exported::create(array(
+            'objectid' => $cm->instance,
+            'context'  => context_module::instance($cm->id),
+            'other'    => array(
+                'tab' => $tab,
+                'format_readable' => $format_readable,
+                'format' => $format,
+                'groupid' => $groupid,
+                'groupingid' => $groupingid,
+            ),
+        ));
+        $event->trigger();
+    break;
+}
+
+
 // Tab determines which table to download (userlist or group overview)!
-switch (required_param('tab', PARAM_ALPHA)) {
+switch ($tab) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');
-        switch(required_param('format', PARAM_INT)) {
+        switch($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                add_to_log($cm->course,
-                           'grouptool', 'export',
-                           "download.php?id=".$cmid."&groupingid=".$groupingid.
-                           "&groupid=".$groupid."&tab=overview&format=".GROUPTOOL_PDF,
-                           get_string('overview', 'grouptool').' PDF',
-                           $cm->id);
                 echo $instance->download_overview_pdf($groupid, $groupingid);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=overview&format=".GROUPTOOL_TXT,
-                        get_string('overview', 'grouptool').' TXT',
-                        $cm->id);
                 echo $instance->download_overview_txt($groupid, $groupingid);
                 break;
             case GROUPTOOL_XLS:
                 $PAGE->url->param('format', GROUPTOOL_XLS);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=overview&format=".GROUPTOOL_XLS,
-                        get_string('overview', 'grouptool').' XLS',
-                        $cm->id);
                 echo $instance->download_overview_xls($groupid, $groupingid);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=overview&format=".GROUPTOOL_XLSX,
-                        get_string('overview', 'grouptool').' XLSX',
-                        $cm->id);
                 echo $instance->download_overview_xlsx($groupid, $groupingid);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=overview&format=".GROUPTOOL_ODS,
-                        get_string('overview', 'grouptool').' ODS',
-                        $cm->id);
                 echo $instance->download_overview_ods($groupid, $groupingid);
                 break;
             default:
@@ -108,55 +135,25 @@ switch (required_param('tab', PARAM_ALPHA)) {
         break;
     case 'userlist':
         $PAGE->url->param('tab', 'userlist');
-        switch(required_param('format', PARAM_INT)) {
+        switch($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=userlist&format=".GROUPTOOL_PDF,
-                        get_string('userlist', 'grouptool').' PDF',
-                        $cm->id);
                 echo $instance->download_userlist_pdf($groupid, $groupingid);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=userlist&format=".GROUPTOOL_TXT,
-                        get_string('userlist', 'grouptool').' TXT',
-                        $cm->id);
                 echo $instance->download_userlist_txt($groupid, $groupingid);
                 break;
             case GROUPTOOL_XLS:
                 $PAGE->url->param('format', GROUPTOOL_XLS);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=userlist&format=".GROUPTOOL_XLS,
-                        get_string('userlist', 'grouptool').' XLS',
-                        $cm->id);
                 echo $instance->download_userlist_xls($groupid, $groupingid);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=userlist&format=".GROUPTOOL_XLSX,
-                        get_string('userlist', 'grouptool').' XLSX',
-                        $cm->id);
                 echo $instance->download_userlist_xlsx($groupid, $groupingid);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                add_to_log($cm->course,
-                        'grouptool', 'export',
-                        "download.php?id=".$cmid."&groupingid=".$groupingid.
-                        "&groupid=".$groupid."&tab=userlist&format=".GROUPTOOL_ODS,
-                        get_string('userlist', 'grouptool').' ODS',
-                        $cm->id);
                 echo $instance->download_userlist_ods($groupid, $groupingid);
                 break;
             default:
