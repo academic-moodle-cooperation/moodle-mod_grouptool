@@ -12,9 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-namespace mod_grouptool\event;
-defined('MOODLE_INTERNAL') || die();
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_user_imported event.
@@ -27,6 +25,9 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_grouptool\event;
+defined('MOODLE_INTERNAL') || die();
+
 class user_imported extends \core\event\base {
     /**
      * Init method.

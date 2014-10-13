@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_viewed event.
@@ -27,6 +27,7 @@
  */
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
+
 class course_module_viewed extends \core\event\course_module_viewed {
     protected function init() {
         $this->data['objecttable'] = 'grouptool';
