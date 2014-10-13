@@ -70,11 +70,10 @@ function group_add_member_handler($data) {
             $reg->modified_by = 0; // There's no way we can get the teachers id!
             if (!$DB->record_exists('grouptool_registered', array('agrpid' => $reg->agrpid,
                                                                  'userid' => $reg->userid))) {
-                $DB->insert_record('grouptool_registered', $reg);
-                add_to_log($grouptool->course,
-                           'grouptool', 'register',
-                           "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->groupid,
-                           'via event agrp='.$grouptool->agrpid.' user='.$data->userid);
+                $reg->id = $DB->insert_record('grouptool_registered', $reg);
+                $reg->groupid = $data->groupid;
+                $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
+                \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
             }
         }
     }
@@ -109,16 +108,21 @@ function group_remove_member_handler($data) {
     foreach ($grouptools as $grouptool) {
         switch($grouptool->ifmemberremoved) {
             case GROUPTOOL_FOLLOW:
-                $sql = "SELECT reg.id AS id FROM {grouptool_agrps} AS agrps
+                $sql = "SELECT reg.id AS id, reg.agrpid AS agrpid, reg.userid as userid, agrps.groupid FROM {grouptool_agrps} AS agrps
                  INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrpid
                       WHERE reg.userid = :userid
                         AND agrps.grouptoolid = :grouptoolid
                         AND agrps.groupid = :groupid";
                 if ($regs = $DB->get_records_sql($sql,
-                        array('grouptoolid' => $grouptool->id,
-                              'userid'      => $data->userid,
-                              'groupid'     => $data->groupid))) {
+                                                 array('grouptoolid' => $grouptool->id,
+                                                       'userid'      => $data->userid,
+                                                       'groupid'     => $data->groupid))) {
                     $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
+                    foreach($regs as $reg) {
+                        /* Trigger event */
+                        $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
+                        \mod_grouptool\event\registration_deleted::create_via_eventhandler($cm, $reg)->trigger();
+                    }
 
                     // Get next queued user and put him in the group (and delete queue entry)!
                     if (!empty($grouptool->use_queue)) {
@@ -142,10 +146,16 @@ function group_remove_member_handler($data) {
                             $newrecord = clone $record;
                             unset($newrecord->id);
                             $newrecord->modified_by = $newrecord->userid;
-                            $DB->insert_record('grouptool_registered', $newrecord);
+                            $newrecord->id = $DB->insert_record('grouptool_registered', $newrecord);
                             if (!empty($grouptool->immediate_reg)) {
                                 groups_add_member($data->groupid, $newrecord->userid);
                             }
+                            /* Trigger event */
+                            // We got the cm above already!
+                            $newrecord->groupid = $data->groupid;
+                            $record->groupid = $data->groupid;
+                            \mod_grouptool\event\user_moved::promotion_from_queue($cm, $record, $newrecord)->trigger();
+
                             $allowm = $grouptool->allow_multiple;
                             $agrps = $DB->get_fieldset_sql("SELECT id
                                                             FROM {grouptool_agrps} as agrps
@@ -218,77 +228,47 @@ function group_remove_member_handler($data) {
                             message_send($eventdata);
 
                             if (($allowm && ($usrregcnt >= $max)) || !$allowm) {
+                                // Get all queue entries and trigger queue_entry_deleted events for each!
+                                $queue_entries = $DB->get_records_sql("SELECT queued.*, agrp.groupid
+                                                                         FROM {grouptool_queued} as queued
+                                                                         JOIN {grouptool_agrps} as agrp ON queued.agrpid = agrp.id
+                                                                        WHERE userid = ? AND agrpid ".$sql,
+                                                                      array_merge(array($newrecord->userid), $params));
                                 $DB->delete_records_select('grouptool_queued',
                                                            ' userid = ? AND agrpid '.$sql,
                                                            array_merge(array($newrecord->userid),
                                                                        $params));
+                                foreach($queue_entries as $cur_queue_entry) {
+                                    /* Trigger event */
+                                    // We got the cm above already!
+                                    \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cm, $cur_queue_entry)->trigger();
+                                }
                             } else {
+                                $queue_entries = $DB->get_records_sql("SELECT queued.*, agrp.groupid
+                                                                         FROM {grouptool_queued} as queued
+                                                                         JOIN {grouptool_agrps} as agrp ON queued.agrpid = agrp.id
+                                                                        WHERE userid = :userid AND agrpid = :agrpid",
+                                                                      array('userid' => $newrecord->userid,
+                                                                            'agrpid' => $agrp[$grouptool->id]->id));
                                 $DB->delete_records('grouptool_queued', array('userid' => $newrecord->userid,
-                                                                             'agrpid' => $agrp[$grouptool->id]->id));
+                                                                              'agrpid' => $agrp[$grouptool->id]->id));
+                                foreach($queue_entries as $cur_queue_entry) {
+                                    /* Trigger event */
+                                    // We got the cm above already!
+                                    \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cm, $cur_queue_entry)->trigger();
+                                }
                             }
                         }
                     }
-                    add_to_log($grouptool->course,
-                            'grouptool', 'unregister',
-                            "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->groupid,
-                            'via event agrp='.$agrp[$grouptool->id]->id.' user='.$data->userid);
                 }
                 break;
             default:
             case GROUPTOOL_IGNORE:
                 break;
         }
-
     }
     return true;
 }
-
-/**
- * groups_remove_member_handler
- * event:       groups_members_removed
- * schedule:    instant
- *
- * @param array courseid, userid - user deleted from all coursegroups
- * @global CFG
- * @global DB
- * @return bool true if success
- */
-function groups_remove_member_handler($data) {
-    global $CFG, $DB;
-
-    $course = $DB->get_record('course', array('id' => $data->courseid));
-
-    if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
-        return true;
-    }
-
-    foreach ($grouptools as $grouptool) {
-        switch($grouptool->ifmemberremoved) {
-            case GROUPTOOL_FOLLOW:
-                $sql = "SELECT reg.id AS id FROM {grouptool_agrps} AS agrps
-                        INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrpid
-                        WHERE reg.userid = :userid AND agrps.grouptoolid = :grouptoolid";
-                if ($regs = $DB->get_records_sql($sql,
-                                                array('grouptoolid' => $grouptool->id,
-                                                      'userid'      => $data->userid))) {
-
-                    $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
-                    add_to_log($grouptool->course,
-                            'course', 'unregister',
-                            "view.php?id=".$data->courseid,
-                            'via event course='.$data->courseid.' user='.$data->userid,
-                            $grouptool->coursemodule);
-                }
-                break;
-            default:
-            case GROUPTOOL_IGNORE:
-                break;
-        }
-
-    }
-    return true;
-}
-
 
 /**
  * group_deleted_handler
@@ -328,23 +308,23 @@ function group_deleted_handler($data) {
                             $DB->set_field('grouptool_agrps', 'groupid', $newid,
                                            array('groupid' => $data->id));
                         }
+                        // Trigger event!
+                        $logdata = new stdClass();
+                        $logdata->cmid = $cmid;
+                        $logdata->groupid = $data->id;
+                        $logdata->newid = $newid;
+                        $logdata->courseid = $data->courseid;
+                        \mod_grouptool\event\group_recreated::create_from_object($logdata);
+
                         if ($grouptool->immediate_reg) {
                             require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
                             $instance = new grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
                         $grouprecreated = true;
-                        add_to_log($data->courseid,
-                                   'course', 'create recreate grouptool group',
-                                   "view.php?id=".$data->courseid,
-                                   'via event course='.$data->courseid.' grp='.$data->id);
                     } else {
                         print_error('error', 'moodle');
                         return false;
-                        $agrpids = array_merge($agrpids,
-                                               $DB->get_fieldset_select('grouptool_agrps', 'id',
-                                                                        "groupid = ?",
-                                                                        array($data->id)));
                     }
                 } else {
                     if ($grouptool->immediate_reg) {
@@ -364,45 +344,42 @@ function group_deleted_handler($data) {
         }
     }
     if (count($agrpids) > 0) {
+        $agrps = $DB->get_records_list('grouptool_agrps', 'id', $agrpids);
+        $cms = array();
+        $regs = $DB->get_records_list('grouptool_registered', 'agrpid', $agrpids);
         $DB->delete_records_list('grouptool_registered', 'agrpid', $agrpids);
+        foreach($regs as $cur) {
+            if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
+                $cms[$agrps[$cur->agrpid]->grouptoolid] = get_contextmodule_from_instance('grouptool', $agrps[$cur->agrpid]->grouptoolid);
+            }
+            $cur->groupid = $agrps[$cur->agrpid]->groupid;
+            \mod_grouptool\event\registration_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
+        }
+        $queues = $DB->get_records_list('grouptool_queued', 'agrpid', $agrpids);
         $DB->delete_records_list('grouptool_queued', 'agrpid', $agrpids);
+        foreach($queues as $cur) {
+            if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
+                $cms[$agrps[$cur->agrpid]->grouptoolid] = get_contextmodule_from_instance('grouptool', $agrps[$cur->agrpid]->grouptoolid);
+            }
+            //Trigger event!
+            $cur->groupid = $agrps[$cur->agrpid]->groupid;
+            \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
+        }
         $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);
-        add_to_log($data->courseid,
-                'course', 'delete grouptool references',
-                "view.php?id=".$data->courseid,
-                'via event course='.$data->courseid.' grp='.$data->id.' agrps='.
-                implode('|', $agrpids));
+        foreach($agrps as $cur) {
+            if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
+                $cms[$cur->grouptoolid] = get_contextmodule_from_instance('grouptool', $cur->grouptoolid);
+            }
+            // Trigger event!
+            $logdata = new stdClass();
+            $logdata->cmid = $cms[$cur->grouptoolid]->id;
+            $logdata->groupid = $cur->groupid;
+            $logdata->agrpid = $cur->id;
+            $logdata->courseid = $data->courseid;
+            \mod_grouptool\event\agrp_deleted::create_from_object($logdata);
+        }
     }
 
-    return true;
-}
-
-/**
- * groups_deleted_handler
- * event:       groups_groups_deleted
- * schedule:    instant
- *
- * @param int courseid
- * @global DB
- * @return bool true if success
- */
-function groups_deleted_handler($courseid) {
-    global $DB;
-
-    // Delete all active-groups from grouptool including all connected registrations and queues.
-    $grouptoolids = $DB->get_records_list('grouptool', 'course', array($courseid), 'id ASC', 'id');
-    $agrps = $DB->get_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
-    // We gotta log this actions! @todo logging!
-    $DB->delete_records_list('grouptool_queued', 'agrpid', array_keys($agrps));
-
-    $DB->delete_records_list('grouptool_registered', 'agrpid', array_keys($agrps));
-
-    $DB->delete_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
-    add_to_log($courseid,
-            'course', 'delete grouptool references',
-            "view.php?id=".$courseid,
-            'via event for all coursegroups course='.$courseid.' agrps='.
-            implode('|', array_keys($agrps)));
     return true;
 }
 
@@ -439,9 +416,9 @@ function group_created_handler($data) {
         if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->id,
                                                          'groupid'     => $data->id))) {
             $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp);
-            add_to_log($data->courseid, 'grouptool', 'update agrps',
-                       "view.php?id=".$grouptool->id."&tab=overview&groupid=".$data->id,
-                       'via event course='.$data->courseid.' agrp='.$newagrp->id, $grouptool->coursemodule);
+            // Trigger event!
+            $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
+            \mod_grouptool\event\agrp_created::create_from_object($cm, $newagrp)->trigger();
         }
     }
     return true;

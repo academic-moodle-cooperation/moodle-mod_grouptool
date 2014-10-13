@@ -161,23 +161,6 @@ class restore_grouptool_activity_task extends restore_activity_task {
         $rules[] = new restore_log_rule('grouptool', 'update agrps',
                                         'view.php?id={course_module}&tab=overview', '{grouptool}');
 
-        /*
-         * @todo find out how to impelement those two rules with their references...
-         * $rules[] = new restore_log_rule('grouptool', 'grade group',
-         *                                 new moodle_url("/mod/grouptool/view.php",
-         *                                                array('id'       => $this->grouptool->id,
-         *                                                      'tab'      => 'grading',
-         *                                                      'activity' => $cm_to_use->instance,
-         *                                                      'groupid'  => $group,
-         *                                                      'refresh_table'=>1)), '{group}');
-         * $rules[] = new restore_log_rule('grouptool', 'grade group',
-         *                                 new moodle_url("/mod/grouptool/view.php",
-         *                                                array('id'       => $this->grouptool->id,
-         *                                                      'tab'      => 'grading',
-         *                                                      'activity' => $cm_to_use->instance,
-         *                                                      'refresh_table'=> 1)), '{group}');
-         */
-
         return $rules;
     }
 

@@ -69,6 +69,7 @@ $PAGE->set_url('/mod/grouptool/view.php', array('id' => $cm->id));
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($grouptool->name));
 $PAGE->set_heading(format_string($course->fullname));
+$PAGE->set_activity_record($grouptool);
 
 $instance = new grouptool($cm->id, $grouptool, $cm, $course);
 
@@ -187,8 +188,21 @@ if (has_capability('moodle/course:managegroups', $context)) {
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
 
 $tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
-add_to_log($course->id, 'grouptool', 'view '.$tab, "view.php?id={$id}&tab={$tab}",
-           $instance->get_name(), $id);
+
+/* TRIGGER THE VIEW EVENT */
+$event = \mod_grouptool\event\course_module_viewed::create(array(
+    'objectid' => $cm->instance,
+    'context'  => context_module::instance($cm->id),
+    'other'    => array(
+        'tab' => $tab,
+        'name' => $instance->get_name(),
+    ),
+));
+$event->add_record_snapshot('course', $course);
+// In the next line you can use $PAGE->activityrecord if you have set it, or skip this line if you don't have a record.
+$event->add_record_snapshot($PAGE->cm->modname, $grouptool);
+$event->trigger();
+/* END OF VIEW EVENT */
 
 switch($tab) {
     case 'administration':

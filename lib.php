@@ -91,10 +91,6 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
     $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
 
     $return = $DB->insert_record('grouptool', $grouptool);
-    add_to_log($grouptool->course,
-               'grouptool', 'add',
-               "view.php?g=".$return,
-               '');
 
     require_once($CFG->dirroot.'/calendar/lib.php');
     $event = new stdClass;
@@ -185,11 +181,6 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
     $grouptool->grpsize = clean_param($grouptool->grpsize, PARAM_INT);
     $grouptool->choose_min = clean_param($grouptool->choose_min, PARAM_INT);
     $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
-
-    add_to_log($grouptool->course,
-            'grouptool', 'update',
-            "view.php?id=".$grouptool->id,
-            '');
 
     // Register students if immediate registration has been turned on!
     if ($grouptool->immediate_reg) {
@@ -378,11 +369,6 @@ function grouptool_delete_instance($id) {
     if (! $grouptool = $DB->get_record('grouptool', array('id' => $id))) {
         return false;
     }
-
-    add_to_log($grouptool->course,
-            'course', 'delete',
-            "view.php?id=".$grouptool->course,
-            '');
 
     // Get all agrp-ids for this grouptool-instance!
     if ($DB->record_exists('grouptool_agrps', array('grouptoolid' => $id))) {
