@@ -511,19 +511,6 @@ function grouptool_print_recent_mod_activity($activity, $courseid, $detail, $mod
 }
 
 /**
- * Function to be run periodically according to the moodle cron
- * This function searches for things that need to be done, such
- * as sending out mail, toggling flags etc ...
- *
- * we don't need any cron right now ^^
- *
- * @return boolean
- **/
-function grouptool_cron () {
-    return true;
-}
-
-/**
  * Returns all other caps used in the module
  *
  * @example return array('moodle/site:accessallgroups');
