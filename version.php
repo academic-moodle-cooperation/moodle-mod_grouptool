@@ -30,9 +30,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version  = 2014090803;
-$module->release   = "2014-09-08";       // User-friendly version number.
-$module->maturity  = MATURITY_STABLE;
-$module->requires  = 2013101800;         // Requires this Moodle version!
-$module->cron      = 0;                  // Period for cron to check this module (secs).
-$module->component = 'mod_grouptool';    // To check on upgrade, that module sits in correct place.
+$plugin->version   = 2014101300;
+$plugin->release   = "2014-10-13";       // User-friendly version number.
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->requires  = 2014041100;         // Requires this Moodle version!
+$plugin->component = 'mod_grouptool';    // To check on upgrade, that module sits in correct place.
