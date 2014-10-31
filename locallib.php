@@ -46,7 +46,7 @@ require_once($CFG->libdir.'/pdflib.php');
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class view_admin_form extends moodleform {
+class mod_grouptool_view_admin_form extends moodleform {
     /**
      * Definition of administration form
      *
@@ -468,7 +468,7 @@ LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class view_import_form extends moodleform {
+class mod_grouptool_view_import_form extends moodleform {
     /**
      * Definition of import form
      *
@@ -554,7 +554,7 @@ class view_import_form extends moodleform {
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grouptool {
+class mod_grouptool {
     /** @var object */
     private $cm;
     /** @var object */
@@ -1577,11 +1577,11 @@ class grouptool {
         }
 
         // Create the form-object!
-        $mform = new view_admin_form(null,
-                                     array('id'           => $id,
-                                           'roles'        => $rolenames,
-                                           'show_grpsize' => ($this->grouptool->use_size
-                                                             && $this->grouptool->use_individual)));
+        $mform = new mod_grouptool_view_admin_form(null,
+                                                   array('id'           => $id,
+                                                         'roles'        => $rolenames,
+                                                         'show_grpsize' => ($this->grouptool->use_size
+                                                                            && $this->grouptool->use_individual)));
 
         if ($fromform = $mform->get_data()) {
             if (isset($fromform->createGroups)) {
@@ -4895,7 +4895,7 @@ EOS;
         require_capability('mod/grouptool:register_students', $this->context);
 
         $id = $this->cm->id;
-        $form = new view_import_form(null, array('id' => $id));
+        $form = new mod_grouptool_view_import_form(null, array('id' => $id));
 
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             $group = required_param('group', PARAM_INT);
