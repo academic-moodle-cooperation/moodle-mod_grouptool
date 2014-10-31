@@ -318,7 +318,7 @@ function group_deleted_handler($data) {
 
                         if ($grouptool->immediate_reg) {
                             require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-                            $instance = new grouptool($cmid, $grouptool);
+                            $instance = new mod_grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
                         $grouprecreated = true;
@@ -329,7 +329,7 @@ function group_deleted_handler($data) {
                 } else {
                     if ($grouptool->immediate_reg) {
                         require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-                        $instance = new grouptool($cmid, $grouptool);
+                        $instance = new mod_grouptool($cmid, $grouptool);
                         $instance->push_registrations();
                     }
                 }

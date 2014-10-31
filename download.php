@@ -35,7 +35,7 @@ $context = context_module::instance($cmid);
 $PAGE->set_context($context);
 $url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', array('id' => $cmid));
 $PAGE->set_url($url);
-$instance = new grouptool($cmid);
+$instance = new mod_grouptool($cmid);
 
 require_login($cm->course, true, $cm);
 require_capability('mod/grouptool:view_registrations', $context);

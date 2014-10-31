@@ -315,7 +315,7 @@ class mod_grouptool_observer {
 
                             if ($grouptool->immediate_reg) {
                                 require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-                                $instance = new grouptool($cmid, $grouptool);
+                                $instance = new mod_grouptool($cmid, $grouptool);
                                 $instance->push_registrations();
                             }
                             $grouprecreated = true;
@@ -326,7 +326,7 @@ class mod_grouptool_observer {
                     } else {
                         if ($grouptool->immediate_reg) {
                             require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-                            $instance = new grouptool($cmid, $grouptool);
+                            $instance = new mod_grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
                     }

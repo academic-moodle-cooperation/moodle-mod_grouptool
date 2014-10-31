@@ -109,7 +109,7 @@ foreach ($grouptools as $grouptool) {
     if (has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_registrations', $context)) {
         // It's similar to the student mymoodle output!
-        $instance = new grouptool($grouptool->coursemodule, $grouptool);
+        $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
         $userstats = $instance->get_registration_stats($USER->id);
     }
 
