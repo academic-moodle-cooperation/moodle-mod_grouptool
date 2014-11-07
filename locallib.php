@@ -196,9 +196,8 @@ class mod_grouptool_view_admin_form extends moodleform {
 
             $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'grouptool'),
                                array('size' => '64'));
-            $namingstd = (isset($CFG->grouptool_name_scheme) ?
-                          $CFG->grouptool_name_scheme : get_string('group', 'group').
-                          ' #');
+            $namingstd = get_config('mod_grouptool', 'name_scheme');
+            $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
             $mform->setDefault('namingscheme', $namingstd);
             $mform->setType('namingscheme', PARAM_RAW);
 
@@ -319,9 +318,10 @@ class mod_grouptool_view_admin_form extends moodleform {
                 $options['add_fields'] = array();
                 $options['add_fields']['grpsize'] = new stdClass();
                 $options['add_fields']['grpsize']->name = 'grpsize';
+                $grouptool_grpsize = get_config('mod_grouptool', 'grpsize');
                 $options['add_fields']['grpsize']->stdvalue = $grouptool->grpsize ?
                                                               $grouptool->grpsize :
-                                                              $CFG->grouptool_grpsize;
+                                                              $grouptool_grpsize;
                 if (!empty($this->_customdata['show_grpsize'])) {
                     $options['add_fields']['grpsize']->label = get_string('groupsize', 'grouptool');
                     $options['add_fields']['grpsize']->type = 'text';
@@ -520,7 +520,9 @@ class mod_grouptool_view_import_form extends moodleform {
 
             $mform->addElement('advcheckbox', 'forceregistration', '', '&nbsp;'.get_string('forceregistration', 'grouptool'));
             $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
-            $mform->setDefault('forceregistration', $CFG->grouptool_force_importreg);
+            if ($force_importreg = get_config('mod_grouptool', 'force_importreg')) {
+                $mform->setDefault('forceregistration', $force_importreg);
+            }
 
             $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }
@@ -2851,8 +2853,9 @@ EOS;
             if (empty($this->grouptool->use_individual)) {
                 $sizesql = " ".$this->grouptool->grpsize." AS grpsize,";
             } else {
+                $grouptool_grpsize = get_config('mod_grouptool', 'grpsize');
                 $grpsize = (!empty($this->grouptool->grpsize) ?
-                            $this->grouptool->grpsize : $CFG->grouptool_grpsize);
+                            $this->grouptool->grpsize : $grouptool_grpsize);
                 if (empty($grpsize)) {
                     $grpsize = 3;
                 }
@@ -4752,7 +4755,11 @@ EOS;
                 }
             }
         }
-        $importfields = explode(',', empty($CFG->grouptool_importfields)?'username,idnumber':$CFG->grouptool_importfields);
+        if (false == ($grouptool_importfields = get_config('mod_grouptool', 'importfields'))) {
+            $importfields = explode(',', $grouptool_importfields);
+        } else {
+            $importfields = array('username','idnumber');
+        }
         foreach ($users as $user) {
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
@@ -5009,7 +5016,7 @@ EOS;
                 } else {
                     $size = !empty($this->grouptool->grpsize) ?
                     $this->grouptool->grpsize :
-                    $CFG->grouptool_grpsize;
+                    get_config('mod_grouptool', 'grpsize');
                     $free = ($size - count($agrp->registered));
 
                 }

@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool
  */
 function xmldb_grouptool_upgrade($oldversion) {
-    global $DB;
+    global $DB, $CFG;
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
@@ -426,6 +426,38 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2014031900, 'grouptool');
+    }
+
+    if ($oldversion < 2014110703) {
+        // Move module settings from config table to config_plugins!
+        $settingsnames = array('requiremodintro', 'name_scheme', 'allow_reg',
+                               'show_members', 'immediate_reg', 'allow_unreg',
+                               'grpsize', 'use_size', 'use_individual', 'use_queue',
+                               'max_queues', 'allow_multiple', 'choose_min', 'choose_max',
+                               'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted',
+                               'force_importreg', 'importfields');
+        // Check if everything is all right!
+        foreach ($settingsnames as $cur) {
+            $name = 'grouptool_'.$cur;
+            if (!isset($CFG->$name)) {
+                throw new coding_exception("'$name' not found in CFG!");
+            }
+            if ($DB->count_records('config', array('name'=>$name)) != 1) {
+                throw new coding_exception("'$name' could not be uniquely selected in DB!");
+            }
+        }
+        foreach ($settingsnames as $cur) {
+            $name = 'grouptool_'.$cur;
+            set_config($cur, $CFG->$name, 'mod_grouptool');
+            if (get_config('mod_grouptool', $cur) !== false) {
+                $DB->delete_records('config', array('name'=>$name));
+            } else {
+                throw new coding_exception("'$name' could not be properly migrated, because of some coding error.");
+            }
+        }
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2014110703, 'grouptool');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.
