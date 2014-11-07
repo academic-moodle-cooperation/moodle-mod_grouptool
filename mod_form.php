@@ -196,7 +196,7 @@ GROUP BY reg.userid) as regcnts';
         $use_queue = get_config('mod_grouptool', 'use_queue');
         $mform->setDefault('use_queue', (($use_queue !== false) ? $use_queue : 0));
         $mform->disabledIf('use_queue', 'allow_reg', 'equal', 1);
-        $mform->setType('max_queues', PARAM_INT);
+        $mform->setType('queues_max', PARAM_INT);
         $max_queues = get_config('mod_grouptool', 'max_queues');
         $mform->setDefault('queues_max', (($max_queues !== false) ? $max_queues : 1));
         $mform->addHelpButton('queue_grp', 'queuesgrp', 'grouptool');
