@@ -311,16 +311,17 @@ function grouptool_update_queues($grouptool = 0) {
                                                            $agrp->grpsize;
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
-            $sql = "SELECT queued.id as id, queued.agrpid as agrpid, queued.timestamp as timestamp,
-                           queued.userid as userid, (regs < ?) as priority, reg.regs as regs
+            // We use MAX to trick Postgres into thinking this is an full GROUP BY statement.
+            $sql = "SELECT queued.id as id, MAX(queued.agrpid) as agrpid, MAX(queued.timestamp),
+                           MAX(queued.userid) as userid, (regs < ?) as priority, MAX(reg.regs) as regs
                                   FROM {grouptool_queued} AS queued
                              LEFT JOIN (SELECT userid, COUNT(DISTINCT id) as regs
                                          FROM {grouptool_registered}
                                         WHERE agrpid ".$agrpsql."
                                      GROUP BY userid) AS reg ON queued.userid = reg.userid
                                  WHERE queued.agrpid = ?
-                              GROUP BY queued.id
-                              ORDER BY priority DESC, 'timestamp' ASC";
+                              GROUP BY queued.id, priority
+                              ORDER BY priority DESC, queued.timestamp ASC";
 
             if ($records = $DB->get_records_sql($sql, array_merge(array($min),
                                                                  $params, array($agrpid)))) {
