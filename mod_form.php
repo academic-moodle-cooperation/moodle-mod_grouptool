@@ -54,13 +54,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $course = $DB->get_record('course', array('id' => $cm->course));
             $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
             $sql = '
- SELECT MAX(regcnt)
-    FROM (
-  SELECT COUNT(reg.id) as regcnt
-    FROM {grouptool_registered} as reg
-    JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
-   WHERE agrps.grouptoolid = :grouptoolid
-GROUP BY reg.userid) as regcnts';
+  SELECT MAX(regcnt)
+    FROM (SELECT COUNT(reg.id) as regcnt
+            FROM {grouptool_registered} as reg
+            JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+           WHERE agrps.grouptoolid = :grouptoolid
+        GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $cm->instance);
             $maxregs = $DB->get_field_sql($sql, $params);
         } else if ($course = optional_param('course', 0, PARAM_INT)) {
@@ -318,23 +317,21 @@ GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $maxgrpregs = $DB->get_field_sql($sql, $params);
             $sql = '
-     SELECT MAX(regcnt)
-        FROM (
-      SELECT COUNT(reg.id) as regcnt
-        FROM {grouptool_registered} as reg
-        JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
-       WHERE agrps.grouptoolid = :grouptoolid
-    GROUP BY reg.userid) as regcnts';
+      SELECT MAX(regcnt)
+        FROM (SELECT COUNT(reg.id) as regcnt
+                FROM {grouptool_registered} as reg
+                JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+               WHERE agrps.grouptoolid = :grouptoolid
+            GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $maxuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
-     SELECT MIN(regcnt)
-        FROM (
-      SELECT COUNT(reg.id) as regcnt
-        FROM {grouptool_registered} as reg
-        JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
-       WHERE agrps.grouptoolid = :grouptoolid
-    GROUP BY reg.userid) as regcnts
+      SELECT MIN(regcnt)
+        FROM (SELECT COUNT(reg.id) as regcnt
+                FROM {grouptool_registered} as reg
+                JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+               WHERE agrps.grouptoolid = :grouptoolid
+            GROUP BY reg.userid) as regcnts
        WHERE regcnt > 0';
             $params = array('grouptoolid' => $data['instance']);
             $minuserregs = $DB->get_field_sql($sql, $params);

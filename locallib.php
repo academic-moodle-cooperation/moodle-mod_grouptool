@@ -276,9 +276,9 @@ class mod_grouptool_view_admin_form extends moodleform {
                 $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
                 $params = array_merge(array($cm->instance), $params);
                 $groupdata = (array)$DB->get_records_sql("
-                        SELECT grp.id AS id, grp.name AS name,
-                               agrp.grpsize AS grpsize, agrp.active AS active,
-                               agrp.sort_order AS sort_order
+                        SELECT grp.id AS id, MAX(grp.name) AS name,
+                               MAX(agrp.grpsize) AS grpsize, MAX(agrp.active) AS active,
+                               MAX(agrp.sort_order) AS sort_order
                         FROM {groups} AS grp
                         LEFT JOIN {grouptool_agrps} as agrp
                              ON agrp.groupid = grp.id AND agrp.grouptoolid = ?
@@ -2870,13 +2870,13 @@ EOS;
             $idstring = "agrp.id as agrpid, grp.id as id";
         }
         $groupdata = $DB->get_records_sql("
-                SELECT ".$idstring.", grp.name AS name,".$sizesql." agrp.sort_order AS sort_order
+                SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order
                 FROM {groups} AS grp LEFT JOIN {grouptool_agrps} as agrp ON agrp.groupid = grp.id
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} AS grpgs ON {groupings_groups}.groupingid = grpgs.id
                 WHERE agrp.grouptoolid = :grouptoolid AND agrp.active = 1".
                      $agrpidwhere.$groupidwhere.$groupingidwhere."
-                GROUP BY grp.id
+                GROUP BY grp.id, agrp.id
                 ORDER BY sort_order ASC, name ASC", $params);
         foreach ($groupdata as $key => $group) {
             $groupingids = $DB->get_fieldset_select('groupings_groups',
@@ -3911,11 +3911,12 @@ EOS;
                 $queuedparams = array_merge($agrpsparam, $agrpsparam);
 
                 $queueentries = $DB->get_records_sql("
-                    SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
-                    FROM {grouptool_queued} AS queued
-                    LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql."
+                      SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
+                             MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) as priority
+                        FROM {grouptool_queued} AS queued
+                   LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql."
                     ".$queuedsql."
-                   GROUP BY queued.id
+                    GROUP BY queued.id
                     ORDER BY priority DESC, queued.timestamp ASC",
                     array_merge(array($grouptool->choose_min), $queuedparams));
             } else {
@@ -3924,7 +3925,7 @@ EOS;
                 $queueentries = $DB->get_records_sql("SELECT *, '1' as priority
                                                        FROM {grouptool_queued} as queued".
                                                        $queuedsql.
-                                                      "ORDER BY 'timestamp' ASC",
+                                                      "ORDER BY timestamp ASC",
                                                       $queuedparams);
             }
             $userregs = $DB->get_records_sql_menu('SELECT reg.userid, COUNT(DISTINCT reg.id)
@@ -3937,7 +3938,7 @@ EOS;
 
         // Get group entries (sorted by sort-order)!
         $groupsdata = $DB->get_records_sql("
-                SELECT agrp.id as id, agrp.groupid as groupid, agrp.grpsize as grpsize,
+                SELECT agrp.id as id, MAX(agrp.groupid) as groupid, MAX(agrp.grpsize) as grpsize,
                        COUNT(DISTINCT reg.id) as registered
                   FROM {grouptool_agrps} as agrp
              LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrp.id
@@ -4725,9 +4726,10 @@ EOS;
                                                          'grouptool', $groupinfo->name),
                                               array('notifyproblem'));
         }
-        $sql = '     SELECT agrps.id as id, agrps.groupid as grpid, COUNT(regs.id) as regs,
-                            grptl.use_individual as indi, grptl.grpsize as globalsize, agrps.grpsize as size,
-                            grptl.name as instancename
+        // We use MAX to trick Postgres into thinking this is a full GROUPU BY statement!
+        $sql = '     SELECT agrps.id as id, MAX(agrps.groupid) as grpid, COUNT(regs.id) as regs,
+                            MAX(grptl.use_individual) as indi, MAX(grptl.grpsize) as globalsize, MAX(agrps.grpsize) as size,
+                            MAX(grptl.name) as instancename
                        FROM {grouptool_agrps} as agrps
                        JOIN {grouptool} as grptl ON agrps.grouptoolid = grptl.id
                   LEFT JOIN {grouptool_registered} as regs ON agrps.id = regs.agrpid
@@ -5910,7 +5912,8 @@ EOS;
             $grouptoolid = $this->grouptool->id;
         }
 
-        $sql = "SELECT agrps.id AS agrpid, agrps.groupid AS groupid,
+        // We use MAX to trick postgres into thinking this is a full group_by statement!
+        $sql = "SELECT agrps.id AS agrpid, MAX(agrps.groupid) AS groupid,
                        COUNT(DISTINCT reg.userid) AS grptoolregs,
                        COUNT(DISTINCT mreg.userid) AS mdlregs
                 FROM {grouptool_agrps} as agrps
@@ -5918,7 +5921,7 @@ EOS;
                     LEFT JOIN {groups_members} as mreg ON agrps.groupid = mreg.groupid
                                                        AND reg.userid = mreg.userid
                 WHERE agrps.active = 1 AND agrps.grouptoolid = ?
-                GROUP BY agrps.id ASC";
+                GROUP BY agrps.id";
         $return = $DB->get_records_sql($sql, array($grouptoolid));
 
         foreach ($return as $key => $group) {
@@ -6242,43 +6245,36 @@ EOS;
             }
         }
 
-        if (!empty($agrpsql)) {
-            if (key_exists("regs", $orderby)) {
-                $regorder = "ORDER BY grps.name ".($orderby['regs'] ? 'ASC' : 'DESC');
-            } else {
-                $regorder = "";
-            }
-            if (key_exists("queues", $orderby)) {
-                $queueorder = "ORDER BY grps.name ".($orderby['queues'] ? 'ASC' : 'DESC');
-            } else {
-                $queueorder = "";
-            }
-            $sqljoin = " LEFT JOIN {grouptool_registered} AS reg ON u.id = reg.userid
-                                                                 AND reg.agrpid ".$agrpsql.
-                       " LEFT JOIN {grouptool_queued} AS queue ON u.id = queue.userid
-                                                               AND queue.agrpid ".$agrpsql.
-                       " LEFT JOIN {grouptool_agrps} AS agrps ON queue.agrpid = agrps.id
-                                                              OR reg.agrpid = agrps.id
-                         LEFT JOIN {groups} AS grps ON agrps.groupid = grps.id";
-        } else {
-            $sqljoin = "";
-        }
-        $sqljoinreg = (!empty($agrpsql) ? : "");
-        $sql = "SELECT $ufields".
-               (!empty($agrpsql) ?
-                ", GROUP_CONCAT(DISTINCT reg.agrpid SEPARATOR ',') as regs" : ", null as regs").
-               (!empty($agrpsql) ?
-                ", GROUP_CONCAT(DISTINCT queue.agrpid SEPARATOR ',') as queues" : ", null as queues").
-              // Just to have a good name for sorting!
-              (!empty($agrpsql) ? ", grps.name AS grpname" : "" ).
-              " FROM {user} AS u".
-                $sqljoin.
-              " WHERE u.id ".$usersql.
-              " GROUP BY u.id".
+        $sql = "SELECT $ufields ".
+               "FROM {user} AS u ".
+               "WHERE u.id ".$usersql.
                $orderbystring;
-        $params = array_merge($agrpparams, $agrpparams, $userparams);
+        $params = array_merge($userparams);
 
         $data = $DB->get_records_sql($sql, $params);
+
+        // Add reg and queue data...
+        if (!empty($agrpsql)) {
+            foreach ($data as $idx => $cur) {
+                $sql = "SELECT agrps.id
+                          FROM {grouptool_registered} AS regs
+                     LEFT JOIN {grouptool_agrps}      AS agrps ON regs.agrpid = agrps.id
+                     LEFT JOIN {groups}               AS grps  ON agrps.groupid = grps.id
+                         WHERE regs.userid = ?
+                               AND regs.agrpid ".$agrpsql;
+                $params = array_merge(array($cur->id), $agrpparams);
+                $data[$idx]->regs = implode(',', $DB->get_fieldset_sql($sql, $params));
+                $sql = "SELECT agrps.id
+                          FROM {grouptool_queued} AS queued
+                     LEFT JOIN {grouptool_agrps}  AS agrps ON queued.agrpid = agrps.id
+                     LEFT JOIN {groups}           AS grps  ON agrps.groupid = grps.id
+                         WHERE queued.userid = ?
+                               AND queued.agrpid ".$agrpsql;
+                $params = array_merge(array($cur->id), $agrpparams);
+                $data[$idx]->queues = implode(',', $DB->get_fieldset_sql($sql, $params));
+            }
+        }
+
         return $data;
     }
 
@@ -6415,7 +6411,8 @@ EOS;
         if (!empty($groupingid)) {
             // Get all groupings groups!
             $groups = groups_get_all_groups($this->course->id, 0, $groupingid);
-            $groupingsusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id');
+            $ufields = user_picture::fields('u', array('idnumber'));
+            $groupingsusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupingusers)) {
                 $groupingusers = array();
             } else {
@@ -6443,7 +6440,8 @@ EOS;
         if (!empty($groupid)) {
             // Same as with groupingid but just with 1 group!
             // Get all group members!
-            $groupusers = groups_get_members($groupid, 'DISTINCT u.id');
+            $ufields = user_picture::fields('u', array('idnumber'));
+            $groupusers = groups_get_members($groupid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupusers)) {
                 $groupusers = array();
             } else {
@@ -7263,3 +7261,4 @@ EOS;
     }
 
 }
+

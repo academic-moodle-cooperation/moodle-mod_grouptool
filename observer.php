@@ -129,13 +129,14 @@ class mod_grouptool_observer {
                                                                 FROM {grouptool_agrps}
                                                                WHERE grouptoolid = ?', array($grouptool->id));
                             list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
-                            $sql = "SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
+                            $sql = "SELECT queued.id, MAX(queued.agrpid) as agrpid, MAX(queued.userid) as userid,
+                                                      MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) as priority
                                       FROM {grouptool_queued} AS queued
                                  LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid
                                                                          AND reg.agrpid ".$agrpssql."
                                      WHERE queued.agrpid = ?
                                   GROUP BY queued.id
-                                  ORDER BY priority DESC, timestamp ASC
+                                  ORDER BY priority DESC, queued.timestamp ASC
                                      LIMIT 1";
                             $params = array_merge(array($grouptool->choose_max),
                                                   $agrpsparam,
@@ -397,8 +398,8 @@ class mod_grouptool_observer {
             return true;
         }
         $sortorder = $DB->get_records_sql("SELECT agrp.grouptoolid, MAX(agrp.sort_order) AS max
-                                              FROM {grouptool_agrps} AS agrp
-                                              GROUP BY agrp.grouptoolid");
+                                             FROM {grouptool_agrps} AS agrp
+                                         GROUP BY agrp.grouptoolid");
         foreach ($grouptools as $grouptool) {
             $newagrp = new StdClass();
             $newagrp->grouptoolid = $grouptool->id;

@@ -130,7 +130,8 @@ function group_remove_member_handler($data) {
                                                             FROM {grouptool_agrps}
                                                            WHERE grouptoolid = ?', array($grouptool->id));
                         list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
-                        $sql = "SELECT queued.*, (COUNT(DISTINCT reg.id) < ?) as priority
+                        // We use MAX to trick Postgres into thinking this is a full GROUP BY statement.
+                        $sql = "SELECT queued.id, MAX(queued.agrpid), MAX(queued.userid), MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) as priority
                                   FROM {grouptool_queued} AS queued
                              LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid
                                                                      AND reg.agrpid ".$agrpssql."
