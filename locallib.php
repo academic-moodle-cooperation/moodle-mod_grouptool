@@ -4891,7 +4891,9 @@ EOS;
                         \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp)->trigger();
                         $agrp = $agrp->id;
                     }
-                    if ($forceregistration && !empty($agrp)) {
+                    if ($forceregistration && !empty($agrp)
+                        && !$DB->record_exists('grouptool_registered',
+                                               array('agrpid' => $agrp, 'userid' => $userinfo->id))) {
                         $reg = new stdClass();
                         $reg->agrpid = $agrp;
                         $reg->userid = $userinfo->id;
