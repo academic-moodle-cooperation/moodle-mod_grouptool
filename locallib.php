@@ -259,6 +259,7 @@ class mod_grouptool_view_admin_form extends moodleform {
         if (has_capability('mod/grouptool:create_groups', $this->context)
                 || has_capability('mod/grouptool:create_groupings', $this->context)) {
             $mform->addElement('header', 'groupsettings', get_string('agroups', 'grouptool'));
+            $mform->setExpanded('groupsettings');
 
             // Register our custom form control.
             $nogroups = 0;
