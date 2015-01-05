@@ -418,7 +418,7 @@ $string['skipped'] = 'Übersprungen';
 $string['source'] = 'Quelle';
 $string['source_missing'] = 'Es gibt keine Quellen, von denen kopiert werden kann!';
 $string['sources_missing'] = 'Es existiert zumindest 1 Gruppe, bei der keine Quelle ausgewählt wurde!';
-$string['sortlist_no_data'] = 'Es gibt derzeit keine Gruppen anzuzeigen!';
+$string['sortlist_no_data'] = 'In diesem Kurs sind aktuell keine Gruppen vorhanden.';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> angemeldet in Moodle-Gruppe und Gruppenverwaltung</li><li><span style="font-weight:bold">?</span> angemeldet in Moodle-Gruppe, nicht aber in der Gruppenverwaltung</li><li><span style="font-weight:bold">+</span> angemeldet in der Gruppenverwaltung, nicht aber in Moodle-Gruppe</li><li><span style="font-weight:bold">1, 2, 3...</span> auf Warteliste in der Gruppenverwaltung</li></ul>';
 $string['switched_to_all_groups'] = 'Ändere Gruppenfilter zu "Alle"!';
