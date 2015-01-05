@@ -348,7 +348,7 @@ class mod_grouptool_observer {
             $DB->delete_records_list('grouptool_registered', 'agrpid', $agrpids);
             foreach($regs as $cur) {
                 if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
-                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_contextmodule_from_instance('grouptool', $agrps[$cur->agrpid]->grouptoolid);
+                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_coursemodule_from_instance('grouptool', $agrps[$cur->agrpid]->grouptoolid);
                 }
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
                 \mod_grouptool\event\registration_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
@@ -357,7 +357,7 @@ class mod_grouptool_observer {
             $DB->delete_records_list('grouptool_queued', 'agrpid', $agrpids);
             foreach($queues as $cur) {
                 if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
-                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_contextmodule_from_instance('grouptool', $agrps[$cur->agrpid]->grouptoolid);
+                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_coursemodule_from_instance('grouptool', $agrps[$cur->agrpid]->grouptoolid);
                 }
                 //Trigger event!
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
@@ -365,11 +365,12 @@ class mod_grouptool_observer {
             }
             $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);
             foreach($agrps as $cur) {
-                if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
-                    $cms[$cur->grouptoolid] = get_contextmodule_from_instance('grouptool', $cur->grouptoolid);
+                if (empty($cms[$cur->grouptoolid])) {
+                    $cms[$cur->grouptoolid] = get_coursemodule_from_instance('grouptool', $cur->grouptoolid);
                 }
                 // Trigger event!
                 $logdata = new stdClass();
+                $logdata->id = $cur->id;
                 $logdata->cmid = $cms[$cur->grouptoolid]->id;
                 $logdata->groupid = $cur->groupid;
                 $logdata->agrpid = $cur->id;
