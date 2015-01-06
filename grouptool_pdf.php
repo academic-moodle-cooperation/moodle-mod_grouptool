@@ -68,8 +68,8 @@ class grouptool_pdf extends pdf {
      * @param timemstamp $timedue time due to which students can submit
      * @param string $viewname the checkmark-modulename to view
      */
-    public function set_overview_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
-                                             $viewname) {
+    public function set_overview_header_data($coursename='coursename', $grouptoolname='grouptoolname', $timeavailable=0, $timedue=0,
+                                             $viewname='viewname') {
         $this->header1 = array();
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
@@ -156,86 +156,87 @@ class grouptool_pdf extends pdf {
         // Set font.
         $this->SetFont('', '');
 
-        // Title.
+        $pagewidth = $this->getPageWidth();
+        $scale = $pagewidth / 200;
+        $oldfontsize = $this->getFontSize();
+        $this->setFontSize('10');
 
-        $header = $this->header1;
+        // First row.
+        $border = 0;
+        $height = 7;
+        $this->SetFont('', 'B');
+        $this->MultiCell(15 * $scale, $height, $this->header1[0],
+                         $border, 'L', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
+        $this->SetFont('', '');
+        $this->MultiCell(41 * $scale, $height, $this->header1[1],
+                         $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-        if ($header != false) {
+        // Spacer!
+        $this->MultiCell(15 * $scale, $height, "",
+                         $border, 'C', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
+        $this->SetFont('', 'B');
+        $this->MultiCell(26 * $scale, $height, $this->header1[2],
+                         $border, 'L', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
+        $this->SetFont('', '');
+        $this->MultiCell(46 * $scale, $height, $this->header1[3],
+                         $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            $pagewidth = $this->getPageWidth();
-            $scale = $pagewidth / 200;
-            $oldfontsize = $this->getFontSize();
-            $this->setFontSize('12');
+        // Spacer!
+        $this->MultiCell(15 * $scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
+                         false, false, $height, 'M', true);
+        $this->SetFont('', 'B');
+        $this->MultiCell(0, $height, $this->header1[4],
+                         $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            // First row.
-            $border = 0;
-            $height = 4;
-            $this->SetFont('', 'B');
-            $this->MultiCell(15 * $scale, $height, $header[0], $border, 'L', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
+        $this->Ln();
 
-            $this->SetFont('', '');
-            $this->MultiCell(41 * $scale, $height, $header[1], $border, 'R', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
+        // Second row.
 
-            // Spacer!
-            $this->MultiCell(15 * $scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
-                             false, false, $height, 'M', true);
+        $this->SetFont('', 'B');
+        $this->MultiCell(15 * $scale, $height, $this->header2[0],
+                         $border, 'L', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            $this->SetFont('', 'B');
-            $this->MultiCell(26 * $scale, $height, $header[2], $border, 'L', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
-            $this->SetFont('', '');
+        $this->SetFont('', '');
+        $this->MultiCell(41 * $scale, $height, $this->header2[1],
+                         $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            $this->SetFont('', '');
-            $this->MultiCell(46 * $scale, $height, $header[3], $border, 'R', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
+        // Spacer!
+        $this->MultiCell(15 * $scale, $height, "",
+                         $border, 'C', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            // Spacer!
-            $this->MultiCell(15 * $scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
-                             false, false, $height, 'M', true);
+        $this->SetFont('', 'B');
+        $this->MultiCell(26 * $scale, $height, $this->header2[2],
+                         $border, 'L', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            $this->SetFont('', 'B');
-            $this->MultiCell(0, $height, $header[4], $border, 'R', 0, 0, null, null, true, 1,
-                             false, false, $height, 'M', true);
+        $this->SetFont('', '');
+        $this->MultiCell(46 * $scale, $height, $this->header2[3],
+                         $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            $this->Ln();
+        // Spacer!
+        $this->MultiCell(15 * $scale, $height, "",
+                         $border, 'C', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            // Second row.
-            $height = 4;
-            $header = $this->header2;
+        $this->SetFont('', '');
+        $this->MultiCell(/*31*$scale*/0, $height, $this->header2[4],
+                         $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
-            $this->SetFont('', 'B');
-            $this->MultiCell(15 * $scale, $height, $header[0], $border, 'L', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
+        $this->Ln();
+        $this->SetFontSize($oldfontsize);
+    }
 
-            $this->SetFont('', '');
-            $this->MultiCell(41 * $scale, $height, $header[1], $border, 'R', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
+    /**
+     * If showheaderfooter is selected
+     * Displays the number and total number of pages in the footer
+     */
+    public function Footer(){
+        // Set font.
+        $this->SetFont('', '');
 
-            // Spacer!
-            $this->MultiCell(15 * $scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
-                             false, false, $height, 'M', true);
+        // Position at 15 mm from bottom
+        $this->SetY(-15);
 
-            $this->SetFont('', 'B');
-            $this->MultiCell(26 * $scale, $height, $header[2], $border, 'L', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
-
-            $this->SetFont('', '');
-            $this->MultiCell(46 * $scale, $height, $header[3], $border, 'R', 0, 0, null, null, true,
-                             1, false, false, $height, 'M', true);
-
-            // Spacer!
-            $this->MultiCell(15 * $scale, $height, "", $border, 'C', 0, 0, null, null, true, 1,
-                             false, false, $height, 'M', true);
-
-            $this->SetFont('', '');
-            $this->MultiCell(/*31*$scale*/0, $height, $header[4], $border, 'R', 0, 0, null, null,
-                             true, 1, false, false, $height, 'M', true);
-
-            $this->Ln();
-            $this->SetFontSize($oldfontsize);
-        }
+        // Page number
+        $this->Cell(0, 10, $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 
     /**
