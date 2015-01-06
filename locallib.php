@@ -5423,11 +5423,11 @@ EOS;
         }
 
         $pdf->set_overview_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
-                                    $viewname);
+                                       $viewname);
 
         // Set header/footer!
         $pdf->setPrintHeader(true);
-        $pdf->setPrintFooter(false);
+        $pdf->setPrintFooter(true);
 
         $textsize = optional_param('textsize', 1, PARAM_INT);
         switch ($textsize){
@@ -5444,15 +5444,16 @@ EOS;
 
         // Set margins!
         if (1) {
-            $pdf->SetMargins(10, 30, 10); // Left Top Right.
+            $pdf->SetMargins(10, 30, 10, true); // Left Top Right.
         } else {
-            $pdf->SetMargins(10, 10, 10);
+            $pdf->SetMargins(10, 10, 10, true);
         }
         // Set default monospaced font!
         $pdf->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/'freeserif');
 
         // Set margins!
         $pdf->SetHeaderMargin(7);
+        $pdf->SetFooterMargin(7);
 
         // Set auto page breaks!
         $pdf->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
@@ -5477,7 +5478,7 @@ EOS;
                              get_string('free', 'grouptool').' '.$group->free;
                 $regdata = $group->reg_data;
                 $queuedata = $group->queue_data;
-                $mregdata = $group->mreg_data;
+                $mregdata = isset($group->mreg_data) ? $group->mreg_data : array();
                 $pdf->add_grp_overview($groupname, $groupinfo, $regdata, $queuedata, $mregdata);
                 $pdf->MultiCell(0, $pdf->getLastH(), '', 'B', 'L', false, 1, null, null, true, 1,
                                 true, false, $pdf->getLastH(), 'M', true);
@@ -5497,7 +5498,7 @@ EOS;
                             'M', true);
         }
 
-        ob_clean();
+        //ob_clean();
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                     groups_get_group_name($groupid).'_'.get_string('overview', 'grouptool');
@@ -7079,7 +7080,7 @@ EOS;
 
         // Set header/footer!
         $pdf->setPrintHeader(true);
-        $pdf->setPrintFooter(false);
+        $pdf->setPrintFooter(true);
 
         $textsize = optional_param('textsize', 1, PARAM_INT);
         switch ($textsize){
@@ -7096,15 +7097,16 @@ EOS;
 
         // Set margins!
         if (1) {
-            $pdf->SetMargins(10, 30, 10); // Left Top Right!
+            $pdf->SetMargins(10, 30, 10, true); // Left Top Right!
         } else {
-            $pdf->SetMargins(10, 10, 10);
+            $pdf->SetMargins(10, 10, 10, true);
         }
         // Set default monospaced font!
         $pdf->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/'freeserif');
 
         // Set margins!
         $pdf->SetHeaderMargin(7);
+        $pdf->SetFooterMargin(7);
 
         // Set auto page breaks!
         $pdf->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
