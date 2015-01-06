@@ -84,68 +84,80 @@ if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
 }
 
 // Print tabs according to users capabilities!
-$inactive = null;
-$activetwo = null;
+$inactive = array();
 $tabs = array();
 $row = array();
-$availabletabs = array();
 if (has_capability('mod/grouptool:create_groups', $context)
     || has_capability('mod/grouptool:create_groupings', $context)
     || has_capability('mod/grouptool:register_students', $context)) {
-    $row[] = new tabobject('administration',
-                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                           '&amp;tab=administration',
-                           get_string('administration', 'grouptool'),
-                           get_string('administration_alt', 'grouptool'),
-                           false);
-    $availabletabs[] = 'administration';
+    $row['administration'] = new tabobject('administration',
+                                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                           '&amp;tab=administration',
+                                           get_string('administration', 'grouptool'),
+                                           get_string('administration_alt', 'grouptool'),
+                                           false);
 }
 if (has_capability('mod/grouptool:grade', $context)
     || has_capability('mod/grouptool:grade_own_group', $context)) {
-    $row[] = new tabobject('grading',
-                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=grading',
-                           get_string('grading', 'grouptool'),
-                           get_string('grading_alt', 'grouptool'),
-                           false);
-    $availabletabs[] = 'grading';
+    $row['grading'] = new tabobject('grading',
+                                    $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=grading',
+                                    get_string('grading', 'grouptool'),
+                                    get_string('grading_alt', 'grouptool'),
+                                    false);
 }
 if (has_capability('mod/grouptool:register_students', $context)
         || ($gmok && has_capability('mod/grouptool:register', $context))) {
-    $row[] = new tabobject('selfregistration',
-                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                           '&amp;tab=selfregistration',
-                           get_string('selfregistration', 'grouptool'),
-                           get_string('selfregistration_alt', 'grouptool'),
-                           false);
-    $availabletabs[] = 'selfregistration';
+    $row['selfregistration'] = new tabobject('selfregistration',
+                                             $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                             '&amp;tab=selfregistration',
+                                             get_string('selfregistration', 'grouptool'),
+                                             get_string('selfregistration_alt', 'grouptool'),
+                                             false);
 }
 if (has_capability('mod/grouptool:register_students', $context)) {
-    $row[] = new tabobject('import',
-                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
-                           get_string('import', 'grouptool'),
-                           get_string('import_desc', 'grouptool'),
-                           false);
-    $availabletabs[] = 'import';
+    $row['import'] = new tabobject('import',
+                                   $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
+                                   get_string('import', 'grouptool'),
+                                   get_string('import_desc', 'grouptool'),
+                                   false);
 }
-if (has_capability('mod/grouptool:view_registrations', $context)) {
-    $row[] = new tabobject('overview',
-                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
-                           get_string('overview', 'grouptool'),
-                           get_string('overview_alt', 'grouptool'),
-                           false);
-    $availabletabs[] = 'overview';
+if (has_capability('mod/grouptool:view_registrations', $context)
+   && has_capability('mod/grouptool:view_registrations', $context)) {
+    $row['users'] = new tabobject('users',
+                                  $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
+                                  get_string('users_tab', 'grouptool'),
+                                  get_string('users_tab_alt', 'grouptool'),
+                                  false);
+    $row['users']->subtree['overview'] = new tabobject('overview',
+                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
+                                                       get_string('overview_tab', 'grouptool'),
+                                                       get_string('overview_tab_alt', 'grouptool'),
+                                                       false);
+    $row['users']->subtree['overview']->level = 2;
+    $row['users']->subtree['userlist'] = new tabobject('userlist',
+                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=userlist',
+                                                       get_string('userlist_tab', 'grouptool'),
+                                                       get_string('userlist_tab_alt', 'grouptool'),
+                                                       false);
+    $row['users']->subtree['userlist']->level = 2;
+} else if (has_capability('mod/grouptool:view_registrations', $context)) {
+        $row['users'] = new tabobject('users',
+                                      $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
+                                      get_string('users_tab', 'grouptool'),
+                                      get_string('users_tab_alt', 'grouptool'),
+                                      false);
+} else if (has_capability('mod/grouptool:view_registrations', $context)) {
+    $row['users'] = new tabobject('userlist',
+                                  $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=userlist',
+                                  get_string('users_tab', 'grouptool'),
+                                  get_string('users_tab_alt', 'grouptool'),
+                                  false);
 }
-if (has_capability('mod/grouptool:view_registrations', $context)) {
-    $row[] = new tabobject('userlist',
-                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=userlist',
-                           get_string('userlist', 'grouptool'),
-                           get_string('userlist_alt', 'grouptool'),
-                           false);
-    $availabletabs[] = 'userlist';
-}
+
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
 }
+$availabletabs = array_keys($row);
 if (count($row) > 1) {
     $tab = optional_param('tab', null, PARAM_ALPHAEXT);
     if ($tab) {
@@ -165,9 +177,14 @@ if (count($row) > 1) {
             $SESSION->mod_grouptool->currenttab = current($availabletabs);
         }
     }
-    $tabs[] = $row;
 
-    echo print_tabs($tabs, $SESSION->mod_grouptool->currenttab, $inactive, $activetwo, true);
+    switch ($SESSION->mod_grouptool->currenttab) {
+        case 'overview':
+        case 'userlist':
+            $inactive[] = 'users';
+            break;
+    }
+    echo $OUTPUT->tabtree($row, $SESSION->mod_grouptool->currenttab, $inactive);
 } else if (count($row) == 1) {
     $SESSION->mod_grouptool->currenttab = current($availabletabs);
     $tab = current($availabletabs);
