@@ -57,6 +57,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
 
             //add JS-Eventhandler for each tag
             Y.all('.tag').on('click', M.mod_grouptool.administration_add_tag);
+            Y.all('.tag').setStyle('cursor','pointer');
 
             //add JS-Eventhandlers to hide individual groupsize-fields
             //if use_size or use_individual are false
