@@ -319,6 +319,11 @@ $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag number">#</span>';
 $string['nameschemenotunique'] = 'Group names from this name scheme are not unique ({$a}). Please choose another one or use # (numeric index) or @ (alphabetic index) to create unique group names.';
 $string['namingscheme'] = 'Name scheme';
+$string['namingscheme_help'] = '<p>The Name scheme defines how groups will be named automatically when you add new groups.</p>
+<p>Please take note of:<br />
+<ol><li>The name of a group has to be unique within your moodle course. </li>
+<li>If you want to create more than one group at once, you have to use tags to create unique names. </li></ol></p>
+<p>Each of this tags will be replaced in the final group names. The tags in [] are related to the users data and the # and @ symbols will be replaced through the groups serial number. If JavaScript is enabled you can simply click on the tags to append them to the name-scheme. Please consider that the group names have to be unique in each course and therefore you may have to alter the name scheme until it\'s conflict-free.</p>';
 $string['no_conflictfree_to_display'] = 'No conflict-free groups to display. So we try to display all instead!';
 $string['no_data_to_display'] = 'No group(s) data to display!';
 $string['no_grades_present'] = 'No grades to show';
@@ -425,8 +430,6 @@ $string['sortlist_no_data'] = 'There are no groups present at the moment!';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li><li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li><li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li><li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li></ul>';
 $string['switched_to_all_groups'] = 'Changed group filter to all groups!';
-$string['tags'] = 'Available tags';
-$string['tags_help'] = 'You can use this tags to define the name scheme. Each of this tags will be replaced in the final group names. The tags in [] are related to the users data and the # and @ symbols will be replaced through the groups serial number. If JavaScript is enabled you can simply click on the tags to append them to the name-scheme. Please consider that the group names have to be unique in each course and therefore you may have to alter the name scheme until it\'s conflict-free.';
 $string['target'] = 'Target';
 $string['too_many_queue_places'] = 'Can\'t queue {$a->username} in group {$a->groupname} because {$a->username} is already queued in too many groups!';
 $string['too_many_regs'] = 'User is registered/queued in too many groups already!';

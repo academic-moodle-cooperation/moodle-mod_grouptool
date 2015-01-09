@@ -206,16 +206,17 @@ class mod_grouptool_view_admin_form extends moodleform {
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
 
-            $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'grouptool'),
-                               array('size' => '64'));
+
+            $naminggrp = array();
+            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', array('size' => '64'));
+            $naminggrp[] =& $mform->createElement('static', 'tags', '',
+                                                  get_string('name_scheme_tags', 'grouptool'));
             $namingstd = get_config('mod_grouptool', 'name_scheme');
             $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
             $mform->setDefault('namingscheme', $namingstd);
             $mform->setType('namingscheme', PARAM_RAW);
-
-            $mform->addElement('static', 'tags', get_string('tags', 'grouptool'),
-                               get_string('name_scheme_tags', 'grouptool'));
-            $mform->addHelpButton('tags', 'tags', 'grouptool');
+            $mform->addGroup($naminggrp, 'naminggrp', get_string('namingscheme', 'grouptool'), ' ', false);
+            $mform->addHelpButton('naminggrp', 'namingscheme', 'grouptool');
             // Init JS!
             $PAGE->requires->string_for_js('showmore', 'form');
             $PAGE->requires->string_for_js('showless', 'form');

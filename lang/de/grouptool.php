@@ -318,6 +318,11 @@ $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag number">#</span>';
 $string['nameschemenotunique'] = 'Gruppennamen, die aus diesem Namensschema erzeugt werden, sind nicht einzigartig ({$a}). Bitte wählen sie ein anderes Namensschema oder benutzen sie # (laufende Nummer) oder @ (alphabetische Repräsentation) um eindeutige Gruppennamen zu erzeugen.';
 $string['namingscheme'] = 'Namensschema';
+$string['namingscheme_help'] = '<p>Das Namensschema definiert, wie Gruppen beim Erstellen automatisch benannt werden. </p>
+<p>Hierbei ist folgendes zu beachten:<br />
+<ol><li>Der Gruppenname muss immer einzigartig in Ihrem Kurs sein (d.h. es können nicht mehrere Gruppen idente Namen tragen).</li>
+<li>Sollen mehrere Gruppen hinzugefügt werden, müssen zwingend "Tags" verwendet werden, die die Gruppen eindeutig bezeichnen.</li></ol></p>
+<p>Jeder "Tag" wird für die Gruppennamen durch (Benutzer-)Informationen ersetzt. Die Tags in [] sind mit Benutzerdaten verknüpft und die # und @ werden durch eine laufende Nummer bzw. alphabetische Repräsentation dieser ersetzt. Wenn JavaScript aktiviert ist, können Sie durch Klicken auf die Tags, diese dem Namensschema anhängen. Bitte beachten Sie, dass jeder Gruppenname innerhalb des Kurses einzigartig sein muss und ändern Sie bei entsprechenden Problemen das Namensschema!</p>';
 $string['no_conflictfree_to_display'] = 'Keine konfliktfreien Gruppen anzuzeigen. Stattdessen alle angezeigt!';
 $string['no_data_to_display'] = 'Keine Gruppendaten anzuzeigen!';
 $string['no_grades_present'] = 'Keine Bewertungen anzuzeigen';
@@ -424,8 +429,6 @@ $string['sortlist_no_data'] = 'In diesem Kurs sind aktuell keine Gruppen vorhand
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> angemeldet in Moodle-Gruppe und Gruppenverwaltung</li><li><span style="font-weight:bold">?</span> angemeldet in Moodle-Gruppe, nicht aber in der Gruppenverwaltung</li><li><span style="font-weight:bold">+</span> angemeldet in der Gruppenverwaltung, nicht aber in Moodle-Gruppe</li><li><span style="font-weight:bold">1, 2, 3...</span> auf Warteliste in der Gruppenverwaltung</li></ul>';
 $string['switched_to_all_groups'] = 'Ändere Gruppenfilter zu "Alle"!';
-$string['tags'] = 'Verfügbare Tags';
-$string['tags_help'] = 'Man kann diese Tags benutzen um Namensschemen zu definieren. Jeder Tag wird für die Gruppennamen durch (Benutzer-)Informationen ersetzt. Die Tags in [] sind mit Benutzerdaten verknüpft und die # und @ werden durch eine laufende Nummer bzw. alphabetische Repräsentation dieser ersetzt. Wenn JavaScript aktiviert ist, können Sie durch Klicken auf die Tags, diese dem Namensschema anhängen. Bitte beachten Sie, dass jeder Gruppenname innerhalb des Kurses einzigartig sein muss und ändern Sie bei entsprechenden Problemen das Namensschema!';
 $string['target'] = 'Ziel';
 $string['too_many_queue_places'] = 'Kann {$a->username} nicht in Warteliste der Gruppe {$a->groupname} eintragen, weil {$a->username} bereits in zu vielen Wartelisten eingetragen ist!';
 $string['too_many_regs'] = 'Nutzer ist bereits in zu vielen Gruppen angemeldet!';
