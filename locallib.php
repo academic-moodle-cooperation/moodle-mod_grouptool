@@ -3536,7 +3536,7 @@ EOS;
                         $record->agrpid = $agrpid;
                         $record->userid = $userid;
                         $record->timestamp = time();
-                        $DB->insert_record('grouptool_queued', $record);
+                        $record->id = $DB->insert_record('grouptool_queued', $record);
                         // Trigger the event!
                         $record->groupid = $groupdata->id;
                         \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();

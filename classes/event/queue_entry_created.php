@@ -42,7 +42,7 @@ class queue_entry_created extends \core\event\base {
         $this->data['objecttable'] = 'grouptool_queued';
     }
 
-    public static function create_direct(\stdClass $regdata) {
+    public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
         $event = \mod_grouptool\event\queue_entry_created::create(array(
             'objectid' => $regdata->id,
