@@ -33,9 +33,10 @@
     overflow:auto;
 }
 
-.path-mod-grouptool div.drag_area {
-    overflow:auto;
-    margin-right:5px;
+/* CSS Fallback to make sure it isn't visible! */
+.path-mod-grouptool .drag_area .draggable_item:first-child .moveupbutton ,
+.path-mod-grouptool .drag_area .draggable_item:last-child .movedownbutton  {
+    visibility:hidden !important;
 }
 
 .path-mod-grouptool div.checkbox_controls {
@@ -69,35 +70,10 @@
     margin-left:1em;
 }
 
-.path-mod-grouptool ul.drag_list {
-    display:inline;
-    /*display:inline-block;*/
-    white-space:nowrap;
-    max-height:350px;
-    overflow:auto;
-    list-style-type:none;
-}
-
-.path-mod-grouptool .draggable_item {
-    margin-top:1px;
-    margin-bottom:1px;
-    font-size:10px;
-    valign:middle;
-}
-
-.path-mod-grouptool .draggable_item table {
-    border:solid 1px black;
-    background:#dddddd;
-}
-
 .path-mod-grouptool .draggable_item .checkbox_container {
     margin-left:3px;
     margin-right:5px;
     vertical-align:middle;
-}
-
-.path-mod-grouptool .draggable_item .checkbox_status {
-
 }
 
 .path-mod-grouptool .draggable_item .grpname, .draggable_item .addfield {

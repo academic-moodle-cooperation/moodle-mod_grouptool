@@ -93,7 +93,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
         //Y.DD.DDM._debugShim = true;
 
         //enable the drag-symbols when JS is enabled :)
-        Y.all('ul.drag_list li.draggable_item .drag_image').removeClass('js_invisible');
+        Y.all('.drag_list .draggable_item .drag_image').removeClass('js_invisible');
 
         Y.DD.DDM.on('drop:over', function(e) {
             //Get a reference to our drag and drop nodes
@@ -101,10 +101,10 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                 drop = e.drop.get('node');
 
             //Are we dropping on a li node?
-            if (drop.get('tagName').toLowerCase() === 'li') {
+            if (drop.get('tagName').toLowerCase() === 'tr') {
                 //Are we not going up?
                 if (!goingUp) {
-                    drop = drop.next('li.draggable_item');
+                    drop = drop.next('tr.draggable_item');
                 }
                 //Add the node to this list
                 e.drop.get('node').get('parentNode').insertBefore(drag, drop);
@@ -139,10 +139,16 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             drag.get('node').one('.movedownbutton').setStyle('visibility', 'visible');
             drag.get('node').one('.moveupbutton').setStyle('visibility', 'visible');
             drag.get('node').setStyle('opacity', '.25');
-            drag.get('dragNode').addClass('draggable_item');
-            drag.get('dragNode').set('innerHTML', drag.get('node').get('innerHTML'));
+            drag.get('dragNode').addClass('draggable_item dragnode');
+            var innerHTML = '<table class="'+drag.get('node').ancestor('table').getAttribute('class')+"\">\n";
+            drag.get('node').all('td').each(function(current, index, nodelist) {
+                innerHTML += '<td class="'+current.getAttribute('class')+'">'+current.get('innerHTML')+"</td>\n";
+            }, null);
+            innerHTML += "\n</table>";
+            drag.get('dragNode').set('innerHTML', innerHTML);
             drag.get('dragNode').setStyles({
-                opacity: '.5',
+                opacity: '.5', //Make hovered div invisible till I found a better solution.
+                align:'center',
                 borderColor: drag.get('node').getStyle('borderColor'),
                 backgroundColor: drag.get('node').getStyle('backgroundColor')
             });
@@ -158,25 +164,30 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                 opacity: '1'
             });
             //set the hidden fields containing the sort order new
-            Y.all('ul.drag_list li input.sort_order').each(function(current, index, nodelist) {
+            Y.all('table.drag_list tr.draggable_item td input.sort_order').each(function(current, index, nodelist) {
                 current.setAttribute('value', index);
                 if(index == 0) {
-                    current.ancestor('li.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
+                    if (current.ancestor('tr.draggable_item')) {
+                        current.ancestor('tr.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
+                    }
                 } else if(index == nodelist.size() - 1) {
-                    current.ancestor('li.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
+                    if (current.ancestor('tr.draggable_item')) {
+                        current.ancestor('tr.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
+                    }
                 } else {
-                    current.ancestor('li.draggable_item').all('.movedownbutton, .moveupbutton').setStyle('visibility', 'visible');
+                    if (current.ancestor('tr.draggable_item')) {
+                        current.ancestor('tr.draggable_item').all('.movedownbutton, .moveupbutton').setStyle('visibility', 'visible');
+                    }
                 }
-
-                });
+            });
         });
         //Listen for all drag:drophit events
         Y.DD.DDM.on('drag:drophit', function(e) {
             var drop = e.drop.get('node'),
                 drag = e.drag.get('node');
 
-            //if we are not on an li, we must have been dropped on a ul
-            if (drop.get('tagName').toLowerCase() !== 'li') {
+            //if we are not on an tr, we must have been dropped on a tbody
+            if (drop.get('tagName').toLowerCase() !== 'tr') {
                 if (!drop.contains(drag)) {
                     drop.appendChild(drag);
                     //Set the new parentScroll on the nodescroll plugin
@@ -188,8 +199,8 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
         //Static Vars
         var goingUp = false, lastY = 0;
 
-        //Get the list of li's in the lists and make them draggable
-        var lis = Y.all('.drag_list li');
+        //Get the list of tr's in the lists and make them draggable
+        var lis = Y.all('.drag_list tr');
         lis.each(function(v, k) {
             //v.plug(Y.Plugin.Drag);
             //Now you can only drag it from the x in the corner
@@ -218,51 +229,51 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
         Y.all('.buttons .movedownbutton').on('click', function(e) { //move the node 1 element down
             //swap sort-order-values
             var this_order = e.target.ancestor('.draggable_item').one('.sort_order').get('value');
-            var other_order = e.target.ancestor('.draggable_item').next('li.draggable_item').one('.sort_order').get('value');
+            var other_order = e.target.ancestor('.draggable_item').next('.draggable_item').one('.sort_order').get('value');
 
             // Stop the button from submitting
             e.preventDefault();
 
-            if(e.target.ancestor('.draggable_item').previous('li.draggable_item') == null) { //first list-element? ==> hide move-up-link
+            if(e.target.ancestor('.draggable_item').previous('.draggable_item') == null) { //first list-element? ==> hide move-up-link
                 e.target.ancestor('.draggable_item').one('.moveupbutton').setStyle('visibility', 'visible');
-                e.target.ancestor('.draggable_item').next('li.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
+                e.target.ancestor('.draggable_item').next('.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
             }
-            if(e.target.ancestor('.draggable_item').next('li.draggable_item').next('li.draggable_item') == null) { //will it be the last list-element? ==> hide move-down-link
+            if(e.target.ancestor('.draggable_item').next('.draggable_item').next('.draggable_item') == null) { //will it be the last list-element? ==> hide move-down-link
                 e.target.ancestor('.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
-                e.target.ancestor('.draggable_item').next('li.draggable_item').one('.movedownbutton').setStyle('visibility', 'visible');
+                e.target.ancestor('.draggable_item').next('.draggable_item').one('.movedownbutton').setStyle('visibility', 'visible');
             }
 
             e.target.ancestor('.draggable_item').one('.sort_order').set('value', other_order);
-            e.target.ancestor('.draggable_item').next('li.draggable_item').one('.sort_order').set('value', this_order);
+            e.target.ancestor('.draggable_item').next('.draggable_item').one('.sort_order').set('value', this_order);
             //swap list-elements
-            e.target.ancestor('.draggable_item').swap(e.target.ancestor('.draggable_item').next('li.draggable_item'));
+            e.target.ancestor('.draggable_item').swap(e.target.ancestor('.draggable_item').next('.draggable_item'));
         });
         Y.all('.buttons .moveupbutton').on('click', function(e) { //move the node 1 element up
             //swap sort-order-values
             var this_order = e.target.ancestor('.draggable_item').one('.sort_order').get('value');
-            var other_order = e.target.ancestor('.draggable_item').previous('li.draggable_item').one('.sort_order').get('value');
+            var other_order = e.target.ancestor('.draggable_item').previous('.draggable_item').one('.sort_order').get('value');
 
             // Stop the button from submitting
             e.preventDefault();
 
-            if(e.target.ancestor('.draggable_item').next('li.draggable_item') == null) { //is it the last list-element? ==> show move-down-link
+            if(e.target.ancestor('.draggable_item').next('.draggable_item') == null) { //is it the last list-element? ==> show move-down-link
                 e.target.ancestor('.draggable_item').one('.movedownbutton').setStyle('visibility', 'visible');
-                e.target.ancestor('.draggable_item').previous('li.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
+                e.target.ancestor('.draggable_item').previous('.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
             }
-            if(e.target.ancestor('.draggable_item').previous('li.draggable_item').previous('li.draggable_item') == null) { //will it be the first list-element? ==> hide move-up-link
+            if(e.target.ancestor('.draggable_item').previous('.draggable_item').previous('.draggable_item') == null) { //will it be the first list-element? ==> hide move-up-link
                 e.target.ancestor('.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
-                e.target.ancestor('.draggable_item').previous('li.draggable_item').one('.moveupbutton').setStyle('visibility', 'visible');
+                e.target.ancestor('.draggable_item').previous('.draggable_item').one('.moveupbutton').setStyle('visibility', 'visible');
             }
 
             e.target.ancestor('.draggable_item').one('.sort_order').set('value', other_order);
-            e.target.ancestor('.draggable_item').previous('li.draggable_item').one('.sort_order').set('value', this_order);
+            e.target.ancestor('.draggable_item').previous('.draggable_item').one('.sort_order').set('value', this_order);
             //swap list-elements
-            e.target.ancestor('.draggable_item').swap(e.target.ancestor('.draggable_item').previous('li.draggable_item'));
+            e.target.ancestor('.draggable_item').swap(e.target.ancestor('.draggable_item').previous('.draggable_item'));
 
         });
 
         //Create simple targets for the lists.
-        var uls = Y.all('.drag_list ul');
+        var uls = Y.all('.drag_list');
         uls.each(function(v, k) {
             var tar = new Y.DD.Drop({
                 node: v
