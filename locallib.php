@@ -5100,6 +5100,16 @@ EOS;
                 $groupdata->queue_data = array();
             }
 
+            //We create a dummy user-object to get the fullname-format
+            $dummy = new stdClass();
+            $namefields = get_all_user_name_fields();
+            foreach($namefields as $namefield) {
+                $dummy->$namefield = $namefield;
+            }
+            $fullnameformat = fullname($dummy);
+            //Now get the ones used in fullname in the correct order
+            $namefields = order_in_string($namefields, $fullnameformat);
+
             if (count($agrp->registered) >= 1) {
                 foreach ($agrp->registered as $regentry) {
                     if (!array_key_exists($regentry->userid, $userinfo)) {
@@ -5137,15 +5147,33 @@ EOS;
                     } else {
                         $row = array();
                         $row['name'] = fullname($userinfo[$regentry->userid]);
-                        if (!empty($userinfo[$regentry->userid]->idnumber)) {
-                            $row['idnumber'] = $userinfo[$regentry->userid]->idnumber;
-                        } else {
-                            $row['idnumber'] = '-';
+                        foreach($namefields as $namefield) {
+                            if (!empty($userinfo[$regentry->userid]->$namefield)) {
+                                $row[$namefield] = $userinfo[$regentry->userid]->$namefield;
+                            } else {
+                                $row[$namefield] = '';
+                            }
                         }
-                        if (!empty($userinfo[$regentry->userid]->email)) {
-                            $row['email'] = $userinfo[$regentry->userid]->email;
+                        if (empty($CFG->showuseridentity)) {
+                            if (!empty($userinfo[$regentry->userid]->idnumber)) {
+                                $row['idnumber'] = $userinfo[$regentry->userid]->idnumber;
+                            } else {
+                                $row['idnumber'] = '-';
+                            }
+                            if (!empty($userinfo[$regentry->userid]->email)) {
+                                $row['email'] = $userinfo[$regentry->userid]->email;
+                            } else {
+                                $row['email'] = '-';
+                            }
                         } else {
-                            $row['email'] = '-';
+                            $fields = explode(',', $CFG->showuseridentity);
+                            foreach($fields as $field) {
+                                if (!empty($userinfo[$regentry->userid]->$field)) {
+                                    $row[$field] = $userinfo[$regentry->userid]->$field;
+                                } else {
+                                    $row[$field] = '';
+                                }
+                            }
                         }
                         if (key_exists($regentry->userid, $agrp->moodle_members)) {
                             $row['status'] = "✔";
@@ -5201,15 +5229,33 @@ EOS;
                         } else {
                             $row = array();
                             $row['name'] = fullname($userinfo[$memberid]);
-                            if (!empty($userinfo[$memberid]->idnumber)) {
-                                $row['idnumber'] = $userinfo[$memberid]->idnumber;
-                            } else {
-                                $row['idnumber'] = '-';
+                            foreach($namefields as $namefield) {
+                                if (!empty($userinfo[$memberid]->$namefield)) {
+                                    $row[$namefield] = $userinfo[$memberid]->$namefield;
+                                } else {
+                                    $row[$namefield] = '';
+                                }
                             }
-                            if (!empty($userinfo[$memberid]->email)) {
-                                $row['email'] = $userinfo[$memberid]->email;
+                            if (empty($CFG->showuseridentity)) {
+                                if (!empty($userinfo[$memberid]->idnumber)) {
+                                    $row['idnumber'] = $userinfo[$memberid]->idnumber;
+                                } else {
+                                    $row['idnumber'] = '-';
+                                }
+                                if (!empty($userinfo[$memberid]->email)) {
+                                    $row['email'] = $userinfo[$memberid]->email;
+                                } else {
+                                    $row['email'] = '-';
+                                }
                             } else {
-                                $row['email'] = '-';
+                                $fields = explode(',', $CFG->showuseridentity);
+                                foreach($fields as $field) {
+                                    if (!empty($userinfo[$memberid]->$field)) {
+                                        $row[$field] = $userinfo[$memberid]->$field;
+                                    } else {
+                                        $row[$field] = '';
+                                    }
+                                }
                             }
                             $groupdata->mreg_data[] = $row;
                         }
@@ -5247,18 +5293,35 @@ EOS;
                         $row = array();
                         $row['rank'] = $queueentry->rank;
                         $row['name'] = fullname($userinfo[$queueentry->userid]);
-                        if (!empty($userinfo[$queueentry->userid]->idnumber)) {
-                            $row['idnumber'] = $userinfo[$queueentry->userid]->idnumber;
-                        } else {
-                            $row['idnumber'] = '-';
+                        foreach($namefields as $namefield) {
+                            if (!empty($userinfo[$queueentry->userid]->$namefield)) {
+                                $row[$namefield] = $userinfo[$queueentry->userid]->$namefield;
+                            } else {
+                                $row[$namefield] = '';
+                            }
                         }
-                        if (!empty($userinfo[$queueentry->userid]->email)) {
-                            $row['email'] = $userinfo[$queueentry->userid]->email;
+                        if (empty($CFG->showuseridentity)) {
+                            if (!empty($userinfo[$queueentry->userid]->idnumber)) {
+                                $row['idnumber'] = $userinfo[$queueentry->userid]->idnumber;
+                            } else {
+                                $row['idnumber'] = '-';
+                            }
+                            if (!empty($userinfo[$queueentry->userid]->email)) {
+                                $row['email'] = $userinfo[$queueentry->userid]->email;
+                            } else {
+                                $row['email'] = '-';
+                            }
                         } else {
-                            $row['email'] = '-';
+                            $fields = explode(',', $CFG->showuseridentity);
+                            foreach($fields as $field) {
+                                if (!empty($userinfo[$queueentry->userid]->$field)) {
+                                    $row[$field] = $userinfo[$queueentry->userid]->$field;
+                                } else {
+                                    $row[$field] = '';
+                                }
+                            }
                         }
                         $groupdata->queue_data[] = $row;
-
                     }
                 }
             } else {
@@ -5544,7 +5607,8 @@ EOS;
      * @param MoodleExcelWorkbook $workbook workbook to put data into
      * @param array $groups which groups from whom to include data
      */
-    private function overview_fill_workbook(&$workbook, $groups) {
+    private function overview_fill_workbook(&$workbook, $groups, $collapsed=array()) {
+        global $CFG;
         if (count($groups) > 0) {
 
             $columnwidth = array( 7, 22, 14, 17); // Unit: mm!
@@ -5624,17 +5688,30 @@ EOS;
             $noqueueentriesformat = $workbook->add_format($queueentryprop);
             $noqueueentriesformat->set_align('center');
 
+            //We create a dummy user-object to get the fullname-format
+            $dummy = new stdClass();
+            $namefields = get_all_user_name_fields();
+            foreach($namefields as $namefield) {
+                $dummy->$namefield = $namefield;
+            }
+            $fullnameformat = fullname($dummy);
+            //Now get the ones used in fullname in the correct order
+            $namefields = order_in_string($namefields, $fullnameformat);
+
+            $columnwidth = array(0               => 26,
+                                 'fullname'      => 26,
+                                 'firstname'     => 20,
+                                 'surname'       => 20,
+                                 'email'         => 35,
+                                 'registrations' => 47,
+                                 'queues_rank'   => 7.5,
+                                 'queues_grp'    => 47,); // Unit: mm!
+
             // Start row for groups general sheet!
             $j = 0;
             foreach ($groups as $key => $group) {
                 // Add worksheet for each group!
                 $groupworksheets[$key] = $workbook->add_worksheet($group->name);
-
-                // The standard-column-widths: 7 - 22 - 14 - 17!
-                $groupworksheets[$key]->set_column(0, 0, $columnwidth[0]);
-                $groupworksheets[$key]->set_column(1, 1, $columnwidth[1]);
-                $groupworksheets[$key]->set_column(2, 2, $columnwidth[2]);
-                $groupworksheets[$key]->set_column(3, 3, $columnwidth[3]);
 
                 $groupname = $group->name;
                 $groupinfo = array();
@@ -5693,24 +5770,92 @@ EOS;
 
                 // Registrations and queue headline!
                 // First the headline!
-                $groupworksheets[$key]->write_string(7, 0, get_string('status', 'grouptool'),
+                $k = 0;
+                $groupworksheets[$key]->write_string(7, $k, get_string('status', 'grouptool'),
                                                       $regheadformat);
-                $groupworksheets[$key]->write_string(7, 1, get_string('fullname'),
-                                                      $regheadformat);
-                $groupworksheets[$key]->write_string(7, 2, get_string('idnumber'),
-                                                      $regheadformat);
-                $groupworksheets[$key]->write_string(7, 3, get_string('email'), $regheadlast);
-                if ($generalsheet) {
-                    $allgroupsworksheet->write_string($j + 7, 0, get_string('status', 'grouptool'),
-                                                      $regheadformat);
-                    $allgroupsworksheet->write_string($j + 7, 1, get_string('fullname'),
-                                                      $regheadformat);
-                    $allgroupsworksheet->write_string($j + 7, 2, get_string('idnumber'),
-                                                      $regheadformat);
-                    $allgroupsworksheet->write_string($j + 7, 3, get_string('email'),
-                                                      $regheadlast);
+                $k++; //k = 1
+
+                // First we output every namefield from used by fullname in exact the defined order!
+                foreach($namefields as $namefield) {
+                    $groupworksheets[$key]->write_string(7, $k, get_user_field_name($namefield), $regheadformat);
+                    $hidden = in_array($namefield, $collapsed) ? true : false;
+                    $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
+                    $groupworksheets[$key]->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
+                    $k++;
+                }
+                //k = n
+                if(!empty($CFG->showuseridentity)) {
+                    $fields = explode(',', $CFG->showuseridentity);
+                    $curfieldcount = 1;
+                    foreach($fields as $field) {
+                        if ($curfieldcount == count($fields)) {
+                            $groupworksheets[$key]->write_string(7, $k, get_user_field_name($field), $regheadlast);
+                        } else {
+                            $groupworksheets[$key]->write_string(7, $k, get_user_field_name($field), $regheadformat);
+                            $curfieldcount++;
+                        }
+                        $hidden = in_array($field, $collapsed) ? true : false;
+                        $columnwidth[$field] = empty($columnwidth[$field]) ? $columnwidth[0] : $columnwidth[$field];
+                        $groupworksheets[$key]->set_column($k, $k, $columnwidth[$field], null, $hidden);
+                        $k++; //k = n+x
+                    }
+                } else {
+                    $groupworksheets[$key]->write_string(7, $k, get_user_field_name('idnumber'), $regheadformat);
+                    $hidden = in_array('idnumber', $collapsed) ? true : false;
+                    $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
+                    $groupworksheets[$key]->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
+                    $k++; //k = n+1
+
+                    $groupworksheets[$key]->write_string(7, $k, get_user_field_name('email'), $regheadlast);
+                    $hidden = in_array('email', $collapsed) ? true : false;
+                    $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
+                    $groupworksheets[$key]->set_column($k, $k, $columnwidth['email'], null, $hidden);
+                    $k++; //k = n+2
                 }
 
+                if ($generalsheet) {
+                    $k = 0;
+                    $allgroupsworksheet->write_string($j + 7, $k, get_string('status', 'grouptool'),
+                                                      $regheadformat);
+                    $k++;
+                    // First we output every namefield from used by fullname in exact the defined order!
+                    foreach($namefields as $namefield) {
+                        $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name($namefield), $regheadformat);
+                        $hidden = in_array($namefield, $collapsed) ? true : false;
+                        $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
+                        $allgroupsworksheet->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
+                        $k++;
+                    }
+                    //k = n
+                    if(!empty($CFG->showuseridentity)) {
+                        $fields = explode(',', $CFG->showuseridentity);
+                        $curfieldcount = 1;
+                        foreach($fields as $field) {
+                            if ($curfieldcount == count($fields)) {
+                                $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name($field), $regheadlast);
+                            } else {
+                                $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name($field), $regheadformat);
+                                $curfieldcount++;
+                            }
+                            $hidden = in_array($field, $collapsed) ? true : false;
+                            $columnwidth[$field] = empty($columnwidth[$field]) ? $columnwidth[0] : $columnwidth[$field];
+                            $allgroupsworksheet->set_column($k, $k, $columnwidth[$field], null, $hidden);
+                            $k++; //k = n+x
+                        }
+                    } else {
+                        $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name('idnumber'), $regheadformat);
+                        $hidden = in_array('idnumber', $collapsed) ? true : false;
+                        $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
+                        $allgroupsworksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
+                        $k++; //k = n+1
+
+                        $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name('email'), $regheadlast);
+                        $hidden = in_array('email', $collapsed) ? true : false;
+                        $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
+                        $allgroupsworksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
+                        $k++; //k = n+2
+                    }
+                }
                 // Now the registrations!
                 $i = 0;
                 if (!empty($regdata)) {
@@ -5720,23 +5865,66 @@ EOS;
                         } else if ($i == 1) {
                             $regentryformat->set_top(1);
                         }
-                        $groupworksheets[$key]->write_string(8 + $i, 0, $reg['status'],
+                        $k = 0;
+                        $groupworksheets[$key]->write_string(8 + $i, $k, $reg['status'],
                                                              $regentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 1, $reg['name'],
-                                                             $regentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 2, $reg['idnumber'],
-                                                             $regentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 3, $reg['email'],
-                                                             $regentrylast);
+                        $k++;
+                        // First we output every namefield from used by fullname in exact the defined order!
+                        foreach($namefields as $namefield) {
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $reg[$namefield], $regentryformat);
+                            $k++;
+                        }
+                        //k = n
+                        if(!empty($CFG->showuseridentity)) {
+                            $fields = explode(',', $CFG->showuseridentity);
+                            $curfieldcount = 1;
+                            foreach($fields as $field) {
+                                if ($curfieldcount == count($fields)) {
+                                    $groupworksheets[$key]->write_string(8 + $i, $k, $reg[$field], $regentrylast);
+                                } else {
+                                    $groupworksheets[$key]->write_string(8 + $i, $k, $reg[$field], $regentryformat);
+                                    $curfieldcount++;
+                                }
+                                $k++; //k = n+x
+                            }
+                        } else {
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $reg['idnumber'], $regentryformat);
+                            $k++; //k = n+1
+
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $reg['email'], $regentrylast);
+                            $k++; //k = n+2
+                        }
+
                         if ($generalsheet) {
-                            $allgroupsworksheet->write_string($j + 8 + $i, 0, $reg['status'],
+                            $k = 0;
+                            $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['status'],
                                                               $regentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 1, $reg['name'],
-                                                              $regentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 2, $reg['idnumber'],
-                                                              $regentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 3, $reg['email'],
-                                                              $regentrylast);
+                            $k++;
+                            // First we output every namefield from used by fullname in exact the defined order!
+                            foreach($namefields as $namefield) {
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg[$namefield], $regentryformat);
+                                $k++;
+                            }
+                            //k = n
+                            if(!empty($CFG->showuseridentity)) {
+                                $fields = explode(',', $CFG->showuseridentity);
+                                $curfieldcount = 1;
+                                foreach($fields as $field) {
+                                    if ($curfieldcount == count($fields)) {
+                                        $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg[$field], $regentrylast);
+                                    } else {
+                                        $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg[$field], $regentryformat);
+                                        $curfieldcount++;
+                                    }
+                                    $k++; //k = n+x
+                                }
+                            } else {
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['idnumber'], $regentryformat);
+                                $k++; //k = n+1
+
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['email'], $regentrylast);
+                                $k++; //k = n+2
+                            }
                         }
                         $i++;
                     }
@@ -5763,22 +5951,66 @@ EOS;
                         } else if ($i == 1) {
                             $regentryformat->set_top(1);
                         }
-                        $groupworksheets[$key]->write_string(8 + $i, 0, '?', $regentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 1, $mreg['name'],
+                        $k = 0;
+                        $groupworksheets[$key]->write_string(8 + $i, $k, '?',
                                                              $regentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 2, $mreg['idnumber'],
-                                                             $regentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 3, $mreg['email'],
-                                                             $regentrylast);
+                        $k++;
+                        // First we output every namefield from used by fullname in exact the defined order!
+                        foreach($namefields as $namefield) {
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $mreg[$namefield], $regentryformat);
+                            $k++;
+                        }
+                        //k = n
+                        if(!empty($CFG->showuseridentity)) {
+                            $fields = explode(',', $CFG->showuseridentity);
+                            $curfieldcount = 1;
+                            foreach($fields as $field) {
+                                if ($curfieldcount == count($fields)) {
+                                    $groupworksheets[$key]->write_string(8 + $i, $k, $mreg[$field], $regentrylast);
+                                } else {
+                                    $groupworksheets[$key]->write_string(8 + $i, $k, $mreg[$field], $regentryformat);
+                                    $curfieldcount++;
+                                }
+                                $k++; //k = n+x
+                            }
+                        } else {
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $mreg['idnumber'], $regentryformat);
+                            $k++; //k = n+1
+
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $mreg['email'], $regentrylast);
+                            $k++; //k = n+2
+                        }
+
                         if ($generalsheet) {
-                            $allgroupsworksheet->write_string($j + 8 + $i, 0, '?',
+                            $k = 0;
+                            $allgroupsworksheet->write_string($j + 8 + $i, $k, '?',
                                                               $regentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 1, $mreg['name'],
-                                                              $regentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 2, $mreg['idnumber'],
-                                                              $regentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 3, $mreg['email'],
-                                                              $regentrylast);
+                            $k++;
+                            // First we output every namefield from used by fullname in exact the defined order!
+                            foreach($namefields as $namefield) {
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg[$namefield], $regentryformat);
+                                $k++;
+                            }
+                            //k = n
+                            if(!empty($CFG->showuseridentity)) {
+                                $fields = explode(',', $CFG->showuseridentity);
+                                $curfieldcount = 1;
+                                foreach($fields as $field) {
+                                    if ($curfieldcount == count($fields)) {
+                                        $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg[$field], $regentrylast);
+                                    } else {
+                                        $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg[$field], $regentryformat);
+                                        $curfieldcount++;
+                                    }
+                                    $k++; //k = n+x
+                                }
+                            } else {
+                                $allgroupsworksheets->write_string($j + 8 + $i, $k, $mreg['idnumber'], $regentryformat);
+                                $k++; //k = n+1
+
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['email'], $regentrylast);
+                                $k++; //k = n+2
+                            }
                         }
                         $i++;
                     }
@@ -5791,23 +6023,66 @@ EOS;
                         } else if ($i == 1) {
                             $regentryformat->set_top(1);
                         }
-                        $groupworksheets[$key]->write(8 + $i, 0, $queue['rank'],
-                                                      $queueentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 1, $queue['name'],
-                                                             $queueentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 2, $queue['idnumber'],
-                                                             $queueentryformat);
-                        $groupworksheets[$key]->write_string(8 + $i, 3, $queue['email'],
-                                                             $queueentrylast);
+                        $k = 0;
+                        $groupworksheets[$key]->write_string(8 + $i, $k, $queue['rank'],
+                                                             $regentryformat);
+                        $k++;
+                        // First we output every namefield from used by fullname in exact the defined order!
+                        foreach($namefields as $namefield) {
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $queue[$namefield], $regentryformat);
+                            $k++;
+                        }
+                        //k = n
+                        if(!empty($CFG->showuseridentity)) {
+                            $fields = explode(',', $CFG->showuseridentity);
+                            $curfieldcount = 1;
+                            foreach($fields as $field) {
+                                if ($curfieldcount == count($fields)) {
+                                    $groupworksheets[$key]->write_string(8 + $i, $k, $queue[$field], $regentrylast);
+                                } else {
+                                    $groupworksheets[$key]->write_string(8 + $i, $k, $queue[$field], $regentryformat);
+                                    $curfieldcount++;
+                                }
+                                $k++; //k = n+x
+                            }
+                        } else {
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $queue['idnumber'], $regentryformat);
+                            $k++; //k = n+1
+
+                            $groupworksheets[$key]->write_string(8 + $i, $k, $queue['email'], $regentrylast);
+                            $k++; //k = n+2
+                        }
+
                         if ($generalsheet) {
-                            $allgroupsworksheet->write_string($j + 8 + $i, 0, $queue['rank'],
-                                                              $queueentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 1, $queue['name'],
-                                                              $queueentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 2, $queue['idnumber'],
-                                                              $queueentryformat);
-                            $allgroupsworksheet->write_string($j + 8 + $i, 3, $queue['email'],
-                                                              $queueentrylast);
+                            $k = 0;
+                            $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['rank'],
+                                                              $regentryformat);
+                            $k++;
+                            // First we output every namefield from used by fullname in exact the defined order!
+                            foreach($namefields as $namefield) {
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue[$namefield], $regentryformat);
+                                $k++;
+                            }
+                            //k = n
+                            if(!empty($CFG->showuseridentity)) {
+                                $fields = explode(',', $CFG->showuseridentity);
+                                $curfieldcount = 1;
+                                foreach($fields as $field) {
+                                    if ($curfieldcount == count($fields)) {
+                                        $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue[$field], $regentrylast);
+                                    } else {
+                                        $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue[$field], $regentryformat);
+                                        $curfieldcount++;
+                                    }
+                                    $k++; //k = n+x
+                                }
+                            } else {
+                                $allgroupsworksheets->write_string($j + 8 + $i, $k, $queue['idnumber'], $regentryformat);
+                                $k++; //k = n+1
+
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['email'], $regentrylast);
+                                $k++; //k = n+2
+                            }
                         }
                         $i++;
                     }
@@ -6267,7 +6542,9 @@ EOS;
             $usersql = ' LIKE *';
             $userparams = array();
         }
-        $ufields = user_picture::fields('u', array('idnumber'));
+
+        $extrauserfields = get_extra_user_fields_sql($this->context, 'u');
+        $mainuserfields = user_picture::fields('u', array('idnumber'));
         $orderbystring = "";
         if (!empty($orderby)) {
             foreach ($orderby as $field => $direction) {
@@ -6284,8 +6561,7 @@ EOS;
                 }
             }
         }
-
-        $sql = "SELECT $ufields ".
+        $sql = "SELECT $mainuserfields $extrauserfields ".
                "FROM {user} AS u ".
                "WHERE u.id ".$usersql.
                $orderbystring;
@@ -6597,11 +6873,32 @@ EOS;
             }
             $table->head = array($picture, $fullname, $idnumber, $email, $registrations, $queues);
         } else {
-            $head = array('name'          => get_string('fullname'),
-                          'idnumber'      => get_string('idnumber'),
-                          'email'         => get_string('email'),
-                          'registrations' => get_string('registrations', 'grouptool'),
-                          'queues'        => get_string('queues', 'grouptool'));
+            //We create a dummy user-object to get the fullname-format
+            $dummy = new stdClass();
+            $namefields = get_all_user_name_fields();
+            foreach($namefields as $namefield) {
+                $dummy->$namefield = $namefield;
+            }
+            $fullnameformat = fullname($dummy);
+            //Now get the ones used in fullname in the correct order
+            $namefields = order_in_string($namefields, $fullnameformat);
+
+            $head = array('name'          => get_string('fullname'),);
+            foreach($namefields as $namefield) {
+                $head[$namefield] = get_user_field_name($namefield);
+            }
+            if (empty($CFG->showuseridentity)) {
+                $head['idnumber'] = get_user_field_name('idnumber');
+            } else {
+                $fields = explode(',', $CFG->showuseridentity);
+                foreach($fields as $field) {
+                    $head[$field] = get_user_field_name($field);
+                }
+            }
+            $head['idnumber'] = get_user_field_name('idnumber');
+            $head['email']         = get_user_field_name('email');
+            $head['registrations'] = get_string('registrations', 'grouptool');
+            $head['queues']        = get_string('queues', 'grouptool');
         }
         $rows = array();
         if (!empty($userdata)) {
@@ -6674,17 +6971,31 @@ EOS;
                     $rows[] = array($picture, $fullname, $idnumber, $email, $registrations,
                                     $queueentries);
                 } else {
-                    $fullname = fullname($user);
-                    $idnumber = $user->idnumber;
-                    $email = $user->email;
+                    $row = array();
+                    $row['name'] = fullname($user);
+
+                    foreach($namefields as $namefield) {
+                        $row[$namefield] = $user->$namefield;
+                    }
+                    if (empty($CFG->showuseridentity)) {
+                        $row['idnumber'] = $user->idnumber;
+                    } else {
+                        $fields = explode(',', $CFG->showuseridentity);
+                        foreach($fields as $field) {
+                            $row[$field] = $user->$field;
+                        }
+                    }
+                    $row['idnumber'] = $user->idnumber;
+                    $row['email'] = $user->email;
                     if (!empty($user->regs)) {
                         $regs = explode(',', $user->regs);
                         $registrations = array();
                         foreach ($regs as $reg) {
                             $registrations[] = $groupinfo[$reg]->name;
                         }
+                        $row['registrations'] = $registrations;
                     } else {
-                        $registrations = array();
+                        $row['registrations'] = array();
                     }
                     if (!empty($user->queues)) {
                         $queues = explode(',', $user->queues);
@@ -6697,14 +7008,11 @@ EOS;
                             $queueentries[] = array('rank' => $rank,
                                                     'name' => $groupinfo[$queue]->name);
                         }
+                        $row['queues'] = $queueentries;
                     } else {
-                        $queueentries = array();
+                        $row['queues'] = array();
                     }
-                    $rows[] = array('name'          => $fullname,
-                                    'idnumber'      => $idnumber,
-                                    'email'         => $email,
-                                    'registrations' => $registrations,
-                                    'queues'        => $queueentries);
+                    $rows[] = $row;
                 }
             }
         }
@@ -6959,12 +7267,9 @@ EOS;
      */
     private function userlist_fill_workbook(&$workbook, $data=array(), $orderby=array(),
                                             $collapsed=array()) {
-        global $SESSION;
+        global $SESSION, $CFG;
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         if (count($data) > 0) {
-
-            $columnwidth = array(26.71, 15.29, 29.86, 47, 7.29, 47); // Unit: mm!
-
             if (count($data) > 1) {
                 // General information? unused at the moment!
                 $worksheet = $workbook->add_worksheet(get_string('all'));
@@ -6976,18 +7281,6 @@ EOS;
                     }
                 }
 
-                // Standard column widths: 7 - 22 - 14 - 17!
-                $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(0, 0, $columnwidth[0], null, $hidden);
-                $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(1, 1, $columnwidth[1], null, $hidden);
-                $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(2, 2, $columnwidth[2], null, $hidden);
-                $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(3, 3, $columnwidth[3], null, $hidden);
-                $hidden = in_array('fullname', $collapsed) ? true : false;
-                $worksheet->set_column(4, 4, $columnwidth[4], null, $hidden);
-                $worksheet->set_column(5, 5, $columnwidth[5], null, $hidden);
             }
 
             // Prepare formats!
@@ -7038,81 +7331,169 @@ EOS;
 
             // Start row for groups general sheet!
             $j = 0;
+
+            //We create a dummy user-object to get the fullname-format
+            $dummy = new stdClass();
+            $namefields = get_all_user_name_fields();
+            foreach($namefields as $namefield) {
+                $dummy->$namefield = $namefield;
+            }
+            $fullnameformat = fullname($dummy);
+            //Now get the ones used in fullname in the correct order
+            $namefields = order_in_string($namefields, $fullnameformat);
+
+            $columnwidth = array(0               => 26,
+                                 'fullname'      => 26,
+                                 'firstname'     => 20,
+                                 'surname'       => 20,
+                                 'email'         => 35,
+                                 'registrations' => 47,
+                                 'queues_rank'   => 7.5,
+                                 'queues_grp'    => 47,); // Unit: mm!
+
             foreach ($data as $key => $user) {
                 if ($key == 0) {
                     // Headline!
-                    $worksheet->write_string($j, 0, $user['name'], $headlineformat);
-                    $worksheet->write_blank($j + 1, 0, $headlineformat);
-                    $worksheet->merge_cells($j, 0, $j + 1, 0);
-                    $worksheet->write_string($j, 1, $user['idnumber'], $headlineformat);
-                    $worksheet->write_blank($j + 1, 1, $headlineformat);
-                    $worksheet->merge_cells($j, 1, $j + 1, 1);
-                    $worksheet->write_string($j, 2, $user['email'], $headlineformat);
-                    $worksheet->write_blank($j + 1, 2, $headlineformat);
-                    $worksheet->merge_cells($j, 2, $j + 1, 2);
-                    $worksheet->write_string($j, 3, $user['registrations'], $headlineformat);
-                    $worksheet->write_blank($j + 1, 3, $headlineformat);
-                    $worksheet->merge_cells($j, 3, $j + 1, 3);
-                    $worksheet->write_string($j, 4, $user['queues'], $headlinenbb);
-                    $worksheet->write_blank($j, 5, $headlinenbb);
-                    $worksheet->merge_cells($j, 4, $j, 5);
-                    $worksheet->write_string($j + 1, 4, get_string('rank', 'grouptool'),
+                    $k = 0;
+                    // First we output every namefield from used by fullname in exact the defined order!
+                    foreach($namefields as $namefield) {
+                        $worksheet->write_string($j, $k, get_user_field_name($namefield), $headlineformat);
+                        $worksheet->write_blank($j + 1, $k, $headlineformat);
+                        $worksheet->merge_cells($j, $k, $j + 1, $k);
+                        $hidden = in_array($namefield, $collapsed) ? true : false;
+                        $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
+                        $worksheet->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
+                        $k++;
+                    }
+                    //k = n
+                    if(!empty($CFG->showuseridentity)) {
+                        $fields = explode(',', $CFG->showuseridentity);
+                        foreach($fields as $field) {
+                            $worksheet->write_string($j, $k, get_user_field_name($field), $headlineformat);
+                            $worksheet->write_blank($j + 1, $k, $headlineformat);
+                            $hidden = in_array($field, $collapsed) ? true : false;
+                            $columnwidth[$field] = empty($columnwidth[$field]) ? $columnwidth[0] : $columnwidth[$field];
+                            $worksheet->set_column($k, $k, $columnwidth[$field], null, $hidden);
+                            $worksheet->merge_cells($j, $k, $j + 1, $k);
+                            $k++; //k = n+x
+                        }
+                    } else {
+                        $worksheet->write_string($j, $k, get_user_field_name('idnumber'), $headlineformat);
+                        $worksheet->write_blank($j + 1, $k, $headlineformat);
+                        $hidden = in_array('idnumber', $collapsed) ? true : false;
+                        $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
+                        $worksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
+                        $worksheet->merge_cells($j, $k, $j + 1, $k);
+                        $k++; //k = n+1
+
+                        $worksheet->write_string($j, $k, get_user_field_name('email'), $headlineformat);
+                        $worksheet->write_blank($j + 1, $k, $headlineformat);
+                        $hidden = in_array('email', $collapsed) ? true : false;
+                        $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
+                        $worksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
+                        $worksheet->merge_cells($j, $k, $j + 1, $k);
+                        $k++; //k = n+2
+                    }
+                    $worksheet->write_string($j, $k, $user['registrations'], $headlineformat);
+                    $worksheet->write_blank($j + 1, $k, $headlineformat);
+                    $hidden = in_array('registrations', $collapsed) ? true : false;
+                    $columnwidth['registrations'] = empty($columnwidth['registrations']) ? $columnwidth[0] : $columnwidth['registrations'];
+                    $worksheet->set_column($k, $k, $columnwidth['registrations'], null, $hidden);
+                    $worksheet->merge_cells($j, $k, $j + 1, $k);
+                    $k++; //k = n+3
+                    $worksheet->write_string($j, $k, $user['queues'], $headlinenbb);
+                    $worksheet->write_blank($j, $k+1, $headlinenbb);
+                    $hidden = in_array('queues', $collapsed) ? true : false;
+                    $columnwidth['queues_rank'] = empty($columnwidth['queues_rank']) ? $columnwidth[0] : $columnwidth['queues_rank'];
+                    $worksheet->set_column($k, $k, $columnwidth['queues_rank'], null, $hidden);
+                    $columnwidth['queues_grp'] = empty($columnwidth['queues_grp']) ? $columnwidth[0] : $columnwidth['queues_grp'];
+                    $worksheet->set_column($k+1, $k+1, $columnwidth['queues_grp'], null, $hidden);
+                    $worksheet->merge_cells($j, $k, $j, $k+1);
+                    $worksheet->write_string($j + 1, $k, get_string('rank', 'grouptool'),
                                              $headlinelast);
-                    $worksheet->write_string($j + 1, 5, get_string('group', 'group'), $headlinenb);
+                    $worksheet->write_string($j + 1, $k+1, get_string('group', 'group'), $headlinenb);
+                    $k+= 2; //k = n+5
                     $rows = 2;
                 } else {
-
+                    $k = 0;
                     $rows = max(array(1, count($user['registrations']), count($user['queues'])));
 
-                    $worksheet->write_string($j, 0, $user['name'], $regentryformat);
-                    if ($rows > 1) {
-                        $worksheet->merge_cells($j, 0, $j + $rows - 1, 0);
+                    // First we output every namefield from used by fullname in exact the defined order!
+                    foreach($namefields as $namefield) {
+                        if (empty($user[$namefield])) {
+                            $user[$namefield] = '';
+                        }
+                        $worksheet->write_string($j, $k, $user[$namefield], $regentryformat);
+                        if ($rows > 1) {
+                            $worksheet->merge_cells($j, $k, $j + $rows - 1, $k);
+                        }
+                        $k++;
                     }
+                    // k = n
 
-                    $worksheet->write_string($j, 1, $user['idnumber'], $regentryformat);
-                    if ($rows > 1) {
-                        $worksheet->merge_cells($j, 1, $j + $rows - 1, 1);
-                    }
+                    if(!empty($CFG->showuseridentity)) {
+                        $fields = explode(',', $CFG->showuseridentity);
+                        foreach($fields as $field) {
+                            if (empty($user[$field])) {
+                                $worksheet->write_blank($j, $k, $regentryformat);
+                            } else {
+                                $worksheet->write_string($j, $k, $user[$field], $regentryformat);
+                            }
+                            if ($rows > 1) {
+                                $worksheet->merge_cells($j, $k, $j + $rows - 1, $k);
+                            }
+                            $k++; //k = n+x
+                        }
+                    } else {
+                        $worksheet->write_string($j, $k, $user['idnumber'], $regentryformat);
+                        if ($rows > 1) {
+                            $worksheet->merge_cells($j, $k, $j + $rows - 1, $k);
+                        }
+                        $k++; //k = n+1
 
-                    $worksheet->write_string($j, 2, $user['email'], $regentryformat);
-                    if ($rows > 1) {
-                        $worksheet->merge_cells($j, 2, $j + $rows - 1, 2);
+                        $worksheet->write_string($j, $k, $user['email'], $regentryformat);
+                        if ($rows > 1) {
+                            $worksheet->merge_cells($j, $k, $j + $rows - 1, $k);
+                        }
+                        $k++; //k = n+2;
                     }
 
                     for ($i = 0; $i < $rows; $i++) {
                         if ($i != 0) {
-                            $worksheet->write_blank($j + $i, 0, $regentryformat);
-                            $worksheet->write_blank($j + $i, 1, $regentryformat);
-                            $worksheet->write_blank($j + $i, 2, $regentryformat);
+                            for ($m = 0; $m < $k; $m++) {
+                                // Write all the empty cells!
+                                $worksheet->write_blank($j + $i, $m, $regentryformat);
+                            }
                         }
                         if ((count($user['registrations']) == 0) && ($i == 0)) {
-                            $worksheet->write_string($j, 3, get_string('no_registrations',
+                            $worksheet->write_string($j, $k, get_string('no_registrations',
                                                                        'grouptool'),
                                                      $noregentriesformat);
                             if ($rows > 1) {
-                                $worksheet->merge_cells($j, 3, $j + $rows - 1, 3);
+                                $worksheet->merge_cells($j, $k, $j + $rows - 1, $k);
                             }
                         } else if (key_exists($i, $user['registrations'])) {
-                            $worksheet->write_string($j + $i, 3, $user['registrations'][$i],
+                            $worksheet->write_string($j + $i, $k, $user['registrations'][$i],
                                                      $regentryformat);
                         } else {
-                            $worksheet->write_blank($j + $i, 3, $regentryformat);
+                            $worksheet->write_blank($j + $i, $k, $regentryformat);
                         }
                         if ((count($user['queues']) == 0) && ($i == 0)) {
-                            $worksheet->write_string($j, 4, get_string('nowhere_queued',
+                            $worksheet->write_string($j, $k+1, get_string('nowhere_queued',
                                                                        'grouptool'),
                                                      $noqueueentriesformat);
-                            $worksheet->merge_cells($j, 4, $j + $rows - 1, 5);
+                            $worksheet->merge_cells($j, $k+1, $j + $rows - 1, $k+2);
                         } else if (key_exists($i, $user['queues'])) {
-                            $worksheet->write_number($j + $i, 4, $user['queues'][$i]['rank'],
+                            $worksheet->write_number($j + $i, $k+1, $user['queues'][$i]['rank'],
                                                      $queueentrylast);
-                            $worksheet->write_string($j + $i, 5, $user['queues'][$i]['name'],
+                            $worksheet->write_string($j + $i, $k+2, $user['queues'][$i]['name'],
                                                      $queueentrylast);
                         } else {
-                            $worksheet->write_blank($j + $i, 4, $queueentrylast);
-                            $worksheet->write_blank($j + $i, 5, $queueentrylast);
+                            $worksheet->write_blank($j + $i, $k+1, $queueentrylast);
+                            $worksheet->write_blank($j + $i, $k+2, $queueentrylast);
                         }
                     }
+                    $k += 3;
                 }
                 $j += $rows;    // We use 1 row space between groups!
             }
@@ -7301,4 +7682,3 @@ EOS;
     }
 
 }
-
