@@ -105,6 +105,20 @@ $string['change_group_to'] = 'Continue with group-change to {$a->groupname}?';
 $string['change_group_to_success'] = 'Group-change successful! {$a->username} is now registered in group {$a->groupname}!';
 $string['you_change_group_to_success'] = 'Group-change successful! You are now registered in group {$a->groupname}!';
 $string['checkbox_control_header'] = 'De-/select groups and groupings';
+$string['checkbox_control_header_help'] = '<p>By using this function you can activate/ deactivate groups of one or more groupings within your grouptool:
+    <ol>
+        <li>Choose in the multiple-select field "All groups" (all available groups will be activated/deactivated), one grouping or several groupings (by using Ctrl + Click).</li>
+        <li>Use one of the following options "Select/ Deselect/ Invert":
+            <ul>
+                <li><b>Select:</b> The groups of the chosen grouping(s) will be activated.</li>
+                <li><b>Deselect:</b> The groups of the chosen grouping(s) will be deactivated </li>
+                <li><b>Invert:</b> All groups of the non-chosen groupings will be activated. </li>
+            </ul>
+        </li>
+        <li>Asume your choice by clicking on the button "Go".</li>
+        <li>Save your changes by clicking on the button "Save changes".</li>
+    </ol>
+</p>';
 $string['choose_group'] = 'You must choose a target group!';
 $string['choose_max'] = 'Maximum groups to choose';
 $string['choose_min'] = 'Minimum groups to choose';
@@ -142,6 +156,7 @@ $string['define_amount_groups'] = 'Define number of groups';
 $string['define_amount_members'] = 'Define number of group members';
 $string['delete_reference'] = 'Delete from grouptool';
 $string['description'] = 'Description';
+$string['deselect'] = 'Deselect';
 $string['determinismerror'] = 'The registration end can\'t be before the registration start or in the past.';
 $string['digits'] = 'Minimum digits';
 $string['disabled'] = 'Disabled';
@@ -275,6 +290,7 @@ $string['import_user_prev'] = 'Import {$a->fullname} ({$a->idnumber}) in group {
 $string['import_user_problem'] = 'Problem during import of {$a->fullname}({$a->idnumber} - {$a->id}) in group {$a->groupname}.';
 $string['incomplete_only_label'] = 'Show only groups with missing grades';
 $string['intro'] = 'Description';
+$string['invert'] = 'Invert';
 $string['landscape'] = 'Landscape';
 $string['late'] = '{$a} late';
 $string['loading'] = 'loading...';
@@ -390,9 +406,7 @@ $string['resolve_queue_legend'] = 'Resolve queues';
 $string['resolve_queue_title'] = 'Resolve pending queues';
 $string['resolve_queue'] = 'Resolve queues';
 $string['selected'] = 'Selected';
-$string['select_all'] = 'All';
-$string['select_none'] = 'None';
-$string['select_inverse'] = 'Inverse';
+$string['select'] = 'Select';
 $string['selectfromcohort'] = 'Select members from cohort';
 $string['selfregistration'] = 'Registration';
 $string['selfregistration_alt'] = 'Register to one or more groups (depending on settings)';
