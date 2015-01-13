@@ -105,6 +105,19 @@ $string['change_group_to'] = 'Soll mit Gruppenwechsel zu {$a->groupname} fortgef
 $string['change_group_to_success'] = 'Gruppenwechsel erfolgreich! {$a->username} ist nun in der Gruppe {$a->groupname} registriert!';
 $string['you_change_group_to_success'] = 'Ihr Gruppenwechsel war erfolgreich! Sie sind nun in der Gruppe {$a->groupname} registriert!';
 $string['checkbox_control_header'] = 'Gruppen/Gruppierungen auswählen';
+$string['checkbox_control_header_help'] = '<p>Mit dieser Funktion können Sie gezielt Gruppen aus einer/ mehreren Gruppierung(en) in Ihrer Gruppenverwaltung aktivieren oder deaktivieren:
+<ol>
+    <li>Wählen Sie im Auswahlfeld zwischen den Varianten "Alle Gruppen" (d.h. es werden alle enthaltenen Gruppen aktiviert/deaktiviert ) bzw. eine Gruppierung oder wahlweise mehrere Gruppierungen (mit Strg + Klick).</li>
+    <li>Nutzen Sie Sie eine der drei Optionen "Selektieren/ Deselektieren/ Invertieren":
+        <ul>
+            <li><b>Selektieren:</b> Die Gruppe(n) der ausgewählten Gruppierung(en) aus dem Auswahlfeld wird/ werden aktiviert.</li>
+            <li><b>Deselektieren:</b> Die Gruppe(n) der ausgewählten Gruppierung(en) aus dem Auswahlfeld wird/ werden deaktiviert. </li>
+            <li><b>Invertieren:</b> Es werden alle Gruppen der nicht ausgewählten Gruppierung(en) aus dem Auswahlfeld markiert. </li>
+        </ul>
+    </li>
+    <li>Übernehmen Sie Ihre Auswahl über Klick auf die Schaltfläche "Start".</li>
+    <li>Speichern Sie über "Änderungen speichern".</li>
+</ol></p>';
 $string['choose_group'] = 'Sie müssen eine Zielgruppe auswählen!';
 $string['choose_max'] = 'Maximalanzahl zu wählender Gruppen';
 $string['choose_min'] = 'Mindestanzahl zu wählender Gruppen';
@@ -142,6 +155,7 @@ $string['define_amount_groups'] = 'Gruppenanzahl festlegen';
 $string['define_amount_members'] = 'Mitgliederanzahl festlegen';
 $string['delete_reference'] = 'Lösche aus der Gruppenverwaltung';
 $string['description'] = 'Beschreibung';
+$string['deselect'] = 'Deselektieren';
 $string['determinismerror'] = 'Das Anmeldeende, darf nicht vor dem Anmeldebeginn oder in der Vergangenheit liegen!';
 $string['digits'] = 'Mindestanzahl Stellen';
 $string['disabled'] = 'Deaktiviert';
@@ -275,6 +289,7 @@ $string['import_user_prev'] = 'Importiere {$a->fullname} ({$a->idnumber}) in Gru
 $string['import_user_problem'] = 'Fehler beim Importieren von {$a->fullname} (ID-Nummer: {$a->idnumber}) in Gruppe {$a->groupname}.';
 $string['incomplete_only_label'] = 'Zeige nur Gruppen mit fehlenden Bewertungen';
 $string['intro'] = 'Beschreibung';
+$string['invert'] = 'Invertieren';
 $string['landscape'] = 'Querformat';
 $string['late'] = '{$a} zu spät';
 $string['loading'] = 'Lade...';
@@ -390,9 +405,7 @@ $string['resolve_queue_legend'] = 'Löse Wartelisten auf';
 $string['resolve_queue_title'] = 'Löse Wartelisten auf';
 $string['resolve_queue'] = 'Wartelisten auflösen';
 $string['selected'] = 'Ausgewählt';
-$string['select_all'] = 'Alle';
-$string['select_none'] = 'Keine';
-$string['select_inverse'] = 'Invertieren';
+$string['select'] = 'Selektieren';
 $string['selectfromcohort'] = 'Mitglieder aus globaler Gruppe wählen';
 $string['selfregistration'] = 'Anmeldung';
 $string['selfregistration_alt'] = 'Selbstanmeldung zu einer oder mehreren Gruppen';

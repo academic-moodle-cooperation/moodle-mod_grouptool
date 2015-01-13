@@ -40,17 +40,14 @@
 
 .path-mod-grouptool div.checkbox_controls {
     padding:10px;
-    max-height:350px;
     overflow:auto;
     white-space:nowrap;
-    float:right;
     background:#dddddd;
     margin-left:5px;
     margin-right:5px;
 }
 
 .path-mod-grouptool div.checkbox_controls .checkbox_controls_header {
-    text-align:center;
     font-weight:bold;
 }
 
@@ -60,17 +57,16 @@
 }
 
 .path-mod-grouptool div.checkbox_controls .checkbox_control .check_name {
-    float:left;
     text-align:left;
     display:inline-block;
     clear:both;
 }
 
-.path-mod-grouptool div.checkbox_controls .checkbox_control button.select_all,
-.path-mod-grouptool div.checkbox_controls .checkbox_control button.select_none,
-.path-mod-grouptool div.checkbox_controls .checkbox_control button.toggle_selection {
+.path-mod-grouptool input.select_all,
+.path-mod-grouptool input.select_none,
+.path-mod-grouptool input.toggle_selection {
     clear:none;
-    margin-left:2px;
+    margin-left:1em;
 }
 
 .path-mod-grouptool ul.drag_list {

@@ -49,19 +49,32 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
     M.mod_grouptool = M.mod_grouptool || {}; //this line use existing name path if it exists, ortherwise create a new one.
                                                  //This is to avoid to overwrite previously loaded module with same name.
 
-    M.mod_grouptool.sortlist_update_checkboxes = function(e, classname, newstate) {
-        var checkboxes = Y.all('input.' + classname);
+    M.mod_grouptool.sortlist_update_checkboxes = function(e, newstate) {
+
+        var selector = '';
+
+        // Get all selected groupids and construct selector!
+        Y.all('select[name="classes[]"] option').each( function() {
+            // this = option from the select
+            if (this.get('selected') == true) {
+                if (selector != '') {
+                    selector += ', ';
+                }
+                selector += '.class' + this.get('value');
+            }
+        });
+        var checkboxes = Y.all(selector);
 
         e.preventDefault();
 
         switch(newstate) {
-            case 'checked': //check
+            case 'select': //check
                 checkboxes.set('checked', 'checked');
                 break;
-            case 'unchecked': //uncheck
+            case 'deselect': //uncheck
                 checkboxes.set('checked', '');
                 break;
-            default: //toggle by default
+            case 'toggle':
                 checkboxes.each(function(current, index, nodelist) {
                     if(current.get('checked')) {
                         current.set('checked', '');
@@ -69,6 +82,8 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                         current.set('checked', 'checked');
                     }
                 })
+                break;
+            default:
                 break;
         }
     }
@@ -254,18 +269,26 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             });
         });
 
-        var checkbox_controls = Y.all('.checkbox_controls .checkbox_control');
-        checkbox_controls.each(function(current, index, nodelist) {
-            var classes = nodelist.item(index).getAttribute('class').split(" ");
+        var checkbox_controls_action = Y.one('.sortlist_container .felement [name="do_class_action"]');
+        checkbox_controls_action.on('click', function(e) {
+            // Get the new state and continue!
+            var newstate = '';
+            Y.all('input[name = "class_action"]').each(function (current, bla, nodelist) {
+                if (current.get('checked') == true) {
+                    newstate = current.get('value');
+                }
+            });
+            M.mod_grouptool.sortlist_update_checkboxes(e, newstate);
+        });
+/*
 
             for(var i = 0; i < classes.length; i++) {
                 if(classes[i] != 'checkbox_control') {
-                    current.one('.select_all').on('click', M.mod_grouptool.sortlist_update_checkboxes,  null, classes[i], 'checked');
+                    current.one('.select_all').on('click', M.mod_grouptool.sortlist_update_checkboxes,  null, classes[i], 'input[name = "class_action"]:checked');
                     current.one('.select_none').on('click', M.mod_grouptool.sortlist_update_checkboxes,  null, classes[i], 'unchecked');
                     current.one('.toggle_selection').on('click', M.mod_grouptool.sortlist_update_checkboxes,  null, classes[i], null);
                 }
-            }
-        });
+            }*/
 
         return new sortlist(config); //'config' contains the parameter values
     };

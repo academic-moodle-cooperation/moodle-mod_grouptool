@@ -334,6 +334,7 @@ class mod_grouptool_view_admin_form extends moodleform {
                 $options['all_string'] = get_string('all').' '.get_string('groups');
                 $mform->addElement('sortlist', 'grouplist', $options);
                 $mform->setDefault('grouplist', $groupdata);
+
                 // Add disabledIfs for all Groupsize-Fields!
                 $usesize = $grouptool->use_size;
                 $mform->addElement('hidden', 'use_size');

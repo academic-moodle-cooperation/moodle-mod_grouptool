@@ -298,9 +298,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return    string
      */
     public function getFrozenHtml() {
-        $value = $this->getValue();
-        return ('' != $value ? htmlspecialchars($value) : '&nbsp;').
-               $this->_getPersistantData();
+        return $this->_getPersistantData();
     }
 
     /**
@@ -497,7 +495,6 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
         if (!is_array($data)) {
             return $data;
         }
-
         foreach ($data as $id => $group) {
             foreach ($this->_options['add_fields'] as $key => $fielddata) {
                 if (empty($fielddata->param_type)) {
@@ -508,6 +505,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 }
             }
         }
+
         return $data;
     }
 
@@ -548,9 +546,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                         $caller->_flagSubmitted = false;
                     }
                     // Same for the checkbox-controller buttons!
-                    if (optional_param_array('select_class', 0, PARAM_INT)
-                            || optional_param_array('deselect_class', 0, PARAM_INT)
-                            || optional_param_array('toggle_class', 0, PARAM_INT)) {
+                    if (optional_param('do_class_action', 0, PARAM_INT)) {
                         $caller->_flagSubmitted = false;
                     }
                     if (null === $value) {
@@ -662,25 +658,26 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function _refresh_active_state() {
         global $COURSE;
-        $select = optional_param_array('select_class', null, PARAM_INT);
-        $deselect = optional_param_array('deselect_class', null, PARAM_INT);
-        $toggle = optional_param_array('toggle_class', null, PARAM_INT);
+        $classes = optional_param_array('classes', null, PARAM_INT);
+        $action = optional_param('class_action', 0, PARAM_ALPHA);
+        $go_button = optional_param('do_class_action', 0, PARAM_BOOL);
 
-        if ($select != null || $deselect != null || $toggle != null) {
+        if (empty($go_button)) {
+            return;
+        }
+
+        if ( $classes == null || count($classes) == 0 ) {
+            $this->_flagSubmitted = false;
+            return;
+        }
+
+        if (!empty($action)) {
             $keys = array();
 
-            if ($select != null) {
-                $action = "select";
-                $groupingid = reset(array_keys($select));
-            } else if ($deselect != null) {
-                $action = "deselect";
-                $groupingid = reset(array_keys($deselect));
-            } else if ($toggle != null) {
-                $action = "toggle";
-                $groupingid = reset(array_keys($toggle));
+            $groups = array();
+            foreach ($classes as $groupingid) {
+                $groups = array_merge($groups, groups_get_all_groups($COURSE->id, 0, $groupingid));
             }
-
-            $groups = groups_get_all_groups($COURSE->id, 0, $groupingid);
 
             foreach ($groups as $current) {
                 switch($action) {
@@ -696,9 +693,9 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                         break;
                 }
             }
-
-            $this->_flagSubmitted = false;
         }
+
+        $this->_flagSubmitted = false;
     }
 
     /**
@@ -732,8 +729,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      * @return    string
      */
     public function toHtml() {
-        global $CFG, $PAGE, $OUTPUT;
-
+        global $CFG, $PAGE, $OUTPUT, $DB;
         if (empty($this->_value) || !array($this->_value) || count($this->_value) == 0) {
             return get_string('sortlist_no_data', 'grouptool');
         }
@@ -769,7 +765,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 $chkboxattr = array(
                         'name'  => $namebase.'[active]',
                         'type'  => 'checkbox',
-                        'class' => 'checkbox_status '.implode(' ', $group['classes']),
+                        'class' => 'checkbox_status class0 '.implode(' ', $group['classes']),
                         'value' => 1);
                 if ($group['active']) {
                     $chkboxattr['checked'] = 'checked';
@@ -874,91 +870,72 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
             $dragablelist = html_writer::tag('ul', $dragableitems, array('class' => 'drag_list'));
 
             // Generate groupings-controls to select/deselect groupings!
-            $checkboxcontroltitle = get_string('checkbox_control_header', 'grouptool');
-            $checkboxcontroltitle = html_writer::tag('div', $checkboxcontroltitle,
-                                                       array('class' => 'checkbox_controls_header'));
+            $checkboxcontroltitle = html_writer::tag('label', get_string('checkbox_control_header', 'grouptool'), array('for'=>'classes'));
+            $helptext = $OUTPUT->render(new help_icon('checkbox_control_header', 'grouptool'));
+            $checkboxcontroltitle = html_writer::tag('div', $checkboxcontroltitle.' '.$helptext,
+                                                       array('class' => 'fitemtitle checkbox_controls_header'));
 
-            $selectall = html_writer::tag('span', get_string('select_all', 'grouptool'));
-            $selectnone = html_writer::tag('span', get_string('select_none', 'grouptool'));
-            $inverseselection = html_writer::tag('span', get_string('select_inverse',
-                                                                     'grouptool'));
+            $selectall = html_writer::tag('span', get_string('select', 'grouptool'));
+            $selectnone = html_writer::tag('span', get_string('deselect', 'grouptool'));
+            $inverseselection = html_writer::tag('span', get_string('invert', 'grouptool'));
             $checkboxcontrolelements = array();
 
             // Static controlelements for all elements!
-            $this->_noSubmitButtons[] = 'select[all]';
-            $checkalllink = html_writer::tag('button', $selectall,
-                                             array('name'  => 'select_class[0]',
-                                                   'value' => 'all',
-                                                   'type'  => 'submit',
-                                                   'title' => strip_tags($selectall),
-                                                   'class' => 'select_all'));
-            $this->_noSubmitButtons[] = 'deselect[all]';
-            $checknonelink = html_writer::tag('button', $selectnone,
-                                              array('name'  => 'deselect_class[0]',
-                                                    'value' => 'all',
-                                                    'type'  => 'submit',
-                                                    'title' => strip_tags($selectnone),
-                                                    'class' => 'select_none'));
-            $this->_noSubmitButtons[] = 'toggle[all]';
-            $checktogglelink = html_writer::tag('button', $inverseselection,
-                                                array('name'  => 'toggle_class[0]',
-                                                      'value' => 'all',
-                                                      'type'  => 'submit',
-                                                      'title' => strip_tags($inverseselection),
-                                                      'class' => 'toggle_selection'));
-            $checkname = html_writer::tag('span', $this->_options['all_string'],
-                                          array('class' => 'name'));
-            $attr = array('class' => 'checkbox_control checkbox_status');
-            $checkboxcontrolelements[] = html_writer::tag('div',
-                                                          $checkname.$checkalllink.$checknonelink.
-                                                          $checktogglelink,
-                                                          $attr);
+            $options = array(html_writer::tag('option', $this->_options['all_string'], array('value' => '0')));
 
             if (!empty($this->_options['classes']) && is_array($this->_options['classes'])) {
                 foreach ($this->_options['classes'] as $key => $class) {
-                    $this->_noSubmitButtons[] = 'select['.$class->id.']';
-                    $selectname = 'select_class['.$class->id.']';
-                    $checkalllink = html_writer::tag('button', $selectall,
-                                                     array('name'  => $selectname,
-                                                           'value' => $class->id,
-                                                           'type'  => 'submit',
-                                                           'title' => strip_tags($selectall),
-                                                           'class' => 'select_all'));
-                    $this->_noSubmitButtons[] = 'deselect['.$class->id.']';
-                    $deselectname = 'deselect_class['.$class->id.']';
-                    $checknonelink = html_writer::tag('button', $selectnone,
-                                                      array('name'  => $deselectname,
-                                                            'value' => $class->id,
-                                                            'type'  => 'submit',
-                                                            'title' => strip_tags($selectnone),
-                                                            'class' => 'select_none'));
-                    $this->_noSubmitButtons[] = 'toggle['.$class->id.']';
-                    $togglename = 'toggle_class['.$class->id.']';
-                    $toggletitle = strip_tags($inverseselection);
-                    $checktogglelink = html_writer::tag('button', $inverseselection,
-                                                        array('name'  => $togglename,
-                                                              'value' => $class->id,
-                                                              'type'  => 'submit',
-                                                              'title' => $toggletitle,
-                                                              'class' => 'toggle_selection'));
-                    $checkname = html_writer::tag('span', $class->name, array('class' => 'name'));
-                    $attr = array('class' => 'checkbox_control class'.$class->id);
-                    $checkboxcontrolelements[] = html_writer::tag('div',
-                                                                  $checkname.$checkalllink.$checknonelink.
-                                                                  $checktogglelink,
-                                                                  $attr);
+                    if ($DB->count_records('groupings_groups', array('groupingid' => $class->id)) != 0) {
+                        $options[] = html_writer::tag('option', $class->name, array('value' => $class->id));
+                    } else {
+                        // Disable empty groupings!
+                        $options[] = html_writer::tag('option', $class->name, array('value' => $class->id, 'disabled' => 'disabled'));
+                    }
                 }
             }
 
-            $checkboxcontrols = $checkboxcontroltitle.implode("", $checkboxcontrolelements);
+            $checkboxcontrols = $checkboxcontroltitle;
+
+            // Add Radiobuttons and Go Button TODO replace single buttons with radiobuttons + go-button
+            $checkalllink = html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                  'type'  => 'radio',
+                                                                  'id'    => 'select',
+                                                                  'value' => 'select',
+                                                                  'class' => 'select_all')).
+                            html_writer::tag('label', strip_tags($selectall), array('for'=>'select'));
+            $checknonelink = html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                   'type'  => 'radio',
+                                                                   'id'    => 'deselect',
+                                                                   'value' => 'deselect',
+                                                                   'class' => 'select_none')).
+                             html_writer::tag('label', strip_tags($selectnone), array('for'=>'deselect'));
+            $checktogglelink = html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                     'type'  => 'radio',
+                                                                     'id'    => 'toggle',
+                                                                     'value' => 'toggle',
+                                                                     'class' => 'toggle_selection')).
+                               html_writer::tag('label', strip_tags($inverseselection), array('for'=>'toggle'));;
+            $submitbutton = html_writer::tag('button', get_string('go'),
+                                             array('name' => 'do_class_action',
+                                                   'value' => 'Go',));
+            $this->_noSubmitButtons[] = 'do_class_action';
+
+            $attr = array('class' => 'felement');
+            $checkboxcontrols .= html_writer::tag('div',
+                                                  html_writer::tag('select', implode("\n", $options),
+                                                                   array('name' => 'classes[]',
+                                                                         'multiple' => 'multiple')).
+                                                  $checkalllink.$checknonelink.
+                                                  $checktogglelink.$submitbutton,
+                                                  $attr);
+
             $content = "";
             if (!empty($checkboxcontrols)) {
-                $content .= html_writer::tag('div', $checkboxcontrols,
-                                             array('class' => 'checkbox_controls'));
+                $content .= $checkboxcontrols;
             }
             $content .= html_writer::tag('div', $dragablelist, array('class' => 'drag_area'));
 
-            $html = html_writer::tag('div', $content, array('class' => 'sortlist_container'));
+            $html = html_writer::tag('div', $content, array('class' => 'fitem sortlist_container'));
             // Init JS!
             $PAGE->requires->yui_module('moodle-mod_grouptool-sortlist',
                                         'M.mod_grouptool.init_sortlist',
