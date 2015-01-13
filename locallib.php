@@ -47,6 +47,18 @@ require_once($CFG->libdir.'/pdflib.php');
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_grouptool_view_admin_form extends moodleform {
+
+    /**
+     * Variable containing reference to our sortlist, so we can alter current active entries afterwards
+     */
+    private $_sortlist = null;
+
+    public function update_cur_active($curactive = null) {
+        if (!empty($curactive) && is_array($curactive)) {
+            $this->_sortlist->_options['curactive'] = $curactive;
+        }
+    }
+
     /**
      * Definition of administration form
      *
@@ -278,7 +290,7 @@ class mod_grouptool_view_admin_form extends moodleform {
                 $params = array_merge(array($cm->instance), $params);
                 $groupdata = (array)$DB->get_records_sql("
                         SELECT grp.id AS id, MAX(grp.name) AS name,
-                               MAX(agrp.grpsize) AS grpsize, MAX(agrp.active) AS active,
+                               MAX(agrp.grpsize) AS grpsize, MAX(agrp.active) AS active, MAX(agrp.active) AS curactive,
                                MAX(agrp.sort_order) AS sort_order
                         FROM {groups} AS grp
                         LEFT JOIN {grouptool_agrps} as agrp
@@ -289,7 +301,7 @@ class mod_grouptool_view_admin_form extends moodleform {
                              ON {groupings_groups}.groupingid = grpgs.id
                         WHERE grp.id ".$grpssql."
                         GROUP BY grp.id
-                        ORDER BY sort_order ASC, name ASC", $params);
+                        ORDER BY active DESC, sort_order ASC, name ASC", $params);
                 /*
                  * convert to multidimensional array and replace comma separated string
                  * through array for each classes list
@@ -331,8 +343,13 @@ class mod_grouptool_view_admin_form extends moodleform {
                     $options['add_fields']['grpsize']->type = 'hidden';
                 }
                 $options['add_fields']['grpsize']->attr = array('size' => '3');
+                //Update active groups marked in form!
+                $options['curactive'] = $DB->get_records_sql_menu("SELECT groupid, active
+                                                                     FROM {grouptool_agrps}
+                                                                    WHERE grouptoolid = ?",
+                                                                  array($cm->instance));
                 $options['all_string'] = get_string('all').' '.get_string('groups');
-                $mform->addElement('sortlist', 'grouplist', $options);
+                $this->_sortlist = $mform->addElement('sortlist', 'grouplist', $options);
                 $mform->setDefault('grouplist', $groupdata);
 
                 // Add disabledIfs for all Groupsize-Fields!
@@ -352,7 +369,7 @@ class mod_grouptool_view_admin_form extends moodleform {
                                        'eq', 0);
                 }
             } else {
-                $mform->addElement('sortlist', 'grouplist', array());
+                $this->_sortlist = $mform->addElement('sortlist', 'grouplist', array());
                 $mform->setExpanded('groupsettings');
                 $mform->setExpanded('groupingscreateHeader');
                 $mform->setDefault('grouplist', null);
@@ -1472,7 +1489,7 @@ class mod_grouptool {
      * @global object $PAGE
      */
     public function view_administration() {
-        global $SESSION, $OUTPUT, $PAGE;
+        global $SESSION, $OUTPUT, $PAGE, $DB;
 
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
@@ -1732,12 +1749,19 @@ class mod_grouptool {
                         echo $OUTPUT->notification(get_string('update_grouplist_failure',
                                                   'grouptool'), 'notifyproblem');
                     }
+
+                    if ($curactive = $DB->get_records_sql_menu("SELECT groupid, active
+                                                                  FROM {grouptool_agrps}
+                                                                 WHERE grouptoolid = ?",
+                                                               array($this->cm->instance))) {
+                        $mform->update_cur_active($curactive);
+                    }
+
                     $mform->display();
                 }
             } else {
                 $mform->display();
             }
-
         } else {
             $mform->display();
         }
