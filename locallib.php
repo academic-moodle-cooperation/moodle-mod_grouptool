@@ -5175,6 +5175,9 @@ EOS;
                                 }
                             }
                         }
+                        // We set those in any case, because PDF and TXT export needs them anyway!
+                        $row['email'] = $userinfo[$regentry->userid]->email;
+                        $row['idnumber'] = $userinfo[$regentry->userid]->idnumber;
                         if (key_exists($regentry->userid, $agrp->moodle_members)) {
                             $row['status'] = "✔";
                         } else {
@@ -5257,6 +5260,9 @@ EOS;
                                     }
                                 }
                             }
+                            // We set those in any case, because PDF and TXT export needs them anyway!
+                            $row['email'] = $userinfo[$memberid]->email;
+                            $row['idnumber'] = $userinfo[$memberid]->idnumber;
                             $groupdata->mreg_data[] = $row;
                         }
                     }
@@ -5321,6 +5327,9 @@ EOS;
                                 }
                             }
                         }
+                        // We set those in any case, because PDF and TXT export needs them anyway!
+                        $row['email'] = $userinfo[$queueentry->userid]->email;
+                        $row['idnumber'] = $userinfo[$queueentry->userid]->idnumber;
                         $groupdata->queue_data[] = $row;
                     }
                 }
