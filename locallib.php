@@ -256,7 +256,6 @@ class mod_grouptool_view_admin_form extends moodleform {
             $mform->addElement('header', 'groupingscreateHeader', get_string('groupingscreation',
                                                                              'grouptool'));
 
-            $mform->addElement('html', get_string('groupingscreatedesc', 'grouptool'));
             $coursegroups = groups_get_all_groups($course->id, null, null, "id");
             if (is_array($coursegroups) && !empty($coursegroups)) {
                 $options = array(0 => get_string('selected', 'grouptool'), 1 => get_string('all'));
@@ -265,7 +264,29 @@ class mod_grouptool_view_admin_form extends moodleform {
                 $mform->addHelpButton('use_all', 'use_all_or_chosen', 'grouptool');
                 $mform->setType('use_all', PARAM_BOOL);
 
-                $mform->addElement('submit', 'createGroupings', get_string('createGroupings',
+                $selectgroups = $mform->createElement('selectgroups', 'grpg_target', get_string('groupingselect', 'grouptool'));
+                $options = array('0' => get_string('no'));
+                if (has_capability('mod/grouptool:create_groupings', $this->context)) {
+                    $options['-1'] = get_string('onenewgrouping', 'grouptool');
+                    $options['-2'] = get_string('onenewgroupingpergroup', 'grouptool');
+                }
+                $selectgroups->addOptGroup("", $options);
+                if ($groupings = groups_get_all_groupings($course->id)) {
+                    $options = array();
+                    foreach ($groupings as $grouping) {
+                        $options[$grouping->id] = strip_tags(format_string($grouping->name));
+                    }
+                    $selectgroups->addOptGroup("————————————————————————", $options);
+                }
+                $mform->addElement($selectgroups);
+                $mform->addHelpButton('grpg_target', 'groupingselect', 'grouptool');
+                if (has_capability('mod/grouptool:create_groupings', $this->context)) {
+                    $mform->addElement('text', 'grpg_groupingname', get_string('groupingname', 'group'));
+                    $mform->setType('grpg_groupingname', PARAM_MULTILANG);
+                    $mform->disabledIf('grpg_groupingname', 'grpg_target', 'noteq', '-1');
+                }
+
+                $mform->addElement('submit', 'createGroupings', get_string('create_assign_Groupings',
                                                                            'grouptool'));
             } else {
                 $mform->addElement('static', html_writer::tag('div', get_string('sortlist_no_data',
@@ -1488,6 +1509,108 @@ class mod_grouptool {
     }
 
     /**
+     * Create a grouping for all selected moodle-groups
+     *
+     * Uses $SESSION->grouptool->view_administration->use_all to determin if groupings for all
+     * or just selected groups should be created and also uses
+     * $SESSION->grouptool->view_administration->grouplist[$group->id]['active']
+     * to determin which groups have been selected
+     *
+     * @global object $SESSION
+     * @global object $PAGE
+     * @global object $OUTPUT
+     * @param int $target -1 for new grouping or groupingid
+     * @param string $name name for new grouping if $target = -1
+     * @param bool $previewonly optional only show preview of created groups
+     * @return array ( 0 => error, 1 => message )
+     */
+    private function update_grouping($target, $name = null, $previewonly = false) {
+        global $SESSION, $PAGE, $OUTPUT;
+        $error = false;
+        $return = "";
+
+        require_capability('mod/grouptool:create_groupings', $this->context);
+
+        if (isset($this->course->id)) {
+            $courseid = $this->course->id;
+        } else {
+            print_error('coursemisconf');
+        }
+
+        if ($target == -1) {
+            if (groups_get_grouping_by_name($courseid, $name)) {
+                // Creation of grouping failed!
+                if ($previewonly) {
+                    $text = get_string('grouping_exists_error_prev', 'grouptool');
+                } else {
+                    $text = get_string('grouping_exists_error', 'grouptool');
+                }
+                return array(0 => true, 1 => $OUTPUT->notification($text, 'notifyproblem'));
+            } else {
+                if (empty($previewonly)) {
+                    // Create Grouping and set as target
+                    $grouping = new stdClass();
+                    $grouping->name = $name;
+                    $grouping->courseid = $courseid;
+                    $target = groups_create_grouping($grouping);
+                    $return = $OUTPUT->notification(get_string('grouping_creation_success', 'grouptool'), 'notifymessage');
+                } else {
+                    $return = $OUTPUT->notification(get_string('grouping_creation_success_prev', 'grouptool'), 'notifymessage');
+                }
+            }
+        }
+
+        if (!empty($target)) {
+            $groups = groups_get_all_groups($courseid);
+            $ids = array();
+            $success = array();
+            $failure = array();
+            foreach ($groups as $group) {
+                $row = array(new html_table_cell($group->name));
+                $active = $SESSION->grouptool->view_administration->grouplist[$group->id]['active'];
+                if (empty($SESSION->grouptool->view_administration->use_all)
+                         && !$active) {
+                    continue;
+                }
+                $groupid = $group->id;
+
+                if (!groups_assign_grouping($target, $groupid)) {
+                    $failure[] = $group->name;
+                    $error = true;
+                } else {
+                    $success[] = $group->name;
+                }
+            }
+            if ($previewonly) {
+                if (!empty($success)) {
+                    $return .= $OUTPUT->notification(get_string('grouping_assign_success_prev', 'grouptool').
+                                                     html_writer::empty_tag('br').
+                                                     implode(', ', $success), 'notifymessage');
+                }
+                if ($error) {
+                    $return .= $OUTPUT->notification(get_string('grouping_assign_error_prev', 'grouptool').
+                                                     html_writer::empty_tag('br').
+                                                     implode(', ', $failure), 'notifyproblem');
+                }
+            } else {
+                $return .= $OUTPUT->notification(get_string('grouping_assign_success', 'grouptool').
+                                                 html_writer::empty_tag('br').
+                                                 implode(', ', $success), 'notifysuccess');
+                if ($error) {
+                    $return .= $OUTPUT->notification(get_string('grouping_assign_error', 'grouptool').
+                                                     html_writer::empty_tag('br').
+                                                     implode(', ', $failure), 'notifyproblem');
+                }
+            }
+        }
+        if (!$previewonly) {
+            // Trigger the event!
+            \mod_grouptool\event\groupings_created::create_from_object($this->cm, $ids)->trigger();
+        }
+        return array(0 => $error, 1 => $return);
+    }
+
+    /**
      * Outputs the content of the administration tab and manages actions taken in this tab
      *
      * @global object $SESSION
@@ -1596,7 +1719,22 @@ class mod_grouptool {
             }
             if (isset($SESSION->grouptool->view_administration->createGroupings)) {
                 require_capability('mod/grouptool:create_groupings', $this->context);
-                list($error, $preview) = $this->create_group_groupings();
+                $target = required_param('target', PARAM_INT);
+                switch($target) { //grpg_target | grpg_groupingname | use_all (0 sel | 1 all)
+                    case 0: // Invalid - no action! TODO Add message!
+                        $error = true;
+                        $preview = '';
+                        break;
+                    case -2: //One grouping per group
+                        list($error, $preview) = $this->create_group_groupings();
+                        break;
+                    case -1: //One new grouping for all
+                        list($error, $preview) = $this->update_grouping($target, required_param('name', PARAM_ALPHANUMEXT));
+                        break;
+                    default:
+                        list($error, $preview) = $this->update_grouping($target);
+                        break;
+                }
                 $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
                 echo $OUTPUT->box($preview, 'generalbox');
             }
@@ -1729,21 +1867,68 @@ class mod_grouptool {
                     $SESSION->grouptool = new stdClass();
                 }
                 $SESSION->grouptool->view_administration = $fromform;
-                list($error, $preview) = $this->create_group_groupings(null, true);
-                $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
-                $continue = "view.php?id=$id&tab=administration&confirm=1";
-                $cancel = "view.php?id=$id&tab=administration";
-                if ($error) {
-                    $confirmtext = get_string('create_groupings_confirm_problem', 'grouptool');
-                    $confirmboxcontent = $this->confirm($confirmtext, $cancel);
-                } else {
-                    $confirmtext = get_string('create_groupings_confirm', 'grouptool');
-                    $confirmboxcontent = $this->confirm($confirmtext, $continue, $cancel);
+                $target = $fromform->grpg_target;
+                switch($target) { //grpg_target | grpg_groupingname | use_all (0 sel | 1 all)
+                    case 0: // Invalid - no action! TODO Add message!
+                        $error = true;
+                        $preview = '';
+                        $cancel = new moodle_url("/mod/grouptool/view.php", array('id'=>$id, 'tab'=>'administration'));
+                        $confirmtext = $OUTPUT->notification(get_string('nogroupingselected', 'grouptool'), 'notifymessage');
+                        $confirmboxcontent = $this->confirm($confirmtext, $cancel);
+                        break;
+                    case -2: //One grouping per group
+                        list($error, $preview) = $this->create_group_groupings($this->course->id, true);
+                        $cancel = new moodle_url("/mod/grouptool/view.php", array('id'=>$id, 'tab'=>'administration'));
+                        $continue = new moodle_url($cancel,
+                                                   array('confirm' => 1,
+                                                         'target' => $target));
+                        if ($error) {
+                            $confirmtext = get_string('create_groupings_confirm_problem', 'grouptool');
+                            $confirmboxcontent = $this->confirm($confirmtext, $cancel);
+                        } else {
+                            $confirmtext = get_string('create_groupings_confirm', 'grouptool');
+                            $confirmboxcontent = $this->confirm($confirmtext, $continue, $cancel);
+                        }
+                        break;
+                    case -1: //One new grouping for all
+                        $name = $fromform->grpg_groupingname;
+                        list($error, $preview) = $this->update_grouping($target, $name, true);
+                        $cancel = new moodle_url("/mod/grouptool/view.php", array('id'=>$id, 'tab'=>'administration'));
+                        $continue = new moodle_url($cancel,
+                                                   array('confirm' => 1,
+                                                         'target' => $target,
+                                                         'name' => $name));
+                        if ($error) {
+                            $confirmtext = get_string('create_groupings_confirm_problem', 'grouptool');
+                            $confirmboxcontent = $this->confirm($confirmtext, $cancel);
+                        } else {
+                            $confirmtext = get_string('create_groupings_confirm', 'grouptool');
+                            $confirmboxcontent = $this->confirm($confirmtext, $continue, $cancel);
+                        }
+                        break;
+                    default:
+                        list($error, $preview) = $this->update_grouping($target, null, true);
+                        $cancel = new moodle_url("/mod/grouptool/view.php", array('id'=>$id, 'tab'=>'administration'));
+                        $continue = new moodle_url($cancel,
+                                                   array('confirm' => 1,
+                                                         'target' => $target));
+                        if ($error) {
+                            $confirmtext = get_string('create_groupings_confirm_problem', 'grouptool');
+                            $confirmboxcontent = $this->confirm($confirmtext, $cancel);
+                        } else {
+                            $confirmtext = get_string('create_groupings_confirm', 'grouptool');
+                            $confirmboxcontent = $this->confirm($confirmtext, $continue, $cancel);
+                        }
+                        break;
                 }
-                echo $OUTPUT->heading(get_string('preview'), 2, 'centered').
-                     $OUTPUT->box($preview, 'generalbox').
-                     $confirmboxcontent;
-
+                $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
+                echo $OUTPUT->heading(get_string('preview'), 2, 'centered');
+                if (!empty($preview)) {
+                     echo $OUTPUT->box($preview, 'generalbox');
+                }
+                if (!empty($confirmboxcontent)) {
+                    echo $confirmboxcontent;
+                }
             } else if (isset($fromform->updateActiveGroups)) {
                 if (has_capability('mod/grouptool:create_groupings', $this->context)
                         || has_capability('mod/grouptool:create_groups', $this->context)) {
