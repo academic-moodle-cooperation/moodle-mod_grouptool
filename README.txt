@@ -15,17 +15,17 @@
 
 /**
  * README.txt
- * @version       2014-02-24
+ * @version       2015-01-14
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 2.5+
+# FOR Moodle 2.7+
 # ---------------------------------------------------------------
 
 Grouptool-Module
@@ -35,7 +35,7 @@ OVERVIEW
 ================================================================================
     The Grouptool Module enhances the standard Moodle-Group-Functionality
     Main features are:
-    
+
     *) Group creation from different user-roles
         - 1-Person-Groups
         - Groups with defined amount of members/groups
@@ -51,13 +51,13 @@ OVERVIEW
         - automatically for all/certain groups
         - for 1 group
         - choose which students grade to copy
-    
+
 
 REQUIREMENTS
 ================================================================================
-    Moodle <2.5 or later>
+    Moodle <2.7 or later>
 
-INSTALLATION 
+INSTALLATION
 ================================================================================
    The zip-archive includes the same directory hierarchy as moodle
    So you only have to copy the files to the correspondent place.
@@ -66,7 +66,7 @@ INSTALLATION
    All languages should be encoded with utf8.
 
     After it you have to run the admin-page of moodle
-    http://your-moodle-site/admin) in your browser. 
+    http://your-moodle-site/admin) in your browser.
     You have to logged in as admin before.
     The installation process will be displayed on the screen.
     That's all.
@@ -74,3 +74,20 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2015011400
+-------------------------
+*) Replace add_to_log calls through triggered events
+*) Replace event handlers with new event observers
+*) Remove unused cron-Method
+*) Add Frankenstyle-prefix for global scope classes
+*) Move plugin settings to config_plugins table
+*) Improve english language file
+*) Ensure support of PostgreSQL-DBs
+*) New improved active groups layout for better usability
+*) Combine Overview and Userlist in common tab participants (2 sub-tabs)
+*) Support additional name fields and useridentity in XLS/XLSX/ODS-export
+*) Add page numbers in PDF export
+*) Better grouping creation features (add selected groups to new/existing grouping)
+*) Grouping-filter in grading tab restricts accessible groups
+
+*) Fixed some minor bugs and typos
