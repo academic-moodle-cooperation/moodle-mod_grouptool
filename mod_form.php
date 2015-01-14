@@ -46,9 +46,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function definition() {
 
-        global $CFG, $DB, $PAGE;
+        global $CFG, $DB, $PAGE, $OUTPUT;
         $mform = $this->_form;
         $maxregs = 0;
+        $queues = 0;
         if ($update = optional_param('update', 0, PARAM_INT)) {
             $cm = get_coursemodule_from_id('grouptool', $update);
             $course = $DB->get_record('course', array('id' => $cm->course));
@@ -62,6 +63,14 @@ class mod_grouptool_mod_form extends moodleform_mod {
         GROUP BY reg.userid) as regcnts';
             $params = array('grouptoolid' => $cm->instance);
             $maxregs = $DB->get_field_sql($sql, $params);
+            $sql = '
+      SELECT COUNT(queue.id) as queue
+        FROM {grouptool_queued} as queue
+        JOIN {grouptool_agrps} as agrps ON queue.agrpid = agrps.id
+       WHERE agrps.grouptoolid = :grouptoolid
+             AND agrps.active = 1';
+            $params = array('grouptoolid' => $cm->instance);
+            $queues = $DB->get_field_sql($sql, $params);
         } else if ($course = optional_param('course', 0, PARAM_INT)) {
             $course = $DB->get_record('course', array('id' => $course));
         } else {
@@ -189,6 +198,9 @@ class mod_grouptool_mod_form extends moodleform_mod {
                                          array('size' => '3'));
         $queue[] = $mform->createElement('checkbox', 'use_queue', '',
                                          get_string('use_queue', 'grouptool'));
+        if ($queues > 0) {
+            $mform->addElement('html', $OUTPUT->notification(get_string('queuespresenterror', 'grouptool'), 'notifymessage'));
+        }
         $mform->addGroup($queue, 'queue_grp',
                          get_string('queues_max', 'grouptool'), ' ', false);
         $mform->setType('use_queue', PARAM_BOOL);
@@ -199,7 +211,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $max_queues = get_config('mod_grouptool', 'max_queues');
         $mform->setDefault('queues_max', (($max_queues !== false) ? $max_queues : 1));
         $mform->addHelpButton('queue_grp', 'queuesgrp', 'grouptool');
-        $mform->disabledIf('queues_max', 'use_queue', 'notchecked');
+        if ($queues > 0) {
+            $queue[1]->setPersistantFreeze(1);
+            $queue[1]->setValue(1);
+            $queue[1]->freeze();
+        } else {
+            $mform->disabledIf('queues_max', 'use_queue', 'notchecked');
+        }
         $mform->disabledIf('queues_max', 'allow_reg', 'equal', 1);
 
         // Prevent user from unsetting if user is registered in multiple groups!
@@ -339,7 +357,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
       SELECT COUNT(queue.id) as queue
         FROM {grouptool_queued} as queue
         JOIN {grouptool_agrps} as agrps ON queue.agrpid = agrps.id
-       WHERE agrps.grouptoolid = :grouptoolid';
+       WHERE agrps.grouptoolid = :grouptoolid
+             AND agrps.active = 1';
             $params = array('grouptoolid' => $data['instance']);
             $queues = $DB->get_field_sql($sql, $params);
         } else {
@@ -359,6 +378,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
             $errors['queues_max'] = get_string('queuesizeerror', 'grouptool');
+        }
+
+        if (array_key_exists('use_queue', $data) && empty($data['use_queue']) && ($queues > 0)) {
+            $errors['queue_grp'] = get_string('queuespresenterror', 'grouptool');
         }
 
         if (!empty($data['allow_multiple']) && ($data['choose_min'] <= 0)) {

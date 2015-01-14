@@ -365,6 +365,7 @@ $string['preview'] = 'Vorschau';
 $string['queue'] = 'Warteliste';
 $string['queuesgrp'] = 'Warteschlangen und maximale Anzahl an Warteschlangenplätze';
 $string['queuesgrp_help'] = 'Wenn Wartelisten aktiviert sind, werden Benutzer, die sich in einer vollen Gruppe anmelden wollen, auf deren Warteliste gesetzt bis sie durch die Abmeldung eines anderen in die Gruppe nachrücken. Nach der Deadline, kann der Lehrende die Wartelisten auflösen, wobei die Gruppen in der Reihenfolge der Sortierung in der Gruppenliste mit den restlichen Wartelisteneinträgen aufgefüllt werden. Man kann die gleichzeitigen Wartelistenplätze für Benutzer begrenzen.<br />Begrenzt die gleichzeitig einnehmbaren Plätze in Wartelisten pro Benutzer in dieser Gruppenverwaltung.';
+$string['queuespresenterror'] = 'Es sind bereits Benutzer in Warteschlangen eingetragen. Sie können diese nicht deaktivieren, bis die Wartelisten aufgelöst wurden.';
 $string['queue_and_multiple_reg_title'] = 'Warteschlangen und Mehrfachanmeldungen';
 $string['queue_in_group'] = 'Trage {$a->username} in Warteliste der Gruppe {$a->groupname} ein?';
 $string['queue_in_group_success'] = '{$a->username} erfolgreich in Warteliste der Gruppe {$a->groupname} eingetragen!';
