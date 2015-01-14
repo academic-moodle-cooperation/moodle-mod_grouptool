@@ -172,7 +172,15 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         $grouptool->use_individual = 0;
     }
     if (!isset($grouptool->use_queue)) {
-        $grouptool->use_queue = 0;
+        $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id)
+                                            FROM {grouptool_agrps} as agrps
+                                       LEFT JOIN {grouptool_queued} as queues ON queues.agrpid = agrps.id
+                                           WHERE agrps.grouptoolid = ?", array($grouptool->instance));
+        if (!empty($queues)) {
+            $grouptool->use_queue = 1;
+        } else {
+            $grouptool->use_queue = 0;
+        }
     }
     if (!isset($grouptool->allow_multiple)) {
         $grouptool->allow_multiple = 0;

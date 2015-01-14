@@ -366,6 +366,7 @@ $string['preview'] = 'Preview';
 $string['queue'] = 'Queue';
 $string['queuesgrp'] = 'Queue and maximum queue places';
 $string['queuesgrp_help'] = 'If queues are enabled, students who try to register in a full group, get queued until someone deregisters from the very same group. After the deadline the teacher has the ability to move students to other groups if they are still queued, where groups are filled using the current sort order of the group list. You should define a maximum number of groups in whom a user can be queued.<br />Limits the maximum simultaneous queue entries for each person in this grouptool.';
+$string['queuespresenterror'] = 'There are users listet in queues. You can\'t deactivate queues until these are resolved.';
 $string['queue_and_multiple_reg_title'] = 'Queues and multiple registrations';
 $string['queue_in_group'] = 'Proceed queueing {$a->username} in group {$a->groupname}?';
 $string['queue_in_group_success'] = 'Successfully queued {$a->username} in group {$a->groupname}!';
