@@ -350,6 +350,7 @@ $string['nothing_to_push'] = 'Nichts zu übernehmen!';
 $string['nowhere_queued'] = 'Keine Wartelisteneinträge';
 $string['number_of_students'] = 'Anzahl an Benutzer/innen';
 $string['occupied'] = 'Belegt';
+$string['onenewgrouping'] = 'Ja, in EINER neuen Gruppierung';
 $string['orientation'] = 'PDF-Ausrichtung';
 $string['overflowwarning'] = 'Wenn Sie fortfahren wird die Gruppengröße in der Instanz {$a->instancename} überschritten!';
 $string['overview'] = 'Überblick';

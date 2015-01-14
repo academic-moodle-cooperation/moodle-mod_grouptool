@@ -351,6 +351,7 @@ $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';
 $string['number_of_students'] = 'Number of students';
 $string['occupied'] = 'Occupied';
+$string['onenewgrouping'] = 'Yes, in ONE new grouping';
 $string['orientation'] = 'PDF-orientation';
 $string['overflowwarning'] = 'If you continue importing the group size in instance {$a->instancename} will be exceeded!';
 $string['overview'] = 'Overview';
