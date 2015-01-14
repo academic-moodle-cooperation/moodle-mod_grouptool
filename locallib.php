@@ -3218,7 +3218,8 @@ EOS;
         if (count($groupdata) == 1) {
             $groupdata = current($groupdata);
             $message->groupname = $groupdata->name;
-            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", array($grouptool->id));
+            // We have to filter only active groups to ensure no problems counting userregs and -queues.
+            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($grouptool->id));
             list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
             array_unshift($params, $userid);
             $userregs = $DB->count_records_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params);
@@ -3869,7 +3870,7 @@ EOS;
                                    null;
         $return->users = count_enrolled_users($this->context, 'mod/grouptool:register');
 
-        $agrps = $DB->get_records('grouptool_agrps', array('grouptoolid' => $this->cm->instance));
+        $agrps = $DB->get_records('grouptool_agrps', array('grouptoolid' => $this->cm->instance, 'active' => 1));
         if (is_array($agrps) && count($agrps) >= 1) {
             $agrpids = array_keys($agrps);
             list($inorequal, $params) = $DB->get_in_or_equal($agrpids);
@@ -4556,7 +4557,8 @@ EOS;
                     } else {
                         $queuerank = false;
                     }
-                    $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", array($this->grouptool->id));
+                    // If we include inactive groups and there's someone registered in one of these, the label gets displayed incorrectly.
+                    $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
                     list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
                     array_unshift($params, $userid);
                     $userregs = $DB->count_records_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params);
@@ -4866,7 +4868,7 @@ EOS;
                     $attr = array('class' => 'notifysuccess');
                     if (!groups_add_member($group, $userinfo->id)) {
                         $error = true;
-                        $notifiication = $OUTPUT->notification(get_string('import_user_problem',
+                        $notification = $OUTPUT->notification(get_string('import_user_problem',
                                                                           'grouptool', $data),
                                                                'notifyproblem');
                         $message .= html_writer::tag('div', $notification,
@@ -4877,6 +4879,11 @@ EOS;
                                                                        $data), $attr);
                     }
                     if ($forceregistration && empty($agrp)) {
+                        /* Registering in an non active Grouptool-group would cause problems
+                         * with incorrectly labeled buttons under certain circumstances.
+                         * We removed the automatic creation and registration in this newly inserted inactive group.
+                         * In no case, there should be a missing agrp entry anyway.
+                         */
                         $newgrpdata = $DB->get_record_sql('SELECT MAX(sort_order), MAX(grpsize)
                                                            FROM grouptool_agrps
                                                            WHERE grouptoolid = ?',
@@ -4890,11 +4897,15 @@ EOS;
                         $agrp->grpsize = $newgrpdata->grpsize;
                         $agrp->id = $DB->insert_record('grouptool_agrps', $agrp);
                         \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp)->trigger();
+                        $notification = $OUTPUT->notification(get_string('import_in_inactive_group_rejected',
+                                                                         'grouptool', $agrp),
+                                                              'notifyproblem');
+                        $message .= html_writer::tag('div', $notification,
+                                                     array('class' => 'error'));
                         $agrp = $agrp->id;
-                    }
-                    if ($forceregistration && !empty($agrp)
-                        && !$DB->record_exists('grouptool_registered',
-                                               array('agrpid' => $agrp, 'userid' => $userinfo->id))) {
+                    } else if ($forceregistration && !empty($agrp)
+                               && !$DB->record_exists('grouptool_registered',
+                                                      array('agrpid' => $agrp, 'userid' => $userinfo->id))) {
                         $reg = new stdClass();
                         $reg->agrpid = $agrp;
                         $reg->userid = $userinfo->id;
