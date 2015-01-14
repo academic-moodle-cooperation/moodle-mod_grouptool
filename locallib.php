@@ -224,17 +224,22 @@ class mod_grouptool_view_admin_form extends moodleform {
                     'M.mod_grouptool.init_administration',
                     array(array('fromto_mode' => GROUPTOOL_FROMTO_GROUPS)));
 
+            $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
+
             $options = array('0' => get_string('no'));
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
-                $options['-1'] = get_string('newgrouping', 'group');
+                $options['-1'] = get_string('onenewgrouping', 'grouptool');
+
             }
+            $selectgroups->addOptGroup("", $options);
             if ($groupings = groups_get_all_groupings($course->id)) {
+                $options = array();
                 foreach ($groupings as $grouping) {
                     $options[$grouping->id] = strip_tags(format_string($grouping->name));
                 }
+                $selectgroups->addOptGroup("————————————————————————", $options);
             }
-            $mform->addElement('select', 'grouping', get_string('createingrouping', 'group'),
-                               $options);
+            $mform->addElement($selectgroups);
             if ($groupings) {
                 $mform->setDefault('grouping', '0');
             }
