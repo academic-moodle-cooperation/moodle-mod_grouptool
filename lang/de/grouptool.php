@@ -130,7 +130,7 @@ $string['chooseactivity'] = 'Sie müssen eine Aktivität auswählen, bevor Daten
 $string['create_1_person_groups'] = '1-Personen-Gruppen erstellen';
 $string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89).';
 $string['createGroups'] = 'Gruppen erstellen';
-$string['createGroupings'] = 'Gruppierungen erstellen';
+$string['createGroupings'] = 'Gruppierungen erstellen/zuweisen';
 $string['create_groups_confirm'] = 'Gruppen erstellen, wie in der Vorschau gezeigt?';
 $string['create_groups_confirm_problem'] = 'Beim Versuch die neuen Gruppen anhand des vorgegebenen Namenschemas anzulegen sind Konflikte aufgetreten - siehe Vorschau - Moodle Gruppen müssen eineindeutige Namen haben. Der Konflikt kann an bereits bestehenden Gruppen mit gleichem Namen oder einem Syntaxfehler im Namensschema (z.B. leer, fehlendes #-Symbol, ...) liegen.';
 $string['create_groupings_confirm'] = 'Gruppierungen erstellen, wie in der Vorschau gezeigt?';
@@ -234,13 +234,23 @@ Erzeuge Gruppen in einem bestimmten Intervall (z.B. von 34 bis 89) - Mit diesem 
 </ul>';
 $string['groupfromtodigits'] = 'Von, Bis &amp; Stellen im Namen:';
 $string['groupinfo'] = 'Gruppeninformationen';
+$string['grouping_assign_success'] = 'Wurden erfolgreich hinzugefügt:';
+$string['grouping_assign_success_prev'] = 'Können erfolgreich hinzugefügt werden:';
+$string['grouping_assign_error'] = 'Konnten nicht zur Gruppierung hinzugefügt werden:';
+$string['grouping_assign_error_prev'] = 'Können nicht zur Gruppierung hinzugefügt werden:';
 $string['grouping_exists_error_prev'] = 'Kann Gruppierung nicht anlegen, da bereits eine Gruppierung mit diesem Namen existiert!';
 $string['grouping_exists_error'] = 'Konnte Gruppierung nicht anlegen, da bereits eine Gruppierung mit diesem Namen existiert!';
 $string['grouping_creation_success'] = 'Gruppierung erfolgreich angelegt und Gruppe {$a} hinzugefügt!';
 $string['grouping_creation_error_prev'] = 'Kann Gruppierung nicht anlegen!';
 $string['grouping_creation_error'] = 'Konnte Gruppierung nicht anlegen!';
-$string['groupingscreation'] = 'Gruppierungserzeugung';
-$string['groupingscreatedesc'] = 'Gruppierungen für wahlweise jede Kursgruppe oder jede ausgewählte Kursgruppe erstellen und jeweilige Gruppe automatisch hinzufügen.';
+$string['grouping_creation_only_success'] = 'Gruppierung erfolgreich angelegt!';
+$string['grouping_creation_only_success_prev'] = 'Gruppierung kann erfolgreich angelegt werden!';
+$string['groupingscreation'] = 'Gruppierung(en) erstellen/zuweisen';
+$string['groupingselect'] = 'Gruppierung für ausgewählte Gruppen';
+$string['groupingselect_help'] = 'Gruppierungen für ausgewählte Gruppen erstellen:<ul>
+<li>für ausgewählte Gruppen EINE neue gemeinsame Gruppierung anlegen. Name der Gruppierung kann selbst gewählt werden.</li>
+<li>für jede ausgewählte Gruppe eine Gruppierung PRO Gruppe anlegen. Name der Gruppierung ist gleich der Name der Gruppe.</li>
+<li>ausgewählte Gruppen in eine bestehende Gruppierung hinzufügen.</li></ul>';
 $string['group_places'] = 'Gruppenplätze';
 $string['group_places_help'] = 'Das Feld "Gruppenplätze" informiert (durch Schrägstrich getrennt) erstens über die Anzahl der gesamt verfügbaren Plätze, zweitens über die Anzahl der freien Gruppenplätze sowie drittens über die Anzahl jener Plätze, die bereits zum Zeitpunkt des Seitenaufrufs belegt waren.';
 $string['groupoverview'] = 'Gruppenübersicht';
@@ -336,6 +346,7 @@ $string['no_users_to_display'] = 'Keine Nutzer anzuzeigen!';
 $string['noaccess'] = 'Sie haben keinen Zugriff auf dieses Modul! Es ist möglich, dass Sie nicht zur richtigen Gruppe gehören.';
 $string['nobody_queued'] = 'Keine Wartelisteneinträge';
 $string['nogrouptools'] = 'Es gibt keine Gruppenverwaltungen!';
+$string['nogroupingselected'] = 'Es wurde(n) keine Gruppierung(en) ausgewählt!';
 $string['nonconflicting'] = 'Konfliktfrei';
 $string['nosmallgroups'] = 'Verhindere kleine Gruppen';
 $string['nosmallgroups_help'] = 'Wenn aktiviert, wird sichergestellt, dass jede Gruppe zumindest zu 70% der angegebenen Größe gefüllt ist! Die Benutzer/innen der unter Umständen vorhandenen letzten kleineren Gruppe, werden auf die übrigen Gruppen aufgeteilt. Es kann daher vorkommen, dass diese Gruppen mehr Mitglieder als spezifiziert haben!';
@@ -351,6 +362,7 @@ $string['nowhere_queued'] = 'Keine Wartelisteneinträge';
 $string['number_of_students'] = 'Anzahl an Benutzer/innen';
 $string['occupied'] = 'Belegt';
 $string['onenewgrouping'] = 'Ja, in EINER neuen Gruppierung';
+$string['onenewgroupingpergroup'] = 'Ja, eine Gruppierung PRO Gruppe';
 $string['orientation'] = 'PDF-Ausrichtung';
 $string['overflowwarning'] = 'Wenn Sie fortfahren wird die Gruppengröße in der Instanz {$a->instancename} überschritten!';
 $string['overview'] = 'Überblick';

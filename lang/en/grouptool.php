@@ -131,7 +131,7 @@ $string['chooseactivity'] = 'You have to choose an activity before data can be d
 $string['create_1_person_groups'] = 'Create 1 person groups';
 $string['create_fromto_groups'] = 'Create groups with numbers from an interval (i.e. from 34 to 89).';
 $string['createGroups'] = 'Create groups';
-$string['createGroupings'] = 'Create groupings';
+$string['create_assign_Groupings'] = 'Create/Assign groupings';
 $string['create_groups_confirm'] = 'Continue to create groups as previewed above?';
 $string['create_groups_confirm_problem'] = 'When trying to create the new groups based on the given name schema conflicts are encountered - see preview - Moodle groups must have unique names. The conflict can be due to existing groups with the same name or a syntax error in the naming scheme (... eg. empty, missing # symbol).';
 $string['create_groupings_confirm'] = 'Continue to create groupings as previewed above?';
@@ -235,13 +235,23 @@ Create groups with numbers from an interval (i.e. from 34 to 89) - use this mode
 </ul>';
 $string['groupfromtodigits'] = 'From, to &amp; digits in group names:';
 $string['groupinfo'] = 'Group information';
+$string['grouping_assign_success'] = 'Were successfully assigned:';
+$string['grouping_assign_success_prev'] = 'Can be successfully assigned:';
+$string['grouping_assign_error'] = 'Couldn\'t be successfully assigned to the grouping:';
+$string['grouping_assign_error_prev'] = 'Can\'t be successfully assigned to the grouping:';
 $string['grouping_exists_error_prev'] = 'Can\'t create grouping because there already exists a grouping with this name!';
 $string['grouping_exists_error'] = 'Couldn\'t create grouping because there already exists a grouping with this name!';
 $string['grouping_creation_success'] = 'Successfully created grouping and assigned group {$a} to it!';
 $string['grouping_creation_error_prev'] = 'Can\'t create grouping!';
 $string['grouping_creation_error'] = 'Couldn\'t create grouping!';
-$string['groupingscreation'] = 'Groupings-creation';
-$string['groupingscreatedesc'] = 'Create a grouping for each course group or each selected course group with the same name as the group and register the group in it.';
+$string['grouping_creation_only_success'] = 'Grouping successfully created!';
+$string['grouping_creation_only_success_prev'] = 'Grouping can be successfully created!';
+$string['groupingscreation'] = 'Create and assign groupings';
+$string['groupingselect'] = 'Groupings for selected groups';
+$string['groupingselect_help'] = 'Create groupings for selected groups:<ul>
+<li>Create ONE grouping for all selected groups. The name of the grouping can be chosen freely.</li>
+<li>Create a grouping for EACH selected group. The grouping is named after the respective group.</li>
+<li>Add selected groups to an existing grouping</li></ul>';
 $string['group_places'] = 'Group places';
 $string['group_places_help'] = 'The field \'group place\' informs (separated by backslash) firstly about the total number of group places, secondly about the number of free places and thirdly about the number of group places that are already occupied.';
 $string['groupoverview'] = 'Group overview';
@@ -337,6 +347,7 @@ $string['no_users_to_display'] = 'No users to display!';
 $string['noaccess'] = 'You have no access to this module (maybe you do not belong to the right group?)!';
 $string['nobody_queued'] = 'Nobody queued';
 $string['nogrouptools'] = 'There are no grouptools!';
+$string['nogroupingselected'] = 'No grouping(s) have been selected!';
 $string['nonconflicting'] = 'Without conflicts';
 $string['nosmallgroups'] = 'Prevent small groups';
 $string['nosmallgroups_help'] = 'If enabled ensures that each group is at least filled by 70% of it\'s size! If a (or more precise the last) group would be filled less than 70% the users for this group get spread over the other groups, causing them to have more members than specified!';
@@ -352,6 +363,7 @@ $string['nowhere_queued'] = 'Not queued';
 $string['number_of_students'] = 'Number of students';
 $string['occupied'] = 'Occupied';
 $string['onenewgrouping'] = 'Yes, in ONE new grouping';
+$string['onenewgroupingpergroup'] = 'Yes, one grouping PER group';
 $string['orientation'] = 'PDF-orientation';
 $string['overflowwarning'] = 'If you continue importing the group size in instance {$a->instancename} will be exceeded!';
 $string['overview'] = 'Overview';
