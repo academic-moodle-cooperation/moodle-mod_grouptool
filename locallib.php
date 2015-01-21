@@ -2899,6 +2899,9 @@ EOS;
             $hiddenelements = html_writer::empty_tag('input', array('type'   => 'hidden',
                                                                      'name'  => 'sesskey',
                                                                      'value' => sesskey()));
+            $hiddenelements .= html_writer::empty_tag('input', array('type'   => 'hidden',
+                                                                     'name'  => 'tab',
+                                                                     'value' => 'grading'));
             $activityelement = html_writer::select($activities, "activity", $activity);;
             $activityselect = html_writer::start_tag('div', array('class' => 'fitem')).
                               html_writer::tag('div', $activitytitle,
@@ -2955,9 +2958,22 @@ EOS;
 
             $filtertitle = get_string('grading_filter_select_title', 'grouptool').
                            $OUTPUT->help_icon('grading_filter_select_title', 'grouptool');
+            $groupingtitle = get_string('grading_grouping_select_title', 'grouptool');
+            $groupings = groups_get_all_groupings($this->course->id);
+            $options = array();
+            foreach ($groupings as $currentgrouping) {
+                $options[$currentgrouping->id] = $currentgrouping->name;
+            }
+            $groupingelement = html_writer::select($options, 'grouping', $grouping,
+                                                   get_string('disabled', 'grouptool'));
+            $groupingselect = html_writer::start_tag('div', array('class' => 'fitem')).
+                              html_writer::tag('div', $groupingtitle, array('class' => 'fitemtitle')).
+                              html_writer::tag('div', $groupingelement, array('class' => 'felement')).
+                              html_writer::end_tag('div');
+
             $options = array("-1" => get_string('nonconflicting', 'grouptool'),
                              "0"  => get_string('all'));
-            $groups = groups_get_all_groups($this->course->id, null, null, 'id, name');
+            $groups = groups_get_all_groups($this->course->id, null, $grouping, 'g.id, g.name');
             foreach ($groups as $key => $group) {
                 $membercount = $DB->count_records('groups_members', array('groupid' => $group->id));
                 if ($membercount == 0) {
@@ -2971,19 +2987,6 @@ EOS;
                             html_writer::tag('div', $filtertitle, array('class' => 'fitemtitle')).
                             html_writer::tag('div', $filterelement, array('class' => 'felement')).
                             html_writer::end_tag('div');
-
-            $groupingtitle = get_string('grading_grouping_select_title', 'grouptool');
-            $groupings = groups_get_all_groupings($this->course->id);
-            $options = array();
-            foreach ($groupings as $currentgrouping) {
-                $options[$currentgrouping->id] = $currentgrouping->name;
-            }
-            $groupingelement = html_writer::select($options, 'grouping', $grouping,
-                                                   get_string('disabled', 'grouptool'));
-            $groupingselect = html_writer::start_tag('div', array('class' => 'fitem')).
-                              html_writer::tag('div', $groupingtitle, array('class' => 'fitemtitle')).
-                              html_writer::tag('div', $groupingelement, array('class' => 'felement')).
-                              html_writer::end_tag('div');
 
             $refreshtitle = "";
             $refreshelement = html_writer::tag('button', get_string('refresh_table_button',
@@ -3000,8 +3003,8 @@ EOS;
             $legend = html_writer::tag('legend', get_string('filters_legend', 'grouptool'));
             $filterelements = html_writer::tag('fieldset',
                                                $legend.$activityselect.$mygroupsonlychkbox.
-                                               $incompleteonlychkbox.$overwritechkbox.$filterselect.
-                                               $groupingselect.$refreshbutton,
+                                               $incompleteonlychkbox.$overwritechkbox.$groupingselect.
+                                               $filterselect.$refreshbutton,
                                                array('class' => 'clearfix'));
             if ($filter > 0) {
                 $tablehtml = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
@@ -3013,6 +3016,18 @@ EOS;
 
             $formcontent = html_writer::tag('div', $hiddenelements.$filterelements.$tablehtml,
                                             array('class' => 'clearfix'));
+
+            //load necessary JS for the status trafficlight
+             $jsmodule = array(
+                                'name'     => 'moodle-mod_grouptool-grading',
+                                'fullpath' => '/mod/grouptool/yui/grading/grading.js',
+                                'requires' => array('base', 'io', 'node'),
+                                'strings' => array()
+                             );
+            $jsdata = array(array( 'lang' => current_language(),
+                             'contextid' => $this->context->id));
+            //$PAGE->requires->js_init_call('M.mod_grouptool.init_grading', $jsdata, true, $jsmodule);
+            $PAGE->requires->yui_module('moodle-mod_grouptool-grading', 'M.mod_grouptool.grading.init', $jsdata);
 
             $formattr = array(
                     'method' => 'post',
