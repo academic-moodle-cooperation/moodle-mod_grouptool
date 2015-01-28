@@ -57,12 +57,12 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
 } else {
     echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
     $moodlereg = groups_get_members($group->grpid, 'u.id');
-    $userfieldssql = user_picture::fields('user');
-    $regsql = "SELECT $userfieldssql, user.idnumber as idnumber
-               FROM {grouptool_registered} as reg
-                   LEFT JOIN {user} as user ON reg.userid = user.id
-               WHERE reg.agrpid = ?
-               ORDER BY timestamp ASC";
+    $userfieldssql = user_picture::fields('usr', array('idnumber'));
+    $regsql = "SELECT $userfieldssql
+                 FROM {grouptool_registered} as reg
+            LEFT JOIN {user} as usr ON reg.userid = usr.id
+                WHERE reg.agrpid = ?
+             ORDER BY timestamp ASC";
     if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
         echo html_writer::tag('div', get_string('no_registrations', 'grouptool'),
                               array('class' => 'reg'));
@@ -83,10 +83,9 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
     }
 
     echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
-    $userfieldssql = user_picture::fields('user');
-    $queuesql = "SELECT $userfieldssql, user.idnumber as idnumber
+    $queuesql = "SELECT $userfieldssql
                  FROM {grouptool_queued} as queue
-                     LEFT JOIN {user} as user ON queue.userid = user.id
+                     LEFT JOIN {user} as usr ON queue.userid = usr.id
                  WHERE queue.agrpid = ?
                  ORDER BY timestamp ASC";
     if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
