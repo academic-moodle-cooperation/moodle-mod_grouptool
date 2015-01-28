@@ -3017,6 +3017,18 @@ EOS;
             $formcontent = html_writer::tag('div', $hiddenelements.$filterelements.$tablehtml,
                                             array('class' => 'clearfix'));
 
+            //load necessary JS for the status trafficlight
+             $jsmodule = array(
+                                'name'     => 'moodle-mod_grouptool-grading',
+                                'fullpath' => '/mod/grouptool/yui/grading/grading.js',
+                                'requires' => array('base', 'io', 'node'),
+                                'strings' => array()
+                             );
+            $jsdata = array(array( 'lang' => current_language(),
+                             'contextid' => $this->context->id));
+            //$PAGE->requires->js_init_call('M.mod_grouptool.init_grading', $jsdata, true, $jsmodule);
+            $PAGE->requires->yui_module('moodle-mod_grouptool-grading', 'M.mod_grouptool.grading.init', $jsdata);
+
             $formattr = array(
                     'method' => 'post',
                     'action' => $PAGE->url,
