@@ -570,6 +570,11 @@ class mod_grouptool_view_import_form extends moodleform {
                 $mform->setDefault('forceregistration', $force_importreg);
             }
 
+            $mform->addElement('advcheckbox', 'includedeleted', '', get_string('includedeleted', 'grouptool'));
+            $mform->addHelpButton('includedeleted', 'includedeleted', 'grouptool');
+            $mform->setAdvanced('includedeleted');
+            $mform->setDefault('includedeleted', 0);
+
             $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }
     }
@@ -4933,7 +4938,7 @@ EOS;
      * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
      */
-    public function import($group, $data, $forceregistration = false, $previewonly = false) {
+    public function import($group, $data, $forceregistration = false, $includedeleted = 0, $previewonly = false) {
         global $DB, $OUTPUT, $CFG, $PAGE, $USER;
 
         $message = "";
@@ -4999,15 +5004,26 @@ EOS;
         foreach ($users as $user) {
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-                $userinfo = $DB->get_records_sql($sql, array('userpattern' => $user));
+                if (empty($includedeleted)) {
+                    $sql .= ' AND deleted = :deleted';
+                    $param = array('userpattern' => $user, 'deleted' => 0);
+                } else {
+                    $param = array('userpattern' => $user);
+                }
+
+                $userinfo = $DB->get_records_sql($sql, $param);
+
                 if (empty($userinfo)) {
-                    $userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user));
+                    $param['userpattern'] = '%'.$user;
+                    $userinfo = $DB->get_records_sql($sql, $param);
                 }
                 if (empty($userinfo)) {
-                    $userinfo = $DB->get_records_sql($sql, array('userpattern' => $user.'%'));
+                    $param['userpattern'] = $user.'%';
+                    $userinfo = $DB->get_records_sql($sql, $param);
                 }
                 if (empty($userinfo)) {
-                    $userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user.'%'));
+                    $param['userpattern'] = '%'.$user.'%';
+                    $userinfo = $DB->get_records_sql($sql, $param);
                 }
                 if (!empty($userinfo) && count($userinfo) == 1) {
                     break;
@@ -5034,6 +5050,15 @@ EOS;
             } else {
                 $userinfo = reset($userinfo);
                 if (!is_enrolled($this->context, $userinfo->id)) {
+
+                    // We have to catch deleted users now, give a message and continue!
+                    if (!empty($userinfo->deleted)) {
+                        $userinfo->fullname = fullname($userinfo);
+                        $text = get_string('user_is_deleted', 'grouptool', $userinfo);
+                        $message .= html_writer::tag('div', $OUTPUT->notification($text, 'notifyproblem'));
+                        $error = true;
+                        continue;
+                    }
                     /*
                      * if user's not enrolled already we force manual enrollment in course,
                      * so we can add the user to the group
@@ -5154,11 +5179,12 @@ EOS;
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             $group = required_param('group', PARAM_INT);
             $data = required_param('data', PARAM_RAW);
+            $includedeleted = optional_param('includedeleted', 0, PARAM_BOOL);
             $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
             if (!empty($data)) {
                 $data = unserialize($data);
             }
-            list($error, $message) = $this->import($group, $data, $forceregistration);
+            list($error, $message) = $this->import($group, $data, $forceregistration, $includedeleted);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'),
@@ -5172,13 +5198,15 @@ EOS;
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
             list($error, $confirmmessage) = $this->import($fromform->group, $fromform->data,
-                                                          $fromform->forceregistration, true);
+                                                          $fromform->forceregistration,
+                                                          $fromform->includedeleted, true);
 
             $attr = array(
                     'confirm'           => '1',
                     'group'             => $fromform->group,
                     'data'              => serialize($fromform->data),
-                    'forceregistration' => $fromform->forceregistration);
+                    'forceregistration' => $fromform->forceregistration,
+                    'includedeleted'    => $fromform->includedeleted);
 
             $continue = new moodle_url($PAGE->url, $attr);
             $cancel = new moodle_url($PAGE->url);
