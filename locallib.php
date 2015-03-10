@@ -286,7 +286,7 @@ class mod_grouptool_view_admin_form extends moodleform {
                     $mform->disabledIf('grpg_groupingname', 'grpg_target', 'noteq', '-1');
                 }
 
-                $mform->addElement('submit', 'createGroupings', get_string('create_assign_Groupings',
+                $mform->addElement('submit', 'createGroupings', get_string('create_assign_groupings',
                                                                            'grouptool'));
             } else {
                 $mform->addElement('static', html_writer::tag('div', get_string('sortlist_no_data',
