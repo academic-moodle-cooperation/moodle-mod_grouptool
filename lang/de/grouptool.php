@@ -131,6 +131,7 @@ $string['create_1_person_groups'] = '1-Personen-Gruppen erstellen';
 $string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89).';
 $string['createGroups'] = 'Gruppen erstellen';
 $string['createGroupings'] = 'Gruppierungen erstellen/zuweisen';
+$string['create_assign_groupings'] = 'Gruppierungen erstellen/zuweisen';
 $string['create_groups_confirm'] = 'Gruppen erstellen, wie in der Vorschau gezeigt?';
 $string['create_groups_confirm_problem'] = 'Beim Versuch die neuen Gruppen anhand des vorgegebenen Namenschemas anzulegen sind Konflikte aufgetreten - siehe Vorschau - Moodle Gruppen müssen eineindeutige Namen haben. Der Konflikt kann an bereits bestehenden Gruppen mit gleichem Namen oder einem Syntaxfehler im Namensschema (z.B. leer, fehlendes #-Symbol, ...) liegen.';
 $string['create_groupings_confirm'] = 'Gruppierungen erstellen, wie in der Vorschau gezeigt?';
