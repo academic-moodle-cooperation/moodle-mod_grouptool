@@ -75,6 +75,13 @@ function group_add_member_handler($data) {
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
                 \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
             }
+        } else if ($reg = $DB->get_record('grouptool_registered', array('agrpid' => $agrp[$grouptool->id]->id,
+                                                                     'userid' => $data->userid,
+                                                                     'modified_by' => -1))) {
+                $reg->modified_by = 0;
+                $DB->update_record($reg);
+                $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
+                \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
         }
     }
     return true;

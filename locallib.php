@@ -472,7 +472,7 @@ class mod_grouptool_view_admin_form extends moodleform {
             $sql = '
    SELECT agrps.groupid as id, COUNT(reg.id) as regcnt
      FROM {grouptool_agrps} as agrps
-LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id
+LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
     WHERE agrps.grouptoolid = :grouptoolid
  GROUP BY agrps.groupid';
             $cm = get_coursemodule_from_id('grouptool', $data['id']);
@@ -3205,7 +3205,7 @@ EOS;
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", array($this->grouptool->id));
         list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
-        $userregs = $DB->count_records_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params);
+        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql, $params);
         $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
@@ -3432,7 +3432,7 @@ EOS;
             $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($grouptool->id));
             list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
             array_unshift($params, $userid);
-            $userregs = $DB->count_records_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params);
+            $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql, $params);
             $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
             $max = $grouptool->allow_multiple ? $grouptool->choose_max : 1;
             $min = $grouptool->allow_multiple ? $grouptool->choose_min : 0;
@@ -3595,7 +3595,7 @@ EOS;
                                                     $message));
                         }
                     } else if (empty($movefromqueue) && $this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues))) {
+                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues + 1))) {
                         // Cache data until enough registrations are made!
                         $record = new stdClass();
                         $record->agrpid = $agrpid;
@@ -3697,7 +3697,7 @@ EOS;
                                                     $message));
                         }
                     } else if ($this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues))) {
+                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues + 1))) {
                         // Cache data until enough registrations are made!
                         // TODO events for place allocation?
                         $record = new stdClass();
@@ -3783,7 +3783,7 @@ EOS;
                                                 $message));
                     }
                 } else if ($this->grouptool->allow_multiple
-                           && ($this->grouptool->choose_min > ($marks + 1 + $userregs + $userqueues))) {
+                           && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues + 1))) {
                     //TODO Place allocation event!
                     // Cache data until enough registrations are made!
                     $record = new stdClass();
@@ -3943,7 +3943,7 @@ EOS;
         $params = array_merge(array($userid), $params);
         return $DB->count_records_sql('SELECT count(id)
                                        FROM {grouptool_registered}
-                                       WHERE userid = ? AND agrpid '.$sql, $params);
+                                       WHERE modified_by >= 0 AND userid = ? AND agrpid '.$sql, $params);
     }
 
     /**
@@ -4085,12 +4085,12 @@ EOS;
             $agrpids = array_keys($agrps);
             list($inorequal, $params) = $DB->get_in_or_equal($agrpids);
             $sql = "SELECT count(DISTINCT userid)
-            FROM {grouptool_registered}
-            WHERE agrpid ".$inorequal;
+                      FROM {grouptool_registered}
+                     WHERE modified_by >= 0 AND agrpid ".$inorequal;
             $return->reg_users = $DB->count_records_sql($sql, $params);
             $sql = "SELECT count(DISTINCT userid)
-            FROM {grouptool_queued}
-            WHERE agrpid ".$inorequal;
+                      FROM {grouptool_queued}
+                     WHERE agrpid ".$inorequal;
             $return->queued_users = $DB->count_records_sql($sql, $params);
         } else {
             $return->reg_users = 0;
@@ -4152,7 +4152,7 @@ EOS;
                       SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
                              MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) as priority
                         FROM {grouptool_queued} AS queued
-                   LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql."
+                   LEFT JOIN {grouptool_registered} AS reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql." AND reg.modified_by >= 0
                     ".$queuedsql."
                     GROUP BY queued.id
                     ORDER BY priority DESC, queued.timestamp ASC",
@@ -4161,14 +4161,14 @@ EOS;
                 $queuedsql = " WHERE queued.agrpid ".$agrpssql." ";
                 $queuedparams = $agrpsparam;
                 $queueentries = $DB->get_records_sql("SELECT *, '1' as priority
-                                                       FROM {grouptool_queued} as queued".
-                                                       $queuedsql.
-                                                      "ORDER BY timestamp ASC",
-                                                      $queuedparams);
+                                                        FROM {grouptool_queued} as queued".
+                                                             $queuedsql.
+                                                   "ORDER BY timestamp ASC",
+                                                     $queuedparams);
             }
             $userregs = $DB->get_records_sql_menu('SELECT reg.userid, COUNT(DISTINCT reg.id)
                                                      FROM {grouptool_registered} as reg
-                                                    WHERE reg.agrpid '.$agrpssql.'
+                                                    WHERE reg.agrpid '.$agrpssql.' AND modified_by >= 0
                                                  GROUP BY reg.userid', $agrpsparam);
         } else {
             return array(true, get_string('no_active_groups', 'grouptool'));
@@ -4179,7 +4179,7 @@ EOS;
                 SELECT agrp.id as id, MAX(agrp.groupid) as groupid, MAX(agrp.grpsize) as grpsize,
                        COUNT(DISTINCT reg.id) as registered
                   FROM {grouptool_agrps} as agrp
-             LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrp.id
+             LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrp.id AND modified_by >= 0
                  WHERE agrp.grouptoolid = ?".$agrpsfiltersql."
               GROUP BY agrp.id
               ORDER BY agrp.sort_order ASC", $agrpsfilterparams);
@@ -4771,7 +4771,7 @@ EOS;
                     $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
                     list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
                     array_unshift($params, $userid);
-                    $userregs = $DB->count_records_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params);
+                    $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql, $params);
                     $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
                     $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
                     $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
@@ -4971,7 +4971,7 @@ EOS;
                             MAX(grptl.name) as instancename
                        FROM {grouptool_agrps} as agrps
                        JOIN {grouptool} as grptl ON agrps.grouptoolid = grptl.id
-                  LEFT JOIN {grouptool_registered} as regs ON agrps.id = regs.agrpid
+                  LEFT JOIN {grouptool_registered} as regs ON agrps.id = regs.agrpid AND regs.modified_by >= 0
                       WHERE agrps.groupid = :grpid
                         AND grptl.use_size = 1
                         AND agrps.active = 1
@@ -5134,15 +5134,23 @@ EOS;
                                                      array('class' => 'error'));
                         $agrp = $agrp->id;
                     } else if ($forceregistration && !empty($agrp)
-                               && !$DB->record_exists('grouptool_registered',
-                                                      array('agrpid' => $agrp, 'userid' => $userinfo->id))) {
-                        $reg = new stdClass();
-                        $reg->agrpid = $agrp;
-                        $reg->userid = $userinfo->id;
-                        $reg->timestamp = time();
-                        $reg->modified_by = $USER->id;
-                        //We don't need to log creation of registration, because we log import as whole!
-                        $reg->id = $DB->insert_record('grouptool_registered', $reg);
+                               && !$DB->record_exists_select('grouptool_registered',
+                                                             "modified_by >= 0 AND agrpid = :agrpid AND userid = :userid",
+                                                             array('agrpid' => $agrp, 'userid' => $userinfo->id))) {
+                        if ($reg = $DB->get_record('grouptool_registered', array('agrpid' => $agrp, 'userid' => $userinfo->id, 'modified_by' => -1), IGNORE_MISSING)) {
+                            // If user is marked, we register him right now!
+                            $reg->modified_by = $USER->id;
+                            $DB->update_record('grouptool->registered', $reg);
+                            // TODO do we have to delete his marks and queues if theres enough registrations?
+                        } else {
+                            $reg = new stdClass();
+                            $reg->agrpid = $agrp;
+                            $reg->userid = $userinfo->id;
+                            $reg->timestamp = time();
+                            $reg->modified_by = $USER->id;
+                            //We don't need to log creation of registration, because we log import as whole!
+                            $reg->id = $DB->insert_record('grouptool_registered', $reg);
+                        }
 
                         \mod_grouptool\event\user_imported::import_forced($this->cm, $reg->id, $agrp, $group, $userinfo->id)->trigger();
                     } else if (!$forceregistration) {
@@ -6475,7 +6483,7 @@ EOS;
                        COUNT(DISTINCT reg.userid) AS grptoolregs,
                        COUNT(DISTINCT mreg.userid) AS mdlregs
                 FROM {grouptool_agrps} as agrps
-                    LEFT JOIN {grouptool_registered} as reg ON agrps.id = reg.agrpid
+                    LEFT JOIN {grouptool_registered} as reg ON agrps.id = reg.agrpid AND reg.modified_by >= 0
                     LEFT JOIN {groups_members} as mreg ON agrps.groupid = mreg.groupid
                                                        AND reg.userid = mreg.userid
                 WHERE agrps.active = 1 AND agrps.grouptoolid = ?
@@ -6819,7 +6827,8 @@ EOS;
                           FROM {grouptool_registered} AS regs
                      LEFT JOIN {grouptool_agrps}      AS agrps ON regs.agrpid = agrps.id
                      LEFT JOIN {groups}               AS grps  ON agrps.groupid = grps.id
-                         WHERE regs.userid = ?
+                         WHERE regs.modified_by >= 0
+                               AND regs.userid = ?
                                AND regs.agrpid ".$agrpsql;
                 $params = array_merge(array($cur->id), $agrpparams);
                 $data[$idx]->regs = implode(',', $DB->get_fieldset_sql($sql, $params));
@@ -6981,7 +6990,7 @@ EOS;
             $groupingusers2 = $DB->get_fieldset_sql("
             SELECT DISTINCT u.id
               FROM {user} as u
-         LEFT JOIN {grouptool_registered} as reg ON u.id = reg.userid
+         LEFT JOIN {grouptool_registered} as reg ON u.id = reg.userid AND reg.modified_by >= 0
          LEFT JOIN {grouptool_queued} as queue ON u.id = queue.userid
          LEFT JOIN {grouptool_agrps} as agrp ON reg.agrpid = agrp.id OR queue.agrpid = agrp.id
              WHERE agrp.groupid ".$groupssql, $groupsparams);
@@ -7009,7 +7018,7 @@ EOS;
             $groupusers2 = $DB->get_fieldset_sql("
             SELECT DISTINCT u.id
               FROM {user} as u
-         LEFT JOIN {grouptool_registered} as reg ON u.id = reg.userid
+         LEFT JOIN {grouptool_registered} as reg ON u.id = reg.userid AND reg.modified_by >= 0
          LEFT JOIN {grouptool_queued} as queue ON u.id = queue.userid
          LEFT JOIN {grouptool_agrps} as agrp ON reg.agrpid = agrp.id OR queue.agrpid = agrp.id
              WHERE agrp.groupid = ?", array($groupid));
