@@ -67,10 +67,11 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
     $text .= $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
     $moodlereg = groups_get_members($group->grpid, 'u.id');
     $userfieldssql = user_picture::fields('usr', array('idnumber'));
+    // Get registrations but exclude all who are just marked for registration!
     $regsql = "SELECT $userfieldssql
                FROM {grouptool_registered} as reg
                    LEFT JOIN {user} as usr ON reg.userid = usr.id
-               WHERE reg.agrpid = ?
+               WHERE reg.agrpid = ? AND reg.modified_by >= 0
                ORDER BY timestamp ASC";
     if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
         $text .= html_writer::tag('div', get_string('no_registrations', 'grouptool'),
@@ -92,6 +93,7 @@ if (!has_capability('mod/grouptool:view_registrations', $context)
     }
 
     $text .= $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
+    // Get queue but exclude all who are just marked not queued!
     $queuesql = "SELECT $userfieldssql
                  FROM {grouptool_queued} as queue
                      LEFT JOIN {user} as usr ON queue.userid = usr.id

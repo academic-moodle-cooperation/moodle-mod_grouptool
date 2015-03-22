@@ -311,8 +311,8 @@ function grouptool_update_queues($grouptool = 0) {
         list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps));
         $groupregs = $DB->get_records_sql_menu('SELECT agrpid, COUNT(id)
                                                   FROM {grouptool_registered}
-                                                 WHERE agrpid '.$agrpsql.
-                                             'GROUP BY agrpid', $params);
+                                                 WHERE agrpid '.$agrpsql.' AND modified_by >= 0
+                                              GROUP BY agrpid', $params);
         foreach ($agrps as $agrpid => $agrp) {
             $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ?
                                                            $grouptool->grpsize :
@@ -322,14 +322,14 @@ function grouptool_update_queues($grouptool = 0) {
             // We use MAX to trick Postgres into thinking this is an full GROUP BY statement.
             $sql = "SELECT queued.id as id, MAX(queued.agrpid) as agrpid, MAX(queued.timestamp),
                            MAX(queued.userid) as userid, (regs < ?) as priority, MAX(reg.regs) as regs
-                                  FROM {grouptool_queued} AS queued
-                             LEFT JOIN (SELECT userid, COUNT(DISTINCT id) as regs
-                                         FROM {grouptool_registered}
-                                        WHERE agrpid ".$agrpsql."
-                                     GROUP BY userid) AS reg ON queued.userid = reg.userid
-                                 WHERE queued.agrpid = ?
-                              GROUP BY queued.id, priority
-                              ORDER BY priority DESC, queued.timestamp ASC";
+                      FROM {grouptool_queued} AS queued
+                 LEFT JOIN (SELECT userid, COUNT(DISTINCT id) as regs
+                              FROM {grouptool_registered}
+                             WHERE agrpid ".$agrpsql." AND modified_by >= 0
+                          GROUP BY userid) AS reg ON queued.userid = reg.userid
+                     WHERE queued.agrpid = ?
+                  GROUP BY queued.id, priority
+                  ORDER BY priority DESC, queued.timestamp ASC";
 
             if ($records = $DB->get_records_sql($sql, array_merge(array($min),
                                                                  $params, array($agrpid)))) {
@@ -349,6 +349,14 @@ function grouptool_update_queues($grouptool = 0) {
                         unset($record->regs);
                         $record->modified_by = 0;
                         $DB->insert_record('grouptool_registered', $record);
+                        if (!empty($grouptool->immediate_reg)) {
+                            groups_add_member($agrp->groupid, $record->userid);
+                        }
+                    } else if ($mark = $DB->get_record('grouptool_registered', array('agrpid' => $agrpid,
+                                                                                     'userid' => $record->userid,
+                                                                                     'modified_by' => -1))) {
+                        $mark->modified_by = 0;
+                        $DB->update_record('grouptool_registered', $mark);
                         if (!empty($grouptool->immediate_reg)) {
                             groups_add_member($agrp->groupid, $record->userid);
                         }

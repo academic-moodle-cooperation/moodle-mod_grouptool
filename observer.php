@@ -55,11 +55,17 @@ class mod_grouptool_observer {
         $agrp = $DB->get_records_sql($agrpssql, array('groupid' => $event->objectid));
 
         $regsql = "SELECT reg.agrpid AS id
-                FROM {grouptool_agrps} AS agrps
-                INNER JOIN {grouptool_registered} as reg ON agrps.id = reg.agrpid
-                WHERE agrps.groupid = :groupid AND reg.userid = :userid";
+                     FROM {grouptool_agrps} AS agrps
+               INNER JOIN {grouptool_registered} as reg ON agrps.id = reg.agrpid
+                    WHERE reg.modified_by >= 0 AND agrps.groupid = :groupid AND reg.userid = :userid";
         $regs = $DB->get_records_sql($regsql, array('groupid' => $event->objectid,
                                                     'userid'  => $event->relateduserid));
+        $markssql = "SELECT reg.agrpid, reg.id, reg.userid, reg.timestamp
+                       FROM {grouptool_agrps} AS agrps
+                 INNER JOIN {grouptool_registered} as reg ON agrps.id = reg.agrpid
+                      WHERE reg.modified_by = -1 AND agrps.groupid = :groupid AND reg.userid = :userid";
+        $marks = $DB->get_records_sql($markssql, array('groupid' => $event->objectid,
+                                                       'userid'  => $event->relateduserid));
         foreach ($grouptools as $grouptool) {
             if (!key_exists($grouptool->agrpid, $regs)) {
                 $reg = new stdClass();
@@ -74,6 +80,13 @@ class mod_grouptool_observer {
                     $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
                     \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
                 }
+            } else if (key_exists($grouptool->agrpid, $marks)) {
+                $record = $marks[$grouptool->agrpid];
+                $record->modified_by = 0;
+                $DB->update_record('grouptool_registered', $record);
+                $reg->groupid = $event->objectid;
+                $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
+                \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $record)->trigger();
             }
         }
         return true;
@@ -108,10 +121,10 @@ class mod_grouptool_observer {
             switch($grouptool->ifmemberremoved) {
                 case GROUPTOOL_FOLLOW:
                     $sql = "SELECT reg.id AS id, reg.agrpid AS agrpid, reg.userid as userid, agrps.groupid FROM {grouptool_agrps} AS agrps
-                     INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrpid
-                          WHERE reg.userid = :userid
-                            AND agrps.grouptoolid = :grouptoolid
-                            AND agrps.groupid = :groupid";
+                        INNER JOIN {grouptool_registered} AS reg ON agrps.id = reg.agrpid
+                             WHERE reg.userid = :userid
+                                   AND agrps.grouptoolid = :grouptoolid
+                                   AND agrps.groupid = :groupid";
                     if ($regs = $DB->get_records_sql($sql,
                                                      array('grouptoolid' => $grouptool->id,
                                                            'userid'      => $event->relateduserid,
