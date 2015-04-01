@@ -4709,9 +4709,24 @@ EOS;
                 }
             }
         }
+		$importfields = explode(',', empty($CFG->grouptool_importfields)?'username,idnumber':$CFG->grouptool_importfields);
         foreach ($users as $user) {
-            $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-            $userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user));
+			foreach ($importfields as $field) {
+				$sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
+				$userinfo = $DB->get_records_sql($sql, array('userpattern' => $user));
+				if (empty($userinfo)) {
+					$userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user));
+				}
+				if (empty($userinfo)) {
+					$userinfo = $DB->get_records_sql($sql, array('userpattern' => $user.'%'));
+				}
+				if (empty($userinfo)) {
+					$userinfo = $DB->get_records_sql($sql, array('userpattern' => '%'.$user.'%'));
+				}
+				if (!empty($userinfo) && count($userinfo) == 1) {
+					break;
+				}
+			}
 
             if (empty($userinfo)) {
                 $message .= html_writer::tag('div',

@@ -162,4 +162,9 @@ if ($ADMIN->fulltree) {
                                                     get_string('cfg_force_importreg', 'grouptool'),
                                                     get_string('cfg_force_importreg_desc', 'grouptool'),
                                                     0, $yes = '1', $no = '0'));
+
+	$settings->add(new admin_setting_configtext('grouptool_importfields',
+											    get_string('cfg_importfields', 'grouptool'),
+											    get_string('cfg_importfields_desc', 'grouptool'),
+											    'username,idnumber', "/^((?![^a-zA-Z,]).)*$/"));
 }

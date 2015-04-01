@@ -428,6 +428,15 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014031900, 'grouptool');
     }
 
+    if ($oldversion < 2014090800) {
+        // We have to have it set for the following upgrade steps!
+        if (!isset($CFG->grouptool_importfields)) {
+            set_config('grouptool_importfields', 'username,idnumber');
+        }
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2014090800, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
