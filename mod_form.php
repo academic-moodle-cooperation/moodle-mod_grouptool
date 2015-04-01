@@ -89,7 +89,7 @@ GROUP BY reg.userid) as regcnts';
         $mform->addHelpButton('name', 'grouptoolname', 'grouptool');
 
         // Adding the standard "intro" and "introformat" fields!
-        $this->add_intro_editor($CFG->grouptool_requiremodintro,
+        $this->add_intro_editor(get_config('mod_grouptool', 'requiremodintro'),
                                 get_string('description', 'grouptool'));
 
         $mform->addElement('header', 'availability', get_string('availability', 'assign'));
@@ -125,25 +125,25 @@ GROUP BY reg.userid) as regcnts';
         $mform->setExpanded('grouptoolfieldset');
 
         $mform->addElement('selectyesno', 'allow_reg', get_string('allow_reg', 'grouptool'));
-        $mform->setDefault('allow_reg',
-                           (isset($CFG->grouptool_allow_reg) ? $CFG->grouptool_allow_reg : 1));
+        $allow_reg = get_config('mod_grouptool', 'allow_reg');
+        $mform->setDefault('allow_reg', (($allow_reg !== false) ? $allow_reg : 1));
         $mform->addHelpButton('allow_reg', 'allow_reg', 'grouptool');
 
         $mform->addElement('selectyesno', 'show_members', get_string('show_members', 'grouptool'));
-        $mform->setDefault('show_members',
-                           (!empty($CFG->grouptool_show_members) ? $CFG->grouptool_show_members : 0));
+        $show_members = get_config('mod_grouptool', 'show_members');
+        $mform->setDefault('show_members', (($show_members !== false) ? $show_members : 0));
         $mform->addHelpButton('show_members', 'show_members', 'grouptool');
 
         $mform->addElement('selectyesno', 'immediate_reg', get_string('immediate_reg',
                                                                       'grouptool'));
-        $mform->setDefault('immediate_reg',
-                           (!empty($CFG->grouptool_immediate_reg) ? $CFG->grouptool_immediate_reg : 0));
+        $immediate_reg = get_config('mod_grouptool', 'immediate_reg');
+        $mform->setDefault('immediate_reg', (($immediate_reg !== false) ? $immediate_reg : 0));
         $mform->addHelpButton('immediate_reg', 'immediate_reg', 'grouptool');
         $mform->disabledIf('immediate_reg', 'allow_reg', 'equal', 1);
 
         $mform->addElement('selectyesno', 'allow_unreg', get_string('allow_unreg', 'grouptool'));
-        $mform->setDefault('allow_unreg',
-                           (!empty($CFG->grouptool_allow_unreg) ? $CFG->grouptool_allow_unreg : 0));
+        $allow_unreg = get_config('mod_grouptool', 'allow_unreg');
+        $mform->setDefault('allow_unreg', (($allow_unreg !== false) ? $allow_unreg : 0));
         $mform->addHelpButton('allow_unreg', 'allow_unreg', 'grouptool');
         $mform->disabledIf('allow_unreg', 'allow_reg', 'equal', 1);
 
@@ -154,11 +154,11 @@ GROUP BY reg.userid) as regcnts';
                                                                                'grouptool'));
         // We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0!
         $mform->setType('grpsize', PARAM_RAW);
-        $mform->setDefault('grpsize',
-                           (!empty($CFG->grouptool_grpsize) ? $CFG->grouptool_grpsize : 3));
+        $grpsize = get_config('mod_grouptool', 'grpsize');
+        $mform->setDefault('grpsize', (($grpsize !== false) ? $grpsize : 3));
         $mform->setType('use_size', PARAM_BOOL);
-        $mform->setDefault('use_size',
-                           (!empty($CFG->grouptool_use_size) ? $CFG->grouptool_use_size : 0));
+        $use_size = get_config('mod_grouptool', 'use_size');
+        $mform->setDefault('use_size', (($use_size !== false) ? $use_size : 0));
         $mform->addGroup($size, 'size_grp', get_string('size', 'grouptool'), ' ', false);
         $mform->addHelpButton('size_grp', 'size_grp', 'grouptool');
         $mform->disabledIf('grpsize', 'use_size', 'notchecked');
@@ -166,8 +166,8 @@ GROUP BY reg.userid) as regcnts';
 
         $mform->addElement('checkbox', 'use_individual', get_string('use_individual', 'grouptool'));
         $mform->setType('use_individual', PARAM_BOOL);
-        $mform->setDefault('use_individual',
-                           (!empty($CFG->grouptool_use_individual) ? $CFG->grouptool_use_individual : 0));
+        $use_individual = get_config('mod_grouptool', 'use_individual');
+        $mform->setDefault('use_individual', (($use_individual !== false) ? $use_individual : 0));
         $mform->addHelpButton('use_individual', 'use_individual', 'grouptool');
         $mform->disabledIf('use_individual', 'allow_reg', 'equal', 1);
         $mform->disabledIf('use_individual', 'use_size', 'notchecked');
@@ -193,12 +193,12 @@ GROUP BY reg.userid) as regcnts';
         $mform->addGroup($queue, 'queue_grp',
                          get_string('queues_max', 'grouptool'), ' ', false);
         $mform->setType('use_queue', PARAM_BOOL);
-        $mform->setDefault('use_queue',
-                           (!empty($CFG->grouptool_use_queue) ? $CFG->grouptool_use_queue : 0));
+        $use_queue = get_config('mod_grouptool', 'use_queue');
+        $mform->setDefault('use_queue', (($use_queue !== false) ? $use_queue : 0));
         $mform->disabledIf('use_queue', 'allow_reg', 'equal', 1);
-        $mform->setType('queues_max', PARAM_INT);
-        $mform->setDefault('queues_max',
-                           (!empty($CFG->grouptool_queues_max) ? $CFG->groutpoo_queues_max : 1));
+        $mform->setType('max_queues', PARAM_INT);
+        $max_queues = get_config('mod_grouptool', 'max_queues');
+        $mform->setDefault('queues_max', (($max_queues !== false) ? $max_queues : 1));
         $mform->addHelpButton('queue_grp', 'queuesgrp', 'grouptool');
         $mform->disabledIf('queues_max', 'use_queue', 'notchecked');
         $mform->disabledIf('queues_max', 'allow_reg', 'equal', 1);
@@ -212,23 +212,23 @@ GROUP BY reg.userid) as regcnts';
         }
         $mform->setType('multreg', PARAM_BOOL);
         $mform->setType('allow_multiple', PARAM_BOOL);
-        $allowmultipledefault = (!empty($CFG->grouptool_allow_multiple) ? $CFG->grouptool_allow_multiple : 0);
-        $mform->setDefault('allow_multiple', $allowmultipledefault);
+        $allow_multiple = get_config('mod_grouptool', 'allow_multiple');
+        $mform->setDefault('allow_multiple', (($allow_multiple !== false) ? $allow_multiple : 0));
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
         $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            array('size' => '3'));
         $mform->setType('choose_min', PARAM_INT);
-        $mform->setDefault('choose_min',
-                           (!empty($CFG->grouptool_choose_min) ? $CFG->grouptool_choose_min : 1));
+        $choose_min = get_config('mod_grouptool', 'choose_min');
+        $mform->setDefault('choose_min', (($choose_min !== false) ? $choose_min : 1));
         $mform->disabledIf('choose_min', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
                            array('size' => '3'));
         $mform->setType('choose_max', PARAM_INT);
-        $mform->setDefault('choose_max',
-                           (!empty($CFG->grouptool_choose_max) ? $CFG->grouptool_choose_max : 1));
+        $choose_max = get_config('mod_grouptool', 'choose_max');
+        $mform->setDefault('choose_max', (($choose_max !== false) ? $choose_max : 1));
         $mform->disabledIf('choose_max', 'allow_reg', 'eq', 0);
 
         if ($maxregs > 1) {
@@ -256,17 +256,15 @@ GROUP BY reg.userid) as regcnts';
                            $options);
         $mform->setType('ifmemberadded', PARAM_INT);
         $mform->addHelpButton('ifmemberadded', 'ifmemberadded', 'grouptool');
-        $mform->setDefault('ifmemberadded', (!empty($CFG->grouptool_ifmemberadded) ?
-                                                 $CFG->grouptool_ifmemberadded :
-                                                 GROUPTOOL_IGNORE));
+        $ifmemberadded = get_config('mod_grouptool', 'ifmemberadded');
+        $mform->setDefault('ifmemberadded', (($ifmemberadded !== false) ? $ifmemberadded : GROUPTOOL_IGNORE));
 
         $mform->addElement('select', 'ifmemberremoved', get_string('ifmemberremoved', 'grouptool'),
                            $options);
         $mform->setType('ifmemberremoved', PARAM_INT);
         $mform->addHelpButton('ifmemberremoved', 'ifmemberremoved', 'grouptool');
-        $mform->setDefault('ifmemberremoved', (!empty($CFG->grouptool_ifmemberremoved) ?
-                                                 $CFG->grouptool_ifmemberremoved :
-                                                 GROUPTOOL_IGNORE));
+        $ifmemberremoved = get_config('mod_grouptool', 'ifmemberremoved');
+        $mform->setDefault('ifmemberremoved', (($ifmemberremoved !== false) ? $ifmemberremoved : GROUPTOOL_IGNORE));
 
         $options = array( GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
                           GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'));
@@ -274,9 +272,8 @@ GROUP BY reg.userid) as regcnts';
                            $options);
         $mform->setType('ifgroupdeleted', PARAM_INT);
         $mform->addHelpButton('ifgroupdeleted', 'ifgroupdeleted', 'grouptool');
-        $mform->setDefault('ifgroupdeleted', (!empty($CFG->grouptool_ifgroupdeleted) ?
-                                                 $CFG->grouptool_ifgroupdeleted :
-                                                 GROUPTOOL_RECREATE_GROUP));
+        $ifgroupdeleted = get_config('mod_grouptool', 'ifgroupdeleted');
+        $mform->setDefault('ifgroupdeleted', (($ifgroupdeleted !== false) ? $ifgroupdeleted : GROUPTOOL_RECREATE_GROUP));
 
         /*
          * ---------------------------------------------------------

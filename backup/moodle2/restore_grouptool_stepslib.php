@@ -57,7 +57,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
     }
 
     protected function process_grouptool($data) {
-        global $DB, $CFG;
+        global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -70,13 +70,13 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
 
         // Due to an old bug it can happen that these settings haven't been backed up!
         if (!isset($data->ifmemberadded)) {
-            $data->ifmemberadded = $CFG->grouptool_ifmemberadded;
+            $data->ifmemberadded = get_config('mod_grouptool', 'ifmemberadded');
         }
         if (!isset($data->ifmemberremoved)) {
-            $data->ifmemberremoved = $CFG->grouptool_ifmemberremoved;
+            $data->ifmemberremoved = get_config('mod_grouptool', 'ifmemberremoved');
         }
         if (!isset($data->ifgroupdeleted)) {
-            $data->ifgroupdeleted = $CFG->grouptool_ifgroupdeleted;
+            $data->ifgroupdeleted = get_config('mod_grouptool', 'ifgroupdeleted');
         }
 
         // Insert the checkmark record!
@@ -136,7 +136,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->modified_by = $this->get_mappingid('user', $data->modified_by);
 
         if ($data->agrpid === false) {
-            
+
             $message = "Couldn't find mapping id for agrp with former id-# ".$oldagrp." so we have to skip it.";
             if (debugging()) { // If it's been displayed, we also write it to the error logs!
                 $from = format_backtrace(debug_backtrace(), CLI_SCRIPT || NO_DEBUG_DISPLAY);
