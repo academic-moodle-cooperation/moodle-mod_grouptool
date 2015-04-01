@@ -40,7 +40,8 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+require_once($CFG->libdir.'/conditionlib.php');
 
 // Do we get course_module ID?
 $id = optional_param('id', 0, PARAM_INT);
@@ -77,12 +78,6 @@ $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 // Output starts here!
 echo $OUTPUT->header();
 
-// Groupmode?
-$gmok = true;
-if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
-    $gmok = $gmok && (groups_has_membership($cm) || !$cm->groupmembersonly);
-}
-
 // Print tabs according to users capabilities!
 $inactive = array();
 $tabs = array();
@@ -106,7 +101,7 @@ if (has_capability('mod/grouptool:grade', $context)
                                     false);
 }
 if (has_capability('mod/grouptool:register_students', $context)
-        || ($gmok && has_capability('mod/grouptool:register', $context))) {
+        || has_capability('mod/grouptool:register', $context)) {
     $row['selfregistration'] = new tabobject('selfregistration',
                                              $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
                                              '&amp;tab=selfregistration',
@@ -158,20 +153,28 @@ if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
 }
 $availabletabs = array_keys($row);
-if (count($row) > 1) {
+
+$modinfo = get_fast_modinfo($course);
+$cm = $modinfo->get_cm($cm->id);
+if (empty($cm->uservisible)) {
+    $SESSION->mod_grouptool->currenttab = 'conditions_prevent_access';
+    $tab = 'conditions_prevent_access';
+} else if (count($row) > 1) {
     $tab = optional_param('tab', null, PARAM_ALPHAEXT);
     if ($tab) {
         $SESSION->mod_grouptool->currenttab = $tab;
     }
 
-    if (!isset($SESSION->mod_grouptool->currenttab)) {
+    if (!isset($SESSION->mod_grouptool->currenttab)
+               || ($SESSION->mod_grouptool->currenttab=='noaccess')
+               || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:create_groups', $context)
                 || has_capability('mod/grouptool:create_groupings', $context)
                 || has_capability('mod/grouptool:register_students', $context)) {
             $SESSION->mod_grouptool->currenttab = 'administration';
         } else if (has_capability('mod/grouptool:register_students', $context)
-                       || ($gmok && has_capability('mod/grouptool:register', $context))) {
+                       || has_capability('mod/grouptool:register', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         } else {
             $SESSION->mod_grouptool->currenttab = current($availabletabs);
@@ -243,6 +246,19 @@ switch($tab) {
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'notifyproblem');
+        echo $OUTPUT->box($notification, 'generalbox centered');
+        break;
+    case 'conditions_prevent_access':
+        if ($cm->availableinfo) {
+            // User cannot access the activity, but on the course page they will
+            // see a link to it, greyed-out, with information (HTML format) from
+            // $cm->availableinfo about why they can't access it.
+            $text = "<br />".format_text($cm->availableinfo, FORMAT_HTML);
+        } else {
+            // User cannot access the activity and they will not see it at all.
+            $text = '';
+        }
+        $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').$text, 'notifyproblem');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
     default:

@@ -50,6 +50,24 @@ $PAGE->set_context($context);
 $PAGE->set_url('/mod/grouptool/showmembers_ajax.php', array('contextid' => $context->id,
                                                             'agrpid'    => $agrpid));
 
+$modinfo = get_fast_modinfo($course);
+$cm = $modinfo->get_cm($cm->id);
+if (!$cm->uservisible) {
+    $result = new stdClass();
+    if ($cm->availableinfo) {
+        // User cannot access the activity, but on the course page they will
+        // see a link to it, greyed-out, with information (HTML format) from
+        // $cm->availableinfo about why they can't access it.
+        $text = "\n".format_text($cm->availableinfo, FORMAT_PLAIN);
+    } else {
+        // User cannot access the activity and they will not see it at all.
+        $text = '';
+    }
+    $result->error = get_string('conditions_prevent_access', 'grouptool').$text;
+    echo json_encode($result);
+    die;
+}
+
 $group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.courseid as courseid,
                                      agrp.id as agrpid, agrp.grpsize as size,
                                      agrp.grouptoolid as grouptoolid

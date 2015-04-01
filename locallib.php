@@ -102,18 +102,16 @@ class mod_grouptool_view_admin_form extends moodleform {
             $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
             $context = context_course::instance($cm->course);
 
-            if (has_capability('moodle/cohort:view', $context)) {
-                $options = cohort_get_visible_list($course);
-                if ($options) {
-                    $options = array(0 => get_string('anycohort', 'cohort')) + $options;
-                    $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
-                                                                        'grouptool'), $options);
-                    $mform->setDefault('cohortid', '0');
-                } else {
-                    $mform->addElement('hidden', 'cohortid');
-                    $mform->setType('cohortid', PARAM_INT);
-                    $mform->setConstant('cohortid', '0');
+            // Since 2.8 the capability gets checked by cohort_get_available_cohorts()!
+            $cohorts = cohort_get_available_cohorts($context, true, 0, 0);
+            if (count($options) != 0) {
+                $options = array(0 => get_string('anycohort', 'cohort'));
+                foreach($cohorts as $cohort) {
+                     $options[$cohort->id] = $cohort->name;
                 }
+                $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
+                                                                    'grouptool'), $options);
+                $mform->setDefault('cohortid', '0');
             } else {
                 $mform->addElement('hidden', 'cohortid');
                 $mform->setType('cohortid', PARAM_INT);
@@ -2890,8 +2888,8 @@ EOS;
                         }
 
                         $name = strip_tags(format_string($mod->name, true));
-                        if (textlib::strlen($name) > 55) {
-                            $name = textlib::substr($name, 0, 50)."...";
+                        if (core_text::strlen($name) > 55) {
+                            $name = core_text::substr($name, 0, 50)."...";
                         }
                         if (!$mod->visible) {
                             $name = "(".$name.")";

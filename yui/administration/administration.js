@@ -61,13 +61,13 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
 
             //add JS-Eventhandlers to hide individual groupsize-fields
             //if use_size or use_individual are false
-            Y.one('input[name=use_size]').on('change', M.mod_grouptool.administration_sizevisupdate);
-            Y.one('input[name=use_individual]').on('change',
-                                                   M.mod_grouptool.administration_sizevisupdate);
+            //Y.one('input[name=use_size]').on('change', M.mod_grouptool.administration_sizevisupdate);
+            /*Y.one('input[name=use_individual]').on('change',
+                                                   M.mod_grouptool.administration_sizevisupdate);*/
             //add JS-Eventhandler to let groupsize-fields follow global-grpsize changes
-            Y.one('input[name=amount]').on('change', M.mod_grouptool.administration_sizevalupdate);
+            /*Y.one('input[name=amount]').on('change', M.mod_grouptool.administration_sizevalupdate);
             Y.one('input[name=use_individual]').on('change',
-                                                   M.mod_grouptool.administration_sizevalupdate);
+                                                   M.mod_grouptool.administration_sizevalupdate);*/
             Y.one('input[name="mode"][value="' + this.fromto_mode + '"]').on('click', M.mod_grouptool.modechange);
 
         }

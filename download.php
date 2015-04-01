@@ -46,6 +46,26 @@ $groupid = optional_param('groupid', 0, PARAM_INT);
 $PAGE->url->param('groupingid', $groupingid);
 $PAGE->url->param('groupid', $groupid);
 
+$modinfo = get_fast_modinfo($cm->course);
+$cm = $modinfo->get_cm($cm->id);
+if (empty($cm->uservisible)) {
+    if ($cm->availableinfo) {
+        // User cannot access the activity, but on the course page they will
+        // see a link to it, greyed-out, with information (HTML format) from
+        // $cm->availableinfo about why they can't access it.
+        $text = html_writer::empty_tag('br').$cm->availableinfo;
+    } else {
+        // User cannot access the activity and they will not see it at all.
+        $text = '';
+    }
+    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').
+                                          html_writer::empty_tag('br').$text, 'notifyproblem');
+    echo $OUTPUT->header();
+    echo $OUTPUT->box($notification, 'generalbox centered');
+    echo $OUTPUT->footer();
+    die;
+}
+
 $tab = required_param('tab', PARAM_ALPHA);
 $format = required_param('format', PARAM_INT);
 switch($format) {
