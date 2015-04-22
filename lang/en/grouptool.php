@@ -136,6 +136,7 @@ $string['create_groups_confirm'] = 'Continue to create groups as previewed above
 $string['create_groups_confirm_problem'] = 'When trying to create the new groups based on the given name schema conflicts are encountered - see preview - Moodle groups must have unique names. The conflict can be due to existing groups with the same name or a syntax error in the naming scheme (... eg. empty, missing # symbol).';
 $string['create_groupings_confirm'] = 'Continue to create groupings as previewed above?';
 $string['create_groupings_confirm_problem'] = 'At least 1 error occurred (refer to preview above)!';
+$string['condition_prevent_access'] = 'The current conditions prevent you from accessing the checkmark instance!';
 $string['copied_grade_feedback'] = 'Group grading<br />
 +Submission from: {$a->student}<br />
 +Graded by: {$a->teacher}<br />

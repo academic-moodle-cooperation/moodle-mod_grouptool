@@ -476,6 +476,14 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2014110703, 'grouptool');
     }
 
+    if ($oldversion < 2015042200) {
+        // Fix a misspelled - and already corrected - string identifier blocking language customisations.
+        $DB->set_field_select('tool_customlang', 'stringid', 'create_assign_groupings', $DB->sql_like('stringid', ':stringid'), array('stringid' => 'create_assign_Groupings'));
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2015042200, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

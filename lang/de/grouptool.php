@@ -136,6 +136,7 @@ $string['create_groups_confirm'] = 'Gruppen erstellen, wie in der Vorschau gezei
 $string['create_groups_confirm_problem'] = 'Beim Versuch die neuen Gruppen anhand des vorgegebenen Namenschemas anzulegen sind Konflikte aufgetreten - siehe Vorschau - Moodle Gruppen müssen eineindeutige Namen haben. Der Konflikt kann an bereits bestehenden Gruppen mit gleichem Namen oder einem Syntaxfehler im Namensschema (z.B. leer, fehlendes #-Symbol, ...) liegen.';
 $string['create_groupings_confirm'] = 'Gruppierungen erstellen, wie in der Vorschau gezeigt?';
 $string['create_groupings_confirm_problem'] = 'Zumindest 1 Fehler ist aufgetreten (siehe Vorschau)!';
+$string['condition_prevent_access'] = 'Die derzeitigen Umstände erlauben Ihnen keinen Zugriff auf die Kreuzerlübung!';
 $string['copied_grade_feedback'] = 'Gruppenbenotung<br />
 +Abgabe von: {$a->student}<br />
 +Note von: {$a->teacher}<br />
