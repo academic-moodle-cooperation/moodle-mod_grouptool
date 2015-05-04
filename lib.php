@@ -553,43 +553,66 @@ function grouptool_get_extra_capabilities() {
  */
 function grouptool_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module,
                                      cm_info $cm) {
+    global $DB;
     $context = context_module::instance($cm->id);
+    $return = false;
+
     if (has_capability('mod/grouptool:create_groups', $context)
             || has_capability('mod/grouptool:create_groupings', $context)
             || has_capability('mod/grouptool:register_students', $context)) {
         $navref->add(get_string('administration', 'grouptool'),
                      new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                      'tab' => 'administration')));
+        $return = true;
     }
     if (has_capability('mod/grouptool:grade', $context)
             || has_capability('mod/grouptool:grade_own_group', $context)) {
         $navref->add(get_string('grading', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'grading')));
+        $return = true;
     }
     // Groupmode?
     $gmok = true;
     if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
         $gmok = $gmok && groups_has_membership($cm);
     }
+    $gt = $DB->get_record('grouptool', array('id' => $cm->instance));
+    $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
+                && ($gt->timeavailable < time()));
 
     if (has_capability('mod/grouptool:register_students', $context)
-       || ($gmok && has_capability('mod/grouptool:register', $context))) {
-        $navref->add(get_string('selfregistration', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                'tab' => 'selfregistration')));
+       || has_capability('mod/grouptool:register', $context)) {
+        $tmp = $navref->add(get_string('selfregistration', 'grouptool'),
+                            new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                            'tab' => 'selfregistration')));
+        $return = true;
     }
+
+    if ((!$regopen || !$gmok) && has_capability('mod/grouptool:register', $context)) {
+        $tmp->hide();
+    }
+
     if (has_capability('mod/grouptool:register_students', $context)) {
         $navref->add(get_string('import', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'import')));
+        $return = true;
     }
     if (has_capability('mod/grouptool:view_registrations', $context)) {
         $navref->add(get_string('overview', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
+        $return = true;
     }
     if (has_capability('mod/grouptool:view_registrations', $context)) {
         $navref->add(get_string('userlist', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
+        $return = true;
     }
+
+    if (!$return) {
+        $navref->add(get_string('view'), new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id)));
+    }
+
+    return $return;
 }
 
 /**
