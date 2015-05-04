@@ -4978,7 +4978,7 @@ EOS;
         $agrps = $DB->get_records_sql($sql, array('grpid' => $group));
         $usercnt = count($users);
         foreach ($agrps as $cur) {
-            if ($cur->indi) {
+            if ($cur->indi && !empty($cur->size)) {
                 if (($cur->regs + $usercnt) > $cur->size) {
                     $message .= html_writer::tag('div',
                                                  $OUTPUT->notification(get_string('overflowwarning',
