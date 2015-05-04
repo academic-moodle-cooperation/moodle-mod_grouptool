@@ -243,6 +243,7 @@ $string['grouping_assign_error_prev'] = 'Können nicht zur Gruppierung hinzugef�
 $string['grouping_exists_error_prev'] = 'Kann Gruppierung nicht anlegen, da bereits eine Gruppierung mit diesem Namen existiert!';
 $string['grouping_exists_error'] = 'Konnte Gruppierung nicht anlegen, da bereits eine Gruppierung mit diesem Namen existiert!';
 $string['grouping_creation_success'] = 'Gruppierung erfolgreich angelegt und Gruppe {$a} hinzugefügt!';
+$string['grouping_creation_success_prev'] = 'Gruppierung kann erfolgreich angelegt und Gruppe {$a} hinzugefügt werden!';
 $string['grouping_creation_error_prev'] = 'Kann Gruppierung nicht anlegen!';
 $string['grouping_creation_error'] = 'Konnte Gruppierung nicht anlegen!';
 $string['grouping_creation_only_success'] = 'Gruppierung erfolgreich angelegt!';

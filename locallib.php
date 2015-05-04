@@ -1556,9 +1556,9 @@ class mod_grouptool {
                     $grouping->name = $name;
                     $grouping->courseid = $courseid;
                     $target = groups_create_grouping($grouping);
-                    $return = $OUTPUT->notification(get_string('grouping_creation_success', 'grouptool'), 'notifymessage');
+                    $return = $OUTPUT->notification(get_string('grouping_creation_only_success', 'grouptool'), 'notifysuccess');
                 } else {
-                    $return = $OUTPUT->notification(get_string('grouping_creation_success_prev', 'grouptool'), 'notifymessage');
+                    $return = $OUTPUT->notification(get_string('grouping_creation_only_success_prev', 'grouptool'), 'notifymessage');
                 }
             }
         }

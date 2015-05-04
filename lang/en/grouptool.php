@@ -243,6 +243,7 @@ $string['grouping_assign_error_prev'] = 'Can\'t be successfully assigned to the 
 $string['grouping_exists_error_prev'] = 'Can\'t create grouping because there already exists a grouping with this name!';
 $string['grouping_exists_error'] = 'Couldn\'t create grouping because there already exists a grouping with this name!';
 $string['grouping_creation_success'] = 'Successfully created grouping and assigned group {$a} to it!';
+$string['grouping_creation_success_prev'] = 'Can successfully create grouping and assign group {$a} to it!';
 $string['grouping_creation_error_prev'] = 'Can\'t create grouping!';
 $string['grouping_creation_error'] = 'Couldn\'t create grouping!';
 $string['grouping_creation_only_success'] = 'Grouping successfully created!';
