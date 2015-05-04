@@ -4979,26 +4979,36 @@ EOS;
         $usercnt = count($users);
         foreach ($agrps as $cur) {
             if ($cur->indi) {
-                if ($cur->regs + $usercnt > $cur->size) {
+                if (($cur->regs + $usercnt) > $cur->size) {
                     $message .= html_writer::tag('div',
                                                  $OUTPUT->notification(get_string('overflowwarning',
                                                                                   'grouptool', $cur),
-                                                                       'notifyproblem'));
+                                                                       'notifytiny'));
                 }
             } else {
-                if ($cur->regs + $usercnt > $cur->globalsize) {
+                if (($cur->regs + $usercnt) > $cur->globalsize) {
                     $message .= html_writer::tag('div',
                                                  $OUTPUT->notification(get_string('overflowwarning',
                                                                                   'grouptool', $cur),
-                                                                       'notifyproblem'));
+                                                                       'notifytiny'));
                 }
             }
         }
+
         if (false == ($grouptool_importfields = get_config('mod_grouptool', 'importfields'))) {
             $importfields = explode(',', $grouptool_importfields);
         } else {
             $importfields = array('username','idnumber');
         }
+
+        $prevtable = new html_table();
+        $prevtable->head = array(get_string('fullname'));
+        foreach ($importfields as $field) {
+            $prevtable->head[] = get_string($field);
+        }
+        $prevtable->head[] = get_string('status');
+        $prevtable->data = array();
+
         foreach ($users as $user) {
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
@@ -5014,46 +5024,80 @@ EOS;
                 if (empty($userinfo)) {
                     $param['userpattern'] = '%'.$user;
                     $userinfo = $DB->get_records_sql($sql, $param);
+                } else if (count($userinfo) == 1) {
+                    break;
                 }
+
                 if (empty($userinfo)) {
                     $param['userpattern'] = $user.'%';
                     $userinfo = $DB->get_records_sql($sql, $param);
+                }  else if (count($userinfo) == 1) {
+                    break;
                 }
+
                 if (empty($userinfo)) {
                     $param['userpattern'] = '%'.$user.'%';
                     $userinfo = $DB->get_records_sql($sql, $param);
+                } else if (count($userinfo) == 1) {
+                    break;
                 }
+
                 if (!empty($userinfo) && count($userinfo) == 1) {
                     break;
                 }
             }
-
+            $row = new html_table_row();
             if (empty($userinfo)) {
-                $message .= html_writer::tag('div',
-                                             $OUTPUT->notification(get_string('user_not_found',
+                $row->cells[] = new html_table_cell($OUTPUT->notification(get_string('user_not_found',
                                                                               'grouptool', $user),
                                                                    'notifyproblem'));
+                $row->cells[0]->colspan = count($prevtable->head);
+                /*$message .= html_writer::tag('div',
+                                             $OUTPUT->notification(get_string('user_not_found',
+                                                                              'grouptool', $user),
+                                                                   'notifyproblem'));*/
                 $error = true;
             } else if (count($userinfo) > 1) {
+                $tmprows = array();
                 foreach ($userinfo as $currentuser) {
-                    if (empty($text)) {
+                    $tmprow = new html_table_row();
+                    /*if (empty($text)) {
                         $text = get_string('found_multiple', 'grouptool').' '.
                                 fullname($currentuser).' ('.$currentuser->idnumber.')';
                     } else {
                         $text .= ', '.fullname($currentuser).' ('.$currentuser->idnumber.')';
+                    }*/
+                    $tmprow->cells = array();
+                    $tmprow->cells[] = new html_table_cell(fullname($currentuser));
+                    foreach ($importfields as $curfield) {
+                        $tmprow->cells[] = new html_table_cell($currentuser->$curfield);
                     }
+                    $tmprows[] = $tmprow;
                 }
-                $message .= html_writer::tag('div', $OUTPUT->notification($text, 'notifyproblem'));
+                $curkey = count($tmprows[0]->cells);
+                $tmprows[0]->cells[$curkey] = new html_table_cell($OUTPUT->notification(get_string('found_multiple', 'grouptool'), 'notifyproblem'));
+                $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
+                //$message .= html_writer::tag('div', $OUTPUT->notification($text, 'notifyproblem'));
+                foreach($tmprows as $tmprow) {
+                    $prevtable->data[] = $tmprow;
+                }
                 $error = true;
+                // We've added multiple rows manualle and can continue with the next user!
+                continue;
             } else {
                 $userinfo = reset($userinfo);
+                $row->cells = array(new html_table_cell(fullname($userinfo)));
+                foreach ($importfields as $curfield) {
+                    $row->cells[] = new html_table_cell(empty($userinfo->$curfield) ? '' : $userinfo->$curfield);
+                }
                 if (!is_enrolled($this->context, $userinfo->id)) {
 
                     // We have to catch deleted users now, give a message and continue!
                     if (!empty($userinfo->deleted)) {
                         $userinfo->fullname = fullname($userinfo);
                         $text = get_string('user_is_deleted', 'grouptool', $userinfo);
-                        $message .= html_writer::tag('div', $OUTPUT->notification($text, 'notifyproblem'));
+                        //$message .= html_writer::tag('div', $OUTPUT->notification($text, 'notifyproblem'));
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, 'notifyproblem'));
                         $error = true;
                         continue;
                     }
@@ -5081,10 +5125,12 @@ EOS;
                         $archrole = array_shift($archroles);
                         $enrolmanual->enrol_user($instance, $userinfo->id, $archrole->id, time());
                     } else {
-                        $message .= html_writer::tag('div',
+                        /*$message .= html_writer::tag('div',
                                                      $OUTPUT->notification(get_string('cant_enrol',
                                                                                       'grouptool'),
-                                                     'notifyproblem'));
+                                                     'notifyproblem'));*/
+                        $row->cells[] = new html_table_cell($OUTPUT->notification(get_string('cant_enrol',
+                                                                                  'grouptool'), 'notifyproblem'));
                     }
                 }
                 $data = array(
@@ -5099,12 +5145,16 @@ EOS;
                         $notification = $OUTPUT->notification(get_string('import_user_problem',
                                                                           'grouptool', $data),
                                                                'notifyproblem');
-                        $message .= html_writer::tag('div', $notification,
-                                                     array('class' => 'error'));
+                        /*$message .= html_writer::tag('div', $notification,
+                                                     array('class' => 'error'));*/
+                        $row->cells[] = new html_table_cell($notification);
+                        $row->attributes['class'] = 'error';
                     } else {
                         $imported[] = $userinfo->id;
-                        $message .= html_writer::tag('div', get_string('import_user', 'grouptool',
-                                                                       $data), $attr);
+                        /*$message .= html_writer::tag('div', get_string('import_user', 'grouptool',
+                                                                       $data), $attr);*/
+                        $row->cells[] = get_string('import_user', 'grouptool', $data);
+                        $row->attributes['class'] = 'notifysuccess';
                     }
                     if ($forceregistration && empty($agrp)) {
                         /* Registering in an non active Grouptool-group would cause problems
@@ -5128,8 +5178,10 @@ EOS;
                         $notification = $OUTPUT->notification(get_string('import_in_inactive_group_rejected',
                                                                          'grouptool', $agrp),
                                                               'notifyproblem');
-                        $message .= html_writer::tag('div', $notification,
-                                                     array('class' => 'error'));
+                        /*$message .= html_writer::tag('div', $notification,
+                                                     array('class' => 'error'));*/
+                        $row->cells[] = $notification;
+                        $row->attributes['class'] = 'error';
                         $agrp = $agrp->id;
                     } else if ($forceregistration && !empty($agrp)
                                && !$DB->record_exists_select('grouptool_registered',
@@ -5157,12 +5209,16 @@ EOS;
                     }
                 } else if ($userinfo) {
                     $attr = array('class' => 'prevsuccess');
-                    $message .= html_writer::tag('div', get_string('import_user_prev', 'grouptool',
-                                                                   $data), $attr);
+                    /*$message .= html_writer::tag('div', get_string('import_user_prev', 'grouptool',
+                                                                   $data), $attr);*/
+                    $row->cells[] = get_string('import_user_prev', 'grouptool', $data);
+                    $row->attributes['class'] = 'prevsuccess';
                 }
             }
+            $prevtable->data[] = $row;
+            unset($row);
         }
-
+        $message .= html_writer::table($prevtable);
         return array($error, $message);
     }
 
