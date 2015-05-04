@@ -3264,7 +3264,7 @@ EOS;
                             list($sql, $params) = $DB->get_in_or_equal($agrpids);
                             $records = $DB->get_records_sql("SELECT queued.*, agrp.groupid
                                                                FROM {grouptool_queued} as queued
-                                                               JOIN {grouptool_agrps} as agrp ON queue.agrpid = agrp.id
+                                                               JOIN {grouptool_agrps} as agrp ON queued.agrpid = agrp.id
                                                               WHERE userid = ? AND agrpid ".$sql,
                                                             array_merge(array($newrecord->userid), $params));
                             $DB->delete_records_select('grouptool_queued',
