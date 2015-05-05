@@ -555,7 +555,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
                                      cm_info $cm) {
     global $DB;
     $context = context_module::instance($cm->id);
-    $return = false;
 
     if (has_capability('mod/grouptool:create_groups', $context)
             || has_capability('mod/grouptool:create_groupings', $context)
@@ -581,15 +580,11 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
                 && ($gt->timeavailable < time()));
 
     if (has_capability('mod/grouptool:register_students', $context)
-       || has_capability('mod/grouptool:register', $context)) {
+       || ($regopen && $gmok && has_capability('mod/grouptool:register', $context))) {
         $tmp = $navref->add(get_string('selfregistration', 'grouptool'),
                             new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                             'tab' => 'selfregistration')));
         $return = true;
-    }
-
-    if ((!$regopen || !$gmok) && has_capability('mod/grouptool:register', $context)) {
-        $tmp->hide();
     }
 
     if (has_capability('mod/grouptool:register_students', $context)) {
@@ -608,11 +603,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
         $return = true;
     }
 
-    if (!$return) {
-        $navref->add(get_string('view'), new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id)));
-    }
-
-    return $return;
+    $navref->nodetype = navigation_node::NODETYPE_BRANCH;
 }
 
 /**
