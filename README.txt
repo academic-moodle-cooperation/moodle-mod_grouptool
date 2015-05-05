@@ -74,6 +74,12 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2015042200
+-------------------------
+*) Fixed a renamed string identifier blocking language customisation
+   if there was an old wrong spelled custom string
+
+
 v 2015011400
 -------------------------
 *) Replace add_to_log calls through triggered events
