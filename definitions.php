@@ -90,11 +90,6 @@ define('GROUPTOOL_PDF', 0);
 define('GROUPTOOL_TXT', 1);
 
 /**
- * GROUPTOOL_XLS - get XLS-File
- */
-define('GROUPTOOL_XLS', 2);
-
-/**
  * GROUPTOOL_ODS - get ODS-File
  */
 define('GROUPTOOL_ODS', 3);
@@ -102,7 +97,7 @@ define('GROUPTOOL_ODS', 3);
 /**
  * GROUPTOOL_XLSX - get XLSX-File
  */
-define('GROUPTOOL_XLSX', 4);
+define('GROUPTOOL_XLSX', 2);
 
 /**
  * GROUPTOOL_RAW - get raw data - just for development

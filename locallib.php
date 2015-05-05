@@ -5325,14 +5325,12 @@ EOS;
             // Global-downloadlinks!
             $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
             $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
-            $xlsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLS));
             $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
             $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
             $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
                                               array('class' => 'title')).'&nbsp;'.
                              html_writer::link($txturl, '.TXT').'&nbsp;'.
                              html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
-                             html_writer::link($xlsurl, '.XLS').'&nbsp;'.
                              html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                              html_writer::link($odsurl, '.ODS');
             $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
@@ -5650,9 +5648,6 @@ EOS;
                     $urlxlsx = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
                                                    'format'  => GROUPTOOL_XLSX));
-                    $urlxls = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_XLS));
                     $urlpdf = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
                                                    'format'  => GROUPTOOL_PDF));
@@ -5664,7 +5659,6 @@ EOS;
                                                       array('class' => 'title')).'&nbsp;'.
                                      html_writer::link($urltxt, '.TXT').'&nbsp;'.
                                      html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
-                                     html_writer::link($urlxls, '.XLS').'&nbsp;'.
                                      html_writer::link($urlpdf, '.PDF').'&nbsp;'.
                                      html_writer::link($urlods, '.ODS');
                     $groupdata .= html_writer::tag('div', $downloadlinks,
@@ -5907,7 +5901,7 @@ EOS;
     }
 
     /**
-     * fills workbook (either XLS or ODS) with data
+     * fills workbook (either XLSX or ODS) with data
      *
      * @param MoodleExcelWorkbook $workbook workbook to put data into
      * @param array $groups which groups from whom to include data
@@ -6447,41 +6441,6 @@ EOS;
     }
 
     /**
-     * outputs generated xls-file for overview (forces download)
-     *
-     * @global object $CFG
-     * @param int $groupid optional get only this group
-     * @param int $groupingid optional get only this grouping
-     */
-    public function download_overview_xls($groupid = 0, $groupingid = 0) {
-        global $CFG;
-
-        require_once($CFG->libdir . "/excellib.class.php");
-
-        $coursename = $this->course->fullname;
-        $grouptoolname = $this->grouptool->name;
-
-        if (!empty($groupid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_group_name($groupid).'_'.get_string('overview', 'grouptool');
-        } else if (!empty($groupingid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_grouping_name($groupingid).'_'.get_string('overview', 'grouptool');
-        } else {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    get_string('group').' '.get_string('overview', 'grouptool');
-        }
-        $workbook = new MoodleExcelWorkbook("-", 'excel5');
-
-        $groups = $this->group_overview_table($groupingid, $groupid, true);
-
-        $this->overview_fill_workbook($workbook, $groups);
-
-        $workbook->send($filename.'.xls');
-        $workbook->close();
-    }
-
-    /**
      * outputs generated xlsx-file for overview (forces download)
      *
      * @global object $CFG
@@ -6497,14 +6456,16 @@ EOS;
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_group_name($groupid).'_'.get_string('overview', 'grouptool');
+            $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
+                                       groups_get_group_name($groupid).'_'.
+                                       get_string('overview', 'grouptool'));
         } else if (!empty($groupingid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_grouping_name($groupingid).'_'.get_string('overview', 'grouptool');
+            $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
+                                       groups_get_grouping_name($groupingid).'_'.
+                                       get_string('overview', 'grouptool'));
         } else {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    get_string('group').' '.get_string('overview', 'grouptool');
+            $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
+                                       get_string('group').' '.get_string('overview', 'grouptool'));
         }
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
 
@@ -6512,7 +6473,7 @@ EOS;
 
         $this->overview_fill_workbook($workbook, $groups);
 
-        $workbook->send($filename);
+        $workbook->send($filename.'.xlsx');
         $workbook->close();
     }
 
@@ -7109,14 +7070,12 @@ EOS;
             if (has_capability('mod/grouptool:export', $context)) {
                 $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
                 $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
-                $xlsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLS));
                 $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
                 $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
                 $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
                                                   array('class' => 'title')).'&nbsp;'.
                         html_writer::link($txturl, '.TXT').'&nbsp;'.
                         html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
-                        html_writer::link($xlsurl, '.XLS').'&nbsp;'.
                         html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                         html_writer::link($odsurl, '.ODS');
                 $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
@@ -7564,7 +7523,7 @@ EOS;
     }
 
     /**
-     * fills workbook (either XLS or ODS) with data
+     * fills workbook (either XLSX or ODS) with data
      *
      * @global object $SESSION
      * @param MoodleExcelWorkbook $workbook workbook to put data into
@@ -7871,56 +7830,19 @@ EOS;
         $this->userlist_fill_workbook($workbook, $data);
 
         if (!empty($groupid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_group_name($groupid).'_'.get_string('userlist', 'grouptool');
+            $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
+                                       groups_get_group_name($groupid).'_'.
+                                       get_string('userlist', 'grouptool'));
         } else if (!empty($groupingid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_grouping_name($groupingid).'_'.get_string('userlist', 'grouptool');
+            $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
+                                       groups_get_grouping_name($groupingid).'_'.
+                                       get_string('userlist', 'grouptool'));
         } else {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    get_string('userlist', 'grouptool');
+            $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
+                                       get_string('userlist', 'grouptool'));
         }
 
-        $workbook->send($filename);
-        $workbook->close();
-    }
-
-    /**
-     * outputs generated xls-file for userlist (forces download)
-     *
-     * @global object $CFG
-     * @param int $groupid optional get only this group
-     * @param int $groupingid optional get only this grouping
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
-     */
-    public function download_userlist_xls($groupid = 0, $groupingid = 0, $orderby=array(),
-                                          $collapsed=array()) {
-        global $CFG;
-
-        require_once($CFG->libdir . "/excellib.class.php");
-
-        $coursename = $this->course->fullname;
-        $grouptoolname = $this->grouptool->name;
-
-        $workbook = new MoodleExcelWorkbook("-", 'excel5');
-
-        $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
-
-        $this->userlist_fill_workbook($workbook, $data);
-
-        if (!empty($groupid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_group_name($groupid).'_'.get_string('userlist', 'grouptool');
-        } else if (!empty($groupingid)) {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    groups_get_grouping_name($groupingid).'_'.get_string('userlist', 'grouptool');
-        } else {
-            $filename = $coursename . '_' . $grouptoolname . '_' .
-                    get_string('userlist', 'grouptool');
-        }
-
-        $workbook->send($filename.'.xls');
+        $workbook->send($filename.'.xlsx');
         $workbook->close();
     }
 

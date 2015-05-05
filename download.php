@@ -75,9 +75,6 @@ switch($format) {
     case GROUPTOOL_TXT:
         $format_readable = 'TXT';
     break;
-    case GROUPTOOL_XLS:
-        $format_readable = 'XLS';
-    break;
     case GROUPTOOL_XLSX:
         $format_readable = 'XLSX';
     break;
@@ -136,10 +133,6 @@ switch ($tab) {
                 $PAGE->url->param('format', GROUPTOOL_TXT);
                 echo $instance->download_overview_txt($groupid, $groupingid);
                 break;
-            case GROUPTOOL_XLS:
-                $PAGE->url->param('format', GROUPTOOL_XLS);
-                echo $instance->download_overview_xls($groupid, $groupingid);
-                break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
                 echo $instance->download_overview_xlsx($groupid, $groupingid);
@@ -163,10 +156,6 @@ switch ($tab) {
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
                 echo $instance->download_userlist_txt($groupid, $groupingid);
-                break;
-            case GROUPTOOL_XLS:
-                $PAGE->url->param('format', GROUPTOOL_XLS);
-                echo $instance->download_userlist_xls($groupid, $groupingid);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
