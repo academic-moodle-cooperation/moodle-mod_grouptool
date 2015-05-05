@@ -38,7 +38,6 @@ $PAGE->set_url($url);
 $instance = new mod_grouptool($cmid);
 
 require_login($cm->course, true, $cm);
-require_capability('mod/grouptool:view_registrations', $context);
 require_capability('mod/grouptool:export', $context);
 
 $groupingid = optional_param('groupingid', 0, PARAM_INT);
@@ -88,6 +87,7 @@ switch($format) {
 /* Trigger the log event before delivering the download! */
 switch($tab) {
     case 'overview':
+        require_capability('mod/grouptool:view_regs_group_view', $context);
         // Trigger overview event.
         $event = \mod_grouptool\event\overview_exported::create(array(
             'objectid' => $cm->instance,
@@ -103,6 +103,7 @@ switch($tab) {
         $event->trigger();
     break;
     case 'userlist':
+        require_capability('mod/grouptool:view_regs_course_view', $context);
         // Trigger userlist event.
         $event = \mod_grouptool\event\userlist_exported::create(array(
             'objectid' => $cm->instance,

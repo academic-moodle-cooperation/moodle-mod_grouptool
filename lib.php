@@ -562,13 +562,11 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
         $navref->add(get_string('administration', 'grouptool'),
                      new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                      'tab' => 'administration')));
-        $return = true;
     }
     if (has_capability('mod/grouptool:grade', $context)
             || has_capability('mod/grouptool:grade_own_group', $context)) {
         $navref->add(get_string('grading', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'grading')));
-        $return = true;
     }
     // Groupmode?
     $gmok = true;
@@ -584,23 +582,26 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
         $tmp = $navref->add(get_string('selfregistration', 'grouptool'),
                             new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                             'tab' => 'selfregistration')));
-        $return = true;
     }
 
     if (has_capability('mod/grouptool:register_students', $context)) {
         $navref->add(get_string('import', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'import')));
-        $return = true;
     }
-    if (has_capability('mod/grouptool:view_registrations', $context)) {
-        $navref->add(get_string('overview', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
-        $return = true;
-    }
-    if (has_capability('mod/grouptool:view_registrations', $context)) {
-        $navref->add(get_string('userlist', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
-        $return = true;
+    if (has_capability('mod/grouptool:view_regs_course_view', $context)
+        && has_capability('mod/grouptool:view_regs_group_view', $context)) {
+        $userstab = $navref->add(get_string('users_tab', 'grouptool'),
+                                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
+        $userstab->add(get_string('overview_tab', 'grouptool'),
+                       new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
+        $userstab->add(get_string('userlist_tab', 'grouptool'),
+                       new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
+    } else if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
+        $navref->add(get_string('users_tab', 'grouptool'),
+                     new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
+    } else if (has_capability('mod/grouptool:view_regs_course_view', $context)) {
+        $navref->add(get_string('users_tab', 'grouptool'),
+                     new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
     }
 
     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
@@ -686,7 +687,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
 
         $str = "";
         if (has_capability('mod/grouptool:register', $context)
-                || has_capability('mod/grouptool:view_registrations', $context)) {
+            || has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:view_regs_course_view', $context)) {
             $attrib = array('title' => $strgrouptool, 'href' => $CFG->wwwroot.
                                                                 '/mod/grouptool/view.php?id='.
                                                                 $grouptool->coursemodule);
@@ -717,7 +719,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
         }
         $details = '';
         if (has_capability('mod/grouptool:register', $context)
-                || has_capability('mod/grouptool:view_registrations', $context)) {
+            || has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:view_regs_course_view', $context)) {
             $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
             $userstats = $instance->get_registration_stats($USER->id);
         }
@@ -785,15 +788,18 @@ function grouptool_print_overview($courses, &$htmlarray) {
             }
         }
 
-        if (has_capability('mod/grouptool:view_registrations', $context) && $grouptool->allow_reg) {
+        if ($grouptool->allow_reg
+            && (has_capability('mod/grouptool:view_regs_group_view', $context)
+                || has_capability('mod/grouptool:view_regs_course_view', $context))) {
             $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool',
                                                            $userstats),
                                          array('class' => 'userstats'));
 
         }
 
-        if ((has_capability('mod/grouptool:view_registrations', $context)
-                                      || has_capability('mod/grouptool:register', $context))) {
+        if (has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:view_regs_course_view', $context)
+            || has_capability('mod/grouptool:register', $context)) {
             if ($grouptool->allow_reg) {
                 $str .= html_writer::tag('div', $details, array('class' => 'details'));
             }

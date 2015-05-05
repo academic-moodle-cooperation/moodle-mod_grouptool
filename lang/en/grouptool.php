@@ -275,7 +275,8 @@ $string['grouptool:register_students'] = 'Register students in an active group u
 $string['grouptool:move_students'] = 'Move students to other groups.';
 $string['grouptool:view_description'] = 'View grouptools description';
 $string['grouptool:view_groups'] = 'View active groups';
-$string['grouptool:view_registrations'] = 'View who\'s registered/queued in which active group using grouptool';
+$string['grouptool:view_regs_group_overview'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
+$string['grouptool:view_regs_course_overview'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
 $string['grouptool:view_own_registration'] = 'View own registration(s).';
 $string['groupuser_import'] = 'Import group users';
 $string['group_not_in_grouping'] = 'Chosen group is not member of chosen grouping!';
@@ -492,3 +493,6 @@ $string['viewmoodlegroups'] = 'To Moodle groups';
 $string['you_are_already_marked'] = 'You marked this group already for registration!';
 $string['you_have_too_less_regs'] = 'Deregistration/dequeue not possible because you\'re registered/queued in too less groups!';
 $string['your_place_allocated_in_group_success'] = 'You successfully marked group {$a->groupname} for registration';
+
+// Deprecated since 2.8
+$string['grouptool:view_registrations'] = 'View who\'s registered/queued in which active group using grouptool';

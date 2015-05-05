@@ -275,7 +275,8 @@ $string['grouptool:register_students'] = 'Melde andere Benutzer in aktiven Grupp
 $string['grouptool:move_students'] = 'Verschiebe Studenten in andere Gruppen.';
 $string['grouptool:view_description'] = 'Zeige Gruppenverwaltungsbeschreibung';
 $string['grouptool:view_groups'] = 'Zeige aktive Gruppen';
-$string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+$string['grouptool:view_regs_group_overview'] = 'Zeige eine nach Gruppen gegliederte Liste, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+$string['grouptool:view_regs_course_overview'] = 'Zeige eine Nutzerliste mit der Information, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
 $string['grouptool:view_own_registration'] = 'Zeige eigene Registrierung(en) an';
 $string['groupuser_import'] = 'Importiere Gruppenmitglieder';
 $string['group_not_in_grouping'] = 'Gewählte Gruppe ist nicht in gewählter Gruppierung!';
@@ -492,3 +493,6 @@ $string['viewmoodlegroups'] = 'Zu den Moodle Gruppen';
 $string['you_are_already_marked'] = 'Sie haben die Gruppe {$a->groupname} bereits erfolgreich zur Anmeldung markiert!';
 $string['you_have_too_less_regs'] = 'Eine Abmeldung ist nicht möglich, weil Sie in zu wenigen Gruppen angemeldet sind';
 $string['your_place_allocated_in_group_success'] = 'Sie haben die Gruppe {$a->groupname} erfolgreich zur Anmeldung markiert.';
+
+// Deprecated since 2.8
+$string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';

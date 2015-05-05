@@ -81,7 +81,8 @@ foreach ($grouptools as $grouptool) {
 
     $str = "";
     if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_registrations', $context)) {
+        || has_capability('mod/grouptool:view_regs_course_view', $context)
+        || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         $attrib = array('title' => $strgrouptool,
                         'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule);
         if ($grouptool->visible) {
@@ -107,7 +108,8 @@ foreach ($grouptools as $grouptool) {
     }
     $details = '';
     if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_registrations', $context)) {
+        || has_capability('mod/grouptool:view_regs_course_view', $context)
+        || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         // It's similar to the student mymoodle output!
         $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
         $userstats = $instance->get_registration_stats($USER->id);
@@ -177,15 +179,19 @@ foreach ($grouptools as $grouptool) {
         }
     }
 
-    if (has_capability('mod/grouptool:view_registrations', $context) && $grouptool->allow_reg) {
+    if ((has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:view_regs_course_view', $context))
+        && $grouptool->allow_reg) {
         $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool', $userstats),
                 array('class' => 'userstats'));
 
     }
 
 
-    if (($grouptool->allow_reg && has_capability('mod/grouptool:view_registrations', $context))
-            || has_capability('mod/grouptool:register', $context)) {
+    if (($grouptool->allow_reg
+            && (has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:view_regs_course_view', $context)))
+        || has_capability('mod/grouptool:register', $context)) {
         $str .= html_writer::tag('div', $details, array('class' => 'details'));
         $str = html_writer::tag('div', $str, array('class' => 'grouptool overview'));
     }

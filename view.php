@@ -116,8 +116,8 @@ if (has_capability('mod/grouptool:register_students', $context)) {
                                    get_string('import_desc', 'grouptool'),
                                    false);
 }
-if (has_capability('mod/grouptool:view_registrations', $context)
-   && has_capability('mod/grouptool:view_registrations', $context)) {
+if (has_capability('mod/grouptool:view_regs_group_view', $context)
+    && has_capability('mod/grouptool:view_regs_course_view', $context)) {
     $row['users'] = new tabobject('users',
                                   $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
                                   get_string('users_tab', 'grouptool'),
@@ -135,14 +135,14 @@ if (has_capability('mod/grouptool:view_registrations', $context)
                                                        get_string('userlist_tab_alt', 'grouptool'),
                                                        false);
     $row['users']->subtree['userlist']->level = 2;
-} else if (has_capability('mod/grouptool:view_registrations', $context)) {
-        $row['users'] = new tabobject('users',
-                                      $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
-                                      get_string('users_tab', 'grouptool'),
-                                      get_string('users_tab_alt', 'grouptool'),
-                                      false);
-} else if (has_capability('mod/grouptool:view_registrations', $context)) {
-    $row['users'] = new tabobject('userlist',
+} else if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
+    $row['users'] = new tabobject('users',
+                                  $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
+                                  get_string('users_tab', 'grouptool'),
+                                  get_string('users_tab_alt', 'grouptool'),
+                                  false);
+} else if (has_capability('mod/grouptool:view_regs_course_view', $context)) {
+    $row['users'] = new tabobject('users',
                                   $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=userlist',
                                   get_string('users_tab', 'grouptool'),
                                   get_string('users_tab_alt', 'grouptool'),

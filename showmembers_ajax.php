@@ -77,7 +77,8 @@ $group = $DB->get_record_sql('SELECT grp.id as grpid, grp.name as grpname, grp.c
 $grouptool = $DB->get_record('grouptool', array('id' => $group->grouptoolid), '*', MUST_EXIST);
 
 $text = '';
-if (!has_capability('mod/grouptool:view_registrations', $context)
+if (!has_capability('mod/grouptool:view_regs_group_view', $context)
+    && !has_capability('mod/grouptool:view_regs_course_view', $context)
     && !$grouptool->show_members) {
     $text .= html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
                               array('class' => 'reg'));
