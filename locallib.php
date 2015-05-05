@@ -7064,7 +7064,7 @@ EOS;
                 return get_string('no_users_to_display', 'grouptool');
             }
         }
-        $groupinfo = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
+        $groupinfo = $this->get_active_groups(true, true, 0, $groupid, $groupingid, false);
 
         if (!$onlydata) {
             if (has_capability('mod/grouptool:export', $context)) {
@@ -7130,7 +7130,7 @@ EOS;
                                                                          'registrations'));
             }
             if (!in_array('queues', $collapsed)) {
-                $queueslink = get_string('queues', 'grouptool');
+                $queueslink = get_string('queues', 'grouptool').' ('.get_string('rank', 'grouptool').')';
                 $queues = new html_table_cell($queueslink.
                                               $this->collapselink($collapsed, 'queues'));
             } else {
@@ -7163,7 +7163,7 @@ EOS;
             $head['idnumber'] = get_user_field_name('idnumber');
             $head['email']         = get_user_field_name('email');
             $head['registrations'] = get_string('registrations', 'grouptool');
-            $head['queues']        = get_string('queues', 'grouptool');
+            $head['queues']        = get_string('queues', 'grouptool').' ('.get_string('rank', 'grouptool').')';
         }
         $rows = array();
         if (!empty($userdata)) {
@@ -7218,13 +7218,12 @@ EOS;
                                 $grouplink = new moodle_url($PAGE->url,
                                                             array('tab'     => 'overview',
                                                                   'groupid' => $groupinfo[$queue]->id));
-                                $rank = $this->get_rank_in_queue($queue, $user->id);
+                                $rank = $this->get_rank_in_queue($groupinfo[$queue]->queued, $user->id);
                                 if (empty($rank)) {
                                     $rank = '*';
                                 }
                                 $queueentries[] = html_writer::link($grouplink,
-                                                                    "(".$rank.") ".
-                                                                    $groupinfo[$queue]->name);
+                                                                    $groupinfo[$queue]->name." (#".$rank.")");
                             }
                         } else {
                             $queueentries = array('-');
