@@ -4995,12 +4995,11 @@ EOS;
             }
         }
 
-        if (false == ($grouptool_importfields = get_config('mod_grouptool', 'importfields'))) {
+        if (false !== ($grouptool_importfields = get_config('mod_grouptool', 'importfields'))) {
             $importfields = explode(',', $grouptool_importfields);
         } else {
             $importfields = array('username','idnumber');
         }
-
         $prevtable = new html_table();
         $prevtable->head = array(get_string('fullname'));
         foreach ($importfields as $field) {
