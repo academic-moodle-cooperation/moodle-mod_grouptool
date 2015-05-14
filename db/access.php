@@ -129,6 +129,16 @@ $capabilities = array(
                 )
         ),
 
+        'mod/grouptool:administrate_groups' => array(
+                'captype' => 'write',
+                'contextlevel' => CONTEXT_MODULE,
+                'legacy' => array(
+                        'teacher' => CAP_ALLOW,
+                        'editingteacher' => CAP_ALLOW,
+                        'manager' => CAP_ALLOW
+                )
+        ),
+
         'mod/grouptool:create_groups' => array(
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,

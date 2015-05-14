@@ -82,15 +82,58 @@ echo $OUTPUT->header();
 $inactive = array();
 $tabs = array();
 $row = array();
-if (has_capability('mod/grouptool:create_groups', $context)
-    || has_capability('mod/grouptool:create_groupings', $context)
-    || has_capability('mod/grouptool:register_students', $context)) {
-    $row['administration'] = new tabobject('administration',
-                                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                           '&amp;tab=administration',
-                                           get_string('administration', 'grouptool'),
-                                           get_string('administration_alt', 'grouptool'),
-                                           false);
+$create_grps = has_capability('mod/grouptool:create_groups', $context);
+$create_grpgs = has_capability('mod/grouptool:create_groupings', $context);
+$admin_grps = has_capability('mod/grouptool:administrate_groups', $context);
+
+if ($create_grps || $create_grpgs || $admin_grps) {
+
+    if ($create_grps && ($admin_grps || $create_grpgs)) {
+        $row['administration'] = new tabobject('administration',
+                                               $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                               '&amp;tab=administration',
+                                               get_string('administration', 'grouptool'),
+                                               get_string('administration_alt', 'grouptool'),
+                                               false);
+        $row['administration']->subtree['group_admin'] = new tabobject('group_admin',
+                                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                                                       '&amp;tab=group_admin',
+                                                                       get_string('group_administration', 'grouptool'),
+                                                                       get_string('group_administration_alt', 'grouptool'),
+                                                                       false);
+        $row['administration']->subtree['group_creation'] = new tabobject('group_creation',
+                                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                                                       '&amp;tab=group_creation',
+                                                                       get_string('group_creation', 'grouptool'),
+                                                                       get_string('group_creation_alt', 'grouptool'),
+                                                                       false);
+    } else if ($create_grps) {
+        $row['administration'] = new tabobject('administration',
+                                               $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                               '&amp;tab=administration',
+                                               get_string('administration', 'grouptool'),
+                                               get_string('administration_alt', 'grouptool'),
+                                               false);
+        $row['administration']->subtree['group_creation'] = new tabobject('group_creation',
+                                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                                                       '&amp;tab=group_creation',
+                                                                       get_string('group_creation', 'grouptool'),
+                                                                       get_string('group_creation_alt', 'grouptool'),
+                                                                       false);
+    } else if ($create_grpgs || $admin_grps) {
+        $row['administration'] = new tabobject('administration',
+                                               $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                               '&amp;tab=administration',
+                                               get_string('administration', 'grouptool'),
+                                               get_string('administration_alt', 'grouptool'),
+                                               false);
+        $row['administration']->subtree['group_admin'] = new tabobject('group_admin',
+                                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                                                       '&amp;tab=group_admin',
+                                                                       get_string('group_administration', 'grouptool'),
+                                                                       get_string('group_administration_alt', 'grouptool'),
+                                                                       false);
+    }
 }
 if (has_capability('mod/grouptool:grade', $context)
     || has_capability('mod/grouptool:grade_own_group', $context)) {
@@ -169,10 +212,11 @@ if (empty($cm->uservisible)) {
                || ($SESSION->mod_grouptool->currenttab=='noaccess')
                || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
-        if (has_capability('mod/grouptool:create_groups', $context)
-                || has_capability('mod/grouptool:create_groupings', $context)
-                || has_capability('mod/grouptool:register_students', $context)) {
-            $SESSION->mod_grouptool->currenttab = 'administration';
+        if (has_capability('mod/grouptool:create_groupings', $context)
+                || has_capability('mod/grouptool:administrate_groups', $context)) {
+            $SESSION->mod_grouptool->currenttab = 'admin_groups';
+        } else if (has_capability('mod/grouptool:create_groups', $context)) {
+            $SESSION->mod_grouptool->currenttab = 'create_groups';
         } else if (has_capability('mod/grouptool:register_students', $context)
                        || has_capability('mod/grouptool:register', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
@@ -185,6 +229,10 @@ if (empty($cm->uservisible)) {
         case 'overview':
         case 'userlist':
             $inactive[] = 'users';
+            break;
+        case 'group_admin':
+        case 'group_creation':
+            $inactive[] = 'administration';
             break;
     }
     echo $OUTPUT->tabtree($row, $SESSION->mod_grouptool->currenttab, $inactive);
@@ -227,7 +275,11 @@ $event->trigger();
 
 switch($tab) {
     case 'administration':
+    case 'group_admin':
         $instance->view_administration();
+        break;
+    case 'group_creation':
+        $instance->view_creation();
         break;
     case 'grading':
         $instance->view_grading();

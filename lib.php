@@ -555,13 +555,30 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
                                      cm_info $cm) {
     global $DB;
     $context = context_module::instance($cm->id);
+    $create_grps = has_capability('mod/grouptool:create_groups', $context);
+    $create_grpgs = has_capability('mod/grouptool:create_groupings', $context);
+    $admin_grps = has_capability('mod/grouptool:administrate_groups', $context);
 
-    if (has_capability('mod/grouptool:create_groups', $context)
-            || has_capability('mod/grouptool:create_groupings', $context)
-            || has_capability('mod/grouptool:register_students', $context)) {
-        $navref->add(get_string('administration', 'grouptool'),
-                     new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                     'tab' => 'administration')));
+    if ($create_grps || $create_grpgs || $admin_grps) {
+        if ($create_grps && ($admin_grps || $create_grpgs)) {
+            $admin = $navref->add(get_string('administration', 'grouptool'),
+                                  new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                                  'tab' => 'administration')));
+            $admin->add(get_string('group_administration', 'grouptool'),
+                                   new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                                   'tab' => 'group_admin')));
+            $admin->add(get_string('group_creation', 'grouptool'),
+                                   new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                                   'tab' => 'group_creation')));
+        } else if ($create_grps) {
+            $navref->add(get_string('group_creation', 'grouptool'),
+                         new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                                  'tab' => 'group_creation')));
+        } else if ($create_grpgs || $admin_grps) {
+            $navref->add(get_string('group_administration', 'grouptool'),
+                         new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
+                                                                                  'tab' => 'group_admin')));
+        }
     }
     if (has_capability('mod/grouptool:grade', $context)
             || has_capability('mod/grouptool:grade_own_group', $context)) {
@@ -578,7 +595,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
                 && ($gt->timeavailable < time()));
 
     if (has_capability('mod/grouptool:register_students', $context)
-       || ($regopen && $gmok && has_capability('mod/grouptool:register', $context))) {
+        || ($regopen && $gmok && has_capability('mod/grouptool:register', $context))) {
         $tmp = $navref->add(get_string('selfregistration', 'grouptool'),
                             new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                             'tab' => 'selfregistration')));
