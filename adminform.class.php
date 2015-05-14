@@ -75,7 +75,7 @@ class mod_grouptool_view_admin_form extends moodleform {
         $coursecontext = context_course::instance($cm->course);
 
         $mform->addElement('hidden', 'tab');
-        $mform->setDefault('tab', 'administration');
+        $mform->setDefault('tab', 'group_admin');
         $mform->setType('tab', PARAM_TEXT);
 
         if (has_capability('mod/grouptool:create_groupings', $this->context)) {

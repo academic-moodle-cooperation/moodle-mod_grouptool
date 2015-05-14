@@ -636,6 +636,17 @@ class mod_grouptool {
                 $event = \mod_grouptool\event\agrps_updated::create_groupcreation($this->cm, $data->namingscheme, $numgrps, $groupingid)->trigger();
             }
         }
+        if (empty($failed)) {
+            $preview = get_string('groups_created', 'grouptool');
+        } else if (empty($preview)) {
+            if (!empty($error)) {
+                $preview = $error;
+            } else {
+                $preview = get_string('group_creation_failed', 'grouptool');
+            }
+        }
+
+        return array($failed, $preview);
     }
 
     /**
@@ -1350,7 +1361,7 @@ class mod_grouptool {
                         $usercnt = count($users);
                         $numgrps    = $data->amount;
                         $userpergrp = floor($usercnt / $numgrps);
-                        $this->create_groups($data, $users, $userpergrp, $numgrps);
+                        list($error, $preview) = $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
                     case GROUPTOOL_MEMBERS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1386,7 +1397,7 @@ class mod_grouptool {
                                 $userpergrp = floor($usercnt / $numgrps);
                             }
                         }
-                        $this->create_groups($data, $users, $userpergrp, $numgrps);
+                        list($error, $preview) = $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
                     case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
@@ -1407,6 +1418,10 @@ class mod_grouptool {
                         list($error, $preview) = $this->create_fromto_groups($data);
                         break;
                 }
+                $class = $error ? 'notifyproblem' : 'notifysuccess';
+                $preview = $OUTPUT->notification($preview, $class);
+                echo $OUTPUT->box(html_writer::tag('div', $preview, array('class'=>'centered')),
+                                  'generalbox');
             }
             unset($SESSION->grouptool->view_administration);
         }
@@ -1514,14 +1529,15 @@ class mod_grouptool {
                     break;
             }
             $preview = html_writer::tag('div', $preview, array('class' => 'centered'));
+            $tab = required_param('tab', PARAM_ALPHANUMEXT);
             if ($error) {
                 $text = get_string('create_groups_confirm_problem', 'grouptool');
-                $url = new moodle_url("view.php?id=$id&tab=administration");
+                $url = new moodle_url("view.php?id=$id&tab=".$tab);
                 $back = new single_button($url, get_string('back'), 'post');
                 $confirmboxcontent = $this->confirm($text, $back);
             } else {
-                $continue = "view.php?id=$id&tab=administration&confirm=true";
-                $cancel = "view.php?id=$id&tab=administration";
+                $continue = "view.php?id=$id&tab=".$tab."&confirm=true";
+                $cancel = "view.php?id=$id&tab=".$tab;
                 $text = get_string('create_groups_confirm', 'grouptool');
                 $confirmboxcontent = $this->confirm($text, $continue, $cancel);
             }

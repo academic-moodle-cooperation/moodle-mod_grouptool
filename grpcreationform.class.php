@@ -76,7 +76,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
         $coursecontext = context_course::instance($cm->course);
 
         $mform->addElement('hidden', 'tab');
-        $mform->setDefault('tab', 'administration');
+        $mform->setDefault('tab', 'group_creation');
         $mform->setType('tab', PARAM_TEXT);
 
         if (has_capability('mod/grouptool:create_groups', $this->context)) {
