@@ -1,1 +1,1 @@
-mod_grouptool.grouptool:view_registrations
+grouptool:view_registrations,mod_grouptool

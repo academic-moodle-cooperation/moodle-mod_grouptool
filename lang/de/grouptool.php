@@ -501,5 +501,5 @@ $string['you_are_already_marked'] = 'Sie haben die Gruppe {$a->groupname} bereit
 $string['you_have_too_less_regs'] = 'Eine Abmeldung ist nicht möglich, weil Sie in zu wenigen Gruppen angemeldet sind';
 $string['your_place_allocated_in_group_success'] = 'Sie haben die Gruppe {$a->groupname} erfolgreich zur Anmeldung markiert.';
 
-// Deprecated since 2.8
+// Deprecated since Moodle 2.8
 $string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';

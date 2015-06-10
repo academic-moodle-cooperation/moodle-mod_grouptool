@@ -501,5 +501,5 @@ $string['you_are_already_marked'] = 'You marked this group already for registrat
 $string['you_have_too_less_regs'] = 'Deregistration/dequeue not possible because you\'re registered/queued in too less groups!';
 $string['your_place_allocated_in_group_success'] = 'You successfully marked group {$a->groupname} for registration';
 
-// Deprecated since 2.8
+// Deprecated since Moodle 2.8
 $string['grouptool:view_registrations'] = 'View who\'s registered/queued in which active group using grouptool';
