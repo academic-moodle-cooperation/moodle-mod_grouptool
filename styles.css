@@ -83,6 +83,13 @@
     vertical-align:middle;
     overflow:hidden;
     white-space:wrap;
+    -moz-hyphens: auto;
+    -o-hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    hyphenate-limit-chars: auto 5;
+    hyphenate-limit-lines: 2;
 }
 
 .path-mod-grouptool .draggable_item .grpsize {

@@ -392,12 +392,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 $nameattr = array('name'  => $namebase.'[name]',
                                   'type'  => 'hidden',
                                   'value' => $group['name']);
-                if (strlen($group['name']) > 25) {
-                    $nameblock = substr($group['name'], 0, 17).'...'.substr($group['name'], -5, 5).
-                                 html_writer::empty_tag('input', $nameattr);
-                } else {
-                    $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
-                }
+                $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
 
                 $row = array( 0 => new html_table_cell(html_writer::empty_tag('input', $advchkboxattr).
                                                        html_writer::empty_tag('input', $chkboxattr)),
@@ -867,12 +862,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 $nameattr = array('name'  => $namebase.'[name]',
                                   'type'  => 'hidden',
                                   'value' => $group['name']);
-                if (strlen($group['name']) > 25) {
-                    $nameblock = substr($group['name'], 0, 17).'...'.substr($group['name'], -5, 5).
-                                 html_writer::empty_tag('input', $nameattr);
-                } else {
-                    $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
-                }
+                $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
 
                 $row = array( 0 => new html_table_cell(html_writer::empty_tag('input', $advchkboxattr).
                                                        html_writer::empty_tag('input', $chkboxattr)),
