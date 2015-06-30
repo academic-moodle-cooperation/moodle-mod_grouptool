@@ -862,7 +862,7 @@ class mod_grouptool {
             $error = false;
             $table = new html_table();
             $table->head  = array(get_string('groupscount', 'group',
-                                  (clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT))));
+                                  (clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT)+1)));
             $table->size  = array('100%');
             $table->align = array('left');
             $table->width = '40%';
