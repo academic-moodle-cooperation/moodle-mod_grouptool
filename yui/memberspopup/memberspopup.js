@@ -57,7 +57,7 @@ Y.extend(MEMBERSPOPUP, Y.Base, {
             this.panel = new M.core.tooltip({
                 bodyhandler: this.set_body_content,
                 footerhandler: this.set_footer,
-                initialheadertext: M.util.get_string('loading', 'grouptool'),
+                initialheadertext: M.util.get_string('loading', 'mod_grouptool'),
                 initialfootertext: ''
             });
         }

@@ -6599,9 +6599,7 @@ EOS;
 
         // Init Members-Popup-JS!
         $PAGE->requires->yui_module('moodle-mod_grouptool-memberspopup', 'M.mod_grouptool.init_memberspopup');
-        $PAGE->requires->strings_for_js(array(
-            'loading',
-        ), 'grouptool');
+        $PAGE->requires->string_for_js('loading', 'mod_grouptool');
 
         $output = get_string('show_members', 'grouptool');
 
