@@ -117,12 +117,27 @@ class sortlist implements renderable {
     public $cm = null;
 
     public function __construct($courseid=null, $cm=null, $filter=null) {
+        global $SESSION;
 
         $this->filter = $filter;
 
         if ($courseid!=null) {
             $this->loadGroups($courseid, $cm);
             $this->cm = $cm;
+        }
+
+        $this->selected = optional_param('selected', null, PARAM_BOOL);
+        if (!isset($SESSION->sortlist)) {
+            $SESSION->sortlist = new stdClass();
+        }
+        if (!isset($SESSION->sortlist->selected)) {
+            $SESSION->sortlist->selected = array();
+        }
+
+        if ($this->selected == null) {
+            $this->selected = $SESSION->sortlist->selected;
+        } else {
+            $SESSION->sortlist->selected = $this->selected;
         }
     }
 
@@ -338,34 +353,53 @@ class sortlist implements renderable {
             }
         }
     }
-
-    /**
-     * refreshs the element order via move1up() and move1down() if corresponding params are set
-     */
-    public function _refresh_element_order() {
-
-        $moveup = optional_param_array('moveup', null, PARAM_INT);
-        $movedown = optional_param_array('movedown', null, PARAM_INT);
-
-        if ($moveup != null) {
-            uasort($sortlist->groups, array(&$this, "cmp"));
-            $moveup = array_keys($moveup);
-            $this->_move1up($moveup[0]);
-        }
-
-        if ($movedown != null) {
-            uasort($sortlist->groups, array(&$this, "cmp"));
-            $movedown = array_keys($movedown);
-            $this->_move1down($movedown[0]);
-        }
-    }
-
 }
 
+class sortlist_controller implements renderable {
+
+    public $sortlist = null;
+
+    public function __construct(sortlist &$sortlist) {
+        global $SESSION;
+        $this->sortlist = $sortlist;
+
+        $classes = optional_param_array('classes', array(0), PARAM_INT);
+        $action = optional_param('class_action', 0, PARAM_ALPHA);
+        $go_button = optional_param('do_class_action', 0, PARAM_BOOL);
+
+        if (!empty($go_button) && ($classes != null)
+            && (count($classes) != 0) && !empty($action)) {
+            $keys = array();
+
+            $groups = array();
+            foreach ($classes as $groupingid) {
+                $groups = array_merge($groups, groups_get_all_groups($this->sortlist->cm->course, 0, $groupingid));
+            }
+
+            foreach ($groups as $current) {
+                switch($action) {
+                    case 'select':
+                        $this->sortlist->selected[$current->id] = 1;
+                        break;
+                    case 'deselect':
+                        $this->sortlist->selected[$current->id] = 0;
+                        break;
+                    case 'toggle':
+                        $next = empty($this->sortlist->selected[$current->id]) ? 1 : 0;
+                        $this->sortlist->selected[$current->id] = $next;
+                        break;
+                }
+            }
+
+            // Update SESSION
+            $SESSION->sortlist->selected = $this->sortlist->selected;
+        }
+    }
+}
 
 class mod_grouptool_renderer extends plugin_renderer_base {
 
-/**
+    /**
      * Returns the input field in HTML
      *
      * @since     1.0
@@ -416,7 +450,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                     'type'  => 'checkbox',
                     'class' => implode(' ', $classes),
                     'value' => $id);
-            if (!empty($group->selected)) {
+            if (!empty($sortlist->selected[$id])) {
                 $chkboxattr['checked'] = 'checked';
             } else if (isset($chkboxattr['checked'])) {
                 unset($chkboxattr['checked']);
@@ -585,7 +619,11 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         return $html;
     }
 
-    protected function render_sortlist_controller(sortlist $sortlist) {
+    protected function render_sortlist_controller(sortlist_controller $controller) {
+        global $OUTPUT, $DB;
+
+        $sortlist = $controller->sortlist;
+
         // Generate groupings-controls to select/deselect groupings!
         $checkboxcontroltitle = html_writer::tag('label', get_string('checkbox_control_header', 'grouptool'), array('for'=>'classes'));
         $helptext = $OUTPUT->render(new help_icon('checkbox_control_header', 'grouptool'));
@@ -601,7 +639,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         $options = array(html_writer::tag('option', get_string('all'), array('value' => '0')));
 
         if (!empty($sortlist->groupings) && is_array($sortlist->groupings)) {
-            foreach ($sortlist->gropuings as $groupingid => $grouping) {
+            foreach ($sortlist->groupings as $groupingid => $grouping) {
                 if ($DB->count_records('groupings_groups', array('groupingid' => $groupingid)) != 0) {
                     $options[] = html_writer::tag('option', $grouping, array('value' => $groupingid));
                 } else {
@@ -614,24 +652,30 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         $checkboxcontrols = $checkboxcontroltitle;
 
         // Add Radiobuttons and Go Button TODO replace single buttons with radiobuttons + go-button
-        $checkalllink = html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                              'type'  => 'radio',
-                                                              'id'    => 'select',
-                                                              'value' => 'select',
-                                                              'class' => 'select_all')).
-                        html_writer::tag('label', strip_tags($selectall), array('for'=>'select'));
-        $checknonelink = html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                               'type'  => 'radio',
-                                                               'id'    => 'deselect',
-                                                               'value' => 'deselect',
-                                                               'class' => 'select_none')).
-                         html_writer::tag('label', strip_tags($selectnone), array('for'=>'deselect'));
-        $checktogglelink = html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                 'type'  => 'radio',
-                                                                 'id'    => 'toggle',
-                                                                 'value' => 'toggle',
-                                                                 'class' => 'toggle_selection')).
-                           html_writer::tag('label', strip_tags($inverseselection), array('for'=>'toggle'));;
+        $checkalllink = html_writer::tag('span',
+                                         html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                               'type'  => 'radio',
+                                                                               'id'    => 'select',
+                                                                               'value' => 'select',
+                                                                               'class' => 'select_all')).
+                                         html_writer::tag('label', strip_tags($selectall), array('for'=>'select')),
+                                         array('class' => 'nowrap'));
+        $checknonelink = html_writer::tag('span',
+                                          html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                                'type'  => 'radio',
+                                                                                'id'    => 'deselect',
+                                                                                'value' => 'deselect',
+                                                                                'class' => 'select_none')).
+                                          html_writer::tag('label', strip_tags($selectnone), array('for'=>'deselect')),
+                                          array('class' => 'nowrap'));
+        $checktogglelink = html_writer::tag('span',
+                                            html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                                  'type'  => 'radio',
+                                                                                  'id'    => 'toggle',
+                                                                                  'value' => 'toggle',
+                                                                                  'class' => 'toggle_selection')).
+                                            html_writer::tag('label', strip_tags($inverseselection), array('for'=>'toggle')),
+                                            array('class' => 'nowrap'));
         $submitbutton = html_writer::tag('button', get_string('go'),
                                          array('name' => 'do_class_action',
                                                'value' => 'Go',));

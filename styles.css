@@ -383,6 +383,10 @@
     font-weight:bold;
 }
 
+.path-mod-grouptool .nowrap * {
+    white-space:nowrap;
+}
+
 .path-mod-grouptool .no_queues, .no_registrations {
     text-align:center;
 }

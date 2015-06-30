@@ -415,7 +415,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             });
         });
 
-        var checkbox_controls_action = Y.one('.sortlist_container .felement [name="do_class_action"]');
+        var checkbox_controls_action = Y.one('button[name="do_class_action"]');
         if (checkbox_controls_action) {
             checkbox_controls_action.on('click', function(e) {
                 // Get the new state and continue!

@@ -1567,7 +1567,6 @@ class mod_grouptool {
                     // Show confirmation dialogue!
                     if (optional_param('confirm', 0, PARAM_BOOL)) {
                         $groups = optional_param_array('selected', null, PARAM_INT);
-                        var_dump($groups);
                         $groups = $DB->get_records_list('groups', 'id', $groups);
                         foreach($groups as $group) {
                             groups_delete_group($group);
@@ -1657,6 +1656,8 @@ class mod_grouptool {
             $mform->setDefault('sesskey', sesskey());
 
             $sortlist = new sortlist($this->course->id, $this->cm, $filter);
+            $sortlist_controller = new sortlist_controller($sortlist);
+            $mform->addElement('html', $output->render($sortlist_controller));
             $mform->addElement('html', $output->render($sortlist));
 
             /*$mform->addElement('checkbox', 'quickgrade', get_string('quickgrade', 'checkmark'));
