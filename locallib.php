@@ -132,6 +132,187 @@ class mod_grouptool_view_import_form extends moodleform {
     }
 }
 
+class mod_grouptool_group_rename_form extends moodleform {
+    /**
+     * Definition of import form
+     *
+     * @global object $CFG
+     * @global object $DB
+     * @global object $PAGE
+     */
+    protected function definition() {
+
+        global $CFG, $PAGE, $DB;
+        $mform = $this->_form;
+
+        $mform->addElement('hidden', 'id');
+        $mform->setDefault('id', $this->_customdata['id']);
+        $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'instance');
+        $mform->setDefault('instance', $this->_customdata['instance']);
+        $mform->setType('instance', PARAM_INT);
+
+        $context = context_module::instance($this->_customdata['instance']);
+        $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
+        $course = $DB->get_record('course', array('id' => $cm->course));
+        $this->course = $course;
+        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
+        $coursecontext = context_course::instance($cm->course);
+
+        $mform->addElement('hidden', 'tab');
+        $mform->setDefault('tab', 'group_admin');
+        $mform->setType('tab', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'courseid');
+        $mform->setDefault('courseid', $course->id);
+        $mform->setType('courseid', PARAM_INT);
+
+        $mform->addElement('hidden', 'rename');
+        $mform->setType('rename', PARAM_INT);
+        $mform->setDefault('rename', $this->_customdata['rename']);
+
+        $mform->addElement('text', 'name', get_string('name'));
+        $mform->setType('name', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'courseid');
+        $mform->setDefault('courseid', $course->id);
+        $mform->setType('courseid', PARAM_INT);
+
+        $grp = array();
+        $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
+        $grp[] = $mform->createElement('cancel');
+        $mform->addGroup($grp, 'actionbuttons', '', array(' '), false);
+        $mform->setType('actionbuttons', PARAM_RAW);
+
+    }
+
+    /**
+     * Validation for import form
+     * If there are errors return array of errors ("fieldname"=>"error message"),
+     * otherwise true if ok.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *               or an empty array if everything is OK.
+     */
+    public function validation($data, $files) {
+        global $CFG, $DB;
+
+        $errors = parent::validation($data, $files);
+        if (empty($data['name'])) {
+            $errors['name'] = get_string('choose_group', 'grouptool');
+        } else {
+            $group = groups_get_group_by_name($this->course->id, $data['name']);
+            $group = $DB->get_record('groups', array('id' => $group));
+            if (!empty($group) && ($group->id != $data['rename'])) {
+                $errors['name'] = get_string('groupnameexists', 'group', $data['name']);
+            }
+        }
+
+        return $errors;
+    }
+}
+
+class mod_grouptool_group_resize_form extends moodleform {
+    /**
+     * Definition of import form
+     *
+     * @global object $CFG
+     * @global object $DB
+     * @global object $PAGE
+     */
+    protected function definition() {
+
+        global $CFG, $PAGE, $DB;
+        $mform = $this->_form;
+
+        $mform->addElement('hidden', 'id');
+        $mform->setDefault('id', $this->_customdata['id']);
+        $mform->setType('id', PARAM_INT);
+
+        $mform->addElement('hidden', 'instance');
+        $mform->setDefault('instance', $this->_customdata['instance']);
+        $mform->setType('instance', PARAM_INT);
+
+        $context = context_module::instance($this->_customdata['instance']);
+        $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
+        $course = $DB->get_record('course', array('id' => $cm->course));
+        $this->course = $course;
+        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
+        $group = $DB->get_record('groups', array('id' => $this->_customdata['resize']));
+        $coursecontext = context_course::instance($cm->course);
+
+        $mform->addElement('hidden', 'tab');
+        $mform->setDefault('tab', 'group_admin');
+        $mform->setType('tab', PARAM_TEXT);
+
+        $mform->addElement('hidden', 'courseid');
+        $mform->setDefault('courseid', $course->id);
+        $mform->setType('courseid', PARAM_INT);
+
+        $mform->addElement('hidden', 'resize');
+        $mform->setType('resize', PARAM_INT);
+        $mform->setDefault('resize', $this->_customdata['resize']);
+
+        $mform->addElement('hidden', 'name');
+        $mform->setType('name', PARAM_TEXT);
+        $mform->setDefault('name', $group->name);
+
+        $mform->addElement('text', 'size', get_string('size'));
+        $mform->setType('size', PARAM_INT);
+
+        $mform->addElement('hidden', 'courseid');
+        $mform->setDefault('courseid', $course->id);
+        $mform->setType('courseid', PARAM_INT);
+
+        $grp = array();
+        $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
+        $grp[] = $mform->createElement('cancel');
+        $mform->addGroup($grp, 'actionbuttons', '', array(' '), false);
+        $mform->setType('actionbuttons', PARAM_RAW);
+
+    }
+
+    /**
+     * Validation for import form
+     * If there are errors return array of errors ("fieldname"=>"error message"),
+     * otherwise true if ok.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *               or an empty array if everything is OK.
+     */
+    public function validation($data, $files) {
+        global $CFG, $DB;
+
+        $errors = parent::validation($data, $files);
+        $sql = '
+   SELECT COUNT(reg.id) as regcnt
+     FROM {grouptool_agrps} as agrps
+LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
+    WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
+        $params = array('grouptoolid' => $data['instance'], 'groupid' => $data['resize']);
+        $regs = $DB->count_records_sql($sql, $params);
+        if ((clean_param($data['size'], PARAM_INT) <= 0)) {
+                $errors['size'] = get_string('grpsizezeroerror', 'grouptool');
+        } else if (!empty($regs) && $data['size'] < $regs) {
+            $errors['size'] = get_string('toomanyregs', 'grouptool');
+        } else {
+            $DB->set_field('grouptool_agrps', 'grpsize', $data['size'],
+                           array('groupid' => $data['resize'], 'grouptoolid' => $data['instance']));
+            if ($data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'=>$data['resize'], 'grouptoolid' => $data['instance']))) {
+                // Error happened...
+                $errors['size'] = get_string('couldnt_resize_group', 'grouptool', $data['size']);
+            }
+        }
+
+        return $errors;
+    }
+}
+
 /**
  * class containing most of the logic used in grouptool-module
  *
@@ -162,6 +343,10 @@ class mod_grouptool {
     private $defaultformat;
     /** @var object instance's context record */
     private $context;
+
+    const FILTER_ALL = 0;
+    const FILTER_ACTIVE = 1;
+    const FILTER_INACTIVE = 2;
 
     /**
      * Constructor for the grouptool class
@@ -1168,7 +1353,7 @@ class mod_grouptool {
      * @global object $PAGE
      */
     public function view_administration() {
-        global $SESSION, $OUTPUT, $PAGE, $DB;
+        global $SESSION, $OUTPUT, $PAGE, $DB, $USER, $CFG;
 
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
@@ -1179,6 +1364,53 @@ class mod_grouptool {
                 $rolenames[$role->id] = strip_tags(role_get_name($role, $context));
             }
         }
+        $filter = optional_param('filter', null, PARAM_INT);
+        if ($filter !== null) {
+            set_user_preference('mod_grouptool_group_filter', $filter, $USER->id);
+        } else {
+            $filter = get_user_preferences('mod_grouptool_group_filter', mod_grouptool::FILTER_ACTIVE, $USER->id);
+        }
+
+        $inactivetabs = array();
+        if (!$active = $DB->count_records('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
+                                                              'active'      => 1))) {
+            $inactivetabs[] = mod_grouptool::FILTER_ACTIVE;
+            if ($filter == mod_grouptool::FILTER_ACTIVE) {
+                $filter = mod_grouptool::FILTER_ALL;
+            }
+        }
+        if (!$inactive = $DB->count_records('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
+                                                                     'active'      => 0))) {
+            $inactivetabs[] = mod_grouptool::FILTER_INACTIVE;
+            if ($filter == mod_grouptool::FILTER_INACTIVE) {
+                $filter = mod_grouptool::FILTER_ALL;
+            }
+        }
+        if (!$all = $DB->count_records('grouptool_agrps', array('grouptoolid' => $this->grouptool->id))) {
+            $inactivetabs[] = mod_grouptool::FILTER_INACTIVE;
+            $inactivetabs[] = mod_grouptool::FILTER_ACTIVE;
+            $filter = mod_grouptool::FILTER_ALL;
+        }
+
+        $filtertabs['active'] = new tabobject(mod_grouptool::FILTER_ACTIVE,
+                                              $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                              '&amp;tab=group_admin&filter='.mod_grouptool::FILTER_ACTIVE,
+                                              get_string('active', 'grouptool'),
+                                              '',
+                                              false);
+        $filtertabs['inactive'] = new tabobject(mod_grouptool::FILTER_INACTIVE,
+                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                                '&amp;tab=group_admin&filter='.mod_grouptool::FILTER_INACTIVE,
+                                                get_string('inactive'),
+                                                '',
+                                                false);
+        $filtertabs['all'] = new tabobject(mod_grouptool::FILTER_ALL,
+                                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                                           '&amp;tab=group_admin&filter='.mod_grouptool::FILTER_ALL,
+                                           get_string('all'),
+                                           '',
+                                           false);
+        echo $OUTPUT->tabtree($filtertabs, $filter, $inactivetabs);
 
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
@@ -1204,6 +1436,89 @@ class mod_grouptool {
                 echo $OUTPUT->box($preview, 'generalbox');
             }
             unset($SESSION->grouptool->view_administration);
+        }
+
+        if ($rename = optional_param('rename', 0, PARAM_INT)) {
+            // Show Rename Form!
+            $gform = new mod_grouptool_group_rename_form(null, array('id'       => $this->cm->id,
+                                                                     'instance' => $this->cm->instance,
+                                                                     'rename'   => $rename,));
+            if ($gform->is_cancelled()) {
+                // Nothing to do here!
+            } else if ($fromform = $gform->get_data()) {
+                $group = new stdClass();
+                $group->id = $fromform->rename;
+                $group->name = $fromform->name;
+                $group->courseid = $fromform->courseid;
+                groups_update_group($group);
+            } else {
+                $data = new stdClass();
+                //$data->id = $this->cm->instance;
+                $data->name = $DB->get_field('groups', 'name', array('id' => $rename));
+                $gform->set_data($data);
+                $gform->display();
+                echo $OUTPUT->footer();
+                die;
+            }
+        }
+
+        if ($resize = optional_param('resize', 0, PARAM_INT)) {
+            // Show Rename Form!
+            $gform = new mod_grouptool_group_resize_form(null, array('id'       => $this->cm->id,
+                                                                     'instance' => $this->cm->instance,
+                                                                     'resize'   => $resize,));
+            if ($gform->is_cancelled()) {
+                // Nothing to do here!
+            } else if ($fromform = $gform->get_data()) {
+                $group = new stdClass();
+                $group->id = $DB->get_field('grouptool_agrps', 'id', array('groupid' => $fromform->resize,
+                                                                           'grouptoolid' => $this->cm->instance));
+                $group->grpsize = $fromform->size;
+                $DB->update_record('grouptool_agrps', $group);
+            } else {
+                $data = new stdClass();
+                //$data->id = $this->cm->instance;
+                $data->size = $DB->get_field('grouptool_agrps', 'grpsize', array('groupid' => $resize, 'grouptoolid' => $this->cm->instance));
+                $gform->set_data($data);
+                $gform->display();
+                echo $OUTPUT->footer();
+                die;
+            }
+        }
+
+        if ($delete = optional_param('delete', 0, PARAM_INT)) {
+            if (!optional_param('confirm', 0, PARAM_BOOL)) {
+                // Show Confirm!
+                $cancel = new moodle_url($PAGE->url);
+                $continue = new moodle_url($cancel, array('confirm' => 1,
+                                                          'delete'  => $delete));
+                $cancel = new single_button($cancel, get_string('no'), 'post');
+                $continue = new single_button($continue,
+                                              get_string('yes'), 'post');
+                $confirmtext = get_string('confirm_delete', 'grouptool');
+                echo $this->confirm($confirmtext, $continue, $cancel);
+                echo $OUTPUT->footer();
+                die;
+            } else {
+                // Delete it!
+                groups_delete_group($delete);
+            }
+        }
+
+        if ($toggle = optional_param('toggle', 0, PARAM_INT)) {
+            if (!empty($toggle)) {
+                $conditions = array('grouptoolid' => $this->cm->instance, 'groupid' => $toggle);
+                if (!$DB->record_exists('grouptool_agrps', $conditions)) {
+                    echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_found', 'grouptool'), 'notifyproblem', $conditions), 'generalbox');
+                } else {
+                    $record = $DB->get_record('grouptool_agrps', $conditions);
+                    if (!empty($record->active)) {
+                        $DB->set_field('grouptool_agrps', 'active', 0, $conditions);
+                    } else {
+                        $DB->set_field('grouptool_agrps', 'active', 1, $conditions);
+                    }
+                }
+            }
         }
 
         // Create the form-object!

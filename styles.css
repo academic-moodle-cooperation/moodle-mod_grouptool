@@ -76,10 +76,7 @@
     vertical-align:middle;
 }
 
-.path-mod-grouptool .draggable_item .grpname, .draggable_item .addfield {
-    font-weight:bold;
-    width:20em;
-    font-size:1.6em;
+.path-mod-grouptool .draggable_item .grpname, .path-mod-grouptool .draggable_item .addfield {
     vertical-align:middle;
     overflow:hidden;
     white-space:wrap;
@@ -92,13 +89,16 @@
     hyphenate-limit-lines: 2;
 }
 
+.path-mod-grouptool .draggable_item .grpname .text {
+    font-weight:bold;
+}
+
 .path-mod-grouptool .draggable_item .grpsize {
     margin-left:20px;
     margin-right:2px;
     text-align:middle;
     vertical-align:middle;
     font-weight:normal;
-    font-size:1.2em;
 }
 
 .path-mod-grouptool .draggable_item .grpsize input {
@@ -113,7 +113,6 @@
 }
 
 .path-mod-grouptool .draggable_item .buttons input[type=image], .draggable_item .buttons img {
-    height:20px;
     background-color: transparent !important;/*#34637f;*/
 }
 

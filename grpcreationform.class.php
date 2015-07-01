@@ -212,8 +212,8 @@ class mod_grouptool_grp_creation_form extends moodleform {
             // Init JS!
             $PAGE->requires->string_for_js('showmore', 'form');
             $PAGE->requires->string_for_js('showless', 'form');
-            $PAGE->requires->yui_module('moodle-mod_grouptool-administration',
-                    'M.mod_grouptool.init_administration',
+            $PAGE->requires->yui_module('moodle-mod_grouptool-groupcreation',
+                    'M.mod_grouptool.init_groupcreation',
                     array(array('fromto_mode' => GROUPTOOL_FROMTO_GROUPS)));
 
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));

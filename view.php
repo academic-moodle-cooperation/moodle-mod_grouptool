@@ -209,14 +209,14 @@ if (empty($cm->uservisible)) {
     }
 
     if (!isset($SESSION->mod_grouptool->currenttab)
-               || ($SESSION->mod_grouptool->currenttab=='noaccess')
-               || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
+            || ($SESSION->mod_grouptool->currenttab=='noaccess')
+            || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:create_groupings', $context)
                 || has_capability('mod/grouptool:administrate_groups', $context)) {
-            $SESSION->mod_grouptool->currenttab = 'admin_groups';
+            $SESSION->mod_grouptool->currenttab = 'group_admin';
         } else if (has_capability('mod/grouptool:create_groups', $context)) {
-            $SESSION->mod_grouptool->currenttab = 'create_groups';
+            $SESSION->mod_grouptool->currenttab = 'group_creation';
         } else if (has_capability('mod/grouptool:register_students', $context)
                        || has_capability('mod/grouptool:register', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
@@ -225,16 +225,6 @@ if (empty($cm->uservisible)) {
         }
     }
 
-    switch ($SESSION->mod_grouptool->currenttab) {
-        case 'overview':
-        case 'userlist':
-            $inactive[] = 'users';
-            break;
-        case 'group_admin':
-        case 'group_creation':
-            $inactive[] = 'administration';
-            break;
-    }
     echo $OUTPUT->tabtree($row, $SESSION->mod_grouptool->currenttab, $inactive);
 } else if (count($row) == 1) {
     $SESSION->mod_grouptool->currenttab = current($availabletabs);

@@ -48,27 +48,25 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             FITEM : '<div class="fitem"></div>',
             FELEMENT : '<div class="felement"></div>'
         },
-        ATTRS = {};
+        ATTRS = {
+            contextid : { 'value' : 0},
+            lang : { 'value' : 'en'}
+        };
+
+    //this line use existing name path if it exists, ortherwise create a new one.
+    //This is to avoid to overwrite previously loaded module with same name.
+    M.mod_grouptool = M.mod_grouptool || {};
 
     Y.extend(administration, Y.Base, {
         initializer : function(config) { //'config' contains the parameter values
-            //gets called when it's going to be pluged in
-            this.fromto_mode = this.get('fromto_mode');
-
-            //add JS-Eventhandler for each tag
-            Y.all('.tag').on('click', M.mod_grouptool.administration_add_tag);
-            Y.all('.tag').setStyle('cursor','pointer');
-
-            //add JS-Eventhandlers to hide individual groupsize-fields
-            //if use_size or use_individual are false
-            //Y.one('input[name=use_size]').on('change', M.mod_grouptool.administration_sizevisupdate);
-            /*Y.one('input[name=use_individual]').on('change',
-                                                   M.mod_grouptool.administration_sizevisupdate);*/
-            //add JS-Eventhandler to let groupsize-fields follow global-grpsize changes
-            /*Y.one('input[name=amount]').on('change', M.mod_grouptool.administration_sizevalupdate);
-            Y.one('input[name=use_individual]').on('change',
-                                                   M.mod_grouptool.administration_sizevalupdate);*/
-            Y.one('input[name="mode"][value="' + this.fromto_mode + '"]').on('click', M.mod_grouptool.modechange);
+            M.mod_grouptool.contextid = config.contextid;
+            M.mod_grouptool.lang = config.lang;
+            M.mod_grouptool.filter = config.filter;
+            Y.log('Initalize Grouptool group administration', "info",  "grouptool");
+            Y.all('a.renamebutton').on('click', M.mod_grouptool.renamegroup);
+            Y.all('a.resizebutton').on('click', M.mod_grouptool.resizegroup);
+            Y.all('a.deletebutton').on('click', M.mod_grouptool.deletegroup);
+            Y.all('a.togglebutton').on('click', M.mod_grouptool.togglegroup);
 
         }
 
@@ -84,63 +82,416 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
           //in the $PAGE->requires->yui_module call.
 
     });
-    //this line use existing name path if it exists, ortherwise create a new one.
-    //This is to avoid to overwrite previously loaded module with same name.
-    M.mod_grouptool = M.mod_grouptool || {};
-    M.mod_grouptool.fromto_mode = {};
 
-    M.mod_grouptool.administration_add_tag = function(e) {
-        var targetfield = Y.one('input[name=namingscheme]');
-
+    M.mod_grouptool.renamegroup = function(e) {
         e.preventDefault();
+        e.stopPropagation();
 
-        var nodeclass = e.target.getAttribute('class');
-        var classes = nodeclass.split(' ');
+        // Get group id!
+        var grpid = e.target.getAttribute('name').replace ( /[^\d]/g, '' );
+        e.target = e.target.ancestor('a');
 
-        for(var i = 0; i < classes.length; i++) {
-            if(classes[i] != 'tag') {
-                if(classes[i] == 'number') {
-                    var tag = '#';
-                } else if(classes[i] == 'alpha') {
-                    var tag = '@';
-                } else {
-                    var tag = '[' + classes[i] + ']';
-                }
+        var field = e.target.previous('input[type=hidden]');
+        var text = e.target.previous('span.text');
+        var button = e.target;
+        var infoNode = '';
+        text.hide('fadeOut');
+        button.hide('fadeOut');
+        field.hide('fadeOut');
+        field.setAttribute('type', 'text');
+        field.show('fadeIn');
+        field.focus();
+        field.select();
+        field.on('key', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // TODO start AJAX Call and process Response!
+            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var contextid = M.mod_grouptool.contextid;
+            var lang = M.mod_grouptool.lang;
+            //url += '?action=rename&groupid='+grpid+'&name='+field.getAttribute('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid;
+            var cfg = {
+                method: 'POST',
+                data: 'action=rename&groupid='+grpid+'&name='+field.get('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
+                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                on: {
+                    start: function(id, args) {
+                        if (infoNode) {
+                            infoNode.hide('fadeOut');
+                            infoNode.remove();
+                        }
+                        Y.log("Start AJAX Call to rename group "+grpid, "info", "grouptool");
+                    },
+                    complete: function(id, args) {
+                        Y.log("AJAX Call to rename group "+grpid+" completed", "info", "grouptool");
+                    },
+                    success: function(id, o, args) {
+                        response = Y.JSON.parse(o.responseText);
+                        if (response.error) {
+                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.error+"</div>"), text);
+                            infoNode.show('fadeIn');
+                            // Remove after 60 seconds automatically!
+                            Y.later(60*1000,infoNode,function() { if (infoNode) {infoNode.hide('fadeOut'); infoNode.remove();}});
+                        } else {
+                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">"+response.message+"</div>"), text);
+                            infoNode.show('fadeIn');
+                            text.setHTML(field.get('value'));
+                            field.hide('fadeOut');
+                            field.setAttribute('value', field.get('value'));
+                            field.setAttribute('type', 'hidden');
+                            text.show('fadeIn');
+                            button.show('fadeIn');
+                            field.detach();
+                            Y.later(5*1000,infoNode,function() { infoNode.hide('fadeOut'); infoNode.remove();});
+                        }
+                        Y.log("AJAX Call to rename group "+grpid+" successfull", "success", "grouptool");
+                    },
+                    failure: function(id, o, args) {
+                        // Show message
+                        response = Y.JSON.parse(o.responseText);
+                        infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.message+"</div>"), text);
+                            infoNode.show('fadeIn');
+                        Y.log("AJAX Call to rename group "+grpid+" failure", "error", "grouptool");
+                    },
+                    end: function(id, args) {
+                        Y.log("AJAX Call to rename group "+grpid+" ended", "info", "grouptool");
+                    }
+                },
+/*                context: Dispatch,
+                form: {
+                    id: formObject,
+                    useDisabled: true,
+                    upload: true
+                },
+                xdr: {
+                    use: 'flash',
+                    dataType: 'xml'
+                },*/
+                /*arguments: {
+                    start: 'foo',
+                    complete: 'bar',
+                    end: 'baz'
+                },*/
+                timeout: 60000,
+            };
+
+            Y.io(url, cfg);
+
+        }, 'enter');
+        field.on('key', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            field.hide('fadeOut');
+            text.hide();
+            field.setAttribute('type', 'hidden');
+            field.setAttribute('value', text.getHTML());
+            field.set('value', text.getHTML());
+            text.show('fadeIn');
+            button.show('fadeIn');
+            if (infoNode) {
+                infoNode.hide('fadeOut');
+                infoNode.remove();
             }
-        }
-        var content = targetfield.get('value');
-        targetfield.set('value', content + tag);
-        targetfield.set('defaultValue', content + tag);
+            field.detach();
+        }, 'esc');
     };
 
-    M.mod_grouptool.administration_sizevalupdate = function() {
-        if(Y.one('input[name=use_individual]').get('value') == 0) {
-            Y.all('.grpsize').one('input').set('value', Y.one('input[name=amount]').get('value'));
-        }
+    M.mod_grouptool.resizegroup = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Get group id!
+        var grpid = e.target.getAttribute('name').replace ( /[^\d]/g, '' );
+        e.target = e.target.ancestor('a');
+
+        var field = e.target.previous('input[type=hidden]');
+        var text = e.target.previous('span.text');
+        var button = e.target;
+        var infoNode = '';
+        text.hide('fadeOut');
+        button.hide('fadeOut');
+        field.hide('fadeOut');
+        field.setAttribute('type', 'text');
+        field.show('fadeIn');
+        field.focus();
+        field.select();
+        field.on('key', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // TODO start AJAX Call and process Response!
+            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var contextid = M.mod_grouptool.contextid;
+            var lang = M.mod_grouptool.lang;
+            //url += '?action=rename&groupid='+grpid+'&name='+field.getAttribute('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid;
+            var cfg = {
+                method: 'POST',
+                data: 'action=resize&groupid='+grpid+'&size='+field.get('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
+                headers: { 'X-Transaction': 'POST resize group '+grpid},
+                on: {
+                    start: function(id, args) {
+                        if (infoNode) {
+                            infoNode.hide('fadeOut');
+                            infoNode.remove();
+                        }
+                        Y.log("Start AJAX Call to resize group "+grpid, "info", "grouptool");
+                    },
+                    complete: function(id, args) {
+                        Y.log("AJAX Call to resize group "+grpid+" completed", "info", "grouptool");
+                    },
+                    success: function(id, o, args) {
+                        response = Y.JSON.parse(o.responseText);
+                        if (response.error) {
+                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.error+"</div>"), text);
+                            infoNode.show('fadeIn');
+                            // Remove after 60 seconds automatically!
+                            Y.later(60*1000,infoNode,function() { if (infoNode) {infoNode.hide('fadeOut'); infoNode.remove();}});
+                        } else {
+                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">"+response.message+"</div>"), text);
+                            infoNode.show('fadeIn');
+                            text.setHTML(field.get('value'));
+                            field.hide('fadeOut');
+                            field.setAttribute('value', field.get('value'));
+                            field.setAttribute('type', 'hidden');
+                            text.show('fadeIn');
+                            button.show('fadeIn');
+                            field.detach();
+                            Y.later(5*1000,infoNode,function() { infoNode.hide('fadeOut'); infoNode.remove();});
+                        }
+                        Y.log("AJAX Call to resize group "+grpid+" successfull", "success", "grouptool");
+                    },
+                    failure: function(id, o, args) {
+                        // Show message
+                        response = Y.JSON.parse(o.responseText);
+                        infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.message+"</div>"), text);
+                            infoNode.show('fadeIn');
+                        Y.log("AJAX Call to resize group "+grpid+" failure", "error", "grouptool");
+                    },
+                    end: function(id, args) {
+                        Y.log("AJAX Call to resize group "+grpid+" ended", "info", "grouptool");
+                    }
+                },
+/*                context: Dispatch,
+                form: {
+                    id: formObject,
+                    useDisabled: true,
+                    upload: true
+                },
+                xdr: {
+                    use: 'flash',
+                    dataType: 'xml'
+                },*/
+                /*arguments: {
+                    start: 'foo',
+                    complete: 'bar',
+                    end: 'baz'
+                },*/
+                timeout: 60000,
+            };
+
+            Y.io(url, cfg);
+
+        }, 'enter');
+        field.on('key', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            field.hide('fadeOut');
+            text.hide();
+            field.setAttribute('type', 'hidden');
+            field.setAttribute('value', text.getHTML());
+            field.set('value', text.getHTML());
+            text.show('fadeIn');
+            button.show('fadeIn');
+            if (infoNode) {
+                infoNode.hide('fadeOut');
+                infoNode.remove();
+            }
+            field.detach();
+        }, 'esc');
     };
 
-    M.mod_grouptool.administration_sizevisupdate = function() {
-        if((Y.one('input[name=use_size]').get('value') == 1)
-              && (Y.one('input[name=use_individual]').get('value') == 1)) {
-            Y.all('.grpsize').setStyle('display', 'block');
+    M.mod_grouptool.togglegroup = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var grpid = e.target.getAttribute('name').replace ( /[^\d]/g, '' );
+        if (e.target.hasClass('active')) {
+            // Set inactive! (AJAX Request)
+            Y.log('DEACTIVATE GROUP '+grpid+'!', "info", "grouptool");
+
+            // TODO start AJAX Call and process Response!
+            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var contextid = M.mod_grouptool.contextid;
+            var lang = M.mod_grouptool.lang;
+            var cfg = {
+                method: 'POST',
+                data: 'action=deactivate&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
+                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                on: {
+                    start: function(id, args) {
+                        Y.log("Start AJAX Call to deactivate group "+grpid, "info", "grouptool");
+                    },
+                    complete: function(id, args) {
+                        Y.log("AJAX Call to deactivate group "+grpid+" completed", "info", "grouptool");
+                    },
+                    success: function(id, o, args) {
+                        response = Y.JSON.parse(o.responseText);
+                        if (response.error) {
+                            Y.log("AJAX Call to deactivate group "+grpid+" successfull but error occured:\n"+response.error, "success", "grouptool");
+                        } else {
+                            if (M.mod_grouptool.filter == 'active') {
+                                // If showing only active remove from list
+                                //e.target.ancestor('tr').hide('fadeOut').later(1000, e.target.ancestor('tr'), 'remove');
+                                e.target.ancestor('tr').hide('fadeOut', null, function(){e.target.ancestor('tr').remove()});
+                            } else {
+                                // Else set URL and alt of new image
+                                e.target.ancestor('tr').hide('fadeOut', null, function() {
+                                        e.target.ancestor('tr').addClass('dimmed_text');
+                                        e.target.replaceClass('active', 'inactive');
+                                        e.target.setAttribute('src', M.util.image_url('t/stop'));
+                                        e.target.setAttribute('alt', M.util.get_string('inactive', 'mod_grouptool'));
+                                        e.target.ancestor('tr').show('fadeIn')});
+                                // and add class dimmed_text to row
+                                //e.target.ancestor('tr').addClass('dimmed_text');
+                            }
+                            Y.log("AJAX Call to deactivate group "+grpid+" successfull\n"+response.message, "success", "grouptool");
+                        }
+                        //Y.log("AJAX Call to deactivate group "+grpid+" successfull", "success", "grouptool");
+                    },
+                    failure: function(id, o, args) {
+                        // Show message
+                        Y.log("AJAX Call to deactivate group "+grpid+" failure", "error", "grouptool");
+                    },
+                    end: function(id, args) {
+                        Y.log("AJAX Call to deactivate group "+grpid+" ended", "info", "grouptool");
+                    }
+                },
+                timeout: 60000,
+            };
+
+            Y.io(url, cfg);
+        } else if (e.target.hasClass('inactive')) {
+            // Set active!
+
+            // Set inactive! (AJAX Request)
+            Y.log('ACTIVATE GROUP '+grpid+'!', "info", "grouptool");
+
+            // TODO start AJAX Call and process Response!
+            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var contextid = M.mod_grouptool.contextid;
+            var lang = M.mod_grouptool.lang;
+            var cfg = {
+                method: 'POST',
+                data: 'action=activate&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
+                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                on: {
+                    start: function(id, args) {
+                        Y.log("Start AJAX Call to activate group "+grpid, "info", "grouptool");
+                    },
+                    complete: function(id, args) {
+                        Y.log("AJAX Call to activate group "+grpid+" completed", "info", "grouptool");
+                    },
+                    success: function(id, o, args) {
+                        response = Y.JSON.parse(o.responseText);
+                        if (response.error) {
+                            Y.log("AJAX Call to activate group "+grpid+" successfull but error occured:\n"+response.error, "success", "grouptool");
+                        } else {
+                            if (M.mod_grouptool.filter == 'inactive') {
+                                // If showing only active remove from list
+                                e.target.ancestor('tr').hide('fadeOut', null, function() {e.target.ancestor('tr').remove()});
+                            } else {
+                                // Else set URL and alt of new image
+                                e.target.ancestor('tr').hide('fadeOut', null, function() {
+                                        e.target.ancestor('tr').removeClass('dimmed_text');
+                                        e.target.replaceClass('inactive', 'active');
+                                        e.target.setAttribute('src', M.util.image_url('t/go'));
+                                        e.target.setAttribute('alt', M.util.get_string('active', 'mod_grouptool'));
+                                        // TODO move node in list to correct position!
+                                        e.target.ancestor('tr').show('fadeIn')});
+                                // and add class dimmed_text to row
+                                //e.target.ancestor('tr').addClass('dimmed_text');
+                            }
+                            Y.log("AJAX Call to activate group "+grpid+" successfull\n"+response.message, "success", "grouptool");
+                        }
+                        //Y.log("AJAX Call to activate group "+grpid+" successfull", "success", "grouptool");
+                    },
+                    failure: function(id, o, args) {
+                        // Show message
+                        Y.log("AJAX Call to activate group "+grpid+" failure", "error", "grouptool");
+                    },
+                    end: function(id, args) {
+                        Y.log("AJAX Call to activate group "+grpid+" ended", "info", "grouptool");
+                    }
+                },
+                timeout: 60000,
+            };
+
+            Y.io(url, cfg);
         } else {
-            Y.all('.grpsize').setStyle('display', 'none');
+            // Error!
+            Y.log('Group with id '+grpid+' must have either class "active" or "inactive"!', "error", "grouptool");
         }
-    };
+    }
 
-    M.mod_grouptool.modechange = function(e) {
-        var fieldset = this.ancestor(SELECTORS.FIELDSETCONTAINSADVANCED);
-        // Toggle collapsed class.
-        fieldset.all(SELECTORS.DIVFITEMADVANCED).toggleClass(CSS.SHOW);
-        var morelesslink = fieldset.one(SELECTORS.MORELESSLINKONLY);
-        // Get corresponding hidden variable.
-        var statuselement = new Y.one('input[name=mform_showmore_' + fieldset.get('id') + ']');
-        // Invert it and change the link text.
-        if (statuselement.get('value') === '0') {
-            statuselement.set('value', 1);
-            morelesslink.setHTML(M.str.form.showless);
-            morelesslink.addClass(CSS.SHOWLESS);
-        }
+    M.mod_grouptool.deletegroup = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Get group id!
+        var grpid = e.target.getAttribute('name').replace ( /[^\d]/g, '' );
+        M.util.show_confirm_dialog(e, {'message':       M.util.get_string('confirm_delete', 'mod_grouptool'),
+                                       'continuelabel': M.util.get_string('yes', 'moodle'),
+                                       'cancellabel':   M.util.get_string('no', 'moodle'),
+                                       'callbackargs':  [grpid],
+                                       'callback':      function(grpid) {
+                                                            if (!grpid) { Y.log('No Group ID!', 'info', 'grouptool'); return; }
+
+                                                            Y.log('DELTE GROUP '+grpid+'!', "info", "grouptool");
+
+                                                            var infoNode = '';
+                                                            // TODO start AJAX Call and process Response!
+                                                            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+                                                            var contextid = M.mod_grouptool.contextid;
+                                                            var lang = M.mod_grouptool.lang;
+                                                            var cfg = {
+                                                                method: 'POST',
+                                                                data: 'action=delete&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
+                                                                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                                                                on: {
+                                                                    start: function(id, args) {
+                                                                        Y.log("Start AJAX Call to delete group "+grpid, "info", "grouptool");
+                                                                    },
+                                                                    complete: function(id, args) {
+                                                                        Y.log("AJAX Call to delete group "+grpid+" completed", "info", "grouptool");
+                                                                    },
+                                                                    success: function(id, o, args) {
+                                                                        response = Y.JSON.parse(o.responseText);
+                                                                        if (response.error) {
+
+                                                                            // Remove after 60 seconds automatically!
+                                                                        } else {
+                                                                            // Success, remove the corresponding table entry...
+                                                                            Y.one('#delete_'+grpid).ancestor('tr').hide('fadeOut');
+                                                                            Y.one('#delete_'+grpid).ancestor('tr').remove();
+                                                                        }
+                                                                        Y.log("AJAX Call to delete group "+grpid+" successfull", "success", "grouptool");
+                                                                    },
+                                                                    failure: function(id, o, args) {
+                                                                        // Show message
+                                                                        Y.log("AJAX Call to rename group "+grpid+" failure", "error", "grouptool");
+                                                                    },
+                                                                    end: function(id, args) {
+                                                                        Y.log("AJAX Call to rename group "+grpid+" ended", "info", "grouptool");
+                                                                    }
+                                                                },
+                                                                timeout: 60000,
+                                                            };
+
+                                                            Y.io(url, cfg);
+                                                    },});
     }
 
     //'config' contains the parameter values
@@ -150,5 +501,5 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
     //end of M.mod_grouptool.init_administration
 
   }, '0.0.1', {
-      requires:['base','dd-constrain', 'dd-proxy', 'dd-drop', 'dd-scroll', 'moodle-form-showAdvanced']
+      requires:['base', 'node', 'event-key', 'transition', 'anim']
   });

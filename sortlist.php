@@ -261,7 +261,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
      */
     public function getValue($sorted=true) {
         $this->_refresh_element_order();
-        $this->_refresh_active_state();
+        $this->_refresh_select_state();
         if (!$sorted) {
             return $this->_clean_addfields($this->_value);
         }
@@ -392,7 +392,7 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 $nameattr = array('name'  => $namebase.'[name]',
                                   'type'  => 'hidden',
                                   'value' => $group['name']);
-                $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
+                $nameblock = html_writer::tag('span', $group['name'], array('class'=>'text')).html_writer::empty_tag('input', $nameattr);
 
                 $row = array( 0 => new html_table_cell(html_writer::empty_tag('input', $advchkboxattr).
                                                        html_writer::empty_tag('input', $chkboxattr)),
@@ -694,11 +694,11 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
     }
 
     /**
-     * updates the element active-state if corresponding params are set
+     * updates the element selected-state if corresponding params are set
      */
-    public function _refresh_active_state() {
+    public function _refresh_select_state() {
         global $COURSE;
-        $classes = optional_param_array('classes', null, PARAM_INT);
+        $classes = optional_param_array('classes', array(0), PARAM_INT);
         $action = optional_param('class_action', 0, PARAM_ALPHA);
         $go_button = optional_param('do_class_action', 0, PARAM_BOOL);
 
@@ -722,14 +722,14 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
             foreach ($groups as $current) {
                 switch($action) {
                     case 'select':
-                        $this->_value[$current->id]['active'] = 1;
+                        $this->_value[$current->id]['selected'] = 1;
                         break;
                     case 'deselect':
-                        $this->_value[$current->id]['active'] = 0;
+                        $this->_value[$current->id]['selected'] = 0;
                         break;
                     case 'toggle':
-                        $next = !$this->_value[$current->id]['active'];
-                        $this->_value[$current->id]['active'] = $next;
+                        $next = !$this->_value[$current->id]['selected'];
+                        $this->_value[$current->id]['selected'] = $next;
                         break;
                 }
             }
@@ -784,6 +784,10 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
             $moveupstr = get_string('moveup', 'grouptool');
             $movedownstr = get_string('movedown', 'grouptool');
             $dragstr = get_string('drag', 'grouptool');
+            $setactivestr = get_string('inactive');
+            $setinactivestr = get_string('active');
+            $deletestr = get_string('delete');
+            $renamestr = get_string('rename');
             $groupdata = $this->getValue();
             $firstkey = key($groupdata);
             end($groupdata);
@@ -804,13 +808,12 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                     }
                 }
                 $chkboxattr = array(
-                        'name'  => $namebase.'[active]',
+                        'name'  => $namebase.'[selected]',
                         'type'  => 'checkbox',
                         'class' => 'checkbox_status class0 '.implode(' ', $group['classes']),
                         'value' => 1);
-                if ($group['active']) {
+                if ($group['selected']) {
                     $chkboxattr['checked'] = 'checked';
-                    $chkboxattr['class'] .= ' current';
                 } else if (isset($chkboxattr['checked'])) {
                     unset($chkboxattr['checked']);
                 }
@@ -862,15 +865,40 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                 $nameattr = array('name'  => $namebase.'[name]',
                                   'type'  => 'hidden',
                                   'value' => $group['name']);
-                $nameblock = $group['name'].html_writer::empty_tag('input', $nameattr);
+                $nameblock = html_writer::tag('span', $group['name'], array('class'=>'text')).html_writer::empty_tag('input', $nameattr);
+                // Todo add edit symbol and functionality for group names!
+                $renameattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
+                                    'alt'   => $renamestr,
+                                    'type'  => 'image',
+                                    'name'  => 'rename['.$id.']',
+                                    'class' => 'renamebutton');
+                $renamebutton = html_writer::link(new moodle_url($PAGE->url, array('rename' => $id)),
+                                                  html_writer::empty_tag('img', $renameattr),
+                                                  array('class'=>$renameattr['class']));
+                $nameblock .= $renamebutton;
+
+                $drag = new html_table_cell($dragbutton);
+                $drag->attributes['class'] = 'buttons';
+
+                $deleteattr = array('src'   => $OUTPUT->pix_url('t/delete'),
+                                    'alt'   => $deletestr,
+                                    'name'  => 'delete['.$id.']',
+                                    'class' => 'deletebutton',
+                                    'id'    => 'delete_'.$id);
+                $this->_noSubmitButtons[] = 'delete['.$id.']';
+                $deletebutton = html_writer::link(new moodle_url($PAGE->url, array('delete'=>$id)),
+                                                  html_writer::empty_tag('img', $deleteattr),
+                                                  array('class'=>$deleteattr['class']));
 
                 $row = array( 0 => new html_table_cell(html_writer::empty_tag('input', $advchkboxattr).
                                                        html_writer::empty_tag('input', $chkboxattr)),
-                              1 => new html_table_cell($nameblock.
+                              1 => $drag,
+                              2 => new html_table_cell($nameblock.
                                                        html_writer::empty_tag('input', $hiddenattr).
                                                        $classelements));
                 $row[0]->attributes['class'] = 'checkbox_container';
-                $row[1]->attributes['class'] = 'grpname';
+                $row[2]->attributes['class'] = 'grpname';
+
                 $additionalfields = array();
                 foreach ($this->_options['add_fields'] as $key => $fielddata) {
                     if (!isset($group[$fielddata->name]) || $group[$fielddata->name] == null) {
@@ -900,20 +928,46 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
                     $row[] = $fieldcell;
 
                 }
+                // Todo: Add status toggle!
+                if ($group['active']) {
+                    $toggleattr = array('src'   => $OUTPUT->pix_url('t/go'),
+                                        'alt'   => $setactivestr,
+                                        'name'  => 'toggle['.$id.']',
+                                        'class' => 'active');
+                    $activestate = html_writer::empty_tag('input', array('type'  =>'hidden',
+                                                                         'name'  => $namebase.'[active]',
+                                                                         'value' => 1));
+                } else {
+                    $toggleattr = array('src'   => $OUTPUT->pix_url('t/stop'),
+                                        'alt'   => $setinactivestr,
+                                        'type'  => 'image',
+                                        'name'  => 'toggle['.$id.']',
+                                        'class' => 'inactive');
+                    $activestate = html_writer::empty_tag('input', array('type'  =>'hidden',
+                                                                         'name'  => $namebase.'[active]',
+                                                                         'value' => 0));
+                }
+                $togglebutton = html_writer::link(new moodle_url($PAGE->url, array('toggle'=>$id)),
+                                                  html_writer::empty_tag('img', $toggleattr),
+                                                  array('class'=>'togglebutton '.$toggleattr['class']));
+                $toggle = new html_table_cell($togglebutton.$activestate);
+                $toggle->attributes['class'] = 'buttons';
+                $row[] = $toggle;
                 $moveup = new html_table_cell($moveupbutton);
                 $moveup->attributes['class'] = 'buttons';
                 $row[] = $moveup;
                 $movedown = new html_table_cell($movedownbutton);
                 $movedown->attributes['class'] = 'buttons';
                 $row[] = $movedown;
-                $drag = new html_table_cell($dragbutton);
-                $drag->attributes['class'] = 'buttons';
-                $row[] = $drag;
+                // TODO delete funktionality!
+                $delete = new html_table_cell($deletebutton);
+                $delete->attributes['class'] = 'buttons';
+                $row[] = $delete;
 
                 $row = new html_table_row($row);
                 $row->attributes['class'] = 'draggable_item';
-                if (!empty($this->_options['curactive'][$id])) {
-                    $row->attributes['class'] .= ' current';
+                if (!$group['active']) {
+                    $row->attributes['class'] .= ' dimmed_text';
                 }
 
                 $rows[] = $row;
@@ -921,7 +975,21 @@ class MoodleQuickForm_sortlist extends HTML_QuickForm_element {
 
             $table->data = $rows;
             $table->attributes['class'] .= 'drag_list table table-condensed';
-            $tablehtml = html_writer::table($table);
+
+            $controller = html_writer::link(new moodle_url($PAGE->url,
+                                                           array('class_action' => 'select',
+                                                                 'do_class_action' => '1')),
+                                            get_string('all'),
+                                            array('class' => 'simple_select_all')).
+                          '/'.
+                          html_writer::link(new moodle_url($PAGE->url,
+                                                           array('class_action' => 'deselect',
+                                                                 'do_class_action' => '1')),
+                                            get_string('none'),
+                                            array('class' => 'simple_select_none'));
+            $controller = html_writer::tag('div', $controller);
+
+            $tablehtml = $controller.html_writer::table($table).$controller;
 
             // Generate groupings-controls to select/deselect groupings!
             $checkboxcontroltitle = html_writer::tag('label', get_string('checkbox_control_header', 'grouptool'), array('for'=>'classes'));
