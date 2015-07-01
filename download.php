@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * download.php
@@ -67,25 +67,25 @@ if (empty($cm->uservisible)) {
 
 $tab = required_param('tab', PARAM_ALPHA);
 $format = required_param('format', PARAM_INT);
-switch($format) {
+switch ($format) {
     case GROUPTOOL_PDF:
-        $format_readable = 'PDF';
+        $readableformat = 'PDF';
     break;
     case GROUPTOOL_TXT:
-        $format_readable = 'TXT';
+        $readableformat = 'TXT';
     break;
     case GROUPTOOL_XLSX:
-        $format_readable = 'XLSX';
+        $readableformat = 'XLSX';
     break;
     case GROUPTOOL_ODS:
-        $format_readable = 'ODS';
+        $readableformat = 'ODS';
     break;
     default:
-        $format_readable = 'unknown';
+        $readableformat = 'unknown';
 }
 
 /* Trigger the log event before delivering the download! */
-switch($tab) {
+switch ($tab) {
     case 'overview':
         require_capability('mod/grouptool:view_regs_group_view', $context);
         // Trigger overview event.
@@ -94,7 +94,7 @@ switch($tab) {
             'context'  => context_module::instance($cm->id),
             'other'    => array(
                 'tab' => $tab,
-                'format_readable' => $format_readable,
+                'format_readable' => $readableformat,
                 'format' => $format,
                 'groupid' => $groupid,
                 'groupingid' => $groupingid,
@@ -110,7 +110,7 @@ switch($tab) {
             'context'  => context_module::instance($cm->id),
             'other'    => array(
                 'tab' => $tab,
-                'format_readable' => $format_readable,
+                'format_readable' => $readableformat,
                 'format' => $format,
                 'groupid' => $groupid,
                 'groupingid' => $groupingid,
@@ -125,7 +125,7 @@ switch($tab) {
 switch ($tab) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');
-        switch($format) {
+        switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
                 echo $instance->download_overview_pdf($groupid, $groupingid);
@@ -149,7 +149,7 @@ switch ($tab) {
         break;
     case 'userlist':
         $PAGE->url->param('tab', 'userlist');
-        switch($format) {
+        switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
                 echo $instance->download_userlist_pdf($groupid, $groupingid);

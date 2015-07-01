@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/upgrade.php
@@ -454,9 +454,10 @@ function xmldb_grouptool_upgrade($oldversion) {
                      html_writer::empty_tag('br')."<br />";
                 continue;
             }
-            if ($DB->count_records('config', array('name'=>$name)) != 1) {
+            if ($DB->count_records('config', array('name' => $name)) != 1) {
                 unset($settingsnames[$key]);
-                echo "Can't select setting for '".$name."' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!".
+                echo "Can't select setting for '".$name.
+                     "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!".
                      html_writer::empty_tag('br')."<br />";
                 continue;
                 throw new coding_exception("'$name' could not be uniquely selected in DB!");
@@ -466,7 +467,7 @@ function xmldb_grouptool_upgrade($oldversion) {
             $name = 'grouptool_'.$cur;
             set_config($cur, $CFG->$name, 'mod_grouptool');
             if (get_config('mod_grouptool', $cur) !== false) {
-                $DB->delete_records('config', array('name'=>$name));
+                $DB->delete_records('config', array('name' => $name));
             } else {
                 throw new coding_exception("'$name' could not be properly migrated, because of some coding error.");
             }
@@ -478,7 +479,8 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     if ($oldversion < 2015042200) {
         // Fix a misspelled - and already corrected - string identifier blocking language customisations.
-        $DB->set_field_select('tool_customlang', 'stringid', 'create_assign_groupings', $DB->sql_like('stringid', ':stringid'), array('stringid' => 'create_assign_Groupings'));
+        $DB->set_field_select('tool_customlang', 'stringid', 'create_assign_groupings', $DB->sql_like('stringid', ':stringid'),
+                              array('stringid' => 'create_assign_Groupings'));
 
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2015042200, 'grouptool');

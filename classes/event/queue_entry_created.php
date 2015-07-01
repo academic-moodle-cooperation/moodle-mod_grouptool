@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_queue_entry_created event.
@@ -44,7 +44,7 @@ class queue_entry_created extends \core\event\base {
 
     public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
-        $event = \mod_grouptool\event\queue_entry_created::create(array(
+        $event = self::create(array(
             'objectid' => $regdata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$regdata,
@@ -97,7 +97,8 @@ class queue_entry_created extends \core\event\base {
     protected function get_legacy_logdata() {
         return array($this->courseid, 'grouptool', 'queue',
                            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-                           'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'], $this->contextinstanceid);
+                           'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
+                           $this->contextinstanceid);
     }
 
     /**
@@ -117,7 +118,7 @@ class queue_entry_created extends \core\event\base {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
-        //groupid, agrpid, userid
+        // ...groupid, agrpid, userid.
         if (empty($this->data['other']['groupid'])) {
             throw new \coding_exception('Groupid has to be specified!');
         }

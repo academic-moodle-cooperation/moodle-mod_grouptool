@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * mod_form.php
@@ -56,18 +56,18 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
             $sql = '
   SELECT MAX(regcnt)
-    FROM (SELECT COUNT(reg.id) as regcnt
-            FROM {grouptool_registered} as reg
-            JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+    FROM (SELECT COUNT(reg.id) regcnt
+            FROM {grouptool_registered} reg
+            JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
            WHERE agrps.grouptoolid = :grouptoolid
                  AND reg.modified_by >= 0
-        GROUP BY reg.userid) as regcnts';
+        GROUP BY reg.userid) regcnts';
             $params = array('grouptoolid' => $cm->instance);
             $maxregs = $DB->get_field_sql($sql, $params);
             $sql = '
-      SELECT COUNT(queue.id) as queue
-        FROM {grouptool_queued} as queue
-        JOIN {grouptool_agrps} as agrps ON queue.agrpid = agrps.id
+      SELECT COUNT(queue.id) queue
+        FROM {grouptool_queued} queue
+        JOIN {grouptool_agrps} agrps ON queue.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
              AND agrps.active = 1';
             $params = array('grouptoolid' => $cm->instance);
@@ -119,7 +119,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
         $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'grouptool');
         $mform->setDefault('alwaysshowdescription', 1);
-        $mform->disabledIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
+        $mform->disabledif ('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
 
         /*
          * ---------------------------------------------------------
@@ -134,27 +134,27 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setExpanded('grouptoolfieldset');
 
         $mform->addElement('selectyesno', 'allow_reg', get_string('allow_reg', 'grouptool'));
-        $allow_reg = get_config('mod_grouptool', 'allow_reg');
-        $mform->setDefault('allow_reg', (($allow_reg !== false) ? $allow_reg : 1));
+        $allowreg = get_config('mod_grouptool', 'allow_reg');
+        $mform->setDefault('allow_reg', (($allowreg !== false) ? $allowreg : 1));
         $mform->addHelpButton('allow_reg', 'allow_reg', 'grouptool');
 
         $mform->addElement('selectyesno', 'show_members', get_string('show_members', 'grouptool'));
-        $show_members = get_config('mod_grouptool', 'show_members');
-        $mform->setDefault('show_members', (($show_members !== false) ? $show_members : 0));
+        $showmembers = get_config('mod_grouptool', 'show_members');
+        $mform->setDefault('show_members', (($showmembers !== false) ? $showmembers : 0));
         $mform->addHelpButton('show_members', 'show_members', 'grouptool');
 
         $mform->addElement('selectyesno', 'immediate_reg', get_string('immediate_reg',
                                                                       'grouptool'));
-        $immediate_reg = get_config('mod_grouptool', 'immediate_reg');
-        $mform->setDefault('immediate_reg', (($immediate_reg !== false) ? $immediate_reg : 0));
+        $immediatereg = get_config('mod_grouptool', 'immediate_reg');
+        $mform->setDefault('immediate_reg', (($immediatereg !== false) ? $immediatereg : 0));
         $mform->addHelpButton('immediate_reg', 'immediate_reg', 'grouptool');
-        $mform->disabledIf('immediate_reg', 'allow_reg', 'equal', 1);
+        $mform->disabledif ('immediate_reg', 'allow_reg', 'equal', 1);
 
         $mform->addElement('selectyesno', 'allow_unreg', get_string('allow_unreg', 'grouptool'));
-        $allow_unreg = get_config('mod_grouptool', 'allow_unreg');
-        $mform->setDefault('allow_unreg', (($allow_unreg !== false) ? $allow_unreg : 0));
+        $allowunreg = get_config('mod_grouptool', 'allow_unreg');
+        $mform->setDefault('allow_unreg', (($allowunreg !== false) ? $allowunreg : 0));
         $mform->addHelpButton('allow_unreg', 'allow_unreg', 'grouptool');
-        $mform->disabledIf('allow_unreg', 'allow_reg', 'equal', 1);
+        $mform->disabledif ('allow_unreg', 'allow_reg', 'equal', 1);
 
         $size = array();
         $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'),
@@ -166,20 +166,20 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $grpsize = get_config('mod_grouptool', 'grpsize');
         $mform->setDefault('grpsize', (($grpsize !== false) ? $grpsize : 3));
         $mform->setType('use_size', PARAM_BOOL);
-        $use_size = get_config('mod_grouptool', 'use_size');
-        $mform->setDefault('use_size', (($use_size !== false) ? $use_size : 0));
+        $usesize = get_config('mod_grouptool', 'use_size');
+        $mform->setDefault('use_size', (($usesize !== false) ? $usesize : 0));
         $mform->addGroup($size, 'size_grp', get_string('size', 'grouptool'), ' ', false);
         $mform->addHelpButton('size_grp', 'size_grp', 'grouptool');
-        $mform->disabledIf('grpsize', 'use_size', 'notchecked');
-        $mform->disabledIf('grpsize', 'allow_reg', 'equal', 1);
+        $mform->disabledif ('grpsize', 'use_size', 'notchecked');
+        $mform->disabledif ('grpsize', 'allow_reg', 'equal', 1);
 
         $mform->addElement('checkbox', 'use_individual', get_string('use_individual', 'grouptool'));
         $mform->setType('use_individual', PARAM_BOOL);
-        $use_individual = get_config('mod_grouptool', 'use_individual');
-        $mform->setDefault('use_individual', (($use_individual !== false) ? $use_individual : 0));
+        $useindividual = get_config('mod_grouptool', 'use_individual');
+        $mform->setDefault('use_individual', (($useindividual !== false) ? $useindividual : 0));
         $mform->addHelpButton('use_individual', 'use_individual', 'grouptool');
-        $mform->disabledIf('use_individual', 'allow_reg', 'equal', 1);
-        $mform->disabledIf('use_individual', 'use_size', 'notchecked');
+        $mform->disabledif ('use_individual', 'allow_reg', 'equal', 1);
+        $mform->disabledif ('use_individual', 'use_size', 'notchecked');
 
         /*
          * ---------------------------------------------------------------------
@@ -205,21 +205,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addGroup($queue, 'queue_grp',
                          get_string('queues_max', 'grouptool'), ' ', false);
         $mform->setType('use_queue', PARAM_BOOL);
-        $use_queue = get_config('mod_grouptool', 'use_queue');
-        $mform->setDefault('use_queue', (($use_queue !== false) ? $use_queue : 0));
-        $mform->disabledIf('use_queue', 'allow_reg', 'equal', 1);
+        $usequeue = get_config('mod_grouptool', 'use_queue');
+        $mform->setDefault('use_queue', (($usequeue !== false) ? $usequeue : 0));
+        $mform->disabledif ('use_queue', 'allow_reg', 'equal', 1);
         $mform->setType('queues_max', PARAM_INT);
-        $max_queues = get_config('mod_grouptool', 'max_queues');
-        $mform->setDefault('queues_max', (($max_queues !== false) ? $max_queues : 1));
+        $maxqueues = get_config('mod_grouptool', 'max_queues');
+        $mform->setDefault('queues_max', (($maxqueues !== false) ? $maxqueues : 1));
         $mform->addHelpButton('queue_grp', 'queuesgrp', 'grouptool');
         if ($queues > 0) {
             $queue[1]->setPersistantFreeze(1);
             $queue[1]->setValue(1);
             $queue[1]->freeze();
         } else {
-            $mform->disabledIf('queues_max', 'use_queue', 'notchecked');
+            $mform->disabledif ('queues_max', 'use_queue', 'notchecked');
         }
-        $mform->disabledIf('queues_max', 'allow_reg', 'equal', 1);
+        $mform->disabledif ('queues_max', 'allow_reg', 'equal', 1);
 
         // Prevent user from unsetting if user is registered in multiple groups!
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
@@ -230,30 +230,30 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setType('multreg', PARAM_BOOL);
         $mform->setType('allow_multiple', PARAM_BOOL);
-        $allow_multiple = get_config('mod_grouptool', 'allow_multiple');
-        $mform->setDefault('allow_multiple', (($allow_multiple !== false) ? $allow_multiple : 0));
+        $allowmultiple = get_config('mod_grouptool', 'allow_multiple');
+        $mform->setDefault('allow_multiple', (($allowmultiple !== false) ? $allowmultiple : 0));
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
-        $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
+        $mform->disabledif ('allow_multiple', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            array('size' => '3'));
         $mform->setType('choose_min', PARAM_INT);
-        $choose_min = get_config('mod_grouptool', 'choose_min');
-        $mform->setDefault('choose_min', (($choose_min !== false) ? $choose_min : 1));
-        $mform->disabledIf('choose_min', 'allow_reg', 'eq', 0);
+        $choosemin = get_config('mod_grouptool', 'choose_min');
+        $mform->setDefault('choose_min', (($choosemin !== false) ? $choosemin : 1));
+        $mform->disabledif ('choose_min', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
                            array('size' => '3'));
         $mform->setType('choose_max', PARAM_INT);
-        $choose_max = get_config('mod_grouptool', 'choose_max');
-        $mform->setDefault('choose_max', (($choose_max !== false) ? $choose_max : 1));
-        $mform->disabledIf('choose_max', 'allow_reg', 'eq', 0);
+        $choosemax = get_config('mod_grouptool', 'choose_max');
+        $mform->setDefault('choose_max', (($choosemax !== false) ? $choosemax : 1));
+        $mform->disabledif ('choose_max', 'allow_reg', 'eq', 0);
 
         if ($maxregs > 1) {
             $mform->freeze('allow_multiple');
         } else {
-            $mform->disabledIf('choose_max', 'allow_multiple', 'notchecked');
-            $mform->disabledIf('choose_min', 'allow_multiple', 'notchecked');
+            $mform->disabledif ('choose_max', 'allow_multiple', 'notchecked');
+            $mform->disabledif ('choose_min', 'allow_multiple', 'notchecked');
         }
         /*
          * ---------------------------------------------------------
@@ -328,39 +328,39 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $sql = '
      SELECT MAX(regcnt)
         FROM (
-      SELECT COUNT(reg.id) as regcnt
-        FROM {grouptool_registered} as reg
-        JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+      SELECT COUNT(reg.id) regcnt
+        FROM {grouptool_registered} reg
+        JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
              AND reg.modified_by >= 0
-    GROUP BY reg.agrpid) as regcnts';
+    GROUP BY reg.agrpid) regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $maxgrpregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT MAX(regcnt)
-        FROM (SELECT COUNT(reg.id) as regcnt
-                FROM {grouptool_registered} as reg
-                JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+        FROM (SELECT COUNT(reg.id) regcnt
+                FROM {grouptool_registered} reg
+                JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
                WHERE agrps.grouptoolid = :grouptoolid
                      AND reg.modified_by >= 0
-            GROUP BY reg.userid) as regcnts';
+            GROUP BY reg.userid) regcnts';
             $params = array('grouptoolid' => $data['instance']);
             $maxuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT MIN(regcnt)
-        FROM (SELECT COUNT(reg.id) as regcnt
-                FROM {grouptool_registered} as reg
-                JOIN {grouptool_agrps} as agrps ON reg.agrpid = agrps.id
+        FROM (SELECT COUNT(reg.id) regcnt
+                FROM {grouptool_registered} reg
+                JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
                WHERE agrps.grouptoolid = :grouptoolid
                      AND reg.modified_by >= 0
-            GROUP BY reg.userid) as regcnts
+            GROUP BY reg.userid) regcnts
        WHERE regcnt > 0';
             $params = array('grouptoolid' => $data['instance']);
             $minuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
-      SELECT COUNT(queue.id) as queue
-        FROM {grouptool_queued} as queue
-        JOIN {grouptool_agrps} as agrps ON queue.agrpid = agrps.id
+      SELECT COUNT(queue.id) queue
+        FROM {grouptool_queued} queue
+        JOIN {grouptool_agrps} agrps ON queue.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
              AND agrps.active = 1';
             $params = array('grouptoolid' => $data['instance']);

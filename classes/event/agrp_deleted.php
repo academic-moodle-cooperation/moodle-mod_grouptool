@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_agrp_deleted event.
@@ -36,7 +36,7 @@ class agrp_deleted extends \core\event\base {
     }
 
     public static function create_from_object($data) {
-        $event = \mod_grouptool\event\agrp_deleted::create(array(
+        $event = self::create(array(
             'objectid' => $data->id,
             'context' => \context_module::instance($data->cmid),
             'other' => $data

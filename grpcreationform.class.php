@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * grpcreationform.class.php
@@ -100,7 +100,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
             $cohorts = cohort_get_available_cohorts($coursecontext, true, 0, 0);
             if (count($options) != 0) {
                 $options = array(0 => get_string('anycohort', 'cohort'));
-                foreach($cohorts as $cohort) {
+                foreach ($cohorts as $cohort) {
                      $options[$cohort->id] = $cohort->name;
                 }
                 $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
@@ -140,8 +140,8 @@ class mod_grouptool_grp_creation_form extends moodleform {
 
             $mform->addElement('text', 'amount', get_string('group_or_member_count', 'grouptool'),
                                array('size' => '4'));
-            $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
-            $mform->disabledIf('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
+            $mform->disabledif ('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             /*
              * We have to clean this params by ourselves afterwards otherwise we get problems
              * with texts getting mapped to 0
@@ -173,15 +173,15 @@ class mod_grouptool_grp_creation_form extends moodleform {
             $mform->setType('digits', PARAM_RAW);
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
                              array(' - ', ' '.get_string('digits', 'grouptool').' '), false);
-            $mform->disabledIf('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
-            $mform->disabledIf('to', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
-            $mform->disabledIf('digits', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('to', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('digits', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setAdvanced('fromto');
 
             $mform->addElement('checkbox', 'nosmallgroups', get_string('nosmallgroups', 'group'));
             $mform->addHelpButton('nosmallgroups', 'nosmallgroups', 'grouptool');
-            $mform->disabledIf('nosmallgroups', 'mode', 'noteq', GROUPTOOL_MEMBERS_AMOUNT);
-            $mform->disabledIf('nosmallgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('nosmallgroups', 'mode', 'noteq', GROUPTOOL_MEMBERS_AMOUNT);
+            $mform->disabledif ('nosmallgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setAdvanced('nosmallgroups');
 
             $options = array('no'        => get_string('noallocation', 'group'),
@@ -195,9 +195,8 @@ class mod_grouptool_grp_creation_form extends moodleform {
             } else {
                 $mform->setDefault('allocateby', 'random');
             }
-            $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
-            $mform->disabledIf('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-
+            $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
+            $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
 
             $naminggrp = array();
             $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', array('size' => '64'));
@@ -238,7 +237,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
                 $mform->addElement('text', 'groupingname', get_string('groupingname', 'group'));
                 $mform->setType('groupingname', PARAM_MULTILANG);
-                $mform->disabledIf('groupingname', 'grouping', 'noteq', '-1');
+                $mform->disabledif ('groupingname', 'grouping', 'noteq', '-1');
             }
 
             $mform->addElement('submit', 'createGroups', get_string('createGroups', 'grouptool'));

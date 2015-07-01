@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_dequeuing_started event.
@@ -36,7 +36,7 @@ class dequeuing_started extends \core\event\base {
     }
 
     public static function create_from_object(\stdClass $cm) {
-        $event = \mod_grouptool\event\dequeuing_started::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
         ));
@@ -77,8 +77,8 @@ class dequeuing_started extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'resolve queue', 'view.php?id=' . $this->contextinstanceid.'&tab=overview', $this->objectid,
-                     $this->contextinstanceid);
+        return array($this->courseid, $this->objecttable, 'resolve queue', 'view.php?id='.$this->contextinstanceid.'&tab=overview',
+                     $this->objectid, $this->contextinstanceid);
     }
 
     /**

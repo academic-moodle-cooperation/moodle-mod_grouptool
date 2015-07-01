@@ -107,34 +107,43 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             e.stopPropagation();
 
             // TODO start AJAX Call and process Response!
-            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var contextid = M.mod_grouptool.contextid;
             var lang = M.mod_grouptool.lang;
-            //url += '?action=rename&groupid='+grpid+'&name='+field.getAttribute('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid;
             var cfg = {
                 method: 'POST',
-                data: 'action=rename&groupid='+grpid+'&name='+field.get('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
-                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                data: 'action=rename&groupid=' + grpid + '&name=' + field.get('value') + '&sesskey=' + M.cfg.sesskey +
+                      '&contextid=' + contextid,
+                headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 on: {
                     start: function(id, args) {
                         if (infoNode) {
                             infoNode.hide('fadeOut');
                             infoNode.remove();
                         }
-                        Y.log("Start AJAX Call to rename group "+grpid, "info", "grouptool");
+                        Y.log("Start AJAX Call to rename group " + grpid, "info", "grouptool");
                     },
                     complete: function(id, args) {
-                        Y.log("AJAX Call to rename group "+grpid+" completed", "info", "grouptool");
+                        Y.log("AJAX Call to rename group " + grpid + " completed", "info", "grouptool");
                     },
                     success: function(id, o, args) {
                         response = Y.JSON.parse(o.responseText);
                         if (response.error) {
-                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.error+"</div>"), text);
+                            var tmpnode = Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">" +
+                                          response.error + "</div>");
+                            infoNode = text.insertBefore(tmpnode, text);
                             infoNode.show('fadeIn');
                             // Remove after 60 seconds automatically!
-                            Y.later(60*1000,infoNode,function() { if (infoNode) {infoNode.hide('fadeOut'); infoNode.remove();}});
+                            Y.later(60 * 1000, infoNode, function() {
+                                if (infoNode) {
+                                    infoNode.hide('fadeOut');
+                                    infoNode.remove();
+                                }
+                            });
                         } else {
-                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">"+response.message+"</div>"), text);
+                            var tmpnode = Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">" +
+                                          response.message + "</div>");
+                            infoNode = text.insertBefore(tmpnode, text);
                             infoNode.show('fadeIn');
                             text.setHTML(field.get('value'));
                             field.hide('fadeOut');
@@ -143,36 +152,26 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                             text.show('fadeIn');
                             button.show('fadeIn');
                             field.detach();
-                            Y.later(5*1000,infoNode,function() { infoNode.hide('fadeOut'); infoNode.remove();});
+                            Y.later(5 * 1000, infoNode, function() {
+                                infoNode.hide('fadeOut');
+                                infoNode.remove();
+                            });
                         }
-                        Y.log("AJAX Call to rename group "+grpid+" successfull", "success", "grouptool");
+                        Y.log("AJAX Call to rename group " + grpid + " successfull", "success", "grouptool");
                     },
                     failure: function(id, o, args) {
                         // Show message
                         response = Y.JSON.parse(o.responseText);
-                        infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.message+"</div>"), text);
-                            infoNode.show('fadeIn');
-                        Y.log("AJAX Call to rename group "+grpid+" failure", "error", "grouptool");
+                        var tmpnode = Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">" +
+                                      response.message + "</div>");
+                        infoNode = text.insertBefore(tmpnode, text);
+                        infoNode.show('fadeIn');
+                        Y.log("AJAX Call to rename group " + grpid + " failure", "error", "grouptool");
                     },
                     end: function(id, args) {
-                        Y.log("AJAX Call to rename group "+grpid+" ended", "info", "grouptool");
+                        Y.log("AJAX Call to rename group " + grpid + " ended", "info", "grouptool");
                     }
                 },
-/*                context: Dispatch,
-                form: {
-                    id: formObject,
-                    useDisabled: true,
-                    upload: true
-                },
-                xdr: {
-                    use: 'flash',
-                    dataType: 'xml'
-                },*/
-                /*arguments: {
-                    start: 'foo',
-                    complete: 'bar',
-                    end: 'baz'
-                },*/
                 timeout: 60000,
             };
 
@@ -222,34 +221,43 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             e.stopPropagation();
 
             // TODO start AJAX Call and process Response!
-            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var contextid = M.mod_grouptool.contextid;
             var lang = M.mod_grouptool.lang;
-            //url += '?action=rename&groupid='+grpid+'&name='+field.getAttribute('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid;
             var cfg = {
                 method: 'POST',
-                data: 'action=resize&groupid='+grpid+'&size='+field.get('value')+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
-                headers: { 'X-Transaction': 'POST resize group '+grpid},
+                data: 'action=resize&groupid=' + grpid + '&size=' + field.get('value') + '&sesskey=' + M.cfg.sesskey +
+                      '&contextid=' + contextid,
+                headers: { 'X-Transaction': 'POST resize group ' + grpid},
                 on: {
                     start: function(id, args) {
                         if (infoNode) {
                             infoNode.hide('fadeOut');
                             infoNode.remove();
                         }
-                        Y.log("Start AJAX Call to resize group "+grpid, "info", "grouptool");
+                        Y.log("Start AJAX Call to resize group " + grpid, "info", "grouptool");
                     },
                     complete: function(id, args) {
-                        Y.log("AJAX Call to resize group "+grpid+" completed", "info", "grouptool");
+                        Y.log("AJAX Call to resize group " + grpid + " completed", "info", "grouptool");
                     },
                     success: function(id, o, args) {
                         response = Y.JSON.parse(o.responseText);
                         if (response.error) {
-                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.error+"</div>"), text);
+                            var tmpnode = Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">" +
+                                                        response.error + "</div>");
+                            infoNode = text.insertBefore(tmpnode, text);
                             infoNode.show('fadeIn');
                             // Remove after 60 seconds automatically!
-                            Y.later(60*1000,infoNode,function() { if (infoNode) {infoNode.hide('fadeOut'); infoNode.remove();}});
+                            Y.later(60 * 1000, infoNode, function() {
+                                if (infoNode) {
+                                    infoNode.hide('fadeOut');
+                                    infoNode.remove();
+                                }
+                            });
                         } else {
-                            infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">"+response.message+"</div>"), text);
+                            var tmpnode = Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">" +
+                                                        response.message + "</div>");
+                            infoNode = text.insertBefore(tmpnode, text);
                             infoNode.show('fadeIn');
                             text.setHTML(field.get('value'));
                             field.hide('fadeOut');
@@ -258,36 +266,25 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                             text.show('fadeIn');
                             button.show('fadeIn');
                             field.detach();
-                            Y.later(5*1000,infoNode,function() { infoNode.hide('fadeOut'); infoNode.remove();});
+                            Y.later(5 * 1000, infoNode, function() {
+                                infoNode.hide('fadeOut');
+                                infoNode.remove();
+                            });
                         }
-                        Y.log("AJAX Call to resize group "+grpid+" successfull", "success", "grouptool");
+                        Y.log("AJAX Call to resize group " + grpid + " successfull", "success", "grouptool");
                     },
                     failure: function(id, o, args) {
                         // Show message
                         response = Y.JSON.parse(o.responseText);
-                        infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">"+response.message+"</div>"), text);
+                        infoNode = text.insertBefore(Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">" +
+                                                                   response.message + "</div>"), text);
                             infoNode.show('fadeIn');
-                        Y.log("AJAX Call to resize group "+grpid+" failure", "error", "grouptool");
+                        Y.log("AJAX Call to resize group " + grpid + " failure", "error", "grouptool");
                     },
                     end: function(id, args) {
-                        Y.log("AJAX Call to resize group "+grpid+" ended", "info", "grouptool");
+                        Y.log("AJAX Call to resize group " + grpid + " ended", "info", "grouptool");
                     }
                 },
-/*                context: Dispatch,
-                form: {
-                    id: formObject,
-                    useDisabled: true,
-                    upload: true
-                },
-                xdr: {
-                    use: 'flash',
-                    dataType: 'xml'
-                },*/
-                /*arguments: {
-                    start: 'foo',
-                    complete: 'bar',
-                    end: 'baz'
-                },*/
                 timeout: 60000,
             };
 
@@ -319,54 +316,51 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
 
         var grpid = e.target.getAttribute('name').replace ( /[^\d]/g, '' );
         if (e.target.hasClass('active')) {
-            // Set inactive! (AJAX Request)
-            Y.log('DEACTIVATE GROUP '+grpid+'!', "info", "grouptool");
+            // Set inactive (via AJAX Request)!
+            Y.log('DEACTIVATE GROUP ' + grpid + '!', "info", "grouptool");
 
-            // TODO start AJAX Call and process Response!
-            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var contextid = M.mod_grouptool.contextid;
             var lang = M.mod_grouptool.lang;
             var cfg = {
                 method: 'POST',
-                data: 'action=deactivate&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
-                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                data: 'action=deactivate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid,
+                headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 on: {
                     start: function(id, args) {
-                        Y.log("Start AJAX Call to deactivate group "+grpid, "info", "grouptool");
+                        Y.log("Start AJAX Call to deactivate group " + grpid, "info", "grouptool");
                     },
                     complete: function(id, args) {
-                        Y.log("AJAX Call to deactivate group "+grpid+" completed", "info", "grouptool");
+                        Y.log("AJAX Call to deactivate group " + grpid + " completed", "info", "grouptool");
                     },
                     success: function(id, o, args) {
                         response = Y.JSON.parse(o.responseText);
                         if (response.error) {
-                            Y.log("AJAX Call to deactivate group "+grpid+" successfull but error occured:\n"+response.error, "success", "grouptool");
+                            Y.log("AJAX Call to deactivate group " + grpid + " successfull but error occured:\n" + response.error,
+                                  "success", "grouptool");
                         } else {
                             if (M.mod_grouptool.filter == 'active') {
-                                // If showing only active remove from list
-                                //e.target.ancestor('tr').hide('fadeOut').later(1000, e.target.ancestor('tr'), 'remove');
                                 e.target.ancestor('tr').hide('fadeOut', null, function(){e.target.ancestor('tr').remove()});
                             } else {
-                                // Else set URL and alt of new image
+                                // Else set URL and alt of new image!
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {
                                         e.target.ancestor('tr').addClass('dimmed_text');
                                         e.target.replaceClass('active', 'inactive');
                                         e.target.setAttribute('src', M.util.image_url('t/stop'));
                                         e.target.setAttribute('alt', M.util.get_string('inactive', 'mod_grouptool'));
                                         e.target.ancestor('tr').show('fadeIn')});
-                                // and add class dimmed_text to row
-                                //e.target.ancestor('tr').addClass('dimmed_text');
+                                // And add class dimmed_text to row!
                             }
-                            Y.log("AJAX Call to deactivate group "+grpid+" successfull\n"+response.message, "success", "grouptool");
+                            Y.log("AJAX Call to deactivate group " + grpid + " successfull\n" + response.message,
+                                  "success", "grouptool");
                         }
-                        //Y.log("AJAX Call to deactivate group "+grpid+" successfull", "success", "grouptool");
                     },
                     failure: function(id, o, args) {
                         // Show message
-                        Y.log("AJAX Call to deactivate group "+grpid+" failure", "error", "grouptool");
+                        Y.log("AJAX Call to deactivate group " + grpid + " failure", "error", "grouptool");
                     },
                     end: function(id, args) {
-                        Y.log("AJAX Call to deactivate group "+grpid+" ended", "info", "grouptool");
+                        Y.log("AJAX Call to deactivate group " + grpid + " ended", "info", "grouptool");
                     }
                 },
                 timeout: 60000,
@@ -376,54 +370,52 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         } else if (e.target.hasClass('inactive')) {
             // Set active!
 
-            // Set inactive! (AJAX Request)
-            Y.log('ACTIVATE GROUP '+grpid+'!', "info", "grouptool");
+            // Set active (via AJAX Request)!
+            Y.log('ACTIVATE GROUP ' + grpid + '!', "info", "grouptool");
 
-            // TODO start AJAX Call and process Response!
-            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+            var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var contextid = M.mod_grouptool.contextid;
             var lang = M.mod_grouptool.lang;
             var cfg = {
                 method: 'POST',
-                data: 'action=activate&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
-                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                data: 'action=activate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid,
+                headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 on: {
                     start: function(id, args) {
-                        Y.log("Start AJAX Call to activate group "+grpid, "info", "grouptool");
+                        Y.log("Start AJAX Call to activate group " + grpid, "info", "grouptool");
                     },
                     complete: function(id, args) {
-                        Y.log("AJAX Call to activate group "+grpid+" completed", "info", "grouptool");
+                        Y.log("AJAX Call to activate group " + grpid + " completed", "info", "grouptool");
                     },
                     success: function(id, o, args) {
                         response = Y.JSON.parse(o.responseText);
                         if (response.error) {
-                            Y.log("AJAX Call to activate group "+grpid+" successfull but error occured:\n"+response.error, "success", "grouptool");
+                            Y.log("AJAX Call to activate group " + grpid + " successfull but error occured:\n" + response.error,
+                                  "success", "grouptool");
                         } else {
                             if (M.mod_grouptool.filter == 'inactive') {
-                                // If showing only active remove from list
+                                // If showing only active remove from list!
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {e.target.ancestor('tr').remove()});
                             } else {
-                                // Else set URL and alt of new image
+                                // Else set URL and alt of new image!
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {
                                         e.target.ancestor('tr').removeClass('dimmed_text');
                                         e.target.replaceClass('inactive', 'active');
                                         e.target.setAttribute('src', M.util.image_url('t/go'));
                                         e.target.setAttribute('alt', M.util.get_string('active', 'mod_grouptool'));
-                                        // TODO move node in list to correct position!
+                                        // TODO move node in list to correct position?
                                         e.target.ancestor('tr').show('fadeIn')});
-                                // and add class dimmed_text to row
-                                //e.target.ancestor('tr').addClass('dimmed_text');
                             }
-                            Y.log("AJAX Call to activate group "+grpid+" successfull\n"+response.message, "success", "grouptool");
+                            Y.log("AJAX Call to activate group " + grpid + " successfull\n" + response.message,
+                                  "success", "grouptool");
                         }
-                        //Y.log("AJAX Call to activate group "+grpid+" successfull", "success", "grouptool");
                     },
                     failure: function(id, o, args) {
                         // Show message
-                        Y.log("AJAX Call to activate group "+grpid+" failure", "error", "grouptool");
+                        Y.log("AJAX Call to activate group " + grpid + " failure", "error", "grouptool");
                     },
                     end: function(id, args) {
-                        Y.log("AJAX Call to activate group "+grpid+" ended", "info", "grouptool");
+                        Y.log("AJAX Call to activate group " + grpid + " ended", "info", "grouptool");
                     }
                 },
                 timeout: 60000,
@@ -432,7 +424,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             Y.io(url, cfg);
         } else {
             // Error!
-            Y.log('Group with id '+grpid+' must have either class "active" or "inactive"!', "error", "grouptool");
+            Y.log('Group with id ' + grpid + ' must have either class "active" or "inactive"!', "error", "grouptool");
         }
     }
 
@@ -449,42 +441,44 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                        'callback':      function(grpid) {
                                                             if (!grpid) { Y.log('No Group ID!', 'info', 'grouptool'); return; }
 
-                                                            Y.log('DELTE GROUP '+grpid+'!', "info", "grouptool");
+                                                            Y.log('DELTE GROUP ' + grpid + '!', "info", "grouptool");
 
                                                             var infoNode = '';
-                                                            // TODO start AJAX Call and process Response!
-                                                            var url = M.cfg.wwwroot+"/mod/grouptool/editgroup_ajax.php";
+                                                            var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
                                                             var contextid = M.mod_grouptool.contextid;
                                                             var lang = M.mod_grouptool.lang;
                                                             var cfg = {
                                                                 method: 'POST',
-                                                                data: 'action=delete&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid,
-                                                                headers: { 'X-Transaction': 'POST rename group '+grpid},
+                                                                data: 'action=delete&groupid=' + grpid +
+                                                                      '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid,
+                                                                headers: { 'X-Transaction': 'POST rename group ' + grpid},
                                                                 on: {
                                                                     start: function(id, args) {
-                                                                        Y.log("Start AJAX Call to delete group "+grpid, "info", "grouptool");
+                                                                        Y.log("Start AJAX Call to delete group " + grpid,
+                                                                              "info", "grouptool");
                                                                     },
                                                                     complete: function(id, args) {
-                                                                        Y.log("AJAX Call to delete group "+grpid+" completed", "info", "grouptool");
+                                                                        Y.log("AJAX Call to delete group " + grpid + " completed",
+                                                                              "info", "grouptool");
                                                                     },
                                                                     success: function(id, o, args) {
                                                                         response = Y.JSON.parse(o.responseText);
-                                                                        if (response.error) {
-
-                                                                            // Remove after 60 seconds automatically!
-                                                                        } else {
+                                                                        if (!response.error) {
                                                                             // Success, remove the corresponding table entry...
-                                                                            Y.one('#delete_'+grpid).ancestor('tr').hide('fadeOut');
-                                                                            Y.one('#delete_'+grpid).ancestor('tr').remove();
+                                                                            Y.one('#delete_' + grpid).ancestor('tr').hide('fadeOut');
+                                                                            Y.one('#delete_' + grpid).ancestor('tr').remove();
                                                                         }
-                                                                        Y.log("AJAX Call to delete group "+grpid+" successfull", "success", "grouptool");
+                                                                        Y.log("AJAX Call to delete group " + grpid + " successfull",
+                                                                              "success", "grouptool");
                                                                     },
                                                                     failure: function(id, o, args) {
                                                                         // Show message
-                                                                        Y.log("AJAX Call to rename group "+grpid+" failure", "error", "grouptool");
+                                                                        Y.log("AJAX Call to rename group " + grpid + " failure",
+                                                                              "error", "grouptool");
                                                                     },
                                                                     end: function(id, args) {
-                                                                        Y.log("AJAX Call to rename group "+grpid+" ended", "info", "grouptool");
+                                                                        Y.log("AJAX Call to rename group " + grpid + " ended",
+                                                                              "info", "grouptool");
                                                                     }
                                                                 },
                                                                 timeout: 60000,
@@ -500,6 +494,6 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
     };
     //end of M.mod_grouptool.init_administration
 
-  }, '0.0.1', {
-      requires:['base', 'node', 'event-key', 'transition', 'anim']
-  });
+}, '0.0.1', {
+    requires:['base', 'node', 'event-key', 'transition', 'anim']
+});

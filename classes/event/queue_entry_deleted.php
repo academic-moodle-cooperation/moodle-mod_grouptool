@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_queue_entry_deleted event.
@@ -44,7 +44,7 @@ class queue_entry_deleted extends \core\event\base {
 
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = 'event';
-        $event = \mod_grouptool\event\queue_entry_deleted::create(array(
+        $event = self::create(array(
             'objectid' => $entrydata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$entrydata,
@@ -54,7 +54,7 @@ class queue_entry_deleted extends \core\event\base {
 
     public static function create_limit_violation(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->reason = 'registration limit violation';
-        $event = \mod_grouptool\event\queue_entry_deleted::create(array(
+        $event = self::create(array(
             'objectid' => $entrydata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$entrydata,
@@ -65,7 +65,7 @@ class queue_entry_deleted extends \core\event\base {
     public static function create_direct(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = null;
         $entrydata->reason = null;
-        $event = \mod_grouptool\event\queue_entry_deleted::create(array(
+        $event = self::create(array(
             'objectid' => $entrydata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$entrydata,
@@ -124,7 +124,8 @@ class queue_entry_deleted extends \core\event\base {
     protected function get_legacy_logdata() {
         return array($this->courseid, $this->objecttable, 'unqueue',
                            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-                           'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'], $this->contextinstanceid);
+                           'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
+                           $this->contextinstanceid);
     }
 
     /**
@@ -144,7 +145,7 @@ class queue_entry_deleted extends \core\event\base {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
-        //groupid, agrpid, userid
+        // ...groupid, agrpid, userid.
         if (empty($this->data['other']['groupid'])) {
             throw new \coding_exception('Groupid has to be specified!');
         }

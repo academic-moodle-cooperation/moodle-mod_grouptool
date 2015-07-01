@@ -98,10 +98,10 @@ YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
         var classes = nodeclass.split(' ');
 
         for(var i = 0; i < classes.length; i++) {
-            if(classes[i] != 'tag') {
-                if(classes[i] == 'number') {
+            if (classes[i] != 'tag') {
+                if (classes[i] == 'number') {
                     var tag = '#';
-                } else if(classes[i] == 'alpha') {
+                } else if (classes[i] == 'alpha') {
                     var tag = '@';
                 } else {
                     var tag = '[' + classes[i] + ']';
@@ -114,13 +114,13 @@ YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
     };
 
     M.mod_grouptool.groupcreation_sizevalupdate = function() {
-        if(Y.one('input[name=use_individual]').get('value') == 0) {
+        if (Y.one('input[name=use_individual]').get('value') == 0) {
             Y.all('.grpsize').one('input').set('value', Y.one('input[name=amount]').get('value'));
         }
     };
 
     M.mod_grouptool.groupcreation_sizevisupdate = function() {
-        if((Y.one('input[name=use_size]').get('value') == 1)
+        if ((Y.one('input[name=use_size]').get('value') == 1)
               && (Y.one('input[name=use_individual]').get('value') == 1)) {
             Y.all('.grpsize').setStyle('display', 'block');
         } else {

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * view.php
@@ -82,13 +82,13 @@ echo $OUTPUT->header();
 $inactive = array();
 $tabs = array();
 $row = array();
-$create_grps = has_capability('mod/grouptool:create_groups', $context);
-$create_grpgs = has_capability('mod/grouptool:create_groupings', $context);
-$admin_grps = has_capability('mod/grouptool:administrate_groups', $context);
+$creategrps = has_capability('mod/grouptool:create_groups', $context);
+$creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+$admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
-if ($create_grps || $create_grpgs || $admin_grps) {
+if ($creategrps || $creategrpgs || $admingrps) {
 
-    if ($create_grps && ($admin_grps || $create_grpgs)) {
+    if ($creategrps && ($admingrps || $creategrpgs)) {
         $row['administration'] = new tabobject('administration',
                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
                                                '&amp;tab=administration',
@@ -107,7 +107,7 @@ if ($create_grps || $create_grpgs || $admin_grps) {
                                                                        get_string('group_creation', 'grouptool'),
                                                                        get_string('group_creation_alt', 'grouptool'),
                                                                        false);
-    } else if ($create_grps) {
+    } else if ($creategrps) {
         $row['administration'] = new tabobject('administration',
                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
                                                '&amp;tab=administration',
@@ -120,7 +120,7 @@ if ($create_grps || $create_grpgs || $admin_grps) {
                                                                        get_string('group_creation', 'grouptool'),
                                                                        get_string('group_creation_alt', 'grouptool'),
                                                                        false);
-    } else if ($create_grpgs || $admin_grps) {
+    } else if ($creategrpgs || $admingrps) {
         $row['administration'] = new tabobject('administration',
                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
                                                '&amp;tab=administration',
@@ -209,7 +209,7 @@ if (empty($cm->uservisible)) {
     }
 
     if (!isset($SESSION->mod_grouptool->currenttab)
-            || ($SESSION->mod_grouptool->currenttab=='noaccess')
+            || ($SESSION->mod_grouptool->currenttab == 'noaccess')
             || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:create_groupings', $context)
@@ -263,7 +263,7 @@ $event->add_record_snapshot($PAGE->cm->modname, $grouptool);
 $event->trigger();
 /* END OF VIEW EVENT */
 
-switch($tab) {
+switch ($tab) {
     case 'administration':
     case 'group_admin':
         $instance->view_administration();

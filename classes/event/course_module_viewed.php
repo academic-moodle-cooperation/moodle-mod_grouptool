@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_viewed event.
@@ -40,7 +40,9 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => $this->data['other']['tab']));
+        return new \moodle_url("/mod/$this->objecttable/view.php",
+                               array('id'  => $this->contextinstanceid,
+                                     'tab' => $this->data['other']['tab']));
     }
 
     /**
@@ -49,7 +51,10 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'view', 'view.php?id=' . $this->contextinstanceid, $this->objectid.' || '.$this->data['other']['name'],
+        return array($this->courseid,
+                     $this->objecttable, 'view',
+                     'view.php?id=' . $this->contextinstanceid,
+                     $this->objectid.' || '.$this->data['other']['name'],
                      $this->contextinstanceid);
     }
 }

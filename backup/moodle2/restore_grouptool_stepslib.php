@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * restore_grouptool_stepslib.php
@@ -99,14 +99,10 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->grouptoolid = $this->get_new_parentid('grouptool');
         $old = $data->groupid;
         $data->groupid = $this->get_mappingid('group', $data->groupid);
-        if($data->groupid === false) {
+        if ($data->groupid === false) {
             $message = "Couldn't find mapping id for group with former id-# ".$old.
                        " so we have to skip it.".html_writer::empty_tag('br').
                        "The group was ".($data->active ? 'active' : 'inactive')." in this instance";
-            if (debugging()) { // If it's been displayed, we also write it to the error logs!
-                $from = format_backtrace(debug_backtrace(), CLI_SCRIPT || NO_DEBUG_DISPLAY);
-                error_log('Debugging: ' . $message . ' in '. PHP_EOL . $from);
-            }
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_agrps', $data);
@@ -138,17 +134,9 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         if ($data->agrpid === false) {
 
             $message = "Couldn't find mapping id for agrp with former id-# ".$oldagrp." so we have to skip it.";
-            if (debugging()) { // If it's been displayed, we also write it to the error logs!
-                $from = format_backtrace(debug_backtrace(), CLI_SCRIPT || NO_DEBUG_DISPLAY);
-                error_log('Debugging: ' . $message . ' in '. PHP_EOL . $from);
-            }
             debugging($message);
         } else if ($data->userid === false) {
             $message = "Couldn't find mapping id for user with former id-# ".$old." so we have to skip it.";
-            if (debugging()) { // If it's been displayed, we also write it to the error logs!
-                $from = format_backtrace(debug_backtrace(), CLI_SCRIPT || NO_DEBUG_DISPLAY);
-                error_log('Debugging: ' . $message . ' in '. PHP_EOL . $from);
-            }
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_registered', $data);
@@ -178,17 +166,9 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
 
         if ($data->agrpid === false) {
             $message = "Couldn't find mapping id for agrp with former id-# ".$oldagrp." so we have to skip it.";
-            if (debugging()) { // If it's been displayed, we also write it to the error logs!
-                $from = format_backtrace(debug_backtrace(), CLI_SCRIPT || NO_DEBUG_DISPLAY);
-                error_log('Debugging: ' . $message . ' in '. PHP_EOL . $from);
-            }
             debugging($message);
         } else if ($data->userid === false) {
             $message = "Couldn't find mapping id for user with former id-# ".$old." so we have to skip it.";
-            if (debugging()) { // If it's been displayed, we also write it to the error logs!
-                $from = format_backtrace(debug_backtrace(), CLI_SCRIPT || NO_DEBUG_DISPLAY);
-                error_log('Debugging: ' . $message . ' in '. PHP_EOL . $from);
-            }
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_queued', $data);

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_group_creation_started event.
@@ -36,49 +36,49 @@ class group_creation_started extends \core\event\base {
     }
 
     public static function create_groupamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
-        $event = \mod_grouptool\event\group_creation_started::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => array( 'mode'     => 'groups_amount',
                               'pattern'  => $pattern,
                               'amount'   => $amount,
-                              'grouping' => $grouping,),
+                              'grouping' => $grouping),
         ));
         return $event;
     }
 
     public static function create_memberamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
-        $event = \mod_grouptool\event\group_creation_started::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => array( 'mode'     => 'members_amount',
                               'pattern'  => $pattern,
                               'amount'   => $amount,
-                              'grouping' => $grouping,),
+                              'grouping' => $grouping),
         ));
         return $event;
     }
 
     public static function create_fromto(\stdClass $cm, $pattern, $from, $to, $grouping = 0) {
-        $event = \mod_grouptool\event\group_creation_started::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => array( 'mode'     => 'fromto',
                               'pattern'  => $pattern,
                               'from'     => $from,
                               'to'         => $to,
-                              'grouping' => $grouping,),
+                              'grouping' => $grouping),
         ));
         return $event;
     }
 
     public static function create_person(\stdClass $cm, $pattern, $grouping = 0) {
-        $event = \mod_grouptool\event\group_creation_started::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => array( 'mode'     => '1-person-groups',
                               'pattern'  => $pattern,
-                              'grouping' => $grouping,),
+                              'grouping' => $grouping),
         ));
         return $event;
     }
@@ -94,22 +94,29 @@ class group_creation_started extends \core\event\base {
         } else {
             $add = '';
         }
-        switch($this->data['other']['mode']) {
+        switch ($this->data['other']['mode']) {
             case 'groups_amount':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                    "course module id '$this->contextinstanceid' by defining the amount of groups (".$this->data['other']['amount'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".$add.".";
+                       "course module id '$this->contextinstanceid' by defining the amount of groups (".
+                       $this->data['other']['amount'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".
+                       $add.".";
             break;
             case 'members_amount':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                    "course module id '$this->contextinstanceid' by defining the amount of members per group (".$this->data['other']['amount'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".$add.".";
+                       "course module id '$this->contextinstanceid' by defining the amount of members per group (".
+                       $this->data['other']['amount'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".
+                       $add.".";
             break;
             case 'fromto':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                    "course module id '$this->contextinstanceid' by defining values to start (".$this->data['other']['from'].") and stop (".$this->data['other']['to'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".$add.".";
+                       "course module id '$this->contextinstanceid' by defining values to start (".$this->data['other']['from'].
+                       ") and stop (".$this->data['other']['to'].") using '".$this->data['other']['pattern'].
+                       "' as pattern for the groupnames".$add.".";
             break;
             case '1-person-groups':
-                return "The user with id '$this->userid' started creating 1-person-groups for each user via '{$this->objecttable}' with the " .
-                    "course module id '$this->contextinstanceid' using '".$this->data['other']['pattern']."' as pattern for the groupnames".$add.".";
+                return "The user with id '$this->userid' started creating 1-person-groups for each user via '".$this->objecttable.
+                       "' with the course module id '$this->contextinstanceid' using '".$this->data['other']['pattern'].
+                       "' as pattern for the groupnames".$add.".";
             break;
         }
     }

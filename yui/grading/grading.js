@@ -71,7 +71,8 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
             }
         });
 
-        ajaxurl = M.cfg.wwwroot + '/mod/grouptool/groupinggroups_ajax.php?groupingid=' + groupingid + '&lang='+M.mod_grouptool.grading.lang+'&contextid='+M.mod_grouptool.grading.contextid;
+        ajaxurl = M.cfg.wwwroot + '/mod/grouptool/groupinggroups_ajax.php?groupingid=' + groupingid +
+                 '&lang=' + M.mod_grouptool.grading.lang + '&contextid=' + M.mod_grouptool.grading.contextid;
 
         var cfg = {
             method : 'get',
@@ -82,21 +83,21 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
                     var data = Y.JSON.parse(o.responseText);
                     var oldsel = -1;
                     Y.one(SELECTORS.GROUPSSELECT).all("option").each( function() {
-                        // this = option from the select
+                        // This = option from the select!
                         if (this.get('selected')) {
                             oldsel  = this.get('value');
                         }
                     });
-                    for (var i=0; i < data.length; i++) {
-                        if (Y.one(SELECTORS.GROUPSSELECT + ' option[value="'+data[i].id+'"]')
-                            && Y.one(SELECTORS.GROUPSSELECT + ' option[value="'+data[i].id+'"]').get('selected')) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (Y.one(SELECTORS.GROUPSSELECT + ' option[value="' + data[i].id + '"]')
+                            && Y.one(SELECTORS.GROUPSSELECT + ' option[value="' + data[i].id + '"]').get('selected')) {
                             options += "\n<option value=\"" + data[i].id + "\" selected=\"selected\">" + data[i].name + "</option>";
                         } else {
                             options += "\n<option value=\"" + data[i].id + "\">" + data[i].name + "</option>";
                         }
                     }
                     Y.one(SELECTORS.GROUPSSELECT).setHTML(options);
-                    if (!Y.one(SELECTORS.GROUPSSELECT + ' option[value=\"'+oldsel+'\"]')) {
+                    if (!Y.one(SELECTORS.GROUPSSELECT + ' option[value=\"' + oldsel + '\"]')) {
                         Y.one(SELECTORS.GROUPSSELECT + 'option[value=\"-1\"]').set('selected');
                     }
                 },

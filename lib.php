@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * lib.php
@@ -41,7 +41,7 @@ require_once(dirname(__FILE__).'/definitions.php');
  * @return mixed true if the feature is supported, null if unknown
  */
 function grouptool_supports($feature) {
-    switch($feature) {
+    switch ($feature) {
         case FEATURE_MOD_INTRO:         return true;
         case FEATURE_GROUPS:            return true;
         case FEATURE_GROUPINGS:         return true;
@@ -173,8 +173,8 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
     }
     if (!isset($grouptool->use_queue)) {
         $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id)
-                                            FROM {grouptool_agrps} as agrps
-                                       LEFT JOIN {grouptool_queued} as queues ON queues.agrpid = agrps.id
+                                            FROM {grouptool_agrps} agrps
+                                       LEFT JOIN {grouptool_queued} queues ON queues.agrpid = agrps.id
                                            WHERE agrps.grouptoolid = ?", array($grouptool->instance));
         if (!empty($queues)) {
             $grouptool->use_queue = 1;
@@ -320,13 +320,13 @@ function grouptool_update_queues($grouptool = 0) {
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
             // We use MAX to trick Postgres into thinking this is an full GROUP BY statement.
-            $sql = "SELECT queued.id as id, MAX(queued.agrpid) as agrpid, MAX(queued.timestamp),
-                           MAX(queued.userid) as userid, (regs < ?) as priority, MAX(reg.regs) as regs
-                      FROM {grouptool_queued} AS queued
-                 LEFT JOIN (SELECT userid, COUNT(DISTINCT id) as regs
+            $sql = "SELECT queued.id id, MAX(queued.agrpid) agrpid, MAX(queued.timestamp),
+                           MAX(queued.userid) userid, (regs < ?) priority, MAX(reg.regs) regs
+                      FROM {grouptool_queued} queued
+                 LEFT JOIN (SELECT userid, COUNT(DISTINCT id) regs
                               FROM {grouptool_registered}
                              WHERE agrpid ".$agrpsql." AND modified_by >= 0
-                          GROUP BY userid) AS reg ON queued.userid = reg.userid
+                          GROUP BY userid) reg ON queued.userid = reg.userid
                      WHERE queued.agrpid = ?
                   GROUP BY queued.id, priority
                   ORDER BY priority DESC, queued.timestamp ASC";
@@ -555,12 +555,12 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
                                      cm_info $cm) {
     global $DB;
     $context = context_module::instance($cm->id);
-    $create_grps = has_capability('mod/grouptool:create_groups', $context);
-    $create_grpgs = has_capability('mod/grouptool:create_groupings', $context);
-    $admin_grps = has_capability('mod/grouptool:administrate_groups', $context);
+    $creategrps = has_capability('mod/grouptool:create_groups', $context);
+    $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+    $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
-    if ($create_grps || $create_grpgs || $admin_grps) {
-        if ($create_grps && ($admin_grps || $create_grpgs)) {
+    if ($creategrps || $creategrpgs || $admingrps) {
+        if ($creategrps && ($admingrps || $creategrpgs)) {
             $admin = $navref->add(get_string('administration', 'grouptool'),
                                   new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                                   'tab' => 'administration')));
@@ -570,11 +570,11 @@ function grouptool_extend_navigation(navigation_node $navref, stdclass $course, 
             $admin->add(get_string('group_creation', 'grouptool'),
                                    new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                                    'tab' => 'group_creation')));
-        } else if ($create_grps) {
+        } else if ($creategrps) {
             $navref->add(get_string('group_creation', 'grouptool'),
                          new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                                   'tab' => 'group_creation')));
-        } else if ($create_grpgs || $admin_grps) {
+        } else if ($creategrpgs || $admingrps) {
             $navref->add(get_string('group_administration', 'grouptool'),
                          new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                                   'tab' => 'group_admin')));
@@ -900,11 +900,11 @@ function grouptool_reset_course_form_definition(&$mform) {
     $mform->addElement('advcheckbox', 'reset_grouptool_registrations',
                        get_string('reset_registrations', 'grouptool'));
     $mform->addHelpButton('reset_grouptool_registrations', 'reset_registrations', 'grouptool');
-    $mform->disabledIf('reset_grouptool_registrations', 'reset_grouptool_agrps', 'checked');
+    $mform->disabledif ('reset_grouptool_registrations', 'reset_grouptool_agrps', 'checked');
     $mform->addElement('advcheckbox', 'reset_grouptool_queues',
                        get_string('reset_queues', 'grouptool'));
     $mform->addHelpButton('reset_grouptool_queues', 'reset_queues', 'grouptool');
-    $mform->disabledIf('reset_grouptool_queues', 'reset_grouptool_agrps', 'checked');
+    $mform->disabledif ('reset_grouptool_queues', 'reset_grouptool_agrps', 'checked');
     $mform->addElement('advcheckbox', 'reset_grouptool_transparent_unreg',
                        get_string('reset_transparent_unreg', 'grouptool'));
     $mform->addHelpButton('reset_grouptool_transparent_unreg', 'reset_transparent_unreg',

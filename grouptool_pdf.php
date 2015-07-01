@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * mod_form.php
@@ -228,14 +228,14 @@ class grouptool_pdf extends pdf {
      * If showheaderfooter is selected
      * Displays the number and total number of pages in the footer
      */
-    public function Footer(){
+    public function Footer() {
         // Set font.
         $this->SetFont('', '');
 
-        // Position at 15 mm from bottom
+        // Position at 15 mm from bottom.
         $this->SetY(-15);
 
-        // Page number
+        // Page number.
         $this->Cell(0, 10, $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
     }
 

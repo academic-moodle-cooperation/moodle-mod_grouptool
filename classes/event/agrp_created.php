@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_agrp_created event.
@@ -36,7 +36,7 @@ class agrp_created extends \core\event\base {
     }
 
     public static function create_from_object(\stdClass $cm, $agrp) {
-        $event = \mod_grouptool\event\agrp_created::create(array(
+        $event = self::create(array(
             'objectid' => $agrp->id,
             'context' => \context_module::instance($cm->id),
             'other' => (array)$agrp
@@ -50,7 +50,9 @@ class agrp_created extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php",
+                               array('id'  => $this->contextinstanceid,
+                                     'tab' => 'overview'));
     }
 
     /**
@@ -59,7 +61,11 @@ class agrp_created extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'create agrp with id \''.$this->data['other']['id'].'\'', 'view.php?id=' . $this->contextinstanceid.'&tab=overview', $this->objectid,
+        return array($this->courseid,
+                     $this->objecttable,
+                     'create agrp with id \''.$this->data['other']['id'].'\'',
+                     'view.php?id=' . $this->contextinstanceid.'&tab=overview',
+                     $this->objectid,
                      $this->contextinstanceid);
     }
 
@@ -70,8 +76,9 @@ class agrp_created extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['id'])) {
-            return "The user with id '$this->userid' created an active groups entry with id '".$this->data['other']['id'].
-                   " for '{$this->objecttable}' with the course module id '$this->contextinstanceid' for group with id '".$this->data['other']['groupid'].".";
+            return "The user with id '$this->userid' created an active groups entry with id '".
+                   $this->data['other']['id']." for '{$this->objecttable}' with the course module id '".
+                   $this->contextinstanceid."' for group with id '".$this->data['other']['groupid'].".";
         }
     }
 

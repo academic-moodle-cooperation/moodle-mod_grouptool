@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_groupings_created event.
@@ -35,7 +35,7 @@ class groupings_created extends \core\event\base {
     }
 
     public static function create_from_object(\stdClass $cm, array $ids) {
-        $event = \mod_grouptool\event\groupings_created::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => $ids,
@@ -58,8 +58,8 @@ class groupings_created extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'create groupings', 'view.php?id='.$this->contextinstanceid.'&tab=overview',
-                     'create groupings for groups:'.implode("|", $this->data['other']),
+        return array($this->courseid, $this->objecttable, 'create groupings', 'view.php?id='.
+                     $this->contextinstanceid.'&tab=overview', 'create groupings for groups:'.implode("|", $this->data['other']),
                      $this->contextinstanceid);
     }
 
@@ -70,7 +70,8 @@ class groupings_created extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' used '{$this->objecttable}' with the " .
-               "course module id '$this->contextinstanceid' to create groupings for groups with ids ".implode(', ', $this->data['other']).".";
+               "course module id '$this->contextinstanceid' to create groupings for groups with ids ".
+               implode(', ', $this->data['other']).".";
     }
 
     /**

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_user_moved event.
@@ -46,7 +46,7 @@ class user_moved extends \core\event\base {
     }
 
     public static function promotion_from_queue(\stdClass $cm, \stdClass $from, \stdClass $to) {
-        $event = \mod_grouptool\event\user_moved::create(array(
+        $event = self::create(array(
             'objectid' => $to->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => array('from' => (array)$from, 'to' => (array)$to, 'type' => 'promotion'),
@@ -55,7 +55,7 @@ class user_moved extends \core\event\base {
     }
 
     public static function move(\stdClass $cm, \stdClass $from, \stdClass $to) {
-        $event = \mod_grouptool\event\user_moved::create(array(
+        $event = self::create(array(
             'objectid' => $to->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => array('from' => (array)$from, 'to' => (array)$to, 'type' => 'move'),
@@ -69,17 +69,19 @@ class user_moved extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        switch($this->data['other']['type']) {
+        switch ($this->data['other']['type']) {
             case 'promotion':
                 return "The user with id '".$this->data['other']['to']['userid']."' was promoted".
-                       " from the queue of active-group with id '".$this->data['other']['from']['agrpid']."' (group id '".$this->data['other']['from']['groupid']."')".
+                       " from the queue of active-group with id '".$this->data['other']['from']['agrpid']."' (group id '".
+                       $this->data['other']['from']['groupid']."')".
                        " in ".$this->objecttable." with course module id '$this->contextinstanceid'";
             break;
             default:
             case 'move':
                 return "The user with id '".$this->data['other']['to']['userid']."' was moved".
-                       " from active-group with id '".$this->data['other']['from']['agrpid']."' (group id '".$this->data['other']['from']['groupid']."')".
-                       " to active-group with id '".$this->data['other']['to']['agrpid']."' (group id '".$this->data['other']['to']['groupid']."')".
+                       " from active-group with id '".$this->data['other']['from']['agrpid']."' (group id '".
+                       $this->data['other']['from']['groupid']."')"." to active-group with id '".
+                       $this->data['other']['to']['agrpid']."' (group id '".$this->data['other']['to']['groupid']."')".
                        " in ".$this->objecttable." with course module id '$this->contextinstanceid'";
             break;
         }
@@ -113,7 +115,8 @@ class user_moved extends \core\event\base {
     protected function get_legacy_logdata() {
         return array($this->courseid, $this->objecttable, 'move user',
                            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['to']['groupid'],
-                           'move user='.$this->data['other']['from']['userid'].' from agrp='.$this->data['other']['from']['agrpid'].' to agrp='.$this->data['other']['to']['agrpid'], $this->contextinstanceid);
+                           'move user='.$this->data['other']['from']['userid'].' from agrp='.$this->data['other']['from']['agrpid'].
+                           ' to agrp='.$this->data['other']['to']['agrpid'], $this->contextinstanceid);
     }
 
     /**

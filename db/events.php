@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * db/events.php
@@ -54,7 +54,7 @@ $observers = array (
             'internal'     => true,
         ),
         // We get id, courseid, name, description, timecreated, timemodified, picture with this handler.
-        
+
 
         array (
             'eventname'    => 'core\event\group_created',

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * lang/de/grouptool.php
@@ -517,5 +517,5 @@ $string['you_are_already_marked'] = 'Sie haben die Gruppe {$a->groupname} bereit
 $string['you_have_too_less_regs'] = 'Eine Abmeldung ist nicht möglich, weil Sie in zu wenigen Gruppen angemeldet sind';
 $string['your_place_allocated_in_group_success'] = 'Sie haben die Gruppe {$a->groupname} erfolgreich zur Anmeldung markiert.';
 
-// Deprecated since Moodle 2.8
+// Deprecated since Moodle 2.8!
 $string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';

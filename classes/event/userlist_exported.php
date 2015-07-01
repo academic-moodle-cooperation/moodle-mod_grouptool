@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_userlist_exported event.
@@ -116,20 +116,20 @@ class userlist_exported extends \core\event\base {
         if ($this->contextlevel != CONTEXT_MODULE) {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
-        
-        //format, format_readable, groupid, groupingid
+
+        // ...format, format_readable, groupid, groupingid.
         if (!key_exists('format', $this->data['other'])) {
             throw new \coding_exception('Format has to be specified!');
         }
-        
+
         if (!key_exists('groupid', $this->data['other'])) {
             throw new \coding_exception('Group-ID-Key missing!');
         }
-        
+
         if (!key_exists('groupingid', $this->data['other'])) {
             throw new \coding_exception('Grouping-ID-Key missing!');
         }
-        
+
         if (!key_exists('format_readable', $this->data['other']) || empty($this->data['other']['format_readable'])) {
             debugging('Missing or empty readable-export-format.', DEBUG_DEVELOPER);
         }

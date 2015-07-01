@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_overview_exported event.
@@ -117,7 +117,7 @@ class overview_exported extends \core\event\base {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
-        //format, format_readable, groupid, groupingid
+        // ...format, format_readable, groupid, groupingid!
         if (!key_exists('format', $this->data['other'])) {
             throw new \coding_exception('Format has to be specified!');
         }

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * showmembers_ajax.php
@@ -59,7 +59,7 @@ if ($action == 'test') {
 }
 
 try {
-    switch($action) {
+    switch ($action) {
         case 'delete': // Delete Group...
             $groupid = required_param('groupid', PARAM_INT);
             require_capability('mod/grouptool:administrate_groups', $context);
@@ -70,7 +70,7 @@ try {
             require_capability('mod/grouptool:administrate_groups', $context);
             $name = required_param('name', PARAM_TEXT);
             $group = groups_get_group_by_name($course->id, $name);
-            $group = $DB->get_record('groups', array('id'=>$group));
+            $group = $DB->get_record('groups', array('id' => $group));
 
             if (!empty($group) && ($group->id != $groupid)) {
                 $result->error = get_string('groupnameexists', 'group', $name);
@@ -81,7 +81,7 @@ try {
                 $group->courseid = (int)$course->id;
 
                 groups_update_group($group);
-                if ($name != $DB->get_field('groups', 'name', array('id'=>$groupid))) {
+                if ($name != $DB->get_field('groups', 'name', array('id' => $groupid))) {
                     // Error happened...
                     $result->error = get_string('couldnt_rename_group', 'grouptool', $name);
                 } else {
@@ -94,9 +94,9 @@ try {
             require_capability('mod/grouptool:administrate_groups', $context);
             $size = required_param('size', PARAM_TEXT);
             $sql = '
-       SELECT COUNT(reg.id) as regcnt
-         FROM {grouptool_agrps} as agrps
-    LEFT JOIN {grouptool_registered} as reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
+       SELECT COUNT(reg.id) regcnt
+         FROM {grouptool_agrps} agrps
+    LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
         WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
             $params = array('grouptoolid' => $cm->instance, 'groupid' => $groupid);
             $regs = $DB->count_records_sql($sql, $params);
@@ -108,7 +108,8 @@ try {
             } else {
                 $DB->set_field('grouptool_agrps', 'grpsize', $size,
                                array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
-                if ($size != $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'=>$groupid, 'grouptoolid' => $cm->instance))) {
+                if ($size != $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'     => $groupid,
+                                                                                'grouptoolid' => $cm->instance))) {
                     // Error happened...
                     $result->error = get_string('couldnt_resize_group', 'grouptool', $name);
                 } else {
@@ -149,8 +150,11 @@ try {
                     $DB->insert_record('grouptool_agrps', $newrecord);
                     $missing[] = "groupid ".$groupid;
                 } else {
-                    $DB->set_field('grouptool_agrps', 'sort_order', $order, array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
-                    if (!$DB->record_exists('grouptool_agrps', array('groupid' => $groupid, 'grouptoolid' => $cm->instance, 'sort_order' => $order))) {
+                    $DB->set_field('grouptool_agrps', 'sort_order', $order, array('groupid'     => $groupid,
+                                                                                  'grouptoolid' => $cm->instance));
+                    if (!$DB->record_exists('grouptool_agrps', array('groupid'     => $groupid,
+                                                                     'grouptoolid' => $cm->instance,
+                                                                     'sort_order'  => $order))) {
                         $failed[] = "groupid ".$groupid;
                     }
                 }
@@ -164,13 +168,18 @@ try {
             }
             break;
         case 'swap':
-            $groupA = required_param('groupA', PARAM_INT);
-            $groupB = required_param('groupB', PARAM_INT);
-            $groupA_order = $DB->get_field('grouptool_agrps', 'sort_order', array('groupid' => $groupA, 'grouptoolid' => $cm->instance));
-            $groupB_order = $DB->get_field('grouptool_agrps', 'sort_order', array('groupid' => $groupB, 'grouptoolid' => $cm->instance));
-            $DB->set_field('grouptool_agrps', 'sort_order', $groupB_order, array('groupid' => $groupA, 'grouptoolid' => $cm->instance));
-            $DB->set_field('grouptool_agrps', 'sort_order', $groupA_order, array('groupid' => $groupB, 'grouptoolid' => $cm->instance));
-            $result->message = "Swapped from GroupA(".$groupA."|".$groupA_order.") GroupB(".$groupB."|".$groupB_order.") to GroupA(".$groupA."|".$groupB_order.") GroupB(".$groupB."|".$groupA_order.")!";
+            $groupa = required_param('groupA', PARAM_INT);
+            $groupb = required_param('groupB', PARAM_INT);
+            $groupaorder = $DB->get_field('grouptool_agrps', 'sort_order', array('groupid' => $groupa,
+                                                                                 'grouptoolid' => $cm->instance));
+            $groupborder = $DB->get_field('grouptool_agrps', 'sort_order', array('groupid' => $groupb,
+                                                                                 'grouptoolid' => $cm->instance));
+            $DB->set_field('grouptool_agrps', 'sort_order', $groupborder, array('groupid' => $groupa,
+                                                                                'grouptoolid' => $cm->instance));
+            $DB->set_field('grouptool_agrps', 'sort_order', $groupaorder, array('groupid' => $groupb,
+                                                                                'grouptoolid' => $cm->instance));
+            $result->message = "Swapped from GroupA(".$groupa."|".$groupaorder.") GroupB(".$groupb."|".$groupborder.") to GroupA(".
+                               $groupa."|".$groupborder.") GroupB(".$groupb."|".$groupaorder.")!";
             break;
     }
 } catch (Exception $e) {

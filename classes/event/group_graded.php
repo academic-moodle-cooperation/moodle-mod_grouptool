@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_group_graded event.
@@ -27,7 +27,7 @@
  */
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
- 
+
 class group_graded extends \core\event\base {
     /**
      * Init method.
@@ -45,7 +45,7 @@ class group_graded extends \core\event\base {
     public static function create_direct(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
         $data->type = 'group';
-        $event = \mod_grouptool\event\group_graded::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$data,
@@ -56,7 +56,7 @@ class group_graded extends \core\event\base {
     public static function create_without_groupid(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
         $data->type = 'users';
-        $event = \mod_grouptool\event\group_graded::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$data,
@@ -70,14 +70,15 @@ class group_graded extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        switch($this->data['other']['type']) {
+        switch ($this->data['other']['type']) {
             case 'group':
                 return "The user with id '".$this->userid."' group-graded group with id '".$this->data['other']['groupid'].
                        "' using ".$this->objecttable." with course module id '$this->contextinstanceid'.";
             break;
             case 'users':
-                return "The user with id '".$this->userid."' group-graded the user(s) with id(s) '".implode(', ', $this->data['other']['selected'])."'".
-                       " using ".$this->objecttable." with course module id '$this->contextinstanceid'.";
+                return "The user with id '".$this->userid."' group-graded the user(s) with id(s) '".
+                       implode(', ', $this->data['other']['selected'])."' using ".$this->objecttable.
+                       " with course module id '$this->contextinstanceid'.";
             break;
         }
     }
@@ -118,8 +119,9 @@ class group_graded extends \core\event\base {
     protected function get_legacy_logdata() {
         if ($this->data['other']['type'] == 'users') {
             return array($this->courseid, 'grouptool', 'grade group',
-                         "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse']."&refresh_table=1",
-                         "group-grade users ".implode(", ", $this->data['other']['selected']), $this->contextinstanceid);
+                         "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
+                         "&refresh_table=1", "group-grade users ".implode(", ", $this->data['other']['selected']),
+                         $this->contextinstanceid);
         }
         return array($this->courseid, 'grouptool', 'grade group',
                            "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].

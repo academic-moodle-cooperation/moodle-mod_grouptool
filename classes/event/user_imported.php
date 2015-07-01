@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_user_imported event.
@@ -43,7 +43,7 @@ class user_imported extends \core\event\base {
     }
 
     public static function import_forced(\stdClass $cm, $id, $agrp, $group, $user) {
-        $event = \mod_grouptool\event\user_imported::create(array(
+        $event = self::create(array(
             'objectid' => $id,
             'context'  => \context_module::instance($cm->id),
             'other'    => array('agrp' => $agrp, 'group' => $group, 'user' => $user, 'type' => 'force'),
@@ -52,7 +52,7 @@ class user_imported extends \core\event\base {
     }
 
     public static function import(\stdClass $cm, $group, $user) {
-        $event = \mod_grouptool\event\user_imported::create(array(
+        $event = self::create(array(
             'objectid' => 0,
             'context'  => \context_module::instance($cm->id),
             'other'    => array('group' => $group, 'user' => $user, 'type' => ''),
@@ -105,11 +105,12 @@ class user_imported extends \core\event\base {
         if ($this->data['other']['type'] == 'force') {
             return array($this->courseid, 'grouptool', 'import',
                                "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
-                               'group='.$this->data['other']['group'].' agrp='.$this->data['other']['agrp'].' user='.$this->data['other']['user'], $this->contextinstanceid);
+                               'group='.$this->data['other']['group'].' agrp='.$this->data['other']['agrp'].' user='.
+                               $this->data['other']['user'], $this->contextinstanceid);
         } else {
             return array($this->courseid, 'grouptool', 'import',
-                               "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
-                               'group='.$this->data['other']['group'].' user='.$this->data['other']['user'], $this->contextinstanceid);
+                         "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
+                         'group='.$this->data['other']['group'].' user='.$this->data['other']['user'], $this->contextinstanceid);
         }
     }
 

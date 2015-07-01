@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_group_recreated event.
@@ -36,7 +36,7 @@ class group_recreated extends \core\event\base {
     }
 
     public static function create_from_object($data) {
-        $event = \mod_grouptool\event\group_recreated::create(array(
+        $event = self::create(array(
             'objectid' => $data['newid'],
             'context' => \context_module::instance($data['cmid']),
             'other' => $data
@@ -59,8 +59,8 @@ class group_recreated extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'recreate group with id \''.$this->data['other']['groupid'].'\'', 'view.php?id=' . $this->contextinstanceid.'&tab=overview', $this->objectid,
-                     $this->contextinstanceid);
+        return array($this->courseid, $this->objecttable, 'recreate group with id \''.$this->data['other']['groupid'].'\'',
+                     'view.php?id='.$this->contextinstanceid.'&tab=overview', $this->objectid, $this->contextinstanceid);
     }
 
     /**
@@ -69,8 +69,9 @@ class group_recreated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The group with id '".$this->data['other']['groupid']."' has been recreated by the eventhandler as group with id '".$this->data['other']['newid']."'".
-               " because it was used in grouptool with the course module id '$this->contextinstanceid'.";
+        return "The group with id '".$this->data['other']['groupid']."' has been recreated by the eventhandler as group with id '".
+               $this->data['other']['newid']."'". " because it was used in grouptool with the course module id '".
+               $this->contextinstanceid."'.";
     }
 
     /**
@@ -99,7 +100,7 @@ class group_recreated extends \core\event\base {
             throw new \coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
-        //format, format_readable, groupid, groupingid
+        // ...format, format_readable, groupid, groupingid.
         if (empty($this->data['other']['groupid'])) {
             throw new \coding_exception('Group-ID has to be specified!');
         }

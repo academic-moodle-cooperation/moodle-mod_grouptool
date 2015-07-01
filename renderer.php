@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * A sortable list of course groups including some additional information and fields
@@ -26,15 +26,12 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-/*require_once($CFG->dirroot.'/mod/grouptool/checkmarkreport.class.php');
-require_once($CFG->dirroot.'/local/checkmarkreport/reportfilterform.class.php');*/
-
 /**
  * Representation of single group with advanced fields!
  *
  * TODO: should we make these renderable with a nice standardised view?
  */
-class activegroup /*implements renderable*/ {
+class activegroup {
     public $id;
     public $groupid;
     public $grouptoolid;
@@ -68,15 +65,14 @@ class activegroup /*implements renderable*/ {
     public function get_by_groupid($groupid, $grouptoolid) {
         global $DB;
 
-        $sql = "SELECT agrp.id as id, agrp.grouptoolid as grouptoolid, agrp.groupid as groupid,
-                       agrp.grpsize as size, agrp.sort_order as order, agrp.active as status,
-                       grp.name as name, grouptool.use_size AS use_size, grouptool.grpsize AS globalsize,
-                       grouptool.use_individual AS individualsize
-                  FROM {grouptool_agrps} AS agrp
-             LEFT JOIN {groups} AS grp ON agrp.groupid = grp.id
-             LEFT JOIN {grouptool} AS grptl ON agrp.grouptoolid = grptl.id
+        $sql = "SELECT agrp.id id, agrp.grouptoolid grouptoolid, agrp.groupid groupid,
+                       agrp.grpsize size, agrp.sort_order order, agrp.active status,
+                       grp.name name, grouptool.use_size use_size, grouptool.grpsize globalsize,
+                       grouptool.use_individual individualsize
+                  FROM {grouptool_agrps} agrp
+             LEFT JOIN {groups} grp ON agrp.groupid = grp.id
+             LEFT JOIN {grouptool} grptl ON agrp.grouptoolid = grptl.id
                  WHERE agrp.groupid = ? AND agrp.grouptoolid = ?";
-
 
         $obj = $DB->get_record_sql($sql, array($groupid, $grouptoolid));
 
@@ -121,8 +117,8 @@ class sortlist implements renderable {
 
         $this->filter = $filter;
 
-        if ($courseid!=null) {
-            $this->loadGroups($courseid, $cm);
+        if ($courseid != null) {
+            $this->loadgroups($courseid, $cm);
             $this->cm = $cm;
         }
 
@@ -141,7 +137,7 @@ class sortlist implements renderable {
         }
     }
 
-    public function loadGroups($courseid, $cm) {
+    public function loadgroups($courseid, $cm) {
         global $DB;
 
         $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
@@ -166,12 +162,12 @@ class sortlist implements renderable {
             }
             $params = array_merge(array($cm->instance), $params);
             $groupdata = (array)$DB->get_records_sql("
-                    SELECT MAX(grp.id) as groupid, MAX(agrp.id) AS id,
-                           MAX(agrp.grouptoolid) as grouptoolid,  MAX(grp.name) AS name,
-                           MAX(agrp.grpsize) AS size, MAX(agrp.sort_order) AS 'order',
-                           MAX(agrp.active) AS status
-                    FROM {groups} AS grp
-                    LEFT JOIN {grouptool_agrps} as agrp
+                    SELECT MAX(grp.id) groupid, MAX(agrp.id) id,
+                           MAX(agrp.grouptoolid) grouptoolid,  MAX(grp.name) name,
+                           MAX(agrp.grpsize) size, MAX(agrp.sort_order) 'order',
+                           MAX(agrp.active) status
+                    FROM {groups} grp
+                    LEFT JOIN {grouptool_agrps} agrp
                          ON agrp.groupid = grp.id AND agrp.grouptoolid = ?
                     WHERE grp.id ".$grpssql.$activefilter."
                     GROUP BY grp.id
@@ -188,7 +184,8 @@ class sortlist implements renderable {
                                                     SELECT DISTINCT groupingid, name
                                                       FROM {groupings_groups}
                                                  LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
-                                                     WHERE {groupings}.courseid = ? AND {groupings_groups}.groupid = ?", array($courseid, $group->groupid));
+                                                     WHERE {groupings}.courseid = ? AND {groupings_groups}.groupid = ?",
+                                                                        array($courseid, $group->groupid));
             }
         }
 
@@ -218,72 +215,6 @@ class sortlist implements renderable {
     }
 
     /**
-     * swaps 2 list-elements
-     *
-     * @param    int    $a    first Element to swap
-     * @param    int    $b    the other Element to swap with
-     */
-    public function _swapElements($a, $b) {
-        if (isset($this->groups[$a]) && isset($this->groups[$b])) {
-            $temp = $this->groups[$a]->order;
-            $this->groups[$a]->order = $this->groups[$b]->order;
-            $this->groups[$b]->order = $temp;
-            // Reorder Elements!
-            uasort($this->groups, array(&$this, "cmp"));
-        } else {
-            print_error('Item swap not possible, 1 of the Elements doesn\'t exist!');
-        }
-    }
-
-    /**
-     * Returns the value of the form element
-     *
-     * @since     1.0
-     * @access    public
-     * @return    mixed
-     */
-    public function getValue() {
-        $this->_refresh_element_order();
-        $this->_refresh_select_state();
-        /*if (!$sorted) {
-            return $this->_clean_addfields($sortlist->groups);
-        }*/
-        //$elementdata = $this->_clean_addfields($sortlist->groups);
-        uasort($elementdata, array(&$this, "cmp"));
-        return $elementdata;
-    }
-
-    /**
-     * moves an Element 1 step up
-     *
-     * @param    int    $index    Element to move
-     */
-    public function _move1up($index) {
-        reset($this->groups);
-        while (key($this->groups) != $index) {
-            next($this->groups);
-        }
-        prev($this->groups);
-        $otherindex = key($this->groups);
-        $this->_swapElements($index, $otherindex);
-    }
-
-    /**
-     * moves an Element 1 step down
-     *
-     * @param    int    $index    Element to move
-     */
-    public function _move1down($index) {
-        reset($this->groups);
-        while (key($this->groups) != $index) {
-            next($this->groups);
-        }
-        next($this->groups);
-        $otherindex = key($this->groups);
-        $this->_swapElements($index, $otherindex);
-    }
-
-    /**
      * compares if two groups are in correct order
      */
     public function cmp($element1, $element2) {
@@ -295,33 +226,15 @@ class sortlist implements renderable {
     }
 
     /**
-     * Returns the value of the form element
-     *
-     * @since     1.0
-     * @access    public
-     * @return    mixed
-     */
-/*    public function getValue($sorted=true) {
-        $this->_refresh_element_order();
-        $this->_refresh_select_state();
-        if (!$sorted) {
-            return $this->_clean_addfields($sortlist->groups);
-        }
-        $elementdata = $this->_clean_addfields($sortlist->groups);
-        uasort($elementdata, array(&$this, "cmp"));
-        return $elementdata;
-    }
-*/
-    /**
      * updates the element selected-state if corresponding params are set
      */
     public function _refresh_select_state() {
         global $COURSE;
         $classes = optional_param_array('groupings', array(0), PARAM_INT);
         $action = optional_param('class_action', 0, PARAM_ALPHA);
-        $go_button = optional_param('do_class_action', 0, PARAM_BOOL);
+        $gobutton = optional_param('do_class_action', 0, PARAM_BOOL);
 
-        if (empty($go_button)) {
+        if (empty($gobutton)) {
             return;
         }
 
@@ -338,7 +251,7 @@ class sortlist implements renderable {
             }
 
             foreach ($groups as $current) {
-                switch($action) {
+                switch ($action) {
                     case 'select':
                         $sortlist->groups[$current->id]['selected'] = 1;
                         break;
@@ -365,9 +278,9 @@ class sortlist_controller implements renderable {
 
         $classes = optional_param_array('classes', array(0), PARAM_INT);
         $action = optional_param('class_action', 0, PARAM_ALPHA);
-        $go_button = optional_param('do_class_action', 0, PARAM_BOOL);
+        $gobutton = optional_param('do_class_action', 0, PARAM_BOOL);
 
-        if (!empty($go_button) && ($classes != null)
+        if (!empty($gobutton) && ($classes != null)
             && (count($classes) != 0) && !empty($action)) {
             $keys = array();
 
@@ -377,7 +290,7 @@ class sortlist_controller implements renderable {
             }
 
             foreach ($groups as $current) {
-                switch($action) {
+                switch ($action) {
                     case 'select':
                         $this->sortlist->selected[$current->id] = 1;
                         break;
@@ -391,7 +304,7 @@ class sortlist_controller implements renderable {
                 }
             }
 
-            // Update SESSION
+            // Update SESSION!
             $SESSION->sortlist->selected = $this->sortlist->selected;
         }
     }
@@ -437,10 +350,9 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         foreach ($sortlist->groups as $id => $group) {
             $row = array(); // Each group gets its own row!
 
-            //$namebase = 'group['.$id.']';
             $classes = array('checkbox_status', 'class0');
             if (!empty($group->groupings) && (count($group->groupings) > 0)) {
-                foreach($group->groupings as $groupingid => $grouping) {
+                foreach ($group->groupings as $groupingid => $grouping) {
                     $classes[] .= 'class'.$groupingid;
                 }
             }
@@ -490,8 +402,8 @@ class mod_grouptool_renderer extends plugin_renderer_base {
             $nameattr = array('name'  => 'name['.$id.']',
                               'type'  => 'hidden',
                               'value' => $group->name);
-            $nameblock = html_writer::tag('span', $group->name, array('class'=>'text')).html_writer::empty_tag('input', $nameattr);
-            // Todo add edit symbol and functionality for group names!
+            $nameblock = html_writer::tag('span', $group->name, array('class' => 'text')).
+                         html_writer::empty_tag('input', $nameattr);
             $renameattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
                                 'alt'   => $renamestr,
                                 'type'  => 'image',
@@ -499,7 +411,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                 'class' => 'renamebutton');
             $renamebutton = html_writer::link(new moodle_url($PAGE->url, array('rename' => $id)),
                                               html_writer::empty_tag('img', $renameattr),
-                                              array('class'=>$renameattr['class']));
+                                              array('class' => $renameattr['class']));
             $nameblock .= $renamebutton;
 
             $drag = new html_table_cell($dragbutton);
@@ -510,9 +422,9 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                 'name'  => 'delete['.$id.']',
                                 'class' => 'deletebutton',
                                 'id'    => 'delete_'.$id);
-            $deletebutton = html_writer::link(new moodle_url($PAGE->url, array('delete'=>$id)),
+            $deletebutton = html_writer::link(new moodle_url($PAGE->url, array('delete' => $id)),
                                               html_writer::empty_tag('img', $deleteattr),
-                                              array('class'=>$deleteattr['class']));
+                                              array('class' => $deleteattr['class']));
 
             $row = array( 0 => new html_table_cell(html_writer::empty_tag('input', $chkboxattr)),
                           1 => $drag,
@@ -521,12 +433,11 @@ class mod_grouptool_renderer extends plugin_renderer_base {
             $row[0]->attributes['class'] = 'checkbox_container';
             $row[2]->attributes['class'] = 'grpname';
 
-
             $sizeattr = array('name'  => 'size['.$id.']',
                               'type'  => 'hidden',
                               'value' => $group->size);
-            $sizeblock = html_writer::tag('span', $group->size, array('class'=>'text')).html_writer::empty_tag('input', $sizeattr);
-            // Todo add edit symbol and functionality for group names!
+            $sizeblock = html_writer::tag('span', $group->size, array('class' => 'text')).
+                         html_writer::empty_tag('input', $sizeattr);
             $resizeattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
                                 'id'    => 'resize_'.$id,
                                 'alt'   => $resizestr,
@@ -535,7 +446,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                 'class' => 'resizebutton');
             $resizebutton = html_writer::link(new moodle_url($PAGE->url, array('resize' => $id)),
                                               html_writer::empty_tag('img', $resizeattr),
-                                              array('class'=>$resizeattr['class']));
+                                              array('class' => $resizeattr['class']));
             $sizeblock .= $resizebutton;
 
             $labelcell = new html_table_cell(html_writer::tag('label', $groupsizestr, array('for' => $resizeattr['id'])));
@@ -559,9 +470,9 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'inactive');
             }
-            $togglebutton = html_writer::link(new moodle_url($PAGE->url, array('toggle'=>$id)),
+            $togglebutton = html_writer::link(new moodle_url($PAGE->url, array('toggle' => $id)),
                                               html_writer::empty_tag('img', $toggleattr),
-                                              array('class'=>'togglebutton '.$toggleattr['class']));
+                                              array('class' => 'togglebutton '.$toggleattr['class']));
             $toggle = new html_table_cell($togglebutton);
             $toggle->attributes['class'] = 'buttons';
             $row[] = $toggle;
@@ -625,7 +536,8 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         $sortlist = $controller->sortlist;
 
         // Generate groupings-controls to select/deselect groupings!
-        $checkboxcontroltitle = html_writer::tag('label', get_string('checkbox_control_header', 'grouptool'), array('for'=>'classes'));
+        $checkboxcontroltitle = html_writer::tag('label', get_string('checkbox_control_header', 'grouptool'),
+                                                 array('for' => 'classes'));
         $helptext = $OUTPUT->render(new help_icon('checkbox_control_header', 'grouptool'));
         $checkboxcontroltitle = html_writer::tag('div', $checkboxcontroltitle.' '.$helptext,
                                                    array('class' => 'fitemtitle checkbox_controls_header'));
@@ -651,14 +563,14 @@ class mod_grouptool_renderer extends plugin_renderer_base {
 
         $checkboxcontrols = $checkboxcontroltitle;
 
-        // Add Radiobuttons and Go Button TODO replace single buttons with radiobuttons + go-button
+        // Add Radiobuttons and Go Button TODO replace single buttons with radiobuttons + go-button!
         $checkalllink = html_writer::tag('span',
                                          html_writer::empty_tag('input', array('name'  => 'class_action',
                                                                                'type'  => 'radio',
                                                                                'id'    => 'select',
                                                                                'value' => 'select',
                                                                                'class' => 'select_all')).
-                                         html_writer::tag('label', strip_tags($selectall), array('for'=>'select')),
+                                         html_writer::tag('label', strip_tags($selectall), array('for' => 'select')),
                                          array('class' => 'nowrap'));
         $checknonelink = html_writer::tag('span',
                                           html_writer::empty_tag('input', array('name'  => 'class_action',
@@ -666,7 +578,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                                                                 'id'    => 'deselect',
                                                                                 'value' => 'deselect',
                                                                                 'class' => 'select_none')).
-                                          html_writer::tag('label', strip_tags($selectnone), array('for'=>'deselect')),
+                                          html_writer::tag('label', strip_tags($selectnone), array('for' => 'deselect')),
                                           array('class' => 'nowrap'));
         $checktogglelink = html_writer::tag('span',
                                             html_writer::empty_tag('input', array('name'  => 'class_action',
@@ -674,11 +586,11 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                                                                   'id'    => 'toggle',
                                                                                   'value' => 'toggle',
                                                                                   'class' => 'toggle_selection')).
-                                            html_writer::tag('label', strip_tags($inverseselection), array('for'=>'toggle')),
+                                            html_writer::tag('label', strip_tags($inverseselection), array('for' => 'toggle')),
                                             array('class' => 'nowrap'));
         $submitbutton = html_writer::tag('button', get_string('go'),
                                          array('name' => 'do_class_action',
-                                               'value' => 'Go',));
+                                               'value' => 'Go'));
 
         $attr = array('class' => 'felement');
         $checkboxcontrols .= html_writer::tag('div',

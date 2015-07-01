@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The mod_grouptool_agrps_updated event.
@@ -36,7 +36,7 @@ class agrps_updated extends \core\event\base {
     }
 
     public static function create_convenient(\stdClass $cm) {
-        $event = \mod_grouptool\event\agrps_updated::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
         ));
@@ -44,7 +44,7 @@ class agrps_updated extends \core\event\base {
     }
 
     public static function create_groupcreation(\stdClass $cm, $pattern, $numgrps, $groupingid = 0) {
-        $event = \mod_grouptool\event\agrps_updated::create(array(
+        $event = self::create(array(
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => array('pattern' => $pattern,
@@ -60,7 +60,8 @@ class agrps_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php",
+                               array('id' => $this->contextinstanceid, 'tab' => 'overview'));
     }
 
     /**
@@ -72,10 +73,15 @@ class agrps_updated extends \core\event\base {
         if (!empty($this->data['other']['pattern'])) {
             return array($this->courseid, $this->objecttable, 'create groups',
                          'view.php?id=' . $this->contextinstanceid.'&tab=overview',
-                         'create groups namescheme:'.$this->data['other']['pattern'].' numgroups:'.$this->data['other']['numgrps'],
+                         'create groups namescheme:'.$this->data['other']['pattern'].
+                         ' numgroups:'.$this->data['other']['numgrps'],
                          $this->contextinstanceid);
         }
-        return array($this->courseid, $this->objecttable, 'update agrps', 'view.php?id=' . $this->contextinstanceid.'&tab=overview', $this->objectid,
+        return array($this->courseid,
+                     $this->objecttable,
+                     'update agrps',
+                     'view.php?id='.$this->contextinstanceid.'&tab=overview',
+                     $this->objectid,
                      $this->contextinstanceid);
     }
 
@@ -92,14 +98,17 @@ class agrps_updated extends \core\event\base {
         }
         if (!empty($this->data['other']['pattern'])) {
             if (!empty($add)) {
-                $add .= ' affecting '.$this->data['other']['numgrps'].' groups (namepattern = \''.$this->data['other']['pattern'].'\')';
+                $add .= ' affecting '.$this->data['other']['numgrps'].
+                        ' groups (namepattern = \''.$this->data['other']['pattern'].'\')';
             } else {
-                $add = ' affecting '.$this->data['other']['numgrps'].' groups (namepattern = \''.$this->data['other']['pattern'].'\')';
+                $add = ' affecting '.$this->data['other']['numgrps'].
+                       ' groups (namepattern = \''.$this->data['other']['pattern'].'\')';
             }
         }
 
-        return "The user with id '$this->userid' updated the active groups for '{$this->objecttable}' with the " .
-            "course module id '$this->contextinstanceid'".$add.".";
+        return "The user with id '$this->userid' updated the active groups".
+               "for '{$this->objecttable}' with the ".
+               "course module id '$this->contextinstanceid'".$add.".";
     }
 
     /**
