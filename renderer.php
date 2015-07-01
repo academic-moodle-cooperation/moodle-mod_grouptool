@@ -403,7 +403,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         foreach ($sortlist->groups as $id => $group) {
             $row = array(); // Each group gets its own row!
 
-            $namebase = 'group['.$id.']';
+            //$namebase = 'group['.$id.']';
             $classes = array('checkbox_status', 'class0');
             if (!empty($group->groupings) && (count($group->groupings) > 0)) {
                 foreach($group->groupings as $groupingid => $grouping) {
@@ -453,7 +453,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                                  array('src'   => $OUTPUT->pix_url('i/dragdrop'),
                                                        'alt'   => $dragstr,
                                                        'class' => 'drag_image js_invisible'));
-            $nameattr = array('name'  => $namebase.'[name]',
+            $nameattr = array('name'  => 'name['.$id.']',
                               'type'  => 'hidden',
                               'value' => $group->name);
             $nameblock = html_writer::tag('span', $group->name, array('class'=>'text')).html_writer::empty_tag('input', $nameattr);
@@ -488,7 +488,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
             $row[2]->attributes['class'] = 'grpname';
 
 
-            $sizeattr = array('name'  => $namebase.'[size]',
+            $sizeattr = array('name'  => 'size['.$id.']',
                               'type'  => 'hidden',
                               'value' => $group->size);
             $sizeblock = html_writer::tag('span', $group->size, array('class'=>'text')).html_writer::empty_tag('input', $sizeattr);

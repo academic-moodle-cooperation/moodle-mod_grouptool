@@ -347,23 +347,36 @@ class mod_grouptool_groupings_creation_form extends moodleform {
         $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
         $coursecontext = context_course::instance($cm->course);
 
+        foreach ($this->_customdata['selected'] as $select) {
+            $mform->addElement('hidden', 'selected['.$select.']');
+            $mform->setDefault('selected['.$select.']', $select);
+            $mform->setType('selected['.$select.']', PARAM_INT);
+        }
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_admin');
         $mform->setType('tab', PARAM_TEXT);
 
-        $grouping = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
+        $mform->addElement('hidden', 'courseid');
+        $mform->setDefault('courseid', $course->id);
+        $mform->setType('courseid', PARAM_INT);
+
+        $mform->addElement('hidden', 'bulkaction');
+        $mform->setDefault('bulkaction', 'grouping');
+        $mform->setType('bulkaction', PARAM_TEXT);
+
+        $groupingel = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
         $options = array('' => get_string('choose'));
         $options['-1'] = get_string('onenewgrouping', 'grouptool');
         $options['-2'] = get_string('onenewgroupingpergroup', 'grouptool');
-        $selectgroups->addOptGroup("", $options);
+        $groupingel->addOptGroup("", $options);
         if ($groupings = groups_get_all_groupings($course->id)) {
             $options = array();
             foreach ($groupings as $grouping) {
                 $options[$grouping->id] = strip_tags(format_string($grouping->name));
             }
-            $selectgroups->addOptGroup("————————————————————————", $options);
+            $groupingel->addOptGroup("————————————————————————", $options);
         }
-        $mform->addElement($selectgroups);
+        $mform->addElement($groupingel);
         $mform->addHelpButton('target', 'groupingselect', 'grouptool');
 
         $mform->addElement('text', 'name', get_string('groupingname', 'group'));
@@ -392,7 +405,7 @@ class mod_grouptool_groupings_creation_form extends moodleform {
         if (($data['target'] == -1) && empty($data['name'])) {
             $errors['name'] = get_string('required');
         }
-        if (($data['target'] == -1) && groups_get_grouping_by_name($data['course'], $data['name'])) {
+        if (($data['target'] == -1) && groups_get_grouping_by_name($data['courseid'], $data['name'])) {
             $errors['name'] = get_string('groupingnameexists', 'group', $data['name']);
         }
 
