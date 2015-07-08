@@ -39,7 +39,6 @@ require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->libdir.'/grade/grade_grade.php');
 require_once($CFG->libdir.'/pdflib.php');
 
-
 /**
  * class representing the moodleform used in the import-tab
  *
