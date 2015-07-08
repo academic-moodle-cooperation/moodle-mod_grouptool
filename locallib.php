@@ -1374,6 +1374,7 @@ class mod_grouptool {
                 $rolenames[$role->id] = strip_tags(role_get_name($role, $context));
             }
         }
+
         $filter = optional_param('filter', null, PARAM_INT);
         if ($filter !== null) {
             set_user_preference('mod_grouptool_group_filter', $filter, $USER->id);
@@ -1420,7 +1421,8 @@ class mod_grouptool {
                                            get_string('all'),
                                            '',
                                            false);
-        echo $OUTPUT->tabtree($filtertabs, $filter, $inactivetabs);
+        echo html_writer::tag('div', $OUTPUT->tabtree($filtertabs, $filter, $inactivetabs),
+                              array('id' => 'filtertabs'));
 
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
@@ -1693,6 +1695,7 @@ class mod_grouptool {
                                         array(array('lang'       => current_language(),
                                                     'contextid'  => $this->context->id,
                                                     'filter'     => $curfilter,
+                                                    'filterid'   => $filter,
                                                     'globalsize' => $this->grouptool->grpsize,)));
             $PAGE->requires->strings_for_js(array('active', 'inactive', 'confirm_delete'), 'mod_grouptool');
             $PAGE->requires->string_for_js('ajax_edit_size_help', 'mod_grouptool');

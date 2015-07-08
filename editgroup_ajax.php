@@ -26,39 +26,39 @@
  */
 
 define('AJAX_SCRIPT', true);
-
-require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->libdir .'/grouplib.php');
-require_once($CFG->dirroot.'/group/lib.php');
-
-$action = required_param('action', PARAM_ALPHANUMEXT);
-$contextid = required_param('contextid', PARAM_INT);
-$lang   = optional_param('lang', 'en', PARAM_LANG);
-
-// If session has expired and its an ajax request so we cant do a page redirect!
-if (!isloggedin()) {
-    $result = new stdClass();
-    $result->error = get_string('sessionerroruser', 'error');
-    echo json_encode($result);
-    die();
-}
-
-list($context, $course, $cm) = get_context_info_array($contextid);
-require_login($course, false, $cm);
-
-$contextid = null; // Now we have a context object throw away the id from the user!
-$PAGE->set_context($context);
-$PAGE->set_url('/mod/grouptool/editgroup_ajax.php', array('contextid' => $context->id,
-                                                          'groupid'    => $groupid));
-$result = new stdClass();
-$result->error = false;
-if ($action == 'test') {
-    $result->message = "SUCCESS!";
-    echo json_encode($result);
-    die;
-}
-
 try {
+    require_once(dirname(__FILE__) . '/../../config.php');
+    require_once($CFG->libdir .'/grouplib.php');
+    require_once($CFG->dirroot.'/group/lib.php');
+    require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+
+    $action = required_param('action', PARAM_ALPHANUMEXT);
+    $contextid = required_param('contextid', PARAM_INT);
+    $lang   = optional_param('lang', 'en', PARAM_LANG);
+
+    // If session has expired and its an ajax request so we cant do a page redirect!
+    if (!isloggedin()) {
+        $result = new stdClass();
+        $result->error = get_string('sessionerroruser', 'error');
+        echo json_encode($result);
+        die();
+    }
+    list($context, $course, $cm) = get_context_info_array($contextid);
+    require_login($course, false, $cm);
+
+    $contextid = null; // Now we have a context object throw away the id from the user!
+    $PAGE->set_context($context);
+    $PAGE->set_url('/mod/grouptool/editgroup_ajax.php', array('action' => $action,
+                                                              'contextid' => $context->id,
+                                                              'lang' => $lang));
+    $result = new stdClass();
+    $result->error = false;
+    if ($action == 'test') {
+        $result->message = "SUCCESS!";
+        echo json_encode($result);
+        die;
+    }
+
     switch ($action) {
         case 'delete': // Delete Group...
             $groupid = required_param('groupid', PARAM_INT);
@@ -103,8 +103,9 @@ try {
             if (empty($size)) {
                 // Disable individual size for this group!
                 $DB->set_field('grouptool_agrps', 'grpsize', null, array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
-                if (!empty($DB->get_field('grouptool_agrps', 'grpsize', array('groupid'    => $groupid,
-                                                                              'grouptoolid' => $cm->instance)))) {
+                $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'    => $groupid,
+                                                                               'grouptoolid' => $cm->instance));
+                if (!empty($dbsize)) {
                     // Error happened...
                     $result->error = get_string('couldnt_resize_group', 'grouptool', $name);
                 } else {
@@ -130,20 +131,94 @@ try {
             break;
         case 'activate':
             $groupid = required_param('groupid', PARAM_INT);
+            $filter = required_param('filter', PARAM_INT);
             $DB->set_field('grouptool_agrps', 'active', 1, array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
             if ($DB->get_field('grouptool_agrps', 'active', array('groupid' => $groupid, 'grouptoolid' => $cm->instance)) == 0) {
                 $result->error = "Couldn't activate group ".$groupid." in grouptool ".$cm->instance."!";
             } else {
                 $result->message = "Activated group ".$groupid." in grouptool ".$cm->instance."!";
             }
+            $result->filtertabs = new stdClass();
+            $result->filtertabs->current = $filter;
+            $result->filtertabs->activestr =   get_string('active', 'grouptool');
+            $result->filtertabs->inactivestr = get_string('inactive');
+            $result->filtertabs->allstr =      get_string('all');
+            $result->filtertabs->activeid =   mod_grouptool::FILTER_ACTIVE;
+            $result->filtertabs->inactiveid = mod_grouptool::FILTER_INACTIVE;
+            $result->filtertabs->allid =      mod_grouptool::FILTER_ALL;
+            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
+                $activeurl = new moodle_url('/mod/grouptool/view.php',
+                                            array('id'     => $cm->id,
+                                                  'tab'    => 'group_admin',
+                                                  'filter' => mod_grouptool::FILTER_ACTIVE));
+                $result->filtertabs->active = $activeurl->out(false);
+            } else {
+                $result->filtertabs->active = '';
+            }
+            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 0))) {
+                $inactiveurl = new moodle_url('/mod/grouptool/view.php',
+                                              array('id'     => $cm->id,
+                                                    'tab'    => 'group_admin',
+                                                    'filter' => mod_grouptool::FILTER_INACTIVE));
+                $result->filtertabs->inactive = $inactiveurl->out(false);
+            } else {
+                $result->filtertabs->inactive = '';
+            }
+            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance))) {
+                $allurl = new moodle_url('/mod/grouptool/view.php',
+                                         array('id'     => $cm->id,
+                                               'tab'    => 'group_admin',
+                                               'filter' => mod_grouptool::FILTER_ALL));
+                $result->filtertabs->all = $allurl->out(false);
+            } else {
+                $result->filtertabs->all = '';
+            }
+
             break;
         case 'deactivate':
             $groupid = required_param('groupid', PARAM_INT);
+            $filter = required_param('filter', PARAM_INT);
             $DB->set_field('grouptool_agrps', 'active', 0, array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
             if ($DB->get_field('grouptool_agrps', 'active', array('groupid' => $groupid, 'grouptoolid' => $cm->instance)) == 1) {
                 $result->error = "Couldn't deactivate group ".$groupid." in grouptool ".$cm->instance."!";
             } else {
                  $result->message = "Deactivated group ".$groupid." in grouptool ".$cm->instance."!";
+            }
+
+            $result->filtertabs = new stdClass();
+            $result->filtertabs->current = $filter;
+            $result->filtertabs->activestr =   get_string('active', 'grouptool');
+            $result->filtertabs->inactivestr = get_string('inactive');
+            $result->filtertabs->allstr =      get_string('all');
+            $result->filtertabs->activeid =   mod_grouptool::FILTER_ACTIVE;
+            $result->filtertabs->inactiveid = mod_grouptool::FILTER_INACTIVE;
+            $result->filtertabs->allid =      mod_grouptool::FILTER_ALL;
+            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
+                $activeurl = new moodle_url('/mod/grouptool/view.php',
+                                            array('id'     => $cm->id,
+                                                  'tab'    => 'group_admin',
+                                                  'filter' => mod_grouptool::FILTER_ACTIVE));
+                $result->filtertabs->active = $activeurl->out(false);
+            } else {
+                $result->filtertabs->active = '';
+            }
+            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 0))) {
+                $inactiveurl = new moodle_url('/mod/grouptool/view.php',
+                                              array('id'     => $cm->id,
+                                                    'tab'    => 'group_admin',
+                                                    'filter' => mod_grouptool::FILTER_INACTIVE));
+                $result->filtertabs->inactive = $inactiveurl->out(false);
+            } else {
+                $result->filtertabs->inactive = '';
+            }
+            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance))) {
+                $allurl = new moodle_url('/mod/grouptool/view.php',
+                                         array('id'     => $cm->id,
+                                               'tab'    => 'group_admin',
+                                               'filter' => mod_grouptool::FILTER_ALL));
+                $result->filtertabs->all = $allurl->out(false);
+            } else {
+                $result->filtertabs->all = '';
             }
             break;
         case 'reorder': // Reorder groups...

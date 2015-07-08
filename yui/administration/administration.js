@@ -49,9 +49,9 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             FELEMENT : '<div class="felement"></div>'
         },
         ATTRS = {
-            contextid : { 'value' : 0},
-            lang : { 'value' : 'en'},
-            globalsize : { 'value' : 3}
+            contextid : { 'value' : 0 },
+            lang : { 'value' : 'en' },
+            globalsize : { 'value' : 3 },
         };
 
     //this line use existing name path if it exists, ortherwise create a new one.
@@ -63,6 +63,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             M.mod_grouptool.contextid = config.contextid;
             M.mod_grouptool.lang = config.lang;
             M.mod_grouptool.filter = config.filter;
+            M.mod_grouptool.filterid = config.filterid;
             M.mod_grouptool.globalsize = config.globalsize;
             Y.log('Initalize Grouptool group administration', "info",  "grouptool");
             Y.all('a.renamebutton').on('click', M.mod_grouptool.renamegroup);
@@ -327,12 +328,61 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             }
             field.detach();
         }, 'esc');
-    };
+    }
+
+    M.mod_grouptool.update_filtertabs = function(data) {
+        Y.all('#filtertabs ul > li').each(function (cur, idx, list) {
+            switch (idx) {
+                case 0: // Active
+                    if (data.active != '') {
+                        cur.one('a').setAttribute('href', data.active);
+                        cur.removeClass('disabled');
+                    } else {
+                        cur.addClass('disabled');
+                        cur.one('a').removeAttribute('href');
+                    }
+                    if (data.current == data.activeid) {
+                        cur.addClass('active');
+                    } else {
+                        cur.removeClass('active');
+                    }
+                    break;
+                case 1: // Inactive
+                    if (data.inactive != '') {
+                        cur.one('a').setAttribute('href', data.inactive);
+                        cur.removeClass('disabled');
+                    } else {
+                        cur.addClass('disabled');
+                        cur.one('a').removeAttribute('href');
+                    }
+                    if (data.current == data.inactiveid) {
+                        cur.addClass('active');
+                    } else {
+                        cur.removeClass('active');
+                    }
+                    break;
+                case 2: // All
+                    if (data.all != '') {
+                        cur.one('a').setAttribute('href', data.all);
+                        cur.removeClass('disabled');
+                    } else {
+                        cur.addClass('disabled');
+                        cur.one('a').removeAttribute('href');
+                    }
+                    if (data.current == data.allid) {
+                        cur.addClass('active');
+                    } else {
+                        cur.removeClass('active');
+                    }
+                    break;
+            }
+        });
+    }
 
     M.mod_grouptool.togglegroup = function(e) {
         e.preventDefault();
         e.stopPropagation();
-
+        Y.log('TOGGLE GROUP ' + grpid, "info", "grouptool");
         var grpid = e.target.getAttribute('name').replace ( /[^\d]/g, '' );
         if (e.target.hasClass('active')) {
             // Set inactive (via AJAX Request)!
@@ -341,13 +391,17 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var contextid = M.mod_grouptool.contextid;
             var lang = M.mod_grouptool.lang;
+            Y.log(url+'?action=deactivate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid +
+                      '&filter=' + M.mod_grouptool.filterid, "info", "grouptool");
             var cfg = {
                 method: 'POST',
-                data: 'action=deactivate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid,
+                data: 'action=deactivate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid +
+                      '&filter=' + M.mod_grouptool.filterid,
                 headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 on: {
                     start: function(id, args) {
-                        Y.log("Start AJAX Call to deactivate group " + grpid, "info", "grouptool");
+                        Y.log("Start AJAX Call to deactivate group " + grpid + "\n" +
+                              url + "?action=deactivate&groupid="+grpid+"&sesskey="+M.cfg.sesskey+"&contextid="+contextid, "info", "grouptool");
                     },
                     complete: function(id, args) {
                         Y.log("AJAX Call to deactivate group " + grpid + " completed", "info", "grouptool");
@@ -370,6 +424,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                         e.target.ancestor('tr').show('fadeIn')});
                                 // And add class dimmed_text to row!
                             }
+                            M.mod_grouptool.update_filtertabs(response.filtertabs);
                             Y.log("AJAX Call to deactivate group " + grpid + " successfull\n" + response.message,
                                   "success", "grouptool");
                         }
@@ -395,13 +450,17 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var contextid = M.mod_grouptool.contextid;
             var lang = M.mod_grouptool.lang;
+            Y.log(url+'?action=deactivate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid +
+                      '&filter=' + M.mod_grouptool.filterid, "info", "grouptool");
             var cfg = {
                 method: 'POST',
-                data: 'action=activate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid,
+                data: 'action=activate&groupid=' + grpid + '&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid +
+                      '&filter=' + M.mod_grouptool.filterid,
                 headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 on: {
                     start: function(id, args) {
-                        Y.log("Start AJAX Call to activate group " + grpid, "info", "grouptool");
+                        Y.log("Start AJAX Call to activate group " + grpid + "\n"+
+                              url + '?action=deactivate&groupid='+grpid+'&sesskey='+M.cfg.sesskey+'&contextid='+contextid, "info", "grouptool");
                     },
                     complete: function(id, args) {
                         Y.log("AJAX Call to activate group " + grpid + " completed", "info", "grouptool");
@@ -425,6 +484,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                         // TODO move node in list to correct position?
                                         e.target.ancestor('tr').show('fadeIn')});
                             }
+                            M.mod_grouptool.update_filtertabs(response.filtertabs);
                             Y.log("AJAX Call to activate group " + grpid + " successfull\n" + response.message,
                                   "success", "grouptool");
                         }
