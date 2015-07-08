@@ -5289,6 +5289,8 @@ EOS;
             $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
         }
         foreach ($agrps as $agrp) {
+            // We give each group 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
+            core_php_time_limit::raise(30);
             if (!$onlydata) {
                 $groupdata = "";
                 $groupinfos = $OUTPUT->heading($groupinfo[$agrp->id]->name, 3);
@@ -5649,6 +5651,7 @@ EOS;
         $data = $this->group_overview_table($groupingid, $groupid, true);
 
         $pdf = new grouptool_pdf();
+        $pdf->setFontSubsetting(false);
 
         // Set orientation (P/L)!
         $orientation = (optional_param('orientation', 0, PARAM_BOOL) == 0) ? 'P' : 'L';
@@ -7118,6 +7121,8 @@ EOS;
         $rows = array();
         if (!empty($userdata)) {
             foreach ($userdata as $user) {
+                // We give each user 10 seconds (minimum) and hope it doesn't time out because of no output in case of download!
+                core_php_time_limit::raise(10);
                 if (!$onlydata) {
                     $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
                                                array('id'     => $user->id,
@@ -7215,7 +7220,7 @@ EOS;
                         $queues = explode(',', $user->queues);
                         $queueentries = array();
                         foreach ($queues as $queue) {
-                            $rank = $this->get_rank_in_queue($queue, $user->id);
+                            $rank = $this->get_rank_in_queue($groupinfo[$queue]->queued, $user->id);
                             if (empty($rank)) {
                                 $rank = '*';
                             }
@@ -7255,6 +7260,7 @@ EOS;
         $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
 
         $pdf = new grouptool_pdf();
+        $pdf->setFontSubsetting(false);
 
         // Set orientation (P/L)!
         $orientation = (optional_param('orientation', 0, PARAM_BOOL) == 0) ? 'P' : 'L';

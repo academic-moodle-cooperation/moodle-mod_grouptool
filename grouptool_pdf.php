@@ -524,7 +524,7 @@ class grouptool_pdf extends pdf {
             if (!empty($queues) && is_array($queues)) {
                 $queuesstrings = array();
                 foreach ($queues as $key => $queue) {
-                    $queuesstrings[] = '('.$queue['rank'].') '.$queue['name'];
+                    $queuesstrings[] = $queue['name'].' (#'.$queue['rank'].')';
                 }
                 if ($getheightonly) {
                     $this->Multicell(0/*.2*$writewidth*/, $height, implode("\n", $queuesstrings),
