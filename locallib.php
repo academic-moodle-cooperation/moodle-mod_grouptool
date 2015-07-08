@@ -7412,9 +7412,7 @@ EOS;
                                get_string('idnumber')."\t".
                                get_string('email')."\t".
                                get_string('registrations', 'grouptool')."\t".
-                               get_string('queues', 'grouptool').' '.
-                               get_string('rank', 'grouptool')."\t".
-                               get_string('queues', 'grouptool');
+                               get_string('queues', 'grouptool')." (".get_string('rank', 'grouptool').")";
                 } else {
                     $rows = max(array(1, count($user['registrations']), count($user['queues'])));
 
@@ -7433,12 +7431,11 @@ EOS;
                             $line .= "\t";
                         }
                         if ((count($user['queues']) == 0) && ($i == 0)) {
-                            $line .= "\t\t".get_string('nowhere_queued', 'grouptool');
+                            $line .= "\t".get_string('nowhere_queued', 'grouptool');
                         } else if (key_exists($i, $user['queues'])) {
-                            $line .= "\t".$user['queues'][$i]['rank'];
-                            $line .= "\t".$user['queues'][$i]['name'];
+                            $line .= "\t".$user['queues'][$i]['name']."(".$user['queues'][$i]['rank'].")";
                         } else {
-                            $line .= "\t\t";
+                            $line .= "\t";
                         }
                         $lines[] = $line;
                     }
