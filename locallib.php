@@ -963,12 +963,15 @@ class mod_grouptool {
                 if ($createdgrouping) {
                     groups_delete_grouping($createdgrouping);
                 }
+                return array(0 => $failed,
+                             1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error);
             } else {
                 $numgrps = clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT) + 1;
                 // Trigger agrps updated via groupcreation event.
                 $groupingid = !empty($grouping) ? $grouping->id : 0;
                 \mod_grouptool\event\agrps_updated::create_groupcreation($this->cm, $data->namingscheme,
                                                                          $numgrps, $groupingid)->trigger();
+                return array(0 => $failed, 1 => get_string('groups_created', 'grouptool'));
             }
         }
     }
@@ -1128,11 +1131,14 @@ class mod_grouptool {
                 if ($createdgrouping) {
                     groups_delete_grouping($createdgrouping);
                 }
+                return array(0 => $failed,
+                             1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error);
             } else {
                 // Trigger agrps updated via groupcreation event.
                 $groupingid = !empty($grouping) ? $grouping->id : 0;
                 \mod_grouptool\event\agrps_updated::create_groupcreation($this->cm, $namescheme,
                                                                          count($groups), $groupingid)->trigger();
+                return array(0 => $failed, 1 => get_string('groups_created', 'grouptool'));
             }
         }
     }

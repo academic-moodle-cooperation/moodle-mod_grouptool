@@ -217,6 +217,7 @@ $string['group_assign_error'] = 'Kann nicht zu Gruppe hinzufügen!';
 $string['group_creation'] = 'Gruppen erstellen';
 $string['group_creation_alt'] = 'Gruppen erstellen';
 $string['group_creation_failed'] = 'Gruppenerstellung fehlgeschlagen!';
+$string['group_creation_success'] = 'Gruppen erfolgreich erstellt!';
 $string['groupcreation'] = 'Gruppen erstellen';
 $string['groupcreationmode'] = 'Modus';
 $string['groupcreationmode_help'] = 'Auswahl, wie Gruppen erstellt werden sollen:<br />

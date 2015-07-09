@@ -218,6 +218,7 @@ $string['grouping_created_and_group_added'] = 'Grouping(s) created and group(s) 
 $string['group_creation'] = 'Create groups';
 $string['group_creation_alt'] = 'Create groups';
 $string['group_creation_failed'] = 'Creation of groups failed!';
+$string['group_creation_success'] = 'Successfully created groups!';
 $string['groupcreation'] = 'Group creation';
 $string['groupcreationmode'] = 'Mode';
 $string['groupcreationmode_help'] = 'Choose how groups should be created:<br />
