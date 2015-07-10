@@ -3092,43 +3092,49 @@ EOS;
                      $agrpidwhere.$groupidwhere.$groupingidwhere."
                 GROUP BY grp.id, agrp.id
                 ORDER BY sort_order ASC, name ASC", $params);
-        foreach ($groupdata as $key => $group) {
-            $groupingids = $DB->get_fieldset_select('groupings_groups',
-                                                    'groupingid',
-                                                    'groupid = ?',
-                                                    array($group->id));
-            if (!empty($groupingids)) {
-                $groupdata[$key]->classes = implode(',', $groupingids);
-            } else {
-                $groupdata[$key]->classes = '';
-            }
-        }
-
-        if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
-                || ($this->grouptool->use_queue && $includequeues)
-                || ($includeregs)) {
-
-            foreach ($groupdata as $key => $currentgroup) {
-
-                $groupdata[$key]->queued = null;
-                if ($includequeues && $this->grouptool->use_queue) {
-                    $attr = array('agrpid' => $currentgroup->agrpid);
-                    $groupdata[$key]->queued = (array)$DB->get_records('grouptool_queued', $attr);
+        if (!empty($groupdata)) {
+            foreach ($groupdata as $key => $group) {
+                $groupingids = $DB->get_fieldset_select('groupings_groups',
+                                                        'groupingid',
+                                                        'groupid = ?',
+                                                        array($group->id));
+                if (!empty($groupingids)) {
+                    $groupdata[$key]->classes = implode(',', $groupingids);
+                } else {
+                    $groupdata[$key]->classes = '';
                 }
-
-                $groupdata[$key]->registered = null;
-                if ($includeregs) {
-                    $params = array('agrpid' => $currentgroup->agrpid);
-                    $where = "agrpid = :agrpid AND modified_by >= 0";
-                    $groupdata[$key]->registered = $DB->get_records_select('grouptool_registered',
-                                                                           $where, $params);
-                    $params['modifierid'] = -1;
-                    $where = "agrpid = :agrpid AND modified_by = :modifierid";
-                    $groupdata[$key]->marked = $DB->get_records_select('grouptool_registered',
-                                                                       $where, $params);
-                    $groupdata[$key]->moodle_members = groups_get_members($currentgroup->id);
-                }
+                flush();
             }
+
+            if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
+                    || ($this->grouptool->use_queue && $includequeues)
+                    || ($includeregs)) {
+
+                foreach ($groupdata as $key => &$currentgroup) {
+                    $currentgroup->queued = null;
+                    if ($includequeues && $this->grouptool->use_queue) {
+                        $attr = array('agrpid' => $currentgroup->agrpid);
+                        $currentgroup->queued = (array)$DB->get_records('grouptool_queued', $attr);
+                    }
+
+                    $currentgroup->registered = null;
+                    if ($includeregs) {
+                        $params = array('agrpid' => $currentgroup->agrpid);
+                        $where = "agrpid = :agrpid AND modified_by >= 0";
+                        $currentgroup->registered = $DB->get_records_select('grouptool_registered',
+                                                                            $where, $params);
+                        $params['modifierid'] = -1;
+                        $where = "agrpid = :agrpid AND modified_by = :modifierid";
+                        $currentgroup->marked = $DB->get_records_select('grouptool_registered',
+                                                                        $where, $params);
+                        $currentgroup->moodle_members = groups_get_members($currentgroup->id);
+                    }
+                    flush();
+                }
+                unset($currentgroup);
+            }
+        } else {
+            $groupdata = array();
         }
 
         return $groupdata;
@@ -5284,7 +5290,7 @@ EOS;
         $agrps = $this->get_active_groups(true, true, 0, $groupid, $groupingid);
         $groupids = array_keys($agrps);
         $groupinfo = groups_get_all_groups($this->grouptool->course);
-        $userinfo = get_enrolled_users($this->context);
+        $userinfo = array();
         $syncstatus = $this->get_sync_status();
         $context = context_module::instance($this->cm->id);
         if ((!$onlydata && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
@@ -5446,6 +5452,7 @@ EOS;
                         }
                         $groupdata->reg_data[] = $row;
                     }
+                    flush();
                 }
             } else if (count($agrp->moodle_members) == 0) {
                 if (!$onlydata) {
@@ -5640,6 +5647,7 @@ EOS;
             } else {
                 $return[] = $groupdata;
             }
+            flush();
         }
 
         if (count($agrps) == 0) {
@@ -6803,7 +6811,7 @@ EOS;
 
         // Add reg and queue data...
         if (!empty($agrpsql)) {
-            foreach ($data as $idx => $cur) {
+            foreach ($data as $idx => &$cur) {
                 $sql = "SELECT agrps.id
                           FROM {grouptool_registered} regs
                      LEFT JOIN {grouptool_agrps}      agrps ON regs.agrpid = agrps.id
@@ -6812,7 +6820,12 @@ EOS;
                                AND regs.userid = ?
                                AND regs.agrpid ".$agrpsql;
                 $params = array_merge(array($cur->id), $agrpparams);
-                $data[$idx]->regs = implode(',', $DB->get_fieldset_sql($sql, $params));
+                $regs = $DB->get_fieldset_sql($sql, $params);
+                if (!empty($regs)) {
+                    $cur->regs = implode(',', $regs);
+                } else {
+                    $cur->queues = '';
+                }
                 $sql = "SELECT agrps.id
                           FROM {grouptool_queued} queued
                      LEFT JOIN {grouptool_agrps}  agrps ON queued.agrpid = agrps.id
@@ -6820,7 +6833,13 @@ EOS;
                          WHERE queued.userid = ?
                                AND queued.agrpid ".$agrpsql;
                 $params = array_merge(array($cur->id), $agrpparams);
-                $data[$idx]->queues = implode(',', $DB->get_fieldset_sql($sql, $params));
+                $queued = $DB->get_fieldset_sql($sql, $params);
+                if (!empty($queued)) {
+                    $cur->queues = implode(',', $queued);
+                } else {
+                    $cur->queues = '';
+                }
+                flush();
             }
         }
 
@@ -7132,10 +7151,11 @@ EOS;
             $head['queues']        = get_string('queues', 'grouptool').' ('.get_string('rank', 'grouptool').')';
         }
         $rows = array();
+
         if (!empty($userdata)) {
-            foreach ($userdata as $user) {
-                // We give each user 10 seconds (minimum) and hope it doesn't time out because of no output in case of download!
-                core_php_time_limit::raise(10);
+            foreach ($userdata as $key => $user) {
+                // We give each user 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
+                core_php_time_limit::raise(30);
                 if (!$onlydata) {
                     $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
                                                array('id'     => $user->id,
@@ -7202,23 +7222,43 @@ EOS;
                     }
                     $rows[] = array($picture, $fullname, $idnumber, $email, $registrations,
                                     $queueentries);
+                    $picture = null;
+                    unset($picture);
+                    $fullname = null;
+                    unset($fullname);
+                    $idnumber = null;
+                    unset($idnumber);
+                    $email = null;
+                    unset($email);
+                    $registrations = null;
+                    unset($registrations);
+                    $queueentries = null;
+                    unset($queueentries);
                 } else {
                     $row = array();
                     $row['name'] = fullname($user);
 
                     foreach ($namefields as $namefield) {
                         $row[$namefield] = $user->$namefield;
+                        $user->namefield = null;
+                        unset($user->namefield);
                     }
+                    $row['idnumber'] = $user->idnumber;
                     if (empty($CFG->showuseridentity)) {
                         $row['idnumber'] = $user->idnumber;
+                        $user->idnumber = null;
+                        unset($user->idnumber);
                     } else {
                         $fields = explode(',', $CFG->showuseridentity);
                         foreach ($fields as $field) {
                             $row[$field] = $user->$field;
+                            $user->$field = null;
+                            unset($user->$field);
                         }
                     }
-                    $row['idnumber'] = $user->idnumber;
                     $row['email'] = $user->email;
+                    $user->email = null;
+                    unset($user->email);
                     if (!empty($user->regs)) {
                         $regs = explode(',', $user->regs);
                         $registrations = array();
@@ -7229,6 +7269,8 @@ EOS;
                     } else {
                         $row['registrations'] = array();
                     }
+                    $user->regs = null;
+                    unset($user->regs);
                     if (!empty($user->queues)) {
                         $queues = explode(',', $user->queues);
                         $queueentries = array();
@@ -7244,7 +7286,11 @@ EOS;
                     } else {
                         $row['queues'] = array();
                     }
+                    $user->queues = null;
+                    unset($user->queues);
                     $rows[] = $row;
+                    $row = null;
+                    unset($row);
                 }
             }
         }

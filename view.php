@@ -77,8 +77,8 @@ $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
 // Output starts here!
 echo $OUTPUT->header();
-
 // Print tabs according to users capabilities!
+
 $inactive = array();
 $tabs = array();
 $row = array();
