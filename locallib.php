@@ -1461,15 +1461,13 @@ class mod_grouptool {
             $gform = new mod_grouptool_group_rename_form(null, array('id'       => $this->cm->id,
                                                                      'instance' => $this->cm->instance,
                                                                      'rename'   => $rename));
-            if ($gform->is_cancelled()) {
-                // Nothing to do here!
-            } else if ($fromform = $gform->get_data()) {
+            if (!$gform->is_cancelled() && $fromform = $gform->get_data()) {
                 $group = new stdClass();
                 $group->id = $fromform->rename;
                 $group->name = $fromform->name;
                 $group->courseid = $fromform->courseid;
                 groups_update_group($group);
-            } else {
+            } else if (!$gform->is_cancelled()) {
                 $data = new stdClass();
                 $data->name = $DB->get_field('groups', 'name', array('id' => $rename));
                 $gform->set_data($data);
@@ -1484,9 +1482,7 @@ class mod_grouptool {
             $gform = new mod_grouptool_group_resize_form(null, array('id'       => $this->cm->id,
                                                                      'instance' => $this->cm->instance,
                                                                      'resize'   => $resize));
-            if ($gform->is_cancelled()) {
-                // Nothing to do here!
-            } else if ($fromform = $gform->get_data()) {
+            if (!$gform->is_cancelled() && $fromform = $gform->get_data()) {
                 if (empty($fromform->size)) {
                     $DB->set_field('grouptool_agrps', 'grpsize', null, array('groupid'     => $fromform->resize,
                                                                              'grouptoolid' => $this->cm->id));
@@ -1497,7 +1493,7 @@ class mod_grouptool {
                     $group->grpsize = $fromform->size;
                     $DB->update_record('grouptool_agrps', $group);
                 }
-            } else {
+            } else if (!$gform->is_cancelled()) {
                 $data = new stdClass();
                 $data->size = $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'     => $resize,
                                                                                  'grouptoolid' => $this->cm->instance));
@@ -1702,7 +1698,7 @@ class mod_grouptool {
                                                     'contextid'  => $this->context->id,
                                                     'filter'     => $curfilter,
                                                     'filterid'   => $filter,
-                                                    'globalsize' => $this->grouptool->grpsize,)));
+                                                    'globalsize' => $this->grouptool->grpsize)));
             $PAGE->requires->strings_for_js(array('active', 'inactive', 'confirm_delete'), 'mod_grouptool');
             $PAGE->requires->string_for_js('ajax_edit_size_help', 'mod_grouptool');
             $PAGE->requires->strings_for_js(array('yes', 'no'), 'moodle');

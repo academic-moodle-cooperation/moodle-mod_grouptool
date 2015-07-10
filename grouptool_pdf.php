@@ -152,7 +152,7 @@ class grouptool_pdf extends pdf {
     /**
      * Header() helper method to actually print the page header in the PDF
      */
-    public function Header() {
+    public function header() {
         // Set font.
         $this->SetFont('', '');
 
@@ -228,7 +228,7 @@ class grouptool_pdf extends pdf {
      * If showheaderfooter is selected
      * Displays the number and total number of pages in the footer
      */
-    public function Footer() {
+    public function footer() {
         // Set font.
         $this->SetFont('', '');
 

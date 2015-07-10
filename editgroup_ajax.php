@@ -140,12 +140,12 @@ try {
             }
             $result->filtertabs = new stdClass();
             $result->filtertabs->current = $filter;
-            $result->filtertabs->activestr =   get_string('active', 'grouptool');
+            $result->filtertabs->activestr = get_string('active', 'grouptool');
             $result->filtertabs->inactivestr = get_string('inactive');
-            $result->filtertabs->allstr =      get_string('all');
-            $result->filtertabs->activeid =   mod_grouptool::FILTER_ACTIVE;
+            $result->filtertabs->allstr = get_string('all');
+            $result->filtertabs->activeid = mod_grouptool::FILTER_ACTIVE;
             $result->filtertabs->inactiveid = mod_grouptool::FILTER_INACTIVE;
-            $result->filtertabs->allid =      mod_grouptool::FILTER_ALL;
+            $result->filtertabs->allid = mod_grouptool::FILTER_ALL;
             if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
                 $activeurl = new moodle_url('/mod/grouptool/view.php',
                                             array('id'     => $cm->id,
@@ -187,12 +187,12 @@ try {
 
             $result->filtertabs = new stdClass();
             $result->filtertabs->current = $filter;
-            $result->filtertabs->activestr =   get_string('active', 'grouptool');
+            $result->filtertabs->activestr = get_string('active', 'grouptool');
             $result->filtertabs->inactivestr = get_string('inactive');
-            $result->filtertabs->allstr =      get_string('all');
-            $result->filtertabs->activeid =   mod_grouptool::FILTER_ACTIVE;
+            $result->filtertabs->allstr = get_string('all');
+            $result->filtertabs->activeid = mod_grouptool::FILTER_ACTIVE;
             $result->filtertabs->inactiveid = mod_grouptool::FILTER_INACTIVE;
-            $result->filtertabs->allid =      mod_grouptool::FILTER_ALL;
+            $result->filtertabs->allid = mod_grouptool::FILTER_ALL;
             if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
                 $activeurl = new moodle_url('/mod/grouptool/view.php',
                                             array('id'     => $cm->id,
