@@ -3083,6 +3083,7 @@ EOS;
         } else {
             $idstring = "agrp.id agrpid, grp.id id";
         }
+        flush();
         $groupdata = $DB->get_records_sql("
                 SELECT ".$idstring.", MAX(grp.name) name,".$sizesql." MAX(agrp.sort_order) sort_order
                 FROM {groups} grp LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
@@ -3109,29 +3110,29 @@ EOS;
             if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
                     || ($this->grouptool->use_queue && $includequeues)
                     || ($includeregs)) {
-
-                foreach ($groupdata as $key => &$currentgroup) {
-                    $currentgroup->queued = null;
+                $keys = array_keys($groupdata);
+                foreach ($keys as $key) {
+                    $groupdata[$key]->queued = null;
                     if ($includequeues && $this->grouptool->use_queue) {
-                        $attr = array('agrpid' => $currentgroup->agrpid);
-                        $currentgroup->queued = (array)$DB->get_records('grouptool_queued', $attr);
+                        $attr = array('agrpid' => $groupdata[$key]->agrpid);
+                        $groupdata[$key]->queued = (array)$DB->get_records('grouptool_queued', $attr);
                     }
 
-                    $currentgroup->registered = null;
+                    $groupdata[$key]->registered = null;
                     if ($includeregs) {
-                        $params = array('agrpid' => $currentgroup->agrpid);
+                        $params = array('agrpid' => $groupdata[$key]->agrpid);
                         $where = "agrpid = :agrpid AND modified_by >= 0";
-                        $currentgroup->registered = $DB->get_records_select('grouptool_registered',
+                        $groupdata[$key]->registered = $DB->get_records_select('grouptool_registered',
                                                                             $where, $params);
                         $params['modifierid'] = -1;
                         $where = "agrpid = :agrpid AND modified_by = :modifierid";
-                        $currentgroup->marked = $DB->get_records_select('grouptool_registered',
+                        $groupdata[$key]->marked = $DB->get_records_select('grouptool_registered',
                                                                         $where, $params);
-                        $currentgroup->moodle_members = groups_get_members($currentgroup->id);
+                        $groupdata[$key]->moodle_members = groups_get_members($groupdata[$key]->id);
                     }
                     flush();
                 }
-                unset($currentgroup);
+                unset($key);
             }
         } else {
             $groupdata = array();
@@ -4329,10 +4330,11 @@ EOS;
                    AND userid = ?';
 
         $marks = $DB->get_records_sql($sql, $params);
-        $groupdata = $this->get_active_groups(true, true);
         foreach ($marks as $id => $cur) {
+            $groupdata = $this->get_active_groups(true, true, 0, $cur->groupid);
+            $groupdata = current($groupdata);
             if ($this->grouptool->use_size) {
-                if (count($groupdata[$cur->groupid]->registered) < $groupdata[$cur->groupid]->grpsize) {
+                if (count($groupdata->registered) < $groupdata->grpsize) {
                     $marks[$id]->type = 'reg';
                 } else if ($this->grouptool->use_queue) {
                     $marks[$id]->type = 'queue';
@@ -4488,12 +4490,23 @@ EOS;
         }
 
         if (empty($hideform)) {
-            // Show information.
-            // General information first!
-            $generalinfo = "";
+            /*
+             * we need a new moodle_url-Object because
+             * $PAGE->url->param('sesskey', sesskey());
+             * won't set sesskey param in $PAGE->url?!?
+             */
+            $url = new moodle_url($PAGE->url, array('sesskey' => sesskey()));
+            $formattr = array(
+                    'method' => 'post',
+                    'action' => $url->out_omit_querystring(),
+                    'id'     => 'registration_form',
+                    'class'  => 'mform');
+            echo html_writer::start_tag('form', $formattr);
+            echo html_writer::start_tag('div', array('class' => 'clearfix'));
+            echo html_writer::input_hidden_params($url);
 
             $regstat = $this->get_registration_stats($USER->id);
-            $formcontent = "";
+
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
                     has_capability('mod/grouptool:register_students', $this->context)) {
                 if ($regstat->queued_users > 0) {
@@ -4518,9 +4531,9 @@ EOS;
                                                                       'grouptool'));
                     $resolvequeueelement = html_writer::tag('div', $resolvequeue,
                                                             array('class' => 'fcontainer'));
-                    $formcontent .= html_writer::tag('fieldset', $resolvequeuelegend.
-                                                                 $resolvequeueelement,
-                                                     array('class' => 'clearfix'));
+                    echo html_writer::tag('fieldset', $resolvequeuelegend.
+                                                      $resolvequeueelement,
+                                          array('class' => 'clearfix'));
                 }
             }
 
@@ -4545,8 +4558,8 @@ EOS;
                                                  array('class' => 'fitemtitle')).
                                 html_writer::tag('div', $placestats,
                                                  array('class' => 'felement'));
-            $generalinfo .= html_writer::tag('div', $registrationinfo,
-                                                    array('class' => 'fitem'));
+            $generalinfo = html_writer::tag('div', $registrationinfo,
+                                                   array('class' => 'fitem'));
 
             $registrationinfo = html_writer::tag('div', get_string('number_of_students',
                                                                    'grouptool'),
@@ -4703,33 +4716,35 @@ EOS;
             $generalinfolegend = html_writer::tag('legend', get_string('general_information',
                                                                        'grouptool'));
             if (has_capability('mod/grouptool:view_description', $this->context)) {
-                $formcontent .= html_writer::tag('fieldset',
-                                                 $generalinfolegend.
-                                                 html_writer::tag('div', $generalinfo,
-                                                                  array('class' => 'fcontainer')),
-                                                 array('class' => 'clearfix'));
+                echo html_writer::tag('fieldset',
+                                      $generalinfolegend.
+                                      html_writer::tag('div', $generalinfo,
+                                                       array('class' => 'fcontainer')),
+                                      array('class' => 'clearfix'));
 
                 // Intro-text if set!
                 if (($this->grouptool->alwaysshowdescription
                      || (time() > $this->grouptool->timeavailable))
                     && $this->grouptool->intro) {
                     $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
-                    $formcontent .= html_writer::tag('fieldset',
-                                                     html_writer::tag('legend',
-                                                                      get_string('intro', 'grouptool')).
-                                                     html_writer::tag('div', $intro,
-                                                                      array('class' => 'fcontainer')),
-                                                     array('class' => 'clearfix'));
+                    echo html_writer::tag('fieldset',
+                                          html_writer::tag('legend',
+                                                           get_string('intro', 'grouptool')).
+                                          html_writer::tag('div', $intro,
+                                                           array('class' => 'fcontainer')),
+                                          array('class' => 'clearfix'));
                 }
             }
-
-            $groups = $this->get_active_groups(true, true);
+            $groups = $this->get_active_groups();
 
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
 
                 // Prepare formular-content for registration-action!
-                foreach ($groups as $key => $group) {
+                foreach ($groups as $key => &$group) {
+                    $group = $this->get_active_groups(true, true, 0, $key);
+                    $group = current($group);
+
                     $registered = count($group->registered);
                     $grpsize = ($this->grouptool->use_size) ? $group->grpsize : "∞";
                     $grouphtml = html_writer::tag('span', get_string('registered', 'grouptool').
@@ -4888,32 +4903,19 @@ EOS;
                     } else {
                         $status = 'empty';
                     }
-                    $formcontent .= html_writer::tag('fieldset',
-                                                     html_writer::tag('legend',
-                                                                      $group->name,
-                                                                      array('class' => 'groupname')).
-                                                     html_writer::tag('div',
-                                                                      $grouphtml,
-                                                                      array('class' => 'fcontainer clearfix')),
-                                                     array('class' => 'clearfix group '.$status));
+                    echo html_writer::tag('fieldset',
+                                          html_writer::tag('legend',
+                                                           $group->name,
+                                                           array('class' => 'groupname')).
+                                          html_writer::tag('div',
+                                                           $grouphtml,
+                                                           array('class' => 'fcontainer clearfix')),
+                                          array('class' => 'clearfix group '.$status));
                 }
             }
 
-            /*
-             * we need a new moodle_url-Object because
-             * $PAGE->url->param('sesskey', sesskey());
-             * won't set sesskey param in $PAGE->url?!?
-             */
-            $url = new moodle_url($PAGE->url, array('sesskey' => sesskey()));
-            $formcontent = html_writer::tag('div', html_writer::input_hidden_params($url).
-                                                   $formcontent,
-                                            array('class' => 'clearfix'));
-            $formattr = array(
-                    'method' => 'post',
-                    'action' => $url->out_omit_querystring(),
-                    'id'     => 'registration_form',
-                    'class'  => 'mform');
-            echo html_writer::tag('form', $formcontent, $formattr);
+            echo html_writer::end_tag('div');
+            echo html_writer::end_tag('form');
         }
     }
 
