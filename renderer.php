@@ -245,7 +245,8 @@ class sortlist implements renderable {
                     SELECT DISTINCT groupingid, name
                       FROM {groupings_groups}
                  LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
-                     WHERE {groupings}.courseid = ?", array($courseid));
+                     WHERE {groupings}.courseid = ?
+                  ORDER BY name ASC", array($courseid));
         }
     }
 
