@@ -3083,7 +3083,7 @@ EOS;
         } else {
             $idstring = "agrp.id agrpid, grp.id id";
         }
-        flush();
+
         $groupdata = $DB->get_records_sql("
                 SELECT ".$idstring.", MAX(grp.name) name,".$sizesql." MAX(agrp.sort_order) sort_order
                 FROM {groups} grp LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
@@ -3104,7 +3104,6 @@ EOS;
                 } else {
                     $groupdata[$key]->classes = '';
                 }
-                flush();
             }
 
             if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
@@ -3130,7 +3129,6 @@ EOS;
                                                                         $where, $params);
                         $groupdata[$key]->moodle_members = groups_get_members($groupdata[$key]->id);
                     }
-                    flush();
                 }
                 unset($key);
             }
@@ -5276,7 +5274,6 @@ EOS;
     public function group_overview_table($groupingid = 0, $groupid = 0, $onlydata = false) {
         global $OUTPUT, $CFG, $DB;
         if (!$onlydata) {
-            $return = "";
             $orientation = optional_param('orientation', 0, PARAM_BOOL);
             $downloadurl = new moodle_url('/mod/grouptool/download.php',
                                           array('id'          => $this->cm->id,
@@ -5289,7 +5286,8 @@ EOS;
             $return = array();
         }
 
-        $agrps = $this->get_active_groups(true, true, 0, $groupid, $groupingid);
+        // We just get an overview and fetch data later on a per group basis to save memory!
+        $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid);
         $groupids = array_keys($agrps);
         $groupinfo = groups_get_all_groups($this->grouptool->course);
         $userinfo = array();
@@ -5307,28 +5305,53 @@ EOS;
                              html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
                              html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                              html_writer::link($odsurl, '.ODS');
-            $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
+            echo html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
         }
+
         foreach ($agrps as $agrp) {
             // We give each group 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
             core_php_time_limit::raise(30);
             if (!$onlydata) {
-                $groupdata = "";
+                if ($syncstatus[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
+                    echo $OUTPUT->box_start('generalbox groupcontainer uptodate');
+                } else {
+                    echo $OUTPUT->box_start('generalbox groupcontainer outdated');
+                }
                 $groupinfos = $OUTPUT->heading($groupinfo[$agrp->id]->name, 3);
+                flush();
             } else {
                 $groupdata = new stdClass();
                 $groupdata->name = $groupinfo[$agrp->id]->name;
             }
 
+            // Get all registered userids!
+            $select = " agrpid = ? AND modified_by > 0 ";
+            $registered = $DB->get_fieldset_select('grouptool_registered', 'userid', $select, array($agrp->agrpid));
+            // Get all moodle-group-member-ids!
+            $select = " groupid = ? ";
+            $members = $DB->get_fieldset_select('groups_members', 'userid', $select, array($agrp->id));
+            // Get all registered users with moodle-group-membership!
+            $absregs = array_intersect($registered, $members);
+            // Get all registered users without moodle-group-membership!
+            $gtregs = array_diff($registered, $members);
+            // Get all moodle-group-members without registration!
+            $mdlregs = array_diff($members, $registered);
+            // Get all queued users!
+            $select = " agrpid = ? ";
+            $queued = $DB->get_fieldset_select('grouptool_queued', 'userid', $select, array($agrp->agrpid));
+
+            // We give additional 1 second per registration/queue/moodle entry in this group!
+            core_php_time_limit::raise(30 * (count($registered) + count($members) + count($queued)));
+
             if (!empty($this->grouptool->use_size)) {
                 if (!empty($this->grouptool->use_individual) && !empty($agrp->grpsize)) {
                     $size = $agrp->grpsize;
-                    $free = $agrp->grpsize - count($agrp->registered);
+                    $free = $agrp->grpsize - count($registered);
                 } else {
                     $size = !empty($this->grouptool->grpsize) ?
                     $this->grouptool->grpsize :
                     get_config('mod_grouptool', 'grpsize');
-                    $free = ($size - count($agrp->registered));
+                    $free = ($size - count($registered));
 
                 }
             } else {
@@ -5339,31 +5362,32 @@ EOS;
                 $groupinfos .= html_writer::tag('span', get_string('total', 'grouptool').' '.$size,
                                                 array('class' => 'groupsize'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('registered', 'grouptool').
-                                                              ' '.count($agrp->registered),
+                                                              ' '.count($registered),
                                                       array('class' => 'registered'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('queued', 'grouptool').' '.
-                                                              count($agrp->queued),
+                                                              count($queued),
                                                       array('class' => 'queued'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('free', 'grouptool').' '.
                                                               $free, array('class' => 'free'));
 
-                $groupdata .= html_writer::tag('div', $groupinfos, array('class' => 'groupinfo'));
+                echo html_writer::tag('div', $groupinfos, array('class' => 'groupinfo'));
 
-                $table = new html_table();
-                $table->attributes['class'] = 'overviewtable';
-                $table->align = array('center', null, null, null);
-                $headcells = array();
-                $headcells[] = new html_table_cell(get_string('status', 'grouptool').
-                                                   $OUTPUT->help_icon('status', 'grouptool'));
-                $headcells[] = new html_table_cell(get_string('fullname'));
-                $headcells[] = new html_table_cell(get_string('idnumber'));
-                $headcells[] = new html_table_cell(get_string('email'));
-                $table->head = $headcells;
-                $rows = array();
+                echo html_writer::start_tag('table',
+                                        array('class' => 'centeredblock userlist table table-striped table-hover table-condensed'));
+                echo html_writer::start_tag('thead');
+                echo html_writer::start_tag('tr');
+                echo html_writer::tag('th', get_string('status', 'grouptool').
+                                            $OUTPUT->help_icon('status', 'grouptool'), array('class' => 'text-center'));
+                echo html_writer::tag('th', get_string('fullname'), array('class' => ''));
+                echo html_writer::tag('th', get_string('idnumber'), array('class' => ''));
+                echo html_writer::tag('th', get_string('email'), array('class' => ''));
+                echo html_writer::end_tag('tr');
+                echo html_writer::end_tag('thead');
+                echo html_writer::start_tag('tbody');
             } else {
                 $groupdata->total = $size;
-                $groupdata->registered = count($agrp->registered);
-                $groupdata->queued = count($agrp->queued);
+                $groupdata->registered = count($registered);
+                $groupdata->queued = count($queued);
                 $groupdata->free = $free;
                 $groupdata->reg_data = array();
                 $groupdata->queue_data = array();
@@ -5379,245 +5403,250 @@ EOS;
             // Now get the ones used in fullname in the correct order!
             $namefields = order_in_string($namefields, $fullnameformat);
 
-            if (count($agrp->registered) >= 1) {
-                foreach ($agrp->registered as $regentry) {
-                    if (!array_key_exists($regentry->userid, $userinfo)) {
-                        $userinfo[$regentry->userid] = $DB->get_record('user',
-                                                                       array('id' => $regentry->userid));
-                    }
-                    if (!$onlydata) {
-                        $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $regentry->userid.'&course='.$this->course->id,
-                                'title' => fullname($userinfo[$regentry->userid]));
-                        $userlink = html_writer::tag('a', fullname($userinfo[$regentry->userid]),
-                                                     $userlinkattr);
-                        $userlink = new html_table_cell($userlink);
-                        if (!empty($userinfo[$regentry->userid]->idnumber)) {
-                            $idnumber = html_writer::tag('span',
-                                                         $userinfo[$regentry->userid]->idnumber,
-                                                         array('class' => 'idnumber'));
-                        } else {
-                            $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
+            if (count($registered) + count($members) >= 1) {
+                if (count($absregs) >= 1) {
+                    foreach ($absregs as $curuser) {
+                        if (!array_key_exists($curuser, $userinfo)) {
+                            $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
                         }
-                        $idnumber = new html_table_cell($idnumber);
-                        if (!empty($userinfo[$regentry->userid]->email)) {
-                            $email = html_writer::tag('span', $userinfo[$regentry->userid]->email,
-                                                      array('class' => 'email'));
-                        } else {
-                            $email = html_writer::tag('span', '-', array('class' => 'email'));
-                        }
-                        $email = new html_table_cell($email);
-                        if (key_exists($regentry->userid, $agrp->moodle_members)) {
-                            $status = new html_table_cell("✔");
-                        } else {
-                            $status = new html_table_cell("+");
-                        }
-                        $rows[] = new html_table_row(array($status, $userlink, $idnumber, $email));
-                    } else {
-                        $row = array();
-                        $row['name'] = fullname($userinfo[$regentry->userid]);
-                        foreach ($namefields as $namefield) {
-                            if (!empty($userinfo[$regentry->userid]->$namefield)) {
-                                $row[$namefield] = $userinfo[$regentry->userid]->$namefield;
-                            } else {
-                                $row[$namefield] = '';
-                            }
-                        }
-                        if (empty($CFG->showuseridentity)) {
-                            if (!empty($userinfo[$regentry->userid]->idnumber)) {
-                                $row['idnumber'] = $userinfo[$regentry->userid]->idnumber;
-                            } else {
-                                $row['idnumber'] = '-';
-                            }
-                            if (!empty($userinfo[$regentry->userid]->email)) {
-                                $row['email'] = $userinfo[$regentry->userid]->email;
-                            } else {
-                                $row['email'] = '-';
-                            }
-                        } else {
-                            $fields = explode(',', $CFG->showuseridentity);
-                            foreach ($fields as $field) {
-                                if (!empty($userinfo[$regentry->userid]->$field)) {
-                                    $row[$field] = $userinfo[$regentry->userid]->$field;
-                                } else {
-                                    $row[$field] = '';
-                                }
-                            }
-                        }
-                        // We set those in any case, because PDF and TXT export needs them anyway!
-                        $row['email'] = $userinfo[$regentry->userid]->email;
-                        $row['idnumber'] = $userinfo[$regentry->userid]->idnumber;
-                        if (key_exists($regentry->userid, $agrp->moodle_members)) {
-                            $row['status'] = "✔";
-                        } else {
-                            $row['status'] = "+";
-                        }
-                        $groupdata->reg_data[] = $row;
-                    }
-                    flush();
-                }
-            } else if (count($agrp->moodle_members) == 0) {
-                if (!$onlydata) {
-                    $cell = new html_table_cell(get_string('no_registrations', 'grouptool'));
-                    $cell->attributes['class'] = 'no_registrations';
-                    $cell->colspan = count($headcells);
-                    $rows[] = new html_table_row(array($cell));
-                }
-            }
-
-            if (count($agrp->moodle_members) >= 1) {
-                foreach ($agrp->moodle_members as $memberid => $member) {
-                    if (!array_key_exists($memberid, $userinfo)) {
-                        $userinfo[$memberid] = $DB->get_record('user', array('id' => $memberid));
-                    }
-                    if ((count($agrp->registered) >= 1)
-                             && $this->get_rank_in_queue($agrp->registered, $memberid)) {
-                        continue;
-                    } else {
+                        $fullname = fullname($userinfo[$curuser]);
                         if (!$onlydata) {
+                            echo html_writer::start_tag('tr', array('class' => ''));
+                            echo html_writer::tag('td', "✔", array('class' => 'status'));
                             $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                    $memberid.'&course='.$this->course->id,
-                                    'title' => fullname($userinfo[$memberid]));
-                            $userlink = html_writer::tag('a', fullname($userinfo[$memberid]),
-                                                         $userlinkattr);
-                            $userlink = new html_table_cell($userlink);
-                            if (!empty($userinfo[$memberid]->idnumber)) {
-                                $idnumber = html_writer::tag('span', $userinfo[$memberid]->idnumber,
+                                    $curuser.'&course='.$this->course->id,
+                                    'title' => $fullname);
+                            $userlink = html_writer::tag('a', $fullname, $userlinkattr);
+                            echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
+                            if (!empty($userinfo[$curuser]->idnumber)) {
+                                $idnumber = html_writer::tag('span',
+                                                             $userinfo[$curuser]->idnumber,
                                                              array('class' => 'idnumber'));
                             } else {
-                                $idnumber = html_writer::tag('span', '-',
-                                                             array('class' => 'idnumber'));
+                                $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
                             }
-                            $idnumber = new html_table_cell($idnumber);
-                            if (!empty($userinfo[$memberid]->email)) {
-                                $email = html_writer::tag('span', $userinfo[$memberid]->email,
+                            echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
+                            if (!empty($userinfo[$curuser]->email)) {
+                                $email = html_writer::tag('span', $userinfo[$curuser]->email,
                                                           array('class' => 'email'));
                             } else {
                                 $email = html_writer::tag('span', '-', array('class' => 'email'));
                             }
-                            $email = new html_table_cell($email);
-                            $status = new html_table_cell("?");
-                            $rows[] = new html_table_row(array($status, $userlink, $idnumber,
-                                                               $email));
+                            echo html_writer::tag('td', $email, array('class' => 'email'));
+                            echo html_writer::end_tag('tr');
+                            flush();
                         } else {
                             $row = array();
-                            $row['name'] = fullname($userinfo[$memberid]);
-                            foreach ($namefields as $namefield) {
-                                if (!empty($userinfo[$memberid]->$namefield)) {
-                                    $row[$namefield] = $userinfo[$memberid]->$namefield;
-                                } else {
-                                    $row[$namefield] = '';
-                                }
-                            }
-                            if (empty($CFG->showuseridentity)) {
-                                if (!empty($userinfo[$memberid]->idnumber)) {
-                                    $row['idnumber'] = $userinfo[$memberid]->idnumber;
-                                } else {
-                                    $row['idnumber'] = '-';
-                                }
-                                if (!empty($userinfo[$memberid]->email)) {
-                                    $row['email'] = $userinfo[$memberid]->email;
-                                } else {
-                                    $row['email'] = '-';
-                                }
-                            } else {
-                                $fields = explode(',', $CFG->showuseridentity);
-                                foreach ($fields as $field) {
-                                    if (!empty($userinfo[$memberid]->$field)) {
-                                        $row[$field] = $userinfo[$memberid]->$field;
-                                    } else {
-                                        $row[$field] = '';
-                                    }
-                                }
+                            $row['name'] = $fullname;
+                            foreach ($namefields as $field) {
+                                $row[$field] = $userinfo[$curuser]->$field;
                             }
                             // We set those in any case, because PDF and TXT export needs them anyway!
-                            $row['email'] = $userinfo[$memberid]->email;
-                            $row['idnumber'] = $userinfo[$memberid]->idnumber;
-                            $groupdata->mreg_data[] = $row;
+                            $row['email'] = $userinfo[$curuser]->email;
+                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                            $row['status'] = "✔";
+                            $groupdata->reg_data[] = $row;
+                            $row = null;
+                            unset($row);
                         }
                     }
+                    $regentry = null;
+                    unset($regentry);
+                }
+
+                if (count($gtregs) >= 1) {
+                    foreach ($gtregs as $curuser) {
+                        if (!array_key_exists($curuser, $userinfo)) {
+                            $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
+                        }
+                        $fullname = fullname($userinfo[$curuser]);
+                        if (!$onlydata) {
+                            echo html_writer::start_tag('tr', array('class' => ''));
+                            echo html_writer::tag('td', "+", array('class' => 'status'));
+                            $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
+                                    $curuser.'&course='.$this->course->id,
+                                    'title' => $fullname);
+                            $userlink = html_writer::tag('a', $fullname, $userlinkattr);
+                            echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
+                            if (!empty($userinfo[$curuser]->idnumber)) {
+                                $idnumber = html_writer::tag('span',
+                                                             $userinfo[$curuser]->idnumber,
+                                                             array('class' => 'idnumber'));
+                            } else {
+                                $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
+                            }
+                            echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
+                            if (!empty($userinfo[$curuser]->email)) {
+                                $email = html_writer::tag('span', $userinfo[$curuser]->email,
+                                                          array('class' => 'email'));
+                            } else {
+                                $email = html_writer::tag('span', '-', array('class' => 'email'));
+                            }
+                            echo html_writer::tag('td', $email, array('class' => 'email'));
+                            html_writer::end_tag('tr');
+                            flush();
+                        } else {
+                            $row = array();
+                            $row['name'] = $fullname;
+                            foreach ($namefields as $field) {
+                                $row[$field] = $userinfo[$curuser]->$field;
+                            }
+                            $row['email'] = $userinfo[$curuser]->email;
+                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                            $row['status'] = "+";
+                            $groupdata->reg_data[] = $row;
+                            $row = null;
+                            unset($row);
+                        }
+                    }
+                    $regentry = null;
+                    unset($regentry);
+                }
+
+                if (count($mdlregs) >= 1) {
+                    foreach ($mdlregs as $curuser) {
+                        if (!array_key_exists($curuser, $userinfo)) {
+                            $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
+                        }
+                        $fullname = fullname($userinfo[$curuser]);
+                        if (!$onlydata) {
+                            echo html_writer::start_tag('tr', array('class' => ''));
+                            echo html_writer::tag('td', "?", array('class' => 'status'));
+                            $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
+                                    $curuser.'&course='.$this->course->id,
+                                    'title' => $fullname);
+                            $userlink = html_writer::tag('a', $fullname, $userlinkattr);
+                            echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
+                            if (!empty($userinfo[$curuser]->idnumber)) {
+                                $idnumber = html_writer::tag('span',
+                                                             $userinfo[$curuser]->idnumber,
+                                                             array('class' => 'idnumber'));
+                            } else {
+                                $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
+                            }
+                            echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
+                            if (!empty($userinfo[$curuser]->email)) {
+                                $email = html_writer::tag('span', $userinfo[$curuser]->email,
+                                                          array('class' => 'email'));
+                            } else {
+                                $email = html_writer::tag('span', '-', array('class' => 'email'));
+                            }
+                            echo html_writer::tag('td', $email, array('class' => 'email'));
+                            echo html_writer::end_tag('tr');
+                            flush();
+                        } else {
+                            $row = array();
+                            $row['name'] = $fullname;
+                            foreach ($namefields as $field) {
+                                $row[$field] = $userinfo[$curuser]->$field;
+                            }
+                            // We set those in any case, because PDF and TXT export needs them anyway!
+                            $row['email'] = $userinfo[$curuser]->email;
+                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                            $row['status'] = "?";
+                            $groupdata->mreg_data[] = $row;
+                            $row = null;
+                            unset($row);
+                        }
+                    }
+                    $regentry = null;
+                    unset($regentry);
+                }
+            } else {
+                if (!$onlydata) {
+                    echo html_writer::start_tag('tr', array('class' => 'regentry reg'));
+                    echo html_writer::tag('td', get_string('no_registrations', 'grouptool'),
+                                          array('class' => 'no_registrations',
+                                                'colspan' => 4));
+                    echo html_writer::end_tag('tr');
                 }
             }
 
-            if (count($agrp->queued) >= 1) {
-                foreach ($agrp->queued as $queueentry) {
-                    if (!array_key_exists($queueentry->userid, $userinfo)) {
-                        $userinfo[$queueentry->userid] = $DB->get_record('user',
-                                                                         array('id' => $queueentry->userid));
+            if (count($queued) >= 1) {
+                $queuedlist = $DB->get_records('grouptool_queued', array('agrpid' => $agrp->agrpid), 'timestamp ASC');
+                foreach ($queued as $curuser) {
+                    if (!array_key_exists($curuser, $userinfo)) {
+                        $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
                     }
-                    $queueentry->rank = $this->get_rank_in_queue($agrp->queued,
-                                                                 $queueentry->userid);
+                    $fullname = fullname($userinfo[$curuser]);
+                    $rank = $this->get_rank_in_queue($queuedlist, $curuser);
                     if (!$onlydata) {
-                        $rank = new html_table_cell($queueentry->rank);
-                        $rank->attributes['class'] = 'rank';
+                        echo html_writer::start_tag('tr', array('class' => 'queueentry'));
+                        echo html_writer::tag('td', $rank, array('class' => 'rank'));
                         $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $queueentry->userid.'&course='.$this->course->id,
-                                'title' => fullname($userinfo[$queueentry->userid]));
-                        $userlink = html_writer::tag('a',
-                                                     fullname($userinfo[$queueentry->userid]),
-                                                     $userlinkattr);
-                        $userlink = new html_table_cell($userlink);
-                        $userlink->attributes['class'] = 'userlink';
-                        $idnumber = new html_table_cell($userinfo[$queueentry->userid]->idnumber);
-                        $idnumber->attributes['class'] = 'idnumber';
-                        $email = new html_table_cell($userinfo[$queueentry->userid]->email);
-                        $email->attributes['class'] = 'email';
-                        $row = new html_table_row(array($rank, $userlink, $idnumber, $email));
-                        $row->attributes['class'] = 'queueentry';
-                        $rows[] = $row;
+                                $curuser.'&course='.$this->course->id,
+                                'title' => $fullname);
+                        $userlink = html_writer::tag('a', $fullname, $userlinkattr);
+                        echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
+                        if (!empty($userinfo[$curuser]->idnumber)) {
+                            $idnumber = html_writer::tag('span',
+                                                         $userinfo[$curuser]->idnumber,
+                                                         array('class' => 'idnumber'));
+                        } else {
+                            $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
+                        }
+                        echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
+                        if (!empty($userinfo[$curuser]->email)) {
+                            $email = html_writer::tag('span', $userinfo[$curuser]->email,
+                                                      array('class' => 'email'));
+                        } else {
+                            $email = html_writer::tag('span', '-', array('class' => 'email'));
+                        }
+                        echo html_writer::tag('td', $email, array('class' => 'email'));
+                        echo html_writer::end_tag('tr');
+                        flush();
                     } else {
                         $row = array();
-                        $row['rank'] = $queueentry->rank;
-                        $row['name'] = fullname($userinfo[$queueentry->userid]);
+                        $row['rank'] = $rank;
+                        $row['name'] = $fullname;
                         foreach ($namefields as $namefield) {
-                            if (!empty($userinfo[$queueentry->userid]->$namefield)) {
-                                $row[$namefield] = $userinfo[$queueentry->userid]->$namefield;
+                            if (!empty($userinfo[$curuser]->$namefield)) {
+                                $row[$namefield] = $userinfo[$curuser]->$namefield;
                             } else {
                                 $row[$namefield] = '';
                             }
                         }
                         if (empty($CFG->showuseridentity)) {
-                            if (!empty($userinfo[$queueentry->userid]->idnumber)) {
-                                $row['idnumber'] = $userinfo[$queueentry->userid]->idnumber;
+                            if (!empty($userinfo[$curuser]->idnumber)) {
+                                $row['idnumber'] = $userinfo[$curuser]->idnumber;
                             } else {
                                 $row['idnumber'] = '-';
                             }
-                            if (!empty($userinfo[$queueentry->userid]->email)) {
-                                $row['email'] = $userinfo[$queueentry->userid]->email;
+                            if (!empty($userinfo[$curuser]->email)) {
+                                $row['email'] = $userinfo[$curuser]->email;
                             } else {
                                 $row['email'] = '-';
                             }
                         } else {
                             $fields = explode(',', $CFG->showuseridentity);
                             foreach ($fields as $field) {
-                                if (!empty($userinfo[$queueentry->userid]->$field)) {
-                                    $row[$field] = $userinfo[$queueentry->userid]->$field;
+                                if (!empty($userinfo[$curuser]->$field)) {
+                                    $row[$field] = $userinfo[$curuser]->$field;
                                 } else {
                                     $row[$field] = '';
                                 }
                             }
                         }
                         // We set those in any case, because PDF and TXT export needs them anyway!
-                        $row['email'] = $userinfo[$queueentry->userid]->email;
-                        $row['idnumber'] = $userinfo[$queueentry->userid]->idnumber;
+                        $row['email'] = $userinfo[$curuser]->email;
+                        $row['idnumber'] = $userinfo[$curuser]->idnumber;
                         $groupdata->queue_data[] = $row;
                     }
                 }
             } else {
                 if (!$onlydata) {
-                    $cell = new html_table_cell(get_string('nobody_queued', 'grouptool'));
-                    $cell->attributes['class'] = 'no_queues';
-                    $cell->colspan = count($headcells);
-                    $row = new html_table_row(array($cell));
-                    $row->attributes['class'] = 'queueentry queue';
-                    $rows[] = $row;
+                    echo html_writer::start_tag('tr', array('class' => 'queueentry queue'));
+                    echo html_writer::tag('td', get_string('nobody_queued', 'grouptool'),
+                                          array('class' => 'no_queues',
+                                                'colspan' => 4));
+                    echo html_writer::end_tag('tr');
                 }
             }
             if (!$onlydata) {
-                $table->data = $rows;
-                $groupdata .= html_writer::table($table);
+                echo html_writer::end_tag('tbody');
+                echo html_writer::end_tag('table');
                 // Group-downloadlinks!
-                if (((count($agrp->queued) > 0) || (count($agrp->registered) > 0))
+                if (((count($queued) > 0) || (count($registered) > 0))
                     && has_capability('mod/grouptool:export', $context)) {
                     $urltxt = new moodle_url($downloadurl,
                                              array('groupid' => $groupinfo[$agrp->id]->id,
@@ -5638,26 +5667,31 @@ EOS;
                                      html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
                                      html_writer::link($urlpdf, '.PDF').'&nbsp;'.
                                      html_writer::link($urlods, '.ODS');
-                    $groupdata .= html_writer::tag('div', $downloadlinks,
-                                                   array('class' => 'download group'));
+                    echo html_writer::tag('div', $downloadlinks, array('class' => 'download group'));
                 }
-                if ($syncstatus[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
-                    $return .= $OUTPUT->box($groupdata, 'generalbox groupcontainer uptodate');
-                } else {
-                    $return .= $OUTPUT->box($groupdata, 'generalbox groupcontainer outdated');
-                }
+                // Faster browser output prevents browser timeout!
+                echo $OUTPUT->box_end();
+                flush();
             } else {
                 $return[] = $groupdata;
             }
-            flush();
+            $groupdata = null;
+            unset($groupdata);
         }
 
         if (count($agrps) == 0) {
             $boxcontent = $OUTPUT->notification(get_string('no_data_to_display', 'grouptool'),
                                                 'notifyproblem');
-            $return .= $OUTPUT->box($boxcontent, 'generalbox centered');
+            $return = $OUTPUT->box($boxcontent, 'generalbox centered');
+            if (!$onlydata) {
+                echo $return;
+            }
         }
-        return $return;
+        if ($onlydata) {
+            return $return;
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -6690,7 +6724,7 @@ EOS;
             }
             $groupingselect = new single_select($url, 'groupingid', $options, $groupingid, false);
 
-            $groups = $this->get_active_groups(true, true, 0, 0, $groupingid);
+            $groups = $this->get_active_groups(false, false, 0, 0, $groupingid);
             $options = array(0 => get_string('all'));
             if (count($groups)) {
                 foreach ($groups as $group) {
@@ -6737,7 +6771,8 @@ EOS;
                                          $OUTPUT->render($orientationselect),
                                   array('class' => 'centered grouptool_userlist_filter'));
 
-            echo $this->group_overview_table($groupingid, $groupid);
+            // If we don't only get the data, the output happens directly per group!
+            $this->group_overview_table($groupingid, $groupid);
         }
     }
 
@@ -6762,7 +6797,7 @@ EOS;
         $return = new stdClass();
 
         // Indexed by agrpid!
-        $agrps = $this->get_active_groups(true, true, 0, $groupid, $groupingid, false);
+        $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
         $agrpids = array_keys($agrps);
         if (!empty($agrpids)) {
             list($agrpsql, $agrpparams) = $DB->get_in_or_equal($agrpids);
@@ -6786,7 +6821,7 @@ EOS;
         }
 
         $extrauserfields = get_extra_user_fields_sql($this->context, 'u');
-        $mainuserfields = user_picture::fields('u', array('idnumber'));
+        $mainuserfields = user_picture::fields('u', array('idnumber', 'email'));
         $orderbystring = "";
         if (!empty($orderby)) {
             foreach ($orderby as $field => $direction) {
@@ -6803,6 +6838,7 @@ EOS;
                 }
             }
         }
+
         $sql = "SELECT $mainuserfields $extrauserfields ".
                "FROM {user} u ".
                "WHERE u.id ".$usersql.
@@ -6822,12 +6858,7 @@ EOS;
                                AND regs.userid = ?
                                AND regs.agrpid ".$agrpsql;
                 $params = array_merge(array($cur->id), $agrpparams);
-                $regs = $DB->get_fieldset_sql($sql, $params);
-                if (!empty($regs)) {
-                    $cur->regs = implode(',', $regs);
-                } else {
-                    $cur->queues = '';
-                }
+                $cur->regs = $DB->get_fieldset_sql($sql, $params);
                 $sql = "SELECT agrps.id
                           FROM {grouptool_queued} queued
                      LEFT JOIN {grouptool_agrps}  agrps ON queued.agrpid = agrps.id
@@ -6835,13 +6866,7 @@ EOS;
                          WHERE queued.userid = ?
                                AND queued.agrpid ".$agrpsql;
                 $params = array_merge(array($cur->id), $agrpparams);
-                $queued = $DB->get_fieldset_sql($sql, $params);
-                if (!empty($queued)) {
-                    $cur->queues = implode(',', $queued);
-                } else {
-                    $cur->queues = '';
-                }
-                flush();
+                $cur->queued = $DB->get_fieldset_sql($sql, $params);
             }
         }
 
@@ -6912,7 +6937,6 @@ EOS;
     public function userlist_table($groupingid = 0, $groupid = 0, $orderby = array(),
                                    $collapsed = array(), $onlydata = false) {
         global $OUTPUT, $CFG, $DB, $PAGE, $SESSION;
-        $return = "";
 
         $context = context_module::instance($this->cm->id);
         if (!isset($SESSION->mod_grouptool->userlist)) {
@@ -6959,7 +6983,7 @@ EOS;
         }
 
         if (!$onlydata) {
-            $return = "";
+            flush();
             $orientation = optional_param('orientation', 0, PARAM_BOOL);
             $downloadurl = new moodle_url('/mod/grouptool/download.php',
                                           array('id'          => $this->cm->id,
@@ -7037,22 +7061,6 @@ EOS;
         }
         $users = $DB->get_records_sql($sql, $params);
 
-        if (!empty($users)) {
-            $users = array_keys($users);
-            $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
-        } else {
-            if (!$onlydata) {
-                $return .= $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display',
-                                                                         'grouptool'),
-                                                              'notifyproblem'),
-                                        'centered generalbox');
-                return $return;
-            } else {
-                return get_string('no_users_to_display', 'grouptool');
-            }
-        }
-        $groupinfo = $this->get_active_groups(true, true, 0, $groupid, $groupingid, false);
-
         if (!$onlydata) {
             if (has_capability('mod/grouptool:export', $context)) {
                 $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
@@ -7065,13 +7073,34 @@ EOS;
                         html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
                         html_writer::link($pdfurl, '.PDF').'&nbsp;'.
                         html_writer::link($odsurl, '.ODS');
-                $return .= html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
+                echo html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
             }
+            flush();
+        }
 
-            $table = new html_table();
-            $table->attributes['class'] = 'centeredblock userlist';
+        if (!empty($users)) {
+            $users = array_keys($users);
+            $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
+        } else {
+            if (!$onlydata) {
+                echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display',
+                                                                   'grouptool'),
+                                                        'notifyproblem'),
+                                  'centered generalbox');
+            } else {
+                return get_string('no_users_to_display', 'grouptool');
+            }
+        }
+        $groupinfo = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
 
-            $picture = new html_table_cell($this->collapselink($collapsed, 'picture'));
+        if (!$onlydata) {
+            echo html_writer::start_tag('table',
+                                        array('class' => 'centeredblock userlist table table-striped table-hover table-condensed'));
+
+            echo html_writer::start_tag('thead');
+            echo html_writer::start_tag('tr');
+            echo html_writer::tag('th', $this->collapselink($collapsed, 'picture'), array('class' => ''));
+            flush();
             if (!in_array('fullname', $collapsed)) {
                 $firstnamelink = html_writer::link(new moodle_url($PAGE->url,
                                                                   array('tsort' => 'firstname')),
@@ -7084,46 +7113,43 @@ EOS;
                 $fullname = html_writer::tag('div', get_string('fullname').
                                                     html_writer::empty_tag('br').
                                                     $firstnamelink.'&nbsp;/&nbsp;'.$surnamelink);
-                $fullname = new html_table_cell($fullname.$this->collapselink($collapsed,
-                                                                             'fullname'));
+                echo html_writer::tag('th', $fullname.$this->collapselink($collapsed, 'fullname'), array('class' => ''));
             } else {
-                $fullname = new html_table_cell($this->collapselink($collapsed, 'fullname'));
+                echo html_writer::tag('th', $this->collapselink($collapsed, 'fullname'), array('class' => ''));
             }
             if (!in_array('idnumber', $collapsed)) {
                 $idnumberlink = html_writer::link(new moodle_url($PAGE->url,
                                                                  array('tsort' => 'idnumber')),
                                                   get_string('idnumber').
                                                   $this->pic_if_sorted($orderby, 'idnumber'));
-                $idnumber = new html_table_cell($idnumberlink.$this->collapselink($collapsed,
-                                                                                  'idnumber'));
+                echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, 'idnumber'), array('class' => ''));
             } else {
-                $idnumber = new html_table_cell($this->collapselink($collapsed, 'idnumber'));
+                echo html_writer::tag('th', $this->collapselink($collapsed, 'idnumber'), array('class' => ''));
             }
             if (!in_array('email', $collapsed)) {
                 $emaillink = html_writer::link(new moodle_url($PAGE->url, array('tsort' => 'email')),
                                                get_string('email').
                                                $this->pic_if_sorted($orderby, 'email'));
-                $email = new html_table_cell($emaillink.$this->collapselink($collapsed, 'email'));
+                echo html_writer::tag('th', $emaillink.$this->collapselink($collapsed, 'email'), array('class' => ''));
             } else {
-                $email = new html_table_cell($this->collapselink($collapsed, 'email'));
+                echo html_writer::tag('th', $this->collapselink($collapsed, 'email'), array('class' => ''));
             }
             if (!in_array('registrations', $collapsed)) {
                 $registrationslink = get_string('registrations', 'grouptool');
-                $registrations = new html_table_cell($registrationslink.
-                                                     $this->collapselink($collapsed,
-                                                                         'registrations'));
+                echo html_writer::tag('th', $registrationslink.
+                                            $this->collapselink($collapsed, 'registrations'), array('class' => ''));
             } else {
-                $registrations = new html_table_cell($this->collapselink($collapsed,
-                                                                         'registrations'));
+                echo html_writer::tag('th', $this->collapselink($collapsed, 'registrations'), array('class' => ''));
             }
             if (!in_array('queues', $collapsed)) {
                 $queueslink = get_string('queues', 'grouptool').' ('.get_string('rank', 'grouptool').')';
-                $queues = new html_table_cell($queueslink.
-                                              $this->collapselink($collapsed, 'queues'));
+                echo html_writer::tag('th', $queueslink.
+                                            $this->collapselink($collapsed, 'queues'), array('class' => ''));
             } else {
-                $queues = new html_table_cell($this->collapselink($collapsed, 'queues'));
+                echo html_writer::tag('th', $this->collapselink($collapsed, 'queues'), array('class' => ''));
             }
-            $table->head = array($picture, $fullname, $idnumber, $email, $registrations, $queues);
+            echo html_writer::end_tag('tr');
+            echo html_writer::end_tag('thead');
         } else {
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
@@ -7152,41 +7178,47 @@ EOS;
             $head['registrations'] = get_string('registrations', 'grouptool');
             $head['queues']        = get_string('queues', 'grouptool').' ('.get_string('rank', 'grouptool').')';
         }
-        $rows = array();
 
+        if (!$onlydata) {
+            echo html_writer::start_tag('tbody');
+        }
         if (!empty($userdata)) {
+            core_php_time_limit::raise(5 * count($userdata));
             foreach ($userdata as $key => $user) {
-                // We give each user 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
-                core_php_time_limit::raise(30);
                 if (!$onlydata) {
+                    echo html_writer::start_tag('tr', array('class' => ''));
+
                     $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
                                                array('id'     => $user->id,
                                                      'course' => $this->course->id));
                     if (!in_array('picture', $collapsed)) {
                         $picture = html_writer::link($userlink, $OUTPUT->user_picture($user));
+                        echo html_writer::tag('td', $picture, array('class' => ''));
                     } else {
                         $picture = "";
                     }
                     if (!in_array('fullname', $collapsed)) {
                         $fullname = html_writer::link($userlink, fullname($user));
+                        echo html_writer::tag('td', $fullname, array('class' => ''));
                     } else {
                         $fullname = "";
                     }
                     if (!in_array('idnumber', $collapsed)) {
                         $idnumber = $user->idnumber;
+                        echo html_writer::tag('td', $idnumber, array('class' => ''));
                     } else {
                         $idnumber = "";
                     }
                     if (!in_array('email', $collapsed)) {
                         $email = $user->email;
+                        echo html_writer::tag('td', $email, array('class' => ''));
                     } else {
                         $email = "";
                     }
                     if (!in_array('registrations', $collapsed)) {
                         if (!empty($user->regs)) {
-                            $regs = explode(',', $user->regs);
                             $registrations = array();
-                            foreach ($regs as $reg) {
+                            foreach ($user->regs as $reg) {
                                 $grouplink = new moodle_url($PAGE->url,
                                                             array('tab'     => 'overview',
                                                                   'groupid' => $groupinfo[$reg]->id));
@@ -7197,18 +7229,22 @@ EOS;
                             $registrations = array('-');
                         }
                         $registrations = implode(html_writer::empty_tag('br'), $registrations);
+                        echo html_writer::tag('td', $registrations, array('class' => ''));
                     } else {
                         $registrations = "";
                     }
                     if (!in_array('queues', $collapsed)) {
-                        if (!empty($user->queues)) {
-                            $queues = explode(',', $user->queues);
+                        if (!empty($user->queued)) {
                             $queueentries = array();
-                            foreach ($queues as $queue) {
+                            foreach ($user->queued as $queue) {
                                 $grouplink = new moodle_url($PAGE->url,
                                                             array('tab'     => 'overview',
                                                                   'groupid' => $groupinfo[$queue]->id));
-                                $rank = $this->get_rank_in_queue($groupinfo[$queue]->queued, $user->id);
+                                $groupdata = $this->get_active_groups(false, true, $queue);
+                                $groupdata = current($groupdata);
+                                $rank = $this->get_rank_in_queue($groupdata->queued, $user->id);
+                                $groupdata = null;
+                                unset($groupdata);
                                 if (empty($rank)) {
                                     $rank = '*';
                                 }
@@ -7219,11 +7255,12 @@ EOS;
                             $queueentries = array('-');
                         }
                         $queueentries = implode(html_writer::empty_tag('br'), $queueentries);
+                        echo html_writer::tag('td', $queueentries, array('class' => ''));
                     } else {
                         $queueentries = "";
                     }
-                    $rows[] = array($picture, $fullname, $idnumber, $email, $registrations,
-                                    $queueentries);
+                    echo html_writer::end_tag('tr');
+                    flush();
                     $picture = null;
                     unset($picture);
                     $fullname = null;
@@ -7246,10 +7283,14 @@ EOS;
                         unset($user->namefield);
                     }
                     $row['idnumber'] = $user->idnumber;
+                    $row['email'] = $user->email;
                     if (empty($CFG->showuseridentity)) {
                         $row['idnumber'] = $user->idnumber;
                         $user->idnumber = null;
                         unset($user->idnumber);
+                        $row['email'] = $user->email;
+                        $user->email = null;
+                        unset($user->email);
                     } else {
                         $fields = explode(',', $CFG->showuseridentity);
                         foreach ($fields as $field) {
@@ -7258,13 +7299,9 @@ EOS;
                             unset($user->$field);
                         }
                     }
-                    $row['email'] = $user->email;
-                    $user->email = null;
-                    unset($user->email);
                     if (!empty($user->regs)) {
-                        $regs = explode(',', $user->regs);
                         $registrations = array();
-                        foreach ($regs as $reg) {
+                        foreach ($user->regs as $reg) {
                             $registrations[] = $groupinfo[$reg]->name;
                         }
                         $row['registrations'] = $registrations;
@@ -7273,11 +7310,12 @@ EOS;
                     }
                     $user->regs = null;
                     unset($user->regs);
-                    if (!empty($user->queues)) {
-                        $queues = explode(',', $user->queues);
+                    if (!empty($user->queued)) {
                         $queueentries = array();
-                        foreach ($queues as $queue) {
-                            $rank = $this->get_rank_in_queue($groupinfo[$queue]->queued, $user->id);
+                        foreach ($user->queued as $queue) {
+                            $groupdata = $this->get_active_groups(false, true, $queue);
+                            $groupdata = current($groupdata);
+                            $rank = $this->get_rank_in_queue($groupdata->queued, $user->id);
                             if (empty($rank)) {
                                 $rank = '*';
                             }
@@ -7297,8 +7335,8 @@ EOS;
             }
         }
         if (!$onlydata) {
-            $table->data = $rows;
-            return $return.html_writer::table($table);
+            echo html_writer::end_tag('tbody');
+            echo html_writer::end_tag('table');
         } else {
             return array_merge(array($head), $rows);
         }
@@ -7888,7 +7926,7 @@ EOS;
         }
         $groupingselect = new single_select($url, 'groupingid', $options, $groupingid, false);
 
-        $groups = $this->get_active_groups(true, true, 0, 0, $groupingid);
+        $groups = $this->get_active_groups(false, false, 0, 0, $groupingid);
         $options = array(0 => get_string('all'));
         if (count($groups)) {
             foreach ($groups as $group) {
@@ -7920,8 +7958,8 @@ EOS;
              html_writer::tag('div', get_string('orientation', 'grouptool').'&nbsp;'.
                                      $OUTPUT->render($orientationselect),
                               array('class' => 'centered grouptool_userlist_filter'));
-
-        echo $this->userlist_table($groupingid, $groupid);
+        flush();
+        $this->userlist_table($groupingid, $groupid);
 
     }
 

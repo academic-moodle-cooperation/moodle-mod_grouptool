@@ -387,7 +387,7 @@
     white-space:nowrap;
 }
 
-.path-mod-grouptool .no_queues, .no_registrations {
+.path-mod-grouptool .no_queues, .path-mod-grouptool .no_registrations {
     text-align:center;
 }
 
