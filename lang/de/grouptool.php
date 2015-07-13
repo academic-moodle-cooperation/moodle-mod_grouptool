@@ -474,7 +474,7 @@ $string['sortlist_no_data'] = 'In diesem Kurs sind aktuell keine Gruppen vorhand
 $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> angemeldet in Moodle-Gruppe und Gruppenverwaltung</li><li><span style="font-weight:bold">?</span> angemeldet in Moodle-Gruppe, nicht aber in der Gruppenverwaltung</li><li><span style="font-weight:bold">+</span> angemeldet in der Gruppenverwaltung, nicht aber in Moodle-Gruppe</li><li><span style="font-weight:bold">1, 2, 3...</span> auf Warteliste in der Gruppenverwaltung</li></ul>';
-$string['successfully_deleted_groups'] = 'Successfully deleted groups!';
+$string['successfully_deleted_groups'] = 'Gruppen erfolgreich gelöscht!';
 $string['switched_to_all_groups'] = 'Ändere Gruppenfilter zu "Alle"!';
 $string['target'] = 'Ziel';
 $string['too_many_queue_places'] = 'Kann {$a->username} nicht in Warteliste der Gruppe {$a->groupname} eintragen, weil {$a->username} bereits in zu vielen Wartelisten eingetragen ist!';

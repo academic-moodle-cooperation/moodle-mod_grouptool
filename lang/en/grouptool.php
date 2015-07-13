@@ -140,7 +140,7 @@ $string['create_groupings_confirm'] = 'Continue to create groupings as previewed
 $string['create_groupings_confirm_problem'] = 'At least 1 error occurred (refer to preview above)!';
 $string['createinsertgrouping'] = 'Add to grouping';
 $string['condition_prevent_access'] = 'The current conditions prevent you from accessing the checkmark instance!';
-$string['confirm_delete'] = 'Do you really wan\'t to delete this element?';
+$string['confirm_delete'] = 'Do you really want to delete this element?';
 $string['copied_grade_feedback'] = 'Group grading<br />
 +Submission from: {$a->student}<br />
 +Graded by: {$a->teacher}<br />
@@ -475,7 +475,7 @@ $string['sortlist_no_data'] = 'There are no groups present at the moment!';
 $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li><li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li><li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li><li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li></ul>';
-$string['successfully_deleted_groups'] = 'Gruppen erfolgreich gelöscht!';
+$string['successfully_deleted_groups'] = 'Successfully deleted groups!';
 $string['switched_to_all_groups'] = 'Changed group filter to all groups!';
 $string['target'] = 'Target';
 $string['too_many_queue_places'] = 'Can\'t queue {$a->username} in group {$a->groupname} because {$a->username} is already queued in too many groups!';

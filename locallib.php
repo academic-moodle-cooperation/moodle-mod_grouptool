@@ -1537,7 +1537,8 @@ class mod_grouptool {
         }
 
         if (($bulkaction = optional_param('bulkaction', null, PARAM_ALPHA))
-            && ($selected = optional_param_array('selected', array(), PARAM_INT))) {
+            && ($selected = optional_param_array('selected', array(), PARAM_INT))
+            && (optional_param('start_bulkaction', 0, PARAM_BOOL))) {
             switch ($bulkaction) {
                 case 'activate':  // ...also via ajax bulk action?
                     // Activate now!
@@ -1576,7 +1577,7 @@ class mod_grouptool {
                         echo $this->confirm('', $continue);
                     } else {
                         $cancel = new moodle_url($PAGE->url, array('tab' => 'group_admin'));
-                        $params = array('confirm' => 1, 'bulkaction' => 'delete');
+                        $params = array('confirm' => 1, 'bulkaction' => 'delete', 'start_bulkaction' => 1);
                         $text = get_string('confirm_delete', 'grouptool').html_writer::start_tag('ul');
                         $groups = $DB->get_records_list('groups', 'id', $selected);
                         foreach ($selected as $select) {
@@ -1670,7 +1671,7 @@ class mod_grouptool {
             $grp = array();
             $grp[] =& $mform->createElement('static', 'with_selection', '', get_string('with_selection', 'grouptool'));
             $grp[] =& $mform->createElement('select', 'bulkaction', '', $actions);
-            $grp[] =& $mform->createElement('submit', 'start', get_string('start', 'grouptool'));
+            $grp[] =& $mform->createElement('submit', 'start_bulkaction', get_string('start', 'grouptool'));
             $mform->addGroup($grp, 'actiongrp', '', ' ', false);
             $mform->disable_form_change_checker();
 

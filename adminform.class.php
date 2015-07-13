@@ -80,6 +80,10 @@ class mod_grouptool_groupings_creation_form extends moodleform {
         $mform->setDefault('bulkaction', 'grouping');
         $mform->setType('bulkaction', PARAM_TEXT);
 
+        $mform->addElement('hidden', 'start_bulkaction');
+        $mform->setDefault('start_bulkaction', 1);
+        $mform->setType('start_bulkaction', PARAM_BOOL);
+
         $groupingel = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
         $options = array('' => get_string('choose'));
         $options['-1'] = get_string('onenewgrouping', 'grouptool');
