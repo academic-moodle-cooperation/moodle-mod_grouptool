@@ -5001,7 +5001,14 @@ EOS;
         $prevtable->head[] = get_string('status');
         $prevtable->data = array();
 
+        $pbar = new progress_bar('checkmarkimportprogress', 500, true);
+        $count = count($users);
+        $processed = 0;
+        $pbar->update($processed, $count, get_string('import_progress_start', 'grouptool'));
+        core_php_time_limit::raise(count($users) * 5);
+        raise_memory_limit(MEMORY_HUGE);
         foreach ($users as $user) {
+            $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
                 if (empty($includedeleted)) {
@@ -5117,6 +5124,8 @@ EOS;
                         'groupname' => $groupinfo->name);
                 if (!$previewonly && $userinfo) {
                     $attr = array('class' => 'notifysuccess');
+                    $pbar->update($processed, $count,
+                                  get_string('import_progress_import', 'grouptool').' '.fullname($userinfo).'...');
                     if (!groups_add_member($group, $userinfo->id)) {
                         $error = true;
                         $notification = $OUTPUT->notification(get_string('import_user_problem',
@@ -5189,6 +5198,13 @@ EOS;
             }
             $prevtable->data[] = $row;
             unset($row);
+            $processed++;
+        }
+        $processed++;
+        if (!$previewonly) {
+            $pbar->update($processed, $count, get_string('import_progress_completed', 'grouptool'));
+        } else {
+            $pbar->update($processed, $count, get_string('import_progress_preview_completed', 'grouptool'));
         }
         $message .= html_writer::table($prevtable);
         return array($error, $message);
