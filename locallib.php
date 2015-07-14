@@ -80,13 +80,29 @@ class mod_grouptool_view_import_form extends moodleform {
             $mform->addElement('header', 'groupuser_import', get_string('groupuser_import',
                                                                         'grouptool'));
 
-            $grps = groups_get_all_groups($course->id);
-            $options = array('none' => get_string('choose'));
-            foreach ($grps as $grp) {
-                $options[$grp->id] = $grp->name;
+            $active = new sortlist($course->id, $cm, mod_grouptool::FILTER_ACTIVE);
+            $inactive = new sortlist($course->id, $cm, mod_grouptool::FILTER_INACTIVE);
+
+            $groups = $mform->createElement('selectgroups', 'group', get_string('choose_targetgroup', 'grouptool'), null,
+                                            array('size' => 15));
+
+            if (!empty($active->groups)) {
+                $options = array();
+                foreach ($active->groups as $grp) {
+                    $options[$grp->groupid] = $grp->name;
+                }
+                $groups->addOptGroup(get_string('active', 'grouptool').' '.get_string('groups'), $options);
             }
-            $mform->addElement('select', 'group', get_string('choose_targetgroup', 'grouptool'),
-                               $options);
+
+            if (!empty($inactive->groups)) {
+                $options = array();
+                foreach ($inactive->groups as $grp) {
+                    $options[$grp->groupid] = $grp->name;
+                }
+                $groups->addOptGroup(get_string('inactive', 'grouptool').' '.get_string('groups'), $options);
+            }
+            $groups->setMultiple(true);
+            $mform->addElement($groups);
             $mform->setType('group', PARAM_INT);
             $mform->addRule('group', null, 'required', null, 'client');
 
@@ -134,7 +150,7 @@ class mod_grouptool_view_import_form extends moodleform {
 
 class mod_grouptool_group_rename_form extends moodleform {
     /**
-     * Definition of import form
+     * Definition of rename form
      *
      * @global object $CFG
      * @global object $DB
@@ -188,7 +204,7 @@ class mod_grouptool_group_rename_form extends moodleform {
     }
 
     /**
-     * Validation for import form
+     * Validation for rename form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
@@ -217,7 +233,7 @@ class mod_grouptool_group_rename_form extends moodleform {
 
 class mod_grouptool_group_resize_form extends moodleform {
     /**
-     * Definition of import form
+     * Definition of resize form
      *
      * @global object $CFG
      * @global object $DB
@@ -276,7 +292,7 @@ class mod_grouptool_group_resize_form extends moodleform {
     }
 
     /**
-     * Validation for import form
+     * Validation for resize form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
@@ -4929,7 +4945,7 @@ EOS;
      * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
      */
-    public function import($group, $data, $forceregistration = false, $includedeleted = 0, $previewonly = false) {
+    public function import($groups, $data, $forceregistration = false, $includedeleted = 0, $previewonly = false) {
         global $DB, $OUTPUT, $CFG, $PAGE, $USER;
 
         $message = "";
@@ -4941,59 +4957,66 @@ EOS;
                 unset($users[$key]);
             }
         }
-        $groupinfo = groups_get_group($group);
+        $groupinfo = array();
+        foreach ($groups as $group) {
+            $groupinfo[$group] = groups_get_group($group);
+        }
         $imported = array();
         $columns = $DB->get_columns('user');
         if (empty($field) || !key_exists($field, $columns)) {
             $field = 'idnumber';
         }
-        $agrp = $DB->get_field('grouptool_agrps', 'id', array('grouptoolid' => $this->grouptool->id,
-                                                              'groupid'     => $group), IGNORE_MISSING);
-        if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
-                                                         'groupid'     => $group,
-                                                         'active'      => 1))) {
-            $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning',
-                                                         'grouptool', $groupinfo->name),
-                                              array('notifyproblem'));
-        }
-        // We use MAX to trick Postgres into thinking this is a full GROUPU BY statement!
-        $sql = '     SELECT agrps.id id, MAX(agrps.groupid) grpid, COUNT(regs.id) regs,
-                            MAX(grptl.use_individual) indi, MAX(grptl.grpsize) globalsize, MAX(agrps.grpsize) size,
-                            MAX(grptl.name) instancename
-                       FROM {grouptool_agrps} agrps
-                       JOIN {grouptool} grptl ON agrps.grouptoolid = grptl.id
-                  LEFT JOIN {grouptool_registered} regs ON agrps.id = regs.agrpid AND regs.modified_by >= 0
-                      WHERE agrps.groupid = :grpid
-                        AND grptl.use_size = 1
-                        AND agrps.active = 1
-                   GROUP BY agrps.id
-                   ';
-        $agrps = $DB->get_records_sql($sql, array('grpid' => $group));
-        $usercnt = count($users);
-        foreach ($agrps as $cur) {
-            if ($cur->indi && !empty($cur->size)) {
-                if (($cur->regs + $usercnt) > $cur->size) {
-                    $message .= html_writer::tag('div',
-                                                 $OUTPUT->notification(get_string('overflowwarning',
-                                                                                  'grouptool', $cur),
-                                                                       'notifytiny'));
-                }
-            } else {
-                if (($cur->regs + $usercnt) > $cur->globalsize) {
-                    $message .= html_writer::tag('div',
-                                                 $OUTPUT->notification(get_string('overflowwarning',
-                                                                                  'grouptool', $cur),
-                                                                       'notifytiny'));
+        $agrp = array();
+        foreach ($groups as $group) {
+            $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', array('grouptoolid' => $this->grouptool->id,
+                                                                          'groupid'     => $group), IGNORE_MISSING);
+            if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
+                                                             'groupid'     => $group,
+                                                             'active'      => 1))) {
+                $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning',
+                                                             'grouptool', $groupinfo[$group]->name),
+                                                  array('notifyproblem'));
+            }
+            // We use MAX to trick Postgres into thinking this is a full GROUPU BY statement!
+            $sql = '     SELECT agrps.id id, MAX(agrps.groupid) grpid, COUNT(regs.id) regs,
+                                MAX(grptl.use_individual) indi, MAX(grptl.grpsize) globalsize, MAX(agrps.grpsize) size,
+                                MAX(grptl.name) instancename
+                           FROM {grouptool_agrps} agrps
+                           JOIN {grouptool} grptl ON agrps.grouptoolid = grptl.id
+                      LEFT JOIN {grouptool_registered} regs ON agrps.id = regs.agrpid AND regs.modified_by >= 0
+                          WHERE agrps.groupid = :grpid
+                            AND grptl.use_size = 1
+                            AND agrps.active = 1
+                       GROUP BY agrps.id
+                       ';
+            $agrps = $DB->get_records_sql($sql, array('grpid' => $group));
+            $usercnt = count($users);
+            foreach ($agrps as $cur) {
+                if ($cur->indi && !empty($cur->size)) {
+                    if (($cur->regs + $usercnt) > $cur->size) {
+                        $message .= html_writer::tag('div',
+                                                     $OUTPUT->notification(get_string('overflowwarning',
+                                                                                      'grouptool', $cur),
+                                                                           'notifytiny'));
+                    }
+                } else {
+                    if (($cur->regs + $usercnt) > $cur->globalsize) {
+                        $message .= html_writer::tag('div',
+                                                     $OUTPUT->notification(get_string('overflowwarning',
+                                                                                      'grouptool', $cur),
+                                                                           'notifytiny'));
+                    }
                 }
             }
         }
-
         if (false !== ($gtimportfields = get_config('mod_grouptool', 'importfields'))) {
             $importfields = explode(',', $gtimportfields);
         } else {
             $importfields = array('username', 'idnumber');
         }
         $prevtable = new html_table();
+        $prevtable->attributes['class'] = 'importpreview table table-striped table-hover';
+        $prevtable->id = 'importpreview';
         $prevtable->head = array(get_string('fullname'));
         foreach ($importfields as $field) {
             $prevtable->head[] = get_string($field);
@@ -5117,83 +5140,88 @@ EOS;
                                                                                   'grouptool'), 'notifyproblem'));
                     }
                 }
-                $data = array(
-                        'id' => $userinfo->id,
-                        'idnumber' => $userinfo->idnumber,
-                        'fullname' => fullname($userinfo),
-                        'groupname' => $groupinfo->name);
-                if (!$previewonly && $userinfo) {
-                    $attr = array('class' => 'notifysuccess');
-                    $pbar->update($processed, $count,
-                                  get_string('import_progress_import', 'grouptool').' '.fullname($userinfo).'...');
-                    if (!groups_add_member($group, $userinfo->id)) {
-                        $error = true;
-                        $notification = $OUTPUT->notification(get_string('import_user_problem',
-                                                                          'grouptool', $data),
-                                                               'notifyproblem');
-                        $row->cells[] = new html_table_cell($notification);
-                        $row->attributes['class'] = 'error';
-                    } else {
-                        $imported[] = $userinfo->id;
-                        $row->cells[] = get_string('import_user', 'grouptool', $data);
-                        $row->attributes['class'] = 'notifysuccess';
-                    }
-                    if ($forceregistration && empty($agrp)) {
-                        /* Registering in an non active Grouptool-group would cause problems
-                         * with incorrectly labeled buttons under certain circumstances.
-                         * We removed the automatic creation and registration in this newly inserted inactive group.
-                         * In no case, there should be a missing agrp entry anyway.
-                         */
-                        $newgrpdata = $DB->get_record_sql('SELECT MAX(sort_order), MAX(grpsize)
-                                                           FROM grouptool_agrps
-                                                           WHERE grouptoolid = ?',
-                                                          array($this->grouptool->id));
-                        // Insert agrp-entry for this group (even if it's not active)!
-                        $agrp = new stdClass();
-                        $agrp->grouptoolid = $this->grouptool->id;
-                        $agrp->groupid = $group;
-                        $agrp->active = 0;
-                        $agrp->sort_order = $newgrpdata->sortorder + 1;
-                        $agrp->grpsize = $newgrpdata->grpsize;
-                        $agrp->id = $DB->insert_record('grouptool_agrps', $agrp);
-                        \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp)->trigger();
-                        $notification = $OUTPUT->notification(get_string('import_in_inactive_group_rejected',
-                                                                         'grouptool', $agrp),
-                                                              'notifyproblem');
-                        $row->cells[] = $notification;
-                        $row->attributes['class'] = 'error';
-                        $agrp = $agrp->id;
-                    } else if ($forceregistration && !empty($agrp)
-                               && !$DB->record_exists_select('grouptool_registered',
-                                                             "modified_by >= 0 AND agrpid = :agrpid AND userid = :userid",
-                                                             array('agrpid' => $agrp, 'userid' => $userinfo->id))) {
-                        if ($reg = $DB->get_record('grouptool_registered',
-                                                   array('agrpid' => $agrp, 'userid' => $userinfo->id, 'modified_by' => -1),
-                                                   IGNORE_MISSING)) {
-                            // If user is marked, we register him right now!
-                            $reg->modified_by = $USER->id;
-                            $DB->update_record('grouptool->registered', $reg);
-                            // TODO do we have to delete his marks and queues if theres enough registrations?
+                foreach ($groups as $group) {
+                    $data = array(
+                            'id' => $userinfo->id,
+                            'idnumber' => $userinfo->idnumber,
+                            'fullname' => fullname($userinfo),
+                            'groupname' => $groupinfo[$group]->name);
+                    if (!$previewonly && $userinfo) {
+                        $attr = array('class' => 'notifysuccess');
+                        $pbar->update($processed, $count,
+                                      get_string('import_progress_import', 'grouptool').' '.fullname($userinfo).'...');
+                        if (!groups_add_member($group, $userinfo->id)) {
+                            $error = true;
+                            $notification = $OUTPUT->notification(get_string('import_user_problem',
+                                                                              'grouptool', $data),
+                                                                   'notifyproblem');
+                            $row->cells[] = new html_table_cell($notification);
+                            $row->attributes['class'] = 'error';
                         } else {
-                            $reg = new stdClass();
-                            $reg->agrpid = $agrp;
-                            $reg->userid = $userinfo->id;
-                            $reg->timestamp = time();
-                            $reg->modified_by = $USER->id;
-                            // We don't need to log creation of registration, because we log import as whole!
-                            $reg->id = $DB->insert_record('grouptool_registered', $reg);
+                            $imported[] = $userinfo->id;
+                            $row->cells[] = get_string('import_user', 'grouptool', $data);
+                            $row->attributes['class'] = 'notifysuccess';
                         }
+                        if ($forceregistration && empty($agrp[$group])) {
+                            /* Registering in an non active Grouptool-group would cause problems
+                             * with incorrectly labeled buttons under certain circumstances.
+                             * We removed the automatic creation and registration in this newly inserted inactive group.
+                             * In no case, there should be a missing agrp entry anyway.
+                             */
+                            $newgrpdata = $DB->get_record_sql('SELECT MAX(sort_order), MAX(grpsize)
+                                                                 FROM {grouptool_agrps}
+                                                               WHERE grouptoolid = ?',
+                                                              array($this->grouptool->id));
+                            // Insert agrp-entry for this group (even if it's not active)!
+                            var_dump($group);
+                            $agrp[$group] = new stdClass();
+                            $agrp[$group]->grouptoolid = $this->grouptool->id;
+                            $agrp[$group]->groupid = $group;
+                            $agrp[$group]->active = 0;
+                            $agrp[$group]->sort_order = $newgrpdata->sortorder + 1;
+                            $agrp[$group]->grpsize = $newgrpdata->grpsize;
+                            $agrp[$group]->id = $DB->insert_record('grouptool_agrps', $agrp[$group]);
+                            \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp[$group])->trigger();
+                            $notification = $OUTPUT->notification(get_string('import_in_inactive_group_rejected',
+                                                                             'grouptool', $agrp[$group]),
+                                                                  'notifyproblem');
+                            $row->cells[] = $notification;
+                            $row->attributes['class'] = 'error';
+                            $agrp[$group] = $agrp[$group]->id;
+                        } else if ($forceregistration && !empty($agrp[$group])
+                                   && !$DB->record_exists_select('grouptool_registered',
+                                                                 "modified_by >= 0 AND agrpid = :agrpid AND userid = :userid",
+                                                                 array('agrpid' => $agrp[$group], 'userid' => $userinfo->id))) {
+                            if ($reg = $DB->get_record('grouptool_registered',
+                                                       array('agrpid' => $agrp[$group],
+                                                             'userid' => $userinfo->id,
+                                                             'modified_by' => -1),
+                                                       IGNORE_MISSING)) {
+                                // If user is marked, we register him right now!
+                                $reg->modified_by = $USER->id;
+                                $DB->update_record('grouptool->registered', $reg);
+                                // TODO do we have to delete his marks and queues if theres enough registrations?
+                            } else {
+                                $reg = new stdClass();
+                                $reg->agrpid = $agrp[$group];
+                                $reg->userid = $userinfo->id;
+                                $reg->timestamp = time();
+                                $reg->modified_by = $USER->id;
+                                // We don't need to log creation of registration, because we log import as whole!
+                                $reg->id = $DB->insert_record('grouptool_registered', $reg);
+                            }
 
-                        \mod_grouptool\event\user_imported::import_forced($this->cm, $reg->id, $agrp,
-                                                                          $group, $userinfo->id)->trigger();
-                    } else if (!$forceregistration) {
-                        // Trigger the event!
-                        \mod_grouptool\event\user_imported::import($this->cm, $group, $userinfo->id)->trigger();
+                            \mod_grouptool\event\user_imported::import_forced($this->cm, $reg->id, $agrp[$group],
+                                                                              $group, $userinfo->id)->trigger();
+                        } else if (!$forceregistration) {
+                            // Trigger the event!
+                            \mod_grouptool\event\user_imported::import($this->cm, $group, $userinfo->id)->trigger();
+                        }
+                    } else if ($userinfo) {
+                        $attr = array('class' => 'prevsuccess');
+                        $row->cells[] = get_string('import_user_prev', 'grouptool', $data);
+                        $row->attributes['class'] = 'prevsuccess';
                     }
-                } else if ($userinfo) {
-                    $attr = array('class' => 'prevsuccess');
-                    $row->cells[] = get_string('import_user_prev', 'grouptool', $data);
-                    $row->attributes['class'] = 'prevsuccess';
                 }
             }
             $prevtable->data[] = $row;
@@ -5227,7 +5255,7 @@ EOS;
         $form = new mod_grouptool_view_import_form(null, array('id' => $id));
 
         if (optional_param('confirm', 0, PARAM_BOOL)) {
-            $group = required_param('group', PARAM_INT);
+            $group = required_param_array('group', PARAM_INT);
             $data = required_param('data', PARAM_RAW);
             $includedeleted = optional_param('includedeleted', 0, PARAM_BOOL);
             $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
@@ -5238,11 +5266,11 @@ EOS;
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'),
-                        'notifyproblem').
-                        html_writer::empty_tag('br').
-                        $message;
+                                                 'notifyproblem').
+                           html_writer::empty_tag('br').
+                           $message;
             }
-            echo $OUTPUT->box($message, 'generalbox centered');
+            echo html_writer::tag('div', $message, array('class' => 'centered'));
         }
 
         if ($fromform = $form->get_data()) {
@@ -5253,10 +5281,12 @@ EOS;
 
             $attr = array(
                     'confirm'           => '1',
-                    'group'             => $fromform->group,
                     'data'              => serialize($fromform->data),
                     'forceregistration' => $fromform->forceregistration,
                     'includedeleted'    => $fromform->includedeleted);
+            foreach ($fromform->group as $group) {
+                $attr['group['.$group.']'] = $group;
+            }
 
             $continue = new moodle_url($PAGE->url, $attr);
             $cancel = new moodle_url($PAGE->url);
@@ -5269,7 +5299,8 @@ EOS;
                                   $confirmmessage;
             }
             echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered').
-                 $this->confirm($confirmmessage, $continue, $cancel);
+                 $confirmmessage.
+                 $this->confirm('', $continue, $cancel);
 
         } else {
             $form->display();

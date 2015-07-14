@@ -332,6 +332,10 @@
     margin-right:auto;
 }
 
+.path-mod-grouptool #importpreview th {
+    white-space: nowrap;
+}
+
 .path-mod-grouptool .groupcontainer.uptodate {
 
 }
