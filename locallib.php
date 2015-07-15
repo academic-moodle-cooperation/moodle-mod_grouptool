@@ -4030,13 +4030,15 @@ EOS;
             case null:
                 $userid = $USER->id;
             default:
-                $groups = $this->get_active_groups(true, true);
+                $groups = $this->get_active_groups(false, false);
                 break;
             case 0:
                 $groups = $this->get_active_groups();
         }
 
         foreach ($groups as $group) {
+            $group = $this->get_active_groups(true, true, $group->agrpid, $group->id);
+            $group = current($group);
             if ($this->grouptool->use_size) {
                 $return->group_places += $group->grpsize;
             }

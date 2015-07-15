@@ -793,11 +793,11 @@ function grouptool_print_overview($courses, &$htmlarray) {
                     $stringlabel = 'registration_missing';
                 }
                 $details .= html_writer::tag('div',
-                        html_writer::tag('div',
-                                get_string($stringlabel, 'grouptool', $missing)).
-                        get_string('registrations', 'grouptool').': '.
-                        get_string('not_registered', 'grouptool'),
-                        array('class' => 'registered'));
+                                             html_writer::tag('div',
+                                                              get_string($stringlabel, 'grouptool', $missing)).
+                                             get_string('registrations', 'grouptool').': '.
+                                             get_string('not_registered', 'grouptool'),
+                                             array('class' => 'registered'));
             }
             if (count($userstats->queued)) {
                 $tempstr = "";
