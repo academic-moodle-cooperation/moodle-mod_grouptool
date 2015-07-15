@@ -100,14 +100,25 @@ try {
         WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
             $params = array('grouptoolid' => $cm->instance, 'groupid' => $groupid);
             $regs = $DB->count_records_sql($sql, $params);
-            if ((clean_param($size, PARAM_INT) <= 0) || !ctype_digit($size)) {
-                    $result->error = get_string('grpsizezeroerror', 'grouptool').' '.
-                                     get_string('error_at', 'grouptool').' '.$group['name'];
+            if (empty($size)) {
+                // Disable individual size for this group!
+                $DB->set_field('grouptool_agrps', 'grpsize', null, array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
+                if (!empty($DB->get_field('grouptool_agrps', 'grpsize', array('groupid'    => $groupid,
+                                                                              'grouptoolid' => $cm->instance)))) {
+                    // Error happened...
+                    $result->error = get_string('couldnt_resize_group', 'grouptool', $name);
+                } else {
+                    $result->message = get_string('resized_group', 'grouptool', $name);
+                }
+            } else if ((clean_param($size, PARAM_INT) < 0) || !ctype_digit($size)) {
+                    $result->error = get_string('grpsizezeroerror', 'grouptool');
             } else if (!empty($regs) && $size < $regs) {
                 $result->error = get_string('toomanyregs', 'grouptool');
             } else {
                 $DB->set_field('grouptool_agrps', 'grpsize', $size,
                                array('groupid' => $groupid, 'grouptoolid' => $cm->instance));
+                $DB->set_field('grouptool', 'use_individual', 1, array('id' => $cm->instance));
+                $DB->set_field('grouptool', 'use_size', 1, array('id' => $cm->instance));
                 if ($size != $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'     => $groupid,
                                                                                 'grouptoolid' => $cm->instance))) {
                     // Error happened...

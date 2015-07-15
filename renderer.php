@@ -108,21 +108,56 @@ class sortlist implements renderable {
 
     public $globalsize = 0;
 
+    public $usesize = 0;
+
+    public $useindividual = 0;
+
     public $filter = null;
 
     public $cm = null;
 
-    public function __construct($courseid=null, $cm=null, $filter=null) {
-        global $SESSION;
+    public function __construct($courseid, $cm, $filter=null) {
+        global $SESSION, $DB, $OUTPUT;
 
         $this->filter = $filter;
+
+        if ($moveup = optional_param('moveup', 0, PARAM_INT)) {
+            // Move up!
+            $a = $DB->get_record('grouptool_agrps', array('groupid' => $moveup,
+                                                          'grouptoolid' => $cm->instance));
+            $b = $DB->get_record('grouptool_agrps', array('grouptoolid' => $a->grouptoolid,
+                                                          'sort_order' => ($a->sort_order - 1)));
+            if (empty($a) || empty($b)) {
+                echo $OUTPUT->notification(get_string('couldnt_move_up', 'grouptool'), 'notifyproblem');
+            } else {
+                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, array('id' => $b->id));
+                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, array('id' => $a->id));
+            }
+        }
+
+        if ($movedown = optional_param('movedown', 0, PARAM_INT)) {
+            // Move up!
+            $a = $DB->get_record('grouptool_agrps', array('groupid' => $movedown,
+                                                          'grouptoolid' => $cm->instance));
+            $b = $DB->get_record('grouptool_agrps', array('grouptoolid' => $a->grouptoolid,
+                                                          'sort_order' => ($a->sort_order + 1)));
+            if (empty($a) || empty($b)) {
+                echo $OUTPUT->notification(get_string('couldnt_move_down', 'grouptool'), 'notifyproblem');
+            } else {
+                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, array('id' => $b->id));
+                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, array('id' => $a->id));
+            }
+        }
 
         if ($courseid != null) {
             $this->loadgroups($courseid, $cm);
             $this->cm = $cm;
+            $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
+            $this->usesize = $grouptool->use_size;
+            $this->useindividual = $grouptool->use_individual;
         }
 
-        $this->selected = optional_param('selected', null, PARAM_BOOL);
+        $this->selected = optional_param_array('selected', null, PARAM_BOOL);
         if (!isset($SESSION->sortlist)) {
             $SESSION->sortlist = new stdClass();
         }
@@ -196,13 +231,13 @@ class sortlist implements renderable {
 
             foreach ($groupdata as $key => $group) {
                 if ($grouptool->use_size && (!$grouptool->use_individual || ($groupdata[$key]->size == null))) {
-                    $groupdata[$key]->size = $this->globalgrpsize;
+                    $groupdata[$key]->size = $this->globalgrpsize.'*';
                 }
 
                 // Convert to activegroup object!
                 $groupdata[$key] = activegroup::construct_from_obj($group);
             }
-            
+
             $this->groups = $groupdata;
 
             // Add groupings...
@@ -334,8 +369,8 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         $moveupstr = get_string('moveup', 'grouptool');
         $movedownstr = get_string('movedown', 'grouptool');
         $dragstr = get_string('drag', 'grouptool');
-        $setactivestr = get_string('inactive');
-        $setinactivestr = get_string('active');
+        $activestr = get_string('active');
+        $inactivestr = get_string('inactive');
         $deletestr = get_string('delete');
         $renamestr = get_string('rename');
         $resizestr = get_string('resize', 'grouptool');
@@ -347,6 +382,18 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         reset($sortlist->groups);
         $table = new html_table();
         $table->data = array();
+        $table->attributes['class'] .= ' table table-striped ';
+        $table->head = array( 0 => '',
+                              1 => '',
+                              2 => get_string('name'));
+        if (!empty($sortlist->usesize)) {
+            $table->head[3] = get_string('size');
+        }
+        $groupstatus = get_string('groupstatus', 'grouptool').$OUTPUT->help_icon('groupstatus', 'grouptool');
+        $table->head = $table->head + array(4 => $groupstatus,
+                                            5 => '',
+                                            6 => '',
+                                            7 => '' );
         foreach ($sortlist->groups as $id => $group) {
             $row = array(); // Each group gets its own row!
 
@@ -379,25 +426,22 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                                       'title' => $showmembersstr));
             $moveupattr = array('src'   => $OUTPUT->pix_url('i/up'),
                                 'alt'   => $moveupstr,
+                                'title' => $moveupstr,
                                 'name'  => 'moveup['.$id.']',
                                 'class' => 'moveupbutton');
-            if ($id == $firstkey) {
-                $moveupattr['style'] = "visibility:hidden;";
-            }
             $moveupurl = new moodle_url($PAGE->url, array('moveup' => $id));
             $moveupbutton = html_writer::link($moveupurl, html_writer::empty_tag('img', $moveupattr), $moveupattr);
             $movedownattr = array('src'   => $OUTPUT->pix_url('i/down'),
                                   'alt'   => $movedownstr,
+                                  'title' => $movedownstr,
                                   'name'  => 'movedown['.$id.']',
                                   'class' => 'movedownbutton');
-            if ($id == $lastkey) {
-                $movedownattr['style'] = "visibility:hidden;";
-            }
             $movedownurl = new moodle_url($PAGE->url, array('movedown' => $id));
             $movedownbutton = html_writer::link($movedownurl, html_writer::empty_tag('img', $movedownattr), $movedownattr);
             $dragbutton = html_writer::empty_tag('img',
                                                  array('src'   => $OUTPUT->pix_url('i/dragdrop'),
                                                        'alt'   => $dragstr,
+                                                       'title' => $dragstr,
                                                        'class' => 'drag_image js_invisible'));
             $nameattr = array('name'  => 'name['.$id.']',
                               'type'  => 'hidden',
@@ -406,12 +450,13 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                          html_writer::empty_tag('input', $nameattr);
             $renameattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
                                 'alt'   => $renamestr,
+                                'title' => $renamestr,
                                 'type'  => 'image',
                                 'name'  => 'rename['.$id.']',
                                 'class' => 'renamebutton');
             $renamebutton = html_writer::link(new moodle_url($PAGE->url, array('rename' => $id)),
                                               html_writer::empty_tag('img', $renameattr),
-                                              array('class' => $renameattr['class']));
+                                              array('class' => $renameattr['class'], 'title' => $renamestr));
             $nameblock .= $renamebutton;
 
             $drag = new html_table_cell($dragbutton);
@@ -419,12 +464,13 @@ class mod_grouptool_renderer extends plugin_renderer_base {
 
             $deleteattr = array('src'   => $OUTPUT->pix_url('t/delete'),
                                 'alt'   => $deletestr,
+                                'title' => $deletestr,
                                 'name'  => 'delete['.$id.']',
                                 'class' => 'deletebutton',
                                 'id'    => 'delete_'.$id);
             $deletebutton = html_writer::link(new moodle_url($PAGE->url, array('delete' => $id)),
                                               html_writer::empty_tag('img', $deleteattr),
-                                              array('class' => $deleteattr['class']));
+                                              array('class' => $deleteattr['class'], 'title' => $deletestr));
 
             $row = array( 0 => new html_table_cell(html_writer::empty_tag('input', $chkboxattr)),
                           1 => $drag,
@@ -433,46 +479,47 @@ class mod_grouptool_renderer extends plugin_renderer_base {
             $row[0]->attributes['class'] = 'checkbox_container';
             $row[2]->attributes['class'] = 'grpname';
 
-            $sizeattr = array('name'  => 'size['.$id.']',
-                              'type'  => 'hidden',
-                              'value' => $group->size);
-            $sizeblock = html_writer::tag('span', $group->size, array('class' => 'text')).
-                         html_writer::empty_tag('input', $sizeattr);
-            $resizeattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
-                                'id'    => 'resize_'.$id,
-                                'alt'   => $resizestr,
-                                'type'  => 'image',
-                                'name'  => 'resize['.$id.']',
-                                'class' => 'resizebutton');
-            $resizebutton = html_writer::link(new moodle_url($PAGE->url, array('resize' => $id)),
-                                              html_writer::empty_tag('img', $resizeattr),
-                                              array('class' => $resizeattr['class']));
-            $sizeblock .= $resizebutton;
+            if (!empty($sortlist->usesize)) {
+                $sizeattr = array('name'  => 'size['.$id.']',
+                                  'type'  => 'hidden',
+                                  'value' => clean_param($group->size, PARAM_INT));
+                $sizeblock = html_writer::tag('span', $group->size, array('class' => 'text')).
+                             html_writer::empty_tag('input', $sizeattr);
+                $resizeattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
+                                    'id'    => 'resize_'.$id,
+                                    'alt'   => $resizestr,
+                                    'title' => $resizestr,
+                                    'type'  => 'image',
+                                    'name'  => 'resize['.$id.']',
+                                    'class' => 'resizebutton');
+                $resizebutton = html_writer::link(new moodle_url($PAGE->url, array('resize' => $id)),
+                                                  html_writer::empty_tag('img', $resizeattr),
+                                                  array('class' => $resizeattr['class'], 'title' => $resizestr));
+                $sizeblock .= $resizebutton;
 
-            $labelcell = new html_table_cell(html_writer::tag('label', $groupsizestr, array('for' => $resizeattr['id'])));
-            $labelcell->attributes['class'] = "size addfield";
+                $fieldcell = new html_table_cell($sizeblock);
+                $fieldcell->attributes['class'] = "size addfield";
+                $row[] = $fieldcell;
+            }
 
-            $fieldcell = new html_table_cell($sizeblock);
-            $fieldcell->attributes['class'] = "size addfield";
-            $row[] = $labelcell;
-            $row[] = $fieldcell;
-
-            // Todo: Add status toggle!
             if ($group->status) {
                 $toggleattr = array('src'   => $OUTPUT->pix_url('t/go'),
-                                    'alt'   => $setactivestr,
+                                    'alt'   => $activestr,
+                                    'title' => $activestr,
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'active');
             } else {
                 $toggleattr = array('src'   => $OUTPUT->pix_url('t/stop'),
-                                    'alt'   => $setinactivestr,
+                                    'alt'   => $inactivestr,
+                                    'title' => $inactivestr,
                                     'type'  => 'image',
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'inactive');
             }
             $togglebutton = html_writer::link(new moodle_url($PAGE->url, array('toggle' => $id)),
                                               html_writer::empty_tag('img', $toggleattr),
-                                              array('class' => 'togglebutton '.$toggleattr['class']));
+                                              array('class' => 'togglebutton '.$toggleattr['class'],
+                                                    'title' => $toggleattr['title']));
             $toggle = new html_table_cell($togglebutton);
             $toggle->attributes['class'] = 'buttons';
             $row[] = $toggle;
@@ -482,7 +529,6 @@ class mod_grouptool_renderer extends plugin_renderer_base {
             $movedown = new html_table_cell($movedownbutton);
             $movedown->attributes['class'] = 'buttons';
             $row[] = $movedown;
-            // TODO delete funktionality!
             $delete = new html_table_cell($deletebutton);
             $delete->attributes['class'] = 'buttons';
             $row[] = $delete;
@@ -501,7 +547,7 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         }
 
         $table->data = $rows;
-        $table->attributes['class'] .= 'drag_list table table-condensed';
+        $table->attributes['class'] .= ' drag_list ';
 
         $controller = html_writer::link(new moodle_url($PAGE->url,
                                                        array('class_action' => 'select',
@@ -514,6 +560,12 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                                              'do_class_action' => '1')),
                                         get_string('none'),
                                         array('class' => 'simple_select_none'));
+        if ($sortlist->usesize) {
+            $controller = html_writer::tag('span', $controller, array('class' => 'text-left')).
+                          html_writer::tag('span', get_string('individual_size_info', 'grouptool'),
+                                           array('class' => 'text-info text-right pull-right'));
+        }
+
         $controller = html_writer::tag('div', $controller);
 
         $tablehtml = $controller.html_writer::table($table).$controller;
@@ -521,12 +573,14 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         $content = html_writer::tag('div', $tablehtml, array('class' => 'drag_area'));
 
         $html = html_writer::tag('div', $content, array('class' => 'fitem sortlist_container'));
+
         // Init JS!
         $context = context_module::instance($sortlist->cm->id);
         $PAGE->requires->yui_module('moodle-mod_grouptool-sortlist',
                                     'M.mod_grouptool.init_sortlist',
                                     array(array('lang'      => current_language(),
                                                 'contextid' => $context->id)));
+
         return $html;
     }
 
@@ -600,9 +654,6 @@ class mod_grouptool_renderer extends plugin_renderer_base {
                                               $checkalllink.$checknonelink.
                                               $checktogglelink.$submitbutton,
                                               $attr);
-        $formattr = array('name' => 'checkboxcontroler',
-                          'method' => 'POST');
-        $checkboxcontrols = html_writer::tag('form', $checkboxcontrols, $formattr);
         return $checkboxcontrols;
     }
 }

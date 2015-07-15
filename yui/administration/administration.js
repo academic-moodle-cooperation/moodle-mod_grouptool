@@ -50,7 +50,8 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         },
         ATTRS = {
             contextid : { 'value' : 0},
-            lang : { 'value' : 'en'}
+            lang : { 'value' : 'en'},
+            globalsize : { 'value' : 3}
         };
 
     //this line use existing name path if it exists, ortherwise create a new one.
@@ -62,6 +63,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             M.mod_grouptool.contextid = config.contextid;
             M.mod_grouptool.lang = config.lang;
             M.mod_grouptool.filter = config.filter;
+            M.mod_grouptool.globalsize = config.globalsize;
             Y.log('Initalize Grouptool group administration', "info",  "grouptool");
             Y.all('a.renamebutton').on('click', M.mod_grouptool.renamegroup);
             Y.all('a.resizebutton').on('click', M.mod_grouptool.resizegroup);
@@ -213,6 +215,10 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         button.hide('fadeOut');
         field.hide('fadeOut');
         field.setAttribute('type', 'text');
+        var tmpnode = Y.Node.create("<div class=\"infonode alert-info\" style=\"display:none\">" +
+                                    M.util.get_string('ajax_edit_size_help', 'mod_grouptool') + "</div>");
+        var helpNode = text.insertBefore(tmpnode, text);
+        helpNode.show('fadeIn');
         field.show('fadeIn');
         field.focus();
         field.select();
@@ -234,6 +240,10 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                         if (infoNode) {
                             infoNode.hide('fadeOut');
                             infoNode.remove();
+                        }
+                        if (helpNode) {
+                            helpNode.hide('fadeOut');
+                            helpNode.remove();
                         }
                         Y.log("Start AJAX Call to resize group " + grpid, "info", "grouptool");
                     },
@@ -259,7 +269,12 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                                         response.message + "</div>");
                             infoNode = text.insertBefore(tmpnode, text);
                             infoNode.show('fadeIn');
-                            text.setHTML(field.get('value'));
+                            var newvalue = field.get('value');
+                            if (newvalue == '') {
+                                text.setHTML(M.mod_grouptool.globalsize+'*');
+                            } else {
+                                text.setHTML(newvalue);
+                            }
                             field.hide('fadeOut');
                             field.setAttribute('value', field.get('value'));
                             field.setAttribute('type', 'hidden');
@@ -305,6 +320,10 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
             if (infoNode) {
                 infoNode.hide('fadeOut');
                 infoNode.remove();
+            }
+            if (helpNode) {
+                helpNode.hide('fadeOut');
+                helpNode.remove();
             }
             field.detach();
         }, 'esc');

@@ -1479,11 +1479,16 @@ class mod_grouptool {
             if ($gform->is_cancelled()) {
                 // Nothing to do here!
             } else if ($fromform = $gform->get_data()) {
-                $group = new stdClass();
-                $group->id = $DB->get_field('grouptool_agrps', 'id', array('groupid' => $fromform->resize,
-                                                                           'grouptoolid' => $this->cm->instance));
-                $group->grpsize = $fromform->size;
-                $DB->update_record('grouptool_agrps', $group);
+                if (empty($fromform->size)) {
+                    $DB->set_field('grouptool_agrps', 'grpsize', null, array('groupid'     => $fromform->resize,
+                                                                             'grouptoolid' => $this->cm->id));
+                } else {
+                    $group = new stdClass();
+                    $group->id = $DB->get_field('grouptool_agrps', 'id', array('groupid' => $fromform->resize,
+                                                                               'grouptoolid' => $this->cm->instance));
+                    $group->grpsize = $fromform->size;
+                    $DB->update_record('grouptool_agrps', $group);
+                }
             } else {
                 $data = new stdClass();
                 $data->size = $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'     => $resize,
@@ -1667,6 +1672,7 @@ class mod_grouptool {
             $grp[] =& $mform->createElement('select', 'bulkaction', '', $actions);
             $grp[] =& $mform->createElement('submit', 'start', get_string('start', 'grouptool'));
             $mform->addGroup($grp, 'actiongrp', '', ' ', false);
+            $mform->disable_form_change_checker();
 
             $mform->display();
 
@@ -1683,10 +1689,12 @@ class mod_grouptool {
             }
             $PAGE->requires->yui_module('moodle-mod_grouptool-administration',
                                         'M.mod_grouptool.init_administration',
-                                        array(array('lang'      => current_language(),
-                                                    'contextid' => $this->context->id,
-                                                    'filter'    => $curfilter)));
+                                        array(array('lang'       => current_language(),
+                                                    'contextid'  => $this->context->id,
+                                                    'filter'     => $curfilter,
+                                                    'globalsize' => $this->grouptool->grpsize,)));
             $PAGE->requires->strings_for_js(array('active', 'inactive', 'confirm_delete'), 'mod_grouptool');
+            $PAGE->requires->string_for_js('ajax_edit_size_help', 'mod_grouptool');
             $PAGE->requires->strings_for_js(array('yes', 'no'), 'moodle');
         }
     }

@@ -95,7 +95,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
     M.mod_grouptool.init_sortlist = function(config) { //'config' contains the parameter values
         //Listen for all drop:over events
         //Y.DD.DDM._debugShim = true;
-
+        Y.log('Initialize Grouptool sortlist', 'info', 'grouptool');
         //enable the drag-symbols when JS is enabled :)
         Y.all('.drag_list .draggable_item .drag_image').removeClass('js_invisible');
 
@@ -352,19 +352,6 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             // Swap list-elements
             e.target.ancestor('.draggable_item').swap(e.target.ancestor('.draggable_item').next('.draggable_item'));
 
-            if (e.target.ancestor('.draggable_item').previous('.draggable_item') == null) {
-                // First list-element? -> hide move-up-link!
-                e.target.ancestor('.draggable_item').next('.draggable_item').all('.moveupbutton').setStyle('visibility',
-                                                                                                           'visible');
-                e.target.ancestor('.draggable_item').all('.moveupbutton').setStyle('visibility', 'hidden');
-            }
-            if (e.target.ancestor('.draggable_item').next('.draggable_item') == null) {
-                // Last list-element? -> hide move-down-link!
-                e.target.ancestor('.draggable_item').all('.movedownbutton').setStyle('visibility', 'hidden');
-                e.target.ancestor('.draggable_item').previous('.draggable_item').all('.movedownbutton').setStyle('visibility',
-                                                                                                                 'visible');
-            }
-
             e.target.ancestor('.draggable_item').one('input.sort_order').set('value', other_order);
             e.target.ancestor('.draggable_item').previous('.draggable_item').one('input.sort_order').set('value', this_order);
         });
@@ -416,19 +403,6 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                 }
             };
             Y.io(url, cfg);
-
-            if (e.target.ancestor('.draggable_item').next('.draggable_item') == null) {
-                // Last list-element? ==> show move-down-link!
-                e.target.ancestor('.draggable_item').all('.movedownbutton').setStyle('visibility', 'visible');
-                e.target.ancestor('.draggable_item').previous('.draggable_item').all('.movedownbutton').setStyle('visibility',
-                                                                                                                 'hidden');
-            }
-            if (e.target.ancestor('.draggable_item').previous('.draggable_item').previous('.draggable_item') == null) {
-                // First list-element? ==> hide move-up-link
-                e.target.ancestor('.draggable_item').all('.moveupbutton').setStyle('visibility', 'hidden');
-                e.target.ancestor('.draggable_item').previous('.draggable_item').all('.moveupbutton').setStyle('visibility',
-                                                                                                               'visible');
-            }
 
             e.target.ancestor('.draggable_item').one('input.sort_order').set('value', other_order);
             e.target.ancestor('.draggable_item').previous('.draggable_item').one('input.sort_order').set('value', this_order);
