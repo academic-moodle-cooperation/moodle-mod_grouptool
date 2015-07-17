@@ -432,14 +432,14 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             });
         }
 
-        Y.one('.simple_select_all').on('click', function(e) {
+        Y.all('.simple_select_all').on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
             Y.all('.class0').set('checked', 'checked');
         });
 
-        Y.one('.simple_select_none').on('click', function(e) {
+        Y.all('.simple_select_none').on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
