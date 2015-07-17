@@ -85,7 +85,7 @@ class mod_grouptool_groupings_creation_form extends moodleform {
         $mform->setType('start_bulkaction', PARAM_BOOL);
 
         $groupingel = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
-        $options = array('' => get_string('choose'));
+        $options = array('' => get_string('choose', 'grouptool'));
         $options['-1'] = get_string('onenewgrouping', 'grouptool');
         $options['-2'] = get_string('onenewgroupingpergroup', 'grouptool');
         $groupingel->addOptGroup("", $options);
@@ -103,8 +103,12 @@ class mod_grouptool_groupings_creation_form extends moodleform {
         $mform->setType('name', PARAM_MULTILANG);
         $mform->disabledif ('name', 'target', 'noteq', '-1');
 
-        $mform->addElement('submit', 'createGroupings', get_string('create_assign_groupings',
-                                                                   'grouptool'));
+        $grp = array();
+        $grp[] = $mform->createElement('submit', 'createGroupings', get_string('create_assign_groupings',
+                                                                               'grouptool'));
+        $grp[] = $mform->createElement('cancel');
+        $mform->addGroup($grp, 'actionbuttons', '', array(' '), false);
+        $mform->setType('actionbuttons', PARAM_RAW);
     }
 
     /**

@@ -122,6 +122,7 @@ $string['checkbox_control_header_help'] = '<p>By using this function you can act
         <li>Save your changes by clicking on the button "Save changes".</li>
     </ol>
 </p>';
+$string['choose'] = 'Choose...';
 $string['choose_group'] = 'You must choose a target group!';
 $string['choose_max'] = 'Maximum groups to choose';
 $string['choose_min'] = 'Minimum groups to choose';
@@ -394,8 +395,8 @@ $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';
 $string['number_of_students'] = 'Number of students';
 $string['occupied'] = 'Occupied';
-$string['onenewgrouping'] = 'Yes, in ONE new grouping';
-$string['onenewgroupingpergroup'] = 'Yes, one grouping PER group';
+$string['onenewgrouping'] = 'In ONE new grouping';
+$string['onenewgroupingpergroup'] = 'One grouping PER group';
 $string['orientation'] = 'PDF-orientation';
 $string['overflowwarning'] = 'If you continue importing the group size in instance {$a->instancename} will be exceeded!';
 $string['overview'] = 'Overview';

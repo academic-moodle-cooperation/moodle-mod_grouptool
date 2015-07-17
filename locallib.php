@@ -1619,7 +1619,10 @@ class mod_grouptool {
                                                                        array('id'       => $id,
                                                                              'selected' => $selected));
                     $groups = $DB->get_records_list('groups', 'id', $selected);
-                    if ($fromform = $mform->get_data()) {
+                    if ($mform->is_cancelled()) {
+                        $bulkaction = null;
+                        $selected = array();
+                    } else if ($fromform = $mform->get_data()) {
                         // Some groupings should be created...
                         if ($fromform->target == -2) { // One new grouping per group!
                             foreach ($groups as $group) {
@@ -1666,7 +1669,8 @@ class mod_grouptool {
                     }
                 break;
             }
-        } else {
+        }
+        if (!$bulkaction || !$selected || !optional_param('start_bulkaction', 0, PARAM_BOOL)) {
             // Show form!
             $formaction = new moodle_url('/mod/grouptool/view.php', array('id' => $this->cm->id,
                                                                           'tab' => 'group_admin',

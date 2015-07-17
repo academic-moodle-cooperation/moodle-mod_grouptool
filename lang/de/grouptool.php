@@ -121,6 +121,7 @@ $string['checkbox_control_header_help'] = '<p>Mit dieser Funktion können Sie ge
     <li>Übernehmen Sie Ihre Auswahl über Klick auf die Schaltfläche "Start".</li>
     <li>Speichern Sie über "Änderungen speichern".</li>
 </ol></p>';
+$string['choose'] = 'Auswählen...';
 $string['choose_group'] = 'Sie müssen eine Zielgruppe auswählen!';
 $string['choose_max'] = 'Maximalanzahl zu wählender Gruppen';
 $string['choose_min'] = 'Mindestanzahl zu wählender Gruppen';
@@ -393,8 +394,8 @@ $string['nothing_to_push'] = 'Nichts zu übernehmen!';
 $string['nowhere_queued'] = 'Keine Wartelisteneinträge';
 $string['number_of_students'] = 'Anzahl an Benutzer/innen';
 $string['occupied'] = 'Belegt';
-$string['onenewgrouping'] = 'Ja, in EINER neuen Gruppierung';
-$string['onenewgroupingpergroup'] = 'Ja, eine Gruppierung PRO Gruppe';
+$string['onenewgrouping'] = 'In EINER neuen Gruppierung';
+$string['onenewgroupingpergroup'] = 'Eine Gruppierung PRO Gruppe';
 $string['orientation'] = 'PDF-Ausrichtung';
 $string['overflowwarning'] = 'Wenn Sie fortfahren wird die Gruppengröße in der Instanz {$a->instancename} überschritten!';
 $string['overview'] = 'Überblick';
