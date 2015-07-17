@@ -91,7 +91,7 @@ class mod_grouptool_view_import_form extends moodleform {
                 foreach ($active->groups as $grp) {
                     $options[$grp->groupid] = $grp->name;
                 }
-                $groups->addOptGroup(get_string('active', 'grouptool').' '.get_string('groups'), $options);
+                $groups->addOptGroup(get_string('activegroups', 'grouptool'), $options);
             }
 
             if (!empty($inactive->groups)) {
@@ -99,7 +99,7 @@ class mod_grouptool_view_import_form extends moodleform {
                 foreach ($inactive->groups as $grp) {
                     $options[$grp->groupid] = $grp->name;
                 }
-                $groups->addOptGroup(get_string('inactive', 'grouptool').' '.get_string('groups'), $options);
+                $groups->addOptGroup(get_string('inactivegroups', 'grouptool'), $options);
             }
             $groups->setMultiple(true);
             $mform->addElement($groups);

@@ -30,6 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['activated_groups'] = 'Gruppen aktiviert!';
 $string['active'] = 'Aktiv';
+$string['activegroups'] = 'Aktive Gruppen';
 $string['add_member'] = 'Füge {$a->username} zur Gruppe {$a->groupname} hinzu';
 $string['added_member'] = '{$a->username} zur Gruppe {$a->groupname} hinzugefügt';
 $string['administration'] = 'Administration';
@@ -325,6 +326,7 @@ $string['import_user'] = 'Importieren von {$a->fullname} ({$a->idnumber}) in Gru
 $string['import_user_prev'] = 'Importiere {$a->fullname} ({$a->idnumber}) in Gruppe {$a->groupname}.';
 $string['import_user_problem'] = 'Fehler beim Importieren von {$a->fullname} (ID-Nummer: {$a->idnumber}) in Gruppe {$a->groupname}.';
 $string['inactive'] = 'Inaktiv';
+$string['inactivegroups'] = 'Inaktive Gruppen';
 $string['includedeleted'] = 'Include deleted users';
 $string['includedeleted_help'] = 'If checked, deleted users won\'t get filtered out of the list. Deleted user-accounts can\'t be enroled in the course during import process.';
 $string['incomplete_only_label'] = 'Zeige nur Gruppen mit fehlenden Bewertungen';
