@@ -1405,25 +1405,6 @@ class mod_grouptool {
         }
 
         $inactivetabs = array();
-        if (!$active = $DB->count_records('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
-                                                              'active'      => 1))) {
-            $inactivetabs[] = self::FILTER_ACTIVE;
-            if ($filter == self::FILTER_ACTIVE) {
-                $filter = self::FILTER_ALL;
-            }
-        }
-        if (!$inactive = $DB->count_records('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
-                                                                     'active'      => 0))) {
-            $inactivetabs[] = self::FILTER_INACTIVE;
-            if ($filter == self::FILTER_INACTIVE) {
-                $filter = self::FILTER_ALL;
-            }
-        }
-        if (!$all = $DB->count_records('grouptool_agrps', array('grouptoolid' => $this->grouptool->id))) {
-            $inactivetabs[] = self::FILTER_INACTIVE;
-            $inactivetabs[] = self::FILTER_ACTIVE;
-            $filter = self::FILTER_ALL;
-        }
 
         $filtertabs['active'] = new tabobject(self::FILTER_ACTIVE,
                                               $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.

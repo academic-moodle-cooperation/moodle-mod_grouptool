@@ -51,6 +51,7 @@ try {
     $PAGE->set_url('/mod/grouptool/editgroup_ajax.php', array('action' => $action,
                                                               'contextid' => $context->id,
                                                               'lang' => $lang));
+    $coreoutput = $PAGE->get_renderer('core', null, RENDERER_TARGET_GENERAL);
     $result = new stdClass();
     $result->error = false;
     if ($action == 'test') {
@@ -138,40 +139,18 @@ try {
             } else {
                 $result->message = "Activated group ".$groupid." in grouptool ".$cm->instance."!";
             }
-            $result->filtertabs = new stdClass();
-            $result->filtertabs->current = $filter;
-            $result->filtertabs->activestr = get_string('active', 'grouptool');
-            $result->filtertabs->inactivestr = get_string('inactive');
-            $result->filtertabs->allstr = get_string('all');
-            $result->filtertabs->activeid = mod_grouptool::FILTER_ACTIVE;
-            $result->filtertabs->inactiveid = mod_grouptool::FILTER_INACTIVE;
-            $result->filtertabs->allid = mod_grouptool::FILTER_ALL;
-            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
-                $activeurl = new moodle_url('/mod/grouptool/view.php',
-                                            array('id'     => $cm->id,
-                                                  'tab'    => 'group_admin',
-                                                  'filter' => mod_grouptool::FILTER_ACTIVE));
-                $result->filtertabs->active = $activeurl->out(false);
+
+            if (($filter == mod_grouptool::FILTER_INACTIVE)
+                && !$DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 0))) {
+                $url = new moodle_url($PAGE->url, array('id'     => $cm->instance,
+                                                        'tab'    => 'group_admin',
+                                                        'filter' => mod_grouptool::FILTER_ALL));
+                $message = get_string('nogroupsinactive', 'grouptool').' '.
+                           html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                $result->noentriesmessage = $OUTPUT->box($coreoutput->notification($message, 'notifymessage'),
+                                                         'generalbox', 'nogroupsinfo');
             } else {
-                $result->filtertabs->active = '';
-            }
-            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 0))) {
-                $inactiveurl = new moodle_url('/mod/grouptool/view.php',
-                                              array('id'     => $cm->id,
-                                                    'tab'    => 'group_admin',
-                                                    'filter' => mod_grouptool::FILTER_INACTIVE));
-                $result->filtertabs->inactive = $inactiveurl->out(false);
-            } else {
-                $result->filtertabs->inactive = '';
-            }
-            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance))) {
-                $allurl = new moodle_url('/mod/grouptool/view.php',
-                                         array('id'     => $cm->id,
-                                               'tab'    => 'group_admin',
-                                               'filter' => mod_grouptool::FILTER_ALL));
-                $result->filtertabs->all = $allurl->out(false);
-            } else {
-                $result->filtertabs->all = '';
+                $result->noentriesmessage = '';
             }
 
             break;
@@ -185,41 +164,19 @@ try {
                  $result->message = "Deactivated group ".$groupid." in grouptool ".$cm->instance."!";
             }
 
-            $result->filtertabs = new stdClass();
-            $result->filtertabs->current = $filter;
-            $result->filtertabs->activestr = get_string('active', 'grouptool');
-            $result->filtertabs->inactivestr = get_string('inactive');
-            $result->filtertabs->allstr = get_string('all');
-            $result->filtertabs->activeid = mod_grouptool::FILTER_ACTIVE;
-            $result->filtertabs->inactiveid = mod_grouptool::FILTER_INACTIVE;
-            $result->filtertabs->allid = mod_grouptool::FILTER_ALL;
-            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
-                $activeurl = new moodle_url('/mod/grouptool/view.php',
-                                            array('id'     => $cm->id,
-                                                  'tab'    => 'group_admin',
-                                                  'filter' => mod_grouptool::FILTER_ACTIVE));
-                $result->filtertabs->active = $activeurl->out(false);
+            if (($filter == mod_grouptool::FILTER_ACTIVE)
+                && !$DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 1))) {
+                $url = new moodle_url($PAGE->url, array('id'     => $cm->instance,
+                                                        'tab'    => 'group_admin',
+                                                        'filter' => mod_grouptool::FILTER_ALL));
+                $message = get_string('nogroupsactive', 'grouptool').' '.
+                           html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                $result->noentriesmessage = $OUTPUT->box($coreoutput->notification($message, 'notifymessage'),
+                                                         'generalbox', 'nogroupsinfo');
             } else {
-                $result->filtertabs->active = '';
+                $result->noentriesmessage = '';
             }
-            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance, 'active' => 0))) {
-                $inactiveurl = new moodle_url('/mod/grouptool/view.php',
-                                              array('id'     => $cm->id,
-                                                    'tab'    => 'group_admin',
-                                                    'filter' => mod_grouptool::FILTER_INACTIVE));
-                $result->filtertabs->inactive = $inactiveurl->out(false);
-            } else {
-                $result->filtertabs->inactive = '';
-            }
-            if ($DB->count_records('grouptool_agrps', array('grouptoolid' => $cm->instance))) {
-                $allurl = new moodle_url('/mod/grouptool/view.php',
-                                         array('id'     => $cm->id,
-                                               'tab'    => 'group_admin',
-                                               'filter' => mod_grouptool::FILTER_ALL));
-                $result->filtertabs->all = $allurl->out(false);
-            } else {
-                $result->filtertabs->all = '';
-            }
+
             break;
         case 'reorder': // Reorder groups...
             $data = required_param_array('order', PARAM_INT);

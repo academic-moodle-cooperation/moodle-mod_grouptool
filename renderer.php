@@ -359,9 +359,26 @@ class mod_grouptool_renderer extends plugin_renderer_base {
         global $CFG, $PAGE, $OUTPUT;
 
         if (empty($sortlist->groups) || !is_array($sortlist->groups) || count($sortlist->groups) == 0) {
-            return $OUTPUT->box($OUTPUT->notification(get_string('sortlist_no_data', 'grouptool'),
-                                                      'notifymessage'),
-                                'generalbox');
+            switch ($sortlist->filter) {
+                case mod_grouptool::FILTER_ACTIVE:
+                    $url = new moodle_url($PAGE->url, array('filter' => mod_grouptool::FILTER_ALL));
+                    $message = get_string('nogroupsactive', 'grouptool').' '.
+                               html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                    break;
+                case mod_grouptool::FILTER_INACTIVE:
+                    $url = new moodle_url($PAGE->url, array('filter' => mod_grouptool::FILTER_ALL));
+                    $message = get_string('nogroupsinactive', 'grouptool').' '.
+                               html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                    break;
+                case mod_grouptool::FILTER_ALL:
+                    $url = new moodle_url($PAGE->url, array('tab' => 'group_creation'));
+                    $message = get_string('nogroups', 'grouptool').' '.
+                               html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
+                    break;
+                default:
+                    $message = var_dump($sortlist->filter);
+            }
+            return $OUTPUT->box($OUTPUT->notification($message, 'notifymessage'), 'generalbox', 'nogroupsinfo');
         }
 
         // Generate draggable items - each representing 1 group!
@@ -571,7 +588,30 @@ class mod_grouptool_renderer extends plugin_renderer_base {
 
         $tablehtml = $controller.html_writer::table($table).$controller;
 
-        $content = html_writer::tag('div', $tablehtml, array('class' => 'drag_area'));
+        if (count($sortlist->groups)) {
+            $content = html_writer::tag('div', $tablehtml, array('class' => 'drag_area'));
+        } else {
+            switch ($sortlist->filter) {
+                case mod_grouptool::FILTER_ACTIVE:
+                    $url = new moodle_url($PAGE->url, array('filter' => mod_grouptool::FILTER_ALL));
+                    $message = get_string('nogroupsactive', 'grouptool').' '.
+                               html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                    break;
+                case mod_grouptool::FILTER_INACTIVE:
+                    $url = new moodle_url($PAGE->url, array('filter' => mod_grouptool::FILTER_ALL));
+                    $message = get_string('nogroupsinactive', 'grouptool').' '.
+                               html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                    break;
+                case mod_grouptool::FILTER_ALL:
+                    $url = new moodle_url($PAGE->url, array('tab' => 'group_creation'));
+                    $message = get_string('nogroups', 'grouptool').' '.
+                               html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
+                    break;
+                default:
+                    $message = var_dump($sortlist->filter);
+            }
+            $content = $OUTPUT->box($OUTPUT->notification($message, 'notifymessage'), 'generalbox', 'nogroupsinfo');
+        }
 
         $html = html_writer::tag('div', $content, array('class' => 'fitem sortlist_container'));
 

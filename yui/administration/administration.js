@@ -330,55 +330,6 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
         }, 'esc');
     }
 
-    M.mod_grouptool.update_filtertabs = function(data) {
-        Y.all('#filtertabs ul > li').each(function (cur, idx, list) {
-            switch (idx) {
-                case 0: // Active
-                    if (data.active != '') {
-                        cur.one('a').setAttribute('href', data.active);
-                        cur.removeClass('disabled');
-                    } else {
-                        cur.addClass('disabled');
-                        cur.one('a').removeAttribute('href');
-                    }
-                    if (data.current == data.activeid) {
-                        cur.addClass('active');
-                    } else {
-                        cur.removeClass('active');
-                    }
-                    break;
-                case 1: // Inactive
-                    if (data.inactive != '') {
-                        cur.one('a').setAttribute('href', data.inactive);
-                        cur.removeClass('disabled');
-                    } else {
-                        cur.addClass('disabled');
-                        cur.one('a').removeAttribute('href');
-                    }
-                    if (data.current == data.inactiveid) {
-                        cur.addClass('active');
-                    } else {
-                        cur.removeClass('active');
-                    }
-                    break;
-                case 2: // All
-                    if (data.all != '') {
-                        cur.one('a').setAttribute('href', data.all);
-                        cur.removeClass('disabled');
-                    } else {
-                        cur.addClass('disabled');
-                        cur.one('a').removeAttribute('href');
-                    }
-                    if (data.current == data.allid) {
-                        cur.addClass('active');
-                    } else {
-                        cur.removeClass('active');
-                    }
-                    break;
-            }
-        });
-    }
-
     M.mod_grouptool.togglegroup = function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -414,7 +365,15 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                   "success", "grouptool");
                         } else {
                             if (M.mod_grouptool.filter == 'active') {
-                                e.target.ancestor('tr').hide('fadeOut', null, function(){e.target.ancestor('tr').remove()});
+                                e.target.ancestor('tr').hide('fadeOut', null, function(){
+                                    e.target.ancestor('tr').remove();
+                                    if (response.noentriesmessage != '') {
+                                        Y.one('div.sortlist_container').hide('fadeOut', null, function() {
+                                            Y.one('div.sortlist_container').setHTML(response.noentriesmessage);
+                                            Y.one('div.sortlist_container').show('fadeIn');
+                                        });
+                                    }
+                                });
                             } else {
                                 // Else set URL and alt of new image!
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {
@@ -425,7 +384,6 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                         e.target.ancestor('tr').show('fadeIn')});
                                 // And add class dimmed_text to row!
                             }
-                            M.mod_grouptool.update_filtertabs(response.filtertabs);
                             Y.log("AJAX Call to deactivate group " + grpid + " successfull\n" + response.message,
                                   "success", "grouptool");
                         }
@@ -475,7 +433,15 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                         } else {
                             if (M.mod_grouptool.filter == 'inactive') {
                                 // If showing only active remove from list!
-                                e.target.ancestor('tr').hide('fadeOut', null, function() {e.target.ancestor('tr').remove()});
+                                e.target.ancestor('tr').hide('fadeOut', null, function() {
+                                    e.target.ancestor('tr').remove();
+                                    if (response.noentriesmessage != '') {
+                                        Y.one('div.sortlist_container').hide('fadeOut', null, function() {
+                                            Y.one('div.sortlist_container').setHTML(response.noentriesmessage);
+                                            Y.one('div.sortlist_container').show('fadeIn');
+                                        });
+                                    }
+                                });
                             } else {
                                 // Else set URL and alt of new image!
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {
@@ -486,7 +452,6 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                         // TODO move node in list to correct position?
                                         e.target.ancestor('tr').show('fadeIn')});
                             }
-                            M.mod_grouptool.update_filtertabs(response.filtertabs);
                             Y.log("AJAX Call to activate group " + grpid + " successfull\n" + response.message,
                                   "success", "grouptool");
                         }
