@@ -521,13 +521,13 @@ class mod_grouptool_renderer extends plugin_renderer_base {
             }
 
             if ($group->status) {
-                $toggleattr = array('src'   => $OUTPUT->pix_url('t/go'),
+                $toggleattr = array('src'   => $OUTPUT->pix_url('active', 'mod_grouptool'),
                                     'alt'   => $activestr,
                                     'title' => $activestr,
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'active');
             } else {
-                $toggleattr = array('src'   => $OUTPUT->pix_url('t/stop'),
+                $toggleattr = array('src'   => $OUTPUT->pix_url('inactive', 'mod_grouptool'),
                                     'alt'   => $inactivestr,
                                     'title' => $inactivestr,
                                     'type'  => 'image',

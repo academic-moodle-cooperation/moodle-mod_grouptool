@@ -379,7 +379,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {
                                         e.target.ancestor('tr').addClass('dimmed_text');
                                         e.target.replaceClass('active', 'inactive');
-                                        e.target.setAttribute('src', M.util.image_url('t/stop'));
+                                        e.target.setAttribute('src', M.util.image_url('inactive', 'mod_grouptool'));
                                         e.target.setAttribute('alt', M.util.get_string('inactive', 'mod_grouptool'));
                                         e.target.ancestor('tr').show('fadeIn')});
                                 // And add class dimmed_text to row!
@@ -447,7 +447,7 @@ YUI.add('moodle-mod_grouptool-administration', function(Y) {
                                 e.target.ancestor('tr').hide('fadeOut', null, function() {
                                         e.target.ancestor('tr').removeClass('dimmed_text');
                                         e.target.replaceClass('inactive', 'active');
-                                        e.target.setAttribute('src', M.util.image_url('t/go'));
+                                        e.target.setAttribute('src', M.util.image_url('active', 'mod_grouptool'));
                                         e.target.setAttribute('alt', M.util.get_string('active', 'mod_grouptool'));
                                         // TODO move node in list to correct position?
                                         e.target.ancestor('tr').show('fadeIn')});
