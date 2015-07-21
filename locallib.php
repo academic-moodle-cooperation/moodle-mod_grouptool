@@ -1682,6 +1682,7 @@ class mod_grouptool {
             $mform->addElement('html', $output->render($sortlist));
 
             $actions = array(
+                '' => get_string('choose', 'grouptool'),
                 'activate' => get_string('setactive', 'grouptool'),
                 'deactivate' => get_string('setinactive', 'grouptool'),
                 'delete' => get_string('delete'),
