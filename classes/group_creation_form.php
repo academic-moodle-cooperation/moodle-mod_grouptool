@@ -97,17 +97,23 @@ class group_creation_form extends \moodleform {
                 $mform->setDefault('roleid', $student->id);
             }
 
-            // Since 2.8 the capability gets checked by cohort_get_available_cohorts()!
-            $cohorts = cohort_get_available_cohorts($coursecontext, true, 0, 0);
-            if (count($options) != 0) {
-                $options = array(0 => get_string('anycohort', 'cohort'));
-                foreach ($cohorts as $cohort) {
-                     $options[$cohort->id] = $cohort->name;
+            $canviewcohorts = has_capability('moodle/cohort:view', $this->context);
+            if ($canviewcohorts) {
+                $cohorts = cohort_get_available_cohorts($coursecontext, true, 0, 0);
+                if (count($cohorts) != 0) {
+                    $options = array(0 => get_string('anycohort', 'cohort'));
+                    foreach ($cohorts as $cohort) {
+                         $options[$cohort->id] = $cohort->name;
+                    }
+                    $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
+                                                                        'grouptool'), $options);
+                    $mform->setDefault('cohortid', '0');
                 }
-                $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
-                                                                    'grouptool'), $options);
-                $mform->setDefault('cohortid', '0');
             } else {
+                $cohorts = array();
+            }
+
+            if (!$canviewcohorts || (count($cohorts) == 0)){
                 $mform->addElement('hidden', 'cohortid');
                 $mform->setType('cohortid', PARAM_INT);
                 $mform->setConstant('cohortid', '0');
