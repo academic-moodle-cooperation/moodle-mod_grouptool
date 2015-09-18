@@ -35,19 +35,18 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 /**
  * class representing the moodleform used in the import-tab
  *
- * @package       mod
- * @subpackage    grouptool
- * @copyright     2012 onwards Philipp Hager {@link e0803285@gmail.com}
- * @since         Moodle 2.2.1+ (Build: 20120127)
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @since         Moodle 2.8+
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_form extends \moodleform {
     /**
      * Definition of import form
-     *
-     * @global object $CFG
-     * @global object $DB
-     * @global object $PAGE
      */
     protected function definition() {
 

@@ -28,6 +28,17 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\registration_created class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class registration_created extends \core\event\base {
     /**
      * Init method.
@@ -40,6 +51,13 @@ class registration_created extends \core\event\base {
         $this->data['objecttable'] = 'grouptool_registered';
     }
 
+    /**
+     * Convenience method for registrations created via observer/eventhandler
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $regdata registration entries data
+     * @return \mod_grouptool\registration_created event object
+     */
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = 'event';
         $event = self::create(array(
@@ -50,6 +68,13 @@ class registration_created extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method for registrations created via direct user action
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $regdata registration entries data
+     * @return \mod_grouptool\registration_created event object
+     */
     public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
         $event = self::create(array(

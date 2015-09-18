@@ -46,10 +46,6 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 class group_resize_form extends \moodleform {
     /**
      * Definition of resize form
-     *
-     * @global object $CFG
-     * @global object $DB
-     * @global object $PAGE
      */
     protected function definition() {
 

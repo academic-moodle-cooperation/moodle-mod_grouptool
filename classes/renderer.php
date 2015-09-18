@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A sortable list of course groups including some additional information and fields
+ * This file contains the renderer class for mod_grouptool
  *
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -25,16 +25,25 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_grouptool\output;
- 
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Grouptools renderer class
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager (office@phager.at)
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class renderer extends \plugin_renderer_base {
 
     /**
-     * Returns the input field in HTML
+     * Render a sortable list of groups with some additional controls
      *
-     * @since     1.0
-     * @access    public
+     * @param \mod_grouptool\sortlist $sortlist Sortlist to render
      * @return    string
      */
     public function render_sortlist(sortlist $sortlist) {
@@ -307,6 +316,12 @@ class renderer extends \plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * Render a controller for the sortable list of groups
+     *
+     * @param \mod_grouptool\sortlist_controller $controller Sortlist controller to render
+     * @return    string
+     */
     protected function render_sortlist_controller(sortlist_controller $controller) {
         global $OUTPUT;
 
@@ -329,7 +344,7 @@ class renderer extends \plugin_renderer_base {
 
         if (!empty($sortlist->groupings) && is_array($sortlist->groupings)) {
             foreach ($sortlist->groupings as $groupingid => $grouping) {
-                /* 
+                /*
                  * We have only non-empty groupings here, it should also work with empty ones but would make no sense.
                  * Maybe we use disabled options for all the empty groupings.
                  */
@@ -339,7 +354,7 @@ class renderer extends \plugin_renderer_base {
 
         $checkboxcontrols = $checkboxcontroltitle;
 
-        // Add Radiobuttons and Go Button
+        // Add Radiobuttons and Go Button!
         $checkalllink = \html_writer::tag('span',
                                          \html_writer::empty_tag('input', array('name'  => 'class_action',
                                                                                'type'  => 'radio',

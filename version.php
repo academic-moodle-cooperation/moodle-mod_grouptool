@@ -15,10 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version.php
- * Defines the version of grouptool
- * This code fragment is called by moodle_needs_upgrading() and
- * /admin/index.php
+ * version.php Defines the version of grouptool
+ *
+ * This code fragment is called by moodle_needs_upgrading() and /admin/index.php
  *
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)

@@ -25,27 +25,55 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_grouptool\output;
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Representation of single group with advanced fields!
  *
- * TODO: should we make these renderable with a nice standardised view?
+ * @todo should we make these renderable with a nice standardised view?
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager (office@phager.at)
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class activegroup {
+    /** @var int $id active groups ID */
     public $id;
+    /** @var int $groupid active groups related group ID */
     public $groupid;
+    /** @var int $grouptoolid active groups related grouptool ID */
     public $grouptoolid;
 
+    /** @var string $name active groups name */
     public $name;
+    /** @var int $size active groups group-size */
     public $size;
+    /** @var int $order active groups sort order */
     public $order;
+    /** @var int[] $groupings active groups related groupings */
     public $groupings;
+    /** @var bool $status active groups status (active/inactive) */
     public $status;
 
+    /** @var bool $selected active groups selection status (selected or not) */
     public $selected;
 
+    /**
+     * Constructor for activegroup
+     *
+     * @param int $id active groups id
+     * @param int $groupid active groups group id
+     * @param int $grouptoolid active groups grouptool id
+     * @param string $name active groups name
+     * @param int $size active groups group-size
+     * @param int $order active groups sort order
+     * @param bool $status active groups status (1-active/0-inactive)
+     * @param int[] $groupings (optional) array of active groups grouping ids
+     * @param bool $selected (optional) selection status of active group (selected or not)
+     */
     public function __construct($id, $groupid, $grouptoolid, $name, $size, $order, $status, $groupings=array(), $selected=0) {
         $this->id = $id;
         $this->groupid = $groupid;
@@ -58,12 +86,25 @@ class activegroup {
         $this->selected = $selected;
     }
 
+    /**
+     * Convenience method using data in object
+     *
+     * @param \stdClass $data Object containing all necessary data
+     * @return \mod_grouptool\output\activegroup active group object
+     */
     public static function construct_from_obj($data) {
         return new activegroup($data->id, $data->groupid, $data->grouptoolid, $data->name,
                                $data->size, $data->order, $data->status, $data->groupings,
                                $data->selected);
     }
 
+    /**
+     * Convenience method using group and grouptoolid to fetch it from DB
+     *
+     * @param int $groupid ID of related moodle-group
+     * @param int $grouptoolid ID of related grouptool instance
+     * @return \mod_grouptool\output\activegroup active group object
+     */
     public function get_by_groupid($groupid, $grouptoolid) {
         global $DB;
 
@@ -92,6 +133,11 @@ class activegroup {
         return $this->construct_from_obj($obj);
     }
 
+    /**
+     * Load active groups related groupings
+     *
+     * @return void
+     */
     public function load_groupings() {
         $this->groupings = $DB->get_records_sql_menu("SELECT groupingid, name
                                                         FROM {groupings_groups}

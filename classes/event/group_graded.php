@@ -28,11 +28,20 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\group_graded class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class group_graded extends \core\event\base {
     /**
      * Init method.
-     *
-     * Please override this in extending class and specify objecttable.
      *
      * @return void
      */
@@ -42,6 +51,13 @@ class group_graded extends \core\event\base {
         $this->data['objecttable'] = 'grouptool';
     }
 
+    /**
+     * Convenience method to create event object from data when grading group with certain id
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $data grading data to log
+     * @return \mod_grouptool\group_graded event object
+     */
     public static function create_direct(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
         $data->type = 'group';
@@ -53,6 +69,13 @@ class group_graded extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object from data when grading group without knowledge of the groups id
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $data grading data to log
+     * @return \mod_grouptool\group_graded event object
+     */
     public static function create_without_groupid(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
         $data->type = 'users';

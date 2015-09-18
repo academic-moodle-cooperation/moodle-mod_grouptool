@@ -25,27 +25,44 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_grouptool\output;
- 
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Representation a sortable collection of active groups with advanced fields!
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager (office@phager.at)
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class sortlist implements \renderable {
-
+    /** @var string $tableclass CSS class for table */
     public $tableclass = 'coloredrows';
-
+    /** @var \stdClass[] $groupings array of non-empty groupings of this course */
     public $groupings = array();
-
+    /** @var \mod_grouptool\output\activegroup[] $groups array of activegroups */
     public $groups = array();
-
+    /** @var int $globalsize active groups standard/global group size */
     public $globalsize = 0;
-
+    /** @var bool $usesize whether or not to use group size */
     public $usesize = 0;
-
+    /** @var bool $useindividual whether or not to use individual group size per activegroup */
     public $useindividual = 0;
-
+    /** @var int $filter current filter (all/active/inactive) */
     public $filter = null;
-
+    /** @var \stdClass $cm course module object */
     public $cm = null;
 
+    /**
+     * Constructor
+     *
+     * @param int $courseid ID of related course
+     * @param \stdClass $cm course module object
+     * @param int $filter optional current filter (active/inactive/all)
+     */
     public function __construct($courseid, $cm, $filter=null) {
         global $SESSION, $DB, $OUTPUT;
 
@@ -102,6 +119,12 @@ class sortlist implements \renderable {
         }
     }
 
+    /**
+     * Load the groups from DB
+     *
+     * @param int $courseid Course for whom to fetch the groups
+     * @param \stdClass $cm course module object
+     */
     public function loadgroups($courseid, $cm) {
         global $DB;
 
@@ -181,18 +204,23 @@ class sortlist implements \renderable {
     }
 
     /**
-     * compares if two groups are in correct order
+     * Compare if two groups are in correct order
+     *
+     * @param \mod_grouptool\output\activegroup $a
+     * @param \mod_grouptool\output\activegroup $b
+     *
+     * @return int -1 (a > b)| 0 (a == b)| 1 (a > b)
      */
-    public function cmp($element1, $element2) {
-        if ($element1->order == $element2->order) {
+    public function cmp($a, $b) {
+        if ($a->order == $b->order) {
             return 0;
         } else {
-            return $element1->order > $element2->order ? 1 : -1;
+            return $a->order > $b->order ? 1 : -1;
         }
     }
 
     /**
-     * updates the element selected-state if corresponding params are set
+     * Update the element selected-state if corresponding params are set
      */
     public function _refresh_select_state() {
         global $COURSE;

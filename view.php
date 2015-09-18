@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * view.php
- * Prints a particular instance of grouptool
+ * view.php Prints a particular instance of grouptool
  *
  * Shows different tabs according to users capabilities
  * |-- administration: tools for creating groups, groupings

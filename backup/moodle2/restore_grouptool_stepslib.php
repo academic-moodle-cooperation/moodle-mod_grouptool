@@ -29,9 +29,21 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Structure step to restore one grouptool activity
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_grouptool_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Defines the structure for grouptool and it's elements to be restored
+     *
+     * @return object the root element for the backup structure
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -56,6 +68,11 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process restoration of 1 grouptool instance
+     *
+     * @param stdClass $data data for this grouptool entry
+     */
     protected function process_grouptool($data) {
         global $DB;
 
@@ -85,6 +102,11 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Process restoration of 1 of grouptool instances active-group
+     *
+     * @param stdClass $data data for this grouptools active group entry
+     */
     protected function process_grouptool_agrp($data) {
         global $DB, $OUTPUT;
 
@@ -110,6 +132,11 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         }
     }
 
+    /**
+     * Process the restoration of a single registration for an active-group
+     *
+     * @param stdClass $data data for this registration entry
+     */
     protected function process_agrp_registration($data) {
         global $DB, $OUTPUT;
 
@@ -144,6 +171,11 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         }
     }
 
+    /**
+     * Process the restoration of a single queue-entry for an active-group
+     *
+     * @param stdClass $data data for this queue entry
+     */
     protected function process_agrp_queue($data) {
         global $DB;
 
@@ -176,8 +208,10 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         }
     }
 
+    /**
+     * Add grouptool related files after restore execution, no need to match by itemname (jst internally handled context)!
+     */
     protected function after_execute() {
-        // Add grouptool related files, no need to match by itemname (jst internally handled context)!
         $this->add_related_files('mod_grouptool', 'intro', null);
     }
 }

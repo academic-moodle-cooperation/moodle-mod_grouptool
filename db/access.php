@@ -28,7 +28,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-// We haven't done this before so: @todo comment what's each capability is about!
+// We haven't done this before so: TODO: comment what's each capability is about!
         'mod/grouptool:addinstance' => array(
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,

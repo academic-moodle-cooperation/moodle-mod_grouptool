@@ -29,9 +29,21 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Define the complete grouptool structure for backup, with file and id annotations
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_grouptool_activity_structure_step extends backup_activity_structure_step {
 
+    /**
+     * Defines the structure to be backed up for grouptool and it's elements
+     *
+     * @return object the root element for the backup structure
+     */
     protected function define_structure() {
 
         // Are we including userinfo?

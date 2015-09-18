@@ -28,13 +28,35 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\group_recreated class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class group_recreated extends \core\event\base {
+    /**
+     * Init method.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'groups';
     }
 
+    /**
+     * Convenience method to create event object from data
+     *
+     * @param \stdClass $data data of recreated group
+     * @return \mod_grouptool\group_recreated event object
+     */
     public static function create_from_object($data) {
         $event = self::create(array(
             'objectid' => $data['newid'],

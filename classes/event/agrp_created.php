@@ -28,13 +28,35 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\agrp_created class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class agrp_created extends \core\event\base {
+    /**
+     * Init method.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'grouptool_agrps';
     }
 
+    /**
+     * Create the event object and set properties.
+     *
+     * @param \stdClass $cm Course-Module object
+     * @param \mod_grouptool\agrp_created $agrp active-group object which has been created
+     */
     public static function create_from_object(\stdClass $cm, $agrp) {
         $event = self::create(array(
             'objectid' => $agrp->id,

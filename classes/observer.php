@@ -29,12 +29,23 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
 
+/**
+ * mod_grouptool_observer handles events due to changes in moodle core which affect grouptool
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @since         Moodle 2.8+
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_grouptool_observer {
     /**
      * group_member_added
      *
-     * @param $event
-     * @global DB
+     * @param \core\event\group_member_added $event Event object containing useful data
      * @return bool true if success
      */
     public static function group_member_added(\core\event\group_member_added $event) {
@@ -91,17 +102,15 @@ class mod_grouptool_observer {
         }
         return true;
     }
+
     /**
      * group_remove_member_handler
      * event:       groups_member_removed
      * schedule:    instant
      *
-     * @param array groupid, userid
-     * @global DB
-     * @global COURSE
+     * @param \core\event\group_member_removed $event Event object containing useful data
      * @return bool true if success
      */
-
     public static function group_member_removed(\core\event\group_member_removed $event) {
         global $DB, $CFG;
 
@@ -290,9 +299,7 @@ class mod_grouptool_observer {
     /**
      * group_deleted
      *
-     * @param $event
-     * @global CFG
-     * @global DB
+     * @param \core\event\group_deleted $event Event object containing useful data
      * @return bool true if success
      */
     public static function group_deleted(\core\event\group_deleted $event) {
@@ -404,8 +411,7 @@ class mod_grouptool_observer {
     /**
      * group_created
      *
-     * @param  $event
-     * @global DB
+     * @param  \core\event\group_created $event Event object containing useful data
      * @return bool true if success
      */
     public static function group_created(\core\event\group_created $event) {

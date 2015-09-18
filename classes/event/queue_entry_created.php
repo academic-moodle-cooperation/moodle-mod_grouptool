@@ -28,11 +28,20 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\queue_entry_created class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class queue_entry_created extends \core\event\base {
     /**
      * Init method.
-     *
-     * Please override this in extending class and specify objecttable.
      *
      * @return void
      */
@@ -42,6 +51,13 @@ class queue_entry_created extends \core\event\base {
         $this->data['objecttable'] = 'grouptool_queued';
     }
 
+    /**
+     * Convenience method to create event object from data
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $regdata data of the created queue entry
+     * @return \mod_grouptool\queue_entry_created event object
+     */
     public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
         $event = self::create(array(

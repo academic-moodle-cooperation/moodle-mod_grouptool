@@ -46,10 +46,6 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 class group_rename_form extends \moodleform {
     /**
      * Definition of rename form
-     *
-     * @global object $CFG
-     * @global object $DB
-     * @global object $PAGE
      */
     protected function definition() {
 

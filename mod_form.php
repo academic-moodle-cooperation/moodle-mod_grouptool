@@ -311,6 +311,16 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $this->add_action_buttons();
     }
 
+    /**
+     * Validation for mod_form
+     * If there are errors return array of errors ("fieldname"=>"error message"),
+     * otherwise true if ok.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *               or an empty array if everything is OK.
+     */
     public function validation($data, $files) {
         global $DB;
         $parenterrors = parent::validation($data, $files);

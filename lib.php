@@ -74,7 +74,7 @@ function grouptool_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $grouptool An object from the form in mod_form.php
+ * @param stdClass $grouptool An object from the form in mod_form.php
  * @param mod_grouptool_mod_form $mform
  * @return int The id of the newly inserted grouptool record
  */
@@ -164,7 +164,7 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $grouptool An object from the form in mod_form.php
+ * @param stdClass $grouptool An object from the form in mod_form.php
  * @param mod_grouptool_mod_form $mform
  * @return boolean Success/Fail
  */
@@ -305,7 +305,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
 /**
  * function looks through all the queues and moves users from queue to reg if theres place
  *
- * @param object|int grouptool or grouptoolid
+ * @param stdClass|int $grouptool grouptool object or grouptoolid
  */
 function grouptool_update_queues($grouptool = 0) {
     global $DB;
@@ -469,6 +469,10 @@ function grouptool_get_coursemodule_info($coursemodule) {
  * $return->info = a short text description
  *
  * @todo do we need this here?
+ * @param \stdClass $course courseobject
+ * @param \stdClass $user userobject
+ * @param \stdClass $mod moduleobject
+ * @param \stdClass $grouptool grouptool object
  *
  * @return stdClass|null
  */
@@ -481,66 +485,8 @@ function grouptool_user_outline($course, $user, $mod, $grouptool) {
 }
 
 /**
- * Prints a detailed representation of what a user has done with
- * a given particular instance of this module, for user activity reports.
- *
- * @todo do we need this here?
- *
- * @param stdClass $course the current course record
- * @param stdClass $user the record of the user we are generating report for
- * @param cm_info $mod course module info
- * @param stdClass $grouptool the module instance record
- * @return void, is supposed to echp directly
- */
-function grouptool_user_complete($course, $user, $mod, $grouptool) {
-}
-
-/**
- * Given a course and a time, this module should find recent activity
- * that has occurred in grouptool activities and print it out.
- * Return true if there was output, or false is there was none.
- *
- * @return boolean
- */
-function grouptool_print_recent_activity($course, $viewfullnames, $timestart) {
-    $return = false;
-    return $return;  // True if anything was printed, otherwise false!
-}
-
-/**
- * Prepares the recent activity data
- *
- * This callback function is supposed to populate the passed array with
- * custom activity records. These records are then rendered into HTML via
- * {@link grouptool_print_recent_mod_activity()}.
- *
- * @param array $activities sequentially indexed array of objects with the 'cmid' property
- * @param int $index the index in the $activities to use for the next record
- * @param int $timestart append activity since this time
- * @param int $courseid the id of the course we produce the report for
- * @param int $cmid course module id
- * @param int $userid check for a particular user's activity only, defaults to 0 (all users)
- * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
- * @return void adds items into $activities and increases $index
- */
-function grouptool_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid,
-                                           $userid=0, $groupid=0) {
-    return;
-}
-
-/**
- * Prints single activity item prepared by {@link grouptool_get_recent_mod_activity()}
- *
- * @return void
- */
-function grouptool_print_recent_mod_activity($activity, $courseid, $detail, $modnames,
-                                             $viewfullnames) {
-}
-
-/**
  * Returns all other caps used in the module
  *
- * @example return array('moodle/site:accessallgroups');
  * @return array
  */
 function grouptool_get_extra_capabilities() {
@@ -555,13 +501,12 @@ function grouptool_get_extra_capabilities() {
  *
  * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
  *
- * @param navigation_node $navref An object representing the navigation tree node
- *                                of the grouptool module instance
- * @param stdClass $course
- * @param stdClass $module
- * @param cm_info $cm
+ * @param navigation_node $navref Object representing the nav tree node of the grouptool mod instance
+ * @param stdClass $course course object
+ * @param stdClass $module module object
+ * @param cm_info $cm cousre module info object
  */
-function grouptool_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module,
+function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module,
                                      cm_info $cm) {
     global $DB;
     $context = context_module::instance($cm->id);
@@ -687,9 +632,10 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
 }
 
 /**
- * prepares text for mymoodle-Page to be displayed
- * @param $courses
- * @param $htmlarray
+ * prepare text for mymoodle-Page to be displayed
+ *
+ * @param stdClass[] $courses
+ * @param string[] $htmlarray
  */
 function grouptool_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB, $OUTPUT;
@@ -844,7 +790,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
  * This function is used by the reset_course_userdata function in moodlelib.
  * This function will remove all posts from the specified grouptool(s)
  * and clean up any related data.
- * @param $data the data submitted from the reset course.
+ *
+ * @param stdClass $data the data submitted from the reset course.
  * @return array status array
  */
 function grouptool_reset_userdata($data) {
@@ -900,7 +847,7 @@ function grouptool_reset_userdata($data) {
 /**
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the grouptool.
- * @param $mform form passed by reference
+ * @param stdClass $mform form passed by reference
  */
 function grouptool_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'grouptoolheader', get_string('modulenameplural', 'grouptool'));
@@ -923,6 +870,8 @@ function grouptool_reset_course_form_definition(&$mform) {
 
 /**
  * Course reset form defaults.
+ *
+ * @param sdtClass $course courseobject
  */
 function grouptool_reset_course_form_defaults($course) {
     return array('reset_grouptool_registrations'     => 1,
@@ -933,6 +882,10 @@ function grouptool_reset_course_form_defaults($course) {
 
 /**
  * Copy Assign Grades from one user to another user (in assign_grade table)
+ *
+ * @param int $id Assignment ID
+ * @param int $fromid User ID from whom will be copied
+ * @param int $toid User ID to whom will be copied
  */
 function grouptool_copy_assign_grades($id, $fromid, $toid) {
     global $DB;

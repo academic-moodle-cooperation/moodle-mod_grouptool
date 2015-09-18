@@ -28,13 +28,38 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\group_creation_started class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class group_creation_started extends \core\event\base {
+    /**
+     * Init method.
+     *
+     * @return void
+     */
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'grouptool';
     }
 
+    /**
+     * Convenience method to create event object when creating groups by amount
+     *
+     * @param \stdClass $cm course module object
+     * @param string $pattern name scheme used when creating groups
+     * @param int $amount number of created groups
+     * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
+     * @return \mod_grouptool\group_creation_started event object
+     */
     public static function create_groupamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create(array(
             'objectid' => $cm->instance,
@@ -47,6 +72,15 @@ class group_creation_started extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object when creating groups by amount of groupmembers
+     *
+     * @param \stdClass $cm course module object
+     * @param string $pattern name scheme used when creating groups
+     * @param int $amount number of created groups
+     * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
+     * @return \mod_grouptool\group_creation_started event object
+     */
     public static function create_memberamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create(array(
             'objectid' => $cm->instance,
@@ -59,6 +93,16 @@ class group_creation_started extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object when creating groups from X to Y
+     *
+     * @param \stdClass $cm course module object
+     * @param string $pattern name scheme used when creating groups
+     * @param int $from lowest index for created groups
+     * @param int $to highest index for created groups
+     * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
+     * @return \mod_grouptool\group_creation_started event object
+     */
     public static function create_fromto(\stdClass $cm, $pattern, $from, $to, $grouping = 0) {
         $event = self::create(array(
             'objectid' => $cm->instance,
@@ -72,6 +116,14 @@ class group_creation_started extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object when creating 1-person-groups
+     *
+     * @param \stdClass $cm course module object
+     * @param string $pattern name scheme used when creating groups
+     * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
+     * @return \mod_grouptool\group_creation_started event object
+     */
     public static function create_person(\stdClass $cm, $pattern, $grouping = 0) {
         $event = self::create(array(
             'objectid' => $cm->instance,

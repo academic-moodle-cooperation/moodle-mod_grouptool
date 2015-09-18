@@ -28,11 +28,20 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\queue_entry_deleted class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class queue_entry_deleted extends \core\event\base {
     /**
      * Init method.
-     *
-     * Please override this in extending class and specify objecttable.
      *
      * @return void
      */
@@ -42,6 +51,13 @@ class queue_entry_deleted extends \core\event\base {
         $this->data['objecttable'] = 'grouptool_queued';
     }
 
+    /**
+     * Convenience method to create event object if queue entry is deleted by observer/eventhandler
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $entrydata data of deleted queue entry
+     * @return \mod_grouptool\queue_entry_deleted event object
+     */
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = 'event';
         $event = self::create(array(
@@ -52,6 +68,13 @@ class queue_entry_deleted extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object if queue entry is deleted i.e. because user has enough registrations
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $entrydata data of deleted queue entry
+     * @return \mod_grouptool\queue_entry_deleted event object
+     */
     public static function create_limit_violation(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->reason = 'registration limit violation';
         $event = self::create(array(
@@ -62,6 +85,13 @@ class queue_entry_deleted extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method to create event object if queue entry is deleted by direct user action
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $entrydata data of deleted queue entry
+     * @return \mod_grouptool\queue_entry_deleted event object
+     */
     public static function create_direct(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = null;
         $entrydata->reason = null;

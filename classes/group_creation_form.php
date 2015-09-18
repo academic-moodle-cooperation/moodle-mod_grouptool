@@ -44,10 +44,16 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 class group_creation_form extends \moodleform {
 
     /**
-     * Variable containing reference to our sortlist, so we can alter current active entries afterwards
+     * @var \mod_grouptool\output\sortlist contains reference to our sortlist, so we can alter current active entries afterwards
      */
     private $_sortlist = null;
 
+    /**
+     * Update currently active sortlist elements
+     *
+     * @param bool[] $curactive currently active entries
+     * @return void
+     */
     public function update_cur_active($curactive = null) {
         if (!empty($curactive) && is_array($curactive)) {
             $this->_sortlist->_options['curactive'] = $curactive;
@@ -56,13 +62,8 @@ class group_creation_form extends \moodleform {
 
     /**
      * Definition of group creation form
-     *
-     * @global object $CFG
-     * @global object $DB
-     * @global object $PAGE
      */
     protected function definition() {
-
         global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
@@ -113,7 +114,7 @@ class group_creation_form extends \moodleform {
                 $cohorts = array();
             }
 
-            if (!$canviewcohorts || (count($cohorts) == 0)){
+            if (!$canviewcohorts || (count($cohorts) == 0)) {
                 $mform->addElement('hidden', 'cohortid');
                 $mform->setType('cohortid', PARAM_INT);
                 $mform->setConstant('cohortid', '0');

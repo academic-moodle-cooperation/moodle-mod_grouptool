@@ -33,6 +33,17 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\user_moved class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class user_moved extends \core\event\base {
     /**
      * Init method.
@@ -45,6 +56,14 @@ class user_moved extends \core\event\base {
         $this->data['objecttable'] = 'grouptool_registered';
     }
 
+    /**
+     * Convenience method usable if user has been promoted/moved from the queue to regular registrations
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $from data from which queue entry the user has been moved
+     * @param \stdClass $to data to which registration entry the user has been moved
+     * @return \mod_grouptool\user_moved event object
+     */
     public static function promotion_from_queue(\stdClass $cm, \stdClass $from, \stdClass $to) {
         $event = self::create(array(
             'objectid' => $to->id,
@@ -54,6 +73,14 @@ class user_moved extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method usable if user has been moved from one group to another
+     *
+     * @param \stdClass $cm course module object
+     * @param \stdClass $from data from which queue entry the user has been moved
+     * @param \stdClass $to data to which registration entry the user has been moved
+     * @return \mod_grouptool\user_moved event object
+     */
     public static function move(\stdClass $cm, \stdClass $from, \stdClass $to) {
         $event = self::create(array(
             'objectid' => $to->id,

@@ -31,8 +31,14 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_stepslib.php');
 
 /**
- * grouptool restore task that provides all the settings and steps to perform one
- * complete restore of the activity
+ * grouptool restore task that provides everything to perform one complete restore of the activity
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_grouptool_activity_task extends restore_activity_task {
 

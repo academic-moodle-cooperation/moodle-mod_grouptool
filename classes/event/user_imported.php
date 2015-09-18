@@ -28,11 +28,20 @@
 namespace mod_grouptool\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The \mod_grouptool\user_imported class holds the logic for the event
+ *
+ * @package       mod_grouptool
+ * @since         Moodle 2.7
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class user_imported extends \core\event\base {
     /**
      * Init method.
-     *
-     * Please override this in extending class and specify objecttable.
      *
      * @return void
      */
@@ -42,6 +51,16 @@ class user_imported extends \core\event\base {
         $this->data['objecttable'] = 'grouptool_registered';
     }
 
+    /**
+     * Convenience method for user imports where registration in grouptool is forced
+     *
+     * @param \stdClass $cm course module object
+     * @param int $id grouptool id
+     * @param int $agrp active group id
+     * @param int $group group id
+     * @param int $user user id
+     * @return \mod_grouptool\user_imported event object
+     */
     public static function import_forced(\stdClass $cm, $id, $agrp, $group, $user) {
         $event = self::create(array(
             'objectid' => $id,
@@ -51,6 +70,14 @@ class user_imported extends \core\event\base {
         return $event;
     }
 
+    /**
+     * Convenience method for user imports
+     *
+     * @param \stdClass $cm course module object
+     * @param int $group group id
+     * @param int $user user id
+     * @return \mod_grouptool\user_imported event object
+     */
     public static function import(\stdClass $cm, $group, $user) {
         $event = self::create(array(
             'objectid' => 0,

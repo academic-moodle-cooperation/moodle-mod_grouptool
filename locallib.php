@@ -67,8 +67,17 @@ class mod_grouptool {
     /** @var object instance's context record */
     private $context;
 
+    /**
+     * filter all groups
+     */
     const FILTER_ALL = 0;
+    /**
+     * filter active groups
+     */
     const FILTER_ACTIVE = 1;
+    /**
+     * filter inactive groups
+     */
     const FILTER_INACTIVE = 2;
 
     /**
@@ -76,11 +85,10 @@ class mod_grouptool {
      *
      * If cmid is set create the cm, course, checkmark objects.
      *
-     * @global object $DB
      * @param int $cmid the current course module id - not set for new grouptools
-     * @param object $grouptool usually null, but if we have it we pass it to save db access
-     * @param object $cm usually null, but if we have it we pass it to save db access
-     * @param object $course usually null, but if we have it we pass it to save db access
+     * @param stdClass $grouptool usually null, but if we have it we pass it to save db access
+     * @param stdClass $cm usually null, but if we have it we pass it to save db access
+     * @param stdClass $course usually null, but if we have it we pass it to save db access
      */
     public function __construct($cmid, $grouptool=null, $cm=null, $course=null) {
         global $DB;
@@ -130,6 +138,11 @@ class mod_grouptool {
         $this->defaultformat = editors_get_preferred_format();
     }
 
+    /**
+     * Return the grouptools name
+     *
+     * @return string the name
+     */
     public function get_name() {
         return $this->grouptool->name;
     }
@@ -140,7 +153,6 @@ class mod_grouptool {
      * If a string or moodle_url is given instead of a single_button, method defaults to post.
      * If cancel=null only continue button is displayed!
      *
-     * @global object $OUTPUT
      * @param string $message The question to ask the user
      * @param single_button|moodle_url|string $continue The single_button component representing the
      *                                                  Continue answer. Can also be a moodle_url
@@ -191,8 +203,9 @@ class mod_grouptool {
      *
      * @param string $namescheme The scheme used for building group names
      * @param int $groupnumber The number of the group to be used in the parsed format string
-     * @param object|array $members optional object or array of objects containing data of members
+     * @param stdClass|array $members optional object or array of objects containing data of members
      *                              for the tags to be replaced with
+     * @param int $digits optional number of digits for from-to-group-creation
      * @return string the parsed format string
      */
     private function groups_parse_name($namescheme, $groupnumber, $members = null, $digits = 0) {
@@ -281,9 +294,7 @@ class mod_grouptool {
     /**
      * Update active group settings for this instance
      *
-     * @global object $DB
-     * @global object $PAGE
-     * @param object $grouplist List of groups as returned by sortlist-Element
+     * @param stdClass $grouplist List of groups as returned by sortlist-Element
      * @param int $grouptoolid optinoal ID of the instance to update for
      * @return true if successfull
      */
@@ -328,11 +339,8 @@ class mod_grouptool {
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance
      *
-     * @global object $DB
-     * @global object $PAGE
-     * @global object $USER
-     * @param object $data data from administration-form with all settings for group creation
-     * @param array $users which users to registrate in the created groups
+     * @param stdClass $data data from administration-form with all settings for group creation
+     * @param stdClass[] $users which users to registrate in the created groups
      * @param int $userpergrp how many users should be registrated per group
      * @param int $numgrps how many groups should be created
      * @param bool $previewonly optional only show preview of created groups
@@ -564,10 +572,7 @@ class mod_grouptool {
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance
      *
-     * @global object $DB
-     * @global object $PAGE
-     * @global object $USER
-     * @param object $data data from administration-form with all settings for group creation
+     * @param stdClass $data data from administration-form with all settings for group creation
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      */
@@ -701,11 +706,8 @@ class mod_grouptool {
     /**
      * Create a moodle group for each of the users in $users
      *
-     * @global object $DB
-     * @global object $PAGE
-     * @global object $USER
-     * @param array $users array of users-objects for which to create the groups
-     * @param array $namescheme scheme determining how to name the created groups
+     * @param stdClass[] $users array of users-objects for which to create the groups
+     * @param string $namescheme scheme determining how to name the created groups
      * @param int $grouping -1 => create new grouping,
      *                       0 => no grouping,
      *                      >0 => assign groups to grouping with that id
@@ -873,9 +875,6 @@ class mod_grouptool {
      * $SESSION->grouptool->view_administration->grouplist[$group->id]['active']
      * to determin which groups have been selected
      *
-     * @global object $SESSION
-     * @global object $PAGE
-     * @global object $OUTPUT
      * @param int $courseid optional id of course to create for
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
@@ -986,9 +985,6 @@ class mod_grouptool {
      * $SESSION->grouptool->view_administration->grouplist[$group->id]['active']
      * to determin which groups have been selected
      *
-     * @global object $SESSION
-     * @global object $PAGE
-     * @global object $OUTPUT
      * @param int $target -1 for new grouping or groupingid
      * @param string $name name for new grouping if $target = -1
      * @param bool $previewonly optional only show preview of created groups
@@ -1083,10 +1079,6 @@ class mod_grouptool {
 
     /**
      * Outputs the content of the administration tab and manages actions taken in this tab
-     *
-     * @global object $SESSION
-     * @global object $OUTPUT
-     * @global object $PAGE
      */
     public function view_administration() {
         global $SESSION, $OUTPUT, $PAGE, $DB, $USER, $CFG;
@@ -1415,10 +1407,6 @@ class mod_grouptool {
 
     /**
      * Outputs the content of the creation tab and manages actions taken in this tab
-     *
-     * @global object $SESSION
-     * @global object $OUTPUT
-     * @global object $PAGE
      */
     public function view_creation() {
         global $SESSION, $OUTPUT, $PAGE, $DB;
@@ -1653,10 +1641,9 @@ class mod_grouptool {
     /**
      * returns a checkboxcontroller (like in moodleform - just without form)
      *
-     * @global object $CFG
      * @param int $groupid ID of checkboxgroup to control (--> checkbox has class "checkboxgroupX")
      * @param string $text optional text to output before submitlink
-     * @param array $attributes optional array of attributes for submitlink
+     * @param string[] $attributes optional array of attributes for submitlink
      * @param bool $originalvalue optional state of checkboxes @ first load
      * @return string HTML Fragment containing html table with necessary data/elements or message
      */
@@ -1721,19 +1708,15 @@ EOS;
     /**
      * returns table used in group-grading form
      *
-     * @global object $OUTPUT
-     * @global object $USER
-     * @global object $PAGE
      * @param int $activity ID of activity to get/set grades from/for
      * @param bool $mygroupsonly limit source-grades to those given by current user
      * @param bool $incompleteonly show only groups which have not-graded members
      * @param int $filter GROUPTOOL_FILTER_ALL => all groups
      *                    GROUPTOOL_FILTER_NONCONFLICTING => groups with exactly 1 graded member
      *                    >0 => id of single group
-     * @param array $selected array with ids of groups/users to copy grades to as keys
-     *                        (depends on filter)
-     * @param array $missingsource optional array with ids of entries for whom no source has been
-     *                                      selected (just to display a clue to select a source)
+     * @param int[] $selected array with ids of groups/users to copy grades to as keys (depends on filter)
+     * @param int[] $missingsource optional array with ids of entries for whom no source has been selected
+     *                             (just to display a clue to select a source)
      * @return string HTML Fragment containing checkbox-controller and dependencies
      */
     private function get_grading_table($activity, $mygroupsonly, $incompleteonly, $filter,
@@ -1989,15 +1972,11 @@ EOS;
     /**
      * copies the grades from the source(s) to the target(s) for the selected activity
      *
-     * @global object $DB
-     * @global object $USER
-     * @global object $PAGE
      * @param int $activity ID of activity to get/set grades from/for
      * @param bool $mygroupsonly limit source-grades to those given by current user
-     * @param array $selected array with ids of groups/users to copy grades to as keys
-     *                        (depends on filter)
-     * @param array $source optional array with ids of entries for whom no source has been
-     *                                      selected (just to display a clue to select a source)
+     * @param int[] $selected array with ids of groups/users to copy grades to as keys (depends on filter)
+     * @param int[] $source optional array with ids of entries for whom no source has been selected
+     *                      (just to display a clue to select a source)
      * @param bool $overwrite optional overwrite existing grades (std: false)
      * @param bool $previewonly optional just return preview data
      * @return array ($error, $message)
@@ -2311,12 +2290,6 @@ EOS;
 
     /**
      * view grading-tab
-     *
-     * @global object $SESSION
-     * @global object $PAGE
-     * @global object $CFG
-     * @global object $OUTPUT
-     * @global object $USER
      */
     public function view_grading() {
         global $SESSION, $PAGE, $CFG, $OUTPUT, $USER, $DB;
@@ -2359,7 +2332,7 @@ EOS;
         if ($filter > 0) {
             if ($step == 2) {
                 $source = optional_param('source', null, PARAM_INT);
-                // Serialized data @todo better PARAM_TYP?
+                // Serialized data TODO: better PARAM_TYPE?
                 $selected = optional_param('selected', null, PARAM_RAW);
                 if (!empty($selected)) {
                     $selected = unserialize($selected);
@@ -2733,8 +2706,6 @@ EOS;
     /**
      * gets data about active groups for this instance
      *
-     * @global object $DB
-     * @global object $PAGE
      * @param bool $includeregs optional include registered users in returned object
      * @param bool $includequeues optional include queued users in returned object
      * @param int $agrpid optional filter by a single active-groupid from {grouptool_agrps}.id
@@ -2850,10 +2821,6 @@ EOS;
     /**
      * unregisters/unqueues a user from a certain active-group
      *
-     * @global object $USER
-     * @global object $PAGE
-     * @global object $DB
-     * @global object $CFG
      * @param int $agrpid active-group-id to unregister/unqueue user from
      * @param int $userid user to unregister/unqueue
      * @param bool $previewonly optional don't act, just return a preview
@@ -3079,12 +3046,10 @@ EOS;
     /**
      * registers/queues a user in a certain active-group
      *
-     * @global object $USER
-     * @global object $PAGE
-     * @global object $DB
      * @param int $agrpid active-group-id to register/queue user to
      * @param int $userid user to register/queue
      * @param bool $previewonly optional don't act, just return a preview
+     * @param bool $movefromqueue optional whether or not the move is from the queue
      * @return array ($error, $message)
      */
     private function register_in_agrp($agrpid=0, $userid=0, $previewonly=false, $movefromqueue=false) {
@@ -3575,8 +3540,6 @@ EOS;
     /**
      * returns number of queue-entries for a particular user in a particular grouptool-instance
      *
-     * @global object $DB
-     * @global object $USER
      * @param int $grouptoolid optional stats from which grouptool-instance should be obtained?
      *                                  uses this->grouptool->id if zero
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
@@ -3608,8 +3571,6 @@ EOS;
     /**
      * returns number of reg-entries for a particular user in a particular grouptool-instance
      *
-     * @global object $DB
-     * @global object $USER
      * @param int $grouptoolid optional stats from which grouptool-instance should be obtained?
      *                                  uses this->grouptool->id if zero
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
@@ -3641,8 +3602,8 @@ EOS;
     /**
      * helperfunction compares to objects using a particular timestamp-property
      *
-     * @param object $a object containing timestamp property
-     * @param object $b object containing timestamp property
+     * @param stdClass $a object containing timestamp property
+     * @param stdClass $b object containing timestamp property
      * @return int 0 if equal, +1 if $a->timestamp > $b->timestamp or -1 if otherwise
      */
     private function cmptimestamp($a, $b) {
@@ -3659,9 +3620,7 @@ EOS;
      * to determin rank otherwise if $data is an integer uses DB-query to get queue rank in
      * active group with id == $data
      *
-     * @global object $DB
-     * @param array|int $data array with regs/queues for a group like returned
-     *                        by get_active_groups() or agrpid
+     * @param int[]|int $data array with regs/queues for a group like returned by get_active_groups() or agrpid
      * @param int $userid user for whom data should be returned
      * @return int rank in queue/registration (registration only via $data-array)
      */
@@ -3699,8 +3658,6 @@ EOS;
      * else if $user == null data about $USERs registrations/queues is added
      * else data about $userids registrations/queues is added
      *
-     * @global object $USER
-     * @global object $DB
      * @param int $userid id of user for whom data should be added
      *                    or 0 (=$USER) or null (=no userdata)
      * @return object object containing information about active groups
@@ -3801,9 +3758,6 @@ EOS;
      * @todo sometimes not every queue entry is resolved, happened unregularly on development system
      *       watch in production system
      *
-     * @global object $OUTPUT
-     * @global object $DB
-     * @global object $USER
      * @param string $mode optional, without function, reserved for optional later implementation
      *                     (random/alphabetical/... distribution, etc)
      * @param bool $previewonly show only preview of actions
@@ -4014,6 +3968,15 @@ EOS;
         return array($error, $returntext);
     }
 
+    /**
+     * Return all marks for the specified user
+     *
+     * The marks are the registation entries before they become active
+     * (i.e. if not enough groups have been chosen).
+     *
+     * @param int $userid (optional) User-ID for which the marks should be returned
+     * @return stdClass[] Users marks
+     */
     public function get_user_marks($userid=0) {
         global $DB, $USER, $OUTPUT;
 
@@ -4063,6 +4026,11 @@ EOS;
         return $marks;
     }
 
+    /**
+     * Delete users marks
+     *
+     * @param int $userid (optional) User for whom the marks should be deleted
+     */
     public function delete_user_marks($userid=0) {
         global $DB;
 
@@ -4074,12 +4042,25 @@ EOS;
         }
     }
 
+    /**
+     * Count users marks
+     *
+     * @param int $userid (optional) User for whom the marks should be counted
+     * @return int amount of users marks
+     */
     public function count_user_marks($userid=0) {
         $marks = $this->get_user_marks($userid);
 
         return count($marks);
     }
 
+    /**
+     * Return if a group is already marked by a user
+     *
+     * @param int $agrpid activegroup id which should be checked
+     * @param int $userid (optional) User for whom the group should be checked
+     * @return bool true if marked
+     */
     public function grpmarked($agrpid, $userid=0) {
         global $DB, $USER;
 
@@ -4095,12 +4076,6 @@ EOS;
 
     /**
      * view selfregistration-tab
-     *
-     * @global object $OUTPUT
-     * @global object  $DB
-     * @global object  $CFG
-     * @global object  $USER
-     * @global object  $PAGE
      */
     public function view_selfregistration() {
         global $OUTPUT, $DB, $CFG, $USER, $PAGE, $SESSION;
@@ -4629,12 +4604,10 @@ EOS;
     /**
      * import users into a certain moodle-group and enrole them if not allready enroled
      *
-     * @global object $DB
-     * @global object $OUTPUT
-     * @global object $CFG
-     * @global object $PAGE
-     * @param int $group id of group to import into
-     * @param object $data from form in import tab (textfield with idnumbers and group-selection)
+     * @param int[] $groups array of ids of groups to import into
+     * @param stdClass $data from form in import tab (textfield with idnumbers and group-selection)
+     * @param bool $forceregistration Force registration in grouptool
+     * @param bool $includedeleted include deleted users in import (can cause problems if they're not enrolled)
      * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
      */
@@ -4933,12 +4906,6 @@ EOS;
 
     /**
      * view import-tab
-     *
-     * @global object $OUTPUT
-     * @global object  $DB
-     * @global object  $CFG
-     * @global object  $USER
-     * @global object  $PAGE
      */
     public function view_import() {
         global $PAGE, $OUTPUT;
@@ -5004,8 +4971,6 @@ EOS;
     /**
      * get all data necessary for displaying/exporting group-overview table
      *
-     * @global object $OUTPUT
-     * @global object $CFG
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group (groupid not agroupid!)
      * @param bool $onlydata optional return object with raw data not html-fragment-string
@@ -5437,7 +5402,6 @@ EOS;
     /**
      * outputs generated pdf-file for overview (forces download)
      *
-     * @global object $USER
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      */
@@ -5652,10 +5616,11 @@ EOS;
     }
 
     /**
-     * fills workbook (either XLSX or ODS) with data
+     * Fill workbook (either XLSX or ODS) with data
      *
      * @param MoodleExcelWorkbook $workbook workbook to put data into
-     * @param array $groups which groups from whom to include data
+     * @param stdClass[] $groups which groups from whom to include data
+     * @param string[] $collapsed array with collapsed columns
      */
     private function overview_fill_workbook(&$workbook, $groups, $collapsed=array()) {
         global $CFG;
@@ -6159,7 +6124,6 @@ EOS;
     /**
      * outputs generated ods-file for overview (forces download)
      *
-     * @global object $CFG
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      */
@@ -6194,7 +6158,6 @@ EOS;
     /**
      * outputs generated xlsx-file for overview (forces download)
      *
-     * @global object $CFG
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      */
@@ -6231,7 +6194,6 @@ EOS;
     /**
      * get object containing informatino about syncronisation of active-groups with moodle-groups
      *
-     * @global object $DB
      * @param int $grouptoolid optional get stats for this grouptool-instance
      *                                  uses $this->instance if zero
      * @return array (global out of sync, array of objects with sync-status for each group)
@@ -6267,7 +6229,6 @@ EOS;
     /**
      * push in grouptool registered users to moodle-groups
      *
-     * @global object $DB
      * @param int $groupid optional only for this group
      * @param int $groupingid optional only for this grouping
      * @param bool $previewonly optional get only the preview
@@ -6365,8 +6326,6 @@ EOS;
     /**
      * Render link for Member-List
      *
-     * @global object $CFG
-     * @global object $PAGE
      * @param int $agrpid active group id, for which the members should be displayed
      * @param string $groupname name of the group
      * @return string HTML fragment
@@ -6396,9 +6355,6 @@ EOS;
 
     /**
      * view overview tab
-     *
-     * @global object $PAGE
-     * @global object $OUTPUT
      */
     public function view_overview() {
         global $PAGE, $OUTPUT;
@@ -6518,14 +6474,11 @@ EOS;
     /**
      * get information about particular users with their registrations/queues
      *
-     * @global object $DB
-     * @global object $PAGE
-     * @global object $OUTPUT
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group
      * @param int|array $userids optional get only this user(s)
-     * @param array $orderby array how data should be sorted (column as key and ASC/DESC as value)
-     * @return array of objects records from DB with all necessary data
+     * @param stdClass[] $orderby array how data should be sorted (column as key and ASC/DESC as value)
+     * @return stdClass[] array of objects records from DB with all necessary data
      */
     public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = array()) {
         global $DB, $PAGE, $OUTPUT;
@@ -6613,15 +6566,14 @@ EOS;
     }
 
     /**
-     * returns picture indicating sort-direction if data is primarily sorted by this column
+     * Return picture indicating sort-direction if data is primarily sorted by this column
      * or empty string if not
      *
-     * @global object $OUTPUT
-     * @param array $oderby array containing current state of sorting
+     * @param stdClass[] $orderby array containing current state of sorting
      * @param string $search columnname to print sortpic for
      * @return string html fragment with sort-pic or empty string
      */
-    private function pic_if_sorted($orderby = array(), $search) {
+    private function pic_if_sorted($orderby = array(), $search = '') {
         global $OUTPUT;
         $keys = array_keys($orderby);
         if (reset($keys) == $search) {
@@ -6638,9 +6590,7 @@ EOS;
     /**
      * returns collapselink (= symbol to show column or column-name and symbol to hide column)
      *
-     * @global object $PAGE
-     * @global object $OUTPUT
-     * @param array $collapsed array with collapsed columns
+     * @param string[] $collapsed array with collapsed columns
      * @param string $search column-name to print link for
      * @return string html-fragment with icon to show column or column header text with icon to hide
      *                              column
@@ -6661,15 +6611,10 @@ EOS;
     /**
      * get all data necessary for displaying/exporting userlist table
      *
-     * @global object $OUTPUT
-     * @global object $CFG
-     * @global object $DB
-     * @global object $PAGE
-     * @global object $SESSION
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group (groupid not agroupid!)
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
+     * @param stdClass[] $orderby optional current order-by array
+     * @param string[] $collapsed optional current array with collapsed columns
      * @param bool $onlydata optional return object with raw data not html-fragment-string
      * @return string|object either html-fragment representing table or raw data as object
      */
@@ -7085,11 +7030,10 @@ EOS;
     /**
      * outputs generated pdf-file for userlist (forces download)
      *
-     * @global object $USER
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
+     * @param stdClass[] $orderby optional current order-by array
+     * @param string[] $collapsed optional current array with collapsed columns
      */
     public function download_userlist_pdf($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7219,12 +7163,11 @@ EOS;
     /**
      * returns data for userlist
      *
-     * @global object $USER
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
-     * @return object raw data
+     * @param stdClass[] $orderby optional current order-by array
+     * @param string[] $collapsed optional current array with collapsed columns
+     * @return stdClass raw data
      */
     public function download_userlist_raw($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7236,8 +7179,8 @@ EOS;
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
+     * @param stdClass[] $orderby optional current order-by array
+     * @param string[] $collapsed optional current array with collapsed columns
      */
     public function download_userlist_txt($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7315,11 +7258,10 @@ EOS;
     /**
      * fills workbook (either XLSX or ODS) with data
      *
-     * @global object $SESSION
      * @param MoodleExcelWorkbook $workbook workbook to put data into
-     * @param array $data userdata with headline at index 0
-     * @param array $orderby current sort-array
-     * @param array $collapsed current collapsed columns
+     * @param stdClass[] $data userdata with headline at index 0
+     * @param stdClass[] $orderby current sort-array
+     * @param string[] $collapsed current collapsed columns
      */
     private function userlist_fill_workbook(&$workbook, $data=array(), $orderby=array(),
                                             $collapsed=array()) {
@@ -7561,11 +7503,10 @@ EOS;
     /**
      * outputs generated ods-file for userlist (forces download)
      *
-     * @global object $CFG
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
+     * @param stdClass[] $orderby optional current order-by array
+     * @param string[] $collapsed optional current array with collapsed columns
      */
     public function download_userlist_ods($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7600,11 +7541,10 @@ EOS;
     /**
      * outputs generated xlsx-file for userlist (forces download)
      *
-     * @global object $CFG
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param array $orderby optional current order-by array
-     * @param array $collapsed optional current array with collapsed columns
+     * @param stdClass[] $orderby optional current order-by array
+     * @param string[] $collapsed optional current array with collapsed columns
      */
     public function download_userlist_xlsx($groupid = 0, $groupingid = 0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7640,9 +7580,6 @@ EOS;
 
     /**
      * view userlist tab
-     *
-     * @global object $PAGE
-     * @global object $OUTPUT
      */
     public function view_userlist() {
         global $PAGE, $OUTPUT;

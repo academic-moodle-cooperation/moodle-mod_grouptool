@@ -15,9 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_form.php
- * This class extends the moodle pdf class with a custom header and some helperfunctions for
- * proper data-output.
+ * Extending the moodle pdf class with a custom header and some helperfunctions for proper data-output.
  *
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -32,6 +30,16 @@ require_once('../../lib/pdflib.php');
 
 define('NORMLINEHEIGHT', 12);
 
+/**
+ * Extended pdf class with convenience methods for outputting Grouptool pdfs
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class pdf extends \pdf {
     /** @var string[] $header1 defines what's in the upper row of page-header **/
     protected $header1 = null;
@@ -244,10 +252,10 @@ class pdf extends \pdf {
      * add_grp_overview writes data about 1 group to pdf
      *
      * @param string $groupname
-     * @param object $groupinfo some statistic data about the group
-     * @param array $registration the users registered in grouptool-group
-     * @param array $queue the queued users
-     * @param array $moodlemembers the users registered in moodle-group
+     * @param stdClass $groupinfo some statistic data about the group
+     * @param stdClass[] $registration the users registered in grouptool-group
+     * @param stdClass[] $queue the queued users
+     * @param stdClass[] $moodlemembers the users registered in moodle-group
      *
      */
     public function add_grp_overview($groupname, $groupinfo, $registration=array(), $queue=array(),
@@ -392,11 +400,10 @@ class pdf extends \pdf {
      * @param string $name of user
      * @param string|integer $idnumber of user
      * @param string $email user's email
-     * @param array $registrations
-     * @param array $queues
+     * @param stdClass[] $registrations
+     * @param stdClass[] $queues
      * @param bool $header if it's a header-row or not
      * @param bool $getheightonly return only the height of the row
-     * @global $SESSION
      * @return void|int height of written row
      *
      */

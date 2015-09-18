@@ -28,10 +28,26 @@ namespace mod_grouptool\output;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Representation of a controller for use with sortlist!
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager (office@phager.at)
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class sortlist_controller implements \renderable {
 
+    /** @var \mod_grouptool\output\sortlist Sortlist instance */
     public $sortlist = null;
 
+    /**
+     * Constructor
+     *
+     * @param \mod_grouptool\output\sortlist $sortlist Sortlist to be used without
+     */
     public function __construct(sortlist &$sortlist) {
         global $SESSION;
         $this->sortlist = $sortlist;

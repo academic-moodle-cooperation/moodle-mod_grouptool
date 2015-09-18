@@ -45,10 +45,6 @@ class groupings_creation_form extends \moodleform {
 
     /**
      * Definition of administration form
-     *
-     * @global object $CFG
-     * @global object $DB
-     * @global object $PAGE
      */
     protected function definition() {
 

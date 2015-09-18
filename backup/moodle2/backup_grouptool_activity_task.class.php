@@ -33,8 +33,14 @@ require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/backup_grouptool_ste
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/backup_grouptool_settingslib.php');
 
 /**
- * grouptool backup task that provides all the settings and steps to perform one
- * complete backup of the activity
+ * grouptool backup task that provides everything to perform one complete backup of the activity
+ *
+ * @package       mod_grouptool
+ * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
+ * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
+ * @author        Philipp Hager
+ * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_grouptool_activity_task extends backup_activity_task {
 
@@ -57,6 +63,9 @@ class backup_grouptool_activity_task extends backup_activity_task {
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable (encoded) links
+     *
+     * @param string $content URL to be modified
+     * @return string modified URL
      */
     static public function encode_content_links($content) {
         global $CFG;

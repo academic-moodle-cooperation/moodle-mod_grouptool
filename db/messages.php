@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = array (
-// Any additional messages needed? @todo Think about sending other messages too!
+// Any additional messages needed? TODO: Think about sending other messages too!
 
 /*
  * Registration info for users who get registrated because they're queued and another person
