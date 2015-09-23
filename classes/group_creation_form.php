@@ -180,7 +180,9 @@ class group_creation_form extends \moodleform {
              */
             $mform->setType('digits', PARAM_RAW);
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
-                             array(' - ', ' '.get_string('digits', 'grouptool').' '), false);
+                             array(' '.\html_writer::tag('label', '-', array('for' => 'id_from')).' ',
+                                   ' '.\html_writer::tag('label', get_string('digits', 'grouptool'),
+                                                         array('for' => 'id_digits')).' '), false);
             $mform->disabledif ('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
             $mform->disabledif ('to', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
             $mform->disabledif ('digits', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);

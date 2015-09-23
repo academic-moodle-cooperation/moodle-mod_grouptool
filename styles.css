@@ -13,15 +13,17 @@
 
 /** administration styles **/
 
-.path-mod-grouptool .error [for=id_digits] {
+.path-mod-grouptool .error label[for=id_digits],
+.path-mod-grouptool .error label[for=id_from],
+.path-mod-grouptool .error label[for=id_to] {
     /*let the digits label stay black - doesn't work right now*/
-    color:#000000 !important;
+    color:#000;
 }
 
 /** sortable grouplist styles **/
 
 .path-mod-grouptool .tabtree {
-    margin-bottom:0px;
+    margin-bottom:0;
 }
 
 .path-mod-grouptool .moodlegrpslnk {
@@ -36,7 +38,7 @@
 /* CSS Fallback to make sure it isn't visible! */
 .path-mod-grouptool .drag_area .draggable_item:first-child .moveupbutton ,
 .path-mod-grouptool .drag_area .draggable_item:last-child .movedownbutton  {
-    visibility:hidden !important;
+    visibility:hidden;
 }
 
 .path-mod-grouptool div.checkbox_controls {
@@ -79,14 +81,12 @@
 .path-mod-grouptool .draggable_item .grpname, .path-mod-grouptool .draggable_item .addfield {
     vertical-align:middle;
     overflow:hidden;
-    white-space:wrap;
+    white-space:normal;
     -moz-hyphens: auto;
     -o-hyphens: auto;
     -webkit-hyphens: auto;
     -ms-hyphens: auto;
     hyphens: auto;
-    hyphenate-limit-chars: auto 5;
-    hyphenate-limit-lines: 2;
 }
 
 .path-mod-grouptool .draggable_item .grpname .text {
@@ -96,7 +96,7 @@
 .path-mod-grouptool .draggable_item .grpsize {
     margin-left:20px;
     margin-right:2px;
-    text-align:middle;
+    text-align:center;
     vertical-align:middle;
     font-weight:normal;
 }
@@ -107,13 +107,13 @@
 }
 
 .path-mod-grouptool .draggable_item .buttons {
-    margin-right:0em;
+    margin-right:0;
     margin-left:5px;
     vertical-align:middle;
 }
 
 .path-mod-grouptool .draggable_item .buttons input[type=image], .draggable_item .buttons img {
-    background-color: transparent !important;/*#34637f;*/
+    background-color: transparent;/*#34637f;*/
 }
 
 .path-mod-grouptool .js_invisible {
@@ -184,7 +184,11 @@
 }
 
 #memberspopupbox .yui3-widget-hd {
-    background: -moz-linear-gradient(center top , #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent;
+    background: -webkit-linear-gradient(top bottom, #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent; /* For Chrome and Safari */
+    background:    -moz-linear-gradient(top bottom, #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent; /* For old Fx (3.6 to 15) */
+    background:     -ms-linear-gradient(top bottom, #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent; /* For pre-releases of IE 10*/
+    background:      -o-linear-gradient(top bottom, #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent; /* For old Opera (11.1 to 12.0) */
+    background:         linear-gradient(to bottom, #FFFFFF, #CCCCCC) repeat scroll 0 0 transparent; /* Standard syntax; must be last */
     border-bottom: 1px solid #BBBBBB;
     border-radius: 10px 10px 0 0;
     color: #333333;
@@ -246,7 +250,6 @@
 .path-mod-grouptool #registration_form fieldset.group div {
     overflow:hidden;
     height:auto;
-    max-height:auto;
 }
 
 .path-mod-grouptool .group .unregbutton {
@@ -254,8 +257,6 @@
     display:inline;
     margin-left:1em;
     margin-right:1em;
-    margin-top:0.25em;
-    margin-bottom:0.25em;
 }
 
 .path-mod-grouptool .group .regbutton {
@@ -263,8 +264,6 @@
     display:inline;
     margin-left:1em;
     margin-right:1em;
-    margin-top:0.25em;
-    margin-bottom:0.25em;
 }
 
 .path-mod-grouptool .group .unqueuebutton {
@@ -272,8 +271,6 @@
     display:inline;
     margin-left:1em;
     margin-right:1em;
-    margin-top:0.25em;
-    margin-bottom:0.25em;
 }
 
 .path-mod-grouptool .group .queuebutton {
@@ -281,8 +278,6 @@
     display:inline;
     margin-left:1em;
     margin-right:1em;
-    margin-top:0.25em;
-    margin-bottom:0.25em;
 }
 
 .path-mod-grouptool .group .rank {
@@ -336,10 +331,6 @@
     white-space: nowrap;
 }
 
-.path-mod-grouptool .groupcontainer.uptodate {
-
-}
-
 .path-mod-grouptool .groupcontainer.outdated {
     border-color: #FFCC99;
     background-color: #EEEEEE;
@@ -375,12 +366,7 @@
 }
 
 .path-mod-grouptool .queue {
-    bgcolor: #eeeeee;
     color: #999999;
-}
-
-.path-mod-grouptool .registered {
-
 }
 
 .path-mod-grouptool .moodlereg {
@@ -418,6 +404,6 @@
 }
 
 .path-mod-grouptool .title {
-    whitespace:nowrap;
+    white-space:nowrap;
     font-weight:bold;
 }
