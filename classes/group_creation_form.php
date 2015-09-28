@@ -24,6 +24,7 @@
  * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,7 +41,7 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_grouptool_grp_creation_form extends moodleform {
+class group_creation_form extends \moodleform {
 
     /**
      * Variable containing reference to our sortlist, so we can alter current active entries afterwards
@@ -68,12 +69,12 @@ class mod_grouptool_grp_creation_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = context_module::instance($this->_customdata['id']);
+        $this->context = \context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', array('id' => $cm->course));
         $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
-        $coursecontext = context_course::instance($cm->course);
+        $coursecontext = \context_course::instance($cm->course);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_creation');
@@ -134,7 +135,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
                                                             GROUPTOOL_FROMTO_GROUPS);
             $mform->addGroup($radioarray, 'modearray',
                              get_string('groupcreationmode', 'grouptool'),
-                             html_writer::empty_tag('br'), false);
+                             \html_writer::empty_tag('br'), false);
             $mform->setDefault('mode', GROUPTOOL_GROUPS_AMOUNT);
             $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
@@ -185,10 +186,10 @@ class mod_grouptool_grp_creation_form extends moodleform {
             $mform->setAdvanced('nosmallgroups');
 
             $options = array('no'        => get_string('noallocation', 'group'),
-                    'random'    => get_string('random', 'group'),
-                    'firstname' => get_string('byfirstname', 'group'),
-                    'lastname'  => get_string('bylastname', 'group'),
-                    'idnumber'  => get_string('byidnumber', 'group'));
+                             'random'    => get_string('random', 'group'),
+                             'firstname' => get_string('byfirstname', 'group'),
+                             'lastname'  => get_string('bylastname', 'group'),
+                             'idnumber'  => get_string('byidnumber', 'group'));
             $mform->addElement('select', 'allocateby', get_string('allocateby', 'group'), $options);
             if ($grouptool->allow_reg) {
                 $mform->setDefault('allocateby', 'no');
@@ -274,7 +275,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
             }
             if ((clean_param($data['from'], PARAM_INT) < 0) || !ctype_digit($data['from'])) {
                 if (isset($errors['fromto'])) {
-                    $errors['fromto'] .= html_writer::empty_tag('br').
+                    $errors['fromto'] .= \html_writer::empty_tag('br').
                                          get_string('from').': '.
                                          get_string('mustbegt0', 'grouptool');
                 } else {
@@ -284,7 +285,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
             }
             if ((clean_param($data['to'], PARAM_INT) < 0) || !ctype_digit($data['to'])) {
                 if (isset($errors['fromto'])) {
-                    $errors['fromto'] .= html_writer::empty_tag('br').
+                    $errors['fromto'] .= \html_writer::empty_tag('br').
                                          get_string('to').': '.
                                          get_string('mustbegt0', 'grouptool');
                 } else {
@@ -294,7 +295,7 @@ class mod_grouptool_grp_creation_form extends moodleform {
             }
             if ((clean_param($data['digits'], PARAM_INT) < 0) || !ctype_digit($data['digits'])) {
                 if (isset($errors['fromto'])) {
-                    $errors['fromto'] .= html_writer::empty_tag('br').
+                    $errors['fromto'] .= \html_writer::empty_tag('br').
                                          get_string('digits', 'grouptool').': '.
                                          get_string('mustbegt0', 'grouptool');
                 } else {

@@ -23,15 +23,16 @@
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
  * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_grouptool;
 
 require_once('../../lib/pdflib.php');
 
 define('NORMLINEHEIGHT', 12);
 
-class grouptool_pdf extends pdf {
+class pdf extends \pdf {
     /** @var string[] $header1 defines what's in the upper row of page-header **/
     protected $header1 = null;
 
@@ -527,28 +528,28 @@ class grouptool_pdf extends pdf {
                     $queuesstrings[] = $queue['name'].' (#'.$queue['rank'].')';
                 }
                 if ($getheightonly) {
-                    $this->Multicell(0/*.2*$writewidth*/, $height, implode("\n", $queuesstrings),
-                            $borderl, 'L', $fill, 0, null, null, true, 1, false, false, $height,
-                            'M', false);
+                    $this->Multicell(0, $height, implode("\n", $queuesstrings), $borderl,
+                                     'L', $fill, 0, null, null, true, 1, false, false, $height,
+                                     'M', false);
                     $height = count($queues) * max(array($height, $this->getLastH()));
                 } else {
-                    $this->Multicell(0/*.2*$writewidth*/, $height, implode("\n", $queuesstrings),
-                            $borderl, 'L', $fill, 0, null, null, true, 1, false, false, $height,
-                            'M', true);
+                    $this->Multicell(0, $height, implode("\n", $queuesstrings), $borderl,
+                                     'L', $fill, 0, null, null, true, 1, false, false, $height,
+                                     'M', true);
                 }
             } else if ($header) {
                 $this->SetFont('', 'B');
-                $this->Multicell(0/*.2*$writewidth*/, $height, $queues, $borderl, 'L', $fill,
-                        0, null, null, true, 1, false, false, $height, 'M', true);
+                $this->Multicell(0, $height, $queues, $borderl, 'L', $fill, 0, null, null,
+                                 true, 1, false, false, $height, 'M', true);
                 if ($getheightonly) {
                     $height = max(array($height, $this->getLastH()));
                 }
                 $this->SetFont('', '');
             } else {
                 $this->SetFont('', 'I');
-                $this->Multicell(0/*.2*$writewidth*/, $height,
-                                 get_string('nowhere_queued', 'grouptool'), $borderl, 'L', $fill,
-                                 0, null, null, true, 1, false, false, $height, 'M', true);
+                $this->Multicell(0, $height, get_string('nowhere_queued', 'grouptool'), $borderl,
+                                 'L', $fill, 0, null, null, true, 1, false, false, $height,
+                                 'M', true);
                 if ($getheightonly) {
                     $height = max(array($height, $this->getLastH()));
                 }

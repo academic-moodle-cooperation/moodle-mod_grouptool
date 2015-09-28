@@ -101,6 +101,7 @@ class mod_grouptool_observer {
      * @global COURSE
      * @return bool true if success
      */
+
     public static function group_member_removed(\core\event\group_member_removed $event) {
         global $DB, $CFG;
 

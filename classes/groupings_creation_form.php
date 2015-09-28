@@ -24,6 +24,7 @@
  * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -40,7 +41,7 @@ require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
  * @since         Moodle 2.2.1+ (Build: 20120127)
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_grouptool_groupings_creation_form extends moodleform {
+class groupings_creation_form extends \moodleform {
 
     /**
      * Definition of administration form
@@ -57,11 +58,11 @@ class mod_grouptool_groupings_creation_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = context_module::instance($this->_customdata['id']);
+        $this->context = \context_module::instance($this->_customdata['id']);
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', array('id' => $cm->course));
         $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
-        $coursecontext = context_course::instance($cm->course);
+        $coursecontext = \context_course::instance($cm->course);
 
         foreach ($this->_customdata['selected'] as $select) {
             $mform->addElement('hidden', 'selected['.$select.']');
