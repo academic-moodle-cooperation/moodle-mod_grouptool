@@ -4865,7 +4865,7 @@ EOS;
                                                        IGNORE_MISSING)) {
                                 // If user is marked, we register him right now!
                                 $reg->modified_by = $USER->id;
-                                $DB->update_record('grouptool->registered', $reg);
+                                $DB->update_record('grouptool_registered', $reg);
                                 // TODO do we have to delete his marks and queues if theres enough registrations?
                             } else {
                                 $reg = new stdClass();
@@ -5030,7 +5030,7 @@ EOS;
             }
 
             // Get all registered userids!
-            $select = " agrpid = ? AND modified_by > 0 ";
+            $select = " agrpid = ? AND modified_by >= 0 ";
             $registered = $DB->get_fieldset_select('grouptool_registered', 'userid', $select, array($agrp->agrpid));
             // Get all moodle-group-member-ids!
             $select = " groupid = ? ";
