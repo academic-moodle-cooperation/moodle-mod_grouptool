@@ -24,7 +24,7 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-YUI.add('moodle-mod_grouptool-memberspopup', function (Y, NAME) {
+YUI.add('moodle-mod_grouptool-memberspopup', function (Y) {
 
 function MEMBERSPOPUP() {
     MEMBERSPOPUP.superclass.constructor.apply(this, arguments);
@@ -35,10 +35,6 @@ var SELECTORS = {
         FOOTER: 'div.moodle-dialogue-ft'
     },
 
-    CSS = {
-        ICON: 'icon',
-        ICONPRE: 'icon-pre'
-    },
     ATTRS = {};
 
 // Set the modules base properties.

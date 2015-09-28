@@ -26,13 +26,13 @@
 
 YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
     var SORTLISTNAME = 'sortlist';
-    var sortlist = function(Y) {
-        sortlist.superclass.constructor.apply(this, arguments);
-    }
+    var Sortlist = function() {
+        Sortlist.superclass.constructor.apply(this, arguments);
+    };
     M.mod_grouptool = M.mod_grouptool || {}; //this line use existing name path if it exists, ortherwise create a new one.
                                              //This is to avoid to overwrite previously loaded module with same name.
     M.mod_grouptool.sortlist = M.mod_grouptool.sortlist || {};
-    Y.extend(sortlist, Y.Base, {
+    Y.extend(Sortlist, Y.Base, {
         initializer : function(config) { //'config' contains the parameter values
             //gets called when it's going to be pluged in
             M.mod_grouptool.sortlist.contextid = config.contextid;
@@ -60,8 +60,8 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
         // Get all selected groupids and construct selector!
         Y.all('select[name="classes[]"] option').each( function() {
             // this = option from the select
-            if (this.get('selected') == true) {
-                if (selector != '') {
+            if (this.get('selected') === true) {
+                if (selector !== '') {
                     selector += ', ';
                 }
                 selector += '.class' + this.get('value');
@@ -79,18 +79,18 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                 checkboxes.set('checked', '');
                 break;
             case 'toggle':
-                checkboxes.each(function(current, index, nodelist) {
+                checkboxes.each(function(current) {
                     if (current.get('checked')) {
                         current.set('checked', '');
                     } else {
                         current.set('checked', 'checked');
                     }
-                })
+                });
                 break;
             default:
                 break;
         }
-    }
+    };
 
     M.mod_grouptool.init_sortlist = function(config) { //'config' contains the parameter values
         //Listen for all drop:over events
@@ -145,7 +145,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             drag.get('node').setStyle('opacity', '.25');
             drag.get('dragNode').addClass('draggable_item dragnode');
             var innerHTML = '<table class="' + drag.get('node').ancestor('table').getAttribute('class') + "\">\n";
-            drag.get('node').all('td').each(function(current, index, nodelist) {
+            drag.get('node').all('td').each(function(current) {
                 innerHTML += '<td class="' + current.getAttribute('class') + '">' + current.get('innerHTML') + "</td>\n";
             }, null);
             innerHTML += "\n</table>";
@@ -172,11 +172,11 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             var neworderparams = '';
             Y.all('table.drag_list tr.draggable_item td input.sort_order').each(function(current, index, nodelist) {
                 current.setAttribute('value', index + 1);
-                if (index == 0) {
+                if (index === 0) {
                     if (current.ancestor('tr.draggable_item')) {
                         current.ancestor('tr.draggable_item').one('.moveupbutton').setStyle('visibility', 'hidden');
                     }
-                } else if (index == nodelist.size() - 1) {
+                } else if (index === nodelist.size() - 1) {
                     if (current.ancestor('tr.draggable_item')) {
                         current.ancestor('tr.draggable_item').one('.movedownbutton').setStyle('visibility', 'hidden');
                     }
@@ -187,15 +187,14 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                 }
 
                 // Add new order to new order params!
-                if (neworderparams == '') {
+                if (neworderparams === '') {
                     neworderparams = current.getAttribute('name') + '=' + current.getAttribute('value');
                 } else {
                     neworderparams += '&' + current.getAttribute('name') + '=' + current.getAttribute('value');
                 }
             });
-            if (neworderparams != '') {
+            if (neworderparams !== '') {
                 var contextid = M.mod_grouptool.sortlist.contextid;
-                var lang = M.mod_grouptool.sortlist.lang;
                 var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
                 var infoNode = '';
                 // Start AJAX Call to update order in DB!
@@ -204,21 +203,21 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                     data: 'action=reorder&sesskey=' + M.cfg.sesskey + '&contextid=' + contextid + '&' + neworderparams,
                     headers: { 'X-Transaction': 'POST reorder groups'},
                     on: {
-                        start: function(id, args) {
-                            if (infoNode != '') {
+                        start: function() {
+                            if (infoNode !== '') {
                                 infoNode.hide('fadeOut');
                                 infoNode.remove();
                             }
                             Y.log("Start AJAX Call to reorder groups", "info", "grouptool");
                         },
-                        complete: function(id, args) {
+                        complete: function() {
                             Y.log("AJAX Call to reorder groups completed", "info", "grouptool");
                         },
-                        success: function(id, o, args) {
+                        success: function(id, o) {
                             response = Y.JSON.parse(o.responseText);
                             if (response.error) {
-                                var tmpnode = Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">" +
-                                                            response.error + "</div>");
+                                tmpnode = Y.Node.create("<div class=\"infonode alert-error\" style=\"display:none\">" +
+                                                        response.error + "</div>");
                                 infoNode = Y.one('table.drag_list').insertBefore(tmpnode, Y.one('table.drag_list'));
                                 infoNode.show('fadeIn');
                                 // Remove after 60 seconds automatically!
@@ -231,8 +230,8 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                                 Y.log("AJAX Call to reorder groups successfull\nError ocured:" + response.error,
                                       "success", "grouptool");
                             } else {
-                                var tmpnode = Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">" +
-                                                            response.message + "</div>");
+                                tmpnode = Y.Node.create("<div class=\"infonode alert-success\" style=\"display:none\">" +
+                                                        response.message + "</div>");
                                 infoNode = Y.one('table.drag_list').insertBefore(tmpnode, Y.one('table.drag_list'));
                                 infoNode.show('fadeIn');
                                 Y.later(5 * 1000, infoNode, function() {
@@ -243,12 +242,12 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                             }
                             //Y.log("AJAX Call to reorder groups successfull", "success", "grouptool");
                         },
-                        failure: function(id, o, args) {
+                        failure: function(id, o) {
                             // Show message
                             Y.log("AJAX Call to reorder groups failure\nStatus: " + o.status + "\nStatustext:" + o.statusText,
                                   "error", "grouptool");
                         },
-                        end: function(id, args) {
+                        end: function() {
                             Y.log("AJAX Call to reorder groups ended", "info", "grouptool");
                         }
                     }
@@ -276,7 +275,7 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
 
         //Get the list of tr's in the lists and make them draggable
         var lis = Y.all('.drag_list tr');
-        lis.each(function(v, k) {
+        lis.each(function(v) {
             //v.plug(Y.Plugin.Drag);
             //Now you can only drag it from the x in the corner
             //v.dd.addHandle('h2').
@@ -311,7 +310,6 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             e.stopPropagation();
 
             var contextid = M.mod_grouptool.sortlist.contextid;
-            var lang = M.mod_grouptool.sortlist.lang;
             var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var valuefrom = e.target.ancestor('.draggable_item').next('.draggable_item').one('input[name="selected[]"]');
             // Start AJAX Call to update order in DB!
@@ -322,13 +320,13 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                       '&groupB=' + valuefrom.getAttribute('value'), // The line was too long!
                 headers: { 'X-Transaction': 'POST reorder groups'},
                 on: {
-                    start: function(id, args) {
+                    start: function() {
                         Y.log("Start AJAX Call to reorder groups", "info", "grouptool");
                     },
-                    complete: function(id, args) {
+                    complete: function() {
                         Y.log("AJAX Call to reorder groups completed", "info", "grouptool");
                     },
-                    success: function(id, o, args) {
+                    success: function(id, o) {
                         response = Y.JSON.parse(o.responseText);
                         if (response.error) {
                             Y.log("AJAX Call to reorder groups successfull\nError ocured:" + response.error,
@@ -337,12 +335,12 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                             Y.log("AJAX Call to reorder groups successfull\n" + response.message, "success", "grouptool");
                         }
                     },
-                    failure: function(id, o, args) {
+                    failure: function(id, o) {
                         // Show message
                         Y.log("AJAX Call to reorder groups failure\nStatus: " + o.status + "\nStatustext:" + o.statusText,
                               "error", "grouptool");
                     },
-                    end: function(id, args) {
+                    end: function() {
                         Y.log("AJAX Call to reorder groups ended", "info", "grouptool");
                     }
                 }
@@ -365,7 +363,6 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             e.stopPropagation();
 
             var contextid = M.mod_grouptool.sortlist.contextid;
-            var lang = M.mod_grouptool.sortlist.lang;
             var url = M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php";
             var valuefrom = e.target.ancestor('.draggable_item').previous('.draggable_item').one('input[name="selected[]"]');
             // Start AJAX Call to update order in DB!
@@ -376,13 +373,13 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                       '&groupB=' + valuefrom.getAttribute('value'),  // The line was too long!
                 headers: { 'X-Transaction': 'POST reorder groups'},
                 on: {
-                    start: function(id, args) {
+                    start: function() {
                         Y.log("Start AJAX Call to reorder groups", "info", "grouptool");
                     },
-                    complete: function(id, args) {
+                    complete: function() {
                         Y.log("AJAX Call to reorder groups completed", "info", "grouptool");
                     },
-                    success: function(id, o, args) {
+                    success: function(id, o) {
                         response = Y.JSON.parse(o.responseText);
                         if (response.error) {
                             Y.log("AJAX Call to reorder groups successfull\nError ocured:" + response.error,
@@ -392,12 +389,12 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
                                   "success", "grouptool");
                         }
                     },
-                    failure: function(id, o, args) {
+                    failure: function(id, o) {
                         // Show message!
                         Y.log("AJAX Call to reorder groups failure\nStatus: " + o.status + "\nStatustext:" + o.statusText,
                               "error", "grouptool");
                     },
-                    end: function(id, args) {
+                    end: function() {
                         Y.log("AJAX Call to reorder groups ended", "info", "grouptool");
                     }
                 }
@@ -412,10 +409,11 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
 
         // Create simple targets for the lists.
         var uls = Y.all('.drag_list');
-        uls.each(function(v, k) {
-            var tar = new Y.DD.Drop({
+        uls.each(function(v) {
+            target = new Y.DD.Drop({
                 node: v
             });
+            Y.log('New drop target: ' + target, 'info', 'grouptool');
         });
 
         var checkbox_controls_action = Y.one('button[name="do_class_action"]');
@@ -423,16 +421,19 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
             checkbox_controls_action.on('click', function(e) {
                 // Get the new state and continue!
                 var newstate = '';
-                Y.all('input[name = "class_action"]').each(function (current, bla, nodelist) {
-                    if (current.get('checked') == true) {
+                Y.all('input[name = "class_action"]').each(function (current) {
+                    if (current.get('checked') === true) {
                         newstate = current.get('value');
                     }
                 });
                 M.mod_grouptool.sortlist_update_checkboxes(e, newstate);
             });
+        } else {
+            Y.log('No sortlist controller found!', 'info', 'grouptool');
         }
 
         Y.all('.simple_select_all').on('click', function(e) {
+            Y.log('Bind aelect-all handler!', 'info', 'grouptool');
             e.preventDefault();
             e.stopPropagation();
 
@@ -440,13 +441,14 @@ YUI.add('moodle-mod_grouptool-sortlist', function(Y) {
         });
 
         Y.all('.simple_select_none').on('click', function(e) {
+            Y.log('Bind deselect-all handler!', 'info', 'grouptool');
             e.preventDefault();
             e.stopPropagation();
 
             Y.all('.class0').set('checked', '');
         });
 
-        return new sortlist(config); //'config' contains the parameter values
+        return new Sortlist(config); //'config' contains the parameter values
     };
     //end of M.mod_grouptool.init_sortlist
   }, '0.0.1', {

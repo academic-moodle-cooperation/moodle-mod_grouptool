@@ -27,8 +27,8 @@
 YUI.add('moodle-mod_grouptool-grading', function (Y) {
     var GRADINGNAME = 'moodle-mod_grouptool-grading';
 
-    var grading = function(Y) {
-        grading.superclass.constructor.apply(this, arguments);
+    var Grading = function() {
+        Grading.superclass.constructor.apply(this, arguments);
     };
 
     var SELECTORS = {
@@ -36,8 +36,8 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
             GROUPINGSSELECT: 'select[name="grouping"]'
         };
 
-    Y.extend(grading, Y.Base, {
-        initializer: function(config) {
+    Y.extend(Grading, Y.Base, {
+        initializer: function() {
             M.mod_grouptool.grading.contextid = this.get('contextid');
             M.mod_grouptool.grading.lang = this.get('lang');
             Y.one(SELECTORS.GROUPINGSSELECT).on('change', M.mod_grouptool.grading.update_groups);
@@ -59,7 +59,7 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
     M.mod_grouptool = M.mod_grouptool || {};
     M.mod_grouptool.grading = M.mod_grouptool.grading || {};
 
-    M.mod_grouptool.grading.update_groups = function(e) {
+    M.mod_grouptool.grading.update_groups = function() {
         var groupingid = 0;
         Y.one(SELECTORS.GROUPINGSSELECT).all("option").each( function() {
             // this = option from the select
@@ -78,7 +78,7 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
             method : 'get',
             context : this,
             on : {
-                success: function(id, o, node) {
+                success: function(id, o) {
                     var options = '';
                     var data = Y.JSON.parse(o.responseText);
                     var oldsel = -1;
@@ -101,7 +101,7 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
                         Y.one(SELECTORS.GROUPSSELECT + 'option[value=\"-1\"]').set('selected');
                     }
                 },
-                failure: function(id, o, node) {
+                failure: function(id, o) {
                     if (M.cfg.developerdebug) {
                         alert(o);
                     }
@@ -113,7 +113,7 @@ YUI.add('moodle-mod_grouptool-grading', function (Y) {
     };
 
     M.mod_grouptool.grading.init = function(config) {
-        return new grading(config);
+        return new Grading(config);
     };
 
 }, '@VERSION@', {

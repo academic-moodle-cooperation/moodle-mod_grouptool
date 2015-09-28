@@ -26,10 +26,9 @@
 
 YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
     var GROUPCREATIONNAME = 'moodle-mod_grouptool-groupcreation';
-    var fromto_mode = {};
-    var groupcreation = function(Y) {
-        groupcreation.superclass.constructor.apply(this, arguments);
-    }
+    var Groupcreation = function() {
+        Groupcreation.superclass.constructor.apply(this, arguments);
+    };
 
     var SELECTORS = {
             FIELDSETCONTAINSADVANCED : 'fieldset.containsadvancedelements',
@@ -37,21 +36,16 @@ YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
             DIVFCONTAINER : 'div.fcontainer',
             MORELESSLINK : 'fieldset.containsadvancedelements .moreless-toggler',
             MORELESSLINKONLY : '.moreless-toggler'
-        },
-        CSS = {
+        };
+    var CSS = {
             SHOW : 'show',
             MORELESSACTIONS: 'moreless-actions',
             MORELESSTOGGLER : 'moreless-toggler',
             SHOWLESS : 'moreless-less'
-        },
-        WRAPPERS = {
-            FITEM : '<div class="fitem"></div>',
-            FELEMENT : '<div class="felement"></div>'
-        },
-        ATTRS = {};
+        };
 
-    Y.extend(groupcreation, Y.Base, {
-        initializer : function(config) { //'config' contains the parameter values
+    Y.extend(Groupcreation, Y.Base, {
+        initializer : function() {
             //gets called when it's going to be pluged in
             this.fromto_mode = this.get('fromto_mode');
 
@@ -59,15 +53,6 @@ YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
             Y.all('.tag').on('click', M.mod_grouptool.groupcreation_add_tag);
             Y.all('.tag').setStyle('cursor','pointer');
 
-            //add JS-Eventhandlers to hide individual groupsize-fields
-            //if use_size or use_individual are false
-            //Y.one('input[name=use_size]').on('change', M.mod_grouptool.groupcreation_sizevisupdate);
-            /*Y.one('input[name=use_individual]').on('change',
-                                                   M.mod_grouptool.groupcreation_sizevisupdate);*/
-            //add JS-Eventhandler to let groupsize-fields follow global-grpsize changes
-            /*Y.one('input[name=amount]').on('change', M.mod_grouptool.groupcreation_sizevalupdate);
-            Y.one('input[name=use_individual]').on('change',
-                                                   M.mod_grouptool.groupcreation_sizevalupdate);*/
             Y.one('input[name="mode"][value="' + this.fromto_mode + '"]').on('click', M.mod_grouptool.modechange);
 
         }
@@ -98,13 +83,13 @@ YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
         var classes = nodeclass.split(' ');
 
         for(var i = 0; i < classes.length; i++) {
-            if (classes[i] != 'tag') {
-                if (classes[i] == 'number') {
-                    var tag = '#';
-                } else if (classes[i] == 'alpha') {
-                    var tag = '@';
+            if (classes[i] !== 'tag') {
+                if (classes[i] === 'number') {
+                    tag = '#';
+                } else if (classes[i] === 'alpha') {
+                    tag = '@';
                 } else {
-                    var tag = '[' + classes[i] + ']';
+                    tag = '[' + classes[i] + ']';
                 }
             }
         }
@@ -114,38 +99,38 @@ YUI.add('moodle-mod_grouptool-groupcreation', function(Y) {
     };
 
     M.mod_grouptool.groupcreation_sizevalupdate = function() {
-        if (Y.one('input[name=use_individual]').get('value') == 0) {
+        if (Y.one('input[name=use_individual]').get('value') === 0) {
             Y.all('.grpsize').one('input').set('value', Y.one('input[name=amount]').get('value'));
         }
     };
 
     M.mod_grouptool.groupcreation_sizevisupdate = function() {
-        if ((Y.one('input[name=use_size]').get('value') == 1)
-              && (Y.one('input[name=use_individual]').get('value') == 1)) {
+        if ((Y.one('input[name=use_size]').get('value') === 1)
+              && (Y.one('input[name=use_individual]').get('value') === 1)) {
             Y.all('.grpsize').setStyle('display', 'block');
         } else {
             Y.all('.grpsize').setStyle('display', 'none');
         }
     };
 
-    M.mod_grouptool.modechange = function(e) {
-        var fieldset = this.ancestor(SELECTORS.FIELDSETCONTAINSADVANCED);
+    M.mod_grouptool.modechange = function() {
+        fieldset = this.ancestor(SELECTORS.FIELDSETCONTAINSADVANCED);
         // Toggle collapsed class.
         fieldset.all(SELECTORS.DIVFITEMADVANCED).toggleClass(CSS.SHOW);
-        var morelesslink = fieldset.one(SELECTORS.MORELESSLINKONLY);
+        morelesslink = fieldset.one(SELECTORS.MORELESSLINKONLY);
         // Get corresponding hidden variable.
-        var statuselement = new Y.one('input[name=mform_showmore_' + fieldset.get('id') + ']');
+        statuselement = new Y.one('input[name=mform_showmore_' + fieldset.get('id') + ']');
         // Invert it and change the link text.
         if (statuselement.get('value') === '0') {
             statuselement.set('value', 1);
             morelesslink.setHTML(M.str.form.showless);
             morelesslink.addClass(CSS.SHOWLESS);
         }
-    }
+    };
 
     //'config' contains the parameter values
     M.mod_grouptool.init_groupcreation = function(params) {
-        return new groupcreation(params); //'params' contains the parameter values
+        return new Groupcreation(params); //'params' contains the parameter values
     };
     //end of M.mod_grouptool.init_groupcreation
 
