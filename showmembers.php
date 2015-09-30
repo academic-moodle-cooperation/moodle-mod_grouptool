@@ -30,12 +30,12 @@ require_once($CFG->libdir .'/grouplib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
 
-$group = $DB->get_record_sql('SELECT grp.id grpid, grp.name grpname, grp.courseid courseid,
-                                     agrp.id agrpid, agrp.grpsize size,
-                                     agrp.grouptoolid grouptoolid
-                              FROM {grouptool_agrps} agrp
-                                LEFT JOIN {groups} grp ON agrp.groupid = grp.id
-                              WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
+$group = $DB->get_record_sql('SELECT grp.id AS grpid, grp.name AS grpname, grp.courseid AS courseid,
+                                     agrp.id AS agrpid, agrp.grpsize AS size,
+                                     agrp.grouptoolid AS grouptoolid
+                                FROM {grouptool_agrps} agrp
+                           LEFT JOIN {groups} grp ON agrp.groupid = grp.id
+                               WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id' => $group->grouptoolid), '*', MUST_EXIST);
 
 $PAGE->set_url('/mod/grouptool/showmembers.php');

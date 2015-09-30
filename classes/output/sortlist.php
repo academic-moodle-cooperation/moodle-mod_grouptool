@@ -127,23 +127,23 @@ class sortlist implements \renderable {
             }
             $params = array_merge(array($cm->instance), $params);
             $groupdata = (array)$DB->get_records_sql("
-                    SELECT MAX(grp.id) groupid, MAX(agrp.id) id,
-                           MAX(agrp.grouptoolid) grouptoolid,  MAX(grp.name) name,
-                           MAX(agrp.grpsize) size, MAX(agrp.sort_order) 'order',
-                           MAX(agrp.active) status
-                    FROM {groups} grp
-                    LEFT JOIN {grouptool_agrps} agrp
-                         ON agrp.groupid = grp.id AND agrp.grouptoolid = ?
-                    WHERE grp.id ".$grpssql.$activefilter."
-                    GROUP BY grp.id
-                    ORDER BY active DESC, sort_order ASC, name ASC", $params);
+                    SELECT MAX(grp.id) AS groupid, MAX(agrp.id) AS id,
+                           MAX(agrp.grouptoolid) AS grouptoolid,  MAX(grp.name) AS name,
+                           MAX(agrp.grpsize) AS size, MAX(agrp.sort_order) AS sort_order,
+                           MAX(agrp.active) AS status
+                      FROM {groups} grp
+                 LEFT JOIN {grouptool_agrps} agrp
+                           ON agrp.groupid = grp.id AND agrp.grouptoolid = ?
+                     WHERE grp.id ".$grpssql.$activefilter."
+                  GROUP BY grp.id
+                  ORDER BY status DESC, sort_order ASC, name ASC", $params);
 
             // Convert to multidimensional array and add groupings.
             $runningidx = 1;
             foreach ($groupdata as $key => $group) {
                 $groupdata[$key] = $group;
                 $groupdata[$key]->selected = 0;
-                $groupdata[$key]->sort_order = $runningidx;
+                $groupdata[$key]->order = $runningidx;
                 $runningidx++;
                 $groupdata[$key]->groupings = $DB->get_records_sql_menu("
                                                     SELECT DISTINCT groupingid, name
@@ -170,7 +170,7 @@ class sortlist implements \renderable {
 
             $this->groups = $groupdata;
 
-            // Add groupings...
+            // Add groupings (only non-empty ones)...
             $this->groupings = $DB->get_records_sql_menu("
                     SELECT DISTINCT groupingid, name
                       FROM {groupings_groups}

@@ -95,7 +95,7 @@ try {
             require_capability('mod/grouptool:administrate_groups', $context);
             $size = required_param('size', PARAM_TEXT);
             $sql = '
-       SELECT COUNT(reg.id) regcnt
+       SELECT COUNT(reg.id) AS regcnt
          FROM {grouptool_agrps} agrps
     LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
         WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';

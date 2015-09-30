@@ -2781,26 +2781,26 @@ EOS;
                 if (empty($grpsize)) {
                     $grpsize = 3;
                 }
-                $sizesql = " COALESCE(agrp.grpsize, ".$grpsize.") grpsize,";
+                $sizesql = " COALESCE(agrp.grpsize, ".$grpsize.") AS grpsize,";
             }
         } else {
             $sizesql = "";
         }
         if ($indexbygroup) {
-            $idstring = "grp.id id, agrp.id agrpid";
+            $idstring = "grp.id AS id, agrp.id AS agrpid";
         } else {
-            $idstring = "agrp.id agrpid, grp.id id";
+            $idstring = "agrp.id AS agrpid, grp.id AS id";
         }
 
         $groupdata = $DB->get_records_sql("
-                SELECT ".$idstring.", MAX(grp.name) name,".$sizesql." MAX(agrp.sort_order) sort_order
-                FROM {groups} grp LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
+                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order
+                     FROM {groups} grp LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
-                WHERE agrp.grouptoolid = :grouptoolid AND agrp.active = 1".
-                     $agrpidwhere.$groupidwhere.$groupingidwhere."
-                GROUP BY grp.id, agrp.id
-                ORDER BY sort_order ASC, name ASC", $params);
+                    WHERE agrp.grouptoolid = :grouptoolid AND agrp.active = 1".
+                          $agrpidwhere.$groupidwhere.$groupingidwhere."
+                 GROUP BY grp.id, agrp.id
+                 ORDER BY sort_order ASC, name ASC", $params);
         if (!empty($groupdata)) {
             foreach ($groupdata as $key => $group) {
                 $groupingids = $DB->get_fieldset_select('groupings_groups',
@@ -2830,11 +2830,11 @@ EOS;
                         $params = array('agrpid' => $groupdata[$key]->agrpid);
                         $where = "agrpid = :agrpid AND modified_by >= 0";
                         $groupdata[$key]->registered = $DB->get_records_select('grouptool_registered',
-                                                                            $where, $params);
+                                                                               $where, $params);
                         $params['modifierid'] = -1;
                         $where = "agrpid = :agrpid AND modified_by = :modifierid";
                         $groupdata[$key]->marked = $DB->get_records_select('grouptool_registered',
-                                                                        $where, $params);
+                                                                           $where, $params);
                         $groupdata[$key]->moodle_members = groups_get_members($groupdata[$key]->id);
                     }
                 }
@@ -3681,11 +3681,10 @@ EOS;
         } else if (!empty($data)) { // It's an active-group-id, so we gotta get the queue data!
             $params = array('agrpid' => $data,
                     'userid' => !empty($userid) ? $userid : $USER->id);
-            $sql = "SELECT count(b.id) rank
-            FROM {grouptool_queued} a
-            INNER JOIN {grouptool_queued} b
-            ON b.timestamp <= a.timestamp
-            WHERE a.agrpid = :agrpid AND a.userid = :userid";
+            $sql = "SELECT count(b.id) AS rank
+                      FROM {grouptool_queued} a
+                INNER JOIN {grouptool_queued} b ON b.timestamp <= a.timestamp
+                     WHERE a.agrpid = :agrpid AND a.userid = :userid";
         } else {
             return null;
         }
@@ -3843,8 +3842,8 @@ EOS;
                 $queuedparams = array_merge($agrpsparam, $agrpsparam);
 
                 $queueentries = $DB->get_records_sql("
-                      SELECT queued.id, MAX(queued.agrpid) agrpid, MAX(queued.userid) userid,
-                             MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) priority
+                      SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
+                             MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) AS priority
                         FROM {grouptool_queued} queued
                    LEFT JOIN {grouptool_registered} reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql.
                                                                                     " AND reg.modified_by >= 0
@@ -3855,7 +3854,7 @@ EOS;
             } else {
                 $queuedsql = " WHERE queued.agrpid ".$agrpssql." ";
                 $queuedparams = $agrpsparam;
-                $queueentries = $DB->get_records_sql("SELECT *, '1' priority
+                $queueentries = $DB->get_records_sql("SELECT *, '1' AS priority
                                                         FROM {grouptool_queued} queued".
                                                              $queuedsql.
                                                    "ORDER BY timestamp ASC",
@@ -3871,8 +3870,8 @@ EOS;
 
         // Get group entries (sorted by sort-order)!
         $groupsdata = $DB->get_records_sql("
-                SELECT agrp.id id, MAX(agrp.groupid) groupid, MAX(agrp.grpsize) grpsize,
-                       COUNT(DISTINCT reg.id) registered
+                SELECT agrp.id AS id, MAX(agrp.groupid) AS groupid, MAX(agrp.grpsize) AS grpsize,
+                       COUNT(DISTINCT reg.id) AS registered
                   FROM {grouptool_agrps} agrp
              LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrp.id AND modified_by >= 0
                  WHERE agrp.grouptoolid = ?".$agrpsfiltersql."
@@ -4672,9 +4671,9 @@ EOS;
                                                   array('notifyproblem'));
             }
             // We use MAX to trick Postgres into thinking this is a full GROUPU BY statement!
-            $sql = '     SELECT agrps.id id, MAX(agrps.groupid) grpid, COUNT(regs.id) regs,
-                                MAX(grptl.use_individual) indi, MAX(grptl.grpsize) globalsize, MAX(agrps.grpsize) size,
-                                MAX(grptl.name) instancename
+            $sql = '     SELECT agrps.id AS id, MAX(agrps.groupid) AS grpid, COUNT(regs.id) AS regs,
+                                MAX(grptl.use_individual) AS indi, MAX(grptl.grpsize) AS globalsize, MAX(agrps.grpsize) AS size,
+                                MAX(grptl.name) AS instancename
                            FROM {grouptool_agrps} agrps
                            JOIN {grouptool} grptl ON agrps.grouptoolid = grptl.id
                       LEFT JOIN {grouptool_registered} regs ON agrps.id = regs.agrpid AND regs.modified_by >= 0
@@ -6246,15 +6245,15 @@ EOS;
         }
 
         // We use MAX to trick postgres into thinking this is a full group_by statement!
-        $sql = "SELECT agrps.id agrpid, MAX(agrps.groupid) groupid,
-                       COUNT(DISTINCT reg.userid) grptoolregs,
-                       COUNT(DISTINCT mreg.userid) mdlregs
-                FROM {grouptool_agrps} agrps
-                    LEFT JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid AND reg.modified_by >= 0
-                    LEFT JOIN {groups_members} mreg ON agrps.groupid = mreg.groupid
-                                                       AND reg.userid = mreg.userid
-                WHERE agrps.active = 1 AND agrps.grouptoolid = ?
-                GROUP BY agrps.id";
+        $sql = "SELECT agrps.id AS agrpid, MAX(agrps.groupid) AS groupid,
+                       COUNT(DISTINCT reg.userid) AS grptoolregs,
+                       COUNT(DISTINCT mreg.userid) AS mdlregs
+                  FROM {grouptool_agrps} agrps
+             LEFT JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid AND reg.modified_by >= 0
+             LEFT JOIN {groups_members} mreg ON agrps.groupid = mreg.groupid
+                                             AND reg.userid = mreg.userid
+                  WHERE agrps.active = 1 AND agrps.grouptoolid = ?
+               GROUP BY agrps.id";
         $return = $DB->get_records_sql($sql, array($grouptoolid));
 
         foreach ($return as $key => $group) {
@@ -6739,9 +6738,10 @@ EOS;
         // Get all ppl that are allowed to register!
         list($esql, $params) = get_enrolled_sql($this->context, 'mod/grouptool:register');
 
-        $sql = "SELECT u.id FROM {user} u ".
-               "LEFT JOIN ($esql) eu ON eu.id=u.id ".
-               "WHERE u.deleted = 0 AND eu.id=u.id ";
+        $sql = "SELECT u.id
+                  FROM {user} u
+             LEFT JOIN ($esql) eu ON eu.id=u.id
+                 WHERE u.deleted = 0 AND eu.id=u.id ";
         if (!empty($groupingid)) {
             // Get all groupings groups!
             $groups = groups_get_all_groups($this->course->id, 0, $groupingid);

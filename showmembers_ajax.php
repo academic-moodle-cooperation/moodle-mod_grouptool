@@ -68,12 +68,12 @@ if (!$cm->uservisible) {
     die;
 }
 
-$group = $DB->get_record_sql('SELECT grp.id grpid, grp.name grpname, grp.courseid courseid,
-                                     agrp.id agrpid, agrp.grpsize size,
-                                     agrp.grouptoolid grouptoolid
-                              FROM {grouptool_agrps} agrp
-                                LEFT JOIN {groups} grp ON agrp.groupid = grp.id
-                              WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
+$group = $DB->get_record_sql('SELECT grp.id AS grpid, grp.name AS grpname, grp.courseid AS courseid,
+                                     agrp.id AS agrpid, agrp.grpsize AS size,
+                                     agrp.grouptoolid AS grouptoolid
+                                FROM {grouptool_agrps} agrp
+                           LEFT JOIN {groups} grp ON agrp.groupid = grp.id
+                               WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id' => $group->grouptoolid), '*', MUST_EXIST);
 
 $text = '';
@@ -88,10 +88,10 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     $userfieldssql = user_picture::fields('usr', array('idnumber'));
     // Get registrations but exclude all who are just marked for registration!
     $regsql = "SELECT $userfieldssql
-               FROM {grouptool_registered} reg
-                   LEFT JOIN {user} usr ON reg.userid = usr.id
-               WHERE reg.agrpid = ? AND reg.modified_by >= 0
-               ORDER BY timestamp ASC";
+                 FROM {grouptool_registered} reg
+            LEFT JOIN {user} usr ON reg.userid = usr.id
+                WHERE reg.agrpid = ? AND reg.modified_by >= 0
+             ORDER BY timestamp ASC";
     if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
         $text .= html_writer::tag('div', get_string('no_registrations', 'grouptool'),
                                   array('class' => 'reg'));
@@ -114,10 +114,10 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     $text .= $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
     // Get queue but exclude all who are just marked not queued!
     $queuesql = "SELECT $userfieldssql
-                 FROM {grouptool_queued} queue
-                     LEFT JOIN {user} usr ON queue.userid = usr.id
-                 WHERE queue.agrpid = ?
-                 ORDER BY timestamp ASC";
+                   FROM {grouptool_queued} queue
+              LEFT JOIN {user} usr ON queue.userid = usr.id
+                  WHERE queue.agrpid = ?
+               ORDER BY timestamp ASC";
     if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
         $text .= html_writer::tag('div', get_string('nobody_queued', 'grouptool'),
                                   array('class' => 'queue'));

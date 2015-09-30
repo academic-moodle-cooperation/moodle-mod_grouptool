@@ -308,7 +308,7 @@ class renderer extends \plugin_renderer_base {
     }
 
     protected function render_sortlist_controller(sortlist_controller $controller) {
-        global $OUTPUT, $DB;
+        global $OUTPUT;
 
         $sortlist = $controller->sortlist;
 
@@ -329,18 +329,17 @@ class renderer extends \plugin_renderer_base {
 
         if (!empty($sortlist->groupings) && is_array($sortlist->groupings)) {
             foreach ($sortlist->groupings as $groupingid => $grouping) {
-                if ($DB->count_records('groupings_groups', array('groupingid' => $groupingid)) != 0) {
-                    $options[] = \html_writer::tag('option', $grouping, array('value' => $groupingid));
-                } else {
-                    // Disable empty groupings!
-                    $options[] = \html_writer::tag('option', $grouping, array('value' => $groupingid, 'disabled' => 'disabled'));
-                }
+                /* 
+                 * We have only non-empty groupings here, it should also work with empty ones but would make no sense.
+                 * Maybe we use disabled options for all the empty groupings.
+                 */
+                $options[] = \html_writer::tag('option', $grouping, array('value' => $groupingid));
             }
         }
 
         $checkboxcontrols = $checkboxcontroltitle;
 
-        // Add Radiobuttons and Go Button TODO replace single buttons with radiobuttons + go-button!
+        // Add Radiobuttons and Go Button
         $checkalllink = \html_writer::tag('span',
                                          \html_writer::empty_tag('input', array('name'  => 'class_action',
                                                                                'type'  => 'radio',

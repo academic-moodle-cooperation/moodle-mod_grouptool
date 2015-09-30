@@ -50,11 +50,11 @@ class mod_grouptool_observer {
             return true;
         }
 
-        $agrpssql = "SELECT agrps.grouptoolid grouptoolid, agrps.id id FROM {grouptool_agrps} agrps
+        $agrpssql = "SELECT agrps.grouptoolid AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} agrps
         WHERE agrps.groupid = :groupid";
         $agrp = $DB->get_records_sql($agrpssql, array('groupid' => $event->objectid));
 
-        $regsql = "SELECT reg.agrpid id
+        $regsql = "SELECT reg.agrpid AS id
                      FROM {grouptool_agrps} agrps
                INNER JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid
                     WHERE reg.modified_by >= 0 AND agrps.groupid = :groupid AND reg.userid = :userid";
@@ -115,13 +115,15 @@ class mod_grouptool_observer {
         if (! $grouptools = $DB->get_records_sql($sql, $params)) {
             return true;
         }
-        $sql = "SELECT agrps.grouptoolid grouptoolid, agrps.id id FROM {grouptool_agrps} agrps
-                WHERE agrps.groupid = :groupid";
+        $sql = "SELECT agrps.grouptoolid grouptoolid, agrps.id id
+                  FROM {grouptool_agrps} agrps
+                 WHERE agrps.groupid = :groupid";
         $agrp = $DB->get_records_sql($sql, array('groupid' => $event->objectid));
         foreach ($grouptools as $grouptool) {
             switch ($grouptool->ifmemberremoved) {
                 case GROUPTOOL_FOLLOW:
-                    $sql = "SELECT reg.id id, reg.agrpid agrpid, reg.userid userid, agrps.groupid FROM {grouptool_agrps} agrps
+                    $sql = "SELECT reg.id AS id, reg.agrpid AS agrpid, reg.userid AS userid, agrps.groupid
+                              FROM {grouptool_agrps} agrps
                         INNER JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid
                              WHERE reg.userid = :userid
                                    AND agrps.grouptoolid = :grouptoolid
@@ -144,8 +146,8 @@ class mod_grouptool_observer {
                                                                 FROM {grouptool_agrps}
                                                                WHERE grouptoolid = ?', array($grouptool->id));
                             list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
-                            $sql = "SELECT queued.id, MAX(queued.agrpid) as agrpid, MAX(queued.userid) as userid,
-                                                      MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) priority
+                            $sql = "SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
+                                                      MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) AS priority
                                       FROM {grouptool_queued} queued
                                  LEFT JOIN {grouptool_registered} reg ON queued.userid = reg.userid
                                                                          AND reg.agrpid ".$agrpssql."
@@ -415,7 +417,7 @@ class mod_grouptool_observer {
         if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
             return true;
         }
-        $sortorder = $DB->get_records_sql("SELECT agrp.grouptoolid, MAX(agrp.sort_order) max
+        $sortorder = $DB->get_records_sql("SELECT agrp.grouptoolid, MAX(agrp.sort_order) AS max
                                              FROM {grouptool_agrps} agrp
                                          GROUP BY agrp.grouptoolid");
         foreach ($grouptools as $grouptool) {

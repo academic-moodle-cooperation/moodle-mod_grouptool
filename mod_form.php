@@ -56,7 +56,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
             $sql = '
   SELECT MAX(regcnt)
-    FROM (SELECT COUNT(reg.id) regcnt
+    FROM (SELECT COUNT(reg.id) AS regcnt
             FROM {grouptool_registered} reg
             JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
            WHERE agrps.grouptoolid = :grouptoolid
@@ -65,7 +65,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $params = array('grouptoolid' => $cm->instance);
             $maxregs = $DB->get_field_sql($sql, $params);
             $sql = '
-      SELECT COUNT(queue.id) queue
+      SELECT COUNT(queue.id) AS queue
         FROM {grouptool_queued} queue
         JOIN {grouptool_agrps} agrps ON queue.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
@@ -328,7 +328,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $sql = '
      SELECT MAX(regcnt)
         FROM (
-      SELECT COUNT(reg.id) regcnt
+      SELECT COUNT(reg.id) AS regcnt
         FROM {grouptool_registered} reg
         JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
@@ -338,7 +338,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $maxgrpregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT MAX(regcnt)
-        FROM (SELECT COUNT(reg.id) regcnt
+        FROM (SELECT COUNT(reg.id) AS regcnt
                 FROM {grouptool_registered} reg
                 JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
                WHERE agrps.grouptoolid = :grouptoolid
@@ -348,7 +348,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $maxuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT MIN(regcnt)
-        FROM (SELECT COUNT(reg.id) regcnt
+        FROM (SELECT COUNT(reg.id) AS regcnt
                 FROM {grouptool_registered} reg
                 JOIN {grouptool_agrps} agrps ON reg.agrpid = agrps.id
                WHERE agrps.grouptoolid = :grouptoolid
@@ -358,7 +358,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $params = array('grouptoolid' => $data['instance']);
             $minuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
-      SELECT COUNT(queue.id) queue
+      SELECT COUNT(queue.id) AS queue
         FROM {grouptool_queued} queue
         JOIN {grouptool_agrps} agrps ON queue.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid

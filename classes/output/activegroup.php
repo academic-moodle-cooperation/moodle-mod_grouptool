@@ -67,10 +67,10 @@ class activegroup {
     public function get_by_groupid($groupid, $grouptoolid) {
         global $DB;
 
-        $sql = "SELECT agrp.id id, agrp.grouptoolid grouptoolid, agrp.groupid groupid,
-                       agrp.grpsize size, agrp.sort_order order, agrp.active status,
-                       grp.name name, grouptool.use_size use_size, grouptool.grpsize globalsize,
-                       grouptool.use_individual individualsize
+        $sql = "SELECT agrp.id AS id, agrp.grouptoolid AS grouptoolid, agrp.groupid AS groupid,
+                       agrp.grpsize AS size, agrp.sort_order AS order, agrp.active AS status,
+                       grp.name AS name, grouptool.use_size AS use_size, grouptool.grpsize AS globalsize,
+                       grouptool.use_individual AS individualsize
                   FROM {grouptool_agrps} agrp
              LEFT JOIN {groups} grp ON agrp.groupid = grp.id
              LEFT JOIN {grouptool} grptl ON agrp.grouptoolid = grptl.id

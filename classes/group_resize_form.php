@@ -117,7 +117,7 @@ class group_resize_form extends \moodleform {
 
         $errors = parent::validation($data, $files);
         $sql = '
-   SELECT COUNT(reg.id) regcnt
+   SELECT COUNT(reg.id) AS regcnt
      FROM {grouptool_agrps} agrps
 LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
     WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
