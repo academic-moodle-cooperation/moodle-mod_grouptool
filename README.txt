@@ -55,7 +55,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle <2.7 or later>
+    Moodle 2.8
 
 INSTALLATION
 ================================================================================
@@ -74,11 +74,52 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2015071502
+-------------------------
+*) Improve coding/css/js style and docs
+*) Cohort dropdown in group creation won't be shown if not necessary
+*) Fix certain users only shown as registered in moodle group not in grouptool
+
+v 2015071501
+-------------------------
+*) Small UI/UX improvements
+*) Removed obsolete code
+*) Use autoloading
+
+v 2015071500
+-------------------------
+*) Improve functionality create groups tab
+*) Properly deprecate strings
+*) Improve layout of groups table in administration
+   -) show full group names
+   -) Improve/add functionality (bulk actions, single group actions)
+*) Impove layout of checkboxcontroller (esp. for small screens)
+*) Fix preview count of group creation
+*) Move queue rank in txt/pdf download behind group name
+*) Reduced memory usage in many parts of the module
+   (now usable for > 10k users and many groups)
+*) Add progress bar to import
+*) Import into multiple groups at once
+
+v 2015050401
+-------------------------
+*) Fix importfields using standard setting instead of set value
+*) Use separate sub-tabs for group creation and administration
+
+v 2015050400
+-------------------------
+*) Improve preview and status of import
+*) Fix bug with wrong overflow warning during import
+*) Add missing language strings
+*) Fix navigation (AJAX Error, appearance with/without subbranches, etc)
+*) Fix typo in SQL
+*) Remove XLS support in exports (only XLSX/ODS/etc. now available)
+*) Fix wrong queued ranks showed in course view table
+
 v 2015042200
 -------------------------
 *) Fixed a renamed string identifier blocking language customisation
    if there was an old wrong spelled custom string
-
 
 v 2015011400
 -------------------------
