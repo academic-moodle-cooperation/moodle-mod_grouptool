@@ -30,10 +30,6 @@ defined('MOODLE_INTERNAL') || die;
 if ($ADMIN->fulltree) {
     require_once($CFG->dirroot.'/mod/grouptool/lib.php');
     require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
-    // ...grouptool_requiremodintro!
-    $settings->add(new admin_setting_configcheckbox('mod_grouptool/requiremodintro',
-                                                    get_string('requiremodintro', 'admin'),
-                                                    get_string('configrequiremodintro', 'admin'), 1));
     // ...grouptool_view_administration!
     $settings->add(new admin_setting_heading('mod_grouptool/view_administration',
                                              get_string('cfg_admin_head', 'grouptool'),

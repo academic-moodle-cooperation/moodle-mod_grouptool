@@ -98,8 +98,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addHelpButton('name', 'grouptoolname', 'grouptool');
 
         // Adding the standard "intro" and "introformat" fields!
-        $this->add_intro_editor(get_config('mod_grouptool', 'requiremodintro'),
-                                get_string('description', 'grouptool'));
+        $this->standard_intro_elements(get_string('description', 'grouptool'));
 
         $mform->addElement('header', 'availability', get_string('availability', 'assign'));
         $mform->setExpanded('availability', true);
