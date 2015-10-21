@@ -40,7 +40,6 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-require_once($CFG->libdir.'/conditionlib.php');
 
 // Do we get course_module ID?
 $id = optional_param('id', 0, PARAM_INT);
