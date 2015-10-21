@@ -74,6 +74,10 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2015071503
+-------------------------
+*) Replace Studierende with Teilnehmer/innen and Lehrende with Trainer/innen in GER language file
+
 v 2015071502
 -------------------------
 *) Improve coding/css/js style and docs
