@@ -219,11 +219,9 @@ class group_creation_form extends \moodleform {
             $mform->addGroup($naminggrp, 'naminggrp', get_string('namingscheme', 'grouptool'), ' ', false);
             $mform->addHelpButton('naminggrp', 'namingscheme', 'grouptool');
             // Init JS!
-            $PAGE->requires->string_for_js('showmore', 'form');
-            $PAGE->requires->string_for_js('showless', 'form');
-            $PAGE->requires->yui_module('moodle-mod_grouptool-groupcreation',
-                    'M.mod_grouptool.init_groupcreation',
-                    array(array('fromto_mode' => GROUPTOOL_FROMTO_GROUPS)));
+            $params = new \stdClass();
+            $params->fromtomode  = GROUPTOOL_FROMTO_GROUPS;
+            $PAGE->requires->js_call_amd('mod_grouptool/groupcreation', 'initializer', array($params));
 
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 

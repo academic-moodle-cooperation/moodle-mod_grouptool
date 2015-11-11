@@ -308,10 +308,11 @@ class renderer extends \plugin_renderer_base {
 
         // Init JS!
         $context = \context_module::instance($sortlist->cm->id);
-        $PAGE->requires->yui_module('moodle-mod_grouptool-sortlist',
-                                    'M.mod_grouptool.init_sortlist',
-                                    array(array('lang'      => current_language(),
-                                                'contextid' => $context->id)));
+
+        $params = new \stdClass();
+        $params->lang = current_language();
+        $params->contextid  = $context->id;
+        $PAGE->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', array($params));
 
         return $html;
     }

@@ -35,6 +35,11 @@
     overflow:auto;
 }
 
+.path-mod-grouptool div.sortlist_container .ui-sortable-helper {
+    width:100%;
+    display:table;
+}
+
 /* CSS Fallback to make sure it isn't visible! */
 .path-mod-grouptool .drag_area .draggable_item:first-child .moveupbutton ,
 .path-mod-grouptool .drag_area .draggable_item:last-child .movedownbutton  {

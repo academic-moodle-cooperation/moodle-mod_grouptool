@@ -141,7 +141,8 @@ $string['create_groupings_confirm'] = 'Gruppierungen erstellen, wie in der Vorsc
 $string['create_groupings_confirm_problem'] = 'Zumindest 1 Fehler ist aufgetreten (siehe Vorschau)!';
 $string['createinsertgrouping'] = 'Zu Gruppierung hinzufügen';
 $string['condition_prevent_access'] = 'Die derzeitigen Umstände erlauben Ihnen keinen Zugriff auf die Kreuzerlübung!';
-$string['confirm_delete'] = 'Wollen Sie dieses Element wirklich löschen?';
+$string['confirm_delete_title'] = 'Wollen Sie dieses Element wirklich löschen?';
+$string['confirm_delete'] = 'Sie sind dabei diese gruppe komplett zu löschen. Dies wird alle bisherigen Gruppenmitglieder unwiederbringlich entfernen. Sind sie SICHER, dass sie fortfahren möchten?';
 $string['copied_grade_feedback'] = 'Gruppenbenotung<br />
 +Abgabe von: {$a->student}<br />
 +Note von: {$a->teacher}<br />

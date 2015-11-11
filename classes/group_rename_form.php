@@ -60,7 +60,7 @@ class group_rename_form extends \moodleform {
         $mform->setDefault('instance', $this->_customdata['instance']);
         $mform->setType('instance', PARAM_INT);
 
-        $context = \context_module::instance($this->_customdata['instance']);
+        $context = \context_module::instance($this->_customdata['id']);
         $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
         $course = $DB->get_record('course', array('id' => $cm->course));
         $this->course = $course;

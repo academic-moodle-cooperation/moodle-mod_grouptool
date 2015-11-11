@@ -141,7 +141,8 @@ $string['create_groupings_confirm'] = 'Continue to create groupings as previewed
 $string['create_groupings_confirm_problem'] = 'At least 1 error occurred (refer to preview above)!';
 $string['createinsertgrouping'] = 'Add to grouping';
 $string['condition_prevent_access'] = 'The current conditions prevent you from accessing the checkmark instance!';
-$string['confirm_delete'] = 'Do you really want to delete this element?';
+$string['confirm_delete_title'] = 'Do you really want to delete this element?';
+$string['confirm_delete'] = 'You are about to completely delete the group. This will remove all members from this group irrecoverable. Are you SURE you want to continue?';
 $string['copied_grade_feedback'] = 'Group grading<br />
 +Submission from: {$a->student}<br />
 +Graded by: {$a->teacher}<br />

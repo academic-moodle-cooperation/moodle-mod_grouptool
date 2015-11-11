@@ -1392,18 +1392,16 @@ class mod_grouptool {
                     $curfilter = 'all';
                 break;
             }
-            $PAGE->requires->yui_module('moodle-mod_grouptool-administration',
-                                        'M.mod_grouptool.init_administration',
-                                        array(array('lang'       => current_language(),
-                                                    'contextid'  => $this->context->id,
-                                                    'filter'     => $curfilter,
-                                                    'filterid'   => $filter,
-                                                    'globalsize' => $this->grouptool->grpsize)));
-            $PAGE->requires->strings_for_js(array('active', 'inactive', 'confirm_delete'), 'mod_grouptool');
-            $PAGE->requires->string_for_js('ajax_edit_size_help', 'mod_grouptool');
-            $PAGE->requires->strings_for_js(array('yes', 'no'), 'moodle');
-        }
-    }
+
+            $params = new stdClass();
+            $params->lang = current_language();
+            $params->contextid  = $this->context->id;
+            $params->filter = $curfilter;
+            $params->filterid = $filter;
+            $params->globalsize = $this->grouptool->grpsize;
+            $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', array($params));
+         }
+     }
 
     /**
      * Outputs the content of the creation tab and manages actions taken in this tab
@@ -2682,15 +2680,10 @@ EOS;
             $formcontent = html_writer::tag('div', $hiddenelements.$filterelements.$tablehtml,
                                             array('class' => 'clearfix'));
 
-             $jsmodule = array(
-                                'name'     => 'moodle-mod_grouptool-grading',
-                                'fullpath' => '/mod/grouptool/yui/grading/grading.js',
-                                'requires' => array('base', 'io', 'node'),
-                                'strings' => array()
-                             );
-            $jsdata = array(array( 'lang' => current_language(),
-                             'contextid' => $this->context->id));
-            $PAGE->requires->yui_module('moodle-mod_grouptool-grading', 'M.mod_grouptool.grading.init', $jsdata);
+            $params = new stdClass();
+            $params->lang = current_language();
+            $params->contextid  = $this->context->id;
+            $PAGE->requires->js_call_amd('mod_grouptool/grading', 'initializer', array($params));
 
             $formattr = array(
                     'method' => 'post',
@@ -4598,6 +4591,13 @@ EOS;
 
             echo html_writer::end_tag('div');
             echo html_writer::end_tag('form');
+
+            if ($this->grouptool->show_members) {
+                // Require the JS to show group members (just once)!
+                $params = new stdClass();
+                $params->contextid  = $this->context->id;
+                $PAGE->requires->js_call_amd('mod_grouptool/memberspopup', 'initializer', array($params));
+            }
         }
     }
 
@@ -6333,10 +6333,6 @@ EOS;
     private function render_members_link($agrpid, $groupname) {
         global $CFG, $PAGE;
 
-        // Init Members-Popup-JS!
-        $PAGE->requires->yui_module('moodle-mod_grouptool-memberspopup', 'M.mod_grouptool.init_memberspopup');
-        $PAGE->requires->string_for_js('loading', 'mod_grouptool');
-
         $output = get_string('show_members', 'grouptool');
 
         // Now create the link around it - we need https on loginhttps pages!
@@ -6347,6 +6343,7 @@ EOS;
         $attributes = array('href' => $url, 'title' => get_string('show_members', 'grouptool'));
         $id = html_writer::random_id('showmembers');
         $attributes['id'] = $id;
+        $attributes['data-agrpid'] = $agrpid;
         $output = html_writer::tag('a', $output, $attributes);
 
         // And finally wrap in a span!
@@ -7640,3 +7637,4 @@ EOS;
     }
 
 }
+
