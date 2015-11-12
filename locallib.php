@@ -2961,26 +2961,25 @@ EOS;
                         }
 
                         $messageuser = $DB->get_record('user', array('id' => $newrecord->userid));
-                        $eventdata = new stdClass();
-                        $eventdata->modulename       = 'grouptool';
+                        $message = new \core\message\message();
                         $userfrom = core_user::get_noreply_user();
-                        $eventdata->userfrom         = $userfrom;
-                        $eventdata->userto           = $messageuser;
-                        $eventdata->subject          = $postsubject;
-                        $eventdata->fullmessage      = $posttext;
-                        $eventdata->fullmessageformat = FORMAT_PLAIN;
-                        $eventdata->fullmessagehtml  = $posthtml;
-                        $eventdata->smallmessage     = get_string('register_you_in_group_success',
+                        $message->component         = 'mod_grouptool';
+                        $message->name              = 'grouptool_moveupreg';
+                        $message->userfrom          = $userfrom;
+                        $message->userto            = $messageuser;
+                        $message->subject           = $postsubject;
+                        $message->fullmessage       = $posttext;
+                        $message->fullmessageformat = FORMAT_HTML;
+                        $message->fullmessagehtml   = $posthtml;
+                        $message->smallmessage      = get_string('register_you_in_group_success',
                                                                   'grouptool', $message);
 
-                        $eventdata->name            = 'grouptool_moveupreg';
-                        $eventdata->component       = 'mod_grouptool';
-                        $eventdata->notification    = 1;
-                        $eventdata->contexturl      = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
+                        $message->notification      = 1;
+                        $message->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
                                                       $this->cm->id;
-                        $eventdata->contexturlname  = $this->grouptool->name;
+                        $message->contexturlname    = $this->grouptool->name;
 
-                        message_send($eventdata);
+                        message_send($message);
                         $DB->delete_records('grouptool_queued', array('id' => $record->id));
 
                         // Trigger the event!
