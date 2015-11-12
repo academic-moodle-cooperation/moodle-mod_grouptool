@@ -107,7 +107,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                             infoNode = $("div.infonode");
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 60*1000);
+                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 60 * 1000);
                         } else {
                             text.before("<div class=\"infonode alert-success\" style=\"display:none\">" +
                                         response.message + "</div>");
@@ -121,7 +121,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                                 button.fadeIn(600);
                             });
                             field.off('keydown');
-                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 5*1000);
+                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 5 * 1000);
                         }
                         log.info("AJAX Call to rename group " + grpid + " successfull\n" + status, "grouptool");
                     },

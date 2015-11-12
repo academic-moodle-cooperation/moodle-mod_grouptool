@@ -1400,8 +1400,8 @@ class mod_grouptool {
             $params->filterid = $filter;
             $params->globalsize = $this->grouptool->grpsize;
             $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', array($params));
-         }
-     }
+        }
+    }
 
     /**
      * Outputs the content of the creation tab and manages actions taken in this tab
