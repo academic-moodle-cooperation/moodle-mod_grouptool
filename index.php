@@ -187,7 +187,6 @@ foreach ($grouptools as $grouptool) {
 
     }
 
-
     if (($grouptool->allow_reg
             && (has_capability('mod/grouptool:view_regs_group_view', $context)
             || has_capability('mod/grouptool:view_regs_course_view', $context)))
@@ -197,7 +196,6 @@ foreach ($grouptools as $grouptool) {
     }
 
     $info = $str;
-
 
     if (!$grouptool->visible) {
         $link = html_writer::link(

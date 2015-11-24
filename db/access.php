@@ -69,7 +69,6 @@ $capabilities = array(
                 )
         ),
 
-
         'mod/grouptool:view_groups' => array(
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
