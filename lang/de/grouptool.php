@@ -293,8 +293,8 @@ $string['grouptool:register_students'] = 'Melde andere Teilnehmer/innen in aktiv
 $string['grouptool:move_students'] = 'Verschiebe Teilnehmer/innen in andere Gruppen.';
 $string['grouptool:view_description'] = 'Zeige Gruppenverwaltungsbeschreibung';
 $string['grouptool:view_groups'] = 'Zeige aktive Gruppen';
-$string['grouptool:view_regs_group_overview'] = 'Zeige eine nach Gruppen gegliederte Liste, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
-$string['grouptool:view_regs_course_overview'] = 'Zeige eine Teilnehmer/innen-Liste mit der Information, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+$string['grouptool:view_regs_group_view'] = 'Zeige eine nach Gruppen gegliederte Liste, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+$string['grouptool:view_regs_course_view'] = 'Zeige eine Teilnehmer/innen-Liste mit der Information, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
 $string['grouptool:view_own_registration'] = 'Zeige eigene Registrierung(en) an';
 $string['groupuser_import'] = 'Importiere Gruppenmitglieder';
 $string['group_not_found'] = 'Gruppe {$a->groupid} konnte in Gruppenverwaltungsinstanz {$a->grouptoolid} nicht gefunden werden!';
@@ -537,3 +537,6 @@ $string['your_place_allocated_in_group_success'] = 'Sie haben die Gruppe {$a->gr
 
 // Deprecated since Moodle 2.8!
 $string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+// Deprecated since Moodle 2.9!
+$string['grouptool:view_regs_group_overview'] = 'Zeige eine nach Gruppen gegliederte Liste, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+$string['grouptool:view_regs_course_overview'] = 'Zeige eine Teilnehmer/innen-Liste mit der Information, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';

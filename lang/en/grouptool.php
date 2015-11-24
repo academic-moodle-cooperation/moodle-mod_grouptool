@@ -294,8 +294,8 @@ $string['grouptool:register_students'] = 'Register students in an active group u
 $string['grouptool:move_students'] = 'Move students to other groups.';
 $string['grouptool:view_description'] = 'View grouptools description';
 $string['grouptool:view_groups'] = 'View active groups';
-$string['grouptool:view_regs_group_overview'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
-$string['grouptool:view_regs_course_overview'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
+$string['grouptool:view_regs_group_view'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
+$string['grouptool:view_regs_course_view'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
 $string['grouptool:view_own_registration'] = 'View own registration(s).';
 $string['groupuser_import'] = 'Import group users';
 $string['group_not_found'] = 'Group {$a->groupid} couldn\'t be found in grouptool {$a->grouptoolid}!';
@@ -538,3 +538,6 @@ $string['your_place_allocated_in_group_success'] = 'You successfully marked grou
 
 // Deprecated since Moodle 2.8!
 $string['grouptool:view_registrations'] = 'View who\'s registered/queued in which active group using grouptool';
+// Deprecated since Moodle 2.9!
+$string['grouptool:view_regs_group_overview'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
+$string['grouptool:view_regs_course_overview'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
