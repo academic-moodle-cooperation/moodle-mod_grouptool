@@ -73,7 +73,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
             field.focus();
             field.select();
         });
-        field.on('keydown', function(e) {
+        field.on('keydown', null, e.data, function(e) {
             if (e.which === 13 || e.which === 27) {
                 e.preventDefault();
                 e.stopPropagation();
