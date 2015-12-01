@@ -4702,7 +4702,7 @@ EOS;
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-                if (empty($includedeleted)) {
+                if (!empty($includedeleted)) {
                     $param = array('userpattern' => $user);
                 } else {
                     $sql .= ' AND deleted <> :deleted';
