@@ -234,23 +234,23 @@ class mod_grouptool_observer {
                                     $posthtml = "";
                                 }
                                 $messageuser = $DB->get_record('user', array('id' => $newrecord->userid));
-                                $message = new \core\message\message();
+                                $moodlemessage = new \core\message\message();
                                 $userfrom = core_user::get_noreply_user();
-                                $message->component         = 'mod_grouptool';
-                                $message->name              = 'grouptool_moveupreg';
-                                $message->userfrom          = $userfrom;
-                                $message->userto            = $messageuser;
-                                $message->subject           = $postsubject;
-                                $message->fullmessage       = $posttext;
-                                $message->fullmessageformat = FORMAT_HTML;
-                                $message->fullmessagehtml   = $posthtml;
-                                $message->smallmessage      = get_string('register_you_in_group_success',
-                                                                         'grouptool', $message);
-                                $message->notification      = 1;
-                                $message->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
-                                                              $cm->id;
-                                $message->contexturlname    = $grouptool->name;
-                                message_send($message);
+                                $moodlemessage->component         = 'mod_grouptool';
+                                $moodlemessage->name              = 'grouptool_moveupreg';
+                                $moodlemessage->userfrom          = $userfrom;
+                                $moodlemessage->userto            = $messageuser;
+                                $moodlemessage->subject           = $postsubject;
+                                $moodlemessage->fullmessage       = $posttext;
+                                $moodlemessage->fullmessageformat = FORMAT_HTML;
+                                $moodlemessage->fullmessagehtml   = $posthtml;
+                                $moodlemessage->smallmessage      = get_string('register_you_in_group_success',
+                                                                               'grouptool', $message);
+                                $moodlemessage->notification      = 1;
+                                $moodlemessage->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
+                                                                    $cm->id;
+                                $moodlemessage->contexturlname    = $grouptool->name;
+                                message_send($moodlemessage);
 
                                 if (($allowm && ($usrregcnt >= $max)) || !$allowm) {
                                     // Get all queue entries and trigger queue_entry_deleted events for each!

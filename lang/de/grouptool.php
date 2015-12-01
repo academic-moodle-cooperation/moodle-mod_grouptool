@@ -109,7 +109,7 @@ $string['you_change_group_to_success'] = 'Ihr Gruppenwechsel war erfolgreich! Si
 $string['checkbox_control_header'] = 'Gruppen/Gruppierungen auswählen';
 $string['checkbox_control_header_help'] = '<p>Mit dieser Funktion können Sie gezielt Gruppen aus einer/ mehreren Gruppierung(en) in Ihrer Gruppenverwaltung aktivieren oder deaktivieren:
 <ol>
-    <li>Wählen Sie im Auswahlfeld zwischen den Varianten "Alle Gruppen" (d.h. es werden alle enthaltenen Gruppen aktiviert/deaktiviert ) bzw. eine Gruppierung oder wahlweise mehrere Gruppierungen (mit Strg + Klick).</li>
+    <li>Wählen Sie im Auswahlfeld zwischen den Varianten "Alle" (d.h. es werden alle enthaltenen Gruppen aktiviert/deaktiviert ) bzw. eine Gruppierung oder wahlweise mehrere Gruppierungen (mit Strg + Klick).</li>
     <li>Nutzen Sie Sie eine der drei Optionen "Selektieren/ Deselektieren/ Invertieren":
         <ul>
             <li><b>Selektieren:</b> Die Gruppe(n) der ausgewählten Gruppierung(en) aus dem Auswahlfeld wird/ werden aktiviert.</li>
@@ -118,7 +118,6 @@ $string['checkbox_control_header_help'] = '<p>Mit dieser Funktion können Sie ge
         </ul>
     </li>
     <li>Übernehmen Sie Ihre Auswahl über Klick auf die Schaltfläche "Start".</li>
-    <li>Speichern Sie über "Änderungen speichern".</li>
 </ol></p>';
 $string['choose'] = 'Auswählen...';
 $string['choose_group'] = 'Sie müssen eine Zielgruppe auswählen!';
@@ -142,7 +141,7 @@ $string['create_groupings_confirm_problem'] = 'Zumindest 1 Fehler ist aufgetrete
 $string['createinsertgrouping'] = 'Zu Gruppierung hinzufügen';
 $string['condition_prevent_access'] = 'Die derzeitigen Umstände erlauben Ihnen keinen Zugriff auf die Kreuzerlübung!';
 $string['confirm_delete_title'] = 'Wollen Sie dieses Element wirklich löschen?';
-$string['confirm_delete'] = 'Sie sind dabei diese gruppe komplett zu löschen. Dies wird alle bisherigen Gruppenmitglieder unwiederbringlich entfernen. Sind sie SICHER, dass sie fortfahren möchten?';
+$string['confirm_delete'] = 'Sie sind dabei diese Gruppe komplett zu löschen. Dies wird alle bisherigen Gruppenmitglieder unwiederbringlich entfernen. Sind Sie SICHER, dass Sie fortfahren möchten?';
 $string['copied_grade_feedback'] = 'Gruppenbenotung<br />
 +Abgabe von: {$a->student}<br />
 +Note von: {$a->teacher}<br />
@@ -328,8 +327,8 @@ $string['import_user_prev'] = 'Importiere {$a->fullname} ({$a->idnumber}) in Gru
 $string['import_user_problem'] = 'Fehler beim Importieren von {$a->fullname} (ID-Nummer: {$a->idnumber}) in Gruppe {$a->groupname}.';
 $string['inactive'] = 'Inaktiv';
 $string['inactivegroups'] = 'Inaktive Gruppen';
-$string['includedeleted'] = 'Include deleted users';
-$string['includedeleted_help'] = 'If checked, deleted users won\'t get filtered out of the list. Deleted user-accounts can\'t be enroled in the course during import process.';
+$string['includedeleted'] = 'auch gelöschte Nutzer/Innen';
+$string['includedeleted_help'] = 'Wenn aktiviert werden gelöschte Nutzer/innen nicht aus der Liste herausgefiltert. Gelöschte Nutzer/innen-Accounts können während des Import-Prozesses NICHT automatisch in den Kurs eingeschrieben werden.';
 $string['incomplete_only_label'] = 'Zeige nur Gruppen mit fehlenden Bewertungen';
 $string['individual_size_info'] = '* Globale Gruppengröße aktiv, da keine individuelle Größe gesetzt ist oder individuelle Gruppengrößen nicht aktiviert sind';
 $string['intro'] = 'Beschreibung';
@@ -344,7 +343,7 @@ $string['messageprovider:grouptool_moveupreg'] = 'Anmeldung durch Nachrücken in
 $string['missing_source_selection'] = 'Keine Quelle ausgewählt!';
 $string['modulename'] = 'Gruppenverwaltung';
 $string['modulenameplural'] = 'Gruppenverwaltungen';
-$string['modulename_help'] = 'Die Gruppenverwaltung umfasst mehrere Aufgabenbereiche in Verbindung mit Gruppen:<ul><li>Sie erlaubt es Gruppen auf verschiedene Art und Weise (Angabe von Anzahl an Gruppen/Gruppenmitgliedern, 1-Personen-Gruppen) sowie Gruppierungen für jede Kursgruppe zu erzeugen.</li><li>Weiters kann sie benutzt werden um es Teilnehmer/innen zu ermöglichen sich selbst innerhalb eines gewissen Zeitraumes zu Gruppen anzumelden.</li><li>Mit ihrere Hilfe lassen sich Gruppenbenotungen durchführen, d.h. eine Aktivitätsbenotung von einem Teilnehmer/einer Teilnehmerin auf andere Gruppenmitglieder zu übertragen.</li><li>Es ist auch möglich Gruppen schnell zu befüllen, indem Nutzer/innen mittels Liste mit Matrikelnummern in eine bestimmmte Gruppe importiert werden.</li><li>Überblick über alle Gruppen sowie deren Anmeldungen/Wartelisten/etc in verschiedene Formate (PDF/XLSX/ODS/TXT) exportierbar.</li><li>Exportierbare Liste aller im Kurs eingeschriebener Teilnehmer/innen mit ihren Gruppenanmeldungen, Wartelistenplätzen, etc (ebenfalls exportierbar).</li></ul><p>(!) Beachten Sie, dass die Gruppen der Gruppenverwaltung sich grundlegend von den Moodle Standardgruppen des Kurses unterscheiden. Um Konsistenz zwischen den Standardgruppen und den Gruppenverwaltungsgruppen zu bewahren, stellen Sie alle Parameter unter dem Abschnitt „Verhalten bei Änderungen in Moodle-Gruppen“ mit Hilfe des Drop Down Menüs auf „Folge Änderungen“ ein.</p>';
+$string['modulename_help'] = 'Die Gruppenverwaltung umfasst mehrere Aufgabenbereiche in Verbindung mit Gruppen:<ul><li>Sie erlaubt es Gruppen auf verschiedene Art und Weise (Angabe von Anzahl an Gruppen/Gruppenmitgliedern, 1-Personen-Gruppen) sowie Gruppierungen für jede Kursgruppe zu erzeugen.</li><li>Weiters kann Sie benutzt werden um es Teilnehmer/innen zu ermöglichen sich selbst innerhalb eines gewissen Zeitraumes zu Gruppen anzumelden.</li><li>Mit ihrere Hilfe lassen sich Gruppenbenotungen durchführen, d.h. eine Aktivitätsbenotung von einem Teilnehmer/einer Teilnehmerin auf andere Gruppenmitglieder zu übertragen.</li><li>Es ist auch möglich Gruppen schnell zu befüllen, indem Nutzer/innen mittels Liste mit Matrikelnummern in eine bestimmmte Gruppe importiert werden.</li><li>Überblick über alle Gruppen sowie deren Anmeldungen/Wartelisten/etc in verschiedene Formate (PDF/XLSX/ODS/TXT) exportierbar.</li><li>Exportierbare Liste aller im Kurs eingeschriebener Teilnehmer/innen mit ihren Gruppenanmeldungen, Wartelistenplätzen, etc (ebenfalls exportierbar).</li></ul><p>(!) Beachten Sie, dass die Gruppen der Gruppenverwaltung sich grundlegend von den Moodle Standardgruppen des Kurses unterscheiden. Um Konsistenz zwischen den Standardgruppen und den Gruppenverwaltungsgruppen zu bewahren, stellen Sie alle Parameter unter dem Abschnitt „Verhalten bei Änderungen in Moodle-Gruppen“ mit Hilfe des Drop Down Menüs auf „Folge Änderungen“ ein.</p>';
 $string['moodlesync'] = 'Verhalten bei Änderungen in Moodle-Gruppen';
 $string['moodlesync_help'] = 'Wie sich die Gruppenverwaltung verhalten soll, wenn Gruppenmitglieder/Gruppen in Moodle hinzugefügt/entfernt werden';
 $string['movedown'] = 'Nach unten verschieben';
@@ -360,7 +359,7 @@ $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag username">[username]</span>
 <span class="tag alpha">@</span>
 <span class="tag number">#</span>';
-$string['nameschemenotunique'] = 'Gruppennamen, die aus diesem Namensschema erzeugt werden, sind nicht einzigartig ({$a}). Bitte wählen sie ein anderes Namensschema oder benutzen sie # (laufende Nummer) oder @ (alphabetische Repräsentation) um eindeutige Gruppennamen zu erzeugen.';
+$string['nameschemenotunique'] = 'Gruppennamen, die aus diesem Namensschema erzeugt werden, sind nicht einzigartig ({$a}). Bitte wählen Sie ein anderes Namensschema oder benutzen Sie # (laufende Nummer) oder @ (alphabetische Repräsentation) um eindeutige Gruppennamen zu erzeugen.';
 $string['namingscheme'] = 'Namensschema';
 $string['namingscheme_help'] = '<p>Das Namensschema definiert, wie Gruppen beim Erstellen automatisch benannt werden. </p>
 <p>Hierbei ist folgendes zu beachten:<br />
@@ -426,7 +425,7 @@ $string['queued'] = 'In Warteliste';
 $string['queued_in_group_info'] = '{$a->username} in Warteliste von {$a->groupname}';
 $string['queued_on_rank'] = 'In Warteliste auf Platz #{$a}';
 $string['queues'] = 'Wartelisten';
-$string['queuespresent'] = 'Es sind bereits Teilnehmer/innen in Warteschlangen eingetragen! Diese werden gelöscht, wenn sie fortfahren. Speichern sie erneut um fortzufahren!';
+$string['queuespresent'] = 'Es sind bereits Teilnehmer/innen in Warteschlangen eingetragen! Diese werden gelöscht, wenn Sie fortfahren. Speichern Sie erneut um fortzufahren!';
 $string['queuesizeerror'] = 'Maximale Warteplätze müssen ganzzahlig und positive sein (>= 1)';
 $string['queues_max'] = 'Max Plätze in Wartelisten';
 $string['queueing_is'] = 'Wartelisten sind';

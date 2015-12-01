@@ -109,7 +109,7 @@ $string['you_change_group_to_success'] = 'Group-change successful! You are now r
 $string['checkbox_control_header'] = 'De-/select groups and groupings';
 $string['checkbox_control_header_help'] = '<p>By using this function you can activate/ deactivate groups of one or more groupings within your grouptool:
     <ol>
-        <li>Choose in the multiple-select field "All groups" (all available groups will be activated/deactivated), one grouping or several groupings (by using Ctrl + Click).</li>
+        <li>Choose in the multiple-select field "All" (all available groups will be activated/deactivated), one grouping or several groupings (by using Ctrl + Click).</li>
         <li>Use one of the following options "Select/ Deselect/ Invert":
             <ul>
                 <li><b>Select:</b> The groups of the chosen grouping(s) will be activated.</li>
@@ -118,7 +118,6 @@ $string['checkbox_control_header_help'] = '<p>By using this function you can act
             </ul>
         </li>
         <li>Asume your choice by clicking on the button "Go".</li>
-        <li>Save your changes by clicking on the button "Save changes".</li>
     </ol>
 </p>';
 $string['choose'] = 'Choose...';

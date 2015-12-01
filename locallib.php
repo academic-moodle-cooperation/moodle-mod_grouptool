@@ -2961,25 +2961,25 @@ EOS;
                         }
 
                         $messageuser = $DB->get_record('user', array('id' => $newrecord->userid));
-                        $message = new \core\message\message();
+                        $moodlemessage = new \core\message\message();
                         $userfrom = core_user::get_noreply_user();
-                        $message->component         = 'mod_grouptool';
-                        $message->name              = 'grouptool_moveupreg';
-                        $message->userfrom          = $userfrom;
-                        $message->userto            = $messageuser;
-                        $message->subject           = $postsubject;
-                        $message->fullmessage       = $posttext;
-                        $message->fullmessageformat = FORMAT_HTML;
-                        $message->fullmessagehtml   = $posthtml;
-                        $message->smallmessage      = get_string('register_you_in_group_success',
-                                                                  'grouptool', $message);
+                        $moodlemessage->component         = 'mod_grouptool';
+                        $moodlemessage->name              = 'grouptool_moveupreg';
+                        $moodlemessage->userfrom          = $userfrom;
+                        $moodlemessage->userto            = $messageuser;
+                        $moodlemessage->subject           = $postsubject;
+                        $moodlemessage->fullmessage       = $posttext;
+                        $moodlemessage->fullmessageformat = FORMAT_HTML;
+                        $moodlemessage->fullmessagehtml   = $posthtml;
+                        $moodlemessage->smallmessage      = get_string('register_you_in_group_success',
+                                                                       'grouptool', $message);
 
-                        $message->notification      = 1;
-                        $message->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
-                                                      $this->cm->id;
-                        $message->contexturlname    = $this->grouptool->name;
+                        $moodlemessage->notification      = 1;
+                        $moodlemessage->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
+                                                            $this->cm->id;
+                        $moodlemessage->contexturlname    = $this->grouptool->name;
 
-                        message_send($message);
+                        message_send($moodlemessage);
                         $DB->delete_records('grouptool_queued', array('id' => $record->id));
 
                         // Trigger the event!

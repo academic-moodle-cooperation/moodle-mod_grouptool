@@ -106,7 +106,7 @@ class import_form extends \moodleform {
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');
 
-            $mform->addElement('advcheckbox', 'forceregistration', '', '&nbsp;'.get_string('forceregistration', 'grouptool'));
+            $mform->addElement('advcheckbox', 'forceregistration', '', get_string('forceregistration', 'grouptool'));
             $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
             if ($forceimportreg = get_config('mod_grouptool', 'force_importreg')) {
                 $mform->setDefault('forceregistration', $forceimportreg);
