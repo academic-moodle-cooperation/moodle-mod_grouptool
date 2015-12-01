@@ -261,8 +261,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
         if ($event->id = $DB->get_field('event', 'id',
                                         array('modulename' => 'grouptool',
                                               'instance'   => $grouptool->id,
-                                              'eventtype'  => 'due'))) {
-
+                                              'eventtype'  => 'deadline'))) {
             $calendarevent = calendar_event::load($event->id);
             $calendarevent->update($event, false);
         } else {
@@ -275,7 +274,7 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
 
     } else if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
                                                                 'instance'   => $grouptool->id,
-                                                                'eventtype'  => 'due'))) {
+                                                                'eventtype'  => 'deadline'))) {
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->delete(true);
     }
@@ -413,13 +412,8 @@ function grouptool_delete_instance($id) {
     if (!isset($event)) {
         $event = new stdClass();
     }
-    while ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
-                                                            'instance'   => $grouptool->id),
-                                        IGNORE_MULTIPLE)) {
-        require_once($CFG->dirroot.'/calendar/lib.php');
-        $calendarevent = calendar_event::load($event->id);
-        $calendarevent->delete(true);
-    }
+
+    $DB->delete_records('event', array('modulename' => 'grouptool', 'instance' => $grouptool->id));
 
     $DB->delete_records('grouptool', array('id' => $id));
 
