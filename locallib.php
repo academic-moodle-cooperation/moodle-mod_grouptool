@@ -2756,9 +2756,12 @@ EOS;
             $idstring = "agrp.id AS agrpid, grp.id AS id";
         }
 
+        $params['agrpgrptlid'] = $this->cm->instance;
+
         $groupdata = $DB->get_records_sql("
                    SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order
-                     FROM {groups} grp LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
+                     FROM {groups} grp
+                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :agrpgrptlid
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
                     WHERE agrp.grouptoolid = :grouptoolid AND agrp.active = 1".
@@ -4700,10 +4703,10 @@ EOS;
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
                 if (empty($includedeleted)) {
-                    $sql .= ' AND deleted = :deleted';
-                    $param = array('userpattern' => $user, 'deleted' => 0);
-                } else {
                     $param = array('userpattern' => $user);
+                } else {
+                    $sql .= ' AND deleted <> :deleted';
+                    $param = array('userpattern' => $user, 'deleted' => 0);
                 }
 
                 $userinfo = $DB->get_records_sql($sql, $param);
