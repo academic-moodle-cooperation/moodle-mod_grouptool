@@ -301,9 +301,6 @@ class mod_grouptool_mod_form extends moodleform_mod {
          */
         $this->standard_coursemodule_elements();
 
-        $mform->setConstant('groupmode', VISIBLEGROUPS);
-        $mform->freeze('groupmode');
-
         /* ------------------------------------------------------------------------------
          * add standard buttons, common to all modules
          */

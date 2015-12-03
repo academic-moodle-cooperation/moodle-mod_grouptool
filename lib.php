@@ -44,14 +44,8 @@ function grouptool_supports($feature) {
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
-        case FEATURE_GROUPS:
-            return true;
-        case FEATURE_GROUPINGS:
-            return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
-        case FEATURE_IDNUMBER:
-            return false;
         case FEATURE_MOD_INTRO:
             return true;
         case FEATURE_SHOW_DESCRIPTION:
@@ -59,6 +53,9 @@ function grouptool_supports($feature) {
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_OTHER;
 
+        case FEATURE_GROUPS:
+        case FEATURE_GROUPINGS:
+        case FEATURE_IDNUMBER:
         default:
             return false;
     }
@@ -532,17 +529,13 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         $navref->add(get_string('grading', 'grouptool'),
                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'grading')));
     }
-    // Groupmode?
-    $gmok = true;
-    if (groups_get_activity_groupmode($cm, $course) != NOGROUPS) {
-        $gmok = $gmok && groups_has_membership($cm);
-    }
+
     $gt = $DB->get_record('grouptool', array('id' => $cm->instance));
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
                 && ($gt->timeavailable < time()));
 
     if (has_capability('mod/grouptool:register_students', $context)
-        || ($regopen && $gmok && has_capability('mod/grouptool:register', $context))) {
+        || ($regopen && has_capability('mod/grouptool:register', $context))) {
         $tmp = $navref->add(get_string('selfregistration', 'grouptool'),
                             new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
                                                                             'tab' => 'selfregistration')));
