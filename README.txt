@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2015-01-14
+ * @version       2.9 (Build 2015-12-02-00)
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 2.7+
+# FOR Moodle 2.9+
 # ---------------------------------------------------------------
 
 Grouptool-Module
@@ -74,6 +74,16 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2015120200
+-------------------------
+*) Update module for compatibility with Moodle 2.9
+*) Rewrite JS to AMD and replace YUI with JQuery where safely possible
+*) Add some missing lang strings
+*) Fix bug where deadline calendar events being duplicated instead of updated for each instance edit
+*) Remove group mode setting and support for groups/groupings, we used it just for the access restrictions in the past
+   but they can (and should) now be realised via conditional access settings (have to be enabled for the Moodle instance first).
+*) Fixed some smaller bugs and improve coding style and documentation
+
 v 2015071503
 -------------------------
 *) Replace Studierende with Teilnehmer/innen and Lehrende with Trainer/innen in GER language file
