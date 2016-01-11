@@ -47,22 +47,6 @@ $context = context_module::instance($cm->id);
 
 require_login($cm->course, true, $cm);
 
-if (!$cm->uservisible) {
-    if ($cm->availableinfo) {
-        // User cannot access the activity, but on the course page they will
-        // see a link to it, greyed-out, with information (HTML format) from
-        // $cm->availableinfo about why they can't access it.
-        $text = "<br />".format_text($cm->availableinfo, FORMAT_HTML);
-    } else {
-        // User cannot access the activity and they will not see it at all.
-        $text = '';
-    }
-    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').$text, 'notifyproblem');
-    echo $OUTPUT->box($notification, 'generalbox centered');
-    echo $OUTPUT->footer();
-    die;
-}
-
 echo $OUTPUT->header();
 
 echo $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
@@ -72,6 +56,10 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
                           array('class' => 'reg'));
 } else {
+
+    $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context)
+                    || has_capability('mod/grouptool:view_regs_course_view', $context);
+
     echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
     $moodlereg = groups_get_members($group->grpid, 'u.id');
     $userfieldssql = user_picture::fields('usr', array('idnumber'));
@@ -87,13 +75,16 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     } else {
         echo html_writer::start_tag('ul');
         foreach ($regs as $user) {
+            if ($showidnumber) {
+                $idnumber = ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')';
+            } else {
+                $idnumber = '';
+            }
             if (!in_array($user->id, $moodlereg)) {
-                echo html_writer::tag('li', fullname($user).
-                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                echo html_writer::tag('li', fullname($user).$idnumber,
                                       array('class' => 'registered'));
             } else {
-                echo html_writer::tag('li', fullname($user).
-                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                echo html_writer::tag('li', fullname($user).$idnumber,
                                       array('class' => 'moodlereg'));
             }
         }
@@ -112,8 +103,12 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     } else {
         echo html_writer::start_tag('ol');
         foreach ($queue as $user) {
-            echo html_writer::tag('li', fullname($user).
-                                        ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+            if ($showidnumber) {
+                $idnumber = ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')';
+            } else {
+                $idnumber = '';
+            }
+            echo html_writer::tag('li', fullname($user).$idnumber,
                                   array('class' => 'queue'));
         }
         echo html_writer::end_tag('ol');

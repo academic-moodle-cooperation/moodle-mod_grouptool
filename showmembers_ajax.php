@@ -76,6 +76,9 @@ $group = $DB->get_record_sql('SELECT grp.id AS grpid, grp.name AS grpname, grp.c
                                WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id' => $group->grouptoolid), '*', MUST_EXIST);
 
+$showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context)
+                || has_capability('mod/grouptool:view_regs_course_view', $context);
+
 $text = '';
 if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     && !has_capability('mod/grouptool:view_regs_course_view', $context)
@@ -98,13 +101,16 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     } else {
         $text .= html_writer::start_tag('ul');
         foreach ($regs as $user) {
+            if ($showidnumber) {
+                $idnumber = ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')';
+            } else {
+                $idnumber = '';
+            }
             if (!in_array($user->id, $moodlereg)) {
-                $text .= html_writer::tag('li', fullname($user).
-                                                ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                $text .= html_writer::tag('li', fullname($user).$idnumber,
                                           array('class' => 'registered'));
             } else {
-                $text .= html_writer::tag('li', fullname($user).
-                                                ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+                $text .= html_writer::tag('li', fullname($user).$idnumber,
                                           array('class' => 'moodlereg'));
             }
         }
@@ -124,8 +130,12 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     } else {
         $text .= html_writer::start_tag('ol');
         foreach ($queue as $user) {
-            $text .= html_writer::tag('li', fullname($user).
-                                            ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')',
+            if ($showidnumber) {
+                $idnumber = ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')';
+            } else {
+                $idnumber = '';
+            }
+            $text .= html_writer::tag('li', fullname($user).$idnumber,
                                       array('class' => 'queue'));
         }
         $text .= html_writer::end_tag('ol');
