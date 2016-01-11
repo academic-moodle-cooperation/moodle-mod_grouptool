@@ -257,6 +257,10 @@
     height:auto;
 }
 
+.path-mod-grouptool #registration_form fieldset .fcontainer .fitem .fitemtitle {
+    padding-top: 0;
+}
+
 .path-mod-grouptool .group .unregbutton {
     vertical-align:middle;
     display:inline;
