@@ -75,7 +75,7 @@ class import_form extends \moodleform {
             $active = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
             $inactive = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
-            $groups = $mform->createElement('selectgroups', 'group', get_string('choose_targetgroup', 'grouptool'), null,
+            $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup', 'grouptool'), null,
                                             array('size' => 15));
 
             if (!empty($active->groups)) {
@@ -95,8 +95,8 @@ class import_form extends \moodleform {
             }
             $groups->setMultiple(true);
             $mform->addElement($groups);
-            $mform->setType('group', PARAM_INT);
-            $mform->addRule('group', null, 'required', null, 'client');
+            $mform->setType('groups', PARAM_INT);
+            $mform->addRule('groups', null, 'required', null, 'client');
 
             $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'),
                     array('wrap' => 'virtual',
@@ -128,8 +128,8 @@ class import_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-        if (empty($data['group']) || ($data['group'] == 'none')) {
-            $errors['group'] = get_string('choose_group', 'grouptool');
+        if (empty($data['groups']) || ($data['groups'] == 'none')) {
+            $errors['groups'] = get_string('choose_group', 'grouptool');
         }
         return $errors;
     }

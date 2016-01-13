@@ -4912,13 +4912,13 @@ EOS;
         $form = new \mod_grouptool\import_form(null, array('id' => $id));
 
         if (optional_param('confirm', 0, PARAM_BOOL)) {
-            $group = required_param_array('group', PARAM_INT);
+            $groups = required_param_array('groups', PARAM_INT);
             $data = required_param('data', PARAM_RAW);
             $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
             if (!empty($data)) {
                 $data = unserialize($data);
             }
-            list($error, $message) = $this->import($group, $data, $forceregistration);
+            list($error, $message) = $this->import($groups, $data, $forceregistration);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'),
@@ -4931,15 +4931,15 @@ EOS;
 
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
-            list($error, $confirmmessage) = $this->import($fromform->group, $fromform->data,
+            list($error, $confirmmessage) = $this->import($fromform->groups, $fromform->data,
                                                           $fromform->forceregistration, true);
 
             $attr = array(
                     'confirm'           => '1',
                     'data'              => serialize($fromform->data),
                     'forceregistration' => $fromform->forceregistration);
-            foreach ($fromform->group as $group) {
-                $attr['group['.$group.']'] = $group;
+            foreach ($fromform->groups as $group) {
+                $attr['groups['.$group.']'] = $group;
             }
 
             $continue = new moodle_url($PAGE->url, $attr);
