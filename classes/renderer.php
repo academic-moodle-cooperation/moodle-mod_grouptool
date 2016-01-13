@@ -270,8 +270,9 @@ class renderer extends \plugin_renderer_base {
                                         get_string('none'),
                                         array('class' => 'simple_select_none'));
         if ($sortlist->usesize) {
+            $settingsurl = new \moodle_url('/course/modedit.php', array('update' => $sortlist->cm->id, 'return' => 1));
             $controller = \html_writer::tag('span', $controller, array('class' => 'text-left')).
-                          \html_writer::tag('span', get_string('individual_size_info', 'grouptool'),
+                          \html_writer::link($settingsurl, get_string('individual_size_info', 'grouptool'),
                                            array('class' => 'text-info text-right pull-right'));
         }
 
