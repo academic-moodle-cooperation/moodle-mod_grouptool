@@ -7337,8 +7337,8 @@ EOS;
                                  'surname'       => 20,
                                  'email'         => 35,
                                  'registrations' => 47,
-                                 'queues_rank'   => 7.5,
-                                 'queues_grp'    => 47); // Unit: mm!
+                                 'queues_grp'    => 47,
+                                 'queues_rank'   => 7.5); // Unit: mm!
 
             foreach ($data as $key => $user) {
                 if ($key == 0) {
@@ -7394,15 +7394,15 @@ EOS;
                     $worksheet->write_string($j, $k, $user['queues'], $headlinenbb);
                     $worksheet->write_blank($j, $k + 1, $headlinenbb);
                     $hidden = in_array('queues', $collapsed) ? true : false;
+                    $columnwidth['queues_grp'] = empty($columnwidth['queues_grp']) ? $columnwidth[0] : $columnwidth['queues_grp'];
+                    $worksheet->set_column($k, $k, $columnwidth['queues_grp'], null, $hidden);
                     $columnwidth['queues_rank'] = empty($columnwidth['queues_rank']) ? $columnwidth[0] :
                                                   $columnwidth['queues_rank'];
-                    $worksheet->set_column($k, $k, $columnwidth['queues_rank'], null, $hidden);
-                    $columnwidth['queues_grp'] = empty($columnwidth['queues_grp']) ? $columnwidth[0] : $columnwidth['queues_grp'];
-                    $worksheet->set_column($k + 1, $k + 1, $columnwidth['queues_grp'], null, $hidden);
+                    $worksheet->set_column($k + 1, $k + 1, $columnwidth['queues_rank'], null, $hidden);
                     $worksheet->merge_cells($j, $k, $j, $k + 1);
-                    $worksheet->write_string($j + 1, $k, get_string('rank', 'grouptool'),
+                    $worksheet->write_string($j + 1, $k, get_string('group', 'group'), $headlinenb);
+                    $worksheet->write_string($j + 1, $k + 1, get_string('rank', 'grouptool'),
                                              $headlinelast);
-                    $worksheet->write_string($j + 1, $k + 1, get_string('group', 'group'), $headlinenb);
                     $k += 2; // ...k = n+5!
                     $rows = 2;
                 } else {
@@ -7475,9 +7475,9 @@ EOS;
                                                      $noqueueentriesformat);
                             $worksheet->merge_cells($j, $k + 1, $j + $rows - 1, $k + 2);
                         } else if (key_exists($i, $user['queues'])) {
-                            $worksheet->write_number($j + $i, $k + 1, $user['queues'][$i]['rank'],
+                            $worksheet->write_string($j + $i, $k + 1, $user['queues'][$i]['name'],
                                                      $queueentrylast);
-                            $worksheet->write_string($j + $i, $k + 2, $user['queues'][$i]['name'],
+                            $worksheet->write_number($j + $i, $k + 2, $user['queues'][$i]['rank'],
                                                      $queueentrylast);
                         } else {
                             $worksheet->write_blank($j + $i, $k + 1, $queueentrylast);
