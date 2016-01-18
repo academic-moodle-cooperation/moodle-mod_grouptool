@@ -4609,11 +4609,10 @@ EOS;
      * @param int[] $groups array of ids of groups to import into
      * @param stdClass $data from form in import tab (textfield with idnumbers and group-selection)
      * @param bool $forceregistration Force registration in grouptool
-     * @param bool $includedeleted include deleted users in import (can cause problems if they're not enrolled)
      * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
      */
-    public function import($groups, $data, $forceregistration = false, $includedeleted = 0, $previewonly = false) {
+    public function import($groups, $data, $forceregistration = false, $previewonly = false) {
         global $DB, $OUTPUT, $CFG, $PAGE, $USER;
 
         $message = "";
@@ -4702,12 +4701,8 @@ EOS;
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
             foreach ($importfields as $field) {
                 $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-                if (!empty($includedeleted)) {
-                    $param = array('userpattern' => $user);
-                } else {
-                    $sql .= ' AND deleted <> :deleted';
-                    $param = array('userpattern' => $user, 'deleted' => 0);
-                }
+                $sql .= ' AND deleted = 0';
+                $param = array('userpattern' => $user);
 
                 $userinfo = $DB->get_records_sql($sql, $param);
 
@@ -4919,12 +4914,11 @@ EOS;
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             $group = required_param_array('group', PARAM_INT);
             $data = required_param('data', PARAM_RAW);
-            $includedeleted = optional_param('includedeleted', 0, PARAM_BOOL);
             $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
             if (!empty($data)) {
                 $data = unserialize($data);
             }
-            list($error, $message) = $this->import($group, $data, $forceregistration, $includedeleted);
+            list($error, $message) = $this->import($group, $data, $forceregistration);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'),
@@ -4938,14 +4932,12 @@ EOS;
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
             list($error, $confirmmessage) = $this->import($fromform->group, $fromform->data,
-                                                          $fromform->forceregistration,
-                                                          $fromform->includedeleted, true);
+                                                          $fromform->forceregistration, true);
 
             $attr = array(
                     'confirm'           => '1',
                     'data'              => serialize($fromform->data),
-                    'forceregistration' => $fromform->forceregistration,
-                    'includedeleted'    => $fromform->includedeleted);
+                    'forceregistration' => $fromform->forceregistration);
             foreach ($fromform->group as $group) {
                 $attr['group['.$group.']'] = $group;
             }

@@ -327,8 +327,6 @@ $string['import_user_prev'] = 'Importiere {$a->fullname} ({$a->idnumber}) in Gru
 $string['import_user_problem'] = 'Fehler beim Importieren von {$a->fullname} (ID-Nummer: {$a->idnumber}) in Gruppe {$a->groupname}.';
 $string['inactive'] = 'Inaktiv';
 $string['inactivegroups'] = 'Inaktive Gruppen';
-$string['includedeleted'] = 'auch gelöschte Nutzer/Innen';
-$string['includedeleted_help'] = 'Wenn aktiviert werden gelöschte Nutzer/innen nicht aus der Liste herausgefiltert. Gelöschte Nutzer/innen-Accounts können während des Import-Prozesses NICHT automatisch in den Kurs eingeschrieben werden.';
 $string['incomplete_only_label'] = 'Zeige nur Gruppen mit fehlenden Bewertungen';
 $string['individual_size_info'] = '* Globale Gruppengröße aktiv, da keine individuelle Größe gesetzt ist oder individuelle Gruppengrößen nicht aktiviert sind';
 $string['intro'] = 'Beschreibung';
@@ -539,3 +537,5 @@ $string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe a
 // Deprecated since Moodle 2.9!
 $string['grouptool:view_regs_group_overview'] = 'Zeige eine nach Gruppen gegliederte Liste, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
 $string['grouptool:view_regs_course_overview'] = 'Zeige eine Teilnehmer/innen-Liste mit der Information, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
+$string['includedeleted'] = 'auch gelöschte Nutzer/Innen';
+$string['includedeleted_help'] = 'Wenn aktiviert werden gelöschte Nutzer/innen nicht aus der Liste herausgefiltert. Gelöschte Nutzer/innen-Accounts können während des Import-Prozesses NICHT automatisch in den Kurs eingeschrieben werden.';

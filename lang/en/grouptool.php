@@ -328,8 +328,6 @@ $string['import_user_prev'] = 'Import {$a->fullname} ({$a->idnumber}) in group {
 $string['import_user_problem'] = 'Problem during import of {$a->fullname}({$a->idnumber} - {$a->id}) in group {$a->groupname}.';
 $string['inactive'] = 'Inactive';
 $string['inactivegroups'] = 'Inactive groups';
-$string['includedeleted'] = 'Include deleted users';
-$string['includedeleted_help'] = 'If checked, deleted users won\'t get filtered out of the list. Deleted user-accounts can\'t be enroled in the course during import process.';
 $string['incomplete_only_label'] = 'Show only groups with missing grades';
 $string['individual_size_info'] = '* global groupsize active, because no individual size is set or individual size is not used at all';
 $string['intro'] = 'Description';
@@ -540,3 +538,5 @@ $string['grouptool:view_registrations'] = 'View who\'s registered/queued in whic
 // Deprecated since Moodle 2.9!
 $string['grouptool:view_regs_group_overview'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
 $string['grouptool:view_regs_course_overview'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
+$string['includedeleted'] = 'Include deleted users';
+$string['includedeleted_help'] = 'If checked, deleted users won\'t get filtered out of the list. Deleted user-accounts can\'t be enroled in the course during import process.';

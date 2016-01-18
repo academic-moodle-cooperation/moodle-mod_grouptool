@@ -112,11 +112,6 @@ class import_form extends \moodleform {
                 $mform->setDefault('forceregistration', $forceimportreg);
             }
 
-            $mform->addElement('advcheckbox', 'includedeleted', '', get_string('includedeleted', 'grouptool'));
-            $mform->addHelpButton('includedeleted', 'includedeleted', 'grouptool');
-            $mform->setAdvanced('includedeleted');
-            $mform->setDefault('includedeleted', 0);
-
             $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }
     }
