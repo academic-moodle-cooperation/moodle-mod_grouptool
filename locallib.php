@@ -7306,7 +7306,7 @@ EOS;
             $regentrylast = $workbook->add_format($regentryprop);
             $regentrylast->set_align('vcenter');
             $noregentriesformat = $workbook->add_format($regentryprop);
-            $noregentriesformat->set_align('center');
+            $noregentriesformat->set_align('left');
             $noregentriesformat->set_align('vcenter');
             $noregentriesformat->set_right(1);
             $queueentryformat = $workbook->add_format($queueentryprop);
@@ -7315,7 +7315,7 @@ EOS;
             $queueentrylast = $workbook->add_format($queueentryprop);
             $queueentrylast->set_align('vcenter');
             $noqueueentriesformat = $workbook->add_format($queueentryprop);
-            $noqueueentriesformat->set_align('center');
+            $noqueueentriesformat->set_align('left');
             $noqueueentriesformat->set_align('vcenter');
 
             // Start row for groups general sheet!
