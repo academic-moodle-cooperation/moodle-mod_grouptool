@@ -55,6 +55,7 @@ if ($id) {
     $course     = $DB->get_record('course', array('id' => $grouptool->course), '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('grouptool', $grouptool->id, $course->id, false,
                                                  MUST_EXIST);
+    $id = $cm->id;
 } else {
     print_error('invalidcoursemodule');
 
