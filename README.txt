@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2.9 (Build 2015-12-02-00)
+ * @version       2.9 (Build 2015-12-20-00)
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -74,6 +74,20 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016012000
+-------------------------
+*) improve alignment of texts on registration page
+*) hide ID-Number for students in show members popup
+*) remove include deleted users option in import
+*) improve text describing non individual group sizes
+*) exchange place of group and rank for queues in userlist xlsx and ods export
+*) move download links to an easier distinguish position in overview
+*) align 'no registrations' and 'no queues' messages in XLSX and ODS left
+*) fix link's URLs if grouptool is called via g parameter in view.php
+*) improve design of self registration tab
+*) removed a language string never used anywhere
+*) enhance show members setting with finer options (all, all after due, own after due, own after reg, none)
+
 v 2015120200
 -------------------------
 *) Update module for compatibility with Moodle 2.9
