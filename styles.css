@@ -275,6 +275,20 @@
     margin-right:1em;
 }
 
+.path-mod-grouptool .download.all {
+    margin-bottom: 1.5em;
+}
+
+.path-mod-grouptool .groupcontainer .download {
+    text-align:right;
+}
+
+@media (min-width:600px) {
+    .path-mod-grouptool .groupcontainer .download {
+        float:right;
+    }
+}
+
 .path-mod-grouptool .group .unqueuebutton {
     vertical-align:middle;
     display:inline;

@@ -5058,6 +5058,30 @@ EOS;
                 $free = '∞';
             }
             if (!$onlydata) {
+                // Group-downloadlinks!
+                if (((count($queued) > 0) || (count($registered) > 0))
+                    && has_capability('mod/grouptool:export', $context)) {
+                    $urltxt = new moodle_url($downloadurl,
+                                             array('groupid' => $groupinfo[$agrp->id]->id,
+                                                   'format'  => GROUPTOOL_TXT));
+                    $urlxlsx = new moodle_url($downloadurl,
+                                             array('groupid' => $groupinfo[$agrp->id]->id,
+                                                   'format'  => GROUPTOOL_XLSX));
+                    $urlpdf = new moodle_url($downloadurl,
+                                             array('groupid' => $groupinfo[$agrp->id]->id,
+                                                   'format'  => GROUPTOOL_PDF));
+                    $urlods = new moodle_url($downloadurl,
+                                             array('groupid' => $groupinfo[$agrp->id]->id,
+                                                   'format'  => GROUPTOOL_ODS));
+
+                    $downloadlinks = html_writer::tag('span', get_string('download').":",
+                                                      array('class' => 'title')).'&nbsp;'.
+                                     html_writer::link($urltxt, '.TXT').'&nbsp;'.
+                                     html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
+                                     html_writer::link($urlpdf, '.PDF').'&nbsp;'.
+                                     html_writer::link($urlods, '.ODS');
+                    $groupinfos .= html_writer::tag('div', $downloadlinks, array('class' => 'download'));
+                }
                 $groupinfos .= html_writer::tag('span', get_string('total', 'grouptool').' '.$size,
                                                 array('class' => 'groupsize'));
                 $groupinfos .= ' / '.html_writer::tag('span', get_string('registered', 'grouptool').
@@ -5344,30 +5368,6 @@ EOS;
             if (!$onlydata) {
                 echo html_writer::end_tag('tbody');
                 echo html_writer::end_tag('table');
-                // Group-downloadlinks!
-                if (((count($queued) > 0) || (count($registered) > 0))
-                    && has_capability('mod/grouptool:export', $context)) {
-                    $urltxt = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_TXT));
-                    $urlxlsx = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_XLSX));
-                    $urlpdf = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_PDF));
-                    $urlods = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_ODS));
-
-                    $downloadlinks = html_writer::tag('span', get_string('download').":",
-                                                      array('class' => 'title')).'&nbsp;'.
-                                     html_writer::link($urltxt, '.TXT').'&nbsp;'.
-                                     html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
-                                     html_writer::link($urlpdf, '.PDF').'&nbsp;'.
-                                     html_writer::link($urlods, '.ODS');
-                    echo html_writer::tag('div', $downloadlinks, array('class' => 'download group'));
-                }
                 // Faster browser output prevents browser timeout!
                 echo $OUTPUT->box_end();
                 flush();
