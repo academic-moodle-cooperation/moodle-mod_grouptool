@@ -231,46 +231,90 @@
     margin-top: -3px;
 }
 
-.path-mod-grouptool .group {
+.path-mod-grouptool #registration_form .group {
     max-height: 200px;
     overflow: auto;
-}
-
-.path-mod-grouptool .group.registered, .group.registered legend {
-    background: #99ff99;
-}
-.path-mod-grouptool .group.queued, .group.queued legend {
-    background: #ffcc99;
-}
-.path-mod-grouptool .group.full, .group.full legend {
-    background: #ffcccc;
-}
-.path-mod-grouptool .group.empty, .group.empty legend {
-    background: transparent;
-}
-.path-mod-grouptool .group {
     vertical-align:middle;
+    margin-bottom:1em;
+    margin-top:1em;
+    padding:0.5em;
+
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05) inset;
+    border: 1px solid #e3e3e3;
 }
 
-.path-mod-grouptool #registration_form fieldset.group div {
+.path-mod-grouptool #registration_form .group.empty {
+    background-color: #f5f5f5;
+}
+
+.path-mod-grouptool #registration_form .group.alert-warning {
+    color: #8A6D3B;
+    background-color: #FCF8E3;
+    border-color: #FAEBCC;
+}
+
+.path-mod-grouptool #registration_form .group h2 {
+    margin-bottom:0;
+    margin-top:0;
+    font-size:1.5em;
+}
+
+.path-mod-grouptool #registration_form .group div {
     overflow:hidden;
     height:auto;
 }
 
-.path-mod-grouptool #registration_form fieldset .fcontainer .fitem .fitemtitle {
-    padding-top: 0;
-}
-
-.path-mod-grouptool .group .unregbutton {
+.path-mod-grouptool #registration_form .group .unregbutton {
     vertical-align:middle;
     display:inline;
     margin-left:1em;
     margin-right:1em;
 }
 
-.path-mod-grouptool .group .regbutton {
+.path-mod-grouptool #registration_form .group .regbutton {
     vertical-align:middle;
     display:inline;
+    margin-left:1em;
+    margin-right:1em;
+}
+
+.path-mod-grouptool #registration_form .group .unqueuebutton {
+    vertical-align:middle;
+    display:inline;
+    margin-left:1em;
+    margin-right:1em;
+}
+
+.path-mod-grouptool #registration_form .group .queuebutton {
+    vertical-align:middle;
+    display:inline;
+    margin-left:1em;
+    margin-right:1em;
+}
+
+.path-mod-grouptool #registration_form .group .rank {
+    vertical-align:middle;
+    display:inline;
+    margin-left:1em;
+    margin-right:1em;
+    white-space:nowrap;
+}
+
+.path-mod-grouptool #registration_form .group .showmembers {
+    vertical-align:middle;
+    margin-left:1em;
+    margin-right:1em;
+}
+.path-mod-grouptool #registration_form .group .queued {
+    vertical-align:middle;
+    margin-left:1em;
+    margin-right:1em;
+    white-space:nowrap;
+}
+
+.path-mod-grouptool #registration_form .group .fillratio {
+    vertical-align:middle;
     margin-left:1em;
     margin-right:1em;
 }
@@ -287,46 +331,6 @@
     .path-mod-grouptool .groupcontainer .download {
         float:right;
     }
-}
-
-.path-mod-grouptool .group .unqueuebutton {
-    vertical-align:middle;
-    display:inline;
-    margin-left:1em;
-    margin-right:1em;
-}
-
-.path-mod-grouptool .group .queuebutton {
-    vertical-align:middle;
-    display:inline;
-    margin-left:1em;
-    margin-right:1em;
-}
-
-.path-mod-grouptool .group .rank {
-    vertical-align:middle;
-    display:inline;
-    margin-left:1em;
-    margin-right:1em;
-    white-space:nowrap;
-}
-
-.path-mod-grouptool .group .showmembers {
-    vertical-align:middle;
-    margin-left:1em;
-    margin-right:1em;
-}
-.path-mod-grouptool .group .queued {
-    vertical-align:middle;
-    margin-left:1em;
-    margin-right:1em;
-    white-space:nowrap;
-}
-
-.path-mod-grouptool .group .fillratio {
-    vertical-align:middle;
-    margin-left:1em;
-    margin-right:1em;
 }
 
 .path-mod-grouptool .late, .path-my .late {

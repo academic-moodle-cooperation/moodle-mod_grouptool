@@ -4414,6 +4414,9 @@ EOS;
             }
             $groups = $this->get_active_groups();
 
+            echo html_writer::start_tag('fieldset', array('class' => 'clearfix')).
+                 html_writer::tag('legend', get_string('groups'));
+
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
 
@@ -4572,25 +4575,27 @@ EOS;
                     }
                     $status = "";
                     if ($regrank !== false) {
-                        $status = 'registered';
+                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, array('class' => 'panel-title')).
+                                                  html_writer::tag('div', $grouphtml, array('class' => 'panel-body')),
+                                                  'generalbox group alert-success');
                     } else if ($queuerank !== false) {
-                        $status = 'queued';
-                    } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
-                        $status = 'full';
+                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, array('class' => 'panel-title')).
+                                                  html_writer::tag('div', $grouphtml, array('class' => 'panel-body')),
+                                                  'generalbox group alert-warning');
+                    } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
+                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, array('class' => 'panel-title')).
+                                                  html_writer::tag('div', $grouphtml, array('class' => 'panel-body')),
+                                                  'generalbox group alert-error');
                     } else {
-                        $status = 'empty';
+                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, array('class' => 'panel-title')).
+                                                  html_writer::tag('div', $grouphtml, array('class' => 'panel-body')),
+                                                  'generalbox group empty');
                     }
-                    echo html_writer::tag('fieldset',
-                                          html_writer::tag('legend',
-                                                           $group->name,
-                                                           array('class' => 'groupname')).
-                                          html_writer::tag('div',
-                                                           $grouphtml,
-                                                           array('class' => 'fcontainer clearfix')),
-                                          array('class' => 'clearfix group '.$status));
+                    echo $grouphtml;
                 }
             }
 
+            echo html_writer::end_tag('fieldset');
             echo html_writer::end_tag('div');
             echo html_writer::end_tag('form');
 
