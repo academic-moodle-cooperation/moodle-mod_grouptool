@@ -473,7 +473,17 @@ $string['selfregistration_alt'] = 'Selbstanmeldung zu einer oder mehreren Gruppe
 $string['setactive'] = 'Aktivieren';
 $string['setinactive'] = 'Deaktivieren';
 $string['show_members'] = 'Gruppenmitglieder anzeigen';
-$string['show_members_help'] = 'Wenn aktiviert ist sichtbar, wer sich schon zur Gruppe angemeldet hat.';
+$string['show_members_help'] = 'Ermöglicht es Teilnehmer/innen (unter gewissen Umständen) zu sehen, wer sich bereits in Gruppen registriert hat.
+<ul>
+    <li><strong>Nein:</strong> zeige keine Gruppenmitglieder</li>
+    <li><strong>Alle - nach Ablauf des Anmeldeendes:</strong> zeige Mitglieder aller Gruppen nach Ablauf des Anmeldeendes</li>
+    <li><strong>Nur eigene - nach Ablauf des Anmeldeendes:</strong> zeige die Mitglieder der eigenen Gruppe(n) nach Ablauf des Anmeldeendes</li>
+    <li><strong>Nur eigene - nach eigener Anmeldung:</strong> zeige die Mitglieder der eigenen Gruppe(n) nach der Anmeldung</li>
+    <li><strong>Ja:</strong> zeige alle Mitglieder der Gruppen</li>
+</ul>';
+$string['showafterdue'] = 'Alle - nach Ablauf des Anmeldeendes';
+$string['showownafterdue'] = 'Nur eigene - nach Ablauf des Anmeldeendes';
+$string['showownafterreg'] = 'Nur eigene - nach eigener Anmeldung';
 $string['size'] = 'Gruppengröße';
 $string['size_grp'] = 'Globale Gruppengrößeneinstellung';
 $string['size_grp_help'] = 'Wenn Gruppengröße verwendet wird, wird die maximale Anzahl an Gruppenanmeldungen für jede Gruppe begrenzt (für diese Instanz). Wenn zusätzlich die "individuelle Größe" aktiviert ist, wird die Gruppengröße für jede Gruppe gesondert festgelegt.';

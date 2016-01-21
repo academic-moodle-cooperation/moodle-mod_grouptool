@@ -53,10 +53,16 @@ if ($ADMIN->fulltree) {
                                                     1, $yes = '1', $no = '0'));
 
     // ...grouptool_show_members - Show groupmembers?
-    $settings->add(new admin_setting_configcheckbox('mod_grouptool/show_members',
-                                                    get_string('cfg_show_members', 'grouptool'),
-                                                    get_string('cfg_show_members_desc', 'grouptool'),
-                                                    0, $yes = '1', $no = '0'));
+    $options = array(GROUPTOOL_HIDE_GROUPMEMBERS               => get_string('yes'),
+                     GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
+                     GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
+                     GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
+                     GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('no'));
+    $settings->add(new admin_setting_configselect('mod_grouptool/show_members',
+                                                  get_string('cfg_show_members', 'grouptool'),
+                                                  get_string('cfg_show_members_desc', 'grouptool'),
+                                                  GROUPTOOL_HIDE_GROUPMEMBERS,
+                                                  $options));
 
     // ...grouptool_immediate_reg - Activate immediate registrations?
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/immediate_reg',

@@ -473,7 +473,17 @@ $string['selfregistration_alt'] = 'Register to one or more groups (depending on 
 $string['setactive'] = 'Activate';
 $string['setinactive'] = 'Deactivate';
 $string['show_members'] = 'Show group members';
-$string['show_members_help'] = 'If enabled students can see who\'s already registered in a group.';
+$string['show_members_help'] = 'Enables students (under certain circumstances) to see who\'s already registered in a group.<br />
+<ul>
+    <li><strong>No:</strong> don\'t show groups\' members at all</li>
+    <li><strong>All - after due date:</strong> show groups\' members for all groups after the due date</li>
+    <li><strong>Own - after due date:</strong> show user\'s own groups\' members after the due date</li>
+    <li><strong>Own - after registration:</strong> show user\'s own groups\' members after he/she registered himself/herself or has been registered by someone else</li>
+    <li><strong>Yes:</strong> show groups\' members</li>
+</ul>';
+$string['showafterdue'] = 'all - after due date';
+$string['showownafterdue'] = 'own - after due date';
+$string['showownafterreg'] = 'own - after registration';
 $string['size'] = 'Group size';
 $string['size_grp'] = 'Group size settings';
 $string['size_grp_help'] = 'If group size is activated the maximum members for each group get limited (set for the whole instance via text field). If additionally the "individual size" is activated, the group size for each group can be defined in the following list.';

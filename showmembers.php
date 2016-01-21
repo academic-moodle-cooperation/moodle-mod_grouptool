@@ -27,6 +27,7 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir .'/grouplib.php');
+require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
 
@@ -50,9 +51,12 @@ require_login($cm->course, true, $cm);
 echo $OUTPUT->header();
 
 echo $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
+
+$grouptool = new mod_grouptool($cm->id, $grouptool, $cm);
+
 if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     && !has_capability('mod/grouptool:view_regs_course_view', $context)
-    && !$grouptool->show_members) {
+    && !$grouptool->canshowmembers($agrpid)) {
     echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
                           array('class' => 'reg'));
 } else {

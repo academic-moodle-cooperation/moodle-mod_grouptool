@@ -28,6 +28,7 @@
 define('AJAX_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir .'/grouplib.php');
+require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
 $contextid = required_param('contextid', PARAM_INT);
@@ -76,13 +77,15 @@ $group = $DB->get_record_sql('SELECT grp.id AS grpid, grp.name AS grpname, grp.c
                                WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
 $grouptool = $DB->get_record('grouptool', array('id' => $group->grouptoolid), '*', MUST_EXIST);
 
+$grouptool = new mod_grouptool($cm->id, $grouptool, $cm);
+
 $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context)
                 || has_capability('mod/grouptool:view_regs_course_view', $context);
 
 $text = '';
 if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     && !has_capability('mod/grouptool:view_regs_course_view', $context)
-    && !$grouptool->show_members) {
+    && !$grouptool->canshowmembers($agrpid)) {
     $text .= html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
                               array('class' => 'reg'));
 } else {

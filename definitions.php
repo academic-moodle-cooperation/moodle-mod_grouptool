@@ -139,3 +139,24 @@ define('GROUPTOOL_RECREATE_GROUP', 0);
  * GROUPTOOL_DELETE_REF - delete all references in grouptool-instance
  */
 define('GROUPTOOL_DELETE_REF', 1);
+
+/**
+ * HIDE_GROUPMEMBERS - never show groupmembers no matter what...
+ */
+define('GROUPTOOL_HIDE_GROUPMEMBERS', 0);
+/**
+ * SHOW_GROUPMEMBERS_AFTER_DUE - show groupmembers after due date
+ */
+define('GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE', 2);
+/**
+ * SHOW_GROUPMEMBERS_AFTER_DUE - show members of own group(s) after due date
+ */
+define('GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE', 3);
+/**
+ * SHOW_GROUPMEMBERS_AFTER_REG - show members of own group(s) immediately after registration
+ */
+define('GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG', 4);
+/**
+ * SHOW_GROUPMEMBERS - show groupmembers no matter what...
+ */
+define('GROUPTOOL_SHOW_GROUPMEMBERS', 1);

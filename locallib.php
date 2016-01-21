@@ -81,6 +81,27 @@ class mod_grouptool {
     const FILTER_INACTIVE = 2;
 
     /**
+     * HIDE_GROUPMEMBERS - never show groupmembers no matter what...
+     */
+    const HIDE_GROUPMEMBERS = GROUPTOOL_HIDE_GROUPMEMBERS;
+    /**
+     * SHOW_GROUPMEMBERS_AFTER_DUE - show groupmembers after due date
+     */
+    const SHOW_GROUPMEMBERS_AFTER_DUE = GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE;
+    /**
+     * SHOW_GROUPMEMBERS_AFTER_DUE - show members of own group(s) after due date
+     */
+    const SHOW_OWN_GROUPMEMBERS_AFTER_DUE = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE;
+    /**
+     * SHOW_OWN_GROUPMEMBERS_AFTER_REG - show members of own group(s) immediately after registration
+     */
+    const SHOW_OWN_GROUPMEMBERS_AFTER_REG = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG;
+    /**
+     * SHOW_GROUPMEMBERS - show groupmembers no matter what...
+     */
+    const SHOW_GROUPMEMBERS = GROUPTOOL_SHOW_GROUPMEMBERS;
+
+    /**
      * Constructor for the grouptool class
      *
      * If cmid is set create the cm, course, checkmark objects.
@@ -4436,9 +4457,7 @@ EOS;
                                                                " ".$queued,
                                                        array('class' => 'queued'));
                     }
-                    if ($this->grouptool->show_members) {
-                        $grouphtml .= $this->render_members_link($group->agrpid, $group->name);
-                    }
+
                     if (!empty($group->registered)) {
                         $regrank = $this->get_rank_in_queue($group->registered, $USER->id);
                     } else {
@@ -4449,6 +4468,13 @@ EOS;
                     } else {
                         $queuerank = false;
                     }
+
+                    // We have to determine if we can show the members link!
+                    $showmembers = $this->canshowmembers($group->agrpid, $regrank, $queuerank);
+                    if ($showmembers) {
+                        $grouphtml .= $this->render_members_link($group->agrpid, $group->name);
+                    }
+
                     /* If we include inactive groups and there's someone registered in one of these,
                      * the label gets displayed incorrectly.
                      */
@@ -4606,6 +4632,64 @@ EOS;
                 $PAGE->requires->js_call_amd('mod_grouptool/memberspopup', 'initializer', array($params));
             }
         }
+    }
+
+    /**
+     * Returns whether or not a user should be able to see the members of this active group.
+     * Either if regrank or queuerank are not set, agrp has to be set!
+     *
+     * @param int|object $agrp Active group's DB ID or active group object
+     * @param int|bool $regrank The registration rank in this active group
+     *                          (false if not registered or null if it has to be determined for the current user)
+     * @param int|bool $queuerank The queue rank in this active group
+     *                            (false if not queued or null if it has to be determined for the current user)
+     * @return bool true if user can show, false if not!
+     */
+    public function canshowmembers($agrp = null, $regrank = null, $queuerank = null) {
+        global $DB, $USER;
+
+        $showmembers = false;
+
+        if ($regrank === null
+            || $queuerank === null) {
+            if (is_numeric($agrp)) {
+                $agrpid = $agrp;
+            } else if (is_object($agrp) && isset($agrp->id)) {
+                $agrpid = $agrp->id;
+            } else {
+                throw new coding_exception('$agrp has to be the active group ID or an object containing $agrp->id');
+            }
+
+            if ($regrank === null) {
+                $regrank = $DB->record_exists('grouptool_registered', array('userid' => $USER->id, 'agrpid' => $agrpid));
+            }
+
+            if ($queuerank === null) {
+                $queuerank = $DB->record_exists('grouptool_queued', array('userid' => $USER->id, 'agrpid' => $agrpid));
+            }
+        }
+
+        switch($this->grouptool->show_members) {
+            case self::SHOW_GROUPMEMBERS:
+                $showmembers = true;
+                break;
+            case self::SHOW_GROUPMEMBERS_AFTER_DUE:
+                $showmembers = (time() > $this->grouptool->timedue);
+                break;
+            case self::SHOW_OWN_GROUPMEMBERS_AFTER_REG:
+                $showmembers = ($regrank !== false) || ($queuerank !== false);
+                break;
+            case self::SHOW_OWN_GROUPMEMBERS_AFTER_DUE:
+                $showmembers = (time() > $this->grouptool->timedue)
+                               && (($regrank !== false) || ($queuerank !== false));
+                break;
+            default:
+            case self::HIDE_GROUPMEMBERS:
+                $showmembers = false;
+                break;
+        }
+
+        return $showmembers;
     }
 
     /**
@@ -4841,7 +4925,6 @@ EOS;
                                                                WHERE grouptoolid = ?',
                                                               array($this->grouptool->id));
                             // Insert agrp-entry for this group (even if it's not active)!
-                            var_dump($group);
                             $agrp[$group] = new stdClass();
                             $agrp[$group]->grouptoolid = $this->grouptool->id;
                             $agrp[$group]->groupid = $group;
@@ -6343,6 +6426,7 @@ EOS;
         $id = html_writer::random_id('showmembers');
         $attributes['id'] = $id;
         $attributes['data-agrpid'] = $agrpid;
+
         $output = html_writer::tag('a', $output, $attributes);
 
         // And finally wrap in a span!

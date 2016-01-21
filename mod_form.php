@@ -137,9 +137,14 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setDefault('allow_reg', (($allowreg !== false) ? $allowreg : 1));
         $mform->addHelpButton('allow_reg', 'allow_reg', 'grouptool');
 
-        $mform->addElement('selectyesno', 'show_members', get_string('show_members', 'grouptool'));
+        $options = array(GROUPTOOL_HIDE_GROUPMEMBERS               => get_string('no'),
+                         GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
+                         GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
+                         GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
+                         GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes'));
+        $mform->addElement('select', 'show_members', get_string('show_members', 'grouptool'), $options);
         $showmembers = get_config('mod_grouptool', 'show_members');
-        $mform->setDefault('show_members', (($showmembers !== false) ? $showmembers : 0));
+        $mform->setDefault('show_members', $showmembers);
         $mform->addHelpButton('show_members', 'show_members', 'grouptool');
 
         $mform->addElement('selectyesno', 'immediate_reg', get_string('immediate_reg',
