@@ -1194,20 +1194,37 @@ class mod_grouptool {
         }
 
         if ($resize = optional_param('resize', 0, PARAM_INT)) {
-            // Show Rename Form!
+            // Show Resize Form!
             $gform = new \mod_grouptool\group_resize_form(null, array('id'       => $this->cm->id,
                                                                       'instance' => $this->cm->instance,
                                                                       'resize'   => $resize));
             if (!$gform->is_cancelled() && $fromform = $gform->get_data()) {
                 if (empty($fromform->size)) {
                     $DB->set_field('grouptool_agrps', 'grpsize', null, array('groupid'     => $fromform->resize,
-                                                                             'grouptoolid' => $this->cm->id));
+                                                                             'grouptoolid' => $this->cm->instance));
+                    if (!$DB->record_exists_select('grouptool_agrps', "grpsize IS NOT NULL AND grouptoolid = ?",
+                                                  array($this->cm->instance))) {
+                        // Deactivate usage of individual group sizes!
+                        $this->grouptool->use_individual = 0;
+                        $update = new stdClass();
+                        $update->id = $this->cm->instance;
+                        $update->use_individual = 0;
+                        $DB->update_record('grouptool', $update);
+                    }
                 } else {
                     $group = new stdClass();
                     $group->id = $DB->get_field('grouptool_agrps', 'id', array('groupid' => $fromform->resize,
                                                                                'grouptoolid' => $this->cm->instance));
                     $group->grpsize = $fromform->size;
                     $DB->update_record('grouptool_agrps', $group);
+                    if (empty($this->grouptool->use_individual)) {
+                        // Activate usage of individual group sizes!
+                        $this->grouptool->use_individual = 1;
+                        $update = new stdClass();
+                        $update->id = $this->cm->instance;
+                        $update->use_individual = 1;
+                        $DB->update_record('grouptool', $update);
+                    }
                 }
             } else if (!$gform->is_cancelled()) {
                 $data = new stdClass();

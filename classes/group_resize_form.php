@@ -119,7 +119,7 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
     WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
         $params = array('grouptoolid' => $data['instance'], 'groupid' => $data['resize']);
         $regs = $DB->count_records_sql($sql, $params);
-        if ((clean_param($data['size'], PARAM_INT) <= 0)) {
+        if (($data['size'] != '') && (clean_param($data['size'], PARAM_INT) <= 0)) {
                 $errors['size'] = get_string('grpsizezeroerror', 'grouptool');
         } else if (!empty($regs) && $data['size'] < $regs) {
             $errors['size'] = get_string('toomanyregs', 'grouptool');
