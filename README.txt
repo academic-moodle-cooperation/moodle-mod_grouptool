@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2.9 (Build 2015-12-20-00)
+ * @version       2016-05-07
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 2.9+
+# FOR Moodle 3.0+
 # ---------------------------------------------------------------
 
 Grouptool-Module
@@ -55,7 +55,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle 2.8
+    Moodle 3.0
 
 INSTALLATION
 ================================================================================
@@ -74,6 +74,12 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016050700
+-------------------------
+*) removed .gitignore from repository
+*) fix bug causing different behavior when changing group sizes with/without JavaScript
+*) PHP 7 compatibility!
+
 v 2016012000
 -------------------------
 *) improve alignment of texts on registration page
