@@ -130,9 +130,8 @@ class renderer extends \plugin_renderer_base {
                     'value' => (!empty($group->order) ? $group->order : 999999),
                     'class' => 'sort_order');
 
-            $showmemberslink = \html_writer::tag('a', $showmembersstr,
-                                                array('href' => 'somewhere',
-                                                      'title' => $showmembersstr));
+            $showmemberslink = \html_writer::tag('a', $showmembersstr, array('href' => 'somewhere',
+                                                                             'title' => $showmembersstr));
             $moveupattr = array('src'   => $OUTPUT->pix_url('i/up'),
                                 'alt'   => $moveupstr,
                                 'title' => $moveupstr,
@@ -147,11 +146,10 @@ class renderer extends \plugin_renderer_base {
                                   'class' => 'movedownbutton');
             $movedownurl = new \moodle_url($PAGE->url, array('movedown' => $id));
             $movedownbutton = \html_writer::link($movedownurl, \html_writer::empty_tag('img', $movedownattr), $movedownattr);
-            $dragbutton = \html_writer::empty_tag('img',
-                                                 array('src'   => $OUTPUT->pix_url('i/dragdrop'),
-                                                       'alt'   => $dragstr,
-                                                       'title' => $dragstr,
-                                                       'class' => 'drag_image js_invisible'));
+            $dragbutton = \html_writer::empty_tag('img', array('src'   => $OUTPUT->pix_url('i/dragdrop'),
+                                                               'alt'   => $dragstr,
+                                                               'title' => $dragstr,
+                                                               'class' => 'drag_image js_invisible'));
             $nameattr = array('name'  => 'name['.$id.']',
                               'type'  => 'hidden',
                               'value' => $group->name);
@@ -225,10 +223,11 @@ class renderer extends \plugin_renderer_base {
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'inactive');
             }
+            $linkattr = array('class' => 'togglebutton '.$toggleattr['class'],
+                              'title' => $toggleattr['title']);
             $togglebutton = \html_writer::link(new \moodle_url($PAGE->url, array('toggle' => $id)),
-                                              \html_writer::empty_tag('img', $toggleattr),
-                                              array('class' => 'togglebutton '.$toggleattr['class'],
-                                                    'title' => $toggleattr['title']));
+                                              \html_writer::empty_tag('img', $toggleattr), $linkattr);
+            unset($linkattr);
             $toggle = new \html_table_cell($togglebutton);
             $toggle->attributes['class'] = 'buttons';
             $row[] = $toggle;
@@ -258,22 +257,21 @@ class renderer extends \plugin_renderer_base {
         $table->data = $rows;
         $table->attributes['class'] .= ' drag_list ';
 
-        $controller = \html_writer::link(new \moodle_url($PAGE->url,
-                                                       array('class_action' => 'select',
-                                                             'do_class_action' => '1')),
+        $controller = \html_writer::link(new \moodle_url($PAGE->url, array('class_action' => 'select',
+                                                                           'do_class_action' => '1')),
                                         get_string('all'),
                                         array('class' => 'simple_select_all')).
                       '/'.
-                      \html_writer::link(new \moodle_url($PAGE->url,
-                                                       array('class_action' => 'deselect',
-                                                             'do_class_action' => '1')),
+                      \html_writer::link(new \moodle_url($PAGE->url, array('class_action' => 'deselect',
+                                                                           'do_class_action' => '1')),
                                         get_string('none'),
                                         array('class' => 'simple_select_none'));
         if ($sortlist->usesize) {
             $settingsurl = new \moodle_url('/course/modedit.php', array('update' => $sortlist->cm->id, 'return' => 1));
+            $linkarg = array('class' => 'text-info text-right pull-right');
             $controller = \html_writer::tag('span', $controller, array('class' => 'text-left')).
-                          \html_writer::link($settingsurl, get_string('individual_size_info', 'grouptool'),
-                                           array('class' => 'text-info text-right pull-right'));
+                          \html_writer::link($settingsurl, get_string('individual_size_info', 'grouptool'), $linkarg);
+            unset($linkarg);
         }
 
         $controller = \html_writer::tag('div', $controller);
@@ -357,42 +355,34 @@ class renderer extends \plugin_renderer_base {
         $checkboxcontrols = $checkboxcontroltitle;
 
         // Add Radiobuttons and Go Button!
-        $checkalllink = \html_writer::tag('span',
-                                         \html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                               'type'  => 'radio',
-                                                                               'id'    => 'select',
-                                                                               'value' => 'select',
-                                                                               'class' => 'select_all')).
-                                         \html_writer::tag('label', strip_tags($selectall), array('for' => 'select')),
-                                         array('class' => 'nowrap'));
-        $checknonelink = \html_writer::tag('span',
-                                          \html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                                'type'  => 'radio',
-                                                                                'id'    => 'deselect',
-                                                                                'value' => 'deselect',
-                                                                                'class' => 'select_none')).
-                                          \html_writer::tag('label', strip_tags($selectnone), array('for' => 'deselect')),
-                                          array('class' => 'nowrap'));
-        $checktogglelink = \html_writer::tag('span',
-                                            \html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                                  'type'  => 'radio',
-                                                                                  'id'    => 'toggle',
-                                                                                  'value' => 'toggle',
-                                                                                  'class' => 'toggle_selection')).
-                                            \html_writer::tag('label', strip_tags($inverseselection), array('for' => 'toggle')),
-                                            array('class' => 'nowrap'));
-        $submitbutton = \html_writer::tag('button', get_string('go'),
-                                         array('name' => 'do_class_action',
-                                               'value' => 'Go'));
+        $checkalllink = \html_writer::tag('span', \html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                                         'type'  => 'radio',
+                                                                                         'id'    => 'select',
+                                                                                         'value' => 'select',
+                                                                                         'class' => 'select_all')).
+                                                  \html_writer::tag('label', strip_tags($selectall), array('for' => 'select')),
+                                                                    array('class' => 'nowrap'));
+        $checknonelink = \html_writer::tag('span', \html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                                          'type'  => 'radio',
+                                                                                          'id'    => 'deselect',
+                                                                                          'value' => 'deselect',
+                                                                                          'class' => 'select_none')).
+                                                   \html_writer::tag('label', strip_tags($selectnone), array('for' => 'deselect')),
+                                                                     array('class' => 'nowrap'));
+        $checktogglelink = \html_writer::tag('span', \html_writer::empty_tag('input', array('name'  => 'class_action',
+                                                                                            'type'  => 'radio',
+                                                                                            'id'    => 'toggle',
+                                                                                            'value' => 'toggle',
+                                                                                            'class' => 'toggle_selection')).
+                                                     \html_writer::tag('label', strip_tags($inverseselection),
+                                                                       array('for' => 'toggle')), array('class' => 'nowrap'));
+        $submitbutton = \html_writer::tag('button', get_string('go'), array('name' => 'do_class_action',
+                                                                            'value' => 'Go'));
 
         $attr = array('class' => 'felement');
-        $checkboxcontrols .= \html_writer::tag('div',
-                                              \html_writer::tag('select', implode("\n", $options),
-                                                               array('name' => 'classes[]',
-                                                                     'multiple' => 'multiple')).
-                                              $checkalllink.$checknonelink.
-                                              $checktogglelink.$submitbutton,
-                                              $attr);
+        $selattr = array('name' => 'classes[]', 'multiple' => 'multiple');
+        $checkboxcontrols .= \html_writer::tag('div', \html_writer::tag('select', implode("\n", $options), $selattr).$checkalllink.
+                                                      $checknonelink.$checktogglelink.$submitbutton, $attr);
         return $checkboxcontrols;
     }
 }

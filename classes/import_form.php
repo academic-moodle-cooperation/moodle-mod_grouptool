@@ -98,10 +98,9 @@ class import_form extends \moodleform {
             $mform->setType('groups', PARAM_INT);
             $mform->addRule('groups', null, 'required', null, 'client');
 
-            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'),
-                    array('wrap' => 'virtual',
-                          'rows' => '20',
-                          'cols' => '50'));
+            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), array('wrap' => 'virtual',
+                                                                                              'rows' => '20',
+                                                                                              'cols' => '50'));
             $mform->addHelpButton('data', 'userlist', 'grouptool');
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');

@@ -25,13 +25,11 @@
  */
 
 /**
-  * @module mod_grouptool/grading
-  */
-define(['jquery', 'core/config', 'core/str', 'core/log'],
-       function($, config, str, log) {
+ * @module mod_grouptool/grading
+ */
+define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, str, log) {
 
     var Grading = function() {
-        /** @access public **/
         this.contextid = 0;
         this.lang = '';
 
@@ -58,9 +56,9 @@ define(['jquery', 'core/config', 'core/str', 'core/log'],
             method : 'get',
             url : config.wwwroot + '/mod/grouptool/groupinggroups_ajax.php',
             data: {
-                    'groupingid': groupingid,
-                    'lang': config.lang,
-                    'contextid': contextid
+                'groupingid': groupingid,
+                'lang': config.lang,
+                'contextid': contextid
             },
             dataType: 'json',
             beforeSend: function() {

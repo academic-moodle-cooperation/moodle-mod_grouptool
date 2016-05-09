@@ -26,8 +26,7 @@
  /**
   * @module mod_grouptool/memberspopup
   */
-define(['jquery', 'core/yui', 'core/config', 'core/str', 'core/url', 'core/log'],
-       function($, Y, config, str, murl, log) {
+define(['jquery', 'core/yui', 'core/config', 'core/str', 'core/url', 'core/log'], function($, Y, config, str, murl, log) {
 
     /**
      * @constructor
@@ -39,7 +38,6 @@ define(['jquery', 'core/yui', 'core/config', 'core/str', 'core/url', 'core/log']
             FOOTER: 'div.moodle-dialogue-ft'
         };
 
-        /** @access private */
         this.contextid = 0;
 
         this.panel = null;

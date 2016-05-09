@@ -27,8 +27,7 @@
 /**
  * @module mod_grouptool/groupcreation
  */
-define(['jquery', 'core/config', 'core/str', 'core/log'],
-       function($, config, str, log) {
+define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, str, log) {
     /**
      * @contructor
      * @alias module:mod_grouptool/groupcreation
@@ -114,7 +113,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'],
         this.fromtomode = params.fromtomode;
 
         log.info('Initialise grouptool group creation js...', 'grouptool');
-        //add JS-Eventhandler for each tag
+        // Add JS-Eventhandler for each tag!
         $('.tag').on('click', null, this, this.add_tag);
         $('.tag').css('cursor', 'pointer');
 

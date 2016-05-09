@@ -834,17 +834,15 @@ class mod_grouptool {
                 } else {
                     $newagrp->active = 0;
                 }
-                if (!$DB->record_exists('grouptool_agrps',
-                                        array('grouptoolid' => $this->grouptool->id,
-                                              'groupid'     => $groupid))) {
+                if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $this->grouptool->id,
+                                                                 'groupid'     => $groupid))) {
                     $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
                 } else {
                     /* This is also the case if eventhandlers work properly
                      * because group gets allready created in eventhandler
                      */
-                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id',
-                                                   array('grouptoolid' => $this->grouptool->id,
-                                                         'groupid'     => $groupid));
+                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id', array('grouptoolid' => $this->grouptool->id,
+                                                                                 'groupid'     => $groupid));
                     if ($this->grouptool->allow_reg == true) {
                         $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
                     }
@@ -1332,9 +1330,8 @@ class mod_grouptool {
                 case 'grouping':
                     // Show grouping creation form!
                     $selected = optional_param_array('selected', array(), PARAM_INT);
-                    $mform = new \mod_grouptool\groupings_creation_form(null,
-                                                                        array('id'       => $id,
-                                                                              'selected' => $selected));
+                    $mform = new \mod_grouptool\groupings_creation_form(null, array('id'       => $id,
+                                                                                    'selected' => $selected));
                     $groups = $DB->get_records_list('groups', 'id', $selected);
                     if ($mform->is_cancelled()) {
                         $bulkaction = null;
@@ -1552,11 +1549,11 @@ class mod_grouptool {
         }
 
         // Create the form-object!
-        $mform = new \mod_grouptool\group_creation_form(null,
-                                                        array('id'           => $id,
-                                                              'roles'        => $rolenames,
-                                                              'show_grpsize' => ($this->grouptool->use_size
-                                                                                 && $this->grouptool->use_individual)));
+        $showgrpsize = $this->grouptool->use_size && $this->grouptool->use_individual;
+        $mform = new \mod_grouptool\group_creation_form(null, array('id'           => $id,
+                                                                    'roles'        => $rolenames,
+                                                                    'show_grpsize' => $showgrpsize));
+        unset($showgrpsize);
 
         if ($fromform = $mform->get_data()) {
             require_capability('mod/grouptool:create_groups', $this->context);
@@ -1793,10 +1790,9 @@ EOS;
             $tablecolumns = array('select',
                     'name',
                     'gradeinfo');
-            $button = html_writer::tag('button', get_string('copy', 'grouptool'),
-                                       array('name'  => 'copygrades',
-                                             'type'  => 'submit',
-                                             'value' => 'true'));
+            $button = html_writer::tag('button', get_string('copy', 'grouptool'), array('name'  => 'copygrades',
+                                                                                        'type'  => 'submit',
+                                                                                        'value' => 'true'));
             $buttontext = get_string('copy_refgrades_feedback', 'grouptool');
             $tableheaders = array('',
                     get_string('name'),
@@ -1856,10 +1852,8 @@ EOS;
                         if (count($userwithgrades) == 1) {
                             $radioattr['type'] = 'hidden';
                         }
-                        $gradeinfocont = ((count($userwithgrades) >= 1) ?
-                                            html_writer::empty_tag('input', $radioattr) : "").
-                                            fullname($groupmembers[$key])." (".
-                                            $finalgrade->formatted_grade;
+                        $gradeinfocont = ((count($userwithgrades) >= 1) ? html_writer::empty_tag('input', $radioattr) : "").
+                                         fullname($groupmembers[$key])." (".$finalgrade->formatted_grade;
                         if (strip_tags($finalgrade->str_feedback) != "") {
                             $gradeinfocont .= " ".
                                               shorten_text(strip_tags($finalgrade->str_feedback),
@@ -1891,9 +1885,9 @@ EOS;
                 }
 
                 $row = new html_table_row(array($select, $name, $gradeinfo));
-                $row->attributes['class'] = isset($row->attributes['class']) ?
-                                            $row->attributes['class'].$error :
-                                            $row->attributes['class'];
+                $tmpclass = $row->attributes['class'];
+                $row->attributes['class'] = isset($tmpclass) ? $tmpclass.$error : $tmpclass;
+                unset($tmpclass);
                 $data[] = $row;
             }
             $tablepostfix = html_writer::tag('div', $buttontext, array('class' => 'center centered'));
@@ -2443,38 +2437,34 @@ EOS;
                     list($error, $preview) = $this->copy_grades($activity, $mygroupsonly,
                                                                 $selected, $source, $overwrite,
                                                                 true);
-                    $continue = new moodle_url("view.php?id=".$this->cm->id,
-                                               array('tab'           => 'grading',
-                                                     'confirm'       => 'true',
-                                                     'sesskey'       => sesskey(),
-                                                     'step'          => '2',
-                                                     'activity'      => $activity,
-                                                     'mygroups_only' => $mygroupsonly,
-                                                     'overwrite'     => $overwrite,
-                                                     'selected'      => serialize($selected),
-                                                     'source'        => serialize($source)));
-                    $cancel = new moodle_url("view.php?id=".$this->cm->id,
-                                             array('tab'           => 'grading',
-                                                   'confirm'       => 'false',
-                                                   'sesskey'       => sesskey(),
-                                                   'step'          => '2',
-                                                   'activity'      => $activity,
-                                                   'mygroups_only' => $mygroupsonly,
-                                                   'overwrite'     => $overwrite,
-                                                   'selected'      => serialize($selected),
-                                                   'source'        => serialize($source)));
+                    $continue = new moodle_url("view.php?id=".$this->cm->id, array('tab'           => 'grading',
+                                                                                   'confirm'       => 'true',
+                                                                                   'sesskey'       => sesskey(),
+                                                                                   'step'          => '2',
+                                                                                   'activity'      => $activity,
+                                                                                   'mygroups_only' => $mygroupsonly,
+                                                                                   'overwrite'     => $overwrite,
+                                                                                   'selected'      => serialize($selected),
+                                                                                   'source'        => serialize($source)));
+                    $cancel = new moodle_url("view.php?id=".$this->cm->id, array('tab'           => 'grading',
+                                                                                 'confirm'       => 'false',
+                                                                                 'sesskey'       => sesskey(),
+                                                                                 'step'          => '2',
+                                                                                 'activity'      => $activity,
+                                                                                 'mygroups_only' => $mygroupsonly,
+                                                                                 'overwrite'     => $overwrite,
+                                                                                 'selected'      => serialize($selected),
+                                                                                 'source'        => serialize($source)));
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
-                        echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm',
-                                                       'grouptool'), $continue, $cancel);
+                        echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm', 'grouptool'), $continue, $cancel);
                     } else {
-                        echo $preview.$this->confirm(get_string('copy_grades_confirm',
-                                                       'grouptool'), $continue, $cancel);
+                        echo $preview.$this->confirm(get_string('copy_grades_confirm', 'grouptool'), $continue, $cancel);
                     }
                 } else {
-                    echo $OUTPUT->box($OUTPUT->notification(get_string('no_target_selected',
-                                                                       'grouptool'),
-                                                            'notifyproblem'), 'generalbox');
+                    $boxcontent = $OUTPUT->notification(get_string('no_target_selected', 'grouptool'), 'notifyproblem');
+                    echo $OUTPUT->box($boxcontent, 'generalbox');
+                    unset($boxcontent);
                     $step = 0;
                 }
 
@@ -2492,45 +2482,41 @@ EOS;
                     list($error, $preview) = $this->copy_grades($activity, $mygroupsonly,
                                                                 $selected, $source, $overwrite,
                                                                 true);
-                    $continue = new moodle_url("view.php?id=".$this->cm->id,
-                                               array('tab'           => 'grading',
-                                                     'confirm'       => 'true',
-                                                     'sesskey'       => sesskey(),
-                                                     'activity'      => $activity,
-                                                     'mygroups_only' => $mygroupsonly,
-                                                     'overwrite'     => $overwrite,
-                                                     'step'          => '2',
-                                                     'selected'      => serialize($selected),
-                                                     'source'        => serialize($source)));
-                    $cancel = new moodle_url("view.php?id=".$this->cm->id,
-                                             array('tab' => 'grading',
-                                                   'confirm'       => 'false',
-                                                   'sesskey'       => sesskey(),
-                                                   'activity'      => $activity,
-                                                   'mygroups_only' => $mygroupsonly,
-                                                   'overwrite'     => $overwrite,
-                                                   'step'          => '2',
-                                                   'selected'      => serialize($selected),
-                                                   'source'        => serialize($source)));
+                    $continue = new moodle_url("view.php?id=".$this->cm->id, array('tab'           => 'grading',
+                                                                                   'confirm'       => 'true',
+                                                                                   'sesskey'       => sesskey(),
+                                                                                   'activity'      => $activity,
+                                                                                   'mygroups_only' => $mygroupsonly,
+                                                                                   'overwrite'     => $overwrite,
+                                                                                   'step'          => '2',
+                                                                                   'selected'      => serialize($selected),
+                                                                                   'source'        => serialize($source)));
+                    $cancel = new moodle_url("view.php?id=".$this->cm->id, array('tab' => 'grading',
+                                                                                 'confirm'       => 'false',
+                                                                                 'sesskey'       => sesskey(),
+                                                                                 'activity'      => $activity,
+                                                                                 'mygroups_only' => $mygroupsonly,
+                                                                                 'overwrite'     => $overwrite,
+                                                                                 'step'          => '2',
+                                                                                 'selected'      => serialize($selected),
+                                                                                 'source'        => serialize($source)));
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
-                        echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm',
-                                                                  'grouptool'), $continue, $cancel);
+                        echo $preview.$this->confirm(get_string('copy_grades_overwrite_confirm', 'grouptool'), $continue, $cancel);
                     } else {
-                        echo $preview.$this->confirm(get_string('copy_grades_confirm',
-                                                                  'grouptool'), $continue, $cancel);
+                        echo $preview.$this->confirm(get_string('copy_grades_confirm', 'grouptool'), $continue, $cancel);
                     }
                 } else {
                     if (empty($selected)) {
-                        echo $OUTPUT->box($OUTPUT->notification(get_string('no_target_selected',
-                                                                           'grouptool'),
-                                                                'notifyproblem'), 'generalbox');
+                        $boxcontent = $OUTPUT->notification(get_string('no_target_selected', 'grouptool'), 'notifyproblem');
+                        echo $OUTPUT->box($boxcontent, 'generalbox');
+                        unset($boxcontent);
                         $step = 0;
                     }
                     if (count($missingsource) != 0) {
-                        echo $OUTPUT->box($OUTPUT->notification(get_string('sources_missing',
-                                                                           'grouptool'),
-                                                                'notifyproblem'), 'generalbox');
+                        $boxcontent = $OUTPUT->notification(get_string('sources_missing', 'grouptool'), 'notifyproblem');
+                        echo $OUTPUT->box($boxcontent, 'generalbox');
+                        unset($boxcontent);
                         $step = 0;
                     }
                 }
@@ -2544,13 +2530,13 @@ EOS;
             list($error, $info) = $this->copy_grades($activity, $mygroupsonly, $selected, $source,
                                                      $overwrite);
             if ($error) {
-                echo $OUTPUT->box($OUTPUT->notification(get_string('copy_grades_errors',
-                                                                   'grouptool'),
-                                                        'notifyproblem').$info, 'generalbox tumargin');
+                $boxcontent = $OUTPUT->notification(get_string('copy_grades_errors', 'grouptool'), 'notifyproblem').$info;
+                echo $OUTPUT->box($boxcontent, 'generalbox tumargin');
+                unset($boxcontent);
             } else {
-                echo $OUTPUT->box($OUTPUT->notification(get_string('copy_grades_success',
-                                                                   'grouptool'),
-                                                        'notifysuccess').$info, 'generalbox tumargin');
+                $boxcontent = $OUTPUT->notification(get_string('copy_grades_success', 'grouptool'), 'notifysuccess').$info;
+                echo $OUTPUT->box($boxcontent, 'generalbox tumargin');
+                unset($boxcontent);
             }
         }
 
@@ -2627,8 +2613,7 @@ EOS;
                                                                           'grouptool'));
             }
             $mygroupsonlychkbox = html_writer::start_tag('div', array('class' => 'fitem')).
-                                  html_writer::tag('div', ($mygroupsonlytitle != "" ?
-                                                          $mygroupsonlytitle : "&nbsp;"),
+                                  html_writer::tag('div', ($mygroupsonlytitle != "" ? $mygroupsonlytitle : "&nbsp;"),
                                                    array('class' => 'fitemtitle')).
                                   html_writer::tag('div', $mygroupsonlyelement,
                                                    array('class' => 'felement')).
@@ -2639,8 +2624,7 @@ EOS;
                                                            get_string('incomplete_only_label',
                                                                       'grouptool'));
             $incompleteonlychkbox = html_writer::start_tag('div', array('class' => 'fitem')).
-                                    html_writer::tag('div', ($incompleteonlytitle != "" ?
-                                                            $incompleteonlytitle : "&nbsp;"),
+                                    html_writer::tag('div', ($incompleteonlytitle != "" ? $incompleteonlytitle : "&nbsp;"),
                                                      array('class' => 'fitemtitle')).
                                     html_writer::tag('div', $incompleteonlyelement,
                                                      array('class' => 'felement')).
@@ -2650,8 +2634,7 @@ EOS;
             $overwriteelement = html_writer::checkbox('overwrite', 1, $overwrite,
                                                       get_string('overwrite_label', 'grouptool'));
             $overwritechkbox = html_writer::start_tag('div', array('class' => 'fitem')).
-                               html_writer::tag('div', ($overwritetitle != "" ?
-                                                       $overwritetitle : "&nbsp;"),
+                               html_writer::tag('div', ($overwritetitle != "" ? $overwritetitle : "&nbsp;"),
                                                 array('class' => 'fitemtitle')).
                                html_writer::tag('div', $overwriteelement,
                                                 array('class' => 'felement')).
@@ -2690,11 +2673,10 @@ EOS;
                             html_writer::end_tag('div');
 
             $refreshtitle = "";
-            $refreshelement = html_writer::tag('button', get_string('refresh_table_button',
-                                                                    'grouptool'),
-                                               array('type'  => 'submit',
-                                                     'name'  => 'refresh_table',
-                                                     'value' => 'true'));
+            $refreshelement = html_writer::tag('button', get_string('refresh_table_button', 'grouptool'), array(
+                    'type'  => 'submit',
+                    'name'  => 'refresh_table',
+                    'value' => 'true'));
             $refreshbutton = html_writer::start_tag('div', array('class' => 'fitem')).
                              html_writer::tag('div', ($refreshtitle != "" ? $refreshtitle : "&nbsp;"),
                                               array('class' => 'fitemtitle')).
@@ -2778,8 +2760,7 @@ EOS;
                 $sizesql = " ".$this->grouptool->grpsize." grpsize,";
             } else {
                 $grouptoolgrpsize = get_config('mod_grouptool', 'grpsize');
-                $grpsize = (!empty($this->grouptool->grpsize) ?
-                            $this->grouptool->grpsize : $grouptoolgrpsize);
+                $grpsize = (!empty($this->grouptool->grpsize) ? $this->grouptool->grpsize : $grouptoolgrpsize);
                 if (empty($grpsize)) {
                     $grpsize = 3;
                 }
@@ -3758,9 +3739,7 @@ EOS;
                 }
             }
         }
-        $return->free_places = ($this->grouptool->use_size) ?
-                                   ($return->group_places - $return->occupied_places) :
-                                   null;
+        $return->free_places = ($this->grouptool->use_size) ? ($return->group_places - $return->occupied_places) : null;
         $return->users = count_enrolled_users($this->context, 'mod/grouptool:register');
 
         $agrps = $DB->get_records('grouptool_agrps', array('grouptoolid' => $this->cm->instance, 'active' => 1));
@@ -3885,16 +3864,13 @@ EOS;
                     }
                     if ($curgroup === false) {
                         $error = true;
-                        $returntext .= html_writer::tag('div',
-                                                        get_string('all_groups_full',
-                                                                   'grouptool',
-                                                                   $queue->userid),
+                        $returntext .= html_writer::tag('div', get_string('all_groups_full', 'grouptool', $queue->userid),
                                                         array('class' => 'error'));
                         return array($error, $returntext);
                     } else {
-                        $curgroup->grpsize = ($grouptool->use_individual && !empty($curgroup->grpsize)) ?
-                                               $curgroup->grpsize :
-                                               $grouptool->grpsize;
+                        $tmpuseindividual = $grouptool->use_individual && !empty($curgroup->grpsize);
+                        $curgroup->grpsize = $tmpuseindividual ? $curgroup->grpsize : $grouptool->grpsize;
+                        unset($tmpuseindividual);
                     }
                 }
 
@@ -4960,11 +4936,9 @@ EOS;
                                    && !$DB->record_exists_select('grouptool_registered',
                                                                  "modified_by >= 0 AND agrpid = :agrpid AND userid = :userid",
                                                                  array('agrpid' => $agrp[$group], 'userid' => $userinfo->id))) {
-                            if ($reg = $DB->get_record('grouptool_registered',
-                                                       array('agrpid' => $agrp[$group],
-                                                             'userid' => $userinfo->id,
-                                                             'modified_by' => -1),
-                                                       IGNORE_MISSING)) {
+                            if ($reg = $DB->get_record('grouptool_registered', array('agrpid' => $agrp[$group],
+                                                                                     'userid' => $userinfo->id,
+                                                                                     'modified_by' => -1), IGNORE_MISSING)) {
                                 // If user is marked, we register him right now!
                                 $reg->modified_by = $USER->id;
                                 $DB->update_record('grouptool_registered', $reg);
@@ -5152,9 +5126,7 @@ EOS;
                     $size = $agrp->grpsize;
                     $free = $agrp->grpsize - count($registered);
                 } else {
-                    $size = !empty($this->grouptool->grpsize) ?
-                    $this->grouptool->grpsize :
-                    get_config('mod_grouptool', 'grpsize');
+                    $size = !empty($this->grouptool->grpsize) ? $this->grouptool->grpsize : get_config('mod_grouptool', 'grpsize');
                     $free = ($size - count($registered));
 
                 }
@@ -5166,21 +5138,16 @@ EOS;
                 // Group-downloadlinks!
                 if (((count($queued) > 0) || (count($registered) > 0))
                     && has_capability('mod/grouptool:export', $context)) {
-                    $urltxt = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_TXT));
-                    $urlxlsx = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_XLSX));
-                    $urlpdf = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_PDF));
-                    $urlods = new moodle_url($downloadurl,
-                                             array('groupid' => $groupinfo[$agrp->id]->id,
-                                                   'format'  => GROUPTOOL_ODS));
+                    $urltxt = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
+                                                                 'format'  => GROUPTOOL_TXT));
+                    $urlxlsx = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
+                                                                  'format'  => GROUPTOOL_XLSX));
+                    $urlpdf = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
+                                                                 'format'  => GROUPTOOL_PDF));
+                    $urlods = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
+                                                                 'format'  => GROUPTOOL_ODS));
 
-                    $downloadlinks = html_writer::tag('span', get_string('download').":",
-                                                      array('class' => 'title')).'&nbsp;'.
+                    $downloadlinks = html_writer::tag('span', get_string('download').":", array('class' => 'title')).'&nbsp;'.
                                      html_writer::link($urltxt, '.TXT').'&nbsp;'.
                                      html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
                                      html_writer::link($urlpdf, '.PDF').'&nbsp;'.
@@ -5383,9 +5350,8 @@ EOS;
             } else {
                 if (!$onlydata) {
                     echo html_writer::start_tag('tr', array('class' => 'regentry reg'));
-                    echo html_writer::tag('td', get_string('no_registrations', 'grouptool'),
-                                          array('class' => 'no_registrations',
-                                                'colspan' => 4));
+                    echo html_writer::tag('td', get_string('no_registrations', 'grouptool'), array('class' => 'no_registrations',
+                                                                                                   'colspan' => 4));
                     echo html_writer::end_tag('tr');
                 }
             }
@@ -5464,9 +5430,8 @@ EOS;
             } else {
                 if (!$onlydata) {
                     echo html_writer::start_tag('tr', array('class' => 'queueentry queue'));
-                    echo html_writer::tag('td', get_string('nobody_queued', 'grouptool'),
-                                          array('class' => 'no_queues',
-                                                'colspan' => 4));
+                    echo html_writer::tag('td', get_string('nobody_queued', 'grouptool'), array('class' => 'no_queues',
+                                                                                                'colspan' => 4));
                     echo html_writer::end_tag('tr');
                 }
             }
@@ -6318,8 +6283,7 @@ EOS;
         $return = $DB->get_records_sql($sql, array($grouptoolid));
 
         foreach ($return as $key => $group) {
-            $return[$key]->status = ($group->grptoolregs > $group->mdlregs) ?
-                                    GROUPTOOL_OUTDATED : GROUPTOOL_UPTODATE;
+            $return[$key]->status = ($group->grptoolregs > $group->mdlregs) ? GROUPTOOL_OUTDATED : GROUPTOOL_UPTODATE;
             $outofsync |= ($return[$key]->status == GROUPTOOL_OUTDATED);
         }
         return array($outofsync, $return);
@@ -6435,9 +6399,8 @@ EOS;
         $output = get_string('show_members', 'grouptool');
 
         // Now create the link around it - we need https on loginhttps pages!
-        $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php',
-                              array('agrpid'    => $agrpid,
-                                    'contextid' => $this->context->id));
+        $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php', array('agrpid'    => $agrpid,
+                                                                                         'contextid' => $this->context->id));
 
         $attributes = array('href' => $url, 'title' => get_string('show_members', 'grouptool'));
         $id = html_writer::random_id('showmembers');
@@ -6970,9 +6933,8 @@ EOS;
                 if (!$onlydata) {
                     echo html_writer::start_tag('tr', array('class' => ''));
 
-                    $userlink = new moodle_url($CFG->wwwroot.'/user/view.php',
-                                               array('id'     => $user->id,
-                                                     'course' => $this->course->id));
+                    $userlink = new moodle_url($CFG->wwwroot.'/user/view.php', array('id'     => $user->id,
+                                                                                     'course' => $this->course->id));
                     if (!in_array('picture', $collapsed)) {
                         $picture = html_writer::link($userlink, $OUTPUT->user_picture($user));
                         echo html_writer::tag('td', $picture, array('class' => ''));
@@ -7001,11 +6963,9 @@ EOS;
                         if (!empty($user->regs)) {
                             $registrations = array();
                             foreach ($user->regs as $reg) {
-                                $grouplink = new moodle_url($PAGE->url,
-                                                            array('tab'     => 'overview',
-                                                                  'groupid' => $groupinfo[$reg]->id));
-                                $registrations[] = html_writer::link($grouplink,
-                                                                     $groupinfo[$reg]->name);
+                                $grouplink = new moodle_url($PAGE->url, array('tab'     => 'overview',
+                                                                              'groupid' => $groupinfo[$reg]->id));
+                                $registrations[] = html_writer::link($grouplink, $groupinfo[$reg]->name);
                             }
                         } else {
                             $registrations = array('-');
@@ -7019,9 +6979,8 @@ EOS;
                         if (!empty($user->queued)) {
                             $queueentries = array();
                             foreach ($user->queued as $queue) {
-                                $grouplink = new moodle_url($PAGE->url,
-                                                            array('tab'     => 'overview',
-                                                                  'groupid' => $groupinfo[$queue]->id));
+                                $grouplink = new moodle_url($PAGE->url, array('tab'     => 'overview',
+                                                                              'groupid' => $groupinfo[$queue]->id));
                                 $groupdata = $this->get_active_groups(false, true, $queue);
                                 $groupdata = current($groupdata);
                                 $rank = $this->get_rank_in_queue($groupdata->queued, $user->id);
@@ -7030,8 +6989,7 @@ EOS;
                                 if (empty($rank)) {
                                     $rank = '*';
                                 }
-                                $queueentries[] = html_writer::link($grouplink,
-                                                                    $groupinfo[$queue]->name." (#".$rank.")");
+                                $queueentries[] = html_writer::link($grouplink, $groupinfo[$queue]->name." (#".$rank.")");
                             }
                         } else {
                             $queueentries = array('-');
@@ -7492,8 +7450,9 @@ EOS;
                     $worksheet->write_string($j, $k, $user['registrations'], $headlineformat);
                     $worksheet->write_blank($j + 1, $k, $headlineformat);
                     $hidden = in_array('registrations', $collapsed) ? true : false;
-                    $columnwidth['registrations'] = empty($columnwidth['registrations']) ? $columnwidth[0] :
-                                                    $columnwidth['registrations'];
+                    $tmp = $columnwidth['registrations'];
+                    $columnwidth['registrations'] = empty($tmp) ? $columnwidth[0] : $tmp;
+                    unset($tmp);
                     $worksheet->set_column($k, $k, $columnwidth['registrations'], null, $hidden);
                     $worksheet->merge_cells($j, $k, $j + 1, $k);
                     $k++; // ...k = n+3!
@@ -7502,8 +7461,9 @@ EOS;
                     $hidden = in_array('queues', $collapsed) ? true : false;
                     $columnwidth['queues_grp'] = empty($columnwidth['queues_grp']) ? $columnwidth[0] : $columnwidth['queues_grp'];
                     $worksheet->set_column($k, $k, $columnwidth['queues_grp'], null, $hidden);
-                    $columnwidth['queues_rank'] = empty($columnwidth['queues_rank']) ? $columnwidth[0] :
-                                                  $columnwidth['queues_rank'];
+                    $tmp = $columnwidth['queues_rank'];
+                    $columnwidth['queues_rank'] = empty($tmp) ? $columnwidth[0] : $tmp;
+                    unset($tmp);
                     $worksheet->set_column($k + 1, $k + 1, $columnwidth['queues_rank'], null, $hidden);
                     $worksheet->merge_cells($j, $k, $j, $k + 1);
                     $worksheet->write_string($j + 1, $k, get_string('group', 'group'), $headlinenb);

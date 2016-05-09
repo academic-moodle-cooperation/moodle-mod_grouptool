@@ -179,10 +179,9 @@ class group_creation_form extends \moodleform {
              * with texts getting mapped to 0
              */
             $mform->setType('digits', PARAM_RAW);
-            $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'),
-                             array(' '.\html_writer::tag('label', '-', array('for' => 'id_from')).' ',
-                                   ' '.\html_writer::tag('label', get_string('digits', 'grouptool'),
-                                                         array('for' => 'id_digits')).' '), false);
+            $fromtoglue = array(' '.\html_writer::tag('label', '-', array('for' => 'id_from')).' ',
+                                ' '.\html_writer::tag('label', get_string('digits', 'grouptool'), array('for' => 'id_digits')).' ');
+            $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'), $fromtoglue, false);
             $mform->disabledif ('from', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
             $mform->disabledif ('to', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
             $mform->disabledif ('digits', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);

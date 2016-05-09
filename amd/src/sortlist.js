@@ -29,8 +29,7 @@
  /**
   * @module mod_grouptool/sortlist
   */
-define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log'],
-       function($, jqui, config, str, murl, log) {
+define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log'], function($, jqui, config, str, murl, log) {
 
     /**
      * @constructor
@@ -80,7 +79,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
     };
 
     Sortlist.prototype.dragStartHandler = function(e, ui) {
-        //Get our drag object
+        // Get our drag object!
         var helper = ui.helper;
 
         helper.find('.movedownbutton').css('visibility', 'visible');
@@ -88,7 +87,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
     };
 
     Sortlist.prototype.dragEndHandler = function() {
-        //set the hidden fields containing the sort order new
+        // Set the hidden fields containing the sort order new!
         var neworderparams = {};
 
         $('table.drag_list tr.draggable_item').find('.movedownbutton, .movelupbutton').css('visibility', 'visible');
@@ -127,8 +126,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
                 success: function(response, status) {
                     var tmpnode = '';
                     if (response.error) {
-                        tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" +
-                                    response.error + "</div>");
+                        tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" + response.error + "</div>");
                         $('table.drag_list').before(tmpnode);
                         infoNode = $('div.infonode');
                         infoNode.fadeIn(600);
@@ -139,8 +137,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
                         log.info("AJAX Call to reorder groups successfull\nError ocured:" + response.error + "\n" + status,
                                  "grouptool");
                     } else {
-                        tmpnode = $("<div class=\"infonode alert-success\" style=\"display:none\">" +
-                                    response.message + "</div>");
+                        tmpnode = $("<div class=\"infonode alert-success\" style=\"display:none\">" + response.message + "</div>");
                         $('table.drag_list').before(tmpnode);
                         infoNode = $('div.infonode');
                         infoNode.fadeIn(600);
@@ -151,7 +148,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
                     }
                 },
                 error: function(jqXHR, status, error) {
-                    // Show message
+                    // Show message!
                     log.error("AJAX Call to reorder groups failure\nStatus: " + status + "\nError:" + error, "grouptool");
                 },
                 end: function() {
@@ -162,13 +159,13 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
         }
     };
 
-    Sortlist.prototype.moveDown = function(e) { //move the node 1 element down
-        //swap sort-order-values
+    Sortlist.prototype.moveDown = function(e) { // Move the node 1 element down!
+        // Swap sort-order-values!
         e.target = $(e.target);
         var this_order = e.target.closest('.draggable_item').find('.sort_order').val();
         var other_order = e.target.closest('.draggable_item').next('.draggable_item').find('.sort_order').val();
 
-        // Stop the button from submitting
+        // Stop the button from submitting!
         e.preventDefault();
         e.stopPropagation();
 
@@ -202,7 +199,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
                 }
             },
             failure: function(jqXHR, status, error) {
-                // Show message
+                // Show message!
                 log.error("AJAX Call to reorder groups failure\nStatus: " + status + "\nError:" + error, "grouptool");
             },
             end: function() {
@@ -211,7 +208,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
         };
         $.ajax(cfg);
 
-        // Swap list-elements
+        // Swap list-elements!
         var nodeA = e.target.closest('.draggable_item');
         var nodeB = e.target.closest('.draggable_item').next('.draggable_item');
         nodeB.after(nodeA.clone(true));
@@ -282,28 +279,28 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
 
     var instance = new Sortlist();
 
-    instance.initializer = function(param) { //'param' contains the parameter values
+    instance.initializer = function(param) { // Parameter 'param' contains the parameter values!
 
         instance.contextid = param.contextid;
         instance.lang = param.lang;
 
         log.info('Initialize Grouptool sortlist', 'grouptool');
         $('.path-mod-grouptool .drag_list tbody').sortable({
-          containment: '.drag_list tbody',
-          cursor: 'move',
-          delay: 150,
-          handle: '.drag_image',
-          items: ' .draggable_item',
-          opacity: 0.5,
-          helper: 'clone',
-          axis: 'y',
-          start: instance.dragStartHandler,
-          stop: instance.dragEndHandler
+            containment: '.drag_list tbody',
+            cursor: 'move',
+            delay: 150,
+            handle: '.drag_image',
+            items: ' .draggable_item',
+            opacity: 0.5,
+            helper: 'clone',
+            axis: 'y',
+            start: instance.dragStartHandler,
+            stop: instance.dragEndHandler
         });
-        //enable the drag-symbols when JS is enabled :)
+        // Enable the drag-symbols when JS is enabled :)!
         $('.path-mod-grouptool .drag_list .draggable_item .drag_image').removeClass('js_invisible');
 
-        //add JS-Eventhandler for each move-up/down-button-click (=images)
+        // Add JS-Eventhandler for each move-up/down-button-click (=images)!
         $('.path-mod-grouptool .buttons .movedownbutton').on('click', null, this, instance.moveDown);
         $('.path-mod-grouptool .buttons .moveupbutton').on('click', null, this, instance.moveUp);
 

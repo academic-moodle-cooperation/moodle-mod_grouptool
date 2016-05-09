@@ -99,8 +99,7 @@ foreach ($grouptools as $grouptool) {
         if ($grouptool->timedue) {
             $str .= html_writer::tag('div', $strduedate.': '.
                                             html_writer::tag('span', userdate($grouptool->timedue),
-                                                             array('class' => (($colorclass == 'late') ?
-                                                                              ' late' : ''))),
+                                                             array('class' => (($colorclass == 'late') ? ' late' : ''))),
                                      $attr);
         } else {
             $str .= html_writer::tag('div', $strduedateno, $attr);

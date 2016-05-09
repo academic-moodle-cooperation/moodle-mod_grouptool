@@ -220,10 +220,9 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
     $event->visible      = instance_is_visible('grouptool', $grouptool);
     $event->timeduration = 0;
 
-    if ($event->id = $DB->get_field('event', 'id',
-                                    array('modulename' => 'grouptool',
-                                          'instance'   => $grouptool->id,
-                                          'eventtype'  => 'availablefrom'))) {
+    if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
+                                                         'instance'   => $grouptool->id,
+                                                         'eventtype'  => 'availablefrom'))) {
         $calendarevent = calendar_event::load($event->id);
         $calendarevent->update($event, false);
     } else {
@@ -255,10 +254,9 @@ function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $
          *  For activity module's events, this can be used to set the alternative text of the
          *  event icon. Set it to 'pluginname' unless you have a better string.
          */
-        if ($event->id = $DB->get_field('event', 'id',
-                                        array('modulename' => 'grouptool',
-                                              'instance'   => $grouptool->id,
-                                              'eventtype'  => 'deadline'))) {
+        if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
+                                                             'instance'   => $grouptool->id,
+                                                             'eventtype'  => 'deadline'))) {
             $calendarevent = calendar_event::load($event->id);
             $calendarevent->update($event, false);
         } else {
@@ -318,9 +316,7 @@ function grouptool_update_queues($grouptool = 0) {
                                                  WHERE agrpid '.$agrpsql.' AND modified_by >= 0
                                               GROUP BY agrpid', $params);
         foreach ($agrps as $agrpid => $agrp) {
-            $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ?
-                                                           $grouptool->grpsize :
-                                                           $agrp->grpsize;
+            $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ? $grouptool->grpsize : $agrp->grpsize;
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
             // We use MAX to trick Postgres into thinking this is an full GROUP BY statement.
@@ -505,60 +501,54 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
 
     if ($creategrps || $creategrpgs || $admingrps) {
         if ($creategrps && ($admingrps || $creategrpgs)) {
-            $admin = $navref->add(get_string('administration', 'grouptool'),
-                                  new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                                  'tab' => 'administration')));
-            $admin->add(get_string('group_administration', 'grouptool'),
-                                   new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                                   'tab' => 'group_admin')));
-            $admin->add(get_string('group_creation', 'grouptool'),
-                                   new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                                   'tab' => 'group_creation')));
+            $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'administration'));
+            $admin = $navref->add(get_string('administration', 'grouptool'), $url);
+            $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'group_admin'));
+            $admin->add(get_string('group_administration', 'grouptool'), $url);
+            $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'group_creation'));
+            $admin->add(get_string('group_creation', 'grouptool'), $url);
         } else if ($creategrps) {
-            $navref->add(get_string('group_creation', 'grouptool'),
-                         new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                                  'tab' => 'group_creation')));
+            $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'group_creation'));
+            $navref->add(get_string('group_creation', 'grouptool'), $url);
         } else if ($creategrpgs || $admingrps) {
-            $navref->add(get_string('group_administration', 'grouptool'),
-                         new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                                  'tab' => 'group_admin')));
+            $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'group_admin'));
+            $navref->add(get_string('group_administration', 'grouptool'), $url);
         }
     }
     if (has_capability('mod/grouptool:grade', $context)
             || has_capability('mod/grouptool:grade_own_group', $context)) {
-        $navref->add(get_string('grading', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'grading')));
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'grading'));
+        $navref->add(get_string('grading', 'grouptool'), $url);
     }
 
     $gt = $DB->get_record('grouptool', array('id' => $cm->instance));
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
-                && ($gt->timeavailable < time()));
+            && ($gt->timeavailable < time()));
 
     if (has_capability('mod/grouptool:register_students', $context)
-        || ($regopen && has_capability('mod/grouptool:register', $context))) {
-        $tmp = $navref->add(get_string('selfregistration', 'grouptool'),
-                            new moodle_url('/mod/grouptool/view.php', array('id'  => $cm->id,
-                                                                            'tab' => 'selfregistration')));
+            || ($regopen && has_capability('mod/grouptool:register', $context))) {
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'selfregistration'));
+        $tmp = $navref->add(get_string('selfregistration', 'grouptool'), $url);
     }
 
     if (has_capability('mod/grouptool:register_students', $context)) {
-        $navref->add(get_string('import', 'grouptool'),
-                new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'import')));
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'import'));
+        $navref->add(get_string('import', 'grouptool'), $url);
     }
     if (has_capability('mod/grouptool:view_regs_course_view', $context)
-        && has_capability('mod/grouptool:view_regs_group_view', $context)) {
-        $userstab = $navref->add(get_string('users_tab', 'grouptool'),
-                                 new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
-        $userstab->add(get_string('overview_tab', 'grouptool'),
-                       new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
-        $userstab->add(get_string('userlist_tab', 'grouptool'),
-                       new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
+            && has_capability('mod/grouptool:view_regs_group_view', $context)) {
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview'));
+        $userstab = $navref->add(get_string('users_tab', 'grouptool'), $url);
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview'));
+        $userstab->add(get_string('overview_tab', 'grouptool'), $url);
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist'));
+        $userstab->add(get_string('userlist_tab', 'grouptool'), $url);
     } else if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
-        $navref->add(get_string('users_tab', 'grouptool'),
-                     new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview')));
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'overview'));
+        $navref->add(get_string('users_tab', 'grouptool'), $url);
     } else if (has_capability('mod/grouptool:view_regs_course_view', $context)) {
-        $navref->add(get_string('users_tab', 'grouptool'),
-                     new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist')));
+        $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'userlist'));
+        $navref->add(get_string('users_tab', 'grouptool'), $url);
     }
 
     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
@@ -665,12 +655,9 @@ function grouptool_print_overview($courses, &$htmlarray) {
                                                 html_writer::tag('span', userdate($ta)), $attr);
             }
             if ($grouptool->timedue) {
-                $str .= html_writer::tag('div', $strduedate.': '.
-                                                html_writer::tag('span',
-                                                                 userdate($grouptool->timedue),
-                                                                 array('class' => (($cc == 'late') ?
-                                                                                   ' late' : ''))),
-                                         $attr);
+                $tagargs = array('class' => (($cc == 'late') ? ' late' : ''));
+                $datesnippet = html_writer::tag('span', userdate($grouptool->timedue), $tagargs);
+                $str .= html_writer::tag('div', $strduedate.': '. $datesnippet, $attr);
             } else {
                 $str .= html_writer::tag('div', $strduedateno, $attr);
             }
@@ -892,10 +879,9 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
         $record = clone $source;
         $record->userid = $curid;
         unset($record->id);
-        if ($record->id = $DB->get_field('assign_grades', 'id',
-                                         array('assignment'    => $id,
-                                               'userid'        => $curid,
-                                               'attemptnumber' => $source->attemptnumber))) {
+        if ($record->id = $DB->get_field('assign_grades', 'id', array('assignment'    => $id,
+                                                                      'userid'        => $curid,
+                                                                      'attemptnumber' => $source->attemptnumber))) {
             $DB->update_record('assign_grades', $record);
             if ($feedbackcomment) {
                 $newfeedbackcomment = clone $feedbackcomment;
@@ -911,9 +897,8 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                                                                           'grouptool',
                                                                           $details),
                                                                $newfeedbackcomment->commentformat);
-                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id',
-                                                             array('assignment' => $id,
-                                                                   'grade'      => $record->id))) {
+                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', array('assignment' => $id,
+                                                                                                    'grade'      => $record->id))) {
                     $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
                 } else {
                     $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
@@ -924,9 +909,8 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                 unset($newfeedbackfile->id);
                 $newfeedbackfile->grade = $record->id;
                 $newfeedbackfile->assignment = $id;
-                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id',
-                                                          array('assignment' => $id,
-                                                                'grade'      => $record->id))) {
+                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', array('assignment' => $id,
+                                                                                             'grade'      => $record->id))) {
                     $DB->update_record('assignfeedback_file', $newfeedbackfile);
                 } else {
                     $DB->insert_record('assignfeedback_file', $newfeedbackfile);
@@ -948,9 +932,8 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                                                                           'grouptool',
                                                                           $details),
                                                                $newfeedbackcomment->commentformat);
-                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id',
-                                                             array('assignment' => $id,
-                                                                   'grade'      => $gradeid))) {
+                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', array('assignment' => $id,
+                                                                                                    'grade'      => $gradeid))) {
                     $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
                 } else {
                     $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
@@ -961,9 +944,8 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                 unset($newfeedbackfile->id);
                 $newfeedbackfile->grade = $gradeid;
                 $newfeedbackfile->assignment = $id;
-                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id',
-                                                          array('assignment' => $id,
-                                                                'grade'      => $gradeid))) {
+                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', array('assignment' => $id,
+                                                                                             'grade'      => $gradeid))) {
                     $DB->update_record('assignfeedback_file', $newfeedbackfile);
                 } else {
                     $DB->insert_record('assignfeedback_file', $newfeedbackfile);

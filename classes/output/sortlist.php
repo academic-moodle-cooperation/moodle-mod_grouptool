@@ -178,9 +178,7 @@ class sortlist implements \renderable {
         }
 
         if (!empty($groupdata) && is_array($groupdata)) {
-            $this->globalgrpsize = $grouptool->grpsize ?
-                                   $grouptool->grpsize :
-                                   get_config('mod_grouptool', 'grpsize');
+            $this->globalgrpsize = $grouptool->grpsize ? $grouptool->grpsize : get_config('mod_grouptool', 'grpsize');
 
             foreach ($groupdata as $key => $group) {
                 if ($grouptool->use_size && (!$grouptool->use_individual || ($groupdata[$key]->size == null))) {

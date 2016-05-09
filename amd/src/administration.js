@@ -27,23 +27,21 @@
  /**
   * @module mod_grouptool/administration
   */
-define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'core/log'],
-       function($, config, str, murl, notif, log) {
+define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'core/log'], function($, cfg, str, murl, notif, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/administration
      */
     var Administration = function() {
-        /** @access private */
         this.contextid = 0;
-        /** @access private */
+
         this.lang = 'en';
-        /** @access private */
+
         this.filter = null;
-        /** @access private */
+
         this.filterid = null;
-        /** @access private */
+
         this.globalsize = 3;
     };
 
@@ -79,25 +77,25 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 e.stopPropagation();
             }
 
-            if (e.which === 13) { // Enter
-                var cfg = {
+            if (e.which === 13) { // Enter!
+                var ajcfg = {
                     method: 'POST',
-                    url: config.wwwroot + "/mod/grouptool/editgroup_ajax.php",
+                    url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
                     data: {
-                            'action': 'rename',
-                            'groupid': grpid,
-                            'name': field.val(),
-                            'sesskey': config.sesskey,
-                            'contextid': e.data.contextid
-                           },
+                        'action': 'rename',
+                        'groupid': grpid,
+                        'name': field.val(),
+                        'sesskey': cfg.sesskey,
+                        'contextid': e.data.contextid
+                    },
                     headers: { 'X-Transaction': 'POST rename group ' + grpid},
                     dataType: 'json',
                     beforeSend: function() {
-                            if (infoNode) {
-                                infoNode.fadeOut(600).delay(600).remove();
-                            }
-                            log.info("Start AJAX Call to rename group " + grpid, "grouptool");
-                        },
+                        if (infoNode) {
+                            infoNode.fadeOut(600).delay(600).remove();
+                        }
+                        log.info("Start AJAX Call to rename group " + grpid, "grouptool");
+                    },
                     complete: function() {
                         log.info("AJAX Call to rename group " + grpid + " completed", "grouptool");
                     },
@@ -109,8 +107,8 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                             // Remove after 60 seconds automatically!
                             window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 60 * 1000);
                         } else {
-                            text.before("<div class=\"infonode alert-success\" style=\"display:none\">" +
-                                        response.message + "</div>");
+                            var startdiv = "<div class=\"infonode alert-success\" style=\"display:none\">";
+                            text.before(startdiv + response.message + "</div>");
                             infoNode = $("div.infonode");
                             infoNode.fadeIn(600);
                             text.html(field.val());
@@ -126,9 +124,9 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                         log.info("AJAX Call to rename group " + grpid + " successfull\n" + status, "grouptool");
                     },
                     error: function(jqXHR, status, error) {
-                        // Show message
-                        var tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" + status + "<br />" +
-                                    "<span class=\"small\">" + error + "</span></div>");
+                        // Show message!
+                        var startdiv = "<div class=\"infonode alert-error\" style=\"display:none\">";
+                        var tmpnode = $(startdiv + status + "<br />" + "<span class=\"small\">" + error + "</span></div>");
                         infoNode = text.before(tmpnode);
                         infoNode.fadeIn(600);
                         log.error("AJAX Call to rename group " + grpid + " failure", "grouptool");
@@ -147,8 +145,8 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     timeout: 60000,
                 };
 
-                $.ajax(cfg);
-            } else if (e.which === 27) { // Escape
+                $.ajax(ajcfg);
+            } else if (e.which === 27) { // Escape!
                 field.fadeOut(600, function() {
                     text.hide();
                     field.attr('type', 'hidden');
@@ -166,10 +164,10 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
     };
 
     /**
-      * Change maximum group size of 1 moodle group via AJAX request.
-      * @access private
-      * @return void
-      */
+     * Change maximum group size of 1 moodle group via AJAX request.
+     * @access private
+     * @return void
+     */
     Administration.prototype.resizegroup = function(e) {
         log.info('Resize Group!', 'grouptool');
         e.preventDefault();
@@ -194,8 +192,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
             field.fadeIn(600);
             field.focus();
             field.select();
-            var tmpnode = $("<div class=\"helpnode alert-info\" style=\"display:none\">" +
-                            strings.resizehelp + "</div>");
+            var tmpnode = $("<div class=\"helpnode alert-info\" style=\"display:none\">" + strings.resizehelp + "</div>");
             text.before(tmpnode);
             helpNode = $('div.helpnode');
             helpNode.fadeIn(600);
@@ -206,17 +203,17 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 e.stopPropagation();
             }
 
-            if (e.which === 13) { // Enter
+            if (e.which === 13) { // Enter!
                 // TODO start AJAX Call and process Response!
-                var cfg = {
+                var ajcfg = {
                     method: 'POST',
-                    url: config.wwwroot + "/mod/grouptool/editgroup_ajax.php",
+                    url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
                     data: {
-                            'action': 'resize',
-                            'groupid': grpid,
-                            'size': field.val(),
-                            'sesskey': config.sesskey,
-                            'contextid': admin.contextid
+                        'action': 'resize',
+                        'groupid': grpid,
+                        'size': field.val(),
+                        'sesskey': cfg.sesskey,
+                        'contextid': admin.contextid
                     },
                     headers: { 'X-Transaction': 'POST resize group ' + grpid},
                     dataType: 'json',
@@ -244,8 +241,8 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                             // Remove after 60 seconds automatically!
                             window.setTimeout(infoNode.fadeOut(600).delay(600).remove(), 60 * 1000);
                         } else {
-                            tmpnode = $("<div class=\"infonode alert-success\" style=\"display:none\">" +
-                                        response.message + "</div>");
+                            var divstart = "<div class=\"infonode alert-success\" style=\"display:none\">";
+                            tmpnode = $(divstart + response.message + "</div>");
                             text.before(tmpnode);
                             infoNode = $('div.infonode');
                             infoNode.fadeIn(600);
@@ -267,7 +264,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                         log.info("AJAX Call to resize group " + grpid + " successfull\n" + status, "grouptool");
                     },
                     error: function(jqXHR, status, error) {
-                        // Show message
+                        // Show message!
                         jqXHR = null;
                         var tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" + status + "</div>");
                         infoNode = text.before(tmpnode);
@@ -288,7 +285,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     timeout: 60000,
                 };
 
-                $.ajax(cfg);
+                $.ajax(ajcfg);
 
             } else if (e.which === 27) {
                 e.preventDefault();
@@ -314,10 +311,10 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
     };
 
     /**
-      * Toggle 1 group (active/inactive) and change symbol or remove the HTML node respectively.
-      * @access private
-      * @return void
-      */
+     * Toggle 1 group (active/inactive) and change symbol or remove the HTML node respectively.
+     * @access private
+     * @return void
+     */
     Administration.prototype.togglegroup = function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -327,28 +324,29 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
 
         log.info('TOGGLE GROUP ' + grpid, "grouptool");
 
-        var cfg;
+        var ajcfg;
 
         if (e.target.hasClass('active')) {
             // Set inactive (via AJAX Request)!
             log.info('DEACTIVATE GROUP ' + grpid + '!', "grouptool");
 
-            cfg = {
+            ajcfg = {
                 method: 'POST',
-                url: config.wwwroot + "/mod/grouptool/editgroup_ajax.php",
+                url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
                 data: {
-                        'action': 'deactivate',
-                        'groupid': grpid,
-                        'sesskey': config.sesskey,
-                        'contextid': e.data.contextid,
-                        'filter': e.data.filterid,
-                      },
+                    'action': 'deactivate',
+                    'groupid': grpid,
+                    'sesskey': cfg.sesskey,
+                    'contextid': e.data.contextid,
+                    'filter': e.data.filterid,
+                },
                 headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 dataType: 'json',
                 beforeSend: function() {
-                    log.info("Start AJAX Call to deactivate group " + grpid + "\n" +
-                             cfg.url + "?action=deactivate&groupid=" + grpid + "&sesskey=" + config.sesskey +
-                             "&contextid=" + e.data.contextid, "grouptool");
+                    var text = "Start AJAX Call to deactivate group " + grpid + "\n";
+                    var urlparams = "?action=deactivate&groupid=" + grpid + "&sesskey=" + cfg.sesskey;
+                    var urlparams2 = "&contextid=" + e.data.contextid;
+                    log.info(text + ajcfg.url + urlparams + urlparams2, "grouptool");
                 },
                 complete: function() {
                     log.info("AJAX Call to deactivate group " + grpid + " completed", "grouptool");
@@ -356,8 +354,8 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 success: function(response, status) {
                     var inactivestr = str.get_string('inactive', 'mod_grouptool');
                     if (response.error) {
-                        log.info("AJAX Call to deactivate group " + grpid + " successfull but error occured:\n" +
-                                 response.error + "\n" + status, "grouptool");
+                        var text = "AJAX Call to deactivate group " + grpid + " successfull but error occured:\n";
+                        log.info(text + response.error + "\n" + status, "grouptool");
                     } else {
                         if (e.data.filter === 'active') {
                             e.target.closest('tr').fadeOut(600, function() {
@@ -389,7 +387,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     }
                 },
                 error: function() {
-                    // Show message
+                    // Show message!
                     log.error("AJAX Call to deactivate group " + grpid + " failure", "grouptool");
                 },
                 end: function() {
@@ -398,28 +396,28 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 timeout: 60000,
             };
 
-            $.ajax(cfg);
+            $.ajax(ajcfg);
 
         } else if (e.target.hasClass('inactive')) {
 
             // Set active (via AJAX Request)!
             log.info('ACTIVATE GROUP ' + grpid + '!', "grouptool");
 
-            cfg = {
+            ajcfg = {
                 method: 'POST',
-                url: config.wwwroot + "/mod/grouptool/editgroup_ajax.php",
+                url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
                 data: {
-                        'action': 'activate',
-                        'groupid': grpid,
-                        'sesskey': config.sesskey,
-                        'contextid': e.data.contextid,
-                        'filter': e.data.filterid
+                    'action': 'activate',
+                    'groupid': grpid,
+                    'sesskey': cfg.sesskey,
+                    'contextid': e.data.contextid,
+                    'filter': e.data.filterid
                 },
                 headers: { 'X-Transaction': 'POST rename group ' + grpid},
                 beforeSend: function() {
-                    log.info('Start AJAX Call to activate group ' + grpid + "\n" + cfg.url + '?action=deactivate' +
-                             '&groupid=' + grpid + '&sesskey=' + config.sesskey +
-                             '&contextid=' + e.data.contextid, "grouptool");
+                    var params = '&contextid=' + e.data.contextid;
+                    var logurl = ajcfg.url + '?action=deactivate' + '&groupid=' + grpid + '&sesskey=' + cfg.sesskey + params;
+                    log.info('Start AJAX Call to activate group ' + grpid + "\n" + logurl, "grouptool");
                 },
                 complete: function() {
                     log.info("AJAX Call to activate group " + grpid + " completed", "grouptool");
@@ -427,8 +425,8 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 success: function(response, status) {
                     var activestr = str.get_string('active', 'mod_grouptool');
                     if (response.error) {
-                        log.info("AJAX Call to activate group " + grpid + " successfull but error occured:\n" +
-                                 response.error + "\n" + status, "grouptool");
+                        var text = "AJAX Call to activate group " + grpid + " successfull but error occured:\n";
+                        log.info(text + response.error + "\n" + status, "grouptool");
                     } else {
                         if (e.data.filter === 'inactive') {
                             // If showing only active remove from list!
@@ -460,7 +458,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     }
                 },
                 error: function(jqXHR, status, error) {
-                    // Show message
+                    // Show message!
                     log.error("AJAX Call to activate group " + grpid + " failure\n" + status + "\n" + error, "grouptool");
                 },
                 end: function() {
@@ -477,7 +475,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 timeout: 60000,
             };
 
-            $.ajax(cfg);
+            $.ajax(ajcfg);
 
         } else {
             // Error!
@@ -486,10 +484,10 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
     };
 
     /**
-      * Delete one moodle group via AJAX request.
-      * @access private
-      * @return void
-      */
+     * Delete one moodle group via AJAX request.
+     * @access private
+     * @return void
+     */
     Administration.prototype.deletegroup = function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -500,82 +498,75 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         var admin = e.data.admin;
         var strings = e.data.strings;
 
-        notif.confirm(strings.title, strings.confirm, strings.yes, strings.no,
-                      function() {
-                          if (!grpid) {
-                              log.info('No Group ID!', 'grouptool');
-                              return;
-                          }
+        notif.confirm(strings.title, strings.confirm, strings.yes, strings.no, function() {
+            if (!grpid) {
+                log.info('No Group ID!', 'grouptool');
+                return;
+            }
 
-                          log.info('DELTE GROUP ' + grpid + '!', "grouptool");
+            log.info('DELTE GROUP ' + grpid + '!', "grouptool");
 
-                          var cfg = {
-                              method: 'POST',
-                              url: config.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                              data: {
-                                      action: 'delete',
-                                      groupid: grpid,
-                                      sesskey: config.sesskey,
-                                      contextid: admin.contextid
-                              },
-                              headers: { 'X-Transaction': 'POST rename group ' + grpid},
-                              beforeSend: function() {
-                                  log.info("Start AJAX Call to delete group " + grpid,
-                                           "grouptool");
-                              },
-                              complete: function() {
-                                  log.info("AJAX Call to delete group " + grpid + " completed",
-                                           "grouptool");
-                              },
-                              success: function(response, status) {
-                                  if (!response.error) {
-                                      // Success, remove the corresponding table entry...
-                                      $('#delete_' + grpid).closest('tr').fadeOut(600)
-                                          .delay(600).remove();
-                                  }
-                                  log.info("AJAX Call to delete group " + grpid + " successfull\n" + status, "grouptool");
-                              },
-                              error: function() {
-                                  // Show message
-                                  log.error("AJAX Call to rename group " + grpid + " failure", "grouptool");
-                              },
-                              end: function() {
-                                  log.info("AJAX Call to rename group " + grpid + " ended", "grouptool");
-                              },
-                              statusCode: {
-                                  404: function() {
-                                      log.error("404: URL not found!", "grouptool");
-                                  },
-                                  500: function() {
-                                      log.error("500: Internal server error!", "grouptool");
-                                  }
-                              },
-                              timeout: 60000,
-                          };
+            var ajcfg = {
+                method: 'POST',
+                url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
+                data: {
+                    action: 'delete',
+                    groupid: grpid,
+                    sesskey: cfg.sesskey,
+                    contextid: admin.contextid
+                },
+                headers: { 'X-Transaction': 'POST rename group ' + grpid},
+                beforeSend: function() {
+                    log.info("Start AJAX Call to delete group " + grpid,
+                             "grouptool");
+                },
+                complete: function() {
+                    log.info("AJAX Call to delete group " + grpid + " completed",
+                             "grouptool");
+                },
+                success: function(response, status) {
+                    if (!response.error) {
+                        // Success, remove the corresponding table entry...
+                        $('#delete_' + grpid).closest('tr').fadeOut(600)
+                            .delay(600).remove();
+                    }
+                    log.info("AJAX Call to delete group " + grpid + " successfull\n" + status, "grouptool");
+                },
+                error: function() {
+                    // Show message!
+                    log.error("AJAX Call to rename group " + grpid + " failure", "grouptool");
+                },
+                end: function() {
+                    log.info("AJAX Call to rename group " + grpid + " ended", "grouptool");
+                },
+                statusCode: {
+                    404: function() {
+                        log.error("404: URL not found!", "grouptool");
+                    },
+                    500: function() {
+                        log.error("500: Internal server error!", "grouptool");
+                    }
+                },
+                timeout: 60000,
+            };
 
-                          $.ajax(cfg);
-                      });
+            $.ajax(ajcfg);
+        });
     };
 
     var instance = new Administration();
 
     /**
-      * Initialize the JS (save params and attach event handler).
-      * @access public
-      * @return void
-      */
-    instance.initializer = function(params) { //'config' contains the parameter values
+     * Initialize the JS (save params and attach event handler).
+     * @access public
+     * @return void
+     */
+    instance.initializer = function(params) { // Param 'cfg' contains the parameter values!
 
-        /** @access private */
         this.contextid = params.contextid;
-
-        /** @access private */
         this.lang = params.lang;
-        /** @access private */
         this.filter = params.filter;
-        /** @access private */
         this.filterid = params.filterid;
-        /** @access private */
         this.globalsize = params.globalsize;
 
         log.info('Initalize Grouptool group administration', "grouptool");
@@ -588,11 +579,11 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         }).fail(function(ex) {
             log.error("Error while retrieving string: " + ex, "grouptool");
         });
-
-        str.get_strings([{key: 'confirm_delete_title', component: 'mod_grouptool'},
-                         {key: 'confirm_delete', component: 'mod_grouptool'},
-                         {key: 'yes', component: 'moodle'},
-                         {key: 'no', component: 'moodle'}]).done(function(s) {
+        var stringstofetch = [{key: 'confirm_delete_title', component: 'mod_grouptool'},
+                              {key: 'confirm_delete', component: 'mod_grouptool'},
+                              {key: 'yes', component: 'moodle'},
+                              {key: 'no', component: 'moodle'}];
+        str.get_strings(stringstofetch).done(function(s) {
             log.info("Strings successfully retrieved: " + s, "grouptool");
             var strings = { title: s[0], confirm: s[1], yes: s[2], no: s[3] };
             $('.path-mod-grouptool a.deletebutton').on('click', null, {strings: strings, admin: instance}, instance.deletegroup);

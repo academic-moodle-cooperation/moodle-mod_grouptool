@@ -83,18 +83,14 @@ class pdf extends \pdf {
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
-        $this->header1[3] = empty($timeavailable) ?
-                            get_string('availabledateno', 'grouptool') :
-                            userdate($timeavailable);
+        $this->header1[3] = empty($timeavailable) ? get_string('availabledateno', 'grouptool') : userdate($timeavailable);
         $this->header1[4] = get_string('groupoverview', 'grouptool');
 
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
-        $this->header2[3] = empty($timedue) ?
-                            get_string('duedateno', 'grouptool') :
-                            userdate($timedue);
+        $this->header2[3] = empty($timedue) ? get_string('duedateno', 'grouptool') : userdate($timedue);
         $this->header2[4] = $viewname;
     }
 
@@ -113,18 +109,14 @@ class pdf extends \pdf {
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
-        $this->header1[3] = empty($timeavailable) ?
-                            get_string('availabledateno', 'grouptool') :
-                            userdate($timeavailable);
+        $this->header1[3] = empty($timeavailable) ? get_string('availabledateno', 'grouptool') : userdate($timeavailable);
         $this->header1[4] = get_string('userlist', 'grouptool');
 
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
-        $this->header2[3] = empty($timedue) ?
-                            get_string('duedateno', 'grouptool') :
-                            userdate($timedue);
+        $this->header2[3] = empty($timedue) ? get_string('duedateno', 'grouptool') : userdate($timedue);
         $this->header2[4] = $viewname;
     }
 
@@ -143,18 +135,14 @@ class pdf extends \pdf {
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
-        $this->header1[3] = empty($timeavailable) ?
-                            get_string('availabledateno', 'grouptool') :
-                            userdate($timeavailable);
+        $this->header1[3] = empty($timeavailable) ? get_string('availabledateno', 'grouptool') : userdate($timeavailable);
         $this->header1[4] = get_string('overview', 'grouptool');
 
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'checkmark').":";
-        $this->header1[3] = empty($timedue) ?
-                            get_string('duedateno', 'grouptool') :
-                            userdate($timedue);
+        $this->header1[3] = empty($timedue) ? get_string('duedateno', 'grouptool') : userdate($timedue);
         $this->header2[4] = $viewname;
     }
 
@@ -226,7 +214,7 @@ class pdf extends \pdf {
                          $border, 'C', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
         $this->SetFont('', '');
-        $this->MultiCell(/*31*$scale*/0, $height, $this->header2[4],
+        $this->MultiCell(0, $height, $this->header2[4],
                          $border, 'R', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
 
         $this->Ln();
@@ -497,8 +485,7 @@ class pdf extends \pdf {
         }
         if (!in_array('registrations', $collapsed)) {
             if (!empty($registrations) && is_array($registrations)) {
-                $registrationsstring = (count($registrations) > 1) ?
-                                       implode("\n", $registrations) : $registrations[0];
+                $registrationsstring = (count($registrations) > 1) ? implode("\n", $registrations) : $registrations[0];
                 if ($getheightonly) {
                     $this->Multicell($widths['registrations'], $height, $registrationsstring,
                                      $border, 'L', $fill, 0, null, null, true, 1, false, false,

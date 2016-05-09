@@ -35,6 +35,6 @@ $messageproviders = array (
  */
     'grouptool_moveupreg' => array (
             'capability'  => 'mod/grouptool:register'
-)
+    )
 
 );

@@ -137,10 +137,9 @@ class mod_grouptool_observer {
                              WHERE reg.userid = :userid
                                    AND agrps.grouptoolid = :grouptoolid
                                    AND agrps.groupid = :groupid";
-                    if ($regs = $DB->get_records_sql($sql,
-                                                     array('grouptoolid' => $grouptool->id,
-                                                           'userid'      => $event->relateduserid,
-                                                           'groupid'     => $event->objectid))) {
+                    if ($regs = $DB->get_records_sql($sql, array('grouptoolid' => $grouptool->id,
+                                                                 'userid'      => $event->relateduserid,
+                                                                 'groupid'     => $event->objectid))) {
                         $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
                         foreach ($regs as $reg) {
                             // Trigger event!
@@ -269,12 +268,11 @@ class mod_grouptool_observer {
                                         \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cm, $cur)->trigger();
                                     }
                                 } else {
+                                    $params = array('userid' => $newrecord->userid, 'agrpid' => $agrp[$grouptool->id]->id);
                                     $queueentries = $DB->get_records_sql("SELECT queued.*, agrp.groupid
                                                                              FROM {grouptool_queued} queued
                                                                              JOIN {grouptool_agrps} agrp ON queued.agrpid = agrp.id
-                                                                            WHERE userid = :userid AND agrpid = :agrpid",
-                                                                          array('userid' => $newrecord->userid,
-                                                                                'agrpid' => $agrp[$grouptool->id]->id));
+                                                                            WHERE userid = :userid AND agrpid = :agrpid", $params);
                                     $DB->delete_records('grouptool_queued', array('userid' => $newrecord->userid,
                                                                                   'agrpid' => $agrp[$grouptool->id]->id));
                                     foreach ($queueentries as $cur) {
@@ -356,9 +354,8 @@ class mod_grouptool_observer {
                     }
                     break;
                 case GROUPTOOL_DELETE_REF:
-                    if ($agrpid = $DB->get_field('grouptool_agrps', 'id',
-                                                 array('groupid'     => $data->id,
-                                                       'grouptoolid' => $grouptool->id))) {
+                    if ($agrpid = $DB->get_field('grouptool_agrps', 'id', array('groupid'     => $data->id,
+                                                                                'grouptoolid' => $grouptool->id))) {
                         $agrpids[] = $agrpid;
                     }
                     break;
