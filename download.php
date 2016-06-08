@@ -58,7 +58,7 @@ if (empty($cm->uservisible)) {
         $text = '';
     }
     $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').
-                                          html_writer::empty_tag('br').$text, 'notifyproblem');
+                                          html_writer::empty_tag('br').$text, 'error');
     echo $OUTPUT->header();
     echo $OUTPUT->box($notification, 'generalbox centered');
     echo $OUTPUT->footer();

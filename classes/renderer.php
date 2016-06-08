@@ -69,7 +69,7 @@ class renderer extends \plugin_renderer_base {
                 default:
                     $message = var_dump($sortlist->filter);
             }
-            return $OUTPUT->box($OUTPUT->notification($message, 'notifymessage'), 'generalbox', 'nogroupsinfo');
+            return $OUTPUT->box($OUTPUT->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
         }
 
         // Generate draggable items - each representing 1 group!
@@ -300,7 +300,7 @@ class renderer extends \plugin_renderer_base {
                 default:
                     $message = var_dump($sortlist->filter);
             }
-            $content = $OUTPUT->box($OUTPUT->notification($message, 'notifymessage'), 'generalbox', 'nogroupsinfo');
+            $content = $OUTPUT->box($OUTPUT->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
         }
 
         $html = \html_writer::tag('div', $content, array('class' => 'fitem sortlist_container'));

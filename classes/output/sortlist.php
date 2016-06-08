@@ -75,7 +75,7 @@ class sortlist implements \renderable {
             $b = $DB->get_record('grouptool_agrps', array('grouptoolid' => $a->grouptoolid,
                                                           'sort_order' => ($a->sort_order - 1)));
             if (empty($a) || empty($b)) {
-                echo $OUTPUT->notification(get_string('couldnt_move_up', 'grouptool'), 'notifyproblem');
+                echo $OUTPUT->notification(get_string('couldnt_move_up', 'grouptool'), 'error');
             } else {
                 $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, array('id' => $b->id));
                 $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, array('id' => $a->id));
@@ -89,7 +89,7 @@ class sortlist implements \renderable {
             $b = $DB->get_record('grouptool_agrps', array('grouptoolid' => $a->grouptoolid,
                                                           'sort_order' => ($a->sort_order + 1)));
             if (empty($a) || empty($b)) {
-                echo $OUTPUT->notification(get_string('couldnt_move_down', 'grouptool'), 'notifyproblem');
+                echo $OUTPUT->notification(get_string('couldnt_move_down', 'grouptool'), 'error');
             } else {
                 $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, array('id' => $b->id));
                 $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, array('id' => $a->id));

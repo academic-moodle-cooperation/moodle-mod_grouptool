@@ -286,7 +286,7 @@ switch ($tab) {
         $instance->view_userlist();
         break;
     case 'noaccess':
-        $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'notifyproblem');
+        $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
     case 'conditions_prevent_access':
@@ -299,12 +299,11 @@ switch ($tab) {
             // User cannot access the activity and they will not see it at all.
             $text = '';
         }
-        $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').$text, 'notifyproblem');
+        $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').$text, 'error');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
     default:
-        $notification = $OUTPUT->notification(get_string('incorrect_tab', 'grouptool'),
-                                              'notifyproblem');
+        $notification = $OUTPUT->notification(get_string('incorrect_tab', 'grouptool'), 'error');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
 }

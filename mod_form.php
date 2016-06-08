@@ -204,7 +204,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $queue[] = $mform->createElement('checkbox', 'use_queue', '',
                                          get_string('use_queue', 'grouptool'));
         if ($queues > 0) {
-            $mform->addElement('html', $OUTPUT->notification(get_string('queuespresenterror', 'grouptool'), 'notifymessage'));
+            $mform->addElement('html', $OUTPUT->notification(get_string('queuespresenterror', 'grouptool'), 'info'));
         }
         $mform->addGroup($queue, 'queue_grp',
                          get_string('queues_max', 'grouptool'), ' ', false);
