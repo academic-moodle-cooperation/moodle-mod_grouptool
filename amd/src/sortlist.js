@@ -51,7 +51,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
             if (selector !== '') {
                 selector += ', ';
             }
-            selector += '.class' + current.val();
+            selector += '.class' + $(current).val();
         });
         var checkboxes = $(selector);
 
@@ -66,14 +66,15 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
                 break;
             case 'toggle':
                 checkboxes.each(function(idx, current) {
-                    if (current.prop('checked')) {
-                        current.prop('checked', false);
+                    if ($(current).prop('checked')) {
+                        $(current).prop('checked', false);
                     } else {
-                        current.prop('checked', true);
+                        $(current).prop('checked', true);
                     }
                 });
                 break;
             default:
+                log.info('Undefined new checkbox state!', 'grouptool');
                 break;
         }
     };
@@ -310,12 +311,14 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
             checkbox_controls_action.on('click', function(e) {
                 // Get the new state and continue!
                 var newstate = '';
-                $('input[name = "class_action"]').each(function (current) {
-                    if (current.prop('checked') === true) {
-                        newstate = current.get('value');
+                $('input[name="class_action"]').each(function (idx, current) {
+                    if ($(current).prop('checked') === true) {
+                        newstate = $(current).val();
+                        log.info('Update checkboxes \'' + newstate + '\'!');
+                        instance.update_checkboxes(e, newstate);
                     }
                 });
-                instance.update_checkboxes(e, newstate);
+
             });
         } else {
             log.info('No sortlist controller found!', 'grouptool');
@@ -323,7 +326,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
 
         // Action button to select all!
         $('.simple_select_all').on('click', function(e) {
-            log.info('Bind aelect-all handler!', 'grouptool');
+            log.info('Bind select-all handler!', 'grouptool');
             e.preventDefault();
             e.stopPropagation();
 
