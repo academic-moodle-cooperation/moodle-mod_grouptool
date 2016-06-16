@@ -2023,9 +2023,15 @@ EOS;
             $info = "";
         }
 
-        $gradeitem = grade_item::fetch(array('itemtype'      => 'mod',
-                                              'itemmodule'   => $cmtouse->modname,
-                                              'iteminstance' => $cmtouse->instance));
+        $gradeitems = grade_item::fetch_all(array('itemtype'     => 'mod',
+                                                  'itemmodule'   => $cmtouse->modname,
+                                                  'iteminstance' => $cmtouse->instance));
+        // TODO #3310 should we support multiple grade items per activity module soon?
+
+        do {
+            // Right now, we just work with the first grade item
+            $gradeitem = current($gradeitems);
+        } while (!empty($gradeitem->itemnumber) && next($gradeitems));
 
         if (is_array($source)) { // Then we are in multigroup mode (filter = 0 || -1)!
             $sourceusers = $DB->get_records_list('user', 'id', $source);
