@@ -92,7 +92,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     dataType: 'json',
                     beforeSend: function() {
                         if (infoNode) {
-                            infoNode.fadeOut(600).delay(600).remove();
+                            infoNode.fadeOut(600, function() { infoNode.remove(); });
                         }
                         log.info("Start AJAX Call to rename group " + grpid, "grouptool");
                     },
@@ -105,7 +105,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                             infoNode = $("div.infonode");
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 60 * 1000);
+                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 60 * 1000);
                         } else {
                             var startdiv = "<div class=\"infonode alert-success\" style=\"display:none\">";
                             text.before(startdiv + response.message + "</div>");
@@ -119,7 +119,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                                 button.fadeIn(600);
                             });
                             field.off('keydown');
-                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove();}, 5 * 1000);
+                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 5 * 1000);
                         }
                         log.info("AJAX Call to rename group " + grpid + " successfull\n" + status, "grouptool");
                     },
@@ -156,7 +156,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     button.fadeIn(600);
                 });
                 if (infoNode) {
-                    infoNode.fadeOut(600).delay(600).remove();
+                    infoNode.fadeOut(600, function() { infoNode.remove(); });
                 }
                 field.off('keydown');
             }
@@ -239,7 +239,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                             infoNode = $('div.infonode');
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(infoNode.fadeOut(600).delay(600).remove(), 60 * 1000);
+                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 60 * 1000);
                         } else {
                             var divstart = "<div class=\"infonode alert-success\" style=\"display:none\">";
                             tmpnode = $(divstart + response.message + "</div>");
@@ -259,7 +259,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                                 button.fadeIn(600);
                                 field.off('keydown');
                             });
-                            window.setTimeout(function() { infoNode.fadeOut(600).delay(600).remove(); }, 5 * 1000);
+                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 5 * 1000);
                         }
                         log.info("AJAX Call to resize group " + grpid + " successfull\n" + status, "grouptool");
                     },
@@ -300,10 +300,10 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                     button.fadeIn(600);
                 });
                 if (infoNode) {
-                    infoNode.fadeOut(600).delay(600).remove();
+                    infoNode.fadeOut(600, function() { infoNode.remove(); });
                 }
                 if (helpNode) {
-                    helpNode.fadeOut(600).delay(600).remove();
+                    helpNode.fadeOut(600, function() { infoNode.remove(); });
                 }
                 field.unbind('key');
             }
@@ -527,8 +527,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 success: function(response, status) {
                     if (!response.error) {
                         // Success, remove the corresponding table entry...
-                        $('#delete_' + grpid).closest('tr').fadeOut(600)
-                            .delay(600).remove();
+                        $('#delete_' + grpid).closest('tr').fadeOut(600, function() { this.remove(); });
                     }
                     log.info("AJAX Call to delete group " + grpid + " successfull\n" + status, "grouptool");
                 },
