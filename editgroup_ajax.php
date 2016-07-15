@@ -129,6 +129,12 @@ try {
                     $result->message = get_string('resized_group', 'grouptool', $name);
                 }
             }
+            $agrpid = $DB->get_field('grouptool_agrps', 'id', array('grouptoolid' => $cm->instance, 'groupid' => $groupid));
+            $grouptoolrec = $DB->get_record('grouptool', array('id' => $cm->instance));
+            if (!empty($grouptoolrec->use_queue)) {
+                $grouptool = new mod_grouptool($cm->id, $grouptoolrec, $cm, $course);
+                $grouptool->fill_from_queue($agrpid);
+            }
             break;
         case 'activate':
             $groupid = required_param('groupid', PARAM_INT);
