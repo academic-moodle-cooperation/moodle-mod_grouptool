@@ -117,9 +117,9 @@ class registration_created extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id'     => $this->contextinstanceid,
-                                                                        'tab'     => 'overview',
-                                                                        'groupid' => $this->data['other']['groupid']));
+        return new \moodle_url("/mod/grouptool/view.php", array('id'      => $this->contextinstanceid,
+                                                                'tab'     => 'overview',
+                                                                'groupid' => $this->data['other']['groupid']));
     }
 
     /**

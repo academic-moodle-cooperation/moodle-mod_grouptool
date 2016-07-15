@@ -82,7 +82,7 @@ class queue_entry_created extends \core\event\base {
 
         return "The user with id '".$this->userid."' created an queue entry for the user with id '".$this->data['other']['userid'].
                "' in agrp with id '".$this->data['other']['agrpid']."' (= group with id '".$this->data['other']['groupid']."')".
-               " in ".$this->objecttable." with course module id '$this->contextinstanceid'".$by;
+               " in ".$this->objecttable." with course module id '$this->contextinstanceid'".$source;
     }
 
     /**
