@@ -3907,8 +3907,7 @@ EOS;
                         $data->current_grp = $curgroup->id;
                         $data->current_text = $curtext;
                         $movetext = get_string('user_move_prev', 'grouptool', $data);
-                        $returntext .= html_writer::tag('div', $movetext.' ('.$curtext.')',
-                                                        array('class' => $class));
+                        $returntext .= html_writer::tag('div', $movetext, array('class' => $class));
                         if (!isset($status[$queue->userid])) {
                             $status[$queue->userid] = new stdClass();
                         }
@@ -3927,8 +3926,7 @@ EOS;
                         $data->current_grp = $curgroup->id;
                         $data->current_text = $curtext;
                         $movedtext = get_string('user_moved', 'grouptool', $data);
-                        $returntext .= html_writer::tag('div', $movedtext.' ('.$curtext.')',
-                                                        array('class' => $class));
+                        $returntext .= html_writer::tag('div', $movedtext, array('class' => $class));
                         $curgroup->registered++;
                         $error = $error || $curerror;
                         $attr = array('id'     => $queue->id,
@@ -3944,8 +3942,8 @@ EOS;
                         $to->agrpid = $curgroup->id;
                         $to->userid = $queue->userid;
                         $to->groupid = $DB->get_field('grouptool_agrps', 'groupid', array('id' => $curgroup->id), MUST_EXIST);
-                        $to->id = $DB->get_field('grouptool_registered', 'id',
-                                                 array('agrpid' => $to->agrpid, 'userid' => $to->userid), MUST_EXIST);
+                        $to->id = $DB->get_field('grouptool_registered', 'id', array('agrpid' => $to->agrpid,
+                                                                                     'userid' => $to->userid), MUST_EXIST);
                         \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
 
                         if ($DB->record_exists('grouptool_queued', $attr)) {
