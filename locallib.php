@@ -4177,14 +4177,7 @@ EOS;
              * won't set sesskey param in $PAGE->url?!?
              */
             $url = new moodle_url($PAGE->url, array('sesskey' => sesskey()));
-            $formattr = array(
-                    'method' => 'post',
-                    'action' => $url->out_omit_querystring(),
-                    'id'     => 'registration_form',
-                    'class'  => 'mform');
-            echo html_writer::start_tag('form', $formattr);
-            echo html_writer::start_tag('div', array('class' => 'clearfix'));
-            echo html_writer::input_hidden_params($url);
+            $mform = new MoodleQuickForm('registration_form', 'post', $url, '', array('id' => 'registration_form'));
 
             $regstat = $this->get_registration_stats($USER->id);
 
@@ -4192,234 +4185,125 @@ EOS;
                     has_capability('mod/grouptool:register_students', $this->context)) {
                 if ($regstat->queued_users > 0) {
                     // Insert queue-resolving button!
-                    $attr = array(
-                            'type'  => 'submit',
-                            'name'  => 'resolve_queues',
-                            'value' => '1');
-                    $resolvequeuebutton = html_writer::tag('button',
-                                                           get_string('resolve_queue', 'grouptool'),
-                                                           $attr);
-                    $resolvequeue = html_writer::tag('div',
-                                                     get_string('resolve_queue_title',
-                                                                'grouptool'),
-                                                     array('class' => 'fitemtitle')).
-                                    html_writer::tag('div', $resolvequeuebutton,
-                                                     array('class' => 'felement'));
-                    $resolvequeue = html_writer::tag('div', $resolvequeue,
-                                                     array('class' => 'fitem'));
-                    $resolvequeuelegend = html_writer::tag('legend',
-                                                           get_string('resolve_queue_legend',
-                                                                      'grouptool'));
-                    $resolvequeueelement = html_writer::tag('div', $resolvequeue,
-                                                            array('class' => 'fcontainer'));
-                    echo html_writer::tag('fieldset', $resolvequeuelegend.
-                                                      $resolvequeueelement,
-                                          array('class' => 'clearfix'));
+                    $mform->addElement('header', 'resolveheader', get_string('resolve_queue_legend', 'grouptool'));
+                    $mform->addElement('submit', 'resolve_queues', get_string('resolve_queue', 'grouptool'));
                 }
             }
-
-            if (!empty($this->grouptool->use_size)) {
-                $placestats = $regstat->group_places.'&nbsp;'.get_string('total', 'grouptool');
-            } else {
-                $placestats = '∞&nbsp;'.get_string('total', 'grouptool');
-            }
-            if (($regstat->free_places != null) && !empty($this->grouptool->use_size)) {
-                $placestats .= ' / '.$regstat->free_places.'&nbsp;'.
-                                get_string('free', 'grouptool');
-            } else {
-                $placestats .= ' / ∞&nbsp;'.get_string('free', 'grouptool');
-            }
-            if ($regstat->occupied_places != null) {
-                $placestats .= ' / '.$regstat->occupied_places.'&nbsp;'.
-                                get_string('occupied', 'grouptool');
-            }
-            $registrationinfo = html_writer::tag('div', get_string('group_places', 'grouptool').
-                                                        $OUTPUT->help_icon('group_places',
-                                                                           'grouptool'),
-                                                 array('class' => 'fitemtitle')).
-                                html_writer::tag('div', $placestats,
-                                                 array('class' => 'felement'));
-            $generalinfo = html_writer::tag('div', $registrationinfo,
-                                                   array('class' => 'fitem'));
-
-            $registrationinfo = html_writer::tag('div', get_string('number_of_students',
-                                                                   'grouptool'),
-                                                 array('class' => 'fitemtitle')).
-                                html_writer::tag('div', $regstat->users,
-                                                 array('class' => 'felement'));
-            $generalinfo .= html_writer::tag('div', $registrationinfo,
-                                                     array('class' => 'fitem'));
-
-            if (($this->grouptool->allow_multiple &&
-                    (count($regstat->registered) < $this->grouptool->choose_min))
-                    || (!$this->grouptool->allow_multiple && !count($regstat->registered))) {
-                if ($this->grouptool->allow_multiple) {
-                    $missing = ($this->grouptool->choose_min - count($regstat->registered));
-                    $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
-                } else {
-                    $missing = 1;
-                    $stringlabel = 'registration_missing';
-                }
-                $missingtext = get_string($stringlabel, 'grouptool', $missing);
-            } else {
-                $missingtext = "";
-            }
-
-            if (!empty($regstat->registered)) {
-                foreach ($regstat->registered as $registration) {
-                    if (empty($registrationscumulative)) {
-                        $registrationscumulative = $registration->grpname.
-                                                   ' ('.$registration->rank.')';
-                    } else {
-                        $registrationscumulative .= ', '.$registration->grpname.
-                                                    ' ('.$registration->rank.')';
-                    }
-                }
-                $registrationinfo = html_writer::tag('div', get_string('registrations',
-                                                                       'grouptool'),
-                                                     array('class' => 'fitemtitle')).
-                                    html_writer::tag('div', html_writer::tag('div', $missingtext).
-                                                            $registrationscumulative,
-                                                     array('class' => 'felement'));
-                $generalinfo .= html_writer::tag('div', $registrationinfo, array('class' => 'fitem'));
-            } else {
-                $registrationinfo = html_writer::tag('div', get_string('registrations',
-                                                                       'grouptool'),
-                                                     array('class' => 'fitemtitle')).
-                                    html_writer::tag('div', html_writer::tag('div', $missingtext).
-                                                            get_string('not_registered',
-                                                                       'grouptool'),
-                                                     array('class' => 'felement'));
-                $generalinfo .= html_writer::tag('div', $registrationinfo, array('class' => 'fitem'));
-            }
-
-            if (!empty($regstat->queued)) {
-                foreach ($regstat->queued as $queue) {
-                    if (empty($queuescumulative)) {
-                        $queuescumulative = $queue->grpname.' ('.$queue->rank.')';
-                    } else {
-                        $queuescumulative .= ', '.$queue->grpname.' ('.$queue->rank.')';
-                    }
-                }
-
-                $registrationinfo = html_writer::tag('div', get_string('queues', 'grouptool'),
-                                                     array('class' => 'fitemtitle')).
-                                    html_writer::tag('div', $queuescumulative,
-                                                     array('class' => 'felement'));
-                $generalinfo .= html_writer::tag('div', $registrationinfo,
-                                                 array('class' => 'fitem'));
-            }
-
-            if (!empty($this->grouptool->timeavailable)) {
-                $timeavailable = html_writer::tag('div', get_string('availabledate', 'grouptool'),
-                                                  array('class' => 'fitemtitle')).
-                                 html_writer::tag('div',
-                                                  userdate($this->grouptool->timeavailable,
-                                                           get_string('strftimedatetime')),
-                                                  array('class' => 'felement'));
-                $generalinfo .= html_writer::tag('div', $timeavailable,
-                                                 array('class' => 'fitem'));
-            }
-
-            $timedue = html_writer::tag('div', get_string('registrationdue', 'grouptool'),
-                                        array('class' => 'fitemtitle'));
-            if (!empty($this->grouptool->timedue)) {
-                $timedue .= html_writer::tag('div',
-                                             userdate($this->grouptool->timedue,
-                                                      get_string('strftimedatetime')),
-                                             array('class' => 'felement'));
-            } else {
-                $timedue .= html_writer::tag('div', get_string('noregistrationdue', 'grouptool'),
-                                             array('class' => 'felement'));
-            }
-            $generalinfo .= html_writer::tag('div', $timedue, array('class' => 'fitem'));
-
-            if (!empty($this->grouptool->allow_unreg)) {
-                $generalinfo .= html_writer::tag('div', html_writer::tag('div',
-                                                                         get_string('unreg_is', 'grouptool'),
-                                                                         array('class' => 'fitemtitle')).
-                                                        html_writer::tag('div',
-                                                                         get_string('allowed', 'grouptool'),
-                                                                         array('class' => 'felement')),
-                                                 array('class' => 'fitem'));
-            } else {
-                $generalinfo .= html_writer::tag('div', html_writer::tag('div',
-                                                                         get_string('unreg_is',
-                                                                                    'grouptool'),
-                                                                         array('class' => 'fitemtitle')).
-                                                        html_writer::tag('div',
-                                                                         get_string('not_permitted',
-                                                                                    'grouptool'),
-                                                                         array('class' => 'felement')),
-                                                 array('class' => 'fitem'));
-            }
-
-            if (!empty($this->grouptool->allow_multiple)) {
-                $minmaxtitle = html_writer::tag('div',
-                                                get_string('choose_minmax_title', 'grouptool'),
-                                                array('class' => 'fitemtitle'));
-                if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
-                    $data = array('min' => $this->grouptool->choose_min,
-                                  'max' => $this->grouptool->choose_max);
-                    $minmaxtext = html_writer::tag('div',
-                                                   get_string('choose_min_max_text', 'grouptool',
-                                                              $data),
-                                                   array('class' => 'felement'));
-                    $class = ' choose_min choose_max';
-                } else if ($this->grouptool->choose_min) {
-                    $minmaxtext = html_writer::tag('div',
-                                                    get_string('choose_min_text', 'grouptool',
-                                                               $this->grouptool->choose_min),
-                                                    array('class' => 'felement'));
-                    $class = ' choose_min';
-                } else if ($this->grouptool->choose_max) {
-                    $minmaxtext = html_writer::tag('div',
-                                                    get_string('choose_max_text', 'grouptool',
-                                                               $this->grouptool->choose_max),
-                                                    array('class' => 'felement'));
-                    $class = ' choose_max';
-                }
-                $generalinfo .= html_writer::tag('div',
-                                                         $minmaxtitle.$minmaxtext,
-                                                         array('class' => 'fitem '.$class));
-            }
-
-            if (!empty($this->grouptool->use_queue)) {
-                $generalinfo .= html_writer::tag('div', html_writer::tag('div',
-                                                                         get_string('queueing_is', 'grouptool'),
-                                                                         array('class' => 'fitemtitle')).
-                                                        html_writer::tag('div',
-                                                                         get_string('active', 'grouptool'),
-                                                                         array('class' => 'felement')),
-                                                 array('class' => 'fitem'));
-            }
-
-            $generalinfolegend = html_writer::tag('legend', get_string('general_information',
-                                                                       'grouptool'));
             if (has_capability('mod/grouptool:view_description', $this->context)) {
-                echo html_writer::tag('fieldset',
-                                      $generalinfolegend.
-                                      html_writer::tag('div', $generalinfo,
-                                                       array('class' => 'fcontainer')),
-                                      array('class' => 'clearfix'));
+
+                $mform->addElement('header', 'generalinfo', get_string('general_information', 'grouptool'));
+                $mform->setExpanded('generalinfo');
+
+                if (!empty($this->grouptool->use_size)) {
+                    $placestats = $regstat->group_places.'&nbsp;'.get_string('total', 'grouptool');
+                } else {
+                    $placestats = '∞&nbsp;'.get_string('total', 'grouptool');
+                }
+                if (($regstat->free_places != null) && !empty($this->grouptool->use_size)) {
+                    $placestats .= ' / '.$regstat->free_places.'&nbsp;'.
+                                    get_string('free', 'grouptool');
+                } else {
+                    $placestats .= ' / ∞&nbsp;'.get_string('free', 'grouptool');
+                }
+                if ($regstat->occupied_places != null) {
+                    $placestats .= ' / '.$regstat->occupied_places.'&nbsp;'.
+                                    get_string('occupied', 'grouptool');
+                }
+                $mform->addElement('static', 'group_places', get_string('group_places', 'grouptool'), $placestats);
+                $mform->addHelpButton('group_places', 'group_places', 'grouptool');
+
+                $mform->addElement('static', 'number_of_students', get_string('number_of_students', 'grouptool'), $regstat->users);
+
+                if (($this->grouptool->allow_multiple &&
+                        (count($regstat->registered) < $this->grouptool->choose_min))
+                        || (!$this->grouptool->allow_multiple && !count($regstat->registered))) {
+                    if ($this->grouptool->allow_multiple) {
+                        $missing = ($this->grouptool->choose_min - count($regstat->registered));
+                        $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
+                    } else {
+                        $missing = 1;
+                        $stringlabel = 'registration_missing';
+                    }
+                    $missingtext = get_string($stringlabel, 'grouptool', $missing);
+                } else {
+                    $missingtext = "";
+                }
+
+                if (!empty($regstat->registered)) {
+                    foreach ($regstat->registered as $registration) {
+                        if (empty($registrationscumulative)) {
+                            $registrationscumulative = $registration->grpname.
+                                                       ' ('.$registration->rank.')';
+                        } else {
+                            $registrationscumulative .= ', '.$registration->grpname.
+                                                        ' ('.$registration->rank.')';
+                        }
+                    }
+                    $mform->addElement('static', 'registrations', get_string('registrations', 'grouptool'),
+                                       html_writer::tag('div', $missingtext).$registrationscumulative);
+                } else {
+                    $mform->addElement('static', 'registrations', get_string('registrations', 'grouptool'),
+                                       html_writer::tag('div', $missingtext).get_string('not_registered', 'grouptool'));
+                }
+
+                if (!empty($regstat->queued)) {
+                    foreach ($regstat->queued as $queue) {
+                        if (empty($queuescumulative)) {
+                            $queuescumulative = $queue->grpname.' ('.$queue->rank.')';
+                        } else {
+                            $queuescumulative .= ', '.$queue->grpname.' ('.$queue->rank.')';
+                        }
+                    }
+                    $mform->addElement('static', 'queues', get_string('queues', 'grouptool'), $queuescumulative);
+                }
+
+                if (!empty($this->grouptool->timeavailable)) {
+                    $mform->addElement('static', 'availabledate', get_string('availabledate', 'grouptool'),
+                                       userdate($this->grouptool->timeavailable, get_string('strftimedatetime')));
+                }
+
+                if (!empty($this->grouptool->timedue)) {
+                    $textdue = userdate($this->grouptool->timedue, get_string('strftimedatetime'));
+                } else {
+                    $textdue = get_string('noregistrationdue', 'grouptool');
+                }
+                $mform->addElement('static', 'registrationdue', get_string('registrationdue', 'grouptool'), $textdue);
+
+                if (!empty($this->grouptool->allow_unreg)) {
+                    $unregtext = get_string('allowed', 'grouptool');
+                } else {
+                    $unregtext = get_string('not_permitted', 'grouptool');
+                }
+                $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'), $unregtext);
+
+                if (!empty($this->grouptool->allow_multiple)) {
+                    if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
+                        $data = array('min' => $this->grouptool->choose_min,
+                                      'max' => $this->grouptool->choose_max);
+                        $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
+                    } else if ($this->grouptool->choose_min) {
+                        $minmaxtext = get_string('choose_min_text', 'grouptool', $this->grouptool->choose_min);
+                    } else if ($this->grouptool->choose_max) {
+                        $minmaxtext = get_string('choose_max_text', 'grouptool', $this->grouptool->choose_max);
+                    }
+                    $mform->addElement('static', 'minmax', get_string('choose_minmax_title', 'grouptool'), $minmaxtext);
+                }
+
+                if (!empty($this->grouptool->use_queue)) {
+                    $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'), get_string('active', 'grouptool'));
+                }
 
                 // Intro-text if set!
-                if (($this->grouptool->alwaysshowdescription
-                     || (time() > $this->grouptool->timeavailable))
-                    && $this->grouptool->intro) {
+                if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
+                        && $this->grouptool->intro) {
                     $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
-                    echo html_writer::tag('fieldset',
-                                          html_writer::tag('legend',
-                                                           get_string('intro', 'grouptool')).
-                                          html_writer::tag('div', $intro,
-                                                           array('class' => 'fcontainer')),
-                                          array('class' => 'clearfix'));
+                    $mform->addElement('header', 'intro', get_string('intro', 'grouptool'));
+                    $mform->addElement('html', $OUTPUT->box($intro, 'generalbox'));
                 }
             }
             $groups = $this->get_active_groups();
 
-            echo html_writer::start_tag('fieldset', array('class' => 'clearfix')).
-                 html_writer::tag('legend', get_string('groups'));
+            $mform->addElement('header', 'groups', get_string('groups'));
 
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
@@ -4600,13 +4484,12 @@ EOS;
                                                   html_writer::tag('div', $grouphtml, array('class' => 'panel-body')),
                                                   'generalbox group empty');
                     }
-                    echo $grouphtml;
+                    $mform->addElement('html', $grouphtml);
+                    //echo $grouphtml;
                 }
             }
 
-            echo html_writer::end_tag('fieldset');
-            echo html_writer::end_tag('div');
-            echo html_writer::end_tag('form');
+            $mform->display();
 
             if ($this->grouptool->show_members) {
                 // Require the JS to show group members (just once)!
