@@ -4713,7 +4713,7 @@ EOS;
                                                              'groupid'     => $group,
                                                              'active'      => 1))) {
                 $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning', 'grouptool',
-                                                             $groupinfo[$group]->name), array('error'));
+                                                             $groupinfo[$group]->name), 'error');
             }
             // We use MAX to trick Postgres into thinking this is a full GROUPU BY statement!
             $sql = '     SELECT agrps.id AS id, MAX(agrps.groupid) AS grpid, COUNT(regs.id) AS regs,
