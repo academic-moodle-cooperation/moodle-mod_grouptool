@@ -110,7 +110,7 @@ $string['checkbox_control_header'] = 'Gruppen/Gruppierungen auswählen';
 $string['checkbox_control_header_help'] = '<p>Mit dieser Funktion können Sie gezielt Gruppen aus einer/ mehreren Gruppierung(en) in Ihrer Gruppenverwaltung aktivieren oder deaktivieren:
 <ol>
     <li>Wählen Sie im Auswahlfeld zwischen den Varianten "Alle" (d.h. es werden alle enthaltenen Gruppen aktiviert/deaktiviert ) bzw. eine Gruppierung oder wahlweise mehrere Gruppierungen (mit Strg + Klick).</li>
-    <li>Nutzen Sie Sie eine der drei Optionen "Selektieren/ Deselektieren/ Invertieren":
+    <li>Nutzen Sie eine der drei Optionen "Selektieren/Deselektieren/Invertieren":
         <ul>
             <li><b>Selektieren:</b> Die Gruppe(n) der ausgewählten Gruppierung(en) aus dem Auswahlfeld wird/ werden aktiviert.</li>
             <li><b>Deselektieren:</b> Die Gruppe(n) der ausgewählten Gruppierung(en) aus dem Auswahlfeld wird/ werden deaktiviert. </li>
