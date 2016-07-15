@@ -305,6 +305,7 @@ function grouptool_update_queues($grouptool = 0) {
     // Update queues and move users from queue to reg if there's place!
     if (!is_object($grouptool)) {
         $grouptool = $DB->get_records('grouptool', array('id' => $grouptool), MUST_EXIST);
+        $grouptool->instance = $grouptool->id;
     } else {
         $grouptool->instance = $grouptool->id;
     }

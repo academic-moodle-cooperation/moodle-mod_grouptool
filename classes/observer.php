@@ -116,7 +116,8 @@ class mod_grouptool_observer {
 
         $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
                                 {grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allow_multiple,
-                                {grouptool}.choose_max, {grouptool}.name
+                                {grouptool}.choose_max, {grouptool}.choose_min, {grouptool}.grpsize,
+                                {grouptool}.name, {grouptool}.use_size, {grouptool}.use_individual
                            FROM {grouptool}
                      RIGHT JOIN {grouptool_agrps} agrp ON agrp.grouptoolid = {grouptool}.id
                           WHERE agrp.groupid = ?";
@@ -150,138 +151,12 @@ class mod_grouptool_observer {
 
                         // Get next queued user and put him in the group (and delete queue entry)!
                         if (!empty($grouptool->use_queue)) {
-                            $agrpids = $DB->get_fieldset_sql('SELECT id
-                                                                FROM {grouptool_agrps}
-                                                               WHERE grouptoolid = ?', array($grouptool->id));
-                            list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
-                            $sql = "SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
-                                                      MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) AS priority
-                                      FROM {grouptool_queued} queued
-                                 LEFT JOIN {grouptool_registered} reg ON queued.userid = reg.userid
-                                                                         AND reg.agrpid ".$agrpssql."
-                                     WHERE queued.agrpid = ?
-                                  GROUP BY queued.id
-                                  ORDER BY priority DESC, queued.timestamp ASC
-                                     LIMIT 1";
-                            $params = array_merge(array($grouptool->choose_max),
-                                                  $agrpsparam,
-                                                  array($agrp[$grouptool->id]->id));
-                            $record = $DB->get_record_sql($sql, $params);
-                            if (is_object($record)) {
-                                $newrecord = clone $record;
-                                unset($newrecord->id);
-                                $newrecord->modified_by = $newrecord->userid;
-                                $newrecord->id = $DB->insert_record('grouptool_registered', $newrecord);
-                                if (!empty($grouptool->immediate_reg)) {
-                                    groups_add_member($event->objectid, $newrecord->userid);
-                                }
-                                // Trigger event!
-                                // We got the cm above already!
-                                $newrecord->groupid = $event->objectid;
-                                $record->groupid = $event->objectid;
-                                \mod_grouptool\event\user_moved::promotion_from_queue($cm, $record, $newrecord)->trigger();
+                            // We include it right here, because we want to have it slim!
+                            require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+                            $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
+                            $instance = new \mod_grouptool($cm->id, $grouptool, $cm);
 
-                                $allowm = $grouptool->allow_multiple;
-                                $agrps = $DB->get_fieldset_sql("SELECT id
-                                                                FROM {grouptool_agrps} agrps
-                                                                WHERE agrps.grouptoolid = :grptlid",
-                                                                array('grptlid' => $grouptool->id));
-                                list($sql, $params) = $DB->get_in_or_equal($agrps);
-                                $usrregcnt = $DB->count_records_select('grouptool_registered',
-                                                                       ' userid = ?
-                                                                        AND agrpid '.$sql,
-                                                                       array_merge(array($newrecord->userid), $params));
-                                $max = $grouptool->choose_max;
-
-                                // Get belonging course!
-                                $course = $DB->get_record('course', array('id' => $grouptool->course));
-                                // Get CM!
-                                $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $course->id);
-                                $message = new stdClass();
-                                $userdata = $DB->get_record('user', array('id' => $newrecord->userid));
-                                $message->username = fullname($userdata);
-                                $groupdata = $DB->get_record('grouptool_agrps', array('id' => $agrp[$grouptool->id]->id));
-                                $groupdata->name = $DB->get_field('groups', 'name', array('id' => $groupdata->groupid));
-                                $message->groupname = $groupdata->name;
-
-                                $strgrouptools = get_string("modulenameplural", "grouptool");
-                                $strgrouptool  = get_string("modulename", "grouptool");
-                                $postsubject = $course->shortname.': '.$strgrouptools.': '.
-                                               format_string($grouptool->name, true);
-                                $posttext  = $course->shortname.' -> '.$strgrouptools.' -> '.
-                                             format_string($grouptool->name, true)."\n";
-                                $posttext .= "----------------------------------------------------------\n";
-                                $posttext .= get_string("register_you_in_group_successmail",
-                                                        "grouptool", $message)."\n";
-                                $posttext .= "----------------------------------------------------------\n";
-                                $usermailformat = $DB->get_field('user', 'mailformat',
-                                                                 array('id' => $newrecord->userid));
-                                if ($usermailformat == 1) {  // HTML!
-                                    $posthtml = "<p><font face=\"sans-serif\">";
-                                    $posthtml = "<a href=\"".$CFG->wwwroot."/course/view.php?id=".
-                                                $course->id."\">".$course->shortname."</a> ->";
-                                    $posthtml = "<a href=\"".$CFG->wwwroot."/mod/grouptool/index.php?id=".
-                                                $course->id."\">".$strgrouptools."</a> ->";
-                                    $posthtml = "<a href=\"".$CFG->wwwroot."/mod/grouptool/view.php?id=".
-                                                $cm->id."\">".format_string($grouptool->name,
-                                                                                  true)."</a></font></p>";
-                                    $posthtml .= "<hr /><font face=\"sans-serif\">";
-                                    $posthtml .= "<p>".get_string("register_you_in_group_successmailhtml",
-                                                                  "grouptool", $message)."</p>";
-                                    $posthtml .= "</font><hr />";
-                                } else {
-                                    $posthtml = "";
-                                }
-                                $messageuser = $DB->get_record('user', array('id' => $newrecord->userid));
-                                $moodlemessage = new \core\message\message();
-                                $userfrom = core_user::get_noreply_user();
-                                $moodlemessage->component         = 'mod_grouptool';
-                                $moodlemessage->name              = 'grouptool_moveupreg';
-                                $moodlemessage->userfrom          = $userfrom;
-                                $moodlemessage->userto            = $messageuser;
-                                $moodlemessage->subject           = $postsubject;
-                                $moodlemessage->fullmessage       = $posttext;
-                                $moodlemessage->fullmessageformat = FORMAT_HTML;
-                                $moodlemessage->fullmessagehtml   = $posthtml;
-                                $moodlemessage->smallmessage      = get_string('register_you_in_group_success',
-                                                                               'grouptool', $message);
-                                $moodlemessage->notification      = 1;
-                                $moodlemessage->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
-                                                                    $cm->id;
-                                $moodlemessage->contexturlname    = $grouptool->name;
-                                message_send($moodlemessage);
-
-                                if (($allowm && ($usrregcnt >= $max)) || !$allowm) {
-                                    // Get all queue entries and trigger queue_entry_deleted events for each!
-                                    $queueentries = $DB->get_records_sql("SELECT queued.*, agrp.groupid
-                                                                             FROM {grouptool_queued} queued
-                                                                             JOIN {grouptool_agrps} agrp ON queued.agrpid = agrp.id
-                                                                            WHERE userid = ? AND agrpid ".$sql,
-                                                                          array_merge(array($newrecord->userid), $params));
-                                    $DB->delete_records_select('grouptool_queued',
-                                                               ' userid = ? AND agrpid '.$sql,
-                                                               array_merge(array($newrecord->userid),
-                                                                           $params));
-                                    foreach ($queueentries as $cur) {
-                                        // Trigger event!
-                                        // We got the cm above already!
-                                        \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cm, $cur)->trigger();
-                                    }
-                                } else {
-                                    $params = array('userid' => $newrecord->userid, 'agrpid' => $agrp[$grouptool->id]->id);
-                                    $queueentries = $DB->get_records_sql("SELECT queued.*, agrp.groupid
-                                                                             FROM {grouptool_queued} queued
-                                                                             JOIN {grouptool_agrps} agrp ON queued.agrpid = agrp.id
-                                                                            WHERE userid = :userid AND agrpid = :agrpid", $params);
-                                    $DB->delete_records('grouptool_queued', array('userid' => $newrecord->userid,
-                                                                                  'agrpid' => $agrp[$grouptool->id]->id));
-                                    foreach ($queueentries as $cur) {
-                                        // Trigger event!
-                                        // We got the cm above already!
-                                        \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cm, $cur)->trigger();
-                                    }
-                                }
-                            }
+                            $instance->fill_from_queue($agrp[$grouptool->id]->id);
                         }
                     }
                     break;

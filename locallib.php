@@ -2833,7 +2833,7 @@ EOS;
      * @return bool true if everything went fine!
      */
     public function fill_from_queue($agrpid) {
-        global $DB;
+        global $DB, $CFG;
 
         if (empty($this->grouptool->use_queue)) {
             return true;
@@ -2846,12 +2846,29 @@ EOS;
             return true;
         }
 
-        $sql = "SELECT queued.*, agrp.groupid
+        /*$sql = "SELECT queued.*, agrp.groupid
                                   FROM {grouptool_queued} queued
                                   JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
                                  WHERE agrpid = ?
                               ORDER BY timestamp ASC";
-        $records = $DB->get_records_sql($sql, array($agrpid));
+        $records = $DB->get_records_sql($sql, array($agrpid));*/
+
+        $agrpids = $DB->get_fieldset_sql('SELECT id
+                                            FROM {grouptool_agrps}
+                                           WHERE grouptoolid = ?', array($this->grouptool->id));
+        list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
+        $sql = "SELECT queued.id, MAX(agrp.groupid) AS groupid, MAX(queued.agrpid) AS agrpid,
+                       MAX(queued.userid) AS userid, MAX(queued.timestamp),
+                       (COUNT(DISTINCT reg.id) < ?) AS priority
+                  FROM {grouptool_queued} queued
+             LEFT JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
+             LEFT JOIN {grouptool_registered} reg ON queued.userid = reg.userid
+                                                     AND reg.agrpid ".$agrpssql."
+                 WHERE queued.agrpid = ?
+              GROUP BY queued.id
+              ORDER BY priority DESC, queued.timestamp ASC";
+        $params = array_merge(array($this->grouptool->choose_min), $agrpsparam, array($agrpid));
+        $records = $DB->get_records_sql($sql, $params);
 
         if (empty($records) || count($records) == 0) {
             return true;
@@ -2861,7 +2878,7 @@ EOS;
         $message->groupname = $groupdata->name;
 
         foreach ($records as $key => $record) {
-            if ($groupdata->grpsize <= count($groupdata->registered)) {
+            if (!empty($this->grouptool->use_size) && ($groupdata->grpsize <= count($groupdata->registered))) {
                 return true;
             }
             $newrecord = clone $record;
