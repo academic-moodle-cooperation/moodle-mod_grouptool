@@ -15,7 +15,7 @@
 
 /**
  * README.txt
- * @version       2016-05-07
+ * @version       2016-06-17
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
  * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
@@ -25,7 +25,7 @@
  */
 
 # ---------------------------------------------------------------
-# FOR Moodle 3.0+
+# FOR Moodle 3.1+
 # ---------------------------------------------------------------
 
 Grouptool-Module
@@ -55,7 +55,7 @@ OVERVIEW
 
 REQUIREMENTS
 ================================================================================
-    Moodle 3.0
+    Moodle 3.1
 
 INSTALLATION
 ================================================================================
@@ -74,6 +74,13 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016061700
+-------------------------
+*) removed deprecated gif icon
+*) replaced legacy notification classes with current ones
+*) fixed broken sortlist JS (advanced checkbox controller not working)
+*) use only gradeitems with itemnumber 0 or NULL for group grading - multi-grade-item-support following in the future
+
 v 2016050700
 -------------------------
 *) removed .gitignore from repository
