@@ -1203,7 +1203,7 @@ class mod_grouptool {
                         $update->use_individual = 0;
                         $DB->update_record('grouptool', $update);
                     }
-                } else { //TEMPORARYMARKER
+                } else {
                     $group = new stdClass();
                     $group->id = $DB->get_field('grouptool_agrps', 'id', array('groupid' => $fromform->resize,
                                                                                'grouptoolid' => $this->cm->instance));
@@ -2029,7 +2029,7 @@ EOS;
         // TODO #3310 should we support multiple grade items per activity module soon?
 
         do {
-            // Right now, we just work with the first grade item
+            // Right now, we just work with the first grade item!
             $gradeitem = current($gradeitems);
         } while (!empty($gradeitem->itemnumber) && next($gradeitems));
 
@@ -2845,13 +2845,6 @@ EOS;
         if (empty($groupdata->queued)) {
             return true;
         }
-
-        /*$sql = "SELECT queued.*, agrp.groupid
-                                  FROM {grouptool_queued} queued
-                                  JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
-                                 WHERE agrpid = ?
-                              ORDER BY timestamp ASC";
-        $records = $DB->get_records_sql($sql, array($agrpid));*/
 
         $agrpids = $DB->get_fieldset_sql('SELECT id
                                             FROM {grouptool_agrps}
@@ -4342,7 +4335,8 @@ EOS;
                 }
 
                 if (!empty($this->grouptool->use_queue)) {
-                    $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'), get_string('active', 'grouptool'));
+                    $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
+                                       get_string('active', 'grouptool'));
                 }
 
                 // Intro-text if set!
@@ -4537,7 +4531,6 @@ EOS;
                                                   'generalbox group empty');
                     }
                     $mform->addElement('html', $grouphtml);
-                    //echo $grouphtml;
                 }
             }
 
