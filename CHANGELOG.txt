@@ -1,0 +1,133 @@
+CHANGELOG
+=========
+
+3.2.0 (2016-12-05)
+------------------
+
+* Moodle 3.2 compatible version
+* [FEATURE] #3091 Add per group limitation for queue places
+* [FEATURE] #3091 PHPUnit tests for registration methods
+* [CHANGED] #3091 Rewrite of register_in_agrp-method and unregister_from_agrp-method
+* [CHANGED] #3833 Use new AMD modal-module and mustache-template for members-pop-up
+
+3.1.2 (2016-06-17)
+------------------
+
+* [FEATURE] #3594 Make name and description searchable
+* [FEATURE] #3177 It's now possible to include inactive groups in course view and user view tables
+* [FEATURE] #3783 New group creation mode "N groups of size M" enables users to create N groups with groupsize M
+* [FIXED] #3316 Unqueue users if they're registered via import or event observer (moodle group administration)
+
+
+3.1.1 (2016-06-17)
+------------------
+
+* [FIXED] #3825 Fix users not being promoted from queue after others unregister
+
+
+3.1.0 (2016-06-17)
+------------------
+
+* Moodle 3.1 compatible version
+* [CHANGED] #3058 Replaced legacy notification classes with current ones
+* [CHANGED] #3058 Use only gradeitems with itemnumber 0 or NULL for group grading -
+  multi-grade-item-support following in the future
+* [FIXED] #3058 Broken sortlist JS (advanced checkbox controller not working)
+* [REMOVED] #3058 Deprecated gif icon
+* [CHANGED] #3328 Fix warning when importing in inactive group
+* [CHANGED] #3299 Replaced custom form with moodleform in self registration
+* [FIXED] #3326 Fixed JS in group administration not showing error messages due to removing them immediatly
+* [CHANGED] #3327 Send messages to users if they get promoted from queue due to unregistration or changed groupsize
+* [FIXED] #3327 Fix users not being promoted from queue if groupsize changes individually
+* other small bugfixes and improvements (whitespace fixes, removed unused and commented out code)
+
+
+3.0.0 (2016-05-07)
+------------------
+
+* Moodle 3.0 compatible version
+* PHP 7 compatibility
+* [FIXED] #3263 Bug causing different behavior when changing group sizes with/without JavaScript
+* [REMOVED] #3130 Unused .gitignore file
+
+
+2.9.0 (2016-01-12)
+------------------
+
+* Moodle 2.9 compatible version
+* [FEATURE] #2781 Hide ID-Number for students in show members popup
+* [FEATURE] #2832 Exchange place of group and rank for queues in userlist xlsx and ods export
+* [FEATURE] #2832 Align 'no registrations' and 'no queues' messages in XLSX and ODS left
+* [FEATURE] #2831 Move download links to an easier distinguish position in overview
+* [FEATURE] #2844 Improve design of self registration tab
+* [FEATURE] #2783 Enhance show members setting with finer options (all, all after due, own after due,
+  own after reg, none)
+* [CHANGED] #2469 Rewrite JS to AMD and replace YUI with JQuery where safely possible
+* [FIXED] #2829 Improve alignment of texts on registration page
+* [FIXED] #2834 Improve text describing non individual group sizes
+* [FIXED] #2825 Deadline calendar events being duplicated instead of updated for each instance edit
+* [FIXED] #2818 Add some missing lang strings
+* [FIXED] #2694 Replace Studierende with Teilnehmer/innen and Lehrende with Trainer/innen in GER
+  language file
+* [FIXED] Link's URLs if grouptool is called via g parameter in view.php
+* [FIXED] Fixed some smaller bugs and improve coding style and documentation
+* [REMOVED] #2838 Remove include deleted users option in import
+* [REMOVED] Language string never used anywhere
+* [REMOVED] #2824 Group mode setting and support for groups/groupings, we used it just for the access
+  restrictions in the past but they can (and should) now be realised via conditional access settings
+  (have to be enabled for the Moodle instance first)
+
+
+2.8.0 (2015-07-15)
+------------------
+
+* Moodle 2.8 compatible version
+* [FEATURE] #2303 Improve functionality create groups tab
+* [FEATURE] #2383 Add progress bar to import
+* [FEATURE] #2311 Import into multiple groups at once
+* [FEATURE] Improve layout of groups table in administration
+   - show full group names
+   - Improve/add functionality (bulk actions, single group actions)
+* [FEATURE] #2301 Use separate sub-tabs for group creation and administration
+* [FIXED] #2675 Cohort dropdown in group creation won't be shown if not necessary
+* [FIXED] #2734 Certain users only shown as registered in moodle group not in grouptool
+* [FIXED] #2355 Impove layout of checkboxcontroller (esp. for small screens)
+* [FIXED] #2355 Small UI/UX improvements
+* [FIXED] #2677 Use autoloading
+* [FIXED] #22289 Preview count of group creation
+* [FIXED] #2394, #2396 Move queue rank in txt/pdf download behind group name
+* [FIXED] #2279, #2547 Reduced memory usage in many parts of the module (now usable for > 10k users
+  and many groups)
+* [FIXED] #2357 Importfields using standard setting instead of set value
+* [FIXED] Properly deprecate strings
+* [FIXED] #2357 Improve preview and status of import
+* [FIXED] #2837 Wrong overflow warning during import
+* [FIXED] #2389 Add missing language strings
+* [FIXED] #2391 Navigation (AJAX Error, appearance with/without subbranches, etc)
+* [FIXED] #2392 Typo in SQL
+* [FIXED] #2393 Fix wrong queued ranks showed in course view table
+* [REMOVED] #2395 XLS support in exports (only XLSX/ODS/etc. now available)
+* [REMOVED] #2680 Obsolete code
+* Improve coding/css/js style and docs
+
+
+2.7 (2015-04-22)
+----------------
+
+* First release for Moodle 2.7
+* [FEATURE] #2140 New improved active groups layout for better usability
+* [FEATURE] #2138 Combine Overview and Userlist in common tab participants (2 sub-tabs)
+* [FEATURE] #2138 Support additional name fields and useridentity in XLS/XLSX/ODS-export
+* [FEATURE] #1923 Add page numbers in PDF export
+* [FEATURE] #2147 Better grouping creation features (add selected groups to new/existing grouping)
+* [FEATURE] #2139 Grouping-filter in grading tab restricts accessible groups
+* [CHANGED] #1914 Replace add_to_log calls through triggered events
+* [CHANGED] #1976 Replace event handlers with new event observers
+* [FIXED] #2082 Add Frankenstyle-prefix for global scope classes
+* [FIXED] #2083 Move plugin settings to config_plugins table
+* [FIXED] #2084 Improve english language file
+* [FIXED] #2085 Ensure support of PostgreSQL-DBs
+* [FIXED] A renamed string identifier blocking language customisation if there was an old wrong
+  spelled custom string
+* [FIXED] Some minor bugs and typos
+* [REMOVED] Unused cron-Method
