@@ -531,7 +531,7 @@ class mod_grouptool {
      * @return array ( 0 => error, 1 => message )
      */
     private function create_fromto_groups($data, $previewonly = false) {
-        global $DB;
+        global $DB, $OUTPUT;
 
         require_capability('mod/grouptool:create_groups', $this->context);
 
@@ -571,6 +571,19 @@ class mod_grouptool {
 
                 $table->data[] = $line;
             }
+
+            // Notification if activation of group size is imminent!
+            if (empty($error) && !empty($data->numberofmembers)) {
+                $a = new stdClass();
+                $a->field = get_string('number_of_members', 'grouptool');
+                $a->globalsize = $this->grouptool->grpsize;
+                if ($data->numberofmembers != $this->grouptool->grpsize) {
+                    echo $OUTPUT->notification(get_string('groupsize_individual_gets_enabled', 'grouptool', $a), 'info');
+                } else {
+                    echo $OUTPUT->notification(get_string('groupsize_gets_enabled', 'grouptool', $a), 'info');
+                }
+            }
+
             return array(0 => $error, 1 => html_writer::table($table));
 
         } else {

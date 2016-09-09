@@ -266,21 +266,29 @@ class group_creation_form extends \moodleform {
         $parenterrors = parent::validation($data, $files);
         $errors = array();
         if (!empty($data['createGroups']) && $data['grouping'] == "-1"
-                 && (empty($data['groupingname']) || $data['groupingname'] == "")) {
+                && (empty($data['groupingname']) || $data['groupingname'] == "")) {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
-        if (!empty($data['createGroups'])
-            && in_array($data['mode'], array(GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS))
-            && ($data['numberofgroups'] <= 0)) {
+        if (!empty($data['createGroups']) && in_array($data['mode'], array(GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS))
+                && ($data['numberofgroups'] <= 0)) {
             $errors['numberofgroups'] = get_string('mustbeposint', 'grouptool');
         }
-        if (!empty($data['createGroups'])
-            && in_array($data['mode'], array(GROUPTOOL_MEMBERS_AMOUNT, GROUPTOOL_N_M_GROUPS, GROUPTOOL_FROMTO_GROUPS))
-            && ($data['numberofmembers'] <= 0)) {
-            $errors['numberofmembers'] = get_string('mustbeposint', 'grouptool');
+        if (!empty($data['createGroups'])) {
+            switch($data['mode']) {
+                case GROUPTOOL_N_M_GROUPS:
+                case GROUPTOOL_FROMTO_GROUPS:
+                    if ($data['numberofmembers'] < 0) {
+                        $errors['numberofmembers'] = get_string('mustbegt0', 'grouptool');
+                    }
+                    break;
+                case GROUPTOOL_MEMBERS_AMOUNT:
+                    if ($data['numberofmembers'] <= 0) {
+                        $errors['numberofmembers'] = get_string('mustbeposint', 'grouptool');
+                    }
+                    break;
+            }
         }
-        if (!empty($data['createGroups'])
-            && ($data['mode'] == GROUPTOOL_FROMTO_GROUPS)) {
+        if (!empty($data['createGroups']) && ($data['mode'] == GROUPTOOL_FROMTO_GROUPS)) {
             if ($data['from'] > $data['to']) {
                 $errors['fromto'] = get_string('fromgttoerror', 'grouptool');
             }
