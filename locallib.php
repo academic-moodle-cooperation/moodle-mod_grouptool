@@ -431,11 +431,12 @@ class mod_grouptool {
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     \mod_grouptool\event\group_creation_started::create_groupamount($this->cm, $data->namingscheme,
-                                                                                    $data->amount, $groupingid)->trigger();
+                                                                                    $data->numberofgroups, $groupingid)->trigger();
                 break;
                 case GROUPTOOL_MEMBERS_AMOUNT:
                     \mod_grouptool\event\group_creation_started::create_memberamount($this->cm, $data->namingscheme,
-                                                                                     $data->amount, $groupingid)->trigger();
+                                                                                     $data->numberofmembers,
+                                                                                     $groupingid)->trigger();
                 break;
             }
 
@@ -523,7 +524,7 @@ class mod_grouptool {
 
     /**
      * Create moodle-groups and also create non-active entries for the created groups
-     * for this instance
+     * for this instance also used for creation of N groups with M members!
      *
      * @param stdClass $data data from administration-form with all settings for group creation
      * @param bool $previewonly optional only show preview of created groups
@@ -630,6 +631,9 @@ class mod_grouptool {
                         $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
                     }
                 }
+                if (!empty($data->numberofmembers) && ($data->numberofmembers != $this->grouptool->grpsize)) {
+                    $DB->set_field('grouptool_agrps', 'grpsize', $data->numberofmembers, array('id' => $newagrp->id));
+                }
                 $createdgroups[] = $groupid;
                 if ($grouping) {
                     groups_assign_grouping($grouping->id, $groupid);
@@ -646,6 +650,15 @@ class mod_grouptool {
                 return array(0 => $failed,
                              1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error);
             } else {
+                // Activate group size if we already used it when creating groups!
+                if (!empty($data->numberofmembers)) {
+                    $this->grouptool->use_size = true;
+                    if ($data->numberofmembers != $this->grouptool->grpsize) {
+                        $this->grouptool->use_individual = true;
+                    }
+                    $DB->update_record('grouptool', $this->grouptool);
+                }
+
                 $numgrps = clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT) + 1;
                 // Trigger agrps updated via groupcreation event.
                 $groupingid = !empty($grouping) ? $grouping->id : 0;
@@ -1404,7 +1417,7 @@ class mod_grouptool {
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
-                        $numgrps    = $data->amount;
+                        $numgrps    = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
                         list($error, $preview) = $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
@@ -1428,9 +1441,9 @@ class mod_grouptool {
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
                         $usercnt = count($users);
-                        $numgrps    = ceil($usercnt / $data->amount);
-                        $userpergrp = $data->amount;
-                        if (!empty($data->nosmallgroups) and $usercnt % $data->amount != 0) {
+                        $numgrps    = ceil($usercnt / $data->numberofmembers);
+                        $userpergrp = $data->numberofmembers;
+                        if (!empty($data->nosmallgroups) and $usercnt % $data->numberofmembers != 0) {
                             /*
                              *  If there would be one group with a small number of member
                              *  reduce the number of groups
@@ -1456,6 +1469,12 @@ class mod_grouptool {
                                                                               $data->groupingname);
                         $preview = $prev;
                         break;
+                    case GROUPTOOL_N_M_GROUPS:
+                        /* Shortcut here: create_fromto_groups does exactly what we want,
+                         * with from = 1 and to = number of groups to create! */
+                        $data->from = 1;
+                        $data->to = $data->numberofgroups;
+                        $data->digits = 1;
                     case GROUPTOOL_FROMTO_GROUPS:
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
@@ -1510,7 +1529,7 @@ class mod_grouptool {
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $data->cohortid, $orderby);
                     $usercnt = count($users);
-                    $numgrps    = clean_param($data->amount, PARAM_INT);
+                    $numgrps    = clean_param($data->numberofgroups, PARAM_INT);
                     $userpergrp = floor($usercnt / $numgrps);
                     list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
                                                                   $numgrps, true);
@@ -1535,9 +1554,9 @@ class mod_grouptool {
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $data->cohortid, $orderby);
                     $usercnt = count($users);
-                    $numgrps    = ceil($usercnt / $data->amount);
-                    $userpergrp = clean_param($data->amount, PARAM_INT);
-                    if (!empty($data->nosmallgroups) and $usercnt % clean_param($data->amount, PARAM_INT) != 0) {
+                    $numgrps    = ceil($usercnt / $data->numberofmembers);
+                    $userpergrp = clean_param($data->numberofmembers, PARAM_INT);
+                    if (!empty($data->nosmallgroups) and $usercnt % clean_param($data->numberofmembers, PARAM_INT) != 0) {
                         /*
                          *  If there would be one group with a small number of member
                          *  reduce the number of groups
@@ -1565,6 +1584,12 @@ class mod_grouptool {
                                                                           true);
                     $preview = $prev;
                     break;
+                case GROUPTOOL_N_M_GROUPS:
+                    /* Shortcut here: create_fromto_groups does exactly what we want,
+                     * with from = 1 and to = number of groups to create! */
+                    $data->from = 1;
+                    $data->to = $data->numberofgroups;
+                    $data->digits = 1;
                 case GROUPTOOL_FROMTO_GROUPS:
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;

@@ -28,6 +28,11 @@
  defined('MOODLE_INTERNAL') || die();
 
 /**
+ * GROUPTOOL_N_M_GROUPS - group creation mode where N groups with a groupsize of M members are created
+ */
+define('GROUPTOOL_N_M_GROUPS', 4);
+
+/**
  * GROUPTOOL_FROMTO_GROUPS - group creation mode where just groups with a starting and
  * ending number are created - no user allocation
  */

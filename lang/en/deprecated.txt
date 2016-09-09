@@ -1,5 +1,6 @@
 grouptool:view_registrations,mod_grouptool
 grouptool:view_regs_group_overview,mod_grouptool
 grouptool:view_regs_course_overview,mod_grouptool
+group_or_member_count,mod_grouptool
 includedeleted,mod_grouptool
 includedeleted_help,mod_grouptool

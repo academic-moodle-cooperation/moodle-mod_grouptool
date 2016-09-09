@@ -124,39 +124,38 @@ class group_creation_form extends \moodleform {
             $mform->setType('seed', PARAM_INT);
 
             $radioarray = array();
-            $radioarray[] = $mform->createElement('radio', 'mode', '',
-                                                            get_string('define_amount_groups',
-                                                                       'grouptool'),
-                                                            GROUPTOOL_GROUPS_AMOUNT);
-            $radioarray[] = $mform->createElement('radio', 'mode', '',
-                                                            get_string('define_amount_members',
-                                                                       'grouptool'),
-                                                            GROUPTOOL_MEMBERS_AMOUNT);
-            $radioarray[] = $mform->createElement('radio', 'mode', '',
-                                                            get_string('create_1_person_groups',
-                                                                       'grouptool'),
-                                                            GROUPTOOL_1_PERSON_GROUPS);
-            $radioarray[] = $mform->createElement('radio', 'mode', '',
-                                                            get_string('create_fromto_groups',
-                                                                       'grouptool'),
-                                                            GROUPTOOL_FROMTO_GROUPS);
+            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('define_amount_groups', 'grouptool'),
+                                                  GROUPTOOL_GROUPS_AMOUNT);
+            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('define_amount_members', 'grouptool'),
+                                                  GROUPTOOL_MEMBERS_AMOUNT);
+            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('create_1_person_groups', 'grouptool'),
+                                                  GROUPTOOL_1_PERSON_GROUPS);
+            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('create_fromto_groups', 'grouptool'),
+                                                  GROUPTOOL_FROMTO_GROUPS);
+            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('create_n_m_groups', 'grouptool'),
+                                                  GROUPTOOL_N_M_GROUPS);
             $mform->addGroup($radioarray, 'modearray',
                              get_string('groupcreationmode', 'grouptool'),
                              \html_writer::empty_tag('br'), false);
             $mform->setDefault('mode', GROUPTOOL_GROUPS_AMOUNT);
             $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
-            $mform->addElement('text', 'amount', get_string('group_or_member_count', 'grouptool'),
-                               array('size' => '4'));
-            $mform->disabledif ('amount', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
-            $mform->disabledif ('amount', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-            /*
-             * We have to clean this params by ourselves afterwards otherwise we get problems
-             * with texts getting mapped to 0
-             */
-            $mform->setType('amount', PARAM_RAW);
-            $mform->setDefault('amount', 2);
+            // Number of groups
+            $mform->addElement('text', 'numberofgroups', get_string('number_of_groups', 'grouptool'), array('size' => '4'));
+            $mform->disabledIf('numberofgroups', 'mode', 'eq', GROUPTOOL_MEMBERS_AMOUNT);
+            $mform->disabledif ('numberofgroups', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
+            $mform->disabledif ('numberofgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->setType('numberofgroups', PARAM_INT);
+            $mform->setDefault('numberofgroups', 2);
 
+            // Number of group members
+            $mform->addElement('text', 'numberofmembers', get_string('number_of_members', 'grouptool'), array('size' => '4'));
+            $mform->disabledIf('numberofmembers', 'mode', 'eq', GROUPTOOL_GROUPS_AMOUNT);
+            $mform->disabledif ('numberofmembers', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
+            $mform->setType('numberofmembers', PARAM_INT);
+            $mform->setDefault('numberofmembers', $grouptool->grpsize);
+
+            // From-To-Group
             $fromto = array();
             $fromto[] = $mform->createElement('text', 'from', get_string('from'));
             $mform->setDefault('from', 0);
@@ -191,6 +190,7 @@ class group_creation_form extends \moodleform {
             $mform->addHelpButton('nosmallgroups', 'nosmallgroups', 'grouptool');
             $mform->disabledif ('nosmallgroups', 'mode', 'noteq', GROUPTOOL_MEMBERS_AMOUNT);
             $mform->disabledif ('nosmallgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('nosmallgroups', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
             $mform->setAdvanced('nosmallgroups');
 
             $options = array('no'        => get_string('noallocation', 'group'),
@@ -206,6 +206,7 @@ class group_creation_form extends \moodleform {
             }
             $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+            $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
             $naminggrp = array();
             $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', array('size' => '64'));
@@ -269,9 +270,14 @@ class group_creation_form extends \moodleform {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
         if (!empty($data['createGroups'])
-            && ((clean_param($data['amount'], PARAM_INT) <= 0) || !ctype_digit($data['amount']))
-            && (($data['mode'] == GROUPTOOL_GROUPS_AMOUNT) || ($data['mode'] == GROUPTOOL_MEMBERS_AMOUNT))) {
-            $errors['amount'] = get_string('mustbeposint', 'grouptool');
+            && in_array($data['mode'], array(GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS))
+            && ($data['numberofgroups'] <= 0)) {
+            $errors['numberofgroups'] = get_string('mustbeposint', 'grouptool');
+        }
+        if (!empty($data['createGroups'])
+            && in_array($data['mode'], array(GROUPTOOL_MEMBERS_AMOUNT, GROUPTOOL_N_M_GROUPS, GROUPTOOL_FROMTO_GROUPS))
+            && ($data['numberofmembers'] <= 0)) {
+            $errors['numberofmembers'] = get_string('mustbeposint', 'grouptool');
         }
         if (!empty($data['createGroups'])
             && ($data['mode'] == GROUPTOOL_FROMTO_GROUPS)) {

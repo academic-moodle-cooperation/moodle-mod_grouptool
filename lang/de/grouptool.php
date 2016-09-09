@@ -130,7 +130,8 @@ $string['choose_min_max_text'] = 'Sie müssen zwischen <span style="font-weight:
 $string['choose_targetgroup'] = 'Import in Gruppe';
 $string['chooseactivity'] = 'Sie müssen eine Aktivität auswählen, bevor Daten angezeigt werden können!';
 $string['create_1_person_groups'] = '1-Personen-Gruppen erstellen';
-$string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89).';
+$string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89), <strong>ohne automatische Zuordnung</strong> von Mitglieder';
+$string['create_n_m_groups'] = 'N Gruppen mit M Mitgliedern erstellen, <strong>ohne automatische Zuordnung</strong> von Mitglieder';
 $string['createGroups'] = 'Gruppen erstellen';
 $string['createGroupings'] = 'Gruppierungen erstellen/zuweisen';
 $string['create_assign_groupings'] = 'Gruppierungen erstellen/zuweisen';
@@ -159,8 +160,8 @@ $string['copy_grades_success'] = 'Die folgenden Bewertungen wurden erfolgreich a
 $string['copy_grades_errors'] = 'Zumindest 1 Fehler trat während des Übertragens der Bewertungen auf:';
 $string['could_not_add'] = 'Konnte {$a->username} nicht zu Gruppe {$a->groupname} hinzufügen!';
 $string['deactivated_groups'] = 'Gruppen deaktiviert!';
-$string['define_amount_groups'] = 'Gruppenanzahl festlegen';
-$string['define_amount_members'] = 'Mitgliederanzahl festlegen';
+$string['define_amount_groups'] = 'Gruppenanzahl N festlegen';
+$string['define_amount_members'] = 'Mitgliederanzahl M festlegen';
 $string['delete_reference'] = 'Lösche aus der Gruppenverwaltung';
 $string['description'] = 'Beschreibung';
 $string['deselect'] = 'Deselektieren';
@@ -223,14 +224,14 @@ $string['groupcreation'] = 'Gruppen erstellen';
 $string['groupcreationmode'] = 'Modus';
 $string['groupcreationmode_help'] = 'Auswahl, wie Gruppen erstellt werden sollen:<br />
 <ul>
-<li>Definiere Gruppenanzahl - Es wird ausgewählt aus welcher Rolle Teilnehmer/innen für die Gruppenerzeugung benutzt werden sollen und die gewünschte Anzahl an Gruppen im Textfeld angegeben. Im Namenschema wird das Schema für die Gruppennamen angegeben. Dabei können folgende Tags verwendet werden:
+<li>Definiere Gruppenanzahl N - Es wird ausgewählt aus welcher Rolle Teilnehmer/innen für die Gruppenerzeugung benutzt werden sollen und die gewünschte Anzahl an Gruppen im Textfeld angegeben. Im Namenschema wird das Schema für die Gruppennamen angegeben. Dabei können folgende Tags verwendet werden:
 <ul>
 <li># (wird durch die Gruppennummer ersetzt)</li>
 <li>@ (wird durch eine Buchstabenrepräsentation der Gruppennummer ersetzt)</li>
 </ul>
 Die betroffenen Teilnehmer/innen werden automatisch auf die angegebene Anzahl an Gruppen verteilt.</li>
 <li>
-Definiere Anzahl an Gruppenmitgliedern - Hier werden die ideale Gruppenmitgliedsanzahl sowie Namensschema und Rolle für die Teilnehmer/innen-auswahl angegeben. Die benötigte Gruppenanzahl wird automatisch errechnet. Wahlweise können kleine Gruppen (entspricht weniger als 70 % Füllung) auf die anderen Gruppen aufgeteilt werden.
+Definiere Mitgliederanzahl M - Hier werden die ideale Gruppenmitgliedsanzahl sowie Namensschema und Rolle für die Teilnehmer/innen-auswahl angegeben. Die benötigte Gruppenanzahl wird automatisch errechnet. Wahlweise können kleine Gruppen (entspricht weniger als 70 % Füllung) auf die anderen Gruppen aufgeteilt werden.
 </li>
 <li>
 1-Personen-Gruppen erzeugen - Hier wird für jede/n ausgewählte/n Teilnehmer/in eine Gruppe erzeugt. Zusätzlich zu # und @ können Sie hier folgende Tags für das Namensschema benutzen:
@@ -243,7 +244,10 @@ Definiere Anzahl an Gruppenmitgliedern - Hier werden die ideale Gruppenmitglieds
 Wenn Daten für eine/n Teilnehmer/in nicht vorhanden sind, wird der Tag durch TagnameXX ersetzt (wobei XX für die laufende Gruppennummer steht).
 </li>
 <li>
-Erzeuge Gruppen in einem bestimmten Intervall (z.B. von 34 bis 89) - Mit diesem Modus ist es möglich (fehlende) Gruppen nachträglich zu erzeugen (z.B. Gruppe 4, Gruppe 5, Gruppe 6). Hierfür müssen einfach die Grenzen (von-bis) eingetragen werden und angegeben werden wie viele Stellen für kleine Zahlen genutzt werden sollen (werden mit führenden Nullen aufgefüllt, z.B. 1, 01, 001 oder 0001...).
+Erzeuge Gruppen in einem bestimmten Intervall (z.B. von 34 bis 89) - Mit diesem Modus ist es möglich (fehlende) Gruppen nachträglich zu erzeugen (z.B. Gruppe 4, Gruppe 5, Gruppe 6). Hierfür müssen einfach die Grenzen (von-bis) eingetragen werden und angegeben werden wie viele Stellen für kleine Zahlen genutzt werden sollen (werden mit führenden Nullen aufgefüllt, z.B. 1, 01, 001 oder 0001...). Mittels der "Mitgliederanzahl M" können Sie eine individuelle Gruppengröße einstellen.  Dabei wird <strong>keine automatische Zuordnung</strong> von Mitgliedern vorgenommen.
+</li>
+<li>
+N Gruppen mit M Mitgliedern erstellen - Erstellen Sie mit diesem Modus eine bestimmte Anzahl von Gruppen (N Gruppen) mit Platz für eine bestimmte Zahl an Mitgliedern (M), z.B.: sieben Gruppen, mit Platz für jeweils drei Mitglieder. Dabei wird <strong>keine automatische Zuordnung</strong> von Mitgliedern vorgenommen.
 </li>
 </ul>';
 $string['groupfromtodigits'] = 'Von, Bis &amp; Stellen im Namen:';
@@ -298,7 +302,6 @@ $string['grouptool:view_own_registration'] = 'Zeige eigene Registrierung(en) an'
 $string['groupuser_import'] = 'Importiere Gruppenmitglieder';
 $string['group_not_found'] = 'Gruppe {$a->groupid} konnte in Gruppenverwaltungsinstanz {$a->grouptoolid} nicht gefunden werden!';
 $string['group_not_in_grouping'] = 'Gewählte Gruppe ist nicht in gewählter Gruppierung!';
-$string['group_or_member_count'] = 'Gruppen- bzw. Mitgliederanzahl';
 $string['grp_marked'] = 'Zur Anmeldung markiert';
 $string['grpsizezeroerror'] = 'Gruppengröße muss größer gleich 1 sein (positive Integerzahl)';
 $string['ifgroupdeleted'] = 'Wenn Kursgruppen gelöscht werden';
@@ -369,6 +372,8 @@ $string['namingscheme_help'] = '<p>Das Namensschema definiert, wie Gruppen beim 
 <ol><li>Der Gruppenname muss immer einzigartig in Ihrem Kurs sein (d.h. es können nicht mehrere Gruppen idente Namen tragen).</li>
 <li>Sollen mehrere Gruppen hinzugefügt werden, müssen zwingend "Tags" verwendet werden, die die Gruppen eindeutig bezeichnen.</li></ol></p>
 <p>Jeder "Tag" wird für die Gruppennamen durch Telnehmer/innen-Informationen ersetzt. Die Tags in [] sind mit Teilnehmer/innen-Daten verknüpft und die # und @ werden durch eine laufende Nummer bzw. alphabetische Repräsentation dieser ersetzt. Wenn JavaScript aktiviert ist, können Sie durch Klicken auf die Tags, diese dem Namensschema anhängen. Bitte beachten Sie, dass jeder Gruppenname innerhalb des Kurses einzigartig sein muss und ändern Sie bei entsprechenden Problemen das Namensschema!</p>';
+$string['number_of_groups'] = 'Gruppenanzahl N';
+$string['number_of_members'] = 'Mitgliederanzahl M';
 $string['no_conflictfree_to_display'] = 'Keine konfliktfreien Gruppen anzuzeigen. Stattdessen alle angezeigt!';
 $string['no_data_to_display'] = 'Keine Gruppendaten anzuzeigen!';
 $string['no_grades_present'] = 'Keine Bewertungen anzuzeigen';
@@ -549,10 +554,12 @@ $string['you_are_already_marked'] = 'Sie haben die Gruppe {$a->groupname} bereit
 $string['you_have_too_less_regs'] = 'Eine Abmeldung ist nicht möglich, weil Sie in zu wenigen Gruppen angemeldet sind';
 $string['your_place_allocated_in_group_success'] = 'Sie haben die Gruppe {$a->groupname} erfolgreich zur Anmeldung markiert.';
 
-// Deprecated since Moodle 2.8!
+// Deprecated since version 2.8!
 $string['grouptool:view_registrations'] = 'Zeige wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
-// Deprecated since Moodle 2.9!
+// Deprecated since version 2.9!
 $string['grouptool:view_regs_group_overview'] = 'Zeige eine nach Gruppen gegliederte Liste, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
 $string['grouptool:view_regs_course_overview'] = 'Zeige eine Teilnehmer/innen-Liste mit der Information, wer in welcher aktiven Gruppe angemeldet/in der Warteliste gereiht ist.';
 $string['includedeleted'] = 'auch gelöschte Nutzer/Innen';
 $string['includedeleted_help'] = 'Wenn aktiviert werden gelöschte Nutzer/innen nicht aus der Liste herausgefiltert. Gelöschte Nutzer/innen-Accounts können während des Import-Prozesses NICHT automatisch in den Kurs eingeschrieben werden.';
+// Deprecated since version 3.1.2!
+$string['group_or_member_count'] = 'Gruppen- bzw. Mitgliederanzahl';
