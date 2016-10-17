@@ -31,6 +31,24 @@ env:
   - DB=pgsql
   - DB=mysqli
 
+# This section defines who's going to receive the notifications!
+notifications:
+  email:
+    recipients:
+        # I'm going to receive all reports, no matter what status they have or had (my encrypted e-mail-adress)!
+      - secure: "flCWAectL8i2cHnaaniLVwd5U9bX6AF1jkhHN1WFRjKVmA+6gR+ep/rRNhmzFPS3FRUsOQRT16XK6h2M5DVWcL+0dO/mVRMmyvLi/cDYVP3Gkmv5eCg3PhwYaS/D0Z5Df2ljE8VT6tRwQHHvuoOchvWjobx/Q7ybEg93UvOxoSBlXf/78ZDbyeuMPqlfISRUJ3xyzbv82Z1RNNhPG6t6eXCLfv583bp9S4ZGqJhR2rBGPt1fnMA0qcpz4RbKbmcUarpAD/VhG7VDs/Tvt1gpTHfG9qcNmwnsVHMo/zCcztrxSG171iwCeGCKyQS2x7t13T40c/yn6iWVmu0tC/HxzxypX1tUBr3LUomkU/AWsgxIZGrW+eksWil91ZAKHiE0aZEvUXOyn4wC3QWT/wK78NaSVbJyZfQdnUsp0ga5j7QiGzsFjQSNsP2NVAbO40QQJnu11fu+UqSmS/LoM/wwiZgakctY5RiP9cEoF0kkbX1QWDgQghhRQhv0JFwHrVI+96QJK/0nVR+lm5ZqMmmC1KG75QJR3yG112X0rfvLzOU31WxH6/0LGdxljY9R0FhIz54Eeg9NnbDBbc8y6Wb0o5STnU4drqzors/dOFoOb+ju3gI/lTS0vxT7gWBtaZiNjbcyLX1Myt9vJFSPKQHPCwD6Chq4hMEH3LxaYq4zIyQ="
+    on_success: always # default: change
+    on_failure: always # default: always
+  slack:
+    # This is the value "[Slack-Organisation]:[API-Key]#[channel]" just encrypted!
+    rooms:
+        #travisci channel
+      - secure: "BmNbSrWSEguJbEuxIyUgQ/1GUG9wEWsXA2rtPKhHrl2rrKl/QN9akxIx65KY5OTx6W5x4RGJ3leQKqcAWkBYgBOatsMIjOhhoQL6TqgjUmWc8kpkrjv4K1j+I2pAQaVkst/PU7E3G3T9OpBRY9cvoEzcAQY1p09GXo+YCXJEr80My2qkxIVVxPNyLA47/QVVikOAgOxBoOez79IrNpkjOVP78i0vlb/WV1xe9y3u1Sv2w5IFGPiSXpfsmPeP1mODv/H9EyviZtYevYOGKCfzu9AZLwu1uYs+ZUATX1Vs7yDHUMJaDmjoGi7f5/2WGBCBtTjdIsMhF82XXB0PLXgXfzm+emF47epsGn0GdUYC/k1Cqt9B6ZIXbFdC8S4z/Q4LKGmbMvuTlq9P4Y3ujvSspyJN/yImXoa8vANKO1MmoQITxyfJJj7YMX/PAY7pYnFB4utY2uWfKXRRoWtOq3gH2kgWTJdpaWMGSOeZdmG9e4u1iW55tOQeQ7HmqBIqDR2tX6RULDsJvUI2ykwvnubA0hJR/fXsFwJDdeb1SJUJcD4NyksXOluwF81M1UAc1OCZWdUYpbj/UEcH1l1b9WY8BFg4zrgXCc4vdjfXSEqPrG+U3UmtjsrtMinyGDTYQJz1xZeBxWmJ9+AxdZBL3I5u1QDLIOLpwyS+cRfIvz/J9Vg="
+        #mod_grouptool channel
+      - secure: "RtD7z+DEZt8GoysIuLAgmhyiUPK+g5ZpE5Zb8kfY3GZYgMlCXvrfHCulWeoZ/OCv/rfRzwmX4PJnyq4nUSdhCVh242ts+8WR/7qdwExVFiP3wYRBYWoyk60yJyDstnGOtzODaQc9Vbth1SEsPWUtbxENRTB+IHJUkKWcBVqQ/Bs64KAeNRSERDr2nk+6EcCssFwsFlolmDGW/FIUFvIvNLu2hp1FNiMi/3Aq7MiKhWIpGOWfxaLrntEsgC6zejWf8QmKAUNMUqwfLHPSQJMevj3BZRCUYBVOOhUsQKQawlRgY/w5ODqq+GlxoXM+v6yKlWGX+qMOsyFSl9eED/ZNx8L27uWGDzWFWRV1w++ZXqL62IwA6CEeI2cnmfCBsQbGXR0H+tBOVfu8QcjYj0kdt6kKtysoXq/F64LaqTbuFBhpmtM2xuReyvcXOpbCZMq/RHkFjv0VfNZCFeYoke9pkSqdyYwcqSuUliPZmU0EP0onmwSWg4JXLT1Xut+l9ll1y2DvBcPHhEaVNPVadMU3v2rTfcfgu759yD66pBHfX7JAN6zaNIKNbLF+GObMO+jKW6maIslyRlFl58H/bZ8J9Ce0BlKfdrhE/ZSqkH2qaN8k0rV1afeRsNHEt6sCP9K1ABwxr9cCN6DvNcucFrPLjNBAoZmRHiMyioSX7hraApk="
+    on_success: always # default: change
+    on_failure: always # default: always
+
 # This lists steps that are run before the installation step.
 before_install:
 # This disables XDebug which should speed up the build.  One reason to remove this
@@ -82,7 +100,9 @@ script:
   - moodle-plugin-ci validate
 # This step runs the PHPUnit tests of your plugin.  If your plugin has PHPUnit tests,
 # then it is highly recommended that you keep this step.
-  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci phpunit --coverage-clover
 # This step runs the Behat tests of your plugin.  If your plugin has Behat tests, then
 # it is highly recommended that you keep this step.
   - moodle-plugin-ci behat
+# Now we view the coverage file!
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.0" ]]; then echo "Show PHPUnit code coverage:"; cat coverage.xml; fi
