@@ -486,6 +486,9 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2015042200, 'grouptool');
     }
 
+    // Moodle v3.2.0 release upgrade line.
+    // Put any upgrade step following this!
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
