@@ -4643,7 +4643,7 @@ EOS;
                 $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning', 'grouptool',
                                                              $groupinfo[$group]->name), 'error');
             }
-            // We use MAX to trick Postgres into thinking this is a full GROUPU BY statement!
+            // We use MAX to trick Postgres into thinking this is a full GROUP BY statement!
             $sql = '     SELECT agrps.id AS id, MAX(agrps.groupid) AS grpid, COUNT(regs.id) AS regs,
                                 MAX(grptl.use_individual) AS indi, MAX(grptl.grpsize) AS globalsize, MAX(agrps.grpsize) AS size,
                                 MAX(grptl.name) AS instancename
