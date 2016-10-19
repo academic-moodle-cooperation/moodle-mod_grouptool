@@ -465,6 +465,7 @@ $string['resized_group'] = 'Gruppengröße geändert!';
 $string['resolve_queue_legend'] = 'Löse Wartelisten auf';
 $string['resolve_queue_title'] = 'Löse Wartelisten auf';
 $string['resolve_queue'] = 'Wartelisten auflösen';
+$string['search:activity'] = 'Gruppenverwaltung - Aktivitätsinformation';
 $string['selected'] = 'Ausgewählt';
 $string['select'] = 'Selektieren';
 $string['selectfromcohort'] = 'Mitglieder aus globaler Gruppe wählen';

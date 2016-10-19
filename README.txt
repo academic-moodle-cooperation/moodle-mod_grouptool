@@ -74,6 +74,10 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016061702
+-------------------------
+*) Make name and description searchable
+
 v 2016061701
 -------------------------
 *) fixed a bug preventing users from being promoted from queue after others unregister

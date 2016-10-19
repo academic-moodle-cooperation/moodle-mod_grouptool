@@ -465,6 +465,7 @@ $string['resized_group'] = 'Changed group size!';
 $string['resolve_queue_legend'] = 'Resolve queues';
 $string['resolve_queue_title'] = 'Resolve pending queues';
 $string['resolve_queue'] = 'Resolve queues';
+$string['search:activity'] = 'Grouptool - activity information';
 $string['selected'] = 'Selected';
 $string['select'] = 'Select';
 $string['selectfromcohort'] = 'Select members from cohort';
