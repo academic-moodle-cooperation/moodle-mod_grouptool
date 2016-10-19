@@ -77,6 +77,13 @@ class mod_grouptool_observer {
                       WHERE reg.modified_by = -1 AND agrps.groupid = :groupid AND reg.userid = :userid";
         $marks = $DB->get_records_sql($markssql, array('groupid' => $event->objectid,
                                                        'userid'  => $event->relateduserid));
+
+        $queuesql = "SELECT queue.agrpid AS agrpid, queue.id AS id
+                       FROM {grouptool_agrps} agrps
+                  LEFT JOIN {grouptool_queued} queue ON agrps.id = queue.agrpid
+                      WHERE agrps.groupid = :groupid AND queue.userid = :userid";
+        $queues = $DB->get_records_sql($queuesql, array('groupid' => $event->objectid,
+                                                        'userid'  => $event->relateduserid));
         foreach ($grouptools as $grouptool) {
             if (!key_exists($grouptool->agrpid, $regs)) {
                 $reg = new stdClass();
@@ -85,16 +92,22 @@ class mod_grouptool_observer {
                 $reg->timestamp = time();
                 $reg->modified_by = 0; // There's no way we can get the teachers id!
                 if (!$DB->record_exists('grouptool_registered', array('agrpid' => $reg->agrpid,
-                                                                     'userid' => $reg->userid))) {
+                                                                      'userid' => $reg->userid))) {
                     $reg->id = $DB->insert_record('grouptool_registered', $reg);
                     $reg->groupid = $event->objectid;
                     $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
                     \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
                 }
+                if (key_exists($grouptool->agrpid, $queues)) {
+                    $DB->delete_records('grouptool_queued', array('id' => $queues[$grouptool->agrpid]->id));
+                }
             } else if (key_exists($grouptool->agrpid, $marks)) {
                 $record = $marks[$grouptool->agrpid];
                 $record->modified_by = 0;
                 $DB->update_record('grouptool_registered', $record);
+                if (key_exists($grouptool->agrpid, $queues)) {
+                    $DB->delete_records('grouptool_queued', array('id' => $queues[$grouptool->agrpid]->id));
+                }
                 $reg->groupid = $event->objectid;
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
                 \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $record)->trigger();

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * import_form.php
+ * import_confirm_form.php
  *
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -33,7 +33,7 @@ require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
 require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 
 /**
- * class representing the moodleform used in the import-tab
+ * class representing the moodleform used in the import-tab to confirm import
  *
  * @package       mod_grouptool
  * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
@@ -44,13 +44,13 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class import_form extends \moodleform {
+class import_confirm_form extends \moodleform {
     /**
      * Definition of import form
      */
     protected function definition() {
-        global $DB;
 
+        global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -65,54 +65,26 @@ class import_form extends \moodleform {
         $mform->setDefault('tab', 'import');
         $mform->setType('tab', PARAM_TEXT);
 
-        if (has_capability('mod/grouptool:register_students', $this->context)) {
-            /* -------------------------------------------------------------------------------
-             * Adding the "group creation" fieldset, where all the common settings are showed
-             */
-            $mform->addElement('header', 'groupuser_import', get_string('groupuser_import',
-                                                                        'grouptool'));
-
-            $active = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
-            $inactive = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
-
-            $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup', 'grouptool'), null,
-                                            array('size' => 15));
-
-            if (!empty($active->groups)) {
-                $options = array();
-                foreach ($active->groups as $grp) {
-                    $options[$grp->groupid] = $grp->name;
-                }
-                $groups->addOptGroup(get_string('activegroups', 'grouptool'), $options);
-            }
-
-            if (!empty($inactive->groups)) {
-                $options = array();
-                foreach ($inactive->groups as $grp) {
-                    $options[$grp->groupid] = $grp->name;
-                }
-                $groups->addOptGroup(get_string('inactivegroups', 'grouptool'), $options);
-            }
-            $groups->setMultiple(true);
-            $mform->addElement($groups);
-            $mform->setType('groups', PARAM_INT);
-            $mform->addRule('groups', null, 'required', null, 'client');
-
-            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), array('wrap' => 'virtual',
-                                                                                              'rows' => '20',
-                                                                                              'cols' => '50'));
-            $mform->addHelpButton('data', 'userlist', 'grouptool');
-            $mform->addRule('data', null, 'required', null, 'client');
-            $mform->addRule('data', null, 'required', null, 'server');
-
-            $mform->addElement('advcheckbox', 'forceregistration', '', get_string('forceregistration', 'grouptool'));
-            $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
-            if ($forceimportreg = get_config('mod_grouptool', 'force_importreg')) {
-                $mform->setDefault('forceregistration', $forceimportreg);
-            }
-
-            $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
+        foreach ($this->_customdata['groups'] as $group) {
+            $mform->addElement('hidden', "group[$group]");
+            $mform->setDefault("group[$group]", $group);
+            $mform->setType("group[$group]", PARAM_INT);
         }
+
+        $mform->addElement('hidden', 'data');
+        $mform->setDefault('data', $this->_customdata['data']);
+        $mform->setType('data', PARAM_NOTAGS);
+
+        $mform->addElement('hidden', 'forceregistration');
+        $mform->setDefault('forceregistration', $this->_customdata['forceregistration']);
+        $mform->setType('forceregistration', PARAM_BOOL);
+
+        $mform->addElement('html', $this->_customdata['confirmmessage']);
+
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'confirm', get_string('continue'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
     }
 
     /**
@@ -127,9 +99,7 @@ class import_form extends \moodleform {
      */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
-        if (empty($data['groups']) || ($data['groups'] == 'none')) {
-            $errors['groups'] = get_string('choose_group', 'grouptool');
-        }
+
         return $errors;
     }
 }

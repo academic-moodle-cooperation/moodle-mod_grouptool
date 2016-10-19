@@ -4608,11 +4608,12 @@ EOS;
      *
      * @param int[] $groups array of ids of groups to import into
      * @param stdClass $data from form in import tab (textfield with idnumbers and group-selection)
+     * @param int[] $ignored which user ids to ignore when importing (used if conflicting users should be ignored)
      * @param bool $forceregistration Force registration in grouptool
      * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
      */
-    public function import($groups, $data, $forceregistration = false, $previewonly = false) {
+    public function import($groups, $data, $ignored = array(), $forceregistration = false, $previewonly = false) {
         global $DB, $OUTPUT, $CFG, $PAGE, $USER;
 
         $message = "";
@@ -4806,6 +4807,15 @@ EOS;
                         $attr = array('class' => 'notifysuccess');
                         $pbar->update($processed, $count,
                                       get_string('import_progress_import', 'grouptool').' '.fullname($userinfo).'...');
+
+                        if (in_array($userinfo->id, $ignored[$group])) {
+                            // We ignore the user for this import in this group!
+                            $cell = new html_table_cell(get_string('import_skipped', 'grouptool', $data));
+                            $cell->attributes['class'] = 'info';
+                            $row->cells[] = $cell;
+                            continue;
+                        }
+
                         if (!groups_add_member($group, $userinfo->id)) {
                             $error = true;
                             $notification = $OUTPUT->notification(get_string('import_user_problem', 'grouptool', $data), 'error');
@@ -4861,16 +4871,35 @@ EOS;
                                 $reg->id = $DB->insert_record('grouptool_registered', $reg);
                             }
 
+                            // Delete every queue entry here!
+                            $DB->delete_records('grouptool_queued', array('agrpid' => $agrp[$group], 'userid' => $userinfo->id));
+
                             \mod_grouptool\event\user_imported::import_forced($this->cm, $reg->id, $agrp[$group],
                                                                               $group, $userinfo->id)->trigger();
-                        } else if (!$forceregistration) {
-                            // Trigger the event!
-                            \mod_grouptool\event\user_imported::import($this->cm, $group, $userinfo->id)->trigger();
+                        } else {
+                            // Delete every queue entry here!
+                            $DB->delete_records('grouptool_queued', array('agrpid' => $agrp[$group], 'userid' => $userinfo->id));
+
+                            if (!$forceregistration) {
+                                // Trigger the event!
+                                \mod_grouptool\event\user_imported::import($this->cm, $group, $userinfo->id)->trigger();
+                            }
                         }
                     } else if ($userinfo) {
-                        $attr = array('class' => 'prevsuccess');
-                        $row->cells[] = get_string('import_user_prev', 'grouptool', $data);
-                        $row->attributes['class'] = 'prevsuccess';
+                        if ($DB->record_exists_select('grouptool_queued', "agrpid = :agrpid AND userid = :userid",
+                                                      array('agrpid' => $agrp[$group], 'userid' => $userinfo->id))) {
+                            $attr = array('class' => 'prevconflict');
+                            $options = array(-1 => get_string('move_user', 'grouptool'),
+                                             $userinfo->id => get_string('skip_user_import', 'grouptool'));
+                            $cell = get_string('import_conflict_user_queued', 'grouptool', $data).
+                                                      html_writer::tag('div', html_writer::select($options, "ignored_{$group}[]", -1, false));
+                            $row->cells[] = $cell;
+                            $row->attributes['class'] = 'prevconflict';
+                        } else {
+                            $attr = array('class' => 'prevsuccess');
+                            $row->cells[] = get_string('import_user_prev', 'grouptool', $data);
+                            $row->attributes['class'] = 'prevsuccess';
+                        }
                     }
                 }
             }
@@ -4899,13 +4928,13 @@ EOS;
         $form = new \mod_grouptool\import_form(null, array('id' => $id));
 
         if (optional_param('confirm', 0, PARAM_BOOL)) {
-            $groups = required_param_array('groups', PARAM_INT);
-            $data = required_param('data', PARAM_RAW);
+            $groups = required_param_array('group', PARAM_INT);
+            $data = required_param('data', PARAM_NOTAGS);
             $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
-            if (!empty($data)) {
-                $data = unserialize($data);
+            foreach ($groups as $group) {
+                $ignored[$group] = optional_param_array("ignored_$group", array(-1 => -1), PARAM_INT);
             }
-            list($error, $message) = $this->import($groups, $data, $forceregistration);
+            list($error, $message) = $this->import($groups, $data, $ignored, $forceregistration);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'), 'error').
@@ -4916,27 +4945,22 @@ EOS;
 
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
-            list($error, $confirmmessage) = $this->import($fromform->groups, $fromform->data,
+            list($error, $confirmmessage) = $this->import($fromform->groups, $fromform->data, array(),
                                                           $fromform->forceregistration, true);
+            $formdata = array('id'                => $id,
+                              'groups'            => $fromform->groups,
+                              'data'              => $fromform->data,
+                              'forceregistration' => $fromform->forceregistration,
+                              'confirmmessage'    => $confirmmessage);
+            // The form data will be fetched through required_param()! TODO gotta refactor this in the future!
+            $confirmform = new \mod_grouptool\import_confirm_form($PAGE->url, $formdata);
 
-            $attr = array(
-                    'confirm'           => '1',
-                    'data'              => serialize($fromform->data),
-                    'forceregistration' => $fromform->forceregistration);
-            foreach ($fromform->groups as $group) {
-                $attr['groups['.$group.']'] = $group;
-            }
-
-            $continue = new moodle_url($PAGE->url, $attr);
-            $cancel = new moodle_url($PAGE->url);
-
+            echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered');
             if ($error) {
-                $confirmmessage = $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), 'error').
-                                  html_writer::empty_tag('br').$confirmmessage;
+                echo $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), 'error');
             }
-            echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered').
-                 $confirmmessage.
-                 $this->confirm('', $continue, $cancel);
+
+            $confirmform->display();
 
         } else {
             $form->display();
