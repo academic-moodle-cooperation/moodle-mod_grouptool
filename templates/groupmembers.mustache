@@ -1,0 +1,92 @@
+{{!
+    This file is part of mod_publication for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_grouptool/groupmembers
+
+    Grouptool's groupmembers template.
+
+    The purpose of this template is to display the members and queued users of an active group in mod_grouptool.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id ID of related element
+    * showidnumber wether to display idnumbers or not
+    * absregs Array with fullname & idnumber pairs.
+    * gtregs Array with fullname & idnumber paris.
+    * mregs Array with fullname & idnumber pairs.
+    * queued Array with fullname, idnumber & rank values.
+
+    Example context (json):
+    {
+        "id": "showmembers584aa6789a9ad34",
+        "courseid": 5,
+        "showidnumber": true,
+        "absregs": [
+            { "id": 1, "fullname": "John Doe", "idnumber": "4567890" },
+            { "id": 2, "fullname": "Jane Doe", "idnumber": "7890123" },
+        ],
+        "gtregs": [
+            { "id": 3, "fullname": "Jessica Jones", "idnumber": "" },
+            { "id": 4, "fullname": "Luke Cage", "idnumber": "0123456" },
+        ],
+        "mregs": [
+            { "id": 5, "fullname": "Barry Allen", "idnumber": "-" },
+            { "id": 6, "fullname": "Bruce Banner", "idnumber": "-" },
+        ],
+        "mregs": [
+            { "id": 7, "fullname": "Barry Allen", "idnumber": "-", "rank": "1" },
+            { "id": 8, "fullname": "Bruce Banner", "idnumber": "-", "rank": "2" },
+        ]
+    }
+
+}}
+<div class="showmembersoverlay" role="tooltip" aria-describedby="{{id}}">
+    <table>
+        <thead>
+            <tr>
+                <td>Status{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td><td>User</td>{{#showidnumber}}<td>IDNumber</td>{{/showidnumber}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#absregs}}<tr>
+                <td>✔</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+            </tr>{{/absregs}}
+            {{#gtregs}}<tr>
+                <td>+</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+            </tr>{{/gtregs}}
+            {{#mregs}}<tr>
+                <td>?</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+            </tr>{{/mregs}}
+            {{! NO REGISTRATIONS }}{{^absregs}}{{^gtregs}}{{^mregs}}<tr class="regentry reg">
+                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_registrations">{{# str }} no_registrations, mod_grouptool {{/ str }}</td>
+            </tr>{{/mregs}}{{/gtregs}}{{/absregs}}{{! END OF NO REGISTRATIONS }}
+        </tbody>
+        <tbody>
+            {{#queued}}<tr class="queueentry queue">
+                <td>{{rank}}</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+            </tr>{{/queued}}
+            {{! NOBODY QUEUED }}{{^queued}}<tr class="queueentry queue">
+                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_queues">{{# str }} nobody_queued, mod_grouptool {{/ str }}</td>
+            </tr>{{/queued}}{{! END OF NOBODY QUEUED }}
+        </tbody>
+    </table>
+</div>

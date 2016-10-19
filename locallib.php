@@ -2684,7 +2684,7 @@ EOS;
      * @param bool $includeinactive optional include also inactive groups - despite the method being called get_active_groups()!
      * @return array of objects containing all necessary information about chosen active groups
      */
-    private function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
+    public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
                                        $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false) {
         global $DB;
 
@@ -4351,7 +4351,7 @@ EOS;
                     // We have to determine if we can show the members link!
                     $showmembers = $this->canshowmembers($group->agrpid, $regrank, $queuerank);
                     if ($showmembers) {
-                        $grouphtml .= $this->render_members_link($group->agrpid);
+                        $grouphtml .= $this->render_members_link($group);
                     }
 
                     /* If we include inactive groups and there's someone registered in one of these,
@@ -4500,14 +4500,19 @@ EOS;
                 }
             }
 
-            $mform->display();
-
             if ($this->grouptool->show_members) {
-                // Require the JS to show group members (just once)!
                 $params = new stdClass();
-                $params->contextid  = $this->context->id;
+                $params->courseid = $this->grouptool->course;
+                $params->showidnumber  = has_capability('mod/grouptool:view_regs_group_view', $this->context)
+                        || has_capability('mod/grouptool:view_regs_course_view', $this->context);
+                $helpicon = new help_icon('status', 'mod_grouptool');
+                // Add the help-icon-data to the form element as data-attribute so we use less params for the JS-call!
+                $mform->updateAttributes(array('data-statushelp' => json_encode($helpicon->export_for_template($OUTPUT))));
+                // Require the JS to show group members (just once)!
                 $PAGE->requires->js_call_amd('mod_grouptool/memberspopup', 'initializer', array($params));
             }
+
+            $mform->display();
         }
     }
 
@@ -6279,23 +6284,99 @@ EOS;
     /**
      * Render link for Member-List
      *
-     * @param int $agrpid active group id, for which the members should be displayed
-     * @param string $groupname name of the group
+     * @param stdClass $group active group object, for which the members should be displayed
      * @return string HTML fragment
      */
-    private function render_members_link($agrpid) {
-        global $CFG;
+    private function render_members_link($group) {
+        global $CFG, $DB;
 
         $output = get_string('show_members', 'grouptool');
 
         // Now create the link around it - we need https on loginhttps pages!
-        $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php', array('agrpid'    => $agrpid,
+        $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php', array('agrpid'    => $group->agrpid,
                                                                                          'contextid' => $this->context->id));
 
         $attributes = array('href' => $url, 'title' => get_string('show_members', 'grouptool'));
         $id = html_writer::random_id('showmembers');
         $attributes['id'] = $id;
-        $attributes['data-agrpid'] = $agrpid;
+        $attributes['data-name'] = $group->name;
+        // Add data attributes for JS!
+        $registered = array();
+        if (!empty($group->registered)) {
+            foreach ($group->registered AS $cur) {
+                $registered[] = $cur->userid;
+            }
+        }
+        $members = array_keys($group->moodle_members);
+        $queued = array();
+        if (!empty($group->queued)) {
+            foreach ($group->queued AS $cur) {
+                $queued[$cur->userid] = $cur->userid;
+            }
+        }
+        // Get all registered users with moodle-group-membership!
+        $absregs = array_intersect($registered, $members);
+        $absregs = array_combine($absregs, $absregs);
+        // Get all registered users without moodle-group-membership!
+        $gtregs = array_diff($registered, $members);
+        $gtregs = array_combine($gtregs, $gtregs);
+        // Get all moodle-group-members without registration!
+        $mdlregs = array_diff($members, $registered);
+        $mdlregs = array_combine($mdlregs, $mdlregs);
+
+        $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
+                        || has_capability('mod/grouptool:view_regs_course_view', $this->context);
+        $userfields = get_all_user_name_fields(true);
+        if ($showidnumber) {
+            $fields = "id,idnumber,".$userfields;
+        } else {
+            $fields = "id,".$userfields;
+        }
+        // Cache needed user records right now!
+        $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
+
+        $attributes['data-absregs'] = array();
+        if (!empty($absregs)) {
+            foreach ($absregs as $cur) {
+                // These user records are fully fetched in $group->moodle_members!
+                $attributes['data-absregs'][] = array('idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                                                      'fullname' => fullname($group->moodle_members[$cur]),
+                                                      'id'       => $cur);
+            }
+        }
+        $attributes['data-absregs'] = json_encode($attributes['data-absregs']);
+
+        $attributes['data-gtregs'] = array();
+        if (!empty($gtregs)) {
+            foreach ($gtregs as $cur) {
+                $attributes['data-gtregs'][] = array('idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                                                     'fullname' => fullname($users[$cur]),
+                                                     'id'       => $cur);
+            }
+        }
+        $attributes['data-gtregs'] = json_encode($attributes['data-gtregs']);
+
+        $attributes['data-mregs'] = array();
+        if (!empty($mdlregs)) {
+            foreach ($mdlregs as $cur) {
+                $attributes['data-mregs'][] = array('idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                                                    'fullname' => fullname($group->moodle_members[$cur]),
+                                                    'id'       => $cur);
+            }
+        }
+        $attributes['data-mregs'] = json_encode($attributes['data-mregs']);
+
+        $attributes['data-queued'] = array();
+        if (!empty($queued)) {
+            $queuedlist = $DB->get_records('grouptool_queued', array('agrpid' => $group->agrpid), 'timestamp ASC');
+            foreach ($queued as $cur) {
+                $attributes['data-queued'][] = array('idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                                                     'fullname' => fullname($users[$cur]),
+                                                     'id'       => $cur,
+                                                     'rank'     => $this->get_rank_in_queue($queuedlist, $cur));
+            }
+        }
+        $attributes['data-queued'] = json_encode($attributes['data-queued']);
 
         $output = html_writer::tag('a', $output, $attributes);
 

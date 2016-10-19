@@ -31,26 +31,21 @@ require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
 
-$group = $DB->get_record_sql('SELECT grp.id AS grpid, grp.name AS grpname, grp.courseid AS courseid,
-                                     agrp.id AS agrpid, agrp.grpsize AS size,
-                                     agrp.grouptoolid AS grouptoolid
-                                FROM {grouptool_agrps} agrp
-                           LEFT JOIN {groups} grp ON agrp.groupid = grp.id
-                               WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
-$grouptool = $DB->get_record('grouptool', array('id' => $group->grouptoolid), '*', MUST_EXIST);
+$grouptoolid = $DB->get_field_sql('SELECT agrp.grouptoolid AS grouptoolid
+                                     FROM {grouptool_agrps} agrp
+                                    WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
+$grouptool = $DB->get_record('grouptool', array('id' => $grouptoolid), '*', MUST_EXIST);
 
 $PAGE->set_url('/mod/grouptool/showmembers.php');
-$coursecontext = context_course::instance($group->courseid);
+$coursecontext = context_course::instance($grouptool->course);
 $PAGE->set_context($coursecontext);
 
-$cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $group->courseid);
+$cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course);
 $context = context_module::instance($cm->id);
 
 require_login($cm->course, true, $cm);
 
 echo $OUTPUT->header();
-
-echo $OUTPUT->heading($group->grpname, 2, 'showmembersheading');
 
 $grouptool = new mod_grouptool($cm->id, $grouptool, $cm);
 
@@ -64,59 +59,93 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context)
                     || has_capability('mod/grouptool:view_regs_course_view', $context);
 
-    echo $OUTPUT->heading(get_string('registrations', 'grouptool'), 3, 'showmembersheading');
-    $moodlereg = groups_get_members($group->grpid, 'u.id');
-    $userfieldssql = user_picture::fields('usr', array('idnumber'));
-    // Get registrations but exclude all who are just marked for registration!
-    $regsql = "SELECT $userfieldssql
-                 FROM {grouptool_registered} reg
-            LEFT JOIN {user} usr ON reg.userid = usr.id
-                WHERE reg.agrpid = ? AND reg.modified_by >= 0
-             ORDER BY timestamp ASC";
-    if (!$regs = $DB->get_records_sql($regsql, array($agrpid))) {
-        echo html_writer::tag('div', get_string('no_registrations', 'grouptool'),
-                              array('class' => 'reg'));
-    } else {
-        echo html_writer::start_tag('ul');
-        foreach ($regs as $user) {
-            if ($showidnumber) {
-                $idnumber = ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')';
-            } else {
-                $idnumber = '';
-            }
-            if (!in_array($user->id, $moodlereg)) {
-                echo html_writer::tag('li', fullname($user).$idnumber,
-                                      array('class' => 'registered'));
-            } else {
-                echo html_writer::tag('li', fullname($user).$idnumber,
-                                      array('class' => 'moodlereg'));
-            }
+    $group = $grouptool->get_active_groups(true, true, $agrpid);
+    $group = current($group);
+
+    echo $OUTPUT->heading($group->name, 2, 'showmembersheading');
+
+    // Add data attributes for JS!
+    $registered = array();
+    if (!empty($group->registered)) {
+        foreach ($group->registered AS $cur) {
+            $registered[] = $cur->userid;
         }
-        echo html_writer::end_tag('ul');
+    }
+    $members = array_keys($group->moodle_members);
+    $queued = array();
+    if (!empty($group->queued)) {
+        foreach ($group->queued AS $cur) {
+            $queued[$cur->userid] = $cur->userid;
+        }
+    }
+    // Get all registered users with moodle-group-membership!
+    $absregs = array_intersect($registered, $members);
+    $absregs = array_combine($absregs, $absregs);
+    // Get all registered users without moodle-group-membership!
+    $gtregs = array_diff($registered, $members);
+    $gtregs = array_combine($gtregs, $gtregs);
+    // Get all moodle-group-members without registration!
+    $mdlregs = array_diff($members, $registered);
+    $mdlregs = array_combine($mdlregs, $mdlregs);
+
+    $context = new stdClass();
+    $context->courseid = $cm->course;
+    $context->showidnumber = $showidnumber;
+    $context->profileurl = $CFG->wwwroot . '/user/view.php?course='.$cm->course.'&id=';
+    $helpicon = new help_icon('status', 'mod_grouptool');
+    $context->statushelp = $helpicon->export_for_template($OUTPUT);
+    $context->name = $group->name;
+
+    // Cache needed user records right now!
+    $userfields = get_all_user_name_fields(true);
+    if ($showidnumber) {
+        $fields = "id,idnumber,".$userfields;
+    } else {
+        $fields = "id,".$userfields;
+    }
+    $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
+
+    $context->absregs = array();
+    if (!empty($absregs)) {
+        foreach ($absregs as $cur) {
+            // These user records are fully fetched in $group->moodle_members!
+            $context->absregs[] = array('idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                                        'fullname' => fullname($group->moodle_members[$cur]),
+                                        'id'       => $cur);
+        }
     }
 
-    echo $OUTPUT->heading(get_string('queue', 'grouptool'), 3, 'showmembersheading queue');
-    // Get queue but exclude all who are just marked not queued!
-    $queuesql = "SELECT $userfieldssql
-                 FROM {grouptool_queued} queue
-                     LEFT JOIN {user} usr ON queue.userid = usr.id
-                 WHERE queue.agrpid = ?
-                 ORDER BY timestamp ASC";
-    if (!$queue = $DB->get_records_sql($queuesql, array($agrpid))) {
-        echo html_writer::tag('div', get_string('nobody_queued', 'grouptool'), array('class' => 'queue'));
-    } else {
-        echo html_writer::start_tag('ol');
-        foreach ($queue as $user) {
-            if ($showidnumber) {
-                $idnumber = ' ('.(($user->idnumber == "") ? '-' : $user->idnumber).')';
-            } else {
-                $idnumber = '';
-            }
-            echo html_writer::tag('li', fullname($user).$idnumber,
-                                  array('class' => 'queue'));
+    $context->gtregs = array();
+    if (!empty($gtregs)) {
+        foreach ($gtregs as $cur) {
+            $context->gtregs[] = array('idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                                       'fullname' => fullname($users[$cur]),
+                                       'id'       => $cur);
         }
-        echo html_writer::end_tag('ol');
     }
+
+    $context->mregs = array();
+    if (!empty($mdlregs)) {
+        foreach ($mdlregs as $cur) {
+            $context->mregs[] = array('idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                                      'fullname' => fullname($group->moodle_members[$cur]),
+                                      'id'       => $cur);
+        }
+    }
+
+    $context->queued = array();
+    if (!empty($queued)) {
+        $queuedlist = $DB->get_records('grouptool_queued', array('agrpid' => $group->agrpid), 'timestamp ASC');
+        foreach ($queued as $cur) {
+            $context->queued[] = array('idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                                       'fullname' => fullname($users[$cur]),
+                                       'id'       => $cur,
+                                       'rank'     => $this->get_rank_in_queue($queuedlist, $cur));
+        }
+    }
+
+    // This will call the function to load and render our template.
+    echo $OUTPUT->box($OUTPUT->render_from_template('mod_grouptool/groupmembers', $context), 'col-xs-12 offset-xs-0 col-lg-8 offset-lg-2');
 }
 
 echo $OUTPUT->footer();

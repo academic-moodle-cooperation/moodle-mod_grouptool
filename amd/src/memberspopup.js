@@ -26,77 +26,111 @@
  /**
   * @module mod_grouptool/memberspopup
   */
-define(['jquery', 'core/yui', 'core/config', 'core/str', 'core/url', 'core/log'], function($, Y, config, str, murl, log) {
+define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str', 'core/log'],
+       function($, ModalFactory, templates, url, str, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/memberspopup
      */
     var Memberspopup = function() {
-        this.SELECTORS = {
-            CLICKABLELINKS: 'span.memberstooltip > a',
-            FOOTER: 'div.moodle-dialogue-ft'
-        };
-
-        this.contextid = 0;
-
-        this.panel = null;
-
-        this.strings = {loading: 'Loading...'};
-    };
-
-    Memberspopup.prototype.showMembers = function(e) {
-
-        // Get group id!
-        /*
-         * In the near future we will change to a data-attribute driven
-         * AJAX call and use a hopefully soon to come moodle AMD module
-         * allowing us to call the popup without YUI in a standard way.
-         *
-         * Until then we're wrapping some YUI and start transitioning
-         * Moodle-style (see also lib/amd/notification.js)
-         *
-         * TODO: rewrite with proper moodle/jquery modules ASAP
-         * var grpid = e.target.data('groupId');
-         * var admin = e.data.admin;
-         * var strings = e.data.strings;
-         */
-        var loading = this.strings.loading;
-        // Here we are wrapping YUI. This allows us to start transitioning, but
-        // wait for a good alternative without having inconsistent dialogues.
-        Y.use('moodle-core-tooltip', function () {
-            if (!this.panel) {
-                this.panel = new M.core.tooltip({
-                    bodyhandler: this.set_body_content,
-                    footerhandler: this.set_footer,
-                    initialheadertext: loading,
-                    initialfootertext: ''
-                });
-            }
-
-            // Call the tooltip setup.
-            this.panel.display_panel(e);
-        });
+        this.showidnumber = false;
+        this.courseid = '';
     };
 
     var instance = new Memberspopup();
 
-    instance.initializer = function(params) {
+    instance.initializer = function(config) {
 
-        instance.contextid = params.contextid;
+        instance.showidnumber = config.showidnumber;
+        instance.courseid = config.courseid;
 
-        str.get_string('loading', 'grouptool').done(function (s) {
-            instance.strings = {loading: s};
-        }).fail(function (e) {
-            log.error('Error while retrieving strings: ' + e, "grouptool");
+        log.info('Initialize groupmembers JS!', 'mod_grouptool');
+
+        if (!instance.modal) {
+            instance.modalpromise = ModalFactory.create({
+                type: ModalFactory.types.MODAL,
+                body: '...'
+            });
+        }
+
+        str.get_string('groupmembers').done(function(s) {
+            log.info('Done loading strings...', 'mod_grouptool');
+            instance.modalpromise.done(function(modal) {
+                log.info('Done preparing modal...', 'mod_grouptool');
+                instance.modal = modal;
+                $('#registration_form').on('click', 'span.memberstooltip > a', null, function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    var element = $( e.target );
+
+                    var statushelp = element.parents('form').data('statushelp');
+
+                    var absregs;
+                    try {
+                        absregs = element.data('absregs');
+                    } catch (ex) {
+                        absregs = [];
+                    }
+
+                    var gtregs;
+                    try {
+                        gtregs = element.data('gtregs');
+                    } catch (ex) {
+                        gtregs = [];
+                    }
+
+                    var mregs;
+                    try {
+                        mregs = element.data('mregs');
+                    } catch (ex) {
+                        mregs = [];
+                    }
+
+                    var queued;
+                    try {
+                        queued = element.data('queued');
+                    } catch (ex) {
+                        queued = [];
+                    }
+
+                    var name;
+                    try {
+                        name = s + ': ' + element.data('name');
+                    } catch (ex) {
+                        name = s;
+                    }
+
+                    var context = {
+                        courseid: instance.courseid,
+                        showidnumber: instance.showidnumber,
+                        profileurl: url.relativeUrl("/user/view.php?course=" + instance.courseid + "&id="),
+                        statushelp: statushelp,
+                        absregs: absregs,
+                        gtregs: gtregs,
+                        mregs: mregs,
+                        queued: queued
+                    };
+
+                    // This will call the function to load and render our template.
+                    var promise = templates.render('mod_grouptool/groupmembers', context);
+
+                    // How we deal with promise objects is by adding callbacks.
+                    promise.done(function(source) {
+                        // Here eventually I have my compiled template, and any javascript that it generated.
+                        instance.modal.setTitle(name);
+                        instance.modal.setBody(source);
+                        instance.modal.show();
+                    }).fail(function(ex) {
+                        // Deal with this exception (I recommend core/notify exception function for this).
+                        instance.modal.setBody(ex.message);
+                        instance.modal.show();
+                    });
+                });
+            });
+        }).fail(function(ex) {
+            log.error("Error getting strings: " + ex, "mod_grouptool");
         });
-
-        /*
-         * Just another hint for the future implementation:
-         *
-         * $(instance.SELECTORS.CLICKABLELINKS).on('click', null, {strings: strings, admin: this}, instance.display_panel);
-         */
-        Y.one('body').delegate('click', instance.showMembers, instance.SELECTORS.CLICKABLELINKS, instance);
     };
 
     return instance;

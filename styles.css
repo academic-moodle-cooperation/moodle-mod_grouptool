@@ -185,48 +185,12 @@
 }
 
 /*styles for view->registration*/
-
-#memberspopupbox {
-    background: #fff;
+.path-mod-grouptool .showmembersoverlay table {
+    width: 100%;
 }
 
-#memberspopupbox .yui3-widget-hd {
-    background: linear-gradient(to bottom, #fff, #ccc) repeat scroll 0 0 transparent;
-    border-bottom: 1px solid #bbb;
-    border-radius: 10px 10px 0 0;
-    color: #333;
-    font-size: 12px;
-    font-weight: normal;
-    letter-spacing: 1px;
-    margin: 0;
-    padding: 5px;
-    text-align: right;
-    text-shadow: 1px 1px 1px #fff;
-}
-
-#memberspopupbox .yui3-widget-bd {
-    color: #555;
-    font-size: 12px;
-    line-height: 2em;
-    overflow: auto;
-    padding: 1em;
-}
-
-#memberspopupbox .yui3-widget-ft {
-    background-color: #fff;
-    font-size: 12px;
-    margin: 0.7em 1em;
-    padding: 0;
-    text-align: right;
-}
-
-#memberspopupbox .yui3-overlay-content {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 10px 10px 10px 10px;
-    box-shadow: 5px 5px 20px 0 #666;
-    margin-left: -3px;
-    margin-top: -3px;
+.path-mod-grouptool .showmembersoverlay table thead {
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .path-mod-grouptool #registration_form .group {
