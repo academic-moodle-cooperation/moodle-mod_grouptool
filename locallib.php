@@ -2718,10 +2718,11 @@ EOS;
      * @param int $groupingid optional filter by a single grouping-id
      * @param bool $indexbygroup optional index returned array by {groups}.id
      *                                    instead of {grouptool_agrps}.id
+     * @param bool $includeinactive optional include also inactive groups - despite the method being called get_active_groups()!
      * @return array of objects containing all necessary information about chosen active groups
      */
     private function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
-                                       $groupid=0, $groupingid=0, $indexbygroup=true) {
+                                       $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false) {
         global $DB, $PAGE, $CFG;
 
         require_capability('mod/grouptool:view_groups', $this->context);
@@ -2769,13 +2770,20 @@ EOS;
 
         $params['agrpgrptlid'] = $this->cm->instance;
 
+        if (!$includeinactive) {
+            $active = " AND agrp.active = 1 ";
+        } else {
+            $active = "";
+        }
+
         $groupdata = $DB->get_records_sql("
-                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order
+                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                          agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :agrpgrptlid
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
-                    WHERE agrp.grouptoolid = :grouptoolid AND agrp.active = 1".
+                    WHERE agrp.grouptoolid = :grouptoolid ".$active.
                           $agrpidwhere.$groupidwhere.$groupingidwhere."
                  GROUP BY grp.id, agrp.id
                  ORDER BY sort_order ASC, name ASC", $params);
@@ -4974,9 +4982,10 @@ EOS;
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group (groupid not agroupid!)
      * @param bool $onlydata optional return object with raw data not html-fragment-string
+     * @param bool $includeinactive optional include inactive groups too!
      * @return string|object either html-fragment representing table or raw data as object
      */
-    public function group_overview_table($groupingid = 0, $groupid = 0, $onlydata = false) {
+    public function group_overview_table($groupingid = 0, $groupid = 0, $onlydata = false, $includeinactive = false) {
         global $OUTPUT, $CFG, $DB;
         if (!$onlydata) {
             $orientation = optional_param('orientation', 0, PARAM_BOOL);
@@ -4986,13 +4995,14 @@ EOS;
                                                 'groupid'     => $groupid,
                                                 'orientation' => $orientation,
                                                 'sesskey'     => sesskey(),
-                                                'tab'         => 'overview'));
+                                                'tab'         => 'overview',
+                                                'inactive'    => $includeinactive));
         } else {
             $return = array();
         }
 
         // We just get an overview and fetch data later on a per group basis to save memory!
-        $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid);
+        $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid, true, $includeinactive);
         $groupids = array_keys($agrps);
         $groupinfo = groups_get_all_groups($this->grouptool->course);
         $userinfo = array();
@@ -5017,16 +5027,19 @@ EOS;
             // We give each group 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
             core_php_time_limit::raise(30);
             if (!$onlydata) {
-                if ($syncstatus[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
+                if (!$agrp->active) {
+                    echo $OUTPUT->box_start('generalbox groupcontainer dimmed_text');
+                } else if ($syncstatus[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
                     echo $OUTPUT->box_start('generalbox groupcontainer uptodate');
                 } else {
                     echo $OUTPUT->box_start('generalbox groupcontainer outdated');
                 }
-                $groupinfos = $OUTPUT->heading($groupinfo[$agrp->id]->name, 3);
+                $groupinfos = $OUTPUT->heading($groupinfo[$agrp->id]->name.($agrp->active ? '' : ' ('.get_string('inactive').')'),
+                                               3);
                 flush();
             } else {
                 $groupdata = new stdClass();
-                $groupdata->name = $groupinfo[$agrp->id]->name;
+                $groupdata->name = $groupinfo[$agrp->id]->name.($agrp->active ? '' : ' ('.get_string('inactive').')');
             }
 
             // Get all registered userids!
@@ -5395,11 +5408,12 @@ EOS;
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
+     * @param int $includeinactive optional include inactive groups too!
      */
-    public function download_overview_pdf($groupid=0, $groupingid=0) {
+    public function download_overview_pdf($groupid=0, $groupingid=0, $includeinactive=false) {
         global $USER;
 
-        $data = $this->group_overview_table($groupingid, $groupid, true);
+        $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $pdf = new \mod_grouptool\pdf();
         $pdf->setFontSubsetting(false);
@@ -5522,10 +5536,11 @@ EOS;
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
+     * @param bool $includeinactive optional include inactive groups too!
      * @return object raw data
      */
-    public function download_overview_raw($groupid=0, $groupingid=0) {
-        return $this->group_overview_table($groupid, $groupingid, true);
+    public function download_overview_raw($groupid=0, $groupingid=0, $includeinactive=false) {
+        return $this->group_overview_table($groupid, $groupingid, true, $includeinactive);
     }
 
     /**
@@ -5533,12 +5548,13 @@ EOS;
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
+     * @param int $includeinactive optional include inactive groups too!
      */
-    public function download_overview_txt($groupid=0, $groupingid=0) {
+    public function download_overview_txt($groupid=0, $groupingid=0, $includeinactive=false) {
         ob_start();
         $return = "";
         $lines = array();
-        $groups = $this->group_overview_table($groupingid, $groupid, true);
+        $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
         if (count($groups) > 0) {
             $lines[] = "*** ".get_string('status', 'grouptool')."\n";
             foreach (explode("</li>", get_string('status_help', 'grouptool')) as $legendline) {
@@ -6117,8 +6133,9 @@ EOS;
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
+     * @param bool $includeinactive optional include inactive groups too!
      */
-    public function download_overview_ods($groupid=0, $groupingid=0) {
+    public function download_overview_ods($groupid=0, $groupingid=0, $includeinactive=false) {
         global $CFG;
 
         require_once($CFG->libdir . "/odslib.class.php");
@@ -6138,7 +6155,7 @@ EOS;
         }
         $workbook = new MoodleODSWorkbook("-");
 
-        $groups = $this->group_overview_table($groupingid, $groupid, true);
+        $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $this->overview_fill_workbook($workbook, $groups);
 
@@ -6151,8 +6168,9 @@ EOS;
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
+     * @param bool $includeinactive optional include inactive groups too!
      */
-    public function download_overview_xlsx($groupid = 0, $groupingid = 0) {
+    public function download_overview_xlsx($groupid = 0, $groupingid = 0, $includeinactive=false) {
         global $CFG;
 
         require_once($CFG->libdir . "/excellib.class.php");
@@ -6174,7 +6192,7 @@ EOS;
         }
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
 
-        $groups = $this->group_overview_table($groupingid, $groupid, true);
+        $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $this->overview_fill_workbook($workbook, $groups);
 
@@ -6347,12 +6365,14 @@ EOS;
         $groupid = optional_param('groupid', 0, PARAM_INT);
         $groupingid = optional_param('groupingid', 0, PARAM_INT);
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
+        $includeinactive = optional_param('inactive', 0, PARAM_BOOL);
         $url = new moodle_url($PAGE->url, array('sesskey'     => sesskey(),
                                                 'groupid'     => $groupid,
                                                 'groupingid'  => $groupingid,
-                                                'orientation' => $orientation));
+                                                'orientation' => $orientation,
+                                                'inactive'    => $includeinactive));
 
-            // Process submitted form!
+        // Process submitted form!
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed?!
             $hideform = 0;
@@ -6425,6 +6445,14 @@ EOS;
                              1 => get_string('landscape', 'grouptool'));
             $orientationselect = new single_select($url, 'orientation', $options, $orientation, false);
 
+            if ($includeinactive) {
+                $inactivetext = get_string('inactivegroups_hide', 'grouptool');
+                $inactiveurl = new moodle_url($url, array('inactive' => 0));
+            } else {
+                $inactivetext = get_string('inactivegroups_show', 'grouptool');
+                $inactiveurl = new moodle_url($url, array('inactive' => 1));
+            }
+
             $syncstatus = $this->get_sync_status();
 
             if ($syncstatus[0]) {
@@ -6447,10 +6475,12 @@ EOS;
                                   array('class' => 'centered grouptool_overview_filter')).
                  html_writer::tag('div', get_string('orientation', 'grouptool').'&nbsp;'.
                                          $OUTPUT->render($orientationselect),
-                                  array('class' => 'centered grouptool_userlist_filter'));
+                                  array('class' => 'centered grouptool_overview_filter')).
+                 html_writer::tag('div', html_writer::link($inactiveurl, $inactivetext),
+                                  array('class' => 'centered grouptool_overview_filter'));
 
             // If we don't only get the data, the output happens directly per group!
-            $this->group_overview_table($groupingid, $groupid);
+            $this->group_overview_table($groupingid, $groupid, false, $includeinactive);
         }
     }
 

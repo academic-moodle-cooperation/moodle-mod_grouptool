@@ -42,8 +42,10 @@ require_capability('mod/grouptool:export', $context);
 
 $groupingid = optional_param('groupingid', 0, PARAM_INT);
 $groupid = optional_param('groupid', 0, PARAM_INT);
+$includeinactive = optional_param('inactive', 0, PARAM_BOOL);
 $PAGE->url->param('groupingid', $groupingid);
 $PAGE->url->param('groupid', $groupid);
+$PAGE->url->param('inactive', $includeinactive);
 
 $modinfo = get_fast_modinfo($cm->course);
 $cm = $modinfo->get_cm($cm->id);
@@ -128,19 +130,19 @@ switch ($tab) {
         switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                echo $instance->download_overview_pdf($groupid, $groupingid);
+                echo $instance->download_overview_pdf($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                echo $instance->download_overview_txt($groupid, $groupingid);
+                echo $instance->download_overview_txt($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                echo $instance->download_overview_xlsx($groupid, $groupingid);
+                echo $instance->download_overview_xlsx($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                echo $instance->download_overview_ods($groupid, $groupingid);
+                echo $instance->download_overview_ods($groupid, $groupingid, $includeinactive);
                 break;
             default:
 
