@@ -77,6 +77,9 @@ CHANGELOG
 v 2016061702
 -------------------------
 *) Make name and description searchable
+*) It's now possible to display inactive groups in the course view & group view tables
+*) Users now get unqueued if they're registered to a group via import or event observer (moodle group administration)
+*) New group creation mode: "N groups of size M" enables users to create N groups with groupsize M
 
 v 2016061701
 -------------------------
