@@ -29,8 +29,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016061700;
-$plugin->release   = "v3.1.0";           // User-friendly version number.
+$plugin->version   = 2016061701;
+$plugin->release   = "v3.1.1";           // User-friendly version number.
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2016052300;         // Requires this Moodle version!
 $plugin->component = 'mod_grouptool';    // To check on upgrade, that module sits in correct place.

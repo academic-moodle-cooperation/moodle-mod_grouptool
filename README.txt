@@ -74,6 +74,10 @@ INSTALLATION
 
 CHANGELOG
 ================================================================================
+v 2016061701
+-------------------------
+*) fixed a bug preventing users from being promoted from queue after others unregister
+
 v 2016061700
 -------------------------
 *) removed deprecated gif icon
