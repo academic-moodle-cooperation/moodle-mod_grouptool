@@ -3045,7 +3045,7 @@ EOS;
                     }
                     // Get next queued user and put him in the group (and delete queue entry)!
                     if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
-                        $this->fill_from_queue();
+                        $this->fill_from_queue($agrpid);
                     }
                     if ($userid == $USER->id) {
                         return array(false, get_string('unreg_you_from_group_success', 'grouptool',
