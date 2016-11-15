@@ -139,6 +139,8 @@ class activegroup {
      * @return void
      */
     public function load_groupings() {
+        global $DB;
+
         $this->groupings = $DB->get_records_sql_menu("SELECT groupingid, name
                                                         FROM {groupings_groups}
                                                    LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id

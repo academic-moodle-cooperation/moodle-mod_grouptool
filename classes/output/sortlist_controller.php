@@ -56,9 +56,7 @@ class sortlist_controller implements \renderable {
         $action = optional_param('class_action', 0, \PARAM_ALPHA);
         $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);
 
-        if (!empty($gobutton) && ($classes != null)
-            && (count($classes) != 0) && !empty($action)) {
-            $keys = array();
+        if (!empty($gobutton) && ($classes != null) && (count($classes) != 0) && !empty($action)) {
 
             $groups = array();
             foreach ($classes as $groupingid) {

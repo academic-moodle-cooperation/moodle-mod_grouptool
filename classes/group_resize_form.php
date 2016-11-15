@@ -48,8 +48,8 @@ class group_resize_form extends \moodleform {
      * Definition of resize form
      */
     protected function definition() {
+        global $DB;
 
-        global $CFG, $PAGE, $DB;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -60,13 +60,9 @@ class group_resize_form extends \moodleform {
         $mform->setDefault('instance', $this->_customdata['instance']);
         $mform->setType('instance', PARAM_INT);
 
-        $context = \context_module::instance($this->_customdata['id']);
         $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
         $course = $DB->get_record('course', array('id' => $cm->course));
-        $this->course = $course;
-        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
         $group = $DB->get_record('groups', array('id' => $this->_customdata['resize']));
-        $coursecontext = \context_course::instance($cm->course);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_admin');
@@ -109,7 +105,7 @@ class group_resize_form extends \moodleform {
      *               or an empty array if everything is OK.
      */
     public function validation($data, $files) {
-        global $CFG, $DB;
+        global $DB;
 
         $errors = parent::validation($data, $files);
         $sql = '

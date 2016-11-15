@@ -77,7 +77,6 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $data->course = $this->get_courseid();
 
         $data->timedue = $this->apply_date_offset($data->timedue);
@@ -108,7 +107,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * @param stdClass $data data for this grouptools active group entry
      */
     protected function process_grouptool_agrp($data) {
-        global $DB, $OUTPUT;
+        global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -138,7 +137,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * @param stdClass $data data for this registration entry
      */
     protected function process_agrp_registration($data) {
-        global $DB, $OUTPUT;
+        global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;

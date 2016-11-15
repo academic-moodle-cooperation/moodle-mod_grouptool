@@ -64,7 +64,7 @@ class group_creation_form extends \moodleform {
      * Definition of group creation form
      */
     protected function definition() {
-        global $CFG, $DB, $PAGE;
+        global $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -262,7 +262,6 @@ class group_creation_form extends \moodleform {
      *               or an empty array if everything is OK.
      */
     public function validation($data, $files) {
-        global $DB;
         $parenterrors = parent::validation($data, $files);
         $errors = array();
         if (!empty($data['createGroups']) && $data['grouping'] == "-1"

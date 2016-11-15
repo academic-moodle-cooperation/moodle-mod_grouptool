@@ -222,7 +222,6 @@ class sortlist implements \renderable {
      */
     public function _refresh_select_state() {
         global $COURSE;
-        $classes = optional_param_array('groupings', array(0), \PARAM_INT);
         $action = optional_param('class_action', 0, \PARAM_ALPHA);
         $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);
 
@@ -235,8 +234,6 @@ class sortlist implements \renderable {
         }
 
         if (!empty($action)) {
-            $keys = array();
-
             $groups = array();
             foreach ($groupings as $groupingid) {
                 $groups = array_merge($groups, groups_get_all_groups($COURSE->id, 0, $groupingid));

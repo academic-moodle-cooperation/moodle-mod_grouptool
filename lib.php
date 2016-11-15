@@ -70,10 +70,9 @@ function grouptool_supports($feature) {
  * of the new instance.
  *
  * @param stdClass $grouptool An object from the form in mod_form.php
- * @param mod_grouptool_mod_form $mform
  * @return int The id of the newly inserted grouptool record
  */
-function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mform = null) {
+function grouptool_add_instance(stdClass $grouptool) {
     global $DB, $CFG;
 
     $grouptool->timecreated = time();
@@ -160,15 +159,13 @@ function grouptool_add_instance(stdClass $grouptool, mod_grouptool_mod_form $mfo
  * will update an existing instance with new data.
  *
  * @param stdClass $grouptool An object from the form in mod_form.php
- * @param mod_grouptool_mod_form $mform
  * @return boolean Success/Fail
  */
-function grouptool_update_instance(stdClass $grouptool, mod_grouptool_mod_form $mform = null) {
+function grouptool_update_instance(stdClass $grouptool) {
     global $DB, $CFG;
 
     $grouptool->timemodified = time();
     $grouptool->id = $grouptool->instance;
-    $cmid = $grouptool->coursemodule;
 
     if (!isset($grouptool->use_size)) {
         $grouptool->use_size = 0;
@@ -334,7 +331,7 @@ function grouptool_update_queues($grouptool = 0) {
 
             if ($records = $DB->get_records_sql($sql, array_merge(array($min),
                                                                  $params, array($agrpid)))) {
-                foreach ($records as $id => $record) {
+                foreach ($records as $record) {
                     if (!empty($grouptool->use_size) && ($groupregs[$agrpid] >= $size)) {
                         // Group is full!
                         break;
@@ -382,7 +379,7 @@ function grouptool_update_queues($grouptool = 0) {
  * @return boolean Success/Failure
  */
 function grouptool_delete_instance($id) {
-    global $DB, $CFG;
+    global $DB;
 
     if (! $grouptool = $DB->get_record('grouptool', array('id' => $id))) {
         return false;
@@ -426,7 +423,7 @@ function grouptool_delete_instance($id) {
  *                        will know about (most noticeably, an icon).
  */
 function grouptool_get_coursemodule_info($coursemodule) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbparams = array('id' => $coursemodule->instance);
     $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
@@ -445,29 +442,6 @@ function grouptool_get_coursemodule_info($coursemodule) {
         }
     }
     return $result;
-}
-
-/**
- * Returns a small object with summary information about what a
- * user has done with a given particular instance of this module
- * Used for user activity reports.
- * $return->time = the time they did it
- * $return->info = a short text description
- *
- * @todo do we need this here?
- * @param \stdClass $course courseobject
- * @param \stdClass $user userobject
- * @param \stdClass $mod moduleobject
- * @param \stdClass $grouptool grouptool object
- *
- * @return stdClass|null
- */
-function grouptool_user_outline($course, $user, $mod, $grouptool) {
-
-    $return = new stdClass();
-    $return->time = 0;
-    $return->info = '';
-    return $return;
 }
 
 /**
@@ -492,8 +466,7 @@ function grouptool_get_extra_capabilities() {
  * @param stdClass $module module object
  * @param cm_info $cm cousre module info object
  */
-function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module,
-                                     cm_info $cm) {
+function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
     global $DB;
     $context = context_module::instance($cm->id);
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
@@ -529,7 +502,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     if (has_capability('mod/grouptool:register_students', $context)
             || ($regopen && has_capability('mod/grouptool:register', $context))) {
         $url = new moodle_url('/mod/grouptool/view.php', array('id' => $cm->id, 'tab' => 'selfregistration'));
-        $tmp = $navref->add(get_string('selfregistration', 'grouptool'), $url);
+        $navref->add(get_string('selfregistration', 'grouptool'), $url);
     }
 
     if (has_capability('mod/grouptool:register_students', $context)) {
@@ -553,19 +526,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     }
 
     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
-}
-
-/**
- * Extends the settings navigation with the grouptool settings
- *
- * This function is called when the context for the page is a grouptool module.
- * This is not called by AJAX so it is safe to rely on the $PAGE.
- *
- * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node $grouptoolnode {@link navigation_node}
- */
-function grouptool_extend_settings_navigation(settings_navigation $settingsnav,
-                                              navigation_node $grouptoolnode=null) {
 }
 
 /**
@@ -614,7 +574,7 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
  * @param string[] $htmlarray
  */
 function grouptool_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG, $DB, $OUTPUT;
+    global $USER, $CFG;
 
     require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
@@ -645,7 +605,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
                 $attrib['class'] = 'dimmed';
             }
-            list($cc, $nused) = grouptool_display_lateness(time(), $grouptool->timedue);
+            list($cc, ) = grouptool_display_lateness(time(), $grouptool->timedue);
             $str .= html_writer::tag('div', $strgrouptool.': '.
                     html_writer::tag('a', $grouptool->name, $attrib),
                     array('class' => 'name'));
@@ -843,10 +803,8 @@ function grouptool_reset_course_form_definition(&$mform) {
 
 /**
  * Course reset form defaults.
- *
- * @param sdtClass $course courseobject
  */
-function grouptool_reset_course_form_defaults($course) {
+function grouptool_reset_course_form_defaults() {
     return array('reset_grouptool_registrations'     => 1,
                  'reset_grouptool_queues'            => 1,
                  'reset_grouptool_agrps'             => 0,

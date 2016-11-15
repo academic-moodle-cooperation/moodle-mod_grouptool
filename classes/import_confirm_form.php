@@ -49,8 +49,8 @@ class import_confirm_form extends \moodleform {
      * Definition of import form
      */
     protected function definition() {
+        global $DB;
 
-        global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -59,7 +59,6 @@ class import_confirm_form extends \moodleform {
         $this->context = \context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-        $course = $DB->get_record('course', array('id' => $cm->course));
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'import');

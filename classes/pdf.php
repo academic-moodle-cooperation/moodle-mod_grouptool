@@ -248,9 +248,7 @@ class pdf extends \pdf {
      * @param stdClass[] $moodlemembers the users registered in moodle-group
      *
      */
-    public function add_grp_overview($groupname, $groupinfo, $registration=array(), $queue=array(),
-                                     $moodlemembers = array()) {
-        $scale = $this->getPageWidth() / 210;
+    public function add_grp_overview($groupname, $groupinfo, $registration=array(), $queue=array(), $moodlemembers = array()) {
 
         // Calculate height.
         $this->setFontSize(1.25 * NORMLINEHEIGHT);
@@ -400,7 +398,6 @@ class pdf extends \pdf {
     public function add_userdata($name, $idnumber, $email, $registrations, $queues, $header=false,
                                  $getheightonly=false) {
         global $SESSION;
-        $scale = $this->getPageWidth() / 210;
 
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
@@ -418,10 +415,6 @@ class pdf extends \pdf {
             // Store current object!
             $this->startTransaction();
 
-            // Store starting values!
-            $starty = $this->GetY();
-
-            $startpage = $this->getPage();
             $height = 0;
         }
 
@@ -458,7 +451,7 @@ class pdf extends \pdf {
         }
         $widths = array();
         foreach ($basicwidths as $column => $width) {
-            $widths[$column] = $basicwidths[$column] * ($totalwidth / $colapsedwidth) * $writewidth;
+            $widths[$column] = $width * ($totalwidth / $colapsedwidth) * $writewidth;
         }
         // Set the last column to stretch over the rest of the page!
         end($widths);
@@ -520,7 +513,7 @@ class pdf extends \pdf {
         if (!in_array('queues', $collapsed)) {
             if (!empty($queues) && is_array($queues)) {
                 $queuesstrings = array();
-                foreach ($queues as $key => $queue) {
+                foreach ($queues as $queue) {
                     $queuesstrings[] = $queue['name'].' (#'.$queue['rank'].')';
                 }
                 if ($getheightonly) {

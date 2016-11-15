@@ -47,7 +47,7 @@ class renderer extends \plugin_renderer_base {
      * @return    string
      */
     public function render_sortlist(sortlist $sortlist) {
-        global $CFG, $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT;
 
         if (empty($sortlist->groups) || !is_array($sortlist->groups) || count($sortlist->groups) == 0) {
             switch ($sortlist->filter) {
@@ -73,8 +73,6 @@ class renderer extends \plugin_renderer_base {
         }
 
         // Generate draggable items - each representing 1 group!
-        $dragableitems = "";
-        $showmembersstr = get_string('show_members', 'grouptool');
         $moveupstr = get_string('moveup', 'grouptool');
         $movedownstr = get_string('movedown', 'grouptool');
         $dragstr = get_string('drag', 'grouptool');
@@ -83,12 +81,6 @@ class renderer extends \plugin_renderer_base {
         $deletestr = get_string('delete');
         $renamestr = get_string('rename');
         $resizestr = get_string('resize', 'grouptool');
-        $groupsizestr = get_string('size', 'grouptool');
-        reset($sortlist->groups);
-        $firstkey = key($sortlist->groups);
-        end($sortlist->groups);
-        $lastkey = key($sortlist->groups);
-        reset($sortlist->groups);
         $table = new \html_table();
         $table->data = array();
         $table->attributes['class'] .= ' table table-striped ';
@@ -108,7 +100,7 @@ class renderer extends \plugin_renderer_base {
 
             $classes = array('checkbox_status', 'class0');
             if (!empty($group->groupings) && (count($group->groupings) > 0)) {
-                foreach ($group->groupings as $groupingid => $grouping) {
+                foreach (array_keys($group->groupings) as $groupingid) {
                     $classes[] .= 'class'.$groupingid;
                 }
             }
@@ -130,8 +122,6 @@ class renderer extends \plugin_renderer_base {
                     'value' => (!empty($group->order) ? $group->order : 999999),
                     'class' => 'sort_order');
 
-            $showmemberslink = \html_writer::tag('a', $showmembersstr, array('href' => 'somewhere',
-                                                                             'title' => $showmembersstr));
             $moveupattr = array('src'   => $OUTPUT->pix_url('i/up'),
                                 'alt'   => $moveupstr,
                                 'title' => $moveupstr,
@@ -337,7 +327,6 @@ class renderer extends \plugin_renderer_base {
         $selectall = \html_writer::tag('span', get_string('select', 'grouptool'));
         $selectnone = \html_writer::tag('span', get_string('deselect', 'grouptool'));
         $inverseselection = \html_writer::tag('span', get_string('invert', 'grouptool'));
-        $checkboxcontrolelements = array();
 
         // Static controlelements for all elements!
         $options = array(\html_writer::tag('option', get_string('all'), array('value' => '0')));

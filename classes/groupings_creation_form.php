@@ -47,8 +47,8 @@ class groupings_creation_form extends \moodleform {
      * Definition of administration form
      */
     protected function definition() {
+        global $DB;
 
-        global $CFG, $DB, $PAGE;
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
@@ -57,8 +57,6 @@ class groupings_creation_form extends \moodleform {
         $this->context = \context_module::instance($this->_customdata['id']);
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', array('id' => $cm->course));
-        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
-        $coursecontext = \context_course::instance($cm->course);
 
         foreach ($this->_customdata['selected'] as $select) {
             $mform->addElement('hidden', 'selected['.$select.']');
@@ -119,7 +117,6 @@ class groupings_creation_form extends \moodleform {
      *               or an empty array if everything is OK.
      */
     public function validation($data, $files) {
-        global $DB;
         $parenterrors = parent::validation($data, $files);
         $errors = array();
 
