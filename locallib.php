@@ -4900,7 +4900,7 @@ EOS;
                             $options = array(-1 => get_string('move_user', 'grouptool'),
                                              $userinfo->id => get_string('skip_user_import', 'grouptool'));
                             $cell = get_string('import_conflict_user_queued', 'grouptool', $data).
-                                                      html_writer::tag('div', html_writer::select($options, "ignored_{$group}[]", -1, false));
+                                    html_writer::tag('div', html_writer::select($options, "ignored_{$group}[]", -1, false));
                             $row->cells[] = $cell;
                             $row->attributes['class'] = 'prevconflict';
                         } else {
@@ -7193,7 +7193,6 @@ EOS;
         $coursename = $this->course->fullname;
         $grouptoolname = $this->grouptool->name;
 
-        $return = "";
         $lines = array();
         $users = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
         if (count($users) > 0) {
@@ -7267,9 +7266,8 @@ EOS;
      * @param stdClass[] $orderby current sort-array
      * @param string[] $collapsed current collapsed columns
      */
-    private function userlist_fill_workbook(&$workbook, $data=array(), $orderby=array(),
-                                            $collapsed=array()) {
-        global $SESSION, $CFG;
+    private function userlist_fill_workbook(&$workbook, $data=array(), $collapsed=array()) {
+        global $CFG;
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         if (count($data) > 0) {
             if (count($data) > 1) {
@@ -7527,7 +7525,7 @@ EOS;
 
         $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
 
-        $this->userlist_fill_workbook($workbook, $data, $orderby, $collapsed);
+        $this->userlist_fill_workbook($workbook, $data, $collapsed);
 
         if (!empty($groupid)) {
             $filename = $coursename . '_' . $grouptoolname . '_' .

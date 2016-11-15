@@ -26,8 +26,9 @@
  */
 
 define('AJAX_SCRIPT', true);
+require_once(dirname(__FILE__) . '/../../config.php');
+
 try {
-    require_once(dirname(__FILE__) . '/../../config.php');
     require_once($CFG->libdir .'/grouplib.php');
     require_once($CFG->dirroot.'/group/lib.php');
     require_once($CFG->dirroot.'/mod/grouptool/locallib.php');

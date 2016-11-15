@@ -105,7 +105,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
         });
 
         if (neworderparams !== '') {
-            var contextid = instance.contextid;
+            var contextid = $('.path-mod-grouptool .drag_list tbody').data('context');
             var infoNode = '';
             // Start AJAX Call to update order in DB!
             var cfg = {
@@ -286,6 +286,7 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
         instance.lang = param.lang;
 
         log.info('Initialize Grouptool sortlist', 'grouptool');
+        $('.path-mod-grouptool .drag_list tbody').data('context', instance.contextid);
         $('.path-mod-grouptool .drag_list tbody').sortable({
             containment: '.drag_list tbody',
             cursor: 'move',

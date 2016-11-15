@@ -26,6 +26,8 @@
  */
 namespace mod_grouptool;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once('../../lib/pdflib.php');
 
 define('NORMLINEHEIGHT', 12);

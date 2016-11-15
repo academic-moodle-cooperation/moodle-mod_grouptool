@@ -46,14 +46,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function definition() {
 
-        global $CFG, $DB, $PAGE, $OUTPUT;
+        global $CFG, $DB, $OUTPUT;
         $mform = $this->_form;
         $maxregs = 0;
         $queues = 0;
         if ($update = optional_param('update', 0, PARAM_INT)) {
             $cm = get_coursemodule_from_id('grouptool', $update);
             $course = $DB->get_record('course', array('id' => $cm->course));
-            $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
             $sql = '
   SELECT MAX(regcnt)
     FROM (SELECT COUNT(reg.id) AS regcnt
