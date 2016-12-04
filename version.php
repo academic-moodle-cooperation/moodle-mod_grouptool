@@ -15,22 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * version.php Defines the version of grouptool
+ * Version information
  *
- * This code fragment is called by moodle_needs_upgrading() and /admin/index.php
- *
- * @package       mod_grouptool
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_grouptool
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016061702;
-$plugin->release   = "v3.2.0-dev";           // User-friendly version number.
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->requires  = 2016052300;         // Requires this Moodle version!
-$plugin->component = 'mod_grouptool';    // To check on upgrade, that module sits in correct place.
+$plugin->version   = 2017012500;
+$plugin->requires  = 2016120500;
+$plugin->component = 'mod_grouptool';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = "v3.2.0";

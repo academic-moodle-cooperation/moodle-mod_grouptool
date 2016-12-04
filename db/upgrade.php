@@ -15,21 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * db/upgrade.php
+ * Upgrade code for install
  *
- * @package       mod_grouptool
- * @author        Andreas Hruska (andreas.hruska@tuwien.ac.at)
- * @author        Katarzyna Potocka (katarzyna.potocka@tuwien.ac.at)
- * @author        Philipp Hager
- * @copyright     2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_grouptool
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Execute grouptool upgrade from the given old version
- * @todo clean before first release (don't need to take all the db-changes with us)
  *
  * @param int $oldversion
  * @return bool
@@ -489,7 +486,7 @@ function xmldb_grouptool_upgrade($oldversion) {
     // Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this!
 
-    if ($oldversion < 2016120500) {
+    if ($oldversion < 2017012500) {
 
         $table = new xmldb_table('grouptool');
 
@@ -514,7 +511,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         }
 
         // Grouptool savepoint reached.
-        upgrade_mod_savepoint(true, 2016120500, 'grouptool');
+        upgrade_mod_savepoint(true, 2017012500, 'grouptool');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.
