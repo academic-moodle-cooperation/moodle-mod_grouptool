@@ -2909,18 +2909,16 @@ EOS;
             $userfrom = core_user::get_noreply_user();
             $moodlemessage->component         = 'mod_grouptool';
             $moodlemessage->name              = 'grouptool_moveupreg';
+            $moodlemessage->courseid          = $this->course->id;
             $moodlemessage->userfrom          = $userfrom;
             $moodlemessage->userto            = $messageuser;
             $moodlemessage->subject           = $postsubject;
             $moodlemessage->fullmessage       = $posttext;
             $moodlemessage->fullmessageformat = FORMAT_HTML;
             $moodlemessage->fullmessagehtml   = $posthtml;
-            $moodlemessage->smallmessage      = get_string('register_you_in_group_success',
-                                                           'grouptool', $message);
-
+            $moodlemessage->smallmessage      = get_string('register_you_in_group_success', 'grouptool', $message);
             $moodlemessage->notification      = 1;
-            $moodlemessage->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.
-                                                $this->cm->id;
+            $moodlemessage->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.$this->cm->id;
             $moodlemessage->contexturlname    = $this->grouptool->name;
 
             message_send($moodlemessage);
