@@ -26,8 +26,8 @@
  /**
   * @module mod_grouptool/memberspopup
   */
-define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str', 'core/log'],
-       function($, ModalFactory, templates, url, str, log) {
+define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str', 'core/log'], function($, ModalFactory, templates,
+                                                                                                        url, str, log) {
 
     /**
      * @constructor

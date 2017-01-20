@@ -140,7 +140,6 @@ class group_creation_form extends \moodleform {
             $mform->setDefault('mode', GROUPTOOL_GROUPS_AMOUNT);
             $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
-            // Number of groups
             $mform->addElement('text', 'numberofgroups', get_string('number_of_groups', 'grouptool'), array('size' => '4'));
             $mform->disabledIf('numberofgroups', 'mode', 'eq', GROUPTOOL_MEMBERS_AMOUNT);
             $mform->disabledif ('numberofgroups', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
@@ -148,14 +147,12 @@ class group_creation_form extends \moodleform {
             $mform->setType('numberofgroups', PARAM_INT);
             $mform->setDefault('numberofgroups', 2);
 
-            // Number of group members
             $mform->addElement('text', 'numberofmembers', get_string('number_of_members', 'grouptool'), array('size' => '4'));
             $mform->disabledIf('numberofmembers', 'mode', 'eq', GROUPTOOL_GROUPS_AMOUNT);
             $mform->disabledif ('numberofmembers', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->setType('numberofmembers', PARAM_INT);
             $mform->setDefault('numberofmembers', $grouptool->grpsize);
 
-            // From-To-Group
             $fromto = array();
             $fromto[] = $mform->createElement('text', 'from', get_string('from'));
             $mform->setDefault('from', 0);

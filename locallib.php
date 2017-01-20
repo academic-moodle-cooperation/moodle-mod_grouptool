@@ -6301,14 +6301,14 @@ EOS;
         // Add data attributes for JS!
         $registered = array();
         if (!empty($group->registered)) {
-            foreach ($group->registered AS $cur) {
+            foreach ($group->registered as $cur) {
                 $registered[] = $cur->userid;
             }
         }
         $members = array_keys($group->moodle_members);
         $queued = array();
         if (!empty($group->queued)) {
-            foreach ($group->queued AS $cur) {
+            foreach ($group->queued as $cur) {
                 $queued[$cur->userid] = $cur->userid;
             }
         }

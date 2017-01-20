@@ -67,14 +67,14 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     // Add data attributes for JS!
     $registered = array();
     if (!empty($group->registered)) {
-        foreach ($group->registered AS $cur) {
+        foreach ($group->registered as $cur) {
             $registered[] = $cur->userid;
         }
     }
     $members = array_keys($group->moodle_members);
     $queued = array();
     if (!empty($group->queued)) {
-        foreach ($group->queued AS $cur) {
+        foreach ($group->queued as $cur) {
             $queued[$cur->userid] = $cur->userid;
         }
     }
@@ -145,7 +145,8 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     }
 
     // This will call the function to load and render our template.
-    echo $OUTPUT->box($OUTPUT->render_from_template('mod_grouptool/groupmembers', $context), 'col-xs-12 offset-xs-0 col-lg-8 offset-lg-2');
+    $class = 'col-xs-12 offset-xs-0 col-lg-8 offset-lg-2';
+    echo $OUTPUT->box($OUTPUT->render_from_template('mod_grouptool/groupmembers', $context), $class);
 }
 
 echo $OUTPUT->footer();
