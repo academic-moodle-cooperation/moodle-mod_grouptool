@@ -217,7 +217,7 @@ $string['grading'] = 'Grading';
 $string['grading_activity_title'] = 'Activity';
 $string['grading_alt'] = 'Tools for copying grades from 1 group member to all others in the group, either for 1 group or for a set of groups.';
 $string['grading_filter_select_title'] = 'Group or groups';
-$string['grading_filter_select_title_help'] = 'Choose which group or groups to use:<ul><li>without conflicts - all groups, in which only 1 group member got graded for the chosen activity</li><li>all - all groups</li><li>"group-name" - only the specifically selected group</li></ul>';
+$string['grading_filter_select_title_help'] = 'Choose which group or groups to use:<ul><li>Without conflicts - all groups, in which only 1 group member got graded for the chosen activity</li><li>All - all groups</li><li>"Group-name" - only the specifically selected group</li></ul>';
 $string['grading_grouping_select_title'] = 'Filter grouping';
 $string['groupchange_from_non_unique_reg'] = 'Can\'t change group due to non unique former group!';
 $string['group_administration'] = 'Administrate groups';
@@ -504,9 +504,9 @@ $string['show_members_help'] = 'Enables students (under certain circumstances) t
     <li><strong>Own - after registration:</strong> show user\'s own groups\' members after he/she registered himself/herself or has been registered by someone else</li>
     <li><strong>Yes:</strong> show groups\' members</li>
 </ul>';
-$string['showafterdue'] = 'all - after due date';
-$string['showownafterdue'] = 'own - after due date';
-$string['showownafterreg'] = 'own - after registration';
+$string['showafterdue'] = 'All - after due date';
+$string['showownafterdue'] = 'Own - after due date';
+$string['showownafterreg'] = 'Own - after registration';
 $string['size'] = 'Group size';
 $string['size_grp'] = 'Group size settings';
 $string['size_grp_help'] = 'If group size is activated the maximum members for each group get limited (set for the whole instance via text field). If additionally the "individual size" is activated, the group size for each group can be defined in the following list.';
