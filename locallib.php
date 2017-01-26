@@ -1632,73 +1632,6 @@ class mod_grouptool {
     }
 
     /**
-     * returns a checkboxcontroller (like in moodleform - just without form)
-     *
-     * @param int $groupid ID of checkboxgroup to control (--> checkbox has class "checkboxgroupX")
-     * @param string $text optional text to output before submitlink
-     * @param string[] $attributes optional array of attributes for submitlink
-     * @param bool $originalvalue optional state of checkboxes @ first load
-     * @return string HTML Fragment containing html table with necessary data/elements or message
-     */
-    public function add_checkbox_controller($groupid, $text = null, $attributes = null,
-                                            $originalvalue = 0) {
-        global $CFG;
-
-        // Set the default text if none was specified!
-        if (empty($text)) {
-            $text = get_string('selectallornone', 'form');
-        }
-
-        $selectvalue = optional_param('checkbox_controller'.$groupid, null, PARAM_INT);
-
-        if ($selectvalue == 0 || is_null($selectvalue)) {
-            $newselectvalue = 1;
-        } else {
-            $newselectvalue = 0;
-        }
-
-        $attr = array('type'  => 'hidden',
-                      'name'  => 'checkbox_controller'.$groupid,
-                      'value' => $newselectvalue);
-        $hiddenstate = html_writer::empty_tag('input', $attr);
-
-        $chckbxcntrlname = 'nosubmit_checkbox_controller' . $groupid;
-
-        // Prepare Javascript for submit element!
-        $js = "\n//<![CDATA[\n";
-        if (!defined('HTML_QUICKFORM_CHECKBOXCONTROLLER_EXISTS')) {
-            $js .= <<<EOS
-function html_quickform_toggle_checkboxes(group) {
-    var checkboxes = document.getElementsByClassName('checkboxgroup' + group);
-    var newvalue = false;
-    var global = eval('html_quickform_checkboxgroup' + group + ';');
-    if (global == 1) {
-        eval('html_quickform_checkboxgroup' + group + ' = 0;');
-        newvalue = '';
-    } else {
-        eval('html_quickform_checkboxgroup' + group + ' = 1;');
-        newvalue = 'checked';
-    }
-
-    for (i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].checked = newvalue;
-    }
-}
-EOS;
-            define('HTML_QUICKFORM_CHECKBOXCONTROLLER_EXISTS', true);
-        }
-        $js .= "\nvar html_quickform_checkboxgroup$groupid=$originalvalue;\n";
-
-        $js .= "//]]>\n";
-
-        require_once("$CFG->libdir/form/submitlink.php");
-        $submitlink = new MoodleQuickForm_submitlink($chckbxcntrlname, $text, $attributes);
-        $submitlink->_js = $js;
-        $submitlink->_onclick = "html_quickform_toggle_checkboxes($groupid); return false;";
-        return $hiddenstate."<div>".$submitlink->toHTML()."</div>";
-    }
-
-    /**
      * returns table used in group-grading form
      *
      * @param int $activity ID of activity to get/set grades from/for
@@ -1713,7 +1646,7 @@ EOS;
      * @return string HTML Fragment containing checkbox-controller and dependencies
      */
     private function get_grading_table($activity, $mygroupsonly, $incompleteonly, $filter, $selected, $missingsource = array()) {
-        global $OUTPUT, $USER;
+        global $OUTPUT, $USER, $PAGE;
 
         // If he want's to grade all he needs the corresponding capability!
         if (!$mygroupsonly) {
@@ -1825,14 +1758,19 @@ EOS;
                 $selectattr = array(
                         'type' => 'checkbox',
                         'name' => 'selected[]',
-                        'value' => $group->id,
-                        'class' => 'checkboxgroup1');
+                        'value' => $group->id);
+                $checkboxcontroller = optional_param('select', '', PARAM_ALPHA);
                 if ((count($groupmembers) <= 1) || count($userwithgrades) == 0) {
                     $selectattr['disabled'] = 'disabled';
+                    unset($selectattr['checked']);
+                } else if ($checkboxcontroller == 'all') {
+                    $selectattr['checked'] = "checked";
+                } else if ($checkboxcontroller == 'none') {
                     unset($selectattr['checked']);
                 } else if (isset($selected[$group->id]) && $selected[$group->id] == 1) {
                     $selectattr['checked'] = "checked";
                 }
+
                 $select = new html_table_cell(html_writer::empty_tag('input', $selectattr));
                 $name = new html_table_cell($group->name);
                 if (empty($gradeinfo)) {
@@ -1876,23 +1814,23 @@ EOS;
                     $grademax = $gradinginfo->items[0]->grademax;
                     $finalgrade->formatted_grade = round($finalgrade->grade, 2) .' / ' .
                                                     round($grademax, 2);
-                    $checked = (isset($selected[$groupmember->id])
-                                && ($selected[$groupmember->id] == 1)) ? true : false;
-                    $row[] = html_writer::checkbox('selected[]', $groupmember->id, $checked, '',
-                                                   array('class' => 'checkbox checkboxgroup1'));
-                    $row[] = html_writer::tag('div', fullname($groupmember),
-                                              array('class' => 'fullname'.$groupmember->id));
-                    $row[] = html_writer::tag('div', $groupmember->idnumber,
-                                              array('class' => 'idnumber'.$groupmember->id));
-                    $row[] = html_writer::tag('div', $finalgrade->formatted_grade,
-                                              array('class' => 'grade'.$groupmember->id));
-                    $row[] = html_writer::tag('div',
-                                              shorten_text(strip_tags($finalgrade->str_feedback),
-                                                           15),
+                    $checkboxcontroller = optional_param('select', '', PARAM_ALPHA);
+                    if ($checkboxcontroller == 'all') {
+                        $checked = true;
+                    } else if ($checkboxcontroller == 'none') {
+                        $checked = false;
+                    } else {
+                        $checked = (isset($selected[$groupmember->id])
+                                    && ($selected[$groupmember->id] == 1)) ? true : false;
+                    }
+                    $row[] = html_writer::checkbox('selected[]', $groupmember->id, $checked, '', array('class' => 'checkbox'));
+                    $row[] = html_writer::tag('div', fullname($groupmember), array('class' => 'fullname'.$groupmember->id));
+                    $row[] = html_writer::tag('div', $groupmember->idnumber, array('class' => 'idnumber'.$groupmember->id));
+                    $row[] = html_writer::tag('div', $finalgrade->formatted_grade, array('class' => 'grade'.$groupmember->id));
+                    $row[] = html_writer::tag('div', shorten_text(strip_tags($finalgrade->str_feedback), 15),
                                               array('class' => 'feedback'.$groupmember->id));
                     if ($mygroupsonly && ($finalgrade->usermodified != $USER->id)) {
-                        $row[] = html_writer::tag('div', get_string('not_graded_by_me',
-                                                                    'grouptool'));
+                        $row[] = html_writer::tag('div', get_string('not_graded_by_me', 'grouptool'));
                     } else {
                         if (GROUPTOOL_IE7_IS_DEAD) {
                             $row[] = html_writer::tag('button',
@@ -1939,16 +1877,22 @@ EOS;
         $table->head = $tableheaders;
         // Instead of the strings an array of html_table_cells can be used for the rows!
         $table->data = $data;
+        $overwrite = optional_param('overwrite', 0, PARAM_BOOL);
+        $grouping = optional_param('grouping', 0, PARAM_INT);
+        $baseurl = new \moodle_url($PAGE->url, array('activity' => $activity,
+                                                     'mygroups_only' => $mygroupsonly,
+                                                     'incomplete_only' => $incompleteonly,
+                                                     'filter' => $filter,
+                                                     'overwrite' => $overwrite,
+                                                     'grouping' => $grouping));
+        $selectallurl = new \moodle_url($baseurl, array('select' => 'all'));
+        $selectnoneurl = new \moodle_url($baseurl, array('select' => 'none'));
+        $links = get_string('select').' '.
+                 \html_writer::link($selectallurl, get_string('all'), array('class' => 'select_all')).'/'.
+                 \html_writer::link($selectnoneurl, get_string('none'), array('class' => 'select_none'));
+        $checkboxcontroller = html_writer::tag('div', $links, array('class' => 'checkboxcontroller'));
 
-        $return = $title.
-                  html_writer::tag('div', $this->add_checkbox_controller(1, null, null, 0),
-                                   array('class' => 'checkboxcontroller')).
-                  html_writer::table($table).$tablepostfix;
-        $return = html_writer::tag('div',
-                                   html_writer::tag('div', $return,
-                                                    array('class' => 'fieldsetsimulation')),
-                                   array('class' => 'clearfix'));
-        return $return;
+        return $title.$checkboxcontroller.html_writer::table($table).$tablepostfix;
     }
 
     /**
@@ -2664,6 +2608,7 @@ EOS;
                     'method' => 'post',
                     'action' => $PAGE->url,
                     'name'   => 'grading_form',
+                    'id'     => 'grading_form',
                     'class'  => 'mform');
             // Print form!
             echo html_writer::tag('form', $formcontent, $formattr);

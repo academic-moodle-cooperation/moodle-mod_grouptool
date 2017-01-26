@@ -99,6 +99,23 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
     instance.initializer = function(params) {
         instance.contextid = params.contextid;
         $(this.SELECTORS.GROUPINGSELECT).on('change', null, this, instance.update_groups);
+
+        var selects = $('#grading_form input[name="selected[]"]');
+
+        $('#grading_form').on('click', '.checkboxcontroller a.select_all', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // Select all!
+            selects.prop('checked', true);
+        });
+        $('#grading_form').on('click', '.checkboxcontroller a.select_none', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // Deselect all!
+            selects.prop('checked', false);
+        });
     };
 
     return instance;
