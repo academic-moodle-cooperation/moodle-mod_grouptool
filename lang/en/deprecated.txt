@@ -4,3 +4,4 @@ grouptool:view_regs_course_overview,mod_grouptool
 group_or_member_count,mod_grouptool
 includedeleted,mod_grouptool
 includedeleted_help,mod_grouptool
+queues_max,mod_grouptool

@@ -196,33 +196,62 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addElement('header', 'queue_and_multiple_reg',
                            get_string('queue_and_multiple_reg_title', 'grouptool'));
 
-        $queue = array();
-        $queue[] = $mform->createElement('text', 'queues_max',
-                                         get_string('queues_max', 'grouptool'),
-                                         array('size' => '3'));
-        $queue[] = $mform->createElement('checkbox', 'use_queue', '',
-                                         get_string('use_queue', 'grouptool'));
+        $usequeueel = $mform->createElement('checkbox', 'use_queue', get_string('use_queue', 'grouptool'));
         if ($queues > 0) {
             $mform->addElement('html', $OUTPUT->notification(get_string('queuespresenterror', 'grouptool'), 'info'));
+            $usequeueel->setPersistantFreeze(1);
+            $usequeueel->setValue(1);
+            $usequeueel->freeze();
         }
-        $mform->addGroup($queue, 'queue_grp',
-                         get_string('queues_max', 'grouptool'), ' ', false);
+        $mform->addElement($usequeueel);
         $mform->setType('use_queue', PARAM_BOOL);
         $usequeue = get_config('mod_grouptool', 'use_queue');
         $mform->setDefault('use_queue', (($usequeue !== false) ? $usequeue : 0));
-        $mform->disabledif ('use_queue', 'allow_reg', 'equal', 1);
-        $mform->setType('queues_max', PARAM_INT);
-        $maxqueues = get_config('mod_grouptool', 'max_queues');
-        $mform->setDefault('queues_max', (($maxqueues !== false) ? $maxqueues : 1));
-        $mform->addHelpButton('queue_grp', 'queuesgrp', 'grouptool');
-        if ($queues > 0) {
-            $queue[1]->setPersistantFreeze(1);
-            $queue[1]->setValue(1);
-            $queue[1]->freeze();
-        } else {
-            $mform->disabledif ('queues_max', 'use_queue', 'notchecked');
+        if ($queues <= 0) {
+            $mform->disabledIf('use_queue', 'allow_reg', 'equal', 1);
         }
-        $mform->disabledif ('queues_max', 'allow_reg', 'equal', 1);
+
+        $queue = array();
+        $queue[] = $mform->createElement('text', 'users_queues_limit', '', array('size' => '3'));
+        $queue[] = $mform->createElement('checkbox', 'limit_users_queues', '', get_string('limit', 'grouptool'));
+        $mform->addGroup($queue, 'users_queues_grp', get_string('users_queues_limit', 'grouptool'), ' ', false);
+        $mform->setType('users_queues_limit', PARAM_INT);
+        $maxqueues = get_config('mod_grouptool', 'users_queues_limit');
+        if (!$maxqueues) {
+            $mform->setDefault('users_queues_limit', 0);
+            $mform->setDefault('limit_users_queues', 0);
+        } else {
+            $mform->setDefault('users_queues_limit', $maxqueues);
+            $mform->setDefault('limit_users_queues', 1);
+        }
+        $mform->addHelpButton('users_queues_grp', 'users_queues_limit', 'grouptool');
+        if ($queues <= 0) {
+            $mform->disabledIf('users_queues_limit', 'use_queue', 'notchecked');
+            $mform->disabledIf('users_queues_limit', 'limit_users_queues', 'notchecked');
+        }
+        $mform->disabledIf('users_queues_limit', 'allow_reg', 'equal', 1);
+        $mform->disabledIf('limit_users_queues', 'allow_reg', 'equal', 1);
+
+        $queue = array();
+        $queue[] = $mform->createElement('text', 'groups_queues_limit', '', array('size' => '3'));
+        $queue[] = $mform->createElement('checkbox', 'limit_groups_queues', '', get_string('limit', 'grouptool'));
+        $mform->addGroup($queue, 'groups_queues_grp', get_string('groups_queues_limit', 'grouptool'), ' ', false);
+        $mform->setType('groups_queues_limit', PARAM_INT);
+        $maxqueues = get_config('mod_grouptool', 'groups_queues_limit');
+        if (!$maxqueues) {
+            $mform->setDefault('groups_queues_limit', 0);
+            $mform->setDefault('limit_groups_queues', 0);
+        } else {
+            $mform->setDefault('groups_queues_limit', $maxqueues);
+            $mform->setDefault('limit_groups_queues', 1);
+        }
+        $mform->addHelpButton('groups_queues_grp', 'groups_queues_limit', 'grouptool');
+        if ($queues <= 0) {
+            $mform->disabledIf('groups_queues_limit', 'use_queue', 'notchecked');
+            $mform->disabledIf('groups_queues_limit', 'limit_groups_queues', 'notchecked');
+        }
+        $mform->disabledIf('groups_queues_limit', 'allow_reg', 'equal', 1);
+        $mform->disabledIf('limit_groups_queues', 'allow_reg', 'equal', 1);
 
         // Prevent user from unsetting if user is registered in multiple groups!
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
@@ -312,6 +341,22 @@ class mod_grouptool_mod_form extends moodleform_mod {
     }
 
     /**
+     * Only available on moodleform_mod.
+     *
+     * @param array $defaultvalues passed by reference
+     */
+    public function data_preprocessing(&$defaultvalues) {
+        if (array_key_exists('users_queues_limit', $defaultvalues) && ($defaultvalues['users_queues_limit'] > 0)) {
+            $defaultvalues['limit_users_queues'] = 1;
+        }
+        if (array_key_exists('groups_queues_limit', $defaultvalues) && ($defaultvalues['groups_queues_limit'] > 0)) {
+            $defaultvalues['limit_groups_queues'] = 1;
+        }
+
+        parent::data_preprocessing($defaultvalues);
+    }
+
+    /**
      * Validation for mod_form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
@@ -390,16 +435,20 @@ class mod_grouptool_mod_form extends moodleform_mod {
             }
         }
 
-        if (!empty($data['use_queue']) && ($data['queues_max'] <= 0)) {
-            $errors['queues_max'] = get_string('queuesizeerror', 'grouptool');
+        if (!empty($data['use_queue']) && !empty($data['limit_groups_queues']) && ($data['groups_queues_limit'] <= 0)) {
+            $errors['groups_queues_grp'] = get_string('queuesizeerror', 'grouptool');
+        }
+
+        if (!empty($data['use_queue']) && !empty($data['limit_users_queues']) && ($data['users_queues_limit'] <= 0)) {
+            $errors['users_queues_grp'] = get_string('queuesizeerror', 'grouptool');
         }
 
         if (array_key_exists('use_queue', $data) && empty($data['use_queue']) && ($queues > 0)) {
             $errors['queue_grp'] = get_string('queuespresenterror', 'grouptool');
         }
 
-        if (!empty($data['allow_multiple']) && ($data['choose_min'] <= 0)) {
-            $errors['choose_min'] = get_string('mustbeposint', 'grouptool');
+        if (!empty($data['allow_multiple']) && ($data['choose_min'] < 0)) {
+            $errors['choose_min'] = get_string('mustbegtoeqmin', 'grouptool');
         }
 
         if (!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {

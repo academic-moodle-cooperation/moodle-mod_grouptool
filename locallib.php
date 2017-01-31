@@ -47,13 +47,13 @@ require_once($CFG->libdir.'/pdflib.php');
  */
 class mod_grouptool {
     /** @var object */
-    private $cm;
+    protected $cm;
     /** @var object */
-    private $course;
+    protected $course;
     /** @var object */
-    private $grouptool;
+    protected $grouptool;
     /** @var object instance's context record */
-    private $context;
+    protected $context;
 
     /**
      * filter all groups
@@ -2931,19 +2931,17 @@ EOS;
     }
 
     /**
-     * unregisters/unqueues a user from a certain active-group
+     * unregisters/unqueues a user from a certain active-group or throw an exception
      *
      * @param int $agrpid active-group-id to unregister/unqueue user from
      * @param int $userid user to unregister/unqueue
-     * @param bool $previewonly optional don't act, just return a preview
-     * @return array ($error, $message)
+     * @param bool $previewonly (optional) don't act, just return a preview
+     * @throws \mod_grouptool\local\exception\notenoughregs If the user hasn't enough registrations!
+     * @throws \mod_grouptool\local\exception\registration In any other case, where the user can't be unregistered!
+     * @return string $message if everything went right
      */
-    private function unregister_from_agrp($agrpid=0, $userid=0, $previewonly=false) {
+    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
         global $USER, $PAGE, $DB;
-
-        if (empty($agrpid)) {
-            print_error('missing_param', null, $PAGE->url);
-        }
 
         if (empty($userid)) {
             $userid = $USER->id;
@@ -2952,14 +2950,15 @@ EOS;
 
         $regopen = ($this->grouptool->allow_reg
                     && (($this->grouptool->timedue == 0)
-                         || (time() < $this->grouptool->timedue)));
+                         || (time() < $this->grouptool->timedue))
+                    && ($this->grouptool->timeavailable < time()));
 
         if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
-            return array(true, get_string('reg_not_open', 'grouptool'));
+            throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
         if (empty($this->grouptool->allow_unreg)) {
-            return array(true, get_string('unreg_not_allowed', 'grouptool'));
+            throw new \mod_grouptool\local\exception\registration('unreg_not_allowed');
         }
 
         $message = new stdClass();
@@ -2968,8 +2967,13 @@ EOS;
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
         $groupdata = reset($groupdata);
+
         $message->groupname = $groupdata->name;
+        $message->userid = $userid;
 
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", array($this->grouptool->id));
         list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
@@ -2981,87 +2985,82 @@ EOS;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
         if ($userregs + $userqueues <= $min) {
             if ($userid == $USER->id) {
-                return array(true, get_string('you_have_too_less_regs', 'grouptool', $message));
+                $text = 'you_have_too_less_regs';
             } else {
-                return array(true, get_string('user_has_too_less_regs', 'grouptool', $message));
+                $text = 'user_has_too_less_regs';
+            }
+
+            // Throw notenoughregs exception with custom description text!
+            throw new \mod_grouptool\local\exception\notenoughregs($text, $message);
+        }
+
+        if ($this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+            // He is registered!
+            if ($previewonly) {
+                // Shortcut here, everything seems to be fine, enough for now!
+                if ($userid == $USER->id) {
+                    return get_string('unreg_you_from_group', 'grouptool', $message);
+                } else {
+                    return get_string('unreg_from_group', 'grouptool', $message);
+                }
+            }
+
+            $records = $DB->get_records('grouptool_registered', array('agrpid' => $agrpid,
+                                                                      'userid' => $userid));
+            $DB->delete_records('grouptool_registered', array('agrpid' => $agrpid,
+                                                              'userid' => $userid));
+            if (!empty($this->grouptool->immediate_reg)) {
+                groups_remove_member($groupdata->id, $userid);
+            }
+            foreach ($records as $data) {
+                // Trigger the event!
+                $data->groupid = $groupdata->id;
+                \mod_grouptool\event\registration_deleted::create_direct($this->cm, $data)->trigger();
+            }
+            // Get next queued user and put him in the group (and delete queue entry)!
+            if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
+                $this->fill_from_queue($agrpid);
+            }
+            if ($userid == $USER->id) {
+                return get_string('unreg_you_from_group_success', 'grouptool', $message);
+            } else {
+                return get_string('unreg_from_group_success', 'grouptool', $message);
+            }
+        }
+        if ($this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+            // He is queued!
+            if ($previewonly) {
+                // Shortcut here, everything seems to be fine, enough for now!
+                if ($userid == $USER->id) {
+                    return get_string('unqueue_you_from_group', 'grouptool', $message);
+                } else {
+                    return get_string('unqueue_from_group', 'grouptool', $message);
+                }
+            }
+
+            $records = $DB->get_records('grouptool_queued', array('agrpid' => $agrpid, 'userid' => $userid));
+            $DB->delete_records('grouptool_queued', array('agrpid' => $agrpid,
+                                                          'userid' => $userid));
+            foreach ($records as $cur) {
+                // Trigger the Event!
+                $cur->groupid = $groupdata->id;
+                \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur)->trigger();
+            }
+            if ($userid == $USER->id) {
+                return get_string('unqueue_you_from_group_success', 'grouptool', $message);
+            } else {
+                return get_string('unqueue_from_group_success', 'grouptool', $message);
             }
         }
 
-        if ($groupdata) {
-            if ($this->get_rank_in_queue($groupdata->registered, $userid) != false) {
-                // He is registered!
-                if ($previewonly) {
-                    if ($userid == $USER->id) {
-                        return array(false, get_string('unreg_you_from_group', 'grouptool',
-                                                       $message));
-                    } else {
-                        return array(false, get_string('unreg_from_group', 'grouptool',
-                                                       $message));
-                    }
-                } else {
-                    $records = $DB->get_records('grouptool_registered', array('agrpid' => $agrpid,
-                                                                              'userid' => $userid));
-                    $DB->delete_records('grouptool_registered', array('agrpid' => $agrpid,
-                                                                      'userid' => $userid));
-                    if (!empty($this->grouptool->immediate_reg)) {
-                        groups_remove_member($groupdata->id, $userid);
-                    }
-                    foreach ($records as $data) {
-                        // Trigger the event!
-                        $data->groupid = $groupdata->id;
-                        \mod_grouptool\event\registration_deleted::create_direct($this->cm, $data)->trigger();
-                    }
-                    // Get next queued user and put him in the group (and delete queue entry)!
-                    if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
-                        $this->fill_from_queue($agrpid);
-                    }
-                    if ($userid == $USER->id) {
-                        return array(false, get_string('unreg_you_from_group_success', 'grouptool',
-                                                       $message));
-                    } else {
-                        return array(false, get_string('unreg_from_group_success', 'grouptool',
-                                                       $message));
-                    }
-                }
-            } else if ($this->get_rank_in_queue($groupdata->queued, $userid) != false) {
-                // He is queued!
-                if ($previewonly) {
-                    if ($userid == $USER->id) {
-                        return array(false, get_string('unqueue_you_from_group', 'grouptool',
-                                                       $message));
-                    } else {
-                        return array(false, get_string('unqueue_from_group', 'grouptool',
-                                                       $message));
-                    }
-                } else {
-                    $records = $DB->get_records('grouptool_queued', array('agrpid' => $agrpid, 'userid' => $userid));
-                    $DB->delete_records('grouptool_queued', array('agrpid' => $agrpid,
-                                                                  'userid' => $userid));
-                    foreach ($records as $cur) {
-                        // Trigger the Event!
-                        $cur->groupid = $groupdata->id;
-                        \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur)->trigger();
-                    }
-                    if ($userid == $USER->id) {
-                        return array(false, get_string('unqueue_you_from_group_success',
-                                                       'grouptool', $message));
-                    } else {
-                        return array(false, get_string('unqueue_from_group_success', 'grouptool',
-                                                       $message));
-                    }
-                }
-            } else {
-                if ($userid == $USER->id) {
-                    return array(true, get_string('you_are_not_in_queue_or_registered', 'grouptool',
-                                                  $message));
-                } else {
-                    return array(true, get_string('not_in_queue_or_registered', 'grouptool',
-                                                  $message));
-                }
-            }
+        // If we got here, the user was neither registered nor queued!
+        if ($userid == $USER->id) {
+            $text = get_string('you_are_not_in_queue_or_registered', 'grouptool', $message);
         } else {
-            return array(true, get_string('error_getting_data', 'grouptool'));
+            $text = get_string('not_in_queue_or_registered', 'grouptool', $message);
         }
+
+        throw new \mod_grouptool\exception\registration($text);
     }
 
     /**
@@ -3070,17 +3069,18 @@ EOS;
      * @param int $agrpid active-group-id to register/queue user to
      * @param int $userid user to register/queue
      * @param bool $previewonly optional don't act, just return a preview
-     * @param bool $movefromqueue optional whether or not the move is from the queue
-     * @return array ($error, $message)
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @throws \mod_grouptool\local\exception\registration
+     * @return string status message
      */
-    private function register_in_agrp($agrpid=0, $userid=0, $previewonly=false, $movefromqueue=false) {
+    protected function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
         global $USER, $PAGE, $DB;
 
         $grouptool = $this->grouptool;
-
-        if (empty($agrpid)) {
-            print_error('missing_param', null, $PAGE->url);
-        }
 
         if (empty($userid)) {
             $userid = $USER->id;
@@ -3093,7 +3093,7 @@ EOS;
                     && ($this->grouptool->timeavailable < time()));
 
         if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
-            return array(true, get_string('reg_not_open', 'grouptool'));
+            throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
         $message = new stdClass();
@@ -3102,459 +3102,889 @@ EOS;
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid);
-        if (count($groupdata) == 1) {
-            $groupdata = current($groupdata);
-            $message->groupname = $groupdata->name;
-            // We have to filter only active groups to ensure no problems counting userregs and -queues.
-            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($grouptool->id));
-            list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
-            array_unshift($params, $userid);
-            $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
-                                                  $params);
-            $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
-            $max = $grouptool->allow_multiple ? $grouptool->choose_max : 1;
-            $min = $grouptool->allow_multiple ? $grouptool->choose_min : 0;
-            if (!empty($groupdata->registered)
-                && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
-                // We're sorry, but user's already registered in this group!
-                if ($userid != $USER->id) {
-                    return array(true, get_string('already_registered', 'grouptool', $message));
-                } else {
-                    return array(true, get_string('you_are_already_registered', 'grouptool',
-                                                  $message));
-                }
-            }
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = current($groupdata);
 
-            if (empty($movefromqueue) && !empty($groupdata->queued)
-                && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
-                // We're sorry, but user's already queued in this group!
-                if ($userid != $USER->id) {
-                    return array(true, get_string('already_queued', 'grouptool', $message));
-                } else {
-                    return array(true, get_string('you_are_aleady_queued', 'grouptol', $message));
-                }
-            }
+        $message->groupname = $groupdata->name;
+        $message->userid = $userid;
+        // We have to filter only active groups to ensure no problems counting userregs and -queues.
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
+                                              $params);
+        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+        $max = $grouptool->allow_multiple ? $grouptool->choose_max : 1;
+        $min = $grouptool->allow_multiple ? $grouptool->choose_min : 0;
 
-            if ($this->grpmarked($groupdata->agrpid, $userid)) {
-                // Allready marked for registration?
-                if ($userid != $USER->id) {
-                    return array(true, get_string('already_marked', 'grouptool', $message));
-                } else {
-                    return array(true, get_string('you_are_already_marked', 'grouptool', $message));
-                }
-            }
-
-            if (empty($movefromqueue)
-                && ($userqueues == 1 && $userregs == $max - 1)
-                || ($userqueues + $userregs == 1 && $max == 1)) {
-                // Groupchange!
-                if (empty($grouptool->allow_unreg)) {
-                    return array(true, get_string('unreg_not_allowed', 'grouptool'));
-                }
-
-                if ($previewonly) {
-                    if (!$this->grouptool->use_size
-                        || (count($groupdata->registered) < $groupdata->grpsize)
-                        || ($this->grouptool->use_queue
-                            && $userqueues < $this->grouptool->queues_max)) {
-                        return array(-1,
-                                     get_string('change_group_to', 'grouptool', $message));
-                    } else if (!$this->grouptool->use_queue) {
-                        // Group is full!
-                        if ($userid != $USER->id) {
-                            return array(1, get_string('reg_in_full_group', 'grouptool', $message));
-                        } else {
-                            return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
-                        }
-                    } else if ($userqueues >= $this->grouptool->queues_max) {
-                        if ($userid != $USER->id) {
-                            return array(1, get_string('too_many_queue_places', 'grouptool'));
-                        } else {
-                            return array(1, get_string('you_have_too_many_queue_places', 'grouptool'));
-                        }
-                    }
-                } else if (!$this->grouptool->use_size
-                           || (count($groupdata->registered) < $groupdata->grpsize)
-                           || ($this->grouptool->use_queue
-                               && $userqueues - 1 < $this->grouptool->queues_max)) {
-                    $record = new stdClass();
-                    $record->agrpid = $agrpid;
-                    $record->userid = $userid;
-                    $record->timestamp = time();
-                    $record->modified_by = $USER->id;
-                    if ($userqueues == 1) {
-                        // Delete his queue!
-                        $queues = $DB->get_records_sql("SELECT queued.*, agrp.groupid
-                                                          FROM {grouptool_queued} queued
-                                                          JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
-                                                          WHERE userid = ? AND agrpid ".$agrpsql, $params);
-                        $DB->delete_records_select('grouptool_queued',
-                                                   "userid = ? AND agrpid ".$agrpsql, $params);
-                        foreach ($queues as $cur) {
-                            // Trigger the event!
-                            \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur);
-                        }
-                    } else if ($userregs == 1) {
-                        $oldgrp = $DB->get_field_sql("SELECT agrp.groupid
-                                                        FROM {grouptool_registered} reg
-                                                        JOIN {grouptool_agrps} agrp ON agrp.id = reg.agrpid
-                                                       WHERE reg.userid = ? AND reg.agrpid ".$agrpsql,
-                                                     $params, MUST_EXIST);
-                        $regs = $DB->get_records_select('grouptool_registered',
-                                                        "userid = ? AND agrpid ".$agrpsql, $params);
-                        $DB->delete_records_select('grouptool_registered',
-                                                   "userid = ? AND agrpid ".$agrpsql, $params);
-                        if (!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
-                            groups_remove_member($oldgrp, $userid);
-                        }
-                        foreach ($regs as $cur) {
-                            // Trigger the event!
-                            $cur->groupid = $oldgrp;
-                            \mod_grouptool\event\registration_deleted::create_direct($this->cm, $cur);
-                        }
-                    }
-                    if (!$this->grouptool->use_size
-                        || (count($groupdata->registered) < $groupdata->grpsize)) {
-                        $record->id = $DB->insert_record('grouptool_registered', $record);
-                        if ($this->grouptool->immediate_reg) {
-                            groups_add_member($groupdata->id, $userid);
-                        }
-                        // Trigger the event!
-                        $record->groupid = $groupdata->id;
-                        \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
-                    } else if ($this->grouptool->use_queue
-                               && $userqueues - 1 < $this->grouptool->queues_max) {
-                        $record->id = $DB->insert_record('grouptool_queued', $record);
-                        // Trigger the Event!
-                        $record->groupid = $groupdata->id;
-                        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();
-                    } else if (!$this->grouptool->use_queue) {
-                        // Group is full!
-                        if ($userid != $USER->id) {
-                            return array(1, get_string('reg_in_full_group', 'grouptool', $message));
-                        } else {
-                            return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
-                        }
-                    } else if ($userqueues - 1 >= $this->grouptool->queues_max) {
-                        if ($userid != $USER->id) {
-                            return array(1, get_string('too_many_queue_places', 'grouptool'));
-                        } else {
-                            return array(1, get_string('you_have_too_many_queue_places', 'grouptool'));
-                        }
-                    }
-                    if ($userid != $USER->id) {
-                        return array(-1,
-                                     get_string('change_group_to_success', 'grouptool',
-                                                $message));
-                    } else {
-                        return array(-1,
-                                     get_string('you_change_group_to_success', 'grouptool',
-                                                $message));
-                    }
-                }
-            }
-
-            if ((empty($movefromqueue) && $userregs + $userqueues >= $max)
-                 || (!empty($movefromqueue) && $userregs + $userqueues - 1 >= $max)) {
-                return array(1, get_string('too_many_regs', 'grouptool'));
-            }
-            // Get users marks!
-            $marks = $this->count_user_marks($userid);
-            if ($grouptool->use_size) {
-                if (count($groupdata->registered) < $groupdata->grpsize) {
-                    // Register!
-                    if ($previewonly) {
-                        if ($userid != $USER->id) {
-                            return array(false,
-                                         get_string('register_in_group', 'grouptool', $message));
-                        } else {
-                            return array(false,
-                                         get_string('register_you_in_group', 'grouptool',
-                                                    $message));
-                        }
-                    } else if (empty($movefromqueue) && $this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues + 1))) {
-                        // Cache data until enough registrations are made!
-                        $record = new stdClass();
-                        $record->agrpid = $agrpid;
-                        $record->userid = $userid;
-                        $record->timestamp = time();
-                        $record->modified_by = -1;
-                        $DB->insert_record('grouptool_registered', $record);
-                        if ($userid != $USER->id) {
-                            return array(false,
-                                         get_string('place_allocated_in_group_success', 'grouptool',
-                                                    $message));
-                        } else {
-                            return array(false,
-                                         get_string('your_place_allocated_in_group_success', 'grouptool',
-                                                    $message));
-                        }
-                    } else {
-                        if ($this->grouptool->allow_multiple) {
-                            // Enough registrations have been made, save them!
-                            if (!empty($marks)) {
-                                $usermarks = $this->get_user_marks($userid);
-                                foreach ($usermarks as $cur) {
-                                    if ($cur->type == 'reg') {
-                                        unset($cur->type);
-                                        $cur->modified_by = $USER->id;
-                                        $DB->update_record('grouptool_registered', $cur);
-                                        if ($this->grouptool->immediate_reg) {
-                                            groups_add_member($cur->groupid, $cur->userid);
-                                        }
-                                    } else {
-                                        unset($cur->type);
-                                        $DB->insert_record('grouptool_queued', $cur);
-                                    }
-                                }
-                                $this->delete_user_marks($userid);
-                            }
-                        }
-                        $record = new stdClass();
-                        $record->agrpid = $agrpid;
-                        $record->userid = $userid;
-                        $record->timestamp = time();
-                        $record->modified_by = $USER->id;
-                        $record->id = $DB->insert_record('grouptool_registered', $record);
-                        if ($this->grouptool->immediate_reg) {
-                            groups_add_member($groupdata->id, $userid);
-                        }
-                        $record->groupid = $groupdata->id;
-                        \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
-
-                        $regcnt = $this->get_user_reg_count(0, $userid);
-                        if (($this->grouptool->allow_multiple
-                            && ($regcnt >= $this->grouptool->choose_max))
-                            || !$this->grouptool->allow_multiple) {
-                            $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                            if (count($agrps) > 0) {
-                                $agrpids = array_keys($agrps);
-                                list($sql, $params) = $DB->get_in_or_equal($agrpids);
-                                $queues = $DB->get_records_sql('SELECT queued.*, agrp.groupid
-                                                                  FROM {grouptool_queued} queued
-                                                                  JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
-                                                                 WHERE  userid = ? AND agrpid '.$sql,
-                                                               array_merge(array($userid), $params));
-                                $DB->delete_records_select('grouptool_queued',
-                                                           ' userid = ? AND agrpid '.$sql,
-                                                           array_merge(array($userid), $params));
-                                foreach ($queues as $cur) {
-                                    // Trigger the event!
-                                    \mod_grouptool\event\queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
-                                }
-                            }
-                        }
-                        if ($userid != $USER->id) {
-                            return array(false,
-                                         get_string('register_in_group_success', 'grouptool',
-                                                    $message));
-                        } else {
-                            return array(false,
-                                         get_string('register_you_in_group_success', 'grouptool',
-                                                    $message));
-                        }
-                    }
-                } else if ($grouptool->use_queue) {
-                    // Try to queue!
-                    if ($userqueues >= $grouptool->queues_max) {
-                        if ($userid != $USER->id) {
-                            return array(1, get_string('too_many_queue_places', 'grouptool'));
-                        } else {
-                            return array(1, get_string('you_have_too_many_queue_places', 'grouptool'));
-                        }
-                    }
-                    $marks = $this->count_user_marks($userid);
-                    if ($previewonly) {
-                        if ($userid != $USER->id) {
-                            return array(-1,
-                                         get_string('queue_in_group', 'grouptool', $message));
-                        } else {
-                            return array(-1,
-                                         get_string('queue_you_in_group', 'grouptool',
-                                                    $message));
-                        }
-                    } else if ($this->grouptool->allow_multiple
-                               && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues + 1))) {
-                        // Cache data until enough registrations are made!
-                        // TODO events for place allocation?
-                        $record = new stdClass();
-                        $record->agrpid = $agrpid;
-                        $record->grp_id = $groupdata->id;
-                        $record->userid = $userid;
-                        $record->timestamp = time();
-                        $record->modified_by = -1;
-                        $DB->insert_record('grouptool_registered', $record);
-                        if ($userid != $USER->id) {
-                            return array(false,
-                                         get_string('place_allocated_in_group_success', 'grouptool',
-                                                    $message));
-                        } else {
-                            return array(false,
-                                         get_string('your_place_allocated_in_group_success', 'grouptool',
-                                                    $message));
-                        }
-                    } else {
-                        if ($this->grouptool->allow_multiple) {
-                            if (!empty($marks)) {
-                                // Enough registrations have been made, save them!
-                                $usermarks = $this->get_user_marks($userid);
-                                foreach ($usermarks as $cur) {
-                                    if ($cur->type == 'reg') {
-                                        unset($cur->type);
-                                        if ($this->grouptool->immediate_reg) {
-                                            groups_add_member($cur->groupid, $cur->userid);
-                                        }
-                                        // Premature triggering because of unsetting $cur->groupid afterwards.
-                                        \mod_grouptool\event\registration_created::create_direct($this->cm, $cur)->trigger();
-                                        unset($cur->groupid);
-                                        $cur->modified_by = $USER->id;
-                                        $DB->update_record('grouptool_registered', $cur);
-                                    } else {
-                                        unset($cur->type);
-                                        // Trigger the event!
-                                        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $cur)->trigger();
-                                        unset($cur->groupid);
-                                        $cur->id = $DB->insert_record('grouptool_queued', $cur);
-                                    }
-                                }
-                                // TODO: Event for marks deletion?
-                                $this->delete_user_marks($userid);
-                            }
-                        }
-                        $record = new stdClass();
-                        $record->agrpid = $agrpid;
-                        $record->userid = $userid;
-                        $record->timestamp = time();
-                        $record->id = $DB->insert_record('grouptool_queued', $record);
-                        // Trigger the event!
-                        $record->groupid = $groupdata->id;
-                        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();
-                        if ($userid != $USER->id) {
-                            return array(-1,
-                                         get_string('queue_in_group_success', 'grouptool',
-                                                    $message));
-                        } else {
-                            return array(-1,
-                                         get_string('queue_you_in_group_success', 'grouptool',
-                                                    $message));
-                        }
-                    }
-
-                } else {
-                    // Group is full!
-                    if ($userid != $USER->id) {
-                        return array(1, get_string('reg_in_full_group', 'grouptool', $message));
-                    } else {
-                        return array(1, get_string('reg_you_in_full_group', 'grouptool', $message));
-                    }
-                }
+        if ($this->qualifies_for_groupchange($agrpid, $userid)) {
+            if ($previewonly) {
+                list(, $return) = $this->can_change_group($agrpid, $userid, $message);
             } else {
-                // Register him!
-                if ($previewonly) {
-                    if ($userid != $USER->id) {
-                        return array(false,
-                                     get_string('register_in_group', 'grouptool', $message));
-                    } else {
-                        return array(false,
-                                     get_string('register_you_in_group', 'grouptool',
-                                                $message));
-                    }
-                } else if ($this->grouptool->allow_multiple
-                           && ($this->grouptool->choose_min > ($marks + $userregs + $userqueues + 1))) {
-                    // TODO Place allocation event!
-                    // Cache data until enough registrations are made!
-                    $record = new stdClass();
-                    $record->agrpid = $agrpid;
-                    $record->grp_id = $groupdata->id;
-                    $record->userid = $userid;
-                    $record->timestamp = time();
-                    $record->modified_by = -1;
-                    $DB->insert_record('grouptool_registered', $record);
-                    if ($userid != $USER->id) {
-                        return array(false,
-                                     get_string('place_allocated_in_group_success', 'grouptool',
-                                                $message));
-                    } else {
-                        return array(false,
-                                     get_string('your_place_allocated_in_group_success', 'grouptool',
-                                                $message));
-                    }
-                } else {
-                    if ($this->grouptool->allow_multiple) {
-                        // Enough registrations have been made, save them!
-                        if ($marks) {
-                            $usermarks = $this->get_user_marks($userid);
-                            foreach ($usermarks as $cur) {
-                                if ($cur->type == 'reg') {
-                                    unset($cur->type);
-                                    $cur->modified_by = $USER->id;
-                                    if ($this->grouptool->immediate_reg) {
-                                        groups_add_member($cur->groupid, $cur->userid);
-                                    }
-                                    // Premature triggering because of unsetting $cur->groupid afterwards!
-                                    \mod_grouptool\event\registration_created::create_direct($this->cm, $cur)->trigger();
-                                    unset($cur->groupid);
-                                    $DB->update_record('grouptool_registered', $cur);
-                                } else {
-                                    unset($cur->type);
-                                    $DB->insert_record('grouptool_queued', $cur);
-                                    // Trigger the event!
-                                    \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $cur)->trigger();
-                                }
-                            }
-                            // TODO event for deletion of users marks?
-                            $this->delete_user_marks($userid);
-                        }
-                    }
-                    $record = new stdClass();
-                    $record->agrpid = $agrpid;
-                    $record->userid = $userid;
-                    $record->timestamp = time();
-                    $record->modified_by = $USER->id;
-                    $record->id = $DB->insert_record('grouptool_registered', $record);
-                    if ($this->grouptool->immediate_reg) {
-                        groups_add_member($groupdata->id, $userid);
-                    }
-                    // Trigger the event!
-                    $record->groupid = $groupdata->id;
-                    \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
+                $return = $this->change_group($agrpid, $userid, $message);
+                // If we can register, we have to convert the other marks to registrations & queue entries!
+                $this->convert_marks_to_regs($userid);
+            }
 
-                    $regcnt = $this->get_user_reg_count(0, $userid);
-                    if (($this->grouptool->allow_multiple
-                        && ($regcnt >= $this->grouptool->choose_max))
-                        || !$this->grouptool->allow_multiple) {
-                        $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
-                        if (count($agrps) > 0) {
-                            $agrpids = array_keys($agrps);
-                            list($sql, $params) = $DB->get_in_or_equal($agrpids);
-                            $queues = $DB->get_records_sql('SELECT queued.*, agrp.groupid
-                                                              FROM {grouptool_queued} queued
-                                                              JOIN {grouptool_agrps} agrp ON queued.agrpid = agrp.id
-                                                             WHERE queued.userid = ? AND queued.agrpid '.$sql,
-                                                           array_merge(array($userid), $params));
-                            $DB->delete_records_select('grouptool_queued',
-                                                       ' userid = ? AND agrpid '.$sql,
-                                                       array_merge(array($userid), $params));
-                            foreach ($queues as $cur) {
-                                // Trigger the event!
-                                \mod_grouptool\event\queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
-                            }
-                        }
-                    }
-                    if ($userid != $USER->id) {
-                        return array(false,
-                                     get_string('register_in_group_success', 'grouptool',
-                                                $message));
-                    } else {
-                        return array(false,
-                                     get_string('register_you_in_group_success', 'grouptool',
-                                                $message));
-                    }
+            return $return;
+        }
+
+        try {
+            // First we try to register the user!
+            if ($previewonly) {
+                $return = $this->can_be_registered($agrpid, $userid, $message);
+            } else {
+                $return = $this->add_registration($agrpid, $userid, $message);
+                // If we can register, we have to convert the other marks to registrations & queue entries!
+                $this->convert_marks_to_regs($userid);
+            }
+
+            return $return;
+        } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
+            if (!$this->grouptool->use_queue) {
+                // Shortcut: throw the exception again, if we don't use queues!
+                throw $e;
+            }
+
+            // There's no place left in the group, so we try to queue the user!
+            try {
+                if ($previewonly) {
+                    $return = $this->can_be_queued($agrpid, $userid, $message);
+                } else {
+                    $return = $this->add_queue_entry($agrpid, $userid, $message);
+                    // If we can queue, we have to convert the other marks to registrations & queue entries!
+                    $this->convert_marks_to_regs($userid);
                 }
+
+                return $return;
+            } catch (\mod_grouptool\local\exception\notenoughregs $e) {
+                // Pass it on!
+                throw $e;
+            }
+        } catch (\mod_grouptool\local\exception\notenoughregs $e) {
+            /* The user has not enough registrations, queue entries or marks,
+             * so we try to mark the user! (Exceptions get handled above!) */
+            if ($previewonly) {
+                list(, $return) = $this->can_be_marked($agrpid, $userid, $message);
+            } else {
+                $return = $this->mark_for_reg($agrpid, $userid, $message);
+            }
+
+            return $return;
+        }
+    }
+
+    /**
+     * Check if user can change the group! Works different by returning 0 or 1!
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message (optional) cached data for the language strings
+     * @return bool whether or not user qualifies for a group change
+     */
+    protected function qualifies_for_groupchange($agrpid, $userid = null, $message = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $groupdata = $this->get_active_groups(false, false, $agrpid);
+            if (count($groupdata) != 1) {
+                throw new \mod_grouptool\local\exception\registration('error_getting_data');
+            }
+            $groupdata = reset($groupdata);
+            $message->groupname = $groupdata->name;
+        }
+
+        try {
+            $this->can_change_group($agrpid, $userid, $message);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if user can change the group! Works different by returning 0 or 1!
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message (optional) cached data for the language strings
+     * @param int $oldagrpid (optional) ID of former active group
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return array with 'boolean' if queued or not and 'string' status message
+     */
+    protected function can_change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(false, false, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $message->groupname = $groupdata->name;
+        }
+
+        if (empty($this->grouptool->allow_unreg)) {
+            throw new \mod_grouptool\local\exception\registration('unreg_not_allowed');
+        }
+
+        if ($this->grpmarked($agrpid, $userid)) {
+            // Allready marked for registration!?!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
+            }
+        }
+
+        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+            // We're sorry, but user's already registered in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
+            }
+        }
+
+        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+            // We're sorry, but user's already queued in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
+            }
+        }
+
+        // We have to filter only active groups to ensure no problems counting userregs and -queues.
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
+                                              $params);
+        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+        $marks = $this->count_user_marks($userid);
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+
+        if (($oldagrpid === null)
+                && !(($userqueues == 1 && $userregs == $max - 1) || ($userqueues + $userregs == 1 && $max == 1))) {
+            // We can't determine a unique group to unreg the user from! He has to do it by manually!
+            throw new \mod_grouptool\local\exception\registration('groupchange_from_non_unique_reg');
+        }
+
+        if ($min > ($marks + $userregs + $userqueues)) {
+            // User has to have at least $min registrations+$queues+$marks to allow group-change!
+            throw new \mod_grouptool\local\exception\registration('too_many_registrations');
+        }
+
+        if ($max < ($marks + $userregs + $userqueues)) {
+            // If user has too many registrations now, we can't allow him to keep that amount!
+            throw new \mod_grouptool\local\exception\exceeduserreglimit();
+        }
+
+        $queue = 0;
+        if ($this->grouptool->use_size && (count($groupdata->registered) > $groupdata->grpsize)) {
+            if (!$this->grouptool->use_queue) {
+                // We can't register the user nor queue the user!
+                throw new \mod_grouptool\local\exception\exceedgroupsize();
+            } else if (count($groupdata->queues) >= $this->grouptool->groups_queues_limit) {
+                throw new \mod_grouptool\local\exception\exceedgroupqueuelimit();
+            }
+
+            if ($this->grouptool->users_queues_limit && ($userqueues >= $this->grouptool->users_queues_limit)
+                    && ($userqueues != 1)) {
+                // We can't queue him, due to exceeding his queue limit or not being able to determine which queue entry to unreg!
+                throw new \mod_grouptool\local\exception\exceeduserqueuelimit();
+            }
+
+            $queue = 1;
+        }
+
+        // We have no 'you'-version of the string here!
+        return array($queue, get_string('change_group_to', 'grouptool', $message));
+    }
+
+    /**
+     * Changes group for certain user. This is only possible if unreg is allowed and we can determine which group to change!
+     *
+     * @param int $agrpid ID of active group to change to
+     * @param int $userid (optional) ID of user to change group for or null ($USER->id is used).
+     * @param stdClass $message (optional) prepared message object containing username and groupname or null.
+     * @param int $oldagrpid (optional) ID of former active group
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return string success message
+     */
+    protected function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $groupdata = $this->get_active_groups(false, false, $agrpid);
+            if (count($groupdata) != 1) {
+                throw new \mod_grouptool\local\exception\registration('error_getting_data');
+            }
+            $groupdata = reset($groupdata);
+            $message->groupname = $groupdata->name;
+        }
+
+        // Check if the user can be registered or queued with respect to max registrations being incremented by 1.
+        $this->can_change_group($agrpid, $userid, $message, $oldagrpid);
+
+        // Determine from which group to change and unregister from it!
+        // We have to filter only active groups to ensure no problems counting userregs and -queues.
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
+                                              $params);
+        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+        if ($oldagrpid !== null) {
+            $sql = "SELECT queued.*, agrp.groupid
+                      FROM {grouptool_queued} queued
+                      JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
+                     WHERE userid = ? AND agrpid = ?";
+            if ($queue = $DB->get_record_sql($sql, array('userid' => $userid,
+                                                         'agrpid' => $oldagrpid), IGNORE_MISSING)) {
+
+                $DB->delete_records('grouptool_queued', array('id' => $queue->id));
+                // Trigger the event!
+                \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $queue);
+            }
+            $sql = "SELECT reg.*, agrp.groupid
+                      FROM {grouptool_registered} reg
+                      JOIN {grouptool_agrps} agrp ON agrp.id = reg.agrpid
+                     WHERE userid = ? AND agrpid = ?";
+            if ($reg = $DB->get_record_sql($sql, array('userid' => $userid,
+                                                       'agrpid' => $oldagrpid), IGNORE_MISSING)) {
+
+                $DB->delete_records('grouptool_registered', array('id' => $reg->id));
+                if (!empty($this->grouptool->immediate_reg)) {
+                    groups_remove_member($reg->groupid, $userid);
+                }
+                // Trigger the event!
+                \mod_grouptool\event\registration_deleted::create_direct($this->cm, $reg);
+            }
+        } else if ($userqueues == 1) {
+            // Delete his queue!
+            $queues = $DB->get_records_sql("SELECT queued.*, agrp.groupid
+                                              FROM {grouptool_queued} queued
+                                              JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
+                                              WHERE userid = ? AND agrpid ".$agrpsql, $params);
+            $DB->delete_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+            foreach ($queues as $cur) {
+                // Trigger the event!
+                \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur);
+            }
+        } else if ($userregs == 1) {
+            $oldgrp = $DB->get_field_sql("SELECT agrp.groupid
+                                            FROM {grouptool_registered} reg
+                                            JOIN {grouptool_agrps} agrp ON agrp.id = reg.agrpid
+                                           WHERE reg.userid = ? AND reg.agrpid ".$agrpsql,
+                                         $params, MUST_EXIST);
+            $reg = $DB->get_record_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params, '*', MUST_EXIST);
+            $DB->delete_records_select('grouptool_registered', "userid = ? AND agrpid ".$agrpsql, $params);
+            if (!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
+                groups_remove_member($oldgrp, $userid);
+            }
+
+            // Trigger the event!
+            $reg->groupid = $oldgrp;
+            \mod_grouptool\event\registration_deleted::create_direct($this->cm, $reg);
+        } else {
+            throw new \mod_grouptool\exception\registration(get_string('groupchange_from_non_unique_reg', 'grouptool'));
+        }
+
+        // Register him in the new group!
+        try {
+            // First we try to register the user!
+            $return = $this->add_registration($agrpid, $userid, $message);
+            // If we can register, we have to convert the other marks to registrations & queue entries!
+            $this->convert_marks_to_regs($userid);
+
+            return $return;
+        } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
+            if (!$this->grouptool->use_queue) {
+                // Shortcut: throw the exception again, if we don't use queues!
+                throw $e;
+            }
+
+            // There's no place left in the group, so we try to queue the user!
+            $return = $this->add_queue_entry($agrpid, $userid, $message);
+            // If we can queue, we have to convert the other marks to registrations & queue entries!
+            $this->convert_marks_to_regs($userid);
+
+            return $return;
+        }
+    }
+
+    /**
+     * Check if user can be marked for registration, else throw exception!
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message (optional) cached data for the language strings
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return array (queued, string) status message
+     */
+    protected function can_be_marked($agrpid, $userid = null, $message = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        $full = !empty($this->grouptool->groups_queues_limit)
+                && (count($groupdata->queued) >= $this->grouptool->groups_queues_limit);
+        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)
+                && (!$this->grouptool->use_queue || $full)) {
+            throw new \mod_grouptool\local\exception\exceedgroupsize();
+        }
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $message->groupname = $groupdata->name;
+        }
+
+        if ($this->grpmarked($agrpid, $userid)) {
+            // Allready marked for registration!?!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
+            }
+        }
+
+        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+            // We're sorry, but user's already registered in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
+            }
+        }
+
+        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+            // We're sorry, but user's already queued in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
+            }
+        }
+
+        // We have to filter only active groups to ensure no problems counting userregs and -queues.
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
+                                              $params);
+        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+        $marks = $this->count_user_marks($userid);
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        if ($min <= ($marks + $userregs + $userqueues)) {
+            throw new \mod_grouptool\local\exception\registration('too_many_registrations');
+        }
+        if ($max <= ($marks + $userregs + $userqueues)) {
+            throw new \mod_grouptool\local\exception\exceeduserreglimit();
+        }
+
+        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
+            if ($userid != $USER->id) {
+                return array(1, get_string('queue_in_group', 'grouptool', $message));
+            } else {
+                return array(1, get_string('queue_you_in_group', 'grouptool', $message));
             }
         } else {
-            return array(true, get_string('error_getting_data', 'grouptool'));
+            if ($userid != $USER->id) {
+                return array(0, get_string('register_in_group', 'grouptool', $message));
+            } else {
+                return array(0, get_string('register_you_in_group', 'grouptool', $message));
+            }
+        }
+    }
+
+
+    /**
+     * Allocates a place in the group. Used in case there are not enough registrations by now.
+     *
+     * @param int $agrpid ID of active group to mark registration for.
+     * @param int $userid (optional) ID of user to mark registration for or null ($USER->id is used).
+     * @param stdClass $message (optional) prepared message object containing username and groupname or null.
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return string success message
+     */
+    protected function mark_for_reg($agrpid, $userid = null, $message = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(false, false, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+
+            $message->groupname = $groupdata->name;
+        }
+
+        $this->can_be_marked($agrpid, $userid, $message);
+
+        $record = new stdClass();
+        $record->agrpid = $agrpid;
+        $record->userid = $userid;
+        $record->timestamp = time();
+        $record->modified_by = -1;
+        $DB->insert_record('grouptool_registered', $record);
+        if ($userid != $USER->id) {
+            return get_string('place_allocated_in_group_success', 'grouptool', $message);
+        } else {
+            return get_string('your_place_allocated_in_group_success', 'grouptool', $message);
+        }
+    }
+
+    /**
+     * Silently converts all of user's marks to registrations and queue entries or throws exception!
+     *
+     * @param int $userid (optional) ID of user to mark registration for or null ($USER->id is used).
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     */
+    protected function convert_marks_to_regs($userid = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        // Get user's marks!
+        $usermarks = $this->get_user_marks($userid);
+
+        $queues = 0;
+        foreach ($usermarks as $cur) {
+            if ($cur->type != 'reg') {
+                $queues++;
+            }
+        }
+        if (!empty($this->grouptool->users_queues_limit) && ($queues > $this->grouptool->users_queues_limit)) {
+            throw new \mod_grouptool\local\exception\exceeduserqueuelimit();
+        }
+
+        foreach ($usermarks as $cur) {
+            if ($cur->type == 'reg') {
+                unset($cur->type);
+                $cur->modified_by = $USER->id;
+                $DB->update_record('grouptool_registered', $cur);
+                if ($this->grouptool->immediate_reg) {
+                    groups_add_member($cur->groupid, $userid);
+                }
+            } else {
+                unset($cur->type);
+                $DB->insert_record('grouptool_queued', $cur);
+                $DB->delete_records('grouptool_registered', array('id' => $cur->id));
+            }
+        }
+        $this->delete_user_marks($userid);
+    }
+
+    /**
+     * Check if user can be queued, else throw exception!
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return string status message
+     */
+    protected function can_be_queued($agrpid, $userid = null, $message = null) {
+        global $USER, $DB;
+
+        // Shortcut if we don't use queues!
+        if (!$this->grouptool->use_queue) {
+            throw new \mod_grouptool\local\exception\exceedgroupsize();
+        }
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $message->groupname = $groupdata->name;
+        }
+
+        /* Get user's marks and also check if enough (queue) places are available,
+         * otherwise display an info and remove marked entry. */
+        $usermarks = $this->get_user_marks($userid);
+
+        $queues = $this->get_user_queues_count(0, $userid);
+        $queueswithmarks = $queues;
+        foreach ($usermarks as $cur) {
+            if ($cur->type != 'reg') {
+                $queueswitharks++;
+            }
+        }
+
+        if ($this->grouptool->users_queues_limit && (($queueswithmarks > $this->grouptool->users_queues_limit)
+                || ($queues >= $this->grouptool->users_queues_limit))) {
+            throw new \mod_grouptool\local\exception\exceeduserqueuelimit();
+        }
+
+        if ($this->grouptool->groups_queues_limit && (count($groupdata->queued) >= $this->grouptool->groups_queues_limit)) {
+            throw new \mod_grouptool\local\exception\exceedgroupqueuelimit();
+        }
+
+        // Is marked?
+        if ($this->grpmarked($agrpid, $userid)) {
+            // Allready marked for registration!?!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
+            }
+        }
+
+        // Is registered?
+        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+            // We're sorry, but user's already registered in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
+            }
+        }
+
+        // Is queued?
+        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+            // We're sorry, but user's already queued in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
+            }
+        }
+
+        // We have to filter only active groups to ensure no problems counting userregs and -queues.
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $this->get_user_reg_count(0, $userid);
+        $marks = $this->count_user_marks($userid);
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        if ($max <= ($marks + $userregs + $queues)) {
+            throw new \mod_grouptool\local\exception\exceeduserreglimit();
+        }
+        if ($min > ($marks + $userregs + $queues + 1)) {
+            // Not enough registrations/queues/marks!
+            throw new \mod_grouptool\local\exception\notenoughregs();
+        }
+
+        if ($userid != $USER->id) {
+            return get_string('queue_in_group', 'grouptool', $message);
+        } else {
+            return get_string('queue_you_in_group', 'grouptool', $message);
+        }
+    }
+
+    /**
+     * Add a queue entry for a certain user/agrp-combination.
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return string status string
+     */
+    protected function add_queue_entry($agrpid, $userid = null, $message = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(false, false, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $message->groupname = $groupdata->name;
+        }
+
+        // This method throws exceptions, if user is not able to be queued!
+        $this->can_be_queued($agrpid, $userid, $message);
+
+        $record = new stdClass();
+        $record->agrpid = $agrpid;
+        $record->userid = $userid;
+        $record->timestamp = time();
+        $record->id = $DB->insert_record('grouptool_queued', $record);
+        // Trigger the event!
+        $record->groupid = $groupdata->id;
+        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();
+        if ($userid != $USER->id) {
+            return get_string('queue_in_group_success', 'grouptool', $message);
+        } else {
+            return get_string('queue_you_in_group_success', 'grouptool', $message);
+        }
+    }
+
+    /**
+     * Check if user can be registered, else throw exception!
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return string status message
+     */
+    protected function can_be_registered($agrpid, $userid = null, $message = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+            $message->groupname = $groupdata->name;
+        }
+
+        /* Get user's marks and also check if enough (queue) places are available,
+         * otherwise display an info and remove marked entry. */
+        $usermarks = $this->get_user_marks($userid);
+
+        $queues = $this->get_user_queues_count($this->grouptool->id, $userid);
+
+        // Is marked?
+        if ($this->grpmarked($agrpid, $userid)) {
+            // Allready marked for registration!?!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
+            }
+        }
+
+        // Is registered?
+        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+            // We're sorry, but user's already registered in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
+            }
+        }
+
+        // Is queued?
+        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+            // We're sorry, but user's already queued in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
+            }
+        }
+
+        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
+            throw new \mod_grouptool\local\exception\exceedgroupsize();
+        }
+
+        $userregs = $this->get_user_reg_count($this->grouptool->id, $userid);
+        $marks = $this->count_user_marks($userid);
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        if ($max <= ($marks + $userregs + $queues)) {
+            throw new \mod_grouptool\local\exception\exceeduserreglimit();
+        }
+        if ($min > ($marks + $userregs + $queues + 1)) {
+            // Not enough registrations/queues/marks!
+            throw new \mod_grouptool\local\exception\notenoughregs();
+        }
+
+        if ($userid != $USER->id) {
+            return get_string('register_in_group', 'grouptool', $message);
+        } else {
+            return get_string('register_you_in_group', 'grouptool', $message);
+        }
+    }
+
+    /**
+     * Add a registration for a certain user/agrp-combination.
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid (optional) ID of user to register or null (then $USER->id is used)
+     * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @return string status message
+     */
+    protected function add_registration($agrpid, $userid = null, $message = null) {
+        global $DB, $USER;
+
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $groupdata = $this->get_active_groups(false, false, $agrpid);
+        if (count($groupdata) != 1) {
+            throw new \mod_grouptool\local\exception\registration('error_getting_data');
+        }
+        $groupdata = reset($groupdata);
+
+        if ($message === null) {
+            $message = new stdClass();
+            if ($userid != $USER->id) {
+                $userdata = $DB->get_record('user', array('id' => $userid));
+                $message->username = fullname($userdata);
+            } else {
+                $message->username = fullname($USER);
+            }
+
+            $message->groupname = $groupdata->name;
+        }
+
+        /* This method throws exceptions if there is a problem */
+        $this->can_be_registered($agrpid, $userid, $message);
+
+        $record = new stdClass();
+        $record->agrpid = $agrpid;
+        $record->userid = $userid;
+        $record->timestamp = time();
+        $record->modified_by = $USER->id;
+        $record->id = $DB->insert_record('grouptool_registered', $record);
+        if ($this->grouptool->immediate_reg) {
+            groups_add_member($groupdata->id, $userid);
+        }
+        // Trigger the event!
+        $record->groupid = $groupdata->id;
+        \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
+        if ($userid != $USER->id) {
+            return get_string('register_in_group_success', 'grouptool', $message);
+        } else {
+            return get_string('register_you_in_group_success', 'grouptool', $message);
         }
     }
 
@@ -3566,7 +3996,7 @@ EOS;
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
      * @return int count of queues in specified instance for specified user
      */
-    private function get_user_queues_count($grouptoolid=0, $userid=0) {
+    protected function get_user_queues_count($grouptoolid=0, $userid=0) {
         global $DB, $USER;
         if (empty($grouptoolid)) {
             $grouptoolid = $this->grouptool->id;
@@ -3597,8 +4027,9 @@ EOS;
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
      * @return int count of queues in specified instance for specified user
      */
-    private function get_user_reg_count($grouptoolid=0, $userid=0) {
+    protected function get_user_reg_count($grouptoolid=0, $userid=0) {
         global $DB, $USER;
+
         if (empty($grouptoolid)) {
             $grouptoolid = $this->grouptool->id;
         }
@@ -3778,8 +4209,6 @@ EOS;
      * @todo sometimes not every queue entry is resolved, happened unregularly on development system
      *       watch in production system
      *
-     * @param string $mode optional, without function, reserved for optional later implementation
-     *                     (random/alphabetical/... distribution, etc)
      * @param bool $previewonly show only preview of actions
      * @return array ($error, $message)
      */
@@ -3907,10 +4336,14 @@ EOS;
                 if ($curgroup !== false) {
                     // Register him or mark as planed!
                     if ($previewonly) {
-                        list($curerror, $curtext) = $this->register_in_agrp($curgroup->id,
-                                                                            $queue->userid,
-                                                                            true,
-                                                                            true);
+                        // Move user and get feedback!
+                        $curerror = 0;
+                        try {
+                            list(, $curtext) = $this->can_change_group($curgroup->id, $queue->userid, null, $queue->agrpid);
+                        } catch (\mod_grouptool\local\exception\registration $e) {
+                            $curerror = 1;
+                            $curtext = $e->getMessage();
+                        }
                         if (!$curerror) {
                             $planned->{$queue->userid}[] = $curgroup->id;
                         }
@@ -3929,10 +4362,14 @@ EOS;
                         $error = $error || $curerror;
                         $curgroup->registered++;
                     } else {
-                        list($curerror, $curtext) = $this->register_in_agrp($curgroup->id,
-                                                                            $queue->userid,
-                                                                            false,
-                                                                            true);
+                        // Move user and get feedback!
+                        $curerror = 0;
+                        try {
+                            $curtext = $this->change_group($curgroup->id, $queue->userid, null, $queue->agrpid);
+                        } catch (\mod_grouptool\local\exception\registration $e) {
+                            $curerror = 1;
+                            $curtext = $e->getMessage();
+                        }
                         $class = $curerror ? 'error' : 'success';
                         $data = new stdClass();
                         $data->userid = $queue->userid;
@@ -4013,17 +4450,21 @@ EOS;
 
         $marks = $DB->get_records_sql($sql, $params);
         foreach ($marks as $id => $cur) {
-            $groupdata = $this->get_active_groups(true, true, 0, $cur->groupid);
+            $groupdata = $this->get_active_groups(true, true, $cur->agrpid);
             $groupdata = current($groupdata);
+
             if ($this->grouptool->use_size) {
+                $notfull = empty($this->grouptool->groups_queues_limit)
+                    || (count($groupdata->queued) < $this->grouptool->groups_queues_limit);
                 if (count($groupdata->registered) < $groupdata->grpsize) {
                     $marks[$id]->type = 'reg';
-                } else if ($this->grouptool->use_queue) {
+                } else if ($this->grouptool->use_queue && $notfull) {
                     $marks[$id]->type = 'queue';
                 } else {
                     // Place occupied in the meanwhile, must look for another group!
                     $info = new stdClass();
                     $info->grpname = groups_get_group_name($cur->groupid);
+                    $info->userid = $userid;
                     echo $OUTPUT->notification(get_string('already_occupied', 'grouptool', $info), 'error');
                     $DB->delete_records('grouptool_registered', array('id' => $id));
                     unset($marks[$id]);
@@ -4045,7 +4486,7 @@ EOS;
         global $DB;
 
         $marks = $this->get_user_marks($userid);
-        if (!empty($marks)) {
+        if (is_array($marks) && count($marks) > 0) {
             list($select, $params) = $DB->get_in_or_equal(array_keys($marks));
             $select = 'id '.$select;
             $DB->delete_records_select('grouptool_registered', $select, $params);
@@ -4098,6 +4539,7 @@ EOS;
                      && (time() > $this->grouptool->timeavailable));
 
         // Process submitted form!
+        $error = false;
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed!
             $hideform = 0;
@@ -4105,23 +4547,34 @@ EOS;
             if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
                 $agrpid = required_param('group', PARAM_INT);
-                list($error, $message) = $this->unregister_from_agrp($agrpid, $USER->id);
+                // Unregister user and get feedback!
+                try {
+                    $confirmmessage = $this->unregister_from_agrp($agrpid, $USER->id);
+                } catch (\mod_grouptool\local\exception\registration $e) {
+                    $error = true;
+                    $confirmmessage = $e->getMessage();
+                }
             } else if ($action == 'reg') {
                 require_capability('mod/grouptool:register', $this->context);
                 $agrpid = required_param('group', PARAM_INT);
                 // Register user and get feedback!
-                list($error, $message) = $this->register_in_agrp($agrpid, $USER->id);
+                try {
+                    $confirmmessage = $this->register_in_agrp($agrpid, $USER->id);
+                } catch (\mod_grouptool\local\exception\registration $e) {
+                    $error = true;
+                    $confirmmessage = $e->getMessage();
+                }
             } else if ($action == 'resolvequeues') {
                 require_capability('mod/grouptool:register_students', $this->context);
-                list($error, $message) = $this->resolve_queues();
+                list($error, $confirmmessage) = $this->resolve_queues(true); // Try only!
                 if ($error == -1) {
                     $error = true;
                 }
             }
             if ($error === true) {
-                echo $OUTPUT->notification($message, 'error');
+                echo $OUTPUT->notification($confirmmessage, 'error');
             } else {
-                echo $OUTPUT->notification($message, 'success');
+                echo $OUTPUT->notification($confirmmessage, 'success');
             }
         } else if (data_submitted() && confirm_sesskey()) {
 
@@ -4152,15 +4605,23 @@ EOS;
                 require_capability('mod/grouptool:register', $this->context);
                 $attr['group'] = $agrpid;
                 // Try only!
-                list($error, $confirmmessage) = $this->unregister_from_agrp($agrpid,
-                                                                            $USER->id, true);
+                try {
+                    $confirmmessage = $this->unregister_from_agrp($agrpid, $USER->id, true);
+                } catch (\mod_grouptool\local\exception\registration $e) {
+                    $error = 1;
+                    $confirmmessage = $e->getMessage();
+                }
             } else {
                 require_capability('mod/grouptool:register', $this->context);
                 $action = 'reg';
                 $attr['group'] = $agrpid;
                 // Try only!
-                list($error, $confirmmessage) = $this->register_in_agrp($agrpid,
-                                                                        $USER->id, true);
+                try {
+                    $confirmmessage = $this->register_in_agrp($agrpid, $USER->id, true);
+                } catch (\mod_grouptool\local\exception\registration $e) {
+                    $error = 1;
+                    $confirmmessage = $e->getMessage();
+                }
             }
             $attr['confirm'] = '1';
             $attr['action'] = $action;
@@ -4372,7 +4833,7 @@ EOS;
                             $buttonattr = array('type'  => 'submit',
                                                 'name'  => 'unreg['.$group->agrpid.']',
                                                 'value' => $group->agrpid,
-                                                'class' => 'unregbutton');
+                                                'class' => 'unregbutton btn btn-secondary');
                             if ($regopen && ($userregs + $userqueues > $min)) {
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                             }
@@ -4389,7 +4850,7 @@ EOS;
                             $buttonattr = array('type'  => 'submit',
                                                 'name'  => 'unreg['.$group->agrpid.']',
                                                 'value' => $group->agrpid,
-                                                'class' => 'unregbutton');
+                                                'class' => 'unregbutton btn btn-secondary');
                             if ($regopen && ($userregs + $userqueues > $min)) {
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                             }
@@ -4402,79 +4863,97 @@ EOS;
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('grp_marked', 'grouptool'),
                                                        array('class' => 'rank'));
-                    } else if ($this->grouptool->allow_unreg
-                               && (($userqueues == 1 && $userregs == $max - 1)
-                                   || ($userregs + $userqueues == 1 && $max == 1))) {
-                        if ($regopen
-                            && (!$this->grouptool->use_size
-                                || (count($group->registered) < $group->grpsize)
-                                || ($this->grouptool->use_queue
-                                    && (count($group->registered) >= $group->grpsize)
-                                    && $userqueues < $this->grouptool->queues_max))) {
-                            // Groupchange!
-                            $label = get_string('change_group', 'grouptool');
-                            if ($this->grouptool->use_size
-                                && count($group->registered) >= $group->grpsize) {
-                                    $label .= ' ('.get_string('queue', 'grouptool').')';
-                            }
-                            $buttonattr = array('type'   => 'submit',
-                                                 'name'  => 'reg['.$group->agrpid.']',
-                                                 'value' => $group->agrpid,
-                                                 'class' => 'regbutton');
-                            $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                        } else if ($regopen && $this->grouptool->use_queue
-                                   && (count($group->registered) >= $group->grpsize)
-                                   && $userqueues >= $this->grouptool->queues_max) {
-                            // Too many queues!
-                            $grouphtml .= html_writer::tag('div',
-                                                           get_string('max_queues_reached',
-                                                                      'grouptool'),
-                                                                      array('class' => 'rank'));
-                        } else if ($regopen) {
-                            // Group is full!
-                            $grouphtml .= html_writer::tag('div',
-                                                           get_string('fullgroup',
-                                                                      'grouptool'),
-                                                                      array('class' => 'rank'));
+                    } else if ($this->qualifies_for_groupchange($group->agrpid, $USER->id)) {
+                        // Groupchange!
+                        $label = get_string('change_group', 'grouptool');
+                        if ($this->grouptool->use_size
+                            && count($group->registered) >= $group->grpsize) {
+                                $label .= ' ('.get_string('queue', 'grouptool').')';
+                                $class = "btn-secondary";
+                        } else {
+                            $class = "btn-primary";
                         }
-                    } else if ($regopen && ($userregs + $userqueues < $max)) {
-                        if (!$this->grouptool->use_size || (count($group->registered) < $group->grpsize)) {
-                            // Register button!
-                            $label = get_string('register', 'grouptool');
-                            $buttonattr = array('type'  => 'submit',
-                                                'name'  => 'reg['.$group->agrpid.']',
-                                                'value' => $group->agrpid,
-                                                'class' => 'regbutton');
-                            $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                        } else if ($this->grouptool->use_queue) {
-                            if ($userqueues < $this->grouptool->queues_max) {
-                                // Queue button!
-                                $label = get_string('queue', 'grouptool');
+                        $buttonattr = array('type'   => 'submit',
+                                             'name'  => 'reg['.$group->agrpid.']',
+                                             'value' => $group->agrpid,
+                                             'class' => 'regbutton btn '.$class);
+                        $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+
+                    } else {
+                        $message = new stdClass();
+                        $message->username = fullname($USER);
+                        $message->groupname = $group->name;
+                        $message->userid = $USER->id;
+
+                        try {
+                            try {
+                                // Can be registered?
+                                $this->can_be_registered($group->agrpid, $USER->id, $message);
+
+                                // Register button!
+                                $label = get_string('register', 'grouptool');
                                 $buttonattr = array('type'  => 'submit',
                                                     'name'  => 'reg['.$group->agrpid.']',
                                                     'value' => $group->agrpid,
-                                                    'class' => 'queuebutton');
-                                $grouphtml .= html_writer::tag('button', $label,
-                                                               $buttonattr);
-                            } else {
-                                // Too many queues!
-                                $grouphtml .= html_writer::tag('div',
-                                                               get_string('max_queues_reached',
-                                                                          'grouptool'),
-                                                                          array('class' => 'rank'));
+                                                    'class' => 'regbutton btn btn-primary');
+                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+
+                            } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
+                                if (!$this->grouptool->use_queue) {
+                                    throw new \mod_grouptool\local\exception\exceedgroupsize();
+                                } else {
+                                    // There's no place left in the group, so we try to queue the user!
+                                    $this->can_be_queued($group->agrpid, $USER->id, $message);
+
+                                    // Queue button!
+                                    $label = get_string('queue', 'grouptool');
+                                    $buttonattr = array('type'  => 'submit',
+                                                        'name'  => 'reg['.$group->agrpid.']',
+                                                        'value' => $group->agrpid,
+                                                        'class' => 'queuebutton btn btn-secondary');
+                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                                }
+                            } catch (\mod_grouptool\local\exception\notenoughregs $e) {
+                                /* The user has not enough registrations, queue entries or marks,
+                                 * so we try to mark the user! (Exceptions get handled above!) */
+                                list($queued, ) = $this->can_be_marked($group->agrpid, $USER->id, $message);
+                                if (!$queued) {
+                                    // Register button!
+                                    $label = get_string('register', 'grouptool');
+                                    $buttonattr = array('type'  => 'submit',
+                                                        'name'  => 'reg['.$group->agrpid.']',
+                                                        'value' => $group->agrpid,
+                                                        'class' => 'regbutton btn btn-primary');
+                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                                } else {
+                                    // Queue button!
+                                    $label = get_string('queue', 'grouptool');
+                                    $buttonattr = array('type'  => 'submit',
+                                                        'name'  => 'reg['.$group->agrpid.']',
+                                                        'value' => $group->agrpid,
+                                                        'class' => 'queuebutton btn btn-secondary');
+                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                                }
                             }
-                        } else {
+                        } catch (\mod_grouptool\local\exception\exceedgroupqueuelimit $e) {
                             // Group is full!
-                            $grouphtml .= html_writer::tag('div',
-                                                           get_string('fullgroup',
-                                                                      'grouptool'),
-                                                                      array('class' => 'rank'));
+                            $grouphtml .= html_writer::tag('div', get_string('fullgroup', 'grouptool'), array('class' => 'rank'));
+                        } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
+                            // Group is full!
+                            $grouphtml .= html_writer::tag('div', get_string('fullgroup', 'grouptool'), array('class' => 'rank'));
+                        } catch (\mod_grouptool\local\exception\exceeduserqueuelimit $e) {
+                            // Too many queues!
+                            $grouphtml .= html_writer::tag('div', get_string('max_queues_reached', 'grouptool'),
+                                                           array('class' => 'rank'));
+
+                        } catch (\mod_grouptool\local\exception\exceeduserreglimit $e) {
+                            $grouphtml .= html_writer::tag('div', get_string('max_regs_reached', 'grouptool'),
+                                                           array('class' => 'rank'));
+
+                        } catch (\mod_grouptool\local\exception\registration $e) {
+                            // No registration possible!
+                            $grouphtml .= html_writer::tag('div', '', array('class' => 'rank'));
                         }
-                    } else if ($regopen) {
-                        $grouphtml .= html_writer::tag('div',
-                                                       get_string('max_regs_reached',
-                                                                  'grouptool'),
-                                                                  array('class' => 'rank'));
                     }
 
                     if ($regrank !== false) {
@@ -7285,10 +7764,9 @@ EOS;
      *
      * @param MoodleExcelWorkbook $workbook workbook to put data into
      * @param stdClass[] $data userdata with headline at index 0
-     * @param stdClass[] $orderby current sort-array
-     * @param string[] $collapsed current collapsed columns
+     * @param string[] $collapsed (optional) currently collapsed columns
      */
-    private function userlist_fill_workbook(&$workbook, $data=array(), $collapsed=array()) {
+    protected function userlist_fill_workbook(&$workbook, $data, $collapsed=array()) {
         global $CFG;
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         if (count($data) > 0) {

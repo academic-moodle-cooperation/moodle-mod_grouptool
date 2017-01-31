@@ -86,13 +86,22 @@ function grouptool_add_instance(stdClass $grouptool) {
     if (!isset($grouptool->use_queue)) {
         $grouptool->use_queue = 0;
     }
+    if (!isset($grouptool->users_queues_limit)) {
+        $grouptool->users_queues_limit = 0;
+    }
+    if (!isset($grouptool->groups_queues_limit)) {
+        $grouptool->groups_queues_limit = 0;
+    }
     if (!isset($grouptool->allow_multiple)) {
         $grouptool->allow_multiple = 0;
+        $grouptool->choose_min = 0;
+        $grouptool->choose_max = 1;
+    } else {
+        $grouptool->choose_min = clean_param($grouptool->choose_min, PARAM_INT);
+        $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
     }
 
     $grouptool->grpsize = clean_param($grouptool->grpsize, PARAM_INT);
-    $grouptool->choose_min = clean_param($grouptool->choose_min, PARAM_INT);
-    $grouptool->choose_max = clean_param($grouptool->choose_max, PARAM_INT);
 
     $return = $DB->insert_record('grouptool', $grouptool);
 
@@ -177,11 +186,13 @@ function grouptool_update_instance(stdClass $grouptool) {
         $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id)
                                             FROM {grouptool_agrps} agrps
                                        LEFT JOIN {grouptool_queued} queues ON queues.agrpid = agrps.id
-                                           WHERE agrps.grouptoolid = ?", array($grouptool->instance));
+                                           WHERE agrps.grouptoolid = ? AND agrps.active = 1", array($grouptool->instance));
         if (!empty($queues)) {
             $grouptool->use_queue = 1;
         } else {
             $grouptool->use_queue = 0;
+            $grouptool->users_queues_limit = 0;
+            $grouptool->groups_queues_limit = 0;
         }
     }
     if (!isset($grouptool->allow_multiple)) {

@@ -489,6 +489,34 @@ function xmldb_grouptool_upgrade($oldversion) {
     // Moodle v3.2.0 release upgrade line.
     // Put any upgrade step following this!
 
+    if ($oldversion < 2016120500) {
+
+        $table = new xmldb_table('grouptool');
+
+        // Rename field queues_max on table grouptool to NEWNAMEGOESHERE.
+        $field = new xmldb_field('queues_max', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'use_queue');
+        // Launch rename field queues_max.
+        $dbman->rename_field($table, $field, 'users_queues_limit');
+
+        // Changing nullability of field users_queues_limit on table grouptool to not null.
+        $field = new xmldb_field('users_queues_limit', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'use_queue');
+        // Launch change of default for field users_queues_limit.
+        $dbman->change_field_default($table, $field);
+        // Launch change of nullability for field users_queues_limit.
+        $dbman->change_field_notnull($table, $field);
+
+        // Define field groups_queues_limit to be added to grouptool.
+        $field = new xmldb_field('groups_queues_limit', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0',
+                                 'users_queues_limit');
+        // Conditionally launch add field groups_queues_limit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2016120500, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
