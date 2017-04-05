@@ -243,9 +243,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic creation of grouptool instance
      *
      * 2 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_create_instance() {
         global $DB;
@@ -260,9 +257,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic registration to a single group
      *
      * 9 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_single() {
         global $DB;
@@ -336,9 +330,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic registration to a single group
      *
      * 6 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_single_queue() {
         global $DB;
@@ -401,9 +392,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic registration to multiple groups with queues
      *
      * 11 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_multiple_queue() {
         global $DB;
@@ -490,9 +478,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests if no error will be wrongly displayed if everythings correct
      *
      * 13 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_groupchange_single() {
         global $DB;
@@ -578,9 +563,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests if no error will be wrongly displayed if everythings correct
      *
      * 10 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_groupchange_multiple() {
         global $DB;
@@ -653,9 +635,6 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests resolving of queues
      *
      * 11 Assertions
-     *
-     * @group amc
-     * @group mod_grouptool
      */
     public function test_queue_resolving() {
         global $DB;
@@ -680,7 +659,7 @@ class grouptool_registration_test extends advanced_testcase {
 
         // Exercise SUT & Validate outcome!
 
-        // Register and queue users 0,1,2 in group 0 and users 3,4,5 in group 1!
+        // Register the users and queue them! Users 0,1,2 in group 0 and users 3,4,5 in group 1!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
         $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->username = fullname($this->students[1]);
