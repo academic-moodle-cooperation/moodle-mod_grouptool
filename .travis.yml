@@ -15,6 +15,7 @@ cache:
 php:
  - 5.6
  - 7.0
+ - 7.1
 
 # This section sets up the environment variables for the build.
 env:
