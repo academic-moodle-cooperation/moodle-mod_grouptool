@@ -3063,7 +3063,7 @@ class mod_grouptool {
 
         if ($this->qualifies_for_groupchange($agrpid, $userid)) {
             if ($previewonly) {
-                list(, $return) = $this->can_change_group($agrpid, $userid, $message);
+                $return = $this->can_change_group($agrpid, $userid, $message);
             } else {
                 $return = $this->change_group($agrpid, $userid, $message);
                 // If we can register, we have to convert the other marks to registrations & queue entries!
@@ -3254,7 +3254,6 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\exceeduserreglimit();
         }
 
-        $queue = 0;
         if ($this->grouptool->use_size && (count($groupdata->registered) > $groupdata->grpsize)) {
             if (!$this->grouptool->use_queue) {
                 // We can't register the user nor queue the user!
@@ -3268,12 +3267,10 @@ class mod_grouptool {
                 // We can't queue him, due to exceeding his queue limit or not being able to determine which queue entry to unreg!
                 throw new \mod_grouptool\local\exception\exceeduserqueuelimit();
             }
-
-            $queue = 1;
         }
 
         // We have no 'you'-version of the string here!
-        return array($queue, get_string('change_group_to', 'grouptool', $message));
+        return get_string('change_group_to', 'grouptool', $message);
     }
 
     /**
@@ -3847,10 +3844,6 @@ class mod_grouptool {
             }
         }
 
-        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
-            throw new \mod_grouptool\local\exception\exceedgroupsize();
-        }
-
         $userregs = $this->get_user_reg_count($this->grouptool->id, $userid);
         $marks = $this->count_user_marks($userid);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
@@ -3861,6 +3854,10 @@ class mod_grouptool {
         if ($min > ($marks + $userregs + $queues + 1)) {
             // Not enough registrations/queues/marks!
             throw new \mod_grouptool\local\exception\notenoughregs();
+        }
+
+        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
+            throw new \mod_grouptool\local\exception\exceedgroupsize();
         }
 
         if ($userid != $USER->id) {
@@ -4281,7 +4278,7 @@ class mod_grouptool {
                         // Move user and get feedback!
                         $curerror = 0;
                         try {
-                            list(, $curtext) = $this->can_change_group($curgroup->id, $queue->userid, null, $queue->agrpid);
+                            $curtext = $this->can_change_group($curgroup->id, $queue->userid, null, $queue->agrpid);
                         } catch (\mod_grouptool\local\exception\registration $e) {
                             $curerror = 1;
                             $curtext = $e->getMessage();

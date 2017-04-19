@@ -531,14 +531,12 @@ class grouptool_registration_test extends advanced_testcase {
 
         // Now check groupchanges by calling register_in_agrp() handling change detection automatically!
         $message->username = fullname($this->students[0]);
-        list($queue, $text) = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, true);
+        $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, true);
         $this->assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
-        $this->assertEquals(0, $queue);
 
         $message->username = fullname($this->students[1]);
-        list($queue, $text) = $grouptool->register_in_agrp($agrpids[1], $this->students[1]->id, true);
+        $text = $grouptool->register_in_agrp($agrpids[1], $this->students[1]->id, true);
         $this->assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
-        $this->assertEquals(0, $queue);
 
         // And move the users!
         $message->username = fullname($this->students[0]);
@@ -551,9 +549,7 @@ class grouptool_registration_test extends advanced_testcase {
 
         /* TODO: disallow unreg, registration present (marked, queued or registered),
          *       too many registrations, exceed group size, exceed user queue limit... */
-        $this->markTestIncomplete('This test has not been fully implemented yet. TODO: dissallow unreg, registration present '.
-                                  '(marked, queued or registered), too many registrations, '.
-                                  'exceeding group size or exceeding users queue limit!');
+
         // Teardown fixture!
         $data = null;
         $grouptool = null;
@@ -615,17 +611,14 @@ class grouptool_registration_test extends advanced_testcase {
         $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[4], $this->students[2]->id, $message));
 
         // Now we give the method the param to know where to unregister user!
-        list($queued, $text) = $grouptool->can_change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
+        $text = $grouptool->can_change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
         $this->assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
-        $this->assertEquals(0, $queued);
         $text = $grouptool->change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
         $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         /* TODO: disallow unreg, registration present (marked, queued or registered),
          *       too many registrations, exceed group size, exceed user queue limit... */
-        $this->markTestIncomplete('This test has not been fully implemented yet. TODO: dissallow unreg, registration present '.
-                                  '(marked, queued or registered), too many registrations, '.
-                                  'exceeding group size or exceeding users queue limit!');
+
         // Teardown fixture!
         $data = null;
         $grouptool = null;
@@ -741,7 +734,13 @@ class testable_grouptool extends mod_grouptool {
      * @return string status message
      */
     public function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
-        return parent::register_in_agrp($agrpid, $userid, $previewonly);
+        try {
+            return parent::register_in_agrp($agrpid, $userid, $previewonly);
+        } catch (Exception $e) {
+            throw $e;
+        } catch (Throwable $t) {
+            throw $t;
+        }
     }
 
     /**
@@ -755,7 +754,13 @@ class testable_grouptool extends mod_grouptool {
      * @return string $message if everything went right
      */
     protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
-        return parent::unregister_from_agrp($agrpid, $userid, $previewonly);
+        try {
+            return parent::unregister_from_agrp($agrpid, $userid, $previewonly);
+        } catch (Exception $e) {
+            throw $e;
+        } catch (Throwable $t) {
+            throw $t;
+        }
     }
 
     /**
@@ -767,7 +772,13 @@ class testable_grouptool extends mod_grouptool {
      * @return bool whether or not user qualifies for a group change
      */
     public function qualifies_for_groupchange($agrpid, $userid=0, $message=null) {
-        return parent::qualifies_for_groupchange($agrpid, $userid, $message);
+        try {
+            return parent::qualifies_for_groupchange($agrpid, $userid, $message);
+        } catch (Exception $e) {
+            throw $e;
+        } catch (Throwable $t) {
+            throw $t;
+        }
     }
 
     /**
@@ -785,7 +796,13 @@ class testable_grouptool extends mod_grouptool {
      * @return array with 'boolean' if queued or not and 'string' status message
      */
     public function can_change_group($agrpid, $userid=0, $message=null, $oldagrpid = null) {
-        return parent::can_change_group($agrpid, $userid, $message, $oldagrpid);
+        try {
+            return parent::can_change_group($agrpid, $userid, $message, $oldagrpid);
+        } catch (Exception $e) {
+            throw $e;
+        } catch (Throwable $t) {
+            throw $t;
+        }
     }
 
     /**
@@ -803,7 +820,13 @@ class testable_grouptool extends mod_grouptool {
      * @return string success message
      */
     public function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
-        return parent::change_group($agrpid, $userid, $message, $oldagrpid);
+        try {
+            return parent::change_group($agrpid, $userid, $message, $oldagrpid);
+        } catch (Exception $e) {
+            throw $e;
+        } catch (Throwable $t) {
+            throw $t;
+        }
     }
 }
 
