@@ -477,6 +477,12 @@ function grouptool_get_extra_capabilities() {
  */
 function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
     global $DB;
+
+    if ($course->id != $module->course) {
+        // Just so PHPMD won't complain about $course being here ;) These have to be equal all the time!
+        return;
+    }
+
     $context = context_module::instance($cm->id);
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
@@ -504,7 +510,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         $navref->add(get_string('grading', 'grouptool'), $url);
     }
 
-    $gt = $DB->get_record('grouptool', array('id' => $cm->instance));
+    $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
             && ($gt->timeavailable < time()));
 

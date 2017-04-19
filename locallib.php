@@ -2883,7 +2883,7 @@ class mod_grouptool {
      * @return string $message if everything went right
      */
     protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
-        global $USER, $PAGE, $DB;
+        global $USER, $DB;
 
         if (empty($userid)) {
             $userid = $USER->id;
@@ -2923,7 +2923,6 @@ class mod_grouptool {
         $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
                                               $params);
         $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
         if ($userregs + $userqueues <= $min) {
             if ($userid == $USER->id) {
@@ -3020,7 +3019,7 @@ class mod_grouptool {
      * @return string status message
      */
     protected function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
-        global $USER, $PAGE, $DB;
+        global $USER, $DB;
 
         $grouptool = $this->grouptool;
 
@@ -3051,15 +3050,6 @@ class mod_grouptool {
 
         $message->groupname = $groupdata->name;
         $message->userid = $userid;
-        // We have to filter only active groups to ensure no problems counting userregs and -queues.
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($grouptool->id));
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
-        array_unshift($params, $userid);
-        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
-                                              $params);
-        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
-        $max = $grouptool->allow_multiple ? $grouptool->choose_max : 1;
-        $min = $grouptool->allow_multiple ? $grouptool->choose_min : 0;
 
         if ($this->qualifies_for_groupchange($agrpid, $userid)) {
             if ($previewonly) {
@@ -3648,7 +3638,7 @@ class mod_grouptool {
         $queueswithmarks = $queues;
         foreach ($usermarks as $cur) {
             if ($cur->type != 'reg') {
-                $queueswitharks++;
+                $queueswithmarks++;
             }
         }
 
@@ -3692,9 +3682,6 @@ class mod_grouptool {
         }
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
-        array_unshift($params, $userid);
         $userregs = $this->get_user_reg_count(0, $userid);
         $marks = $this->count_user_marks($userid);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
@@ -3808,12 +3795,6 @@ class mod_grouptool {
             $message->groupname = $groupdata->name;
         }
 
-        /* Get user's marks and also check if enough (queue) places are available,
-         * otherwise display an info and remove marked entry. */
-        $usermarks = $this->get_user_marks($userid);
-
-        $queues = $this->get_user_queues_count($this->grouptool->id, $userid);
-
         // Is marked?
         if ($this->grpmarked($agrpid, $userid)) {
             // Allready marked for registration!?!
@@ -3844,7 +3825,9 @@ class mod_grouptool {
             }
         }
 
+        // Check if enough (queue) places are available, otherwise display an info and remove marked entry.
         $userregs = $this->get_user_reg_count($this->grouptool->id, $userid);
+        $queues = $this->get_user_queues_count($this->grouptool->id, $userid);
         $marks = $this->count_user_marks($userid);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
@@ -4762,7 +4745,6 @@ class mod_grouptool {
                     $userregs = $DB->count_records_select('grouptool_registered',
                                                           "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql, $params);
                     $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
-                    $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
                     $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
                     if (!empty($group->registered)
                         && $this->get_rank_in_queue($group->registered, $userid) != false) {
