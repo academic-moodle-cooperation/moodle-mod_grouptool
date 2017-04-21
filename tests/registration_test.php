@@ -492,10 +492,10 @@ class grouptool_registration_test extends advanced_testcase {
         // Check possibility of and make a group change for students 0 and 1 to group 1!
         $message->username = fullname($this->students[0]);
         $grouptool->can_change_group($agrpids[1], $this->students[0]->id, $message);
-        $this->assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[0]->id, $message));
+        $this->assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[0]->id));
         $message->username = fullname($this->students[1]);
         $grouptool->can_change_group($agrpids[1], $this->students[1]->id, $message);
-        $this->assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[1]->id, $message));
+        $this->assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[1]->id));
         $message->username = fullname($this->students[2]);
         // Groupchange for student 2 fails, because he's neither registered nor queued or marked anywhere!
         try {
@@ -506,7 +506,7 @@ class grouptool_registration_test extends advanced_testcase {
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
             $this->assertEquals($comptext, $text);
         }
-        $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[2]->id, $message));
+        $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[2]->id));
 
         $message->groupname = $agrps[$agrpids[1]]->name;
 
@@ -583,7 +583,7 @@ class grouptool_registration_test extends advanced_testcase {
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
             $this->assertEquals($comptext, $text);
         }
-        $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[4], $this->students[2]->id, $message));
+        $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[4], $this->students[2]->id));
 
         // Now we give the method the param to know where to unregister user!
         $text = $grouptool->can_change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
@@ -755,13 +755,12 @@ class testable_grouptool extends mod_grouptool {
      * Override method to be available for testing!
      *
      * @param int $agrpid ID of the active group
-     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
-     * @param stdClass $message (optional) cached data for the language strings
+     * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @return bool whether or not user qualifies for a group change
      */
-    public function qualifies_for_groupchange($agrpid, $userid=0, $message=null) {
+    public function qualifies_for_groupchange($agrpid, $userid) {
         try {
-            return parent::qualifies_for_groupchange($agrpid, $userid, $message);
+            return parent::qualifies_for_groupchange($agrpid, $userid);
         } catch (Exception $e) {
             throw $e;
         } catch (Throwable $t) {

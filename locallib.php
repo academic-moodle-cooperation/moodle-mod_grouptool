@@ -3113,18 +3113,24 @@ class mod_grouptool {
      *
      * @param int $agrpid ID of the active group
      * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
-     * @param stdClass $message (optional) cached data for the language strings
      * @return bool whether or not user qualifies for a group change
      */
-    protected function qualifies_for_groupchange($agrpid, $userid = null, $message = null) {
+    protected function qualifies_for_groupchange($agrpid, $userid) {
         global $DB, $USER;
 
-        if ($userid === null) {
-            $userid = $USER->id;
+        // Not really used here, but at least empty values needed by can_change_group()!
+        $message = new stdClass();
+        $message->username = '';
+        $message->groupname = '';
+
+        try {
+            $this->can_change_group($agrpid, $userid, $message);
+        } catch (Exception $e) {
+            return false;
         }
 
-        if ($message === null) {
-            $message = new stdClass();
+        return true;
+    }
             if ($userid != $USER->id) {
                 $userdata = $DB->get_record('user', array('id' => $userid));
                 $message->username = fullname($userdata);
