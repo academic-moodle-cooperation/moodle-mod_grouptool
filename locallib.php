@@ -6764,35 +6764,9 @@ class mod_grouptool {
         }
 
         if (!$hideform) {
-            $groupings = groups_get_all_groupings($this->course->id);
-            $options = array(0 => get_string('all'));
-            if (count($groupings)) {
-                foreach ($groupings as $grouping) {
-                    $options[$grouping->id] = $grouping->name;
-                }
-            }
-            $groupingselect = new single_select($url, 'groupingid', $options, $groupingid, false);
-
-            $groups = $this->get_active_groups(false, false, 0, 0, $groupingid);
-            $options = array(0 => get_string('all'));
-            if (count($groups)) {
-                foreach ($groups as $group) {
-                    $options[$group->id] = $group->name;
-                }
-            }
-            if (!key_exists($groupid, $options)) {
-                $groupid = 0;
-                $url->param('groupid', 0);
-                echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_in_grouping', 'grouptool').
-                                                        html_writer::empty_tag('br').
-                                                        get_string('switched_to_all_groups', 'grouptool'), 'error'),
-                                  'generalbox centered');
-            }
-            $groupselect = new single_select($url, 'groupid', $options, $groupid, false);
-
-            $options = array(0 => get_string('portrait', 'grouptool'),
-                             1 => get_string('landscape', 'grouptool'));
-            $orientationselect = new single_select($url, 'orientation', $options, $orientation, false);
+            $groupingselect = $this->get_grouping_select($url, $groupingid);
+            $groupselect = $this->get_groups_select($url, $groupingid, $groupid);
+            $orientationselect = $this->get_orientation_select($url, $orientation);
 
             if ($includeinactive) {
                 $inactivetext = get_string('inactivegroups_hide', 'grouptool');
@@ -6831,6 +6805,71 @@ class mod_grouptool {
             // If we don't only get the data, the output happens directly per group!
             $this->group_overview_table($groupingid, $groupid, false, $includeinactive);
         }
+    }
+
+    /**
+     * Returns a single select to change currently selected grouping.
+     *
+     * @param moodle_url $url Base URL to use
+     * @param int $groupingid Currently active grouping ID or 0
+     * @return single_select
+     */
+    protected function get_grouping_select($url, $groupingid) {
+        $groupings = groups_get_all_groupings($this->course->id);
+        $options = array(0 => get_string('all'));
+        if (count($groupings)) {
+            foreach ($groupings as $grouping) {
+                $options[$grouping->id] = $grouping->name;
+            }
+        }
+        return new single_select($url, 'groupingid', $options, $groupingid, false);
+    }
+
+    /**
+     * Returns a single select to change currently selected group.
+     *
+     * @param moodle_url $url Base URL to use
+     * @param int $groupingid Currently active grouping ID or 0
+     * @param int $groupid Currently active group ID or 0
+     * @return single_select
+     */
+    protected function get_groups_select($url, $groupingid, $groupid) {
+        global $OUTPUT;
+
+        $groups = $this->get_active_groups(false, false, 0, 0, $groupingid);
+        $options = array(0 => get_string('all'));
+        if (count($groups)) {
+            foreach ($groups as $group) {
+                $options[$group->id] = $group->name;
+            }
+        }
+        if (!key_exists($groupid, $options)) {
+            $groupid = 0;
+            $url->param('groupid', 0);
+            echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_in_grouping', 'grouptool').
+                                                    html_writer::empty_tag('br').
+                                                    get_string('switched_to_all_groups', 'grouptool'), 'error'),
+                              'generalbox centered');
+        }
+        return new single_select($url, 'groupid', $options, $groupid, false);
+    }
+
+    /**
+     * Returns a single select to change currently selected page-orientation.
+     *
+     * @param moodle_url $url Base URL to use
+     * @param int $orientation Currently active orientation
+     * @return single_select
+     */
+    protected function get_orientation_select($url, $orientation) {
+        static $options = null;
+
+        if (!$options) {
+            $options = array(0 => get_string('portrait', 'grouptool'),
+                             1 => get_string('landscape', 'grouptool'));
+        }
+
+        return new single_select($url, 'orientation', $options, $orientation, false);
     }
 
     /**
@@ -7917,27 +7956,10 @@ class mod_grouptool {
                 $options[$grouping->id] = $grouping->name;
             }
         }
-        $groupingselect = new single_select($url, 'groupingid', $options, $groupingid, false);
 
-        $groups = $this->get_active_groups(false, false, 0, 0, $groupingid);
-        $options = array(0 => get_string('all'));
-        if (count($groups)) {
-            foreach ($groups as $group) {
-                $options[$group->id] = $group->name;
-            }
-        }
-        if (!key_exists($groupid, $options)) {
-            $groupid = 0;
-            $url->param('groupid', 0);
-            echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_in_grouping', 'grouptool').html_writer::empty_tag('br').
-                                                    get_string('switched_to_all_groups', 'grouptool'), 'error'),
-                              'generalbox centered');
-        }
-        $groupselect = new single_select($url, 'groupid', $options, $groupid, false);
-
-        $options = array(0 => get_string('portrait', 'grouptool'),
-                         1 => get_string('landscape', 'grouptool'));
-        $orientationselect = new single_select($url, 'orientation', $options, $orientation, false);
+        $groupingselect = $this->get_grouping_select($url, $groupingid);
+        $groupselect = $this->get_groups_select($url, $groupingid, $groupid);
+        $orientationselect = $this->get_orientation_select($url, $orientation);
 
         echo html_writer::tag('div', get_string('grouping', 'group').'&nbsp;'.
                                      $OUTPUT->render($groupingselect),
