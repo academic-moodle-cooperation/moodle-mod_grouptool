@@ -5365,19 +5365,9 @@ class mod_grouptool {
         $userinfo = array();
         $syncstatus = $this->get_sync_status();
         $context = context_module::instance($this->cm->id);
-        if ((!$onlydata && count($agrps)) && has_capability('mod/grouptool:export', $context)) {
+        if (!$onlydata && count($agrps)) {
             // Global-downloadlinks!
-            $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
-            $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
-            $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
-            $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
-            $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
-                                              array('class' => 'title')).'&nbsp;'.
-                             html_writer::link($txturl, '.TXT').'&nbsp;'.
-                             html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
-                             html_writer::link($pdfurl, '.PDF').'&nbsp;'.
-                             html_writer::link($odsurl, '.ODS');
-            echo html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
+            echo $this->get_download_links($downloadurl);
         }
 
         foreach ($agrps as $agrp) {
@@ -5433,23 +5423,8 @@ class mod_grouptool {
             }
             if (!$onlydata) {
                 // Group-downloadlinks!
-                if (((count($queued) > 0) || (count($registered) > 0))
-                    && has_capability('mod/grouptool:export', $context)) {
-                    $urltxt = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
-                                                                 'format'  => GROUPTOOL_TXT));
-                    $urlxlsx = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
-                                                                  'format'  => GROUPTOOL_XLSX));
-                    $urlpdf = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
-                                                                 'format'  => GROUPTOOL_PDF));
-                    $urlods = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id,
-                                                                 'format'  => GROUPTOOL_ODS));
-
-                    $downloadlinks = html_writer::tag('span', get_string('download').":", array('class' => 'title')).'&nbsp;'.
-                                     html_writer::link($urltxt, '.TXT').'&nbsp;'.
-                                     html_writer::link($urlxlsx, '.XLSX').'&nbsp;'.
-                                     html_writer::link($urlpdf, '.PDF').'&nbsp;'.
-                                     html_writer::link($urlods, '.ODS');
-                    $groupinfos .= html_writer::tag('div', $downloadlinks, array('class' => 'download'));
+                if ((count($queued) > 0) || (count($registered) > 0)) {
+                    $groupinfos .= $this->get_download_links($downloadurl, $groupinfo[$agrp->id]);
                 }
                 $groupinfos .= html_writer::tag('span', get_string('total', 'grouptool').' '.$size,
                                                 array('class' => 'groupsize'));
@@ -6992,6 +6967,39 @@ class mod_grouptool {
     }
 
     /**
+     * Returns nice download links for all formats based on downloadurl and groupid
+     *
+     * @param moodle_url $downloadurl The base download URL to use
+     * @param int $groupid (optional) ID of group to use for the download or 0 for all groups download
+     * @return string HTML snippet with download links encapsulated in DIV
+     */
+    protected function get_download_links($downloadurl, $groupid = 0) {
+        if (has_capability('mod/grouptool:export', $this->context)) {
+            $class = 'download';
+            if ($groupid) {
+                $downloadurl = new moodle_url($downloadurl, array('groupid' => $groupid));
+                $downloadtxt = get_string('download');
+            } else {
+                $downloadtxt = get_string('downloadall');
+                $class .= ' all';
+            }
+
+            $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
+            $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
+            $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
+            $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
+            $downloadlinks = html_writer::tag('span', $downloadtxt.":", array('class' => 'title')).'&nbsp;'.
+                                                      html_writer::link($txturl, '.TXT').'&nbsp;'.
+                                                      html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
+                                                      html_writer::link($pdfurl, '.PDF').'&nbsp;'.
+                                                      html_writer::link($odsurl, '.ODS');
+            return html_writer::tag('div', $downloadlinks, array('class' => $class));
+        } else {
+            return '';
+        }
+    }
+
+    /**
      * get all data necessary for displaying/exporting userlist table
      *
      * @param int $groupingid optional get only this grouping
@@ -7128,19 +7136,7 @@ class mod_grouptool {
         $users = $DB->get_records_sql($sql, $params);
 
         if (!$onlydata) {
-            if (has_capability('mod/grouptool:export', $context)) {
-                $txturl = new moodle_url($downloadurl, array('format' => GROUPTOOL_TXT));
-                $xlsxurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_XLSX));
-                $pdfurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_PDF));
-                $odsurl = new moodle_url($downloadurl, array('format' => GROUPTOOL_ODS));
-                $downloadlinks = html_writer::tag('span', get_string('downloadall').":",
-                                                  array('class' => 'title')).'&nbsp;'.
-                        html_writer::link($txturl, '.TXT').'&nbsp;'.
-                        html_writer::link($xlsxurl, '.XLSX').'&nbsp;'.
-                        html_writer::link($pdfurl, '.PDF').'&nbsp;'.
-                        html_writer::link($odsurl, '.ODS');
-                echo html_writer::tag('div', $downloadlinks, array('class' => 'download all'));
-            }
+            echo $this->get_download_links($downloadurl);
             flush();
         }
 
