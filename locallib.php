@@ -5351,6 +5351,39 @@ class mod_grouptool {
     }
 
     /**
+     * Outputs one HTML table row for group overview table
+     *
+     * @param string $status Content for status field
+     * @param int $userid User's DB ID
+     * @param string $name User's name
+     * @param string $idnumber User's ID Number
+     * @param string $email Users E-Mail
+     * @param string $rowclass Row's CSS class
+     */
+    protected function write_one_groupoverview_table_row($status, $userid, $name, $idnumber, $email, $rowclass = '') {
+        echo html_writer::start_tag('tr', array('class' => $rowclass));
+        echo html_writer::tag('td', $status, array('class' => 'status'));
+        $userlinkattr = array('href'  => $CFG->wwwroot.'/user/view.php?id='.$curuser.'&course='.$this->course->id,
+                              'title' => $name);
+        $userlink = html_writer::tag('a', $name, $userlinkattr);
+        echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
+        if (!empty($idnumber)) {
+            $idnumber = html_writer::tag('span', $idnumber, array('class' => 'idnumber'));
+        } else {
+            $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
+        }
+        echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
+        if (!empty($email)) {
+            $email = html_writer::tag('span', $email, array('class' => 'email'));
+        } else {
+            $email = html_writer::tag('span', '-', array('class' => 'email'));
+        }
+        echo html_writer::tag('td', $email, array('class' => 'email'));
+        echo html_writer::end_tag('tr');
+        flush();
+    }
+
+    /**
      * get all data necessary for displaying/exporting group-overview table
      *
      * @param int $groupingid optional get only this grouping
@@ -5494,30 +5527,10 @@ class mod_grouptool {
                         }
                         $fullname = fullname($userinfo[$curuser]);
                         if (!$onlydata) {
-                            echo html_writer::start_tag('tr', array('class' => ''));
-                            echo html_writer::tag('td', "✔", array('class' => 'status'));
-                            $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                    $curuser.'&course='.$this->course->id,
-                                    'title' => $fullname);
-                            $userlink = html_writer::tag('a', $fullname, $userlinkattr);
-                            echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
-                            if (!empty($userinfo[$curuser]->idnumber)) {
-                                $idnumber = html_writer::tag('span',
-                                                             $userinfo[$curuser]->idnumber,
-                                                             array('class' => 'idnumber'));
-                            } else {
-                                $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
-                            }
-                            echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
-                            if (!empty($userinfo[$curuser]->email)) {
-                                $email = html_writer::tag('span', $userinfo[$curuser]->email,
-                                                          array('class' => 'email'));
-                            } else {
-                                $email = html_writer::tag('span', '-', array('class' => 'email'));
-                            }
-                            echo html_writer::tag('td', $email, array('class' => 'email'));
-                            echo html_writer::end_tag('tr');
-                            flush();
+                            $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
+                            $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
+                            $this->write_one_groupoverview_table_row("✔", $curuser, fullname($userinfo[$curuser]), $idnumber,
+                                                                     $email);
                         } else {
                             $row = array();
                             $row['name'] = $fullname;
@@ -5544,30 +5557,10 @@ class mod_grouptool {
                         }
                         $fullname = fullname($userinfo[$curuser]);
                         if (!$onlydata) {
-                            echo html_writer::start_tag('tr', array('class' => ''));
-                            echo html_writer::tag('td', "+", array('class' => 'status'));
-                            $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                    $curuser.'&course='.$this->course->id,
-                                    'title' => $fullname);
-                            $userlink = html_writer::tag('a', $fullname, $userlinkattr);
-                            echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
-                            if (!empty($userinfo[$curuser]->idnumber)) {
-                                $idnumber = html_writer::tag('span',
-                                                             $userinfo[$curuser]->idnumber,
-                                                             array('class' => 'idnumber'));
-                            } else {
-                                $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
-                            }
-                            echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
-                            if (!empty($userinfo[$curuser]->email)) {
-                                $email = html_writer::tag('span', $userinfo[$curuser]->email,
-                                                          array('class' => 'email'));
-                            } else {
-                                $email = html_writer::tag('span', '-', array('class' => 'email'));
-                            }
-                            echo html_writer::tag('td', $email, array('class' => 'email'));
-                            html_writer::end_tag('tr');
-                            flush();
+                            $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
+                            $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
+                            $this->write_one_groupoverview_table_row("+", $curuser, fullname($userinfo[$curuser]), $idnumber,
+                                                                     $email);
                         } else {
                             $row = array();
                             $row['name'] = $fullname;
@@ -5593,30 +5586,10 @@ class mod_grouptool {
                         }
                         $fullname = fullname($userinfo[$curuser]);
                         if (!$onlydata) {
-                            echo html_writer::start_tag('tr', array('class' => ''));
-                            echo html_writer::tag('td', "?", array('class' => 'status'));
-                            $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                    $curuser.'&course='.$this->course->id,
-                                    'title' => $fullname);
-                            $userlink = html_writer::tag('a', $fullname, $userlinkattr);
-                            echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
-                            if (!empty($userinfo[$curuser]->idnumber)) {
-                                $idnumber = html_writer::tag('span',
-                                                             $userinfo[$curuser]->idnumber,
-                                                             array('class' => 'idnumber'));
-                            } else {
-                                $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
-                            }
-                            echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
-                            if (!empty($userinfo[$curuser]->email)) {
-                                $email = html_writer::tag('span', $userinfo[$curuser]->email,
-                                                          array('class' => 'email'));
-                            } else {
-                                $email = html_writer::tag('span', '-', array('class' => 'email'));
-                            }
-                            echo html_writer::tag('td', $email, array('class' => 'email'));
-                            echo html_writer::end_tag('tr');
-                            flush();
+                            $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
+                            $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
+                            $this->write_one_groupoverview_table_row("?", $curuser, fullname($userinfo[$curuser]), $idnumber,
+                                                                     $email);
                         } else {
                             $row = array();
                             $row['name'] = $fullname;
@@ -5653,30 +5626,10 @@ class mod_grouptool {
                     $fullname = fullname($userinfo[$curuser]);
                     $rank = $this->get_rank_in_queue($queuedlist, $curuser);
                     if (!$onlydata) {
-                        echo html_writer::start_tag('tr', array('class' => 'queueentry'));
-                        echo html_writer::tag('td', $rank, array('class' => 'rank'));
-                        $userlinkattr = array('href' => $CFG->wwwroot.'/user/view.php?id='.
-                                $curuser.'&course='.$this->course->id,
-                                'title' => $fullname);
-                        $userlink = html_writer::tag('a', $fullname, $userlinkattr);
-                        echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
-                        if (!empty($userinfo[$curuser]->idnumber)) {
-                            $idnumber = html_writer::tag('span',
-                                                         $userinfo[$curuser]->idnumber,
-                                                         array('class' => 'idnumber'));
-                        } else {
-                            $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
-                        }
-                        echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
-                        if (!empty($userinfo[$curuser]->email)) {
-                            $email = html_writer::tag('span', $userinfo[$curuser]->email,
-                                                      array('class' => 'email'));
-                        } else {
-                            $email = html_writer::tag('span', '-', array('class' => 'email'));
-                        }
-                        echo html_writer::tag('td', $email, array('class' => 'email'));
-                        echo html_writer::end_tag('tr');
-                        flush();
+                        $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
+                        $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
+                        $this->write_one_groupoverview_table_row($rank, $curuser, fullname($userinfo[$curuser]), $idnumber,
+                                                                 $email, 'queueentry');
                     } else {
                         $row = array();
                         $row['rank'] = $rank;
