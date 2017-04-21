@@ -3411,12 +3411,8 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\regpresent
      * @return array (queued, string) status message
      */
-    protected function can_be_marked($agrpid, $userid = null, $message = null) {
+    protected function can_be_marked($agrpid, $userid, $message) {
         global $DB, $USER;
-
-        if ($userid === null) {
-            $userid = $USER->id;
-        }
 
         $groupdata = $this->get_active_groups(true, true, $agrpid);
         if (count($groupdata) != 1) {
@@ -3432,17 +3428,6 @@ class mod_grouptool {
         }
 
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
-        if ($message === null) {
-            $message = new stdClass();
-            if ($userid != $USER->id) {
-                $userdata = $DB->get_record('user', array('id' => $userid));
-                $message->username = fullname($userdata);
-            } else {
-                $message->username = fullname($USER);
-            }
-            $message->groupname = $groupdata->name;
-        }
-
 
         $this->check_users_regs_limits($userid);
 
@@ -3473,30 +3458,14 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\regpresent
      * @return string success message
      */
-    protected function mark_for_reg($agrpid, $userid = null, $message = null) {
+    protected function mark_for_reg($agrpid, $userid, $message) {
         global $DB, $USER;
-
-        if ($userid === null) {
-            $userid = $USER->id;
-        }
 
         $groupdata = $this->get_active_groups(false, false, $agrpid);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
         $groupdata = reset($groupdata);
-
-        if ($message === null) {
-            $message = new stdClass();
-            if ($userid != $USER->id) {
-                $userdata = $DB->get_record('user', array('id' => $userid));
-                $message->username = fullname($userdata);
-            } else {
-                $message->username = fullname($USER);
-            }
-
-            $message->groupname = $groupdata->name;
-        }
 
         $this->can_be_marked($agrpid, $userid, $message);
 
@@ -3519,12 +3488,8 @@ class mod_grouptool {
      * @param int $userid (optional) ID of user to mark registration for or null ($USER->id is used).
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      */
-    protected function convert_marks_to_regs($userid = null) {
+    protected function convert_marks_to_regs($userid) {
         global $DB, $USER;
-
-        if ($userid === null) {
-            $userid = $USER->id;
-        }
 
         // Get user's marks!
         $usermarks = $this->get_user_marks($userid);
@@ -3647,8 +3612,8 @@ class mod_grouptool {
      * Add a queue entry for a certain user/agrp-combination.
      *
      * @param int $agrpid ID of the active group
-     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
-     * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @param int $userid ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $message prepared message object containing username and groupname or null
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
@@ -3658,29 +3623,14 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\regpresent
      * @return string status string
      */
-    protected function add_queue_entry($agrpid, $userid = null, $message = null) {
+    protected function add_queue_entry($agrpid, $userid, $message) {
         global $DB, $USER;
-
-        if ($userid === null) {
-            $userid = $USER->id;
-        }
 
         $groupdata = $this->get_active_groups(false, false, $agrpid);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
         $groupdata = reset($groupdata);
-
-        if ($message === null) {
-            $message = new stdClass();
-            if ($userid != $USER->id) {
-                $userdata = $DB->get_record('user', array('id' => $userid));
-                $message->username = fullname($userdata);
-            } else {
-                $message->username = fullname($USER);
-            }
-            $message->groupname = $groupdata->name;
-        }
 
         // This method throws exceptions, if user is not able to be queued!
         $this->can_be_queued($agrpid, $userid, $message);
@@ -3777,30 +3727,14 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\regpresent
      * @return string status message
      */
-    protected function add_registration($agrpid, $userid = null, $message = null) {
+    protected function add_registration($agrpid, $userid, $message) {
         global $DB, $USER;
-
-        if ($userid === null) {
-            $userid = $USER->id;
-        }
 
         $groupdata = $this->get_active_groups(false, false, $agrpid);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
         $groupdata = reset($groupdata);
-
-        if ($message === null) {
-            $message = new stdClass();
-            if ($userid != $USER->id) {
-                $userdata = $DB->get_record('user', array('id' => $userid));
-                $message->username = fullname($userdata);
-            } else {
-                $message->username = fullname($USER);
-            }
-
-            $message->groupname = $groupdata->name;
-        }
 
         /* This method throws exceptions if there is a problem */
         $this->can_be_registered($agrpid, $userid, $message);
@@ -4049,7 +3983,7 @@ class mod_grouptool {
      * @return array ($error, $message)
      */
     public function resolve_queues($previewonly = false) {
-        global $DB;
+        global $DB, $USER;
         $error = false;
         $returntext = "";
 
@@ -4124,6 +4058,7 @@ class mod_grouptool {
             $curgroup = null;
             $maxregs = !empty($this->grouptool->allow_multiple) ? $this->grouptool->choose_max : 1;
             reset($groupsdata);
+            $message = new stdClass();
             foreach ($queueentries as $queue) {
                 // Get first non-full group!
                 while (($curgroup == null)
@@ -4175,7 +4110,15 @@ class mod_grouptool {
                         // Move user and get feedback!
                         $curerror = 0;
                         try {
-                            $curtext = $this->can_change_group($curgroup->id, $queue->userid, null, $queue->agrpid);
+                            if ($queue->userid != $USER->id) {
+                                $userdata = $DB->get_record('user', array('id' => $queue->userid));
+                                $message->username = fullname($userdata);
+                            } else {
+                                $message->username = fullname($USER);
+                            }
+                            $message->groupname = groups_get_group_name($curgroup->groupid);
+
+                            $curtext = $this->can_change_group($curgroup->id, $queue->userid, $message, $queue->agrpid);
                         } catch (\mod_grouptool\local\exception\registration $e) {
                             $curerror = 1;
                             $curtext = $e->getMessage();
