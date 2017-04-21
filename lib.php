@@ -638,21 +638,45 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 $str .= html_writer::tag('div', $strduedateno, $attr);
             }
         }
-        $details = '';
-        if (has_capability('mod/grouptool:register', $context)
-            || has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)) {
-            $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
-            $userstats = $instance->get_registration_stats($USER->id);
-        }
+        $details = grouptool_get_user_reg_details($grouptool, $context);
 
-        if (has_capability('mod/grouptool:register', $context) && $grouptool->allow_reg) {
+        if (has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:view_regs_course_view', $context)
+            || has_capability('mod/grouptool:register', $context)) {
+            $str = html_writer::tag('div', $str.$details, array('class' => 'grouptool overview'));
+            if (empty($htmlarray[$grouptool->course]['grouptool'])) {
+                $htmlarray[$grouptool->course]['grouptool'] = $str;
+            } else {
+                $htmlarray[$grouptool->course]['grouptool'] .= $str;
+            }
+        }
+    }
+}
+
+/**
+ * Get a nice overview over user's registration details!
+ *
+ * @param stdClass $grouptool Grouptool DB record with additional coursemodule property set!
+ * @param stdClass $context Context instance
+ * @return string HTML snippet with user's registration details
+ */
+function grouptool_get_user_reg_details($grouptool, $context) {
+    global $USER;
+
+    $details = '';
+    if (has_capability('mod/grouptool:register', $context)
+        || has_capability('mod/grouptool:view_regs_course_view', $context)
+        || has_capability('mod/grouptool:view_regs_group_view', $context)) {
+        // It's similar to the student mymoodle output!
+        $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
+        $userstats = $instance->get_registration_stats($USER->id);
+    }
+
+    if (has_capability('mod/grouptool:register', $context)) {
+        if ($grouptool->allow_reg) {
             if (count($userstats->registered)) {
                 $tempstr = "";
                 foreach ($userstats->registered as $registration) {
-                    $ts = $registration->timestamp;
-                    list($colorclass, $text) = grouptool_display_lateness($ts,
-                                                                          $grouptool->timedue);
                     if ($tempstr != "") {
                         $tempstr .= '; ';
                     }
@@ -670,7 +694,8 @@ function grouptool_print_overview($courses, &$htmlarray) {
                     }
                     $details .= html_writer::tag('div',
                             html_writer::tag('div',
-                                    get_string($stringlabel, 'grouptool', $missing)).' '.
+                                    get_string($stringlabel, 'grouptool', $missing),
+                                    array('class' => $colorclass)).' '.
                             get_string('registrations', 'grouptool').': '.$tempstr,
                             array('class' => 'registered'));
                 } else {
@@ -680,18 +705,19 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 }
             } else {
                 if ($grouptool->allow_multiple) {
-                    $missing = $grouptool->choose_min;
+                    $missing = ($grouptool->choose_min - count($userstats->registered));
                     $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                 } else {
                     $missing = 1;
                     $stringlabel = 'registration_missing';
                 }
                 $details .= html_writer::tag('div',
-                                             html_writer::tag('div',
-                                                              get_string($stringlabel, 'grouptool', $missing)).
-                                             get_string('registrations', 'grouptool').': '.
-                                             get_string('not_registered', 'grouptool'),
-                                             array('class' => 'registered'));
+                        html_writer::tag('div',
+                                get_string($stringlabel, 'grouptool', $missing),
+                                array('class' => $colorclass)).
+                        get_string('registrations', 'grouptool').': '.
+                        get_string('not_registered', 'grouptool'),
+                        array('class' => 'registered'));
             }
             if (count($userstats->queued)) {
                 $tempstr = "";
@@ -708,30 +734,16 @@ function grouptool_print_overview($courses, &$htmlarray) {
                         $tempstr, array('class' => 'queued'));
             }
         }
-
-        if ($grouptool->allow_reg
-            && (has_capability('mod/grouptool:view_regs_group_view', $context)
-                || has_capability('mod/grouptool:view_regs_course_view', $context))) {
-            $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool',
-                                                           $userstats),
-                                         array('class' => 'userstats'));
-
-        }
-
-        if (has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)
-            || has_capability('mod/grouptool:register', $context)) {
-            if ($grouptool->allow_reg) {
-                $str .= html_writer::tag('div', $details, array('class' => 'details'));
-            }
-            $str = html_writer::tag('div', $str, array('class' => 'grouptool overview'));
-            if (empty($htmlarray[$grouptool->course]['grouptool'])) {
-                $htmlarray[$grouptool->course]['grouptool'] = $str;
-            } else {
-                $htmlarray[$grouptool->course]['grouptool'] .= $str;
-            }
-        }
     }
+
+    if ((has_capability('mod/grouptool:view_regs_group_view', $context) || has_capability('mod/grouptool:view_regs_course_view',
+                                                                                          $context))
+            && $grouptool->allow_reg) {
+        $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool', $userstats), array('class' => 'userstats'));
+
+    }
+
+    return html_writer::tag('div', $details, array('class' => 'details'));
 }
 
 /**
