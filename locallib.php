@@ -286,6 +286,39 @@ class mod_grouptool {
     }
 
     /**
+     * Adds an agrp-entry for newly created group!
+     *
+     * @param int $groupid Group ID to add agrp entry for!
+     */
+    protected function add_agrp_entry($groupid) {
+        global $DB;
+
+        // Insert into agrp-table!
+        $newagrp = new stdClass();
+        $newagrp->groupid = $groupid;
+        $newagrp->grouptoolid = $this->grouptool->id;
+        $newagrp->sort_order = 999999;
+        if ($this->grouptool->allow_reg == true) {
+            $newagrp->active = 1;
+        } else {
+            $newagrp->active = 0;
+        }
+        $attr = array('grouptoolid' => $this->grouptool->id,
+                      'groupid'     => $groupid);
+        if (!$DB->record_exists('grouptool_agrps', $attr)) {
+            $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
+        } else {
+            /* This is also the case if eventhandlers work properly
+             * because group gets allready created in eventhandler
+             */
+            $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
+            if ($this->grouptool->allow_reg == true) {
+                $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
+            }
+        }
+    }
+
+    /**
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance
      *
@@ -448,29 +481,7 @@ class mod_grouptool {
                 $newgroup->courseid = $this->course->id;
                 $newgroup->name     = $group['name'];
                 $groupid = groups_create_group($newgroup);
-                // Insert into agrp-table!
-                $newagrp = new stdClass();
-                $newagrp->groupid = $groupid;
-                $newagrp->grouptoolid = $this->grouptool->id;
-                $newagrp->sort_order = 999999;
-                if ($this->grouptool->allow_reg == true) {
-                    $newagrp->active = 1;
-                } else {
-                    $newagrp->active = 0;
-                }
-                $attr = array('grouptoolid' => $this->grouptool->id,
-                              'groupid'     => $groupid);
-                if (!$DB->record_exists('grouptool_agrps', $attr)) {
-                    $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
-                } else {
-                    /* This is also the case if eventhandlers work properly
-                     * because group gets allready created in eventhandler
-                     */
-                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
-                    if ($this->grouptool->allow_reg == true) {
-                        $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
-                    }
-                }
+                $this->add_agrp_entry();
                 $createdgroups[] = $groupid;
                 foreach ($group['members'] as $user) {
                     groups_add_member($groupid, $user->id);
@@ -619,28 +630,7 @@ class mod_grouptool {
                 $newgroup->name     = $group;
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
-                $newagrp = new stdClass();
-                $newagrp->groupid = $groupid;
-                $newagrp->grouptoolid = $this->grouptool->id;
-                $newagrp->sort_order = 999999;
-                if ($this->grouptool->allow_reg == true) {
-                    $newagrp->active = 1;
-                } else {
-                    $newagrp->active = 0;
-                }
-                $attr = array('grouptoolid' => $this->grouptool->id,
-                              'groupid'     => $groupid);
-                if (!$DB->record_exists('grouptool_agrps', $attr)) {
-                    $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
-                } else {
-                    /* This is also the case if eventhandlers work properly
-                     * because group gets allready created in eventhandler
-                     */
-                    $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
-                    if ($this->grouptool->allow_reg == true) {
-                        $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
-                    }
-                }
+                $this->add_agrp_entry($groupid);
                 if (!empty($data->numberofmembers) && ($data->numberofmembers != $this->grouptool->grpsize)) {
                     $DB->set_field('grouptool_agrps', 'grpsize', $data->numberofmembers, array('id' => $newagrp->id));
                 }
