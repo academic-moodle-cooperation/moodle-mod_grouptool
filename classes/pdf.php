@@ -24,6 +24,8 @@
  */
 namespace mod_grouptool;
 
+use \context_course as context_course;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once('../../lib/pdflib.php');
@@ -65,6 +67,86 @@ class pdf extends \pdf {
      * use 'C' for center, 'L' for left and 'R' for right
      */
     protected $align = array();
+
+    /** @var int|null used to calculate heights of text-blocks */
+    protected $normalheight = null;
+
+    /** @var int|null used to calculate heights of text-blocks */
+    protected $bigheight = null;
+
+    /**
+     * Class constructor
+     *
+     * Enhances moodle's pdf class by adding calculated values for text-height. {@inheritDoc}
+     *
+     * @param string $orientation page orientation
+     * @param string $unit User measure unit
+     * @param string $format The format used for pages
+     * @param bool $unicode TRUE means that the input text is unicode (default = true)
+     * @param string $encoding Charset encoding (used only when converting back html entities); default is UTF-8.
+     */
+    public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8') {
+        global $SITE, $USER;
+
+        parent::__construct($orientation, $unit, $format, $unicode, $encoding);
+
+        $this->setFontSubsetting(false);
+
+        // Set orientation (P/L)!
+        $orientation = (optional_param('orientation', 0, PARAM_BOOL) == 0) ? 'P' : 'L';
+        $this->setPageOrientation($orientation);
+
+        // Set document information!
+        $this->SetCreator(format_string($SITE->fullname, true, array('context' => context_course::instance(SITEID))).' | '.
+                          get_string('pluginname', 'grouptool'));
+        $this->SetAuthor(fullname($USER));
+
+        // Set header/footer!
+        $this->setPrintHeader(true);
+        $this->setPrintFooter(true);
+
+        $textsize = optional_param('textsize', 1, PARAM_INT);
+        switch ($textsize){
+            case "0":
+                $this->SetFontSize(8);
+                break;
+            case "1":
+                $this->SetFontSize(10);
+                break;
+            case "2":
+                $this->SetFontSize(12);
+                break;
+        }
+
+        // Set default monospaced font!
+        $this->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/'freeserif');
+
+        // Set auto page breaks!
+        $this->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
+
+        // Set image scale factor
+        $this->setImageScale(/*PDF_IMAGE_SCALE_RATIO*/1);
+
+        /*
+         * ---------------------------------------------------------
+         */
+
+        // Set font!
+        $this->SetFont('freeserif', '');
+
+        // Set margins!
+        $this->SetHeaderMargin(7);
+        $this->SetFooterMargin(7);
+        $this->SetMargins(10, 30, 10, true); // Left Top Right.
+
+        // Calculate height.
+        $this->setFontSize(1.25 * NORMLINEHEIGHT);
+        $this->bigheight = $this->getStringHeight(0, 'testtext');
+        $this->setFontSize(1.0 * NORMLINEHEIGHT);
+        $this->normalheight = $this->getStringHeight(0, 'testtext');
+
+        $this->addPage($orientation, 'A4', false, false);
+    }
 
     /**
      * set_overview_header_data() helper method to set the strings for page header for Overview PDF
@@ -245,12 +327,11 @@ class pdf extends \pdf {
      *
      */
     public function add_grp_overview($groupname, $groupinfo, $registration=array(), $queue=array(), $moodlemembers = array()) {
+        $fill = 0;
 
         // Calculate height.
-        $this->setFontSize(1.25 * NORMLINEHEIGHT);
-        $bigheight = $this->getStringHeight(0, 'testtext');
-        $this->setFontSize(1.0 * NORMLINEHEIGHT);
-        $normalheight = $this->getStringHeight(0, 'testtext');
+        $bigheight = $this->bigheight;
+        $normalheight = $this->normalheight;
 
         $height = $bigheight + $normalheight + (count($registration) + count($queue) + 1) * $normalheight;
 
@@ -278,34 +359,9 @@ class pdf extends \pdf {
         $this->ln();
         // Insert registrations & queue tables!
         if (count($registration)) {
-            // Print table-header!
-            $this->SetFont('', 'B');
-            $this->Multicell(0.1 * $writewidth, $normalheight, get_string('status', 'grouptool'),
-                             'RB', 'C', true, 0, null, null, true, 1, true, false, $normalheight,
-                             'M', true);
-            $this->Multicell(0.3 * $writewidth, $normalheight, get_string('fullname'), 'LRB', 'C',
-                             true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
-            $this->Multicell(0.2 * $writewidth, $normalheight, get_string('idnumber'), 'LRB', 'C',
-                             true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
-            $this->Multicell(0.4 * $writewidth, $normalheight, get_string('email'), 'LB', 'C', true,
-                             1, null, null, true, 1, true, false, $normalheight, 'M', true);
-            $fill = 0;
-            $this->SetFillColor(0xe8, 0xe8, 0xe8);
-            $this->SetFont('', '');
+            $this->add_overview_table_header($writewidth, $normalheight);
             foreach ($registration as $row) {
-                    $this->Multicell(0.1 * $writewidth, $normalheight, $row['status'], 'TR', 'C',
-                                     $fill, 0, null, null, true, 1, false, false, $normalheight,
-                                     'M', true);
-                    $this->Multicell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L',
-                                     $fill, 0, null, null, true, 1, false, false, $normalheight,
-                                     'M', true);
-                    $this->Multicell(0.2 * $writewidth, $normalheight, $row['idnumber'], 'TLR', 'L',
-                                     $fill, 0, null, null, true, 1, false, false, $normalheight,
-                                     'M', true);
-                    $this->Multicell(0.4 * $writewidth, $normalheight, $row['email'], 'TL', 'L',
-                                     $fill, 1, null, null, true, 1, false, false, $normalheight,
-                                     'M', true);
-                    $fill ^= 1;
+                $this->add_overview_row($row['status'], $row['name'], $row['idnumber'], $row['email'], $fill);
             }
         } else if (count($moodlemembers) == 0) {
             $this->SetFont('', 'I');
@@ -317,34 +373,10 @@ class pdf extends \pdf {
 
         if (count($moodlemembers) >= 1) {
             if (count($registration) == 0) {
-                $this->SetFont('', 'B');
-                $this->Multicell(0.1 * $writewidth, $normalheight, get_string('status', 'grouptool'),
-                                 'RB', 'C', true, 0, null, null, true, 1, true, false,
-                                 $normalheight, 'M', true);
-                $this->Multicell(0.3 * $writewidth, $normalheight, get_string('fullname'), 'LRB',
-                                 'C', true, 0, null, null, true, 1, true, false, $normalheight,
-                                 'M', true);
-                $this->Multicell(0.2 * $writewidth, $normalheight, get_string('idnumber'), 'LRB',
-                                 'C', true, 0, null, null, true, 1, true, false, $normalheight,
-                                 'M', true);
-                $this->Multicell(0.4 * $writewidth, $normalheight, get_string('email'), 'LB', 'C',
-                                 true, 1, null, null, true, 1, true, false, $normalheight, 'M',
-                                 true);
-                $fill = 0;
-                $this->SetFillColor(0xe8, 0xe8, 0xe8);
-                $this->SetFont('', '');
+                $this->add_overview_table_header($writewidth, $normalheight);
             }
             foreach ($moodlemembers as $row) {
-                $this->Multicell(0.1 * $writewidth, $normalheight, '?', 'TR', 'C', $fill, 0,
-                                 null, null, true, 1, false, false, $normalheight, 'M', true);
-                $this->Multicell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', $fill,
-                                 0, null, null, true, 1, false, false, $normalheight, 'M', true);
-                $this->Multicell(0.2 * $writewidth, $normalheight, $row['idnumber'], 'TLR', 'L',
-                                 $fill, 0, null, null, true, 1, false, false, $normalheight, 'M',
-                                 true);
-                $this->Multicell(0.4 * $writewidth, $normalheight, $row['email'], 'TL', 'L', $fill,
-                                 1, null, null, true, 1, false, false, $normalheight, 'M', true);
-                $fill ^= 1;
+                $this->add_overview_row('?', $row['name'], $row['idnumber'], $row['email'], $fill);
             }
         }
 
@@ -358,16 +390,7 @@ class pdf extends \pdf {
                 } else {
                     $this->SetFillColor(0xff, 0xcc, 0x99);
                 }
-                $this->Multicell(0.1 * $writewidth, $normalheight, $row['rank'], 'TR', 'C', true, 0,
-                                 null, null, true, 1, false, false, $normalheight, 'M', true);
-                $this->Multicell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', true, 0,
-                                 null, null, true, 1, false, false, $normalheight, 'M', true);
-                $this->Multicell(0.2 * $writewidth, $normalheight, $row['idnumber'], 'TLR', 'L',
-                                 true, 0, null, null, true, 1, false, false, $normalheight, 'M',
-                                 true);
-                $this->Multicell(0.4 * $writewidth, $normalheight, $row['email'], 'TL', 'L', true, 1,
-                                 null, null, true, 1, false, false, $normalheight, 'M', true);
-                $fill ^= 1;
+                $this->add_overview_row($row['rank'], $row['name'], $row['idnumber'], $row['email'], $fill, 1);
             }
         } else {
             $this->SetFont('', 'I');
@@ -376,6 +399,56 @@ class pdf extends \pdf {
                              'M', true);
             $this->SetFont('', '');
         }
+    }
+
+    /**
+     * Writes the table header for overview tables to the PDF
+     */
+    private function add_overview_table_header() {
+        // Print table-header!
+        $margins = $this->getMargins();
+        $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
+        $normalheight = $this->normalheight;
+
+        $this->SetFont('', 'B');
+        $this->Multicell(0.1 * $writewidth, $normalheight, get_string('status', 'grouptool'),
+                         'RB', 'C', true, 0, null, null, true, 1, true, false, $normalheight,
+                         'M', true);
+        $this->Multicell(0.3 * $writewidth, $normalheight, get_string('fullname'), 'LRB', 'C',
+                         true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
+        $this->Multicell(0.2 * $writewidth, $normalheight, get_string('idnumber'), 'LRB', 'C',
+                         true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
+        $this->Multicell(0.4 * $writewidth, $normalheight, get_string('email'), 'LB', 'C', true,
+                         1, null, null, true, 1, true, false, $normalheight, 'M', true);
+        $fill = 0;
+        $this->SetFillColor(0xe8, 0xe8, 0xe8);
+        $this->SetFont('', '');
+    }
+
+    /**
+     * Adds a single row of group overview entry data to the PDF
+     *
+     * @param string $status column content
+     * @param string $name column content
+     * @param string $idnumber column content
+     * @param string $email column content
+     * @param bool $fill whether or not this row's cells will contain a background color (gets toggled afterwards)!
+     * @param bool $forcefill force cell background color ($fill gets toggled anyways)!
+     */
+    private function add_overview_row($status, $name, $idnumber, $email, &$fill, $forcefill = 0) {
+        $margins = $this->getMargins();
+        $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
+        $normalheight = $this->normalheight;
+
+        $this->Multicell(0.1 * $writewidth, $normalheight, $status, 'TR', 'C', $fill || $forcefill, 0, null, null, true,
+                         1, false, false, $normalheight, 'M', true);
+        $this->Multicell(0.3 * $writewidth, $normalheight, $name, 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
+                         1, false, false, $normalheight, 'M', true);
+        $this->Multicell(0.2 * $writewidth, $normalheight, $idnumber, 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
+                         1, false, false, $normalheight, 'M', true);
+        $this->Multicell(0.4 * $writewidth, $normalheight, $email, 'TL', 'L', $fill || $forcefill, 1, null, null, true,
+                         1, false, false, $normalheight, 'M', true);
+        $fill ^= 1;
     }
 
     /**

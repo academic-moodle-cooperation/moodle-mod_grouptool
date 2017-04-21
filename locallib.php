@@ -5773,15 +5773,6 @@ class mod_grouptool {
         $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $pdf = new \mod_grouptool\pdf();
-        $pdf->setFontSubsetting(false);
-
-        // Set orientation (P/L)!
-        $orientation = (optional_param('orientation', 0, PARAM_BOOL) == 0) ? 'P' : 'L';
-        $pdf->setPageOrientation($orientation);
-
-        // Set document information!
-        $pdf->SetCreator('TUWEL');
-        $pdf->SetAuthor($USER->firstname . " " . $USER->lastname);
 
         $coursename = $this->course->fullname;
         $timeavailable = $this->grouptool->timeavailable;
@@ -5801,49 +5792,6 @@ class mod_grouptool {
         $pdf->set_overview_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
                                        $viewname);
 
-        // Set header/footer!
-        $pdf->setPrintHeader(true);
-        $pdf->setPrintFooter(true);
-
-        $textsize = optional_param('textsize', 1, PARAM_INT);
-        switch ($textsize){
-            case "0":
-                $pdf->SetFontSize(8);
-                break;
-            case "1":
-                $pdf->SetFontSize(10);
-                break;
-            case "2":
-                $pdf->SetFontSize(12);
-                break;
-        }
-
-        // Set margins!
-        if (1) {
-            $pdf->SetMargins(10, 30, 10, true); // Left Top Right.
-        } else {
-            $pdf->SetMargins(10, 10, 10, true);
-        }
-        // Set default monospaced font!
-        $pdf->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/'freeserif');
-
-        // Set margins!
-        $pdf->SetHeaderMargin(7);
-        $pdf->SetFooterMargin(7);
-
-        // Set auto page breaks!
-        $pdf->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
-
-        // Set image scale factor
-        $pdf->setImageScale(/*PDF_IMAGE_SCALE_RATIO*/1);
-
-        /*
-         * ---------------------------------------------------------
-         */
-
-        // Set font!
-        $pdf->SetFont('freeserif', '');
-        $pdf->addPage($orientation, 'A4', false, false);
         if (count($data) > 0) {
 
             foreach ($data as $group) {
@@ -7468,15 +7416,6 @@ class mod_grouptool {
         $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
 
         $pdf = new \mod_grouptool\pdf();
-        $pdf->setFontSubsetting(false);
-
-        // Set orientation (P/L)!
-        $orientation = (optional_param('orientation', 0, PARAM_BOOL) == 0) ? 'P' : 'L';
-        $pdf->setPageOrientation($orientation);
-
-        // Set document information!
-        $pdf->SetCreator('TUWEL');
-        $pdf->SetAuthor(fullname($USER));
 
         $coursename = $this->course->fullname;
         $timeavailable = $this->grouptool->timeavailable;
@@ -7505,49 +7444,6 @@ class mod_grouptool {
         $pdf->set_userlist_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
                                     $viewname);
 
-        // Set header/footer!
-        $pdf->setPrintHeader(true);
-        $pdf->setPrintFooter(true);
-
-        $textsize = optional_param('textsize', 1, PARAM_INT);
-        switch ($textsize){
-            case "0":
-                $pdf->SetFontSize(8);
-                break;
-            case "1":
-                $pdf->SetFontSize(10);
-                break;
-            case "2":
-                $pdf->SetFontSize(12);
-                break;
-        }
-
-        // Set margins!
-        if (1) {
-            $pdf->SetMargins(10, 30, 10, true); // Left Top Right!
-        } else {
-            $pdf->SetMargins(10, 10, 10, true);
-        }
-        // Set default monospaced font!
-        $pdf->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/'freeserif');
-
-        // Set margins!
-        $pdf->SetHeaderMargin(7);
-        $pdf->SetFooterMargin(7);
-
-        // Set auto page breaks!
-        $pdf->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
-
-        // Set image scale factor!
-        $pdf->setImageScale(/*PDF_IMAGE_SCALE_RATIO*/1);
-
-        /*
-         * ---------------------------------------------------------
-         */
-
-        // Set font!
-        $pdf->SetFont('freeserif', '');
-        $pdf->addPage($orientation, 'A4', false, false);
         if (count($data) > 1) {
             $user = reset($data);
             $name = $user['name'];
