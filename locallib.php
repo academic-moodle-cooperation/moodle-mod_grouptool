@@ -4973,6 +4973,34 @@ class mod_grouptool {
     }
 
     /**
+     * Force enrol a user in this course as student to be able to import into group or register for group!
+     *
+     * @param int $userid ID of user to force enrol!
+     * @throws coding_exception Thrown if smthg very unexpected happened (couldn't instantiate manual enrol instance or similar)
+     */
+    protected function force_enrol_student($userid) {
+        require_once($CFG->dirroot.'/enrol/manual/locallib.php');
+        require_once($CFG->libdir.'/accesslib.php');
+        if (!$enrolmanual = enrol_get_plugin('manual')) {
+            throw new coding_exception(get_string('cant_enrol', 'grouptool'));
+        }
+        if (!$instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
+                                                        'enrol'    => 'manual'), '*', IGNORE_MISSING)) {
+            if ($enrolmanual->add_default_instance($this->course)) {
+                $instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
+                                                           'enrol'    => 'manual'), '*', MUST_EXIST);
+            }
+        }
+        if ($instance != false) {
+            $archroles = get_archetype_roles('student');
+            $archrole = array_shift($archroles);
+            $enrolmanual->enrol_user($instance, $userid, $archrole->id, time());
+        } else {
+            throw new coding_exception(get_string('cant_enrol', 'grouptool'));
+        }
+    }
+
+    /**
      * import users into a certain moodle-group and enrole them if not allready enroled
      *
      * @param int[] $groups array of ids of groups to import into
@@ -5143,24 +5171,12 @@ class mod_grouptool {
                      * if user's not enrolled already we force manual enrollment in course,
                      * so we can add the user to the group
                      */
-                    require_once($CFG->dirroot.'/enrol/manual/locallib.php');
-                    require_once($CFG->libdir.'/accesslib.php');
-                    if (!$enrolmanual = enrol_get_plugin('manual')) {
-                        throw new coding_exception('Can not instantiate enrol_manual');
-                    }
-                    if (!$instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
-                                                                    'enrol'    => 'manual'), '*', IGNORE_MISSING)) {
-                        if ($enrolmanual->add_default_instance($this->course)) {
-                            $instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
-                                                                       'enrol'    => 'manual'), '*', MUST_EXIST);
-                        }
-                    }
-                    if ($instance != false) {
-                        $archroles = get_archetype_roles('student');
-                        $archrole = array_shift($archroles);
-                        $enrolmanual->enrol_user($instance, $userinfo->id, $archrole->id, time());
-                    } else {
-                        $row->cells[] = new html_table_cell($OUTPUT->notification(get_string('cant_enrol', 'grouptool'), 'error'));
+                    try {
+                        $this->force_enrol_student($userinfo->id);
+                    } catch (Exception $e) {
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($e->getMessage(), 'error'));
+                    } catch (Throwable $t) {
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($t->getMessage(), 'error'));
                     }
                 }
                 foreach ($groups as $group) {
@@ -6547,22 +6563,12 @@ class mod_grouptool {
                              * if user's not enrolled already we force manual enrollment in course,
                              * so we can add the user to the group
                              */
-                            require_once($CFG->dirroot.'/enrol/manual/locallib.php');
-                            require_once($CFG->libdir.'/accesslib.php');
-                            if (!$enrolmanual = enrol_get_plugin('manual')) {
-                                throw new coding_exception('Can not instantiate enrol_manual');
-                            }
-                            if (!$instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
-                                                                            'enrol'    => 'manual'), '*', IGNORE_MISSING)) {
-                                if ($enrolmanual->add_default_instance($this->course)) {
-                                    $instance = $DB->get_record('enrol', array('courseid' => $this->course->id,
-                                                                               'enrol'    => 'manual'), '*', MUST_EXIST);
-                                }
-                            }
-                            if ($instance != false) {
-                                $archroles = get_archetype_roles('student');
-                                $archrole = array_shift($archroles);
-                                $enrolmanual->enrol_user($instance, $reg->userid, $archrole->id, time());
+                            try {
+                                $this->force_enrol_student($reg->userid);
+                            } catch (Exception $e) {
+                                $row->cells[] = new html_table_cell($OUTPUT->notification($e->getMessage(), 'error'));
+                            } catch (Throwable $t) {
+                                $row->cells[] = new html_table_cell($OUTPUT->notification($t->getMessage(), 'error'));
                             }
                         }
                         if (groups_add_member($groupid, $reg->userid)) {
