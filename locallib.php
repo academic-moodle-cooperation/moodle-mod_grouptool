@@ -3206,31 +3206,12 @@ class mod_grouptool {
 
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
-        // We have to filter only active groups to ensure no problems counting userregs and -queues.
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
-        array_unshift($params, $userid);
-        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
-                                              $params);
-        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
-        $marks = $this->count_user_marks($userid);
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        list($userregs, $userqueues, , , $max) = $this->check_users_regs_limits($userid, true);
 
         if (($oldagrpid === null)
                 && !(($userqueues == 1 && $userregs == $max - 1) || ($userqueues + $userregs == 1 && $max == 1))) {
             // We can't determine a unique group to unreg the user from! He has to do it by manually!
             throw new \mod_grouptool\local\exception\registration('groupchange_from_non_unique_reg');
-        }
-
-        if ($min > ($marks + $userregs + $userqueues)) {
-            // User has to have at least $min registrations+$queues+$marks to allow group-change!
-            throw new \mod_grouptool\local\exception\registration('too_many_registrations');
-        }
-
-        if ($max < ($marks + $userregs + $userqueues)) {
-            // If user has too many registrations now, we can't allow him to keep that amount!
-            throw new \mod_grouptool\local\exception\exceeduserreglimit();
         }
 
         if ($this->grouptool->use_size && (count($groupdata->registered) > $groupdata->grpsize)) {
@@ -3380,6 +3361,46 @@ class mod_grouptool {
     }
 
     /**
+     * Checks if user has to many, too less registrations and return values!
+     *
+     * @param int $userid User's ID
+     * @param bool $change (optional) true if check is used for group change!
+     * @return array $userregs, $userqueues, $marks, $min, $max
+     */
+    protected function check_users_regs_limits($userid, $change=false) {
+        global $DB;
+
+        // We have to filter only active groups to ensure no problems counting userregs and -queues.
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
+        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        array_unshift($params, $userid);
+        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
+                                              $params);
+        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+        $marks = $this->count_user_marks($userid);
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+
+        if ($change) {
+            if ($min > ($marks + $userregs + $userqueues)) {
+                throw new \mod_grouptool\local\exception\registration('too_many_registrations');
+            }
+            if ($max < ($marks + $userregs + $userqueues)) {
+                throw new \mod_grouptool\local\exception\exceeduserreglimit();
+            }
+        } else {
+            if ($min <= ($marks + $userregs + $userqueues)) {
+                throw new \mod_grouptool\local\exception\registration('too_many_registrations');
+            }
+            if ($max <= ($marks + $userregs + $userqueues)) {
+                throw new \mod_grouptool\local\exception\exceeduserreglimit();
+            }
+        }
+
+        return array($userregs, $userqueues, $marks, $min, $max);
+    }
+
+    /**
      * Check if user can be marked for registration, else throw exception!
      *
      * @param int $agrpid ID of the active group
@@ -3423,22 +3444,7 @@ class mod_grouptool {
         }
 
 
-        // We have to filter only active groups to ensure no problems counting userregs and -queues.
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
-        array_unshift($params, $userid);
-        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
-                                              $params);
-        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
-        $marks = $this->count_user_marks($userid);
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
-        if ($min <= ($marks + $userregs + $userqueues)) {
-            throw new \mod_grouptool\local\exception\registration('too_many_registrations');
-        }
-        if ($max <= ($marks + $userregs + $userqueues)) {
-            throw new \mod_grouptool\local\exception\exceeduserreglimit();
-        }
+        $this->check_users_regs_limits($userid);
 
         if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
             if ($userid != $USER->id) {
