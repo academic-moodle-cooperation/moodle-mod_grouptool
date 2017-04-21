@@ -230,11 +230,15 @@ class grouptool_registration_test extends advanced_testcase {
      * @return testable_assign Testable wrapper around the assign class.
      */
     protected function create_instance($params=array()) {
+        global $DB;
+
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_grouptool');
         $params['course'] = $this->course->id;
         $instance = $generator->create_instance($params);
         $cm = get_coursemodule_from_instance('grouptool', $instance->id);
         $context = context_module::instance($cm->id);
+
+        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $instance->id));
 
         return new testable_grouptool($cm->id, $instance, $cm, $this->course);
     }
@@ -268,15 +272,9 @@ class grouptool_registration_test extends advanced_testcase {
                                                   'grpsize' => 2,
                                                   'use_queue' => 0,
                                                   'allow_unreg' => 0));
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $grouptool->get_grouptool()->id));
 
-        $userid = $this->students[0]->id;
         // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
-        $agrpids = array_keys($agrps);
-        $message = new stdClass();
-        $message->username = fullname($this->students[0]);
-        $message->groupname = $agrps[$agrpids[0]]->name;
+        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
 
@@ -341,15 +339,10 @@ class grouptool_registration_test extends advanced_testcase {
                                                   'grpsize' => 2,
                                                   'use_queue' => 1,
                                                   'allow_unreg' => 0));
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $grouptool->get_grouptool()->id));
 
-        $userid = $this->students[0]->id;
-        // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
-        $agrpids = array_keys($agrps);
-        $message = new stdClass();
+        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
         $message->username = fullname($this->students[3]);
-        $message->groupname = $agrps[$agrpids[0]]->name;
+
         // Prepare by registering users 0 and 1 in group 0 and queue user 2 in group 0!
         $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
         $grouptool->register_in_agrp($agrpids[0], $this->students[1]->id, false);
@@ -406,16 +399,9 @@ class grouptool_registration_test extends advanced_testcase {
                                                   'use_queue' => 1,
                                                   'groups_queues_limit' => 1,
                                                   'users_queues_limit' => 1));
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $grouptool->get_grouptool()->id));
-        // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
-        $agrpids = array_keys($agrps);
-        $message = new stdClass();
-        $message->username = fullname($this->students[0]);
-        $message->groupname = $agrps[$agrpids[0]]->name;
+        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
-
         // Allocate a place first and continue with registering user 0 in groups 0, 1 and 2!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
         $this->assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
@@ -491,13 +477,8 @@ class grouptool_registration_test extends advanced_testcase {
                                                   'use_queue' => 1,
                                                   'groups_queues_limit' => 1,
                                                   'users_queues_limit' => 1));
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $grouptool->get_grouptool()->id));
         // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
-        $agrpids = array_keys($agrps);
-        $message = new stdClass();
-        $message->username = fullname($this->students[0]);
-        $message->groupname = $agrps[$agrpids[0]]->name;
+        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Prepare by registering users 0 and 1 in group 0!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
@@ -574,13 +555,7 @@ class grouptool_registration_test extends advanced_testcase {
                                                   'use_queue' => 1,
                                                   'groups_queues_limit' => 1,
                                                   'users_queues_limit' => 1));
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $grouptool->get_grouptool()->id));
-        // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
-        $agrpids = array_keys($agrps);
-        $message = new stdClass();
-        $message->username = fullname($this->students[0]);
-        $message->groupname = $agrps[$agrpids[0]]->name;
+        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Prepare by registering user 0 in groups 0 and 1 and user 2 in groups 2 and 3!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
@@ -625,6 +600,25 @@ class grouptool_registration_test extends advanced_testcase {
     }
 
     /**
+     * Get's all active groups indexed by active group ID as well as agrpids and prepares a message object!
+     *
+     * @param testable_grouptool $grouptool The grouptool instance to fetch data for
+     * @return array agrps, agrpids, message-object
+     */
+    protected function get_agrps_and_prepare_message($grouptool) {
+        // Get all active groups indexed by active group ID!
+        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
+        $agrpids = array_keys($agrps);
+        $message = new stdClass();
+        $message->username = fullname($this->students[0]);
+        $message->groupname = $agrps[$agrpids[0]]->name;
+
+        return array(0 => $agrps,
+                     1 => $agrpids,
+                     2 => $message);
+    }
+
+    /**
      * Tests resolving of queues
      *
      * 11 Assertions
@@ -642,13 +636,7 @@ class grouptool_registration_test extends advanced_testcase {
                                                   'use_queue' => 1,
                                                   'groups_queues_limit' => 2,
                                                   'users_queues_limit' => 1));
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $grouptool->get_grouptool()->id));
-        // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
-        $agrpids = array_keys($agrps);
-        $message = new stdClass();
-        $message->username = fullname($this->students[0]);
-        $message->groupname = $agrps[$agrpids[0]]->name;
+        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
 
