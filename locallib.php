@@ -3121,27 +3121,45 @@ class mod_grouptool {
 
         return true;
     }
+
+    /**
+     * Check if user is already registered, queued or marked for registration, throw exception in that case!
+     *
+     * @param int $agrpid ID of the active group
+     * @param int $userid ID of user to queue or null (then $USER->id is used)
+     * @param stdClass $groupdata Object with group info
+     * @param stdClass $message (optional) cached data for the language strings
+     * @throws \mod_grouptool\local\exception\regpresent
+     */
+    protected function check_reg_present($agrpid, $userid, $groupdata, $message) {
+        global $USER;
+
+        if ($this->grpmarked($agrpid, $userid)) {
+            // Allready marked for registration!?!
             if ($userid != $USER->id) {
-                $userdata = $DB->get_record('user', array('id' => $userid));
-                $message->username = fullname($userdata);
+                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
             } else {
-                $message->username = fullname($USER);
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
             }
-            $groupdata = $this->get_active_groups(false, false, $agrpid);
-            if (count($groupdata) != 1) {
-                throw new \mod_grouptool\local\exception\registration('error_getting_data');
-            }
-            $groupdata = reset($groupdata);
-            $message->groupname = $groupdata->name;
         }
 
-        try {
-            $this->can_change_group($agrpid, $userid, $message);
-        } catch (Exception $e) {
-            return false;
+        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+            // We're sorry, but user's already registered in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
+            }
         }
 
-        return true;
+        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+            // We're sorry, but user's already queued in this group!
+            if ($userid != $USER->id) {
+                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
+            } else {
+                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
+            }
+        }
     }
 
     /**
@@ -3186,32 +3204,7 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\registration('unreg_not_allowed');
         }
 
-        if ($this->grpmarked($agrpid, $userid)) {
-            // Allready marked for registration!?!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
-            }
-        }
-
-        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
-            // We're sorry, but user's already registered in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
-            }
-        }
-
-        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
-            // We're sorry, but user's already queued in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
-            }
-        }
+        $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
@@ -3417,6 +3410,7 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\exceedgroupsize();
         }
 
+        $this->check_reg_present($agrpid, $userid, $groupdata, $message);
         if ($message === null) {
             $message = new stdClass();
             if ($userid != $USER->id) {
@@ -3428,32 +3422,6 @@ class mod_grouptool {
             $message->groupname = $groupdata->name;
         }
 
-        if ($this->grpmarked($agrpid, $userid)) {
-            // Allready marked for registration!?!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
-            }
-        }
-
-        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
-            // We're sorry, but user's already registered in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
-            }
-        }
-
-        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
-            // We're sorry, but user's already queued in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
-            }
-        }
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
@@ -3647,35 +3615,7 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\exceedgroupqueuelimit();
         }
 
-        // Is marked?
-        if ($this->grpmarked($agrpid, $userid)) {
-            // Allready marked for registration!?!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
-            }
-        }
-
-        // Is registered?
-        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
-            // We're sorry, but user's already registered in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
-            }
-        }
-
-        // Is queued?
-        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
-            // We're sorry, but user's already queued in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
-            }
-        }
+        $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $userregs = $this->get_user_reg_count(0, $userid);
@@ -3791,35 +3731,7 @@ class mod_grouptool {
             $message->groupname = $groupdata->name;
         }
 
-        // Is marked?
-        if ($this->grpmarked($agrpid, $userid)) {
-            // Allready marked for registration!?!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_marked', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_marked', $message);
-            }
-        }
-
-        // Is registered?
-        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
-            // We're sorry, but user's already registered in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_registered', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_already_registered', $message);
-            }
-        }
-
-        // Is queued?
-        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
-            // We're sorry, but user's already queued in this group!
-            if ($userid != $USER->id) {
-                throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
-            } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
-            }
-        }
+        $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // Check if enough (queue) places are available, otherwise display an info and remove marked entry.
         $userregs = $this->get_user_reg_count($this->grouptool->id, $userid);
