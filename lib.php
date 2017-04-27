@@ -940,3 +940,15 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
         }
     }
 }
+
+/**
+ * Map icons for font-awesome themes.
+ *
+ * @return string[] Mapping array with font awesome classes indexed by image names
+ */
+function mod_grouptool_get_fontawesome_icon_map() {
+    return [
+        'mod_grouptool:active' => 'fa-circle text-success',
+        'mod_grouptool:inactive' => 'fa-circle'
+    ];
+}
