@@ -99,52 +99,44 @@ class renderer extends \plugin_renderer_base {
                     'value' => (!empty($group->order) ? $group->order : 999999),
                     'class' => 'sort_order');
 
-            $moveupattr = array('src'   => $OUTPUT->pix_url('i/up'),
-                                'alt'   => $moveupstr,
-                                'title' => $moveupstr,
+            $moveupattr = array('title' => $moveupstr,
                                 'name'  => 'moveup['.$id.']',
                                 'class' => 'moveupbutton');
+            $moveupicon = $OUTPUT->pix_icon('i/up', $moveupstr, 'moodle', $moveupattr);
             $moveupurl = new \moodle_url($PAGE->url, array('moveup' => $id));
-            $moveupbutton = \html_writer::link($moveupurl, \html_writer::empty_tag('img', $moveupattr), $moveupattr);
-            $movedownattr = array('src'   => $OUTPUT->pix_url('i/down'),
-                                  'alt'   => $movedownstr,
-                                  'title' => $movedownstr,
+            $moveupbutton = \html_writer::link($moveupurl, $moveupicon, $moveupattr);
+            $movedownattr = array('title' => $movedownstr,
                                   'name'  => 'movedown['.$id.']',
                                   'class' => 'movedownbutton');
+            $movedownicon = $OUTPUT->pix_icon('i/down', $movedownstr, 'moodle', $movedownattr);
             $movedownurl = new \moodle_url($PAGE->url, array('movedown' => $id));
-            $movedownbutton = \html_writer::link($movedownurl, \html_writer::empty_tag('img', $movedownattr), $movedownattr);
-            $dragbutton = \html_writer::empty_tag('img', array('src'   => $OUTPUT->pix_url('i/dragdrop'),
-                                                               'alt'   => $dragstr,
-                                                               'title' => $dragstr,
-                                                               'class' => 'drag_image js_invisible'));
+            $movedownbutton = \html_writer::link($movedownurl, $movedownicon, $movedownattr);
+            $dragbutton = $OUTPUT->pix_icon('i/dragdrop', $dragstr, 'moodle', array('title' => $dragstr,
+                                                                                    'class' => 'drag_image js_invisible'));
             $nameattr = array('name'  => 'name['.$id.']',
                               'type'  => 'hidden',
                               'value' => $group->name);
             $nameblock = \html_writer::tag('span', $group->name, array('class' => 'text')).
                          \html_writer::empty_tag('input', $nameattr);
-            $renameattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
-                                'alt'   => $renamestr,
-                                'title' => $renamestr,
+            $renameattr = array('title' => $renamestr,
                                 'type'  => 'image',
                                 'name'  => 'rename['.$id.']',
                                 'class' => 'renamebutton');
             $renamebutton = \html_writer::link(new \moodle_url($PAGE->url, array('rename' => $id)),
-                                              \html_writer::empty_tag('img', $renameattr),
-                                              array('class' => $renameattr['class'], 'title' => $renamestr));
+                                               $OUTPUT->pix_icon('t/editstring', $renamestr, 'moodle', $renameattr),
+                                               array('class' => $renameattr['class'], 'title' => $renamestr));
             $nameblock .= $renamebutton;
 
             $drag = new \html_table_cell($dragbutton);
             $drag->attributes['class'] = 'buttons';
 
-            $deleteattr = array('src'   => $OUTPUT->pix_url('t/delete'),
-                                'alt'   => $deletestr,
-                                'title' => $deletestr,
+            $deleteattr = array('title' => $deletestr,
                                 'name'  => 'delete['.$id.']',
                                 'class' => 'deletebutton',
                                 'id'    => 'delete_'.$id);
             $deletebutton = \html_writer::link(new \moodle_url($PAGE->url, array('delete' => $id)),
-                                              \html_writer::empty_tag('img', $deleteattr),
-                                              array('class' => $deleteattr['class'], 'title' => $deletestr));
+                                               $OUTPUT->pix_icon('t/delete', $deletestr, 'moodle', $deleteattr),
+                                               array('class' => $deleteattr['class'], 'title' => $deletestr));
 
             $row = array( 0 => new \html_table_cell(\html_writer::empty_tag('input', $chkboxattr)),
                           1 => $drag,
@@ -159,16 +151,14 @@ class renderer extends \plugin_renderer_base {
                                   'value' => clean_param($group->size, PARAM_INT));
                 $sizeblock = \html_writer::tag('span', $group->size, array('class' => 'text')).
                              \html_writer::empty_tag('input', $sizeattr);
-                $resizeattr = array('src'   => $OUTPUT->pix_url('t/editstring'),
-                                    'id'    => 'resize_'.$id,
-                                    'alt'   => $resizestr,
+                $resizeattr = array('id'    => 'resize_'.$id,
                                     'title' => $resizestr,
                                     'type'  => 'image',
                                     'name'  => 'resize['.$id.']',
                                     'class' => 'resizebutton');
                 $resizebutton = \html_writer::link(new \moodle_url($PAGE->url, array('resize' => $id)),
-                                                  \html_writer::empty_tag('img', $resizeattr),
-                                                  array('class' => $resizeattr['class'], 'title' => $resizestr));
+                                                   $OUTPUT->pix_icon('t/editstring', $resizestr, 'moodle', $resizeattr),
+                                                   array('class' => $resizeattr['class'], 'title' => $resizestr));
                 $sizeblock .= $resizebutton;
 
                 $fieldcell = new \html_table_cell($sizeblock);
@@ -177,23 +167,21 @@ class renderer extends \plugin_renderer_base {
             }
 
             if ($group->status) {
-                $toggleattr = array('src'   => $OUTPUT->pix_url('active', 'mod_grouptool'),
-                                    'alt'   => $activestr,
-                                    'title' => $activestr,
+                $toggleattr = array('title' => $activestr,
+                                    'type'  => 'active',
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'active');
+                $toggleicon = $OUTPUT->pix_icon('active', $activestr, 'mod_grouptool', $toggleattr);
             } else {
-                $toggleattr = array('src'   => $OUTPUT->pix_url('inactive', 'mod_grouptool'),
-                                    'alt'   => $inactivestr,
-                                    'title' => $inactivestr,
+                $toggleattr = array('title' => $inactivestr,
                                     'type'  => 'image',
                                     'name'  => 'toggle['.$id.']',
                                     'class' => 'inactive');
+                $toggleicon = $OUTPUT->pix_icon('inactive', $inactivestr, 'mod_grouptool', $toggleattr);
             }
             $linkattr = array('class' => 'togglebutton '.$toggleattr['class'],
                               'title' => $toggleattr['title']);
-            $togglebutton = \html_writer::link(new \moodle_url($PAGE->url, array('toggle' => $id)),
-                                              \html_writer::empty_tag('img', $toggleattr), $linkattr);
+            $togglebutton = \html_writer::link(new \moodle_url($PAGE->url, array('toggle' => $id)), $toggleicon, $linkattr);
             unset($linkattr);
             $toggle = new \html_table_cell($togglebutton);
             $toggle->attributes['class'] = 'buttons';
