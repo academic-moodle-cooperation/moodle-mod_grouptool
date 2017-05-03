@@ -107,7 +107,7 @@ define('GROUPTOOL_XLSX', 2);
  */
 define('GROUPTOOL_RAW', -1);
 
-/*
+/**
  * GROUPTOOL_NL - Windows style newlines
  * otherwise we get problems with windows users and txt-files (UNIX \n, MAC \r)
  */

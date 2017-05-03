@@ -44,8 +44,6 @@ function grouptool_supports($feature) {
             return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
-        case FEATURE_MOD_INTRO:
-            return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
         case FEATURE_MOD_ARCHETYPE:
@@ -212,6 +210,7 @@ function grouptool_update_instance(stdClass $grouptool) {
  */
 function grouptool_refresh_events($course = 0, $grouptoolid = 0) {
     global $DB, $CFG;
+
     require_once($CFG->dirroot.'/calendar/lib.php');
 
     if ($grouptoolid == 0) {
@@ -305,7 +304,7 @@ function grouptool_update_queues($grouptool = 0) {
 
     // Update queues and move users from queue to reg if there's place!
     if (!is_object($grouptool)) {
-        $grouptool = $DB->get_records('grouptool', array('id' => $grouptool), MUST_EXIST);
+        $grouptool = $DB->get_record('grouptool', array('id' => $grouptool), MUST_EXIST);
         $grouptool->instance = $grouptool->id;
     } else {
         $grouptool->instance = $grouptool->id;
@@ -420,8 +419,8 @@ function grouptool_delete_instance($id) {
  * when printing this activity in a course listing.  See get_array_of_activities() in course/lib.php.
  *
  * @param stdClass $coursemodule The coursemodule object (record).
- * @return cached_cm_info An object on information that the courses
- *                        will know about (most noticeably, an icon).
+ * @return cached_cm_info|bool An object on information that the courses
+ *                             will know about (most noticeably, an icon).
  */
 function grouptool_get_coursemodule_info($coursemodule) {
     global $DB;
@@ -465,11 +464,9 @@ function grouptool_get_extra_capabilities() {
  * @param navigation_node $navref Object representing the nav tree node of the grouptool mod instance
  * @param stdClass $course course object
  * @param stdClass $module module object
- * @param cm_info $cm cousre module info object
+ * @param cm_info $cm course module info object
  */
 function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
-    global $DB;
-
     if ($course->id != $module->course) {
         // Just so PHPMD won't complain about $course being here ;) These have to be equal all the time!
         return;
@@ -538,9 +535,9 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
 /**
  * displays if submission was early enough or late...
  *
- * @param timestamp $timesubmitted
- * @param timestamp $timedue
- * @return array string colorclass, string html-fragment
+ * @param int $timesubmitted
+ * @param int $timedue
+ * @return array string color class, string html-fragment
  */
 function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
     if ($timesubmitted == null) {
@@ -580,7 +577,7 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
  * @deprecated since 3.3
  * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param stdClass[] $courses
- * @param string[] $htmlarray
+ * @param string[][] $htmlarray
  */
 function grouptool_print_overview($courses, &$htmlarray) {
     global $CFG;
@@ -653,7 +650,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
  * Get a nice overview over user's registration details!
  *
  * @param stdClass $grouptool Grouptool DB record with additional coursemodule property set!
- * @param stdClass $context Context instance
+ * @param context $context Context instance
  * @return string HTML snippet with user's registration details
  */
 function grouptool_get_user_reg_details($grouptool, $context) {
@@ -666,7 +663,11 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         // It's similar to the student mymoodle output!
         $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
         $userstats = $instance->get_registration_stats($USER->id);
+    } else {
+        return '';
     }
+
+    list($colorclass, ) = grouptool_display_lateness(time(), $grouptool->timedue);
 
     if (has_capability('mod/grouptool:register', $context)) {
         if ($grouptool->allow_reg) {
@@ -718,7 +719,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
             if (count($userstats->queued)) {
                 $tempstr = "";
                 foreach ($userstats->queued as $queue) {
-                    list($colorclass, $text) = grouptool_display_lateness($queue->timestamp,
+                    list($colorclass, ) = grouptool_display_lateness($queue->timestamp,
                                                                           $grouptool->timedue);
                     if ($tempstr != "") {
                         $tempstr .= ", ";
@@ -803,9 +804,9 @@ function grouptool_reset_userdata($data) {
 /**
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the grouptool.
- * @param stdClass $mform form passed by reference
+ * @param MoodleQuickForm $mform form passed by reference
  */
-function grouptool_reset_course_form_definition(&$mform) {
+function grouptool_reset_course_form_definition(MoodleQuickForm &$mform) {
     $mform->addElement('header', 'grouptoolheader', get_string('modulenameplural', 'grouptool'));
     $mform->addElement('advcheckbox', 'reset_grouptool_agrps',
                        get_string('reset_agrps', 'grouptool'));
@@ -813,11 +814,11 @@ function grouptool_reset_course_form_definition(&$mform) {
     $mform->addElement('advcheckbox', 'reset_grouptool_registrations',
                        get_string('reset_registrations', 'grouptool'));
     $mform->addHelpButton('reset_grouptool_registrations', 'reset_registrations', 'grouptool');
-    $mform->disabledif ('reset_grouptool_registrations', 'reset_grouptool_agrps', 'checked');
+    $mform->disabledIf('reset_grouptool_registrations', 'reset_grouptool_agrps', 'checked');
     $mform->addElement('advcheckbox', 'reset_grouptool_queues',
                        get_string('reset_queues', 'grouptool'));
     $mform->addHelpButton('reset_grouptool_queues', 'reset_queues', 'grouptool');
-    $mform->disabledif ('reset_grouptool_queues', 'reset_grouptool_agrps', 'checked');
+    $mform->disabledIf('reset_grouptool_queues', 'reset_grouptool_agrps', 'checked');
     $mform->addElement('advcheckbox', 'reset_grouptool_transparent_unreg',
                        get_string('reset_transparent_unreg', 'grouptool'));
     $mform->addHelpButton('reset_grouptool_transparent_unreg', 'reset_transparent_unreg',
@@ -844,8 +845,7 @@ function grouptool_reset_course_form_defaults() {
 function grouptool_copy_assign_grades($id, $fromid, $toid) {
     global $DB;
 
-    $source = $DB->get_records('assign_grades', array('assignment' => $id, 'userid' => $fromid),
-                               'id DESC', '*', 0, 1, MUST_EXIST);
+    $source = $DB->get_records('assign_grades', array('assignment' => $id, 'userid' => $fromid), 'id DESC', '*', 0, 1);
     if (!is_array($toid)) {
         $toid = array($toid);
     }

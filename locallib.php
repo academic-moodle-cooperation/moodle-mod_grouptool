@@ -499,7 +499,7 @@ class mod_grouptool {
                 $newgroup->courseid = $this->course->id;
                 $newgroup->name     = $group['name'];
                 $groupid = groups_create_group($newgroup);
-                $this->add_agrp_entry();
+                $this->add_agrp_entry($groupid);
                 $createdgroups[] = $groupid;
                 foreach ($group['members'] as $user) {
                     groups_add_member($groupid, $user->id);
@@ -2878,6 +2878,8 @@ class mod_grouptool {
             // We fetched groupid above in SQL.
             \mod_grouptool\event\user_moved::promotion_from_queue($this->cm, $record, $newrecord)->trigger();
         }
+
+        return true;
     }
 
     /**

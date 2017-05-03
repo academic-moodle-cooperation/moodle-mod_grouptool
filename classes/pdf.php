@@ -221,7 +221,7 @@ class pdf extends \pdf {
         $this->header2 = array();
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
-        $this->header2[2] = get_string('duedate', 'checkmark').":";
+        $this->header2[2] = get_string('duedate', 'grouptool').":";
         $this->header1[3] = empty($timedue) ? get_string('duedateno', 'grouptool') : userdate($timedue);
         $this->header2[4] = $viewname;
     }

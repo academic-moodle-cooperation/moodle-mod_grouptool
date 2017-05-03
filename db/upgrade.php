@@ -330,7 +330,7 @@ function xmldb_grouptool_upgrade($oldversion) {
     $tables = array(2013112701 => new xmldb_table('grouptool_registered'),
                     2013112702 => new xmldb_table('grouptool_queued'));
     foreach ($tables as $vers => $table) {
-        if ($oldversion < vers) {
+        if ($oldversion < $vers) {
             // Define key agrp_id (foreign) to be dropped form grouptool_queued.
             $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps', array('id'));
             // Launch drop key agrp_id.
