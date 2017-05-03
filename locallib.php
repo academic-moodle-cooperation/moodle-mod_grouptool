@@ -143,6 +143,24 @@ class mod_grouptool {
     }
 
     /**
+     * Return Grouptool's settings
+     *
+     * @return object Grouptool's DB record
+     */
+    public function get_settings() {
+        return $this->grouptool;
+    }
+
+    /**
+     * Return Grouptool's multiple registrations settings
+     *
+     * @return array [allow_multiple, choose_min, choose_max]
+     */
+    public function get_reg_settings() {
+        return [$this->grouptool->allow_multiple, $this->grouptool->choose_min, $this->grouptool->choose_max];
+    }
+
+    /**
      * Print a message along with button choices for Continue/Cancel
      *
      * If a string or moodle_url is given instead of a single_button, method defaults to post.
@@ -4305,6 +4323,76 @@ class mod_grouptool {
     }
 
     /**
+     * Return true if the registration is open, false otherwise!
+     *
+     * @return bool true if reg is open, false otherwise
+     */
+    public function is_registration_open() {
+
+        return ($this->grouptool->allow_reg && (($this->grouptool->timedue == 0) || (time() < $this->grouptool->timedue))
+                && (time() > $this->grouptool->timeavailable));
+    }
+
+    /**
+     * Returns the amount of registrations missing in this grouptool instance.
+     *
+     * @return int amount of missing registrations (includes queues!)
+     */
+    public function get_missing_registrations() {
+        global $DB;
+
+        list($esql, $params) = get_enrolled_sql($this->context, 'mod/grouptool:register');
+
+        $sql = "SELECT u.id
+                  FROM {user} u
+             LEFT JOIN ($esql) eu ON eu.id=u.id
+                 WHERE u.deleted = 0 AND eu.id=u.id ";
+        $users = $DB->get_records_sql($sql, $params);
+
+        if (empty($users)) {
+            return 0;
+        }
+
+        list($usql, $uparams) = $DB->get_in_or_equal(array_keys($users), SQL_PARAMS_NAMED, 'usr');
+
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 1;
+
+        if ($min == 0) {
+            return 0;
+        }
+
+        $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
+        $keys = array_keys($agrps);
+
+        if (empty($keys)) {
+            $keys = array(-1);
+        }
+        list($agrpsql, $params) = $DB->get_in_or_equal($keys, SQL_PARAMS_NAMED, 'agrp');
+        $params = array_merge($uparams, $params);
+        $regs = $DB->get_records_sql_menu("SELECT u.id, count(r.id)
+                                             FROM {user} u
+                                        LEFT JOIN {grouptool_registered} r ON u.id = r.userid AND r.modified_by >= 0
+                                                  AND r.agrpid ".$agrpsql."
+                                            WHERE u.id ".$usql."
+                                         GROUP BY u.id", $params);
+        $queues = $DB->get_records_sql_menu("SELECT u.id, count(q.id)
+                                               FROM {user} u
+                                          LEFT JOIN {grouptool_queued} q ON u.id = q.userid AND q.agrpid ".$agrpsql."
+                                              WHERE u.id ".$usql."
+                                           GROUP BY u.id", $params);
+
+        $missing = 0;
+        foreach ($users as $user) {
+            $userregs = $regs[$user->id] + $queues[$user->id];
+            if ($userregs < $min) {
+                $missing += $min - $userregs;
+            }
+        }
+
+        return $missing;
+    }
+
+    /**
      * view selfregistration-tab
      */
     public function view_selfregistration() {
@@ -4312,10 +4400,7 @@ class mod_grouptool {
 
         $userid = $USER->id;
 
-        $regopen = ($this->grouptool->allow_reg
-                     && (($this->grouptool->timedue == 0)
-                         || (time() < $this->grouptool->timedue))
-                     && (time() > $this->grouptool->timeavailable));
+        $regopen = $this->is_registration_open();
 
         // Process submitted form!
         $error = false;

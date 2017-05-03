@@ -163,3 +163,12 @@ define('GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG', 4);
  * SHOW_GROUPMEMBERS - show groupmembers no matter what...
  */
 define('GROUPTOOL_SHOW_GROUPMEMBERS', 1);
+
+/**
+ * GROUPTOOL_EVENT_TYPE_DUE - event type for due date events
+ */
+define('GROUPTOOL_EVENT_TYPE_DUE', 'deadline');
+/**
+ * GROUPTOOL_EVENT_TYPE_AVAILABLEFROM - event type for available from events (not used anymore!)
+ */
+define('GROUPTOOL_EVENT_TYPE_AVAILABLEFROM', 'availablefrom');

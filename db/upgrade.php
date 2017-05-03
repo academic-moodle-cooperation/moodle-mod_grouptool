@@ -474,6 +474,40 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017012500, 'grouptool');
     }
 
+    // Moodle v3.3.0 release upgrade line.
+    // Put any upgrade step following this!
+
+    if ($oldversion < 2017050100) {
+        require_once($CFG->dirroot.'/calendar/lib.php');
+        require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
+
+        // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
+        $count = $DB->count_records('event', array('modulename' => 'grouptool',
+                                                   'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE));
+        $rs = $DB->get_recordset('event', array('modulename' => 'grouptool',
+                                                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE));
+        $i = 0;
+        $cmnames = array();
+        $pbar = new progress_bar('UpdateEvents', 500, true);
+        $pbar->update($i, $count, 'Update events...');
+        foreach ($rs as $cur) {
+            $calendarevent = calendar_event::load($cur->id);
+            if (!array_key_exists($cur->instance, $cmnames)) {
+                $cmnames[$cur->instance] = $DB->get_field('grouptool', 'name', array('id' => $cur->instance));
+            }
+            $cur->name = $cmnames[$cur->instance];
+            $cur->type = CALENDAR_EVENT_TYPE_ACTION;
+            $cur->timesort = $cur->timestart;
+            $calendarevent->update($cur);
+            $i++;
+            $pbar->update($i, $count, 'Update events...');
+        }
+        $pbar->update($count, $count, 'Update events...OK!');
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2017050100, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

@@ -71,7 +71,7 @@ function grouptool_supports($feature) {
  * @return int The id of the newly inserted grouptool record
  */
 function grouptool_add_instance(stdClass $grouptool) {
-    global $DB, $CFG;
+    global $DB;
 
     $grouptool->timecreated = time();
 
@@ -103,43 +103,7 @@ function grouptool_add_instance(stdClass $grouptool) {
 
     $return = $DB->insert_record('grouptool', $grouptool);
 
-    require_once($CFG->dirroot.'/calendar/lib.php');
-    $event = new stdClass;
-    if ($grouptool->allow_reg) {
-        $event->name = get_string('registration_period_start', 'grouptool').' '.$grouptool->name;
-    } else {
-        $event->name = $grouptool->name.' '.get_string('availabledate', 'grouptool');
-    }
-    $event->description  = format_module_intro('grouptool', $grouptool, $grouptool->coursemodule);
-    $event->courseid     = $grouptool->course;
-    $event->groupid      = 0;
-    $event->userid       = 0;
-    $event->modulename   = 'grouptool';
-    $event->instance     = $return;
-    // For activity module's events, this can be used to set the alternative text of the event icon.
-    // Set it to 'pluginname' unless you have a better string.
-    $event->eventtype    = 'availablefrom';
-    if ($grouptool->timeavailable == 0) {
-        $event->timestart = $grouptool->timecreated;
-    } else {
-        $event->timestart    = $grouptool->timeavailable;
-    }
-    $event->visible      = instance_is_visible('grouptool', $grouptool);
-    $event->timeduration = 0;
-    $dueevent = clone($event);
-    calendar_event::create($event);
-
-    if ($grouptool->timedue != 0) {
-        unset($dueevent->id);
-        if ($grouptool->allow_reg) {
-            $dueevent->name = get_string('registration_period_end', 'grouptool').' '.$grouptool->name;
-        } else {
-            $dueevent->name = $grouptool->name.' '.get_string('duedate', 'grouptool');
-        }
-        $dueevent->timestart = $grouptool->timedue;
-        $dueevent->eventtype = 'deadline';
-        calendar_event::create($dueevent);
-    }
+    grouptool_refresh_events($grouptool->course, $return);
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
@@ -181,7 +145,7 @@ function grouptool_update_instance(stdClass $grouptool) {
         $grouptool->use_individual = 0;
     }
     if (!isset($grouptool->use_queue)) {
-        $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id)
+        $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id) AS count
                                             FROM {grouptool_agrps} agrps
                                        LEFT JOIN {grouptool_queued} queues ON queues.agrpid = agrps.id
                                            WHERE agrps.grouptoolid = ? AND agrps.active = 1", array($grouptool->instance));
@@ -208,77 +172,7 @@ function grouptool_update_instance(stdClass $grouptool) {
         $instance->push_registrations();
     }
 
-    require_once($CFG->dirroot.'/calendar/lib.php');
-    $event = new stdClass();
-    if ($grouptool->allow_reg) {
-        $event->name = get_string('registration_period_start', 'grouptool').' '.$grouptool->name;
-    } else {
-        $event->name = $grouptool->name.' '.get_string('availabledate', 'grouptool');
-    }
-    $event->description  = format_module_intro('grouptool', $grouptool, $grouptool->coursemodule);
-    if (!empty($grouptool->timeavailable)) {
-        $event->timestart = $grouptool->timeavailable;
-    } else {
-        $grouptool->timecreated = $DB->get_field('grouptool', 'timecreated',
-                                                 array('id' => $grouptool->id));
-        $event->timestart = $grouptool->timecreated;
-    }
-    $event->visible      = instance_is_visible('grouptool', $grouptool);
-    $event->timeduration = 0;
-
-    if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
-                                                         'instance'   => $grouptool->id,
-                                                         'eventtype'  => 'availablefrom'))) {
-        $calendarevent = calendar_event::load($event->id);
-        $calendarevent->update($event, false);
-    } else {
-        $event->courseid     = $grouptool->course;
-        $event->groupid      = 0;
-        $event->userid       = 0;
-        $event->modulename   = 'grouptool';
-        $event->instance     = $grouptool->id;
-        /*
-         *  For activity module's events, this can be used to set the alternative text of the
-         *  event icon. Set it to 'pluginname' unless you have a better string.
-         */
-        $event->eventtype    = 'availablefrom';
-
-        calendar_event::create($event);
-    }
-
-    if (($grouptool->timedue != 0)) {
-        unset($event->id);
-        unset($calendarevent);
-        if ($grouptool->allow_reg) {
-            $event->name = get_string('registration_period_end', 'grouptool').' '.$grouptool->name;
-        } else {
-            $event->name = $grouptool->name.' '.get_string('duedate', 'grouptool');
-        }
-        $event->timestart = $grouptool->timedue;
-        $event->eventtype    = 'deadline';
-        /*
-         *  For activity module's events, this can be used to set the alternative text of the
-         *  event icon. Set it to 'pluginname' unless you have a better string.
-         */
-        if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
-                                                             'instance'   => $grouptool->id,
-                                                             'eventtype'  => 'deadline'))) {
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->update($event, false);
-        } else {
-            unset($event->id);
-            $event->courseid = $grouptool->course;
-            // We've got some permission issues with calendar_event::create() so we work around that!
-            $calev = new calendar_event($event);
-            $calev->update($event, false);
-        }
-
-    } else if ($event->id = $DB->get_field('event', 'id', array('modulename' => 'grouptool',
-                                                                'instance'   => $grouptool->id,
-                                                                'eventtype'  => 'deadline'))) {
-        $calendarevent = calendar_event::load($event->id);
-        $calendarevent->delete(true);
-    }
+    grouptool_refresh_events($grouptool->course, $grouptool->instance);
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
@@ -301,7 +195,108 @@ function grouptool_update_instance(stdClass $grouptool) {
 }
 
 /**
- * function looks through all the queues and moves users from queue to reg if theres place
+ * Make sure up-to-date events are created for all grouptool instances
+ *
+ * This standard function will check all instances of this module
+ * and make sure there are up-to-date vents created for each of them.
+ * If course = 0, then every grouptool event in the site is checked, else
+ * only grouptool events belonging to the course specified are checked.
+ * This function is used, in it's new format, by restore_refresh_events()
+ *
+ * @param int $course (optional) If zero then all Grouptools for all courses are covered
+ * @param int $grouptoolid (optional) If zero then only course filter is active!
+ *
+ * @throws coding_exception
+ *
+ * @return bool Always returns true
+ */
+function grouptool_refresh_events($course = 0, $grouptoolid = 0) {
+    global $DB, $CFG;
+    require_once($CFG->dirroot.'/calendar/lib.php');
+
+    if ($grouptoolid == 0) {
+        if ($course == 0) {
+            $cond = array();
+        } else {
+            $cond = array('course' => $course);
+        }
+    } else {
+        if ($course == 0) {
+            $cond = array('id' => $grouptoolid);
+        } else {
+            $cond = array('id' => $grouptoolid, 'course' => $course);
+        }
+    }
+
+    if (!$grouptools = $DB->get_records('grouptool', $cond)) {
+        return true;
+    }
+
+    if ($grouptools) {
+        foreach ($grouptools as $grouptool) {
+            $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
+
+            // Start with creating the event.
+            $event = new stdClass();
+            $event->modulename  = 'grouptool';
+            $event->courseid = $grouptool->course;
+            $event->groupid = 0;
+            $event->userid  = 0;
+            $event->instance  = $grouptool->id;
+            $event->name = $grouptool->name;
+            $event->type = CALENDAR_EVENT_TYPE_ACTION;
+
+            if (!empty($grouptool->intro)) {
+                if (!$cm) {
+                    // Convert the links to pluginfile. It is a bit hacky but at this stage the files
+                    // might not have been saved in the module area yet.
+                    $intro = $grouptool->intro;
+                    if ($draftid = file_get_submitted_draft_itemid('introeditor')) {
+                        $intro = file_rewrite_urls_to_pluginfile($intro, $draftid);
+                    }
+
+                    // We need to remove the links to files as the calendar is not ready
+                    // to support module events with file areas.
+                    $intro = strip_pluginfile_content($intro);
+                    $event->description = array('text' => $intro,
+                                                'format' => $grouptool->introformat);
+                } else {
+                    $event->description = format_module_intro('grouptool', $grouptool, $cm->id);
+                }
+            }
+
+            if ($grouptool->timedue) {
+                $event->eventtype = GROUPTOOL_EVENT_TYPE_DUE;
+                $event->name = $grouptool->name;
+
+                $event->timestart = $grouptool->timedue;
+                $event->timesort = $grouptool->timedue;
+                $select = "modulename = :modulename
+                           AND instance = :instance
+                           AND eventtype = :eventtype
+                           AND groupid = 0
+                           AND courseid <> 0";
+                $params = array('modulename' => 'grouptool', 'instance' => $grouptool->id, 'eventtype' => $event->eventtype);
+                $event->id = $DB->get_field_select('event', 'id', $select, $params);
+
+                // Now process the event.
+                if ($event->id) {
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event, false);
+                } else {
+                    calendar_event::create($event, false);
+                }
+            } else {
+                $DB->delete_records('event', array('modulename' => 'grouptool', 'instance' => $grouptool->id,
+                        'eventtype' => GROUPTOOL_EVENT_TYPE_DUE));
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * function looks through all the queues and moves users from queue to reg if there's place
  *
  * @param stdClass|int $grouptool grouptool object or grouptoolid
  */
@@ -408,9 +403,6 @@ function grouptool_delete_instance($id) {
             $DB->delete_records_select('grouptool_registered', "agrpid ".$sql, $params);
             $DB->delete_records_select('grouptool_agrps', "id ".$sql, $params);
         }
-    }
-    if (!isset($event)) {
-        $event = new stdClass();
     }
 
     $DB->delete_records('event', array('modulename' => 'grouptool', 'instance' => $grouptool->id));
@@ -585,11 +577,15 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
 /**
  * prepare text for mymoodle-Page to be displayed
  *
+ * @deprecated since 3.3
+ * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param stdClass[] $courses
  * @param string[] $htmlarray
  */
 function grouptool_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG;
+    global $CFG;
+
+    debugging('The function grouptool_print_overview() is now deprecated.', DEBUG_DEVELOPER);
 
     require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
@@ -939,6 +935,125 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
             }
         }
     }
+}
+
+/*
+ ******************** CALENDAR API AND SIMILAR FUNCTIONS FOR GROUPTOOLS ***********************
+ */
+
+/**
+ * Is the event visible?
+ *
+ * This is used to determine global visibility of an event in all places throughout Moodle. For example,
+ * the ASSIGN_EVENT_TYPE_GRADINGDUE event will not be shown to students on their calendar, and
+ * ASSIGN_EVENT_TYPE_DUE events will not be shown to teachers.
+ *
+ * @param calendar_event $event
+ * @return bool Returns true if the event is visible to the current user, false otherwise.
+ */
+function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
+    global $CFG;
+
+    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    $grouptool = new mod_grouptool($cm->id, null, $cm, null);
+
+    $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
+                                                                                                 $context);
+
+    if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
+        return ((has_capability('mod/grouptool:register', $context) && $grouptool->is_registration_open())
+                || ($managesregs && ($grouptool->get_missing_registrations() >= 1 || $grouptool->is_registration_open())));
+    }
+
+    return false;
+}
+
+/**
+ * This function receives a calendar event and returns the action associated with it, or null if there is none.
+ *
+ * This is used by block_myoverview in order to display the event appropriately. If null is returned then the event
+ * is not displayed on the block.
+ *
+ * @param calendar_event $event
+ * @param \core_calendar\action_factory $factory
+ * @return \core_calendar\local\event\entities\action_interface|null
+ */
+function mod_grouptool_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
+    global $CFG, $USER;
+
+    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+
+    $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
+    $context = context_module::instance($cm->id);
+
+    $grouptool = new mod_grouptool($cm->id, null, $cm, null);
+
+    $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
+                                                                                                 $context);
+    $isopen = $grouptool->is_registration_open();
+
+    $url = new \moodle_url('/mod/grouptool/view.php', [
+        'id' => $cm->id
+    ]);
+
+    $actionable = false;
+    // Item count can't be 0 for the event to be displayed, but now we use it to count the real items!
+    $itemcount = -1;
+    $label = '';
+
+    if (!$managesregs && has_capability('mod/grouptool:register', $context)) {
+        $userstats = $grouptool->get_registration_stats($USER->id);
+        list($allowmultiple, $choosemin, ) = $grouptool->get_reg_settings();
+        if ($allowmultiple) {
+            $itemcount = ($choosemin - count($userstats->registered));
+            $label = get_string(($itemcount > 1) ? 'register' : 'register', 'grouptool');
+        } else {
+            $itemcount = !empty($userstats->registered) ? 0 : 1;
+            $label = get_string('register', 'grouptool');
+        }
+        if ($itemcount <= 0) {
+            $label = get_string('view_registrations', 'grouptool');
+            $itemcount = -1;
+        }
+        // Clickable if registration is open and registrations are missing or enough registrations are made!
+        $actionable = ($isopen && ($itemcount > 0)) || ($itemcount <= 0);
+    } else if ($managesregs) {
+        $missing = $grouptool->get_missing_registrations();
+        $itemcount = ($missing > 0) ? $missing : 0;
+        if ($missing > 1) {
+            $label = get_string('myoverview_registrations_missing', 'grouptool');
+        } else if ($missing == 1) {
+            $label = get_string('myoverview_registrations_missing', 'grouptool');
+        } else {
+            $label = get_string('view');
+            $itemcount = -1;
+        }
+        $url = new moodle_url($url, array('tab' => 'overview'));
+        $actionable = true;
+    }
+
+    return $factory->create_instance($label, $url, $itemcount, $actionable);
+}
+
+/**
+ * Callback function that determines whether an action event should be showing its item count
+ * based on the event type and the item count.
+ *
+ * @param calendar_event $event The calendar event.
+ * @param int $itemcount The item count associated with the action event.
+ * @return bool
+ */
+function mod_grouptool_core_calendar_event_action_shows_item_count(calendar_event $event, $itemcount = 0) {
+    // List of event types where the action event's item count should be shown.
+    $showitemcountfor = [
+        GROUPTOOL_EVENT_TYPE_DUE
+    ];
+    // For mod_grouptool, item count should be shown if the event type is 'due' and there is one or more items.
+    return in_array($event->eventtype, $showitemcountfor) && $itemcount > 0;
 }
 
 /**

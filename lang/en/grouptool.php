@@ -370,6 +370,7 @@ $string['mustbegt0'] = 'Must be an integer greater than or equal 0 (>= 0)';
 $string['mustbegtoeqmin'] = 'Has to be greater than or equal the minimum';
 $string['mustbeposint'] = 'Has to be a positive integer (>= 1).';
 $string['mygroups_only_label'] = 'Show only sources entries I graded';
+$string['myoverview_registrations_missing'] = 'Registrations missing';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>
 <span class="tag idnumber">[idnumber]</span>
@@ -560,6 +561,7 @@ $string['use_individual'] = 'Use individual size per group';
 $string['use_individual_help'] = 'Override global group size with individual value for each group. These get set via the sortable group list on the bottom.';
 $string['use_size'] = 'Activate';
 $string['use_queue'] = 'Use queues';
+$string['view_registrations'] = 'View registrations';
 $string['viewmoodlegroups'] = 'To Moodle groups';
 $string['with_selection'] = 'With selected...';
 $string['you_are_already_marked'] = 'You marked this group already for registration!';

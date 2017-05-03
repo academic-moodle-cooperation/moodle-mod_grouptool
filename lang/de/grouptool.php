@@ -370,6 +370,7 @@ $string['mustbegt0'] = 'Muss ganzzahlig und größer oder gleich 0 sein (>= 0)';
 $string['mustbegtoeqmin'] = 'Muss größer als das oder gleich dem Minimum sein!';
 $string['mustbeposint'] = 'Muss eine positive ganze Zahl sein (>= 1)';
 $string['mygroups_only_label'] = 'Zeige nur Quellen, die ich bewertet habe';
+$string['myoverview_registrations_missing'] = 'Anmeldungen fehlen';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>
 <span class="tag idnumber">[idnumber]</span>
@@ -560,6 +561,7 @@ $string['use_individual'] = 'Benutze individuelle Gruppengrößen';
 $string['use_individual_help'] = 'Überschreibe globale Gruppengröße mit individuellen Werten für jede Gruppe. Diese werden per Gruppenliste weiter unten gesetzt.';
 $string['use_size'] = 'Aktivieren';
 $string['use_queue'] = 'Wartelisten verwenden';
+$string['view_registrations'] = 'Anmeldungen anzeigen';
 $string['viewmoodlegroups'] = 'Zu den Moodle Gruppen';
 $string['with_selection'] = 'Mit Auswahl...';
 $string['you_are_already_marked'] = 'Sie haben die Gruppe {$a->groupname} bereits erfolgreich zur Anmeldung markiert!';
