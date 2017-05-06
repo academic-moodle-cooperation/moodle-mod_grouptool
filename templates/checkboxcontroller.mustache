@@ -1,0 +1,78 @@
+{{!
+    This file is part of mod_publication for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_grouptool/checkboxcontroller
+
+    Grouptool's checkboxcontroller template.
+
+    The purpose of this template is to display control-elements for the sortlist's checkboxes.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * helpicon helpicon displayed besides title
+    * options Array with groupingids & grouping names
+
+    Example context (json):
+    {
+        "helpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
+        "options": [
+            { "id": 1, "name": "Groupingname 1" },
+            { "id": 2, "name": "Groupingname 2" },
+        ]
+    }
+
+}}
+<div>
+    <label for="classes" class="form-check">
+        {{#str}} checkbox_control_header, grouptool {{/str}}{{#helpicon}}{{>core/help_icon}}{{/helpicon}}
+    </label>
+    <div class="form-check form-check-inline">
+        <select name="classes[]" multiple="multiple" class="form-control">
+            <options>
+                <option value="0">{{# str }} all, core {{/str}}</option>
+                {{#options}}
+                <option value="{{id}}" >{{name}}</option>
+            {{/options}}</options>
+        </select>
+    </div>
+
+    <div class="form-check form-check-inline">
+        <label class="nowrap form-check-label">
+            <input type="radio" name="class_action" id="select" value="select" class="select_all form-check-input" />
+            {{# str }} select, mod_grouptool {{/str}}
+        </label>
+    </div>
+    <div class="form-check form-check-inline">
+        <label class="nowrap form-check-label">
+            <input type="radio" name="class_action" id="deselect" value="deselect" class="select_none form-check-input" />
+            {{# str }} deselect, mod_grouptool {{/str}}
+        </label>
+    </div>
+    <div class="form-check form-check-inline">
+        <label class="nowrap form-check-label">
+            <input type="radio" name="class_action" id="toggle" value="toggle" class="toggle_selection form-check-input" />
+            {{# str }} invert, mod_grouptool {{/str}}
+        </label>
+    </div>
+
+    <button name="do_class_action" value="go" class="btn btn-primary">{{# str }} go, core {{/ str }}</button>
+</div>

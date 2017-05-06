@@ -24,6 +24,8 @@
  */
 namespace mod_grouptool\output;
 
+use \stdClass as stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -295,60 +297,25 @@ class renderer extends \plugin_renderer_base {
         $sortlist = $controller->sortlist;
 
         // Generate groupings-controls to select/deselect groupings!
-        $checkboxcontroltitle = \html_writer::tag('label', get_string('checkbox_control_header', 'grouptool'),
-                                                 array('for' => 'classes'));
-        $helptext = $OUTPUT->render(new \help_icon('checkbox_control_header', 'grouptool'));
-        $checkboxcontroltitle = \html_writer::tag('div', $checkboxcontroltitle.' '.$helptext,
-                                                   array('class' => 'fitemtitle checkbox_controls_header'));
+        $context = new stdClass();
 
-        $selectall = \html_writer::tag('span', get_string('select', 'grouptool'));
-        $selectnone = \html_writer::tag('span', get_string('deselect', 'grouptool'));
-        $inverseselection = \html_writer::tag('span', get_string('invert', 'grouptool'));
+        $helpicon = new stdClass();
+        $helpicon->title = get_string('checkbox_control_header', 'grouptool');
+        $helpicon->text = get_string('checkbox_control_header_help', 'grouptool');
+        $context->helpicon = $helpicon;
 
-        // Static controlelements for all elements!
-        $options = array(\html_writer::tag('option', get_string('all'), array('value' => '0')));
-
+        $options = [];
         if (!empty($sortlist->groupings) && is_array($sortlist->groupings)) {
             foreach ($sortlist->groupings as $groupingid => $grouping) {
                 /*
                  * We have only non-empty groupings here, it should also work with empty ones but would make no sense.
                  * Maybe we use disabled options for all the empty groupings.
                  */
-                $options[] = \html_writer::tag('option', $grouping, array('value' => $groupingid));
+                $options[] = ['id' => $groupingid, 'name' => $grouping];
             }
         }
+        $context->options = $options;
 
-        $checkboxcontrols = $checkboxcontroltitle;
-
-        // Add Radiobuttons and Go Button!
-        $checkalllink = \html_writer::tag('span', \html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                                         'type'  => 'radio',
-                                                                                         'id'    => 'select',
-                                                                                         'value' => 'select',
-                                                                                         'class' => 'select_all')).
-                                                  \html_writer::tag('label', strip_tags($selectall), array('for' => 'select')),
-                                                                    array('class' => 'nowrap'));
-        $checknonelink = \html_writer::tag('span', \html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                                          'type'  => 'radio',
-                                                                                          'id'    => 'deselect',
-                                                                                          'value' => 'deselect',
-                                                                                          'class' => 'select_none')).
-                                                   \html_writer::tag('label', strip_tags($selectnone), array('for' => 'deselect')),
-                                                                     array('class' => 'nowrap'));
-        $checktogglelink = \html_writer::tag('span', \html_writer::empty_tag('input', array('name'  => 'class_action',
-                                                                                            'type'  => 'radio',
-                                                                                            'id'    => 'toggle',
-                                                                                            'value' => 'toggle',
-                                                                                            'class' => 'toggle_selection')).
-                                                     \html_writer::tag('label', strip_tags($inverseselection),
-                                                                       array('for' => 'toggle')), array('class' => 'nowrap'));
-        $submitbutton = \html_writer::tag('button', get_string('go'), array('name' => 'do_class_action',
-                                                                            'value' => 'Go'));
-
-        $attr = array('class' => 'felement');
-        $selattr = array('name' => 'classes[]', 'multiple' => 'multiple');
-        $checkboxcontrols .= \html_writer::tag('div', \html_writer::tag('select', implode("\n", $options), $selattr).$checkalllink.
-                                                      $checknonelink.$checktogglelink.$submitbutton, $attr);
-        return $checkboxcontrols;
+        return $OUTPUT->render_from_template("mod_grouptool/checkboxcontroller", $context);
     }
 }
