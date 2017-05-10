@@ -3234,7 +3234,7 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\registration('groupchange_from_non_unique_reg');
         }
 
-        if ($this->grouptool->use_size && (count($groupdata->registered) > $groupdata->grpsize)) {
+        if ($this->grouptool->use_size && !empty($groupdata->registered) && (count($groupdata->registered) > $groupdata->grpsize)) {
             if (!$this->grouptool->use_queue) {
                 // We can't register the user nor queue the user!
                 throw new \mod_grouptool\local\exception\exceedgroupsize();
