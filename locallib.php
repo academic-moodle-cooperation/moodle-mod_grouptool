@@ -1837,18 +1837,12 @@ class mod_grouptool {
                     if ($mygroupsonly && ($finalgrade->usermodified != $USER->id)) {
                         $row[] = html_writer::tag('div', get_string('not_graded_by_me', 'grouptool'));
                     } else {
-                        if (GROUPTOOL_IE7_IS_DEAD) {
-                            $row[] = html_writer::tag('button',
-                                                      get_string('copygrade', 'grouptool'),
-                                                      array('type'  => 'submit',
-                                                            'name'  => 'source',
-                                                            'value' => $groupmember->id));
-                        } else {
-                            $attr = array('type'  => 'submit',
-                                          'name'  => 'source['.$groupmember->id.']',
-                                          'value' => get_string('copygrade', 'grouptool'));
-                            $row[] = html_writer::empty_tag('input', $attr);
-                        }
+                        $row[] = html_writer::tag('button',
+                                                  get_string('copygrade', 'grouptool'),
+                                                  array('type'  => 'submit',
+                                                        'name'  => 'source',
+                                                        'value' => $groupmember->id,
+                                                        'class' => 'btn btn-primary'));
                     }
                     $data[] = $row;
                 }
@@ -2275,19 +2269,7 @@ class mod_grouptool {
                     $selected = unserialize($selected);
                 }
             } else {
-                if (GROUPTOOL_IE7_IS_DEAD) {
-                    $source = optional_param('source', null, PARAM_INT);
-                } else {
-                    /*
-                     * compatibility for MSIE 7 (<button></button>)
-                     * we use a little trick here:
-                     * instead of using value attribute (which gets not submitted in MSIE 7)
-                     * we use the arrays key to submit the value (=user-id)
-                     */
-                    $source = optional_param_array("source", array(), PARAM_TEXT);
-                    $source = array_keys($source);
-                    $source = reset($source);
-                }
+                $source = optional_param('source', null, PARAM_INT);
                 $selected = optional_param_array('selected', null, PARAM_INT);
                 if (!empty($source) && !$refreshtable) {
                     $step = 1;
