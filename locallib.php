@@ -5295,39 +5295,6 @@ class mod_grouptool {
     }
 
     /**
-     * Outputs one HTML table row for group overview table
-     *
-     * @param string $status Content for status field
-     * @param int $userid User's DB ID
-     * @param string $name User's name
-     * @param string $idnumber User's ID Number
-     * @param string $email Users E-Mail
-     * @param string $rowclass Row's CSS class
-     */
-    protected function write_one_groupoverview_table_row($status, $userid, $name, $idnumber, $email, $rowclass = '') {
-        echo html_writer::start_tag('tr', array('class' => $rowclass));
-        echo html_writer::tag('td', $status, array('class' => 'status'));
-        $userlinkattr = array('href'  => $CFG->wwwroot.'/user/view.php?id='.$curuser.'&course='.$this->course->id,
-                              'title' => $name);
-        $userlink = html_writer::tag('a', $name, $userlinkattr);
-        echo html_writer::tag('td', $userlink, array('class' => 'userlink'));
-        if (!empty($idnumber)) {
-            $idnumber = html_writer::tag('span', $idnumber, array('class' => 'idnumber'));
-        } else {
-            $idnumber = html_writer::tag('span', '-', array('class' => 'idnumber'));
-        }
-        echo html_writer::tag('td', $idnumber, array('class' => 'idnumber'));
-        if (!empty($email)) {
-            $email = html_writer::tag('span', $email, array('class' => 'email'));
-        } else {
-            $email = html_writer::tag('span', '-', array('class' => 'email'));
-        }
-        echo html_writer::tag('td', $email, array('class' => 'email'));
-        echo html_writer::end_tag('tr');
-        flush();
-    }
-
-    /**
      * get all data necessary for displaying/exporting group-overview table
      *
      * @param int $groupingid optional get only this grouping
@@ -5366,21 +5333,8 @@ class mod_grouptool {
         foreach ($agrps as $agrp) {
             // We give each group 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
             core_php_time_limit::raise(30);
-            if (!$onlydata) {
-                if (!$agrp->active) {
-                    echo $OUTPUT->box_start('generalbox groupcontainer dimmed_text');
-                } else if ($syncstatus[1][$agrp->agrpid]->status == GROUPTOOL_UPTODATE) {
-                    echo $OUTPUT->box_start('generalbox groupcontainer uptodate');
-                } else {
-                    echo $OUTPUT->box_start('generalbox groupcontainer outdated');
-                }
-                $groupinfos = $OUTPUT->heading($groupinfo[$agrp->id]->name.($agrp->active ? '' : ' ('.get_string('inactive').')'),
-                                               3);
-                flush();
-            } else {
-                $groupdata = new stdClass();
-                $groupdata->name = $groupinfo[$agrp->id]->name.($agrp->active ? '' : ' ('.get_string('inactive').')');
-            }
+            $groupdata = new stdClass();
+            $groupdata->name = $groupinfo[$agrp->id]->name.($agrp->active ? '' : ' ('.get_string('inactive').')');
 
             // Get all registered userids!
             $select = " agrpid = ? AND modified_by >= 0 ";
@@ -5408,49 +5362,36 @@ class mod_grouptool {
                 } else {
                     $size = !empty($this->grouptool->grpsize) ? $this->grouptool->grpsize : get_config('mod_grouptool', 'grpsize');
                     $free = ($size - count($registered));
-
                 }
             } else {
                 $size = "∞";
                 $free = '∞';
             }
+
+            $groupdata->total = $size;
+            $groupdata->registered = count($registered);
+            $groupdata->queued = count($queued);
+            $groupdata->free = $free;
+            $groupdata->reg_data = array();
+            $groupdata->queue_data = array();
+            $groupdata->inactive = !$agrp->active;
+            if ($agrp->active) {
+                $groupdata->uptodate = $syncstatus[1][$agrp->agrpid]->status === GROUPTOOL_UPTODATE;
+                $groupdata->outdated = $syncstatus[1][$agrp->agrpid]->status !== GROUPTOOL_UPTODATE;
+            }
+            // User-ID will be added in template!
+            $groupdata->userlink = $CFG->wwwroot . '/user/view.php?course=' . $this->grouptool->course . '&id=';
+            $groupdata->groupid = $groupinfo[$agrp->id]->id;
+            $groupdata->formattxt = GROUPTOOL_TXT;
+            $groupdata->formatpdf = GROUPTOOL_PDF;
+            $groupdata->formatxlsx = GROUPTOOL_XLSX;
+            $groupdata->formatods = GROUPTOOL_ODS;
+            $statushelp = new help_icon('status', 'mod_grouptool');
             if (!$onlydata) {
-                // Group-downloadlinks!
-                if ((count($queued) > 0) || (count($registered) > 0)) {
-                    $groupinfos .= $this->get_download_links($downloadurl, $groupinfo[$agrp->id]);
-                }
-                $groupinfos .= html_writer::tag('span', get_string('total', 'grouptool').' '.$size,
-                                                array('class' => 'groupsize'));
-                $groupinfos .= ' / '.html_writer::tag('span', get_string('registered', 'grouptool').
-                                                              ' '.count($registered),
-                                                      array('class' => 'registered'));
-                $groupinfos .= ' / '.html_writer::tag('span', get_string('queued', 'grouptool').' '.
-                                                              count($queued),
-                                                      array('class' => 'queued'));
-                $groupinfos .= ' / '.html_writer::tag('span', get_string('free', 'grouptool').' '.
-                                                              $free, array('class' => 'free'));
-
-                echo html_writer::tag('div', $groupinfos, array('class' => 'groupinfo'));
-
-                echo html_writer::start_tag('table',
-                                        array('class' => 'centeredblock userlist table table-striped table-hover table-condensed'));
-                echo html_writer::start_tag('thead');
-                echo html_writer::start_tag('tr');
-                echo html_writer::tag('th', get_string('status', 'grouptool').
-                                            $OUTPUT->help_icon('status', 'grouptool'), array('class' => 'text-center'));
-                echo html_writer::tag('th', get_string('fullname'), array('class' => ''));
-                echo html_writer::tag('th', get_string('idnumber'), array('class' => ''));
-                echo html_writer::tag('th', get_string('email'), array('class' => ''));
-                echo html_writer::end_tag('tr');
-                echo html_writer::end_tag('thead');
-                echo html_writer::start_tag('tbody');
-            } else {
-                $groupdata->total = $size;
-                $groupdata->registered = count($registered);
-                $groupdata->queued = count($queued);
-                $groupdata->free = $free;
-                $groupdata->reg_data = array();
-                $groupdata->queue_data = array();
+                $groupdata->statushelp = $statushelp->export_for_template($OUTPUT);
+                // Format will be added in template!
+                $groupdownloadurl = new moodle_url($downloadurl, array('groupid' => $groupinfo[$agrp->id]->id));
+                $groupdata->downloadurl = $groupdownloadurl->out(false);
             }
 
             // We create a dummy user-object to get the fullname-format!
@@ -5470,25 +5411,20 @@ class mod_grouptool {
                             $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
                         }
                         $fullname = fullname($userinfo[$curuser]);
-                        if (!$onlydata) {
-                            $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
-                            $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
-                            $this->write_one_groupoverview_table_row("✔", $curuser, fullname($userinfo[$curuser]), $idnumber,
-                                                                     $email);
-                        } else {
-                            $row = array();
-                            $row['name'] = $fullname;
-                            foreach ($namefields as $field) {
-                                $row[$field] = $userinfo[$curuser]->$field;
-                            }
-                            // We set those in any case, because PDF and TXT export needs them anyway!
-                            $row['email'] = $userinfo[$curuser]->email;
-                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
-                            $row['status'] = "✔";
-                            $groupdata->reg_data[] = $row;
-                            $row = null;
-                            unset($row);
+
+                        $row = array();
+                        $row['userid'] = $curuser;
+                        $row['name'] = $fullname;
+                        foreach ($namefields as $field) {
+                            $row[$field] = $userinfo[$curuser]->$field;
                         }
+                        // We set those in any case, because PDF and TXT export needs them anyway!
+                        $row['email'] = $userinfo[$curuser]->email;
+                        $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                        $row['status'] = "✔";
+                        $groupdata->reg_data[] = $row;
+                        $row = null;
+                        unset($row);
                     }
                     $regentry = null;
                     unset($regentry);
@@ -5500,24 +5436,19 @@ class mod_grouptool {
                             $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
                         }
                         $fullname = fullname($userinfo[$curuser]);
-                        if (!$onlydata) {
-                            $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
-                            $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
-                            $this->write_one_groupoverview_table_row("+", $curuser, fullname($userinfo[$curuser]), $idnumber,
-                                                                     $email);
-                        } else {
-                            $row = array();
-                            $row['name'] = $fullname;
-                            foreach ($namefields as $field) {
-                                $row[$field] = $userinfo[$curuser]->$field;
-                            }
-                            $row['email'] = $userinfo[$curuser]->email;
-                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
-                            $row['status'] = "+";
-                            $groupdata->reg_data[] = $row;
-                            $row = null;
-                            unset($row);
+
+                        $row = array();
+                        $row['userid'] = $curuser;
+                        $row['name'] = $fullname;
+                        foreach ($namefields as $field) {
+                            $row[$field] = $userinfo[$curuser]->$field;
                         }
+                        $row['email'] = $userinfo[$curuser]->email;
+                        $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                        $row['status'] = "+";
+                        $groupdata->reg_data[] = $row;
+                        $row = null;
+                        unset($row);
                     }
                     $regentry = null;
                     unset($regentry);
@@ -5529,35 +5460,23 @@ class mod_grouptool {
                             $userinfo[$curuser] = $DB->get_record('user', array('id' => $curuser));
                         }
                         $fullname = fullname($userinfo[$curuser]);
-                        if (!$onlydata) {
-                            $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
-                            $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
-                            $this->write_one_groupoverview_table_row("?", $curuser, fullname($userinfo[$curuser]), $idnumber,
-                                                                     $email);
-                        } else {
-                            $row = array();
-                            $row['name'] = $fullname;
-                            foreach ($namefields as $field) {
-                                $row[$field] = $userinfo[$curuser]->$field;
-                            }
-                            // We set those in any case, because PDF and TXT export needs them anyway!
-                            $row['email'] = $userinfo[$curuser]->email;
-                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
-                            $row['status'] = "?";
-                            $groupdata->mreg_data[] = $row;
-                            $row = null;
-                            unset($row);
+
+                        $row = array();
+                        $row['userid'] = $curuser;
+                        $row['name'] = $fullname;
+                        foreach ($namefields as $field) {
+                            $row[$field] = $userinfo[$curuser]->$field;
                         }
+                        // We set those in any case, because PDF and TXT export needs them anyway!
+                        $row['email'] = $userinfo[$curuser]->email;
+                        $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                        $row['status'] = "?";
+                        $groupdata->mreg_data[] = $row;
+                        $row = null;
+                        unset($row);
                     }
                     $regentry = null;
                     unset($regentry);
-                }
-            } else {
-                if (!$onlydata) {
-                    echo html_writer::start_tag('tr', array('class' => 'regentry reg'));
-                    echo html_writer::tag('td', get_string('no_registrations', 'grouptool'), array('class' => 'no_registrations',
-                                                                                                   'colspan' => 4));
-                    echo html_writer::end_tag('tr');
                 }
             }
 
@@ -5569,63 +5488,47 @@ class mod_grouptool {
                     }
                     $fullname = fullname($userinfo[$curuser]);
                     $rank = $this->get_rank_in_queue($queuedlist, $curuser);
-                    if (!$onlydata) {
-                        $idnumber = !empty($userinfo[$curuser]->idnumber) ? $userinfo[$curuser]->idnumber : '';
-                        $email = !empty($userinfo[$curuser]->email) ? $userinfo[$curuser]->email : '';
-                        $this->write_one_groupoverview_table_row($rank, $curuser, fullname($userinfo[$curuser]), $idnumber,
-                                                                 $email, 'queueentry');
-                    } else {
-                        $row = array();
-                        $row['rank'] = $rank;
-                        $row['name'] = $fullname;
-                        foreach ($namefields as $namefield) {
-                            if (!empty($userinfo[$curuser]->$namefield)) {
-                                $row[$namefield] = $userinfo[$curuser]->$namefield;
-                            } else {
-                                $row[$namefield] = '';
-                            }
-                        }
-                        if (empty($CFG->showuseridentity)) {
-                            if (!empty($userinfo[$curuser]->idnumber)) {
-                                $row['idnumber'] = $userinfo[$curuser]->idnumber;
-                            } else {
-                                $row['idnumber'] = '-';
-                            }
-                            if (!empty($userinfo[$curuser]->email)) {
-                                $row['email'] = $userinfo[$curuser]->email;
-                            } else {
-                                $row['email'] = '-';
-                            }
+
+                    $row = array();
+                    $row['userid'] = $curuser;
+                    $row['rank'] = $rank;
+                    $row['name'] = $fullname;
+                    foreach ($namefields as $namefield) {
+                        if (!empty($userinfo[$curuser]->$namefield)) {
+                            $row[$namefield] = $userinfo[$curuser]->$namefield;
                         } else {
-                            $fields = explode(',', $CFG->showuseridentity);
-                            foreach ($fields as $field) {
-                                if (!empty($userinfo[$curuser]->$field)) {
-                                    $row[$field] = $userinfo[$curuser]->$field;
-                                } else {
-                                    $row[$field] = '';
-                                }
+                            $row[$namefield] = '';
+                        }
+                    }
+                    if (empty($CFG->showuseridentity)) {
+                        if (!empty($userinfo[$curuser]->idnumber)) {
+                            $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                        } else {
+                            $row['idnumber'] = '-';
+                        }
+                        if (!empty($userinfo[$curuser]->email)) {
+                            $row['email'] = $userinfo[$curuser]->email;
+                        } else {
+                            $row['email'] = '-';
+                        }
+                    } else {
+                        $fields = explode(',', $CFG->showuseridentity);
+                        foreach ($fields as $field) {
+                            if (!empty($userinfo[$curuser]->$field)) {
+                                $row[$field] = $userinfo[$curuser]->$field;
+                            } else {
+                                $row[$field] = '';
                             }
                         }
-                        // We set those in any case, because PDF and TXT export needs them anyway!
-                        $row['email'] = $userinfo[$curuser]->email;
-                        $row['idnumber'] = $userinfo[$curuser]->idnumber;
-                        $groupdata->queue_data[] = $row;
                     }
-                }
-            } else {
-                if (!$onlydata) {
-                    echo html_writer::start_tag('tr', array('class' => 'queueentry queue'));
-                    echo html_writer::tag('td', get_string('nobody_queued', 'grouptool'), array('class' => 'no_queues',
-                                                                                                'colspan' => 4));
-                    echo html_writer::end_tag('tr');
+                    // We set those in any case, because PDF and TXT export needs them anyway!
+                    $row['email'] = $userinfo[$curuser]->email;
+                    $row['idnumber'] = $userinfo[$curuser]->idnumber;
+                    $groupdata->queue_data[] = $row;
                 }
             }
             if (!$onlydata) {
-                echo html_writer::end_tag('tbody');
-                echo html_writer::end_tag('table');
-                // Faster browser output prevents browser timeout!
-                echo $OUTPUT->box_end();
-                flush();
+                echo $OUTPUT->render_from_template('mod_grouptool/overviewgroup', $groupdata);
             } else {
                 $return[] = $groupdata;
             }
@@ -6687,7 +6590,7 @@ class mod_grouptool {
                  * (just register not already registered persons and let the others be)
                  */
                 $url = new moodle_url($PAGE->url, array('pushtomdl' => 1, 'sesskey' => sesskey()));
-                $button = new single_button($url, get_string('updatemdlgrps', 'grouptool'));
+                $button = new single_button($url, get_string('updatemdlgrps', 'grouptool'), 'post', true);
                 echo $OUTPUT->box(html_writer::empty_tag('br').
                                   $OUTPUT->render($button).
                                   html_writer::empty_tag('br'), 'generalbox centered');
