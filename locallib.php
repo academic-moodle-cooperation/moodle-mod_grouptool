@@ -5077,7 +5077,7 @@ class mod_grouptool {
                     $prevtable->data[] = $tmprow;
                 }
                 $error = true;
-                // We've added multiple rows manualle and can continue with the next user!
+                // We've added multiple rows manually and can continue with the next user!
                 continue;
             } else {
                 $userinfo = reset($userinfo);
