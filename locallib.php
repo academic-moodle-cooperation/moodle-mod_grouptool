@@ -4905,6 +4905,8 @@ class mod_grouptool {
      * @throws coding_exception Thrown if smthg very unexpected happened (couldn't instantiate manual enrol instance or similar)
      */
     protected function force_enrol_student($userid) {
+        global $CFG, $DB;
+
         require_once($CFG->dirroot.'/enrol/manual/locallib.php');
         require_once($CFG->libdir.'/accesslib.php');
         if (!$enrolmanual = enrol_get_plugin('manual')) {
@@ -4937,7 +4939,7 @@ class mod_grouptool {
      * @return array ($error, $message)
      */
     public function import($groups, $data, $ignored = array(), $forceregistration = false, $previewonly = false) {
-        global $DB, $OUTPUT, $CFG, $USER;
+        global $DB, $OUTPUT, $USER;
 
         $message = "";
         $error = false;
