@@ -150,32 +150,22 @@
     margin-right: auto;
     text-align: left;
 }
-.path-mod-grouptool .coloredrows.grading_gradingtable {
+.path-mod-grouptool .grading_gradingtable {
     display: table;
     margin-left: auto;
     margin-right: auto;
 }
-.path-mod-grouptool .coloredrows.grading_previewtable {
+.path-mod-grouptool .grading_previewtable {
     display: table;
     margin-left: auto;
     margin-right: auto;
 }
-.path-mod-grouptool .coloredrows.grading_previewtable td[rowspan] {
-    background-color: #fafafa;
+.path-mod-grouptool .grading_previewtable td[rowspan] {
     text-align: center;
 }
 
-.path-mod-grouptool .coloredrows.grading_previewtable td {
+.path-mod-grouptool .grading_previewtable td {
     vertical-align: middle;
-}
-
-.path-mod-grouptool .coloredrows.grading_previewtable .firstgrouprow {
-    border-top: 1.5px solid black;
-}
-
-.path-mod-grouptool .generalbox.tumargin {
-    margin-left: 10px;
-    margin-right: 10px;
 }
 
 .path-mod-grouptool .indent {

@@ -1639,6 +1639,8 @@ class mod_grouptool {
     /**
      * returns table used in group-grading form
      *
+     * TODO use templates and load via AJAX (AMD core/fragment)
+     *
      * @param int $activity ID of activity to get/set grades from/for
      * @param bool $mygroupsonly limit source-grades to those given by current user
      * @param bool $incompleteonly show only groups which have not-graded members
@@ -1668,19 +1670,14 @@ class mod_grouptool {
 
         $table = new html_table();
 
-        $title = html_writer::tag('div', get_string('groupselection', 'grouptool').
-                                         $OUTPUT->help_icon('groupselection', 'grouptool'),
-                                  array('class' => 'groupselectiontitle'));
-
         if ($activity == 0) {
-            return $title.
-                   $OUTPUT->box($OUTPUT->notification(get_string('chooseactivity', 'grouptool'), 'error'), 'generalbox centered');
+            return $OUTPUT->box($OUTPUT->notification(get_string('chooseactivity', 'grouptool'), 'error'), 'generalbox centered');
         }
 
         // General table settings!
-        $table->attributes['class'] .= ' coloredrows grading_gradingtable';
+        $table->attributes['class'] .= ' table table-hover grading_gradingtable';
         $tablepostfix = "";
-        // Determin what mode we have to interpret the selected items the right way!
+        // Determine what mode we have to interpret the selected items the right way!
         if ($filter == GROUPTOOL_FILTER_ALL || $filter == GROUPTOOL_FILTER_NONCONFLICTING) {
             // Multiple groups?
             $tablecolumns = array('select',
@@ -1688,7 +1685,8 @@ class mod_grouptool {
                     'gradeinfo');
             $button = html_writer::tag('button', get_string('copy', 'grouptool'), array('name'  => 'copygrades',
                                                                                         'type'  => 'submit',
-                                                                                        'value' => 'true'));
+                                                                                        'value' => 'true',
+                                                                                        'class' => 'btn btn-primary'));
             $buttontext = get_string('copy_refgrades_feedback', 'grouptool');
             $tableheaders = array('',
                     get_string('name'),
@@ -1700,14 +1698,13 @@ class mod_grouptool {
             foreach ($groups as $group) {
                 $error = "";
                 $groupmembers = groups_get_members($group->id);
-                // Get grading info for all groupmembers!
+                // Get grading info for all group members!
                 $gradinginfo = grade_get_grades($this->course->id, 'mod', $cmtouse->modname,
-                                                 $cmtouse->instance, array_keys($groupmembers));
+                                                $cmtouse->instance, array_keys($groupmembers));
                 $gradeinfo = array();
                 if (in_array($group->id, $missingsource)) {
                     $error = ' error';
-                    $gradeinfo[] = html_writer::tag('div', get_string('missing_source_selection',
-                                                                      'grouptool'));
+                    $gradeinfo[] = html_writer::tag('div', get_string('missing_source_selection', 'grouptool'));
                 }
 
                 $userwithgrades = array();
@@ -1736,34 +1733,39 @@ class mod_grouptool {
                         $grademax = $gradinginfo->items[0]->grademax;
                         $finalgrade->formatted_grade = round($finalgrade->grade, 2) .' / ' .
                                                         round($grademax, 2);
-                        $radioattr = array(
-                                'name' => 'source['.$group->id.']',
-                                'value' => $groupmembers[$key]->id,
-                                'type' => 'radio');
+                        $radioattr = array('name'  => 'source['.$group->id.']',
+                                           'value' => $groupmembers[$key]->id,
+                                           'type'  => 'radio',
+                                           'class' => 'form-check-input');
                         if (isset($source[$group->id])
                                 && $source[$group->id] == $groupmembers[$key]->id) {
                             $radioattr['selected'] = 'selected';
                         }
                         if (count($userwithgrades) == 1) {
+                            $radioattr['disabled'] = 'disabled';
+                            $radioattr['checked'] = 'checked';
+                            $gradeinfocont = html_writer::empty_tag('input', $radioattr);
+                            unset($radioattr['disabled']);
                             $radioattr['type'] = 'hidden';
+                            $gradeinfocont .= html_writer::empty_tag('input', $radioattr);
+                        } else if (count($userwithgrades > 1)) {
+                            $gradeinfocont = html_writer::empty_tag('input', $radioattr);
                         }
-                        $gradeinfocont = ((count($userwithgrades) >= 1) ? html_writer::empty_tag('input', $radioattr) : "").
-                                         fullname($groupmembers[$key])." (".$finalgrade->formatted_grade;
+                        $gradeinfocont .= ' '.fullname($groupmembers[$key])." (".$finalgrade->formatted_grade;
                         if (strip_tags($finalgrade->str_feedback) != "") {
-                            $gradeinfocont .= " ".
-                                              shorten_text(strip_tags($finalgrade->str_feedback),
-                                                           15);
+                            $gradeinfocont .= " ".shorten_text(strip_tags($finalgrade->str_feedback), 15);
                         }
                         $gradeinfocont .= ")";
-                        $gradeinfo[] = html_writer::tag('div', $gradeinfocont,
-                                                        array('class' => 'gradinginfo'.
-                                                                         $groupmembers[$key]->id));
+                        $label = html_writer::tag('label', $gradeinfocont, array('class' => 'form-check-label gradinginfo'.
+                                                                                            $groupmembers[$key]->id));
+                        $gradeinfo[] = html_writer::tag('div', $label, array('class' => 'form-check'));
                     }
                 }
                 $selectattr = array(
                         'type' => 'checkbox',
                         'name' => 'selected[]',
-                        'value' => $group->id);
+                        'value' => $group->id,
+                        'class' => 'form-check-input');
                 $checkboxcontroller = optional_param('select', '', PARAM_ALPHA);
                 if ((count($groupmembers) <= 1) || count($userwithgrades) == 0) {
                     $selectattr['disabled'] = 'disabled';
@@ -1775,8 +1777,10 @@ class mod_grouptool {
                 } else if (isset($selected[$group->id]) && $selected[$group->id] == 1) {
                     $selectattr['checked'] = "checked";
                 }
+                $checkbox = html_writer::tag('label', html_writer::empty_tag('input', $selectattr),
+                                             array('class' => 'form-check-label'));
 
-                $select = new html_table_cell(html_writer::empty_tag('input', $selectattr));
+                $select = new html_table_cell(html_writer::tag('div', $checkbox, array('class' => 'form-check')));
                 $name = new html_table_cell($group->name);
                 if (empty($gradeinfo)) {
                     $gradeinfo = new html_table_cell(get_string('no_grades_present', 'grouptool'));
@@ -1828,7 +1832,11 @@ class mod_grouptool {
                         $checked = (isset($selected[$groupmember->id])
                                     && ($selected[$groupmember->id] == 1)) ? true : false;
                     }
-                    $row[] = html_writer::checkbox('selected[]', $groupmember->id, $checked, '', array('class' => 'checkbox'));
+                    $checkbox = html_writer::tag('label', html_writer::checkbox('selected[]', $groupmember->id, $checked, '',
+                                                                                array('class' => 'checkbox form-check-element')),
+                                                 array('class' => 'form-check-label'));
+
+                    $row[] = new html_table_cell(html_writer::tag('div', $checkbox, array('class' => 'form-check')));
                     $row[] = html_writer::tag('div', fullname($groupmember), array('class' => 'fullname'.$groupmember->id));
                     $row[] = html_writer::tag('div', $groupmember->idnumber, array('class' => 'idnumber'.$groupmember->id));
                     $row[] = html_writer::tag('div', $finalgrade->formatted_grade, array('class' => 'grade'.$groupmember->id));
@@ -1891,7 +1899,7 @@ class mod_grouptool {
                  \html_writer::link($selectnoneurl, get_string('none'), array('class' => 'select_none'));
         $checkboxcontroller = html_writer::tag('div', $links, array('class' => 'checkboxcontroller'));
 
-        return $title.$checkboxcontroller.html_writer::table($table).$tablepostfix;
+        return $checkboxcontroller.html_writer::table($table).$tablepostfix;
     }
 
     /**
@@ -1927,7 +1935,7 @@ class mod_grouptool {
         }
         if ($previewonly) {
             $previewtable = new html_table();
-            $previewtable->attributes['class'] = 'coloredrows grading_previewtable';
+            $previewtable->attributes['class'] = 'table table-hover grading_previewtable';
         } else {
             $info = "";
         }
@@ -2097,7 +2105,7 @@ class mod_grouptool {
                 $count = in_array($source, $selected) ? count($selected) - 1 : count($selected);
                 $previewtable->head = array('', get_string('fullname')." (".$count.")",
                         get_string('grade'), get_string('feedback'));
-                $previewtable->attributes['class'] = 'coloredrows grading_previewtable';
+                $previewtable->attributes['class'] = 'table table-hover grading_previewtable';
             } else {
                 $info .= html_writer::start_tag('div');
                 $nameinfo = "";
@@ -2269,7 +2277,12 @@ class mod_grouptool {
                     $selected = unserialize($selected);
                 }
             } else {
-                $source = optional_param('source', null, PARAM_INT);
+                if ($refreshtable) {
+                    // Otherwise we get problems here, if we refresh and change from multiple groups to a single group!
+                    $source = null;
+                } else {
+                    $source = optional_param('source', null, PARAM_INT);
+                }
                 $selected = optional_param_array('selected', null, PARAM_INT);
                 if (!empty($source) && !$refreshtable) {
                     $step = 1;
@@ -2429,176 +2442,36 @@ class mod_grouptool {
             }
         }
 
+        $activities = array();
         if ($step != 1 || count($missingsource)) {    // Show form if step is either 0 or 2!
 
             // Prepare form content!
-            $activitytitle = get_string('grading_activity_title', 'grouptool');
-
-            if ($modinfo = get_fast_modinfo($this->course)) {
-                $sections = $modinfo->get_sections();
-                foreach ($sections as $curnumber => $sectionmodules) {
-                    $sectiontext = '--- '.
-                                   course_get_format($this->course)->get_section_name($curnumber).
-                                   ' ---';
-                    $activities["section/$curnumber"] = $sectiontext;
-
-                    foreach ($sectionmodules as $curcmid) {
-                        $mod = $modinfo->get_cm($curcmid);
-                        if ($mod->modname == "label") {
-                            continue;
-                        }
-
-                        if (file_exists($CFG->dirroot . '/mod/'.$mod->modname.'/lib.php')) {
-                            require_once($CFG->dirroot . '/mod/'.$mod->modname.'/lib.php');
-                            $supportfn = $mod->modname."_supports";
-                            if (function_exists($supportfn)) {
-                                if ($supportfn(FEATURE_GRADE_HAS_GRADE) !== true) {
-                                    continue;
-                                }
-                            }
-                        }
-
-                        $name = strip_tags(format_string($mod->name, true));
-                        if (core_text::strlen($name) > 55) {
-                            $name = core_text::substr($name, 0, 50)."...";
-                        }
-                        if (!$mod->visible) {
-                            $name = "(".$name.")";
-                        }
-                        $activities["$curcmid"] = $name;
-                    }
-                }
-            }
-
-            $hiddenelements = html_writer::empty_tag('input', array('type'   => 'hidden',
-                                                                     'name'  => 'sesskey',
-                                                                     'value' => sesskey()));
-            $hiddenelements .= html_writer::empty_tag('input', array('type'   => 'hidden',
-                                                                     'name'  => 'tab',
-                                                                     'value' => 'grading'));
-            $activityelement = html_writer::select($activities, "activity", $activity);;
-            $activityselect = html_writer::start_tag('div', array('class' => 'fitem')).
-                              html_writer::tag('div', $activitytitle,
-                                               array('class' => 'fitemtitle')).
-                              html_writer::tag('div', $activityelement,
-                                               array('class' => 'felement')).
-                              html_writer::end_tag('div');
-
-            $mygroupsonlytitle = "";
-            if (!has_capability('mod/grouptool:grade', $this->context)) {
-                $attr['disabled'] = 'disabled';
-                $mygroupsonlyelement = html_writer::checkbox('mygroups_only', 1, $mygroupsonly,
-                                                               get_string('mygroups_only_label',
-                                                                          'grouptool'), $attr);
-                $attributes['type'] = 'hidden';
-                $attributes['value'] = 1;
-                $attributes['name'] = 'mygroups_only';
-                $mygroupsonlyelement .= html_writer::empty_tag('input', $attributes);
-            } else {
-                $mygroupsonlyelement = html_writer::checkbox('mygroups_only', 1, $mygroupsonly,
-                                                               get_string('mygroups_only_label',
-                                                                          'grouptool'));
-            }
-            $mygroupsonlychkbox = html_writer::start_tag('div', array('class' => 'fitem')).
-                                  html_writer::tag('div', ($mygroupsonlytitle != "" ? $mygroupsonlytitle : "&nbsp;"),
-                                                   array('class' => 'fitemtitle')).
-                                  html_writer::tag('div', $mygroupsonlyelement,
-                                                   array('class' => 'felement')).
-                                  html_writer::end_tag('div');
-
-            $incompleteonlytitle = "";
-            $incompleteonlyel = html_writer::checkbox('incomplete_only', 1, $incompleteonly, get_string('incomplete_only_label',
-                                                                                                        'grouptool'));
-            $incompleteonlychkbox = html_writer::start_tag('div', array('class' => 'fitem')).
-                                    html_writer::tag('div', ($incompleteonlytitle != "" ? $incompleteonlytitle : "&nbsp;"),
-                                                     array('class' => 'fitemtitle')).
-                                    html_writer::tag('div', $incompleteonlyel,
-                                                     array('class' => 'felement')).
-                                    html_writer::end_tag('div');
-
-            $overwritetitle = "";
-            $overwriteelement = html_writer::checkbox('overwrite', 1, $overwrite,
-                                                      get_string('overwrite_label', 'grouptool'));
-            $overwritechkbox = html_writer::start_tag('div', array('class' => 'fitem')).
-                               html_writer::tag('div', ($overwritetitle != "" ? $overwritetitle : "&nbsp;"),
-                                                array('class' => 'fitemtitle')).
-                               html_writer::tag('div', $overwriteelement,
-                                                array('class' => 'felement')).
-                               html_writer::end_tag('div');
-
-            $filtertitle = get_string('grading_filter_select_title', 'grouptool').
-                           $OUTPUT->help_icon('grading_filter_select_title', 'grouptool');
-            $groupingtitle = get_string('grading_grouping_select_title', 'grouptool');
-            $groupings = groups_get_all_groupings($this->course->id);
-            $options = array();
-            foreach ($groupings as $currentgrouping) {
-                $options[$currentgrouping->id] = $currentgrouping->name;
-            }
-            $groupingelement = html_writer::select($options, 'grouping', $grouping,
-                                                   get_string('disabled', 'grouptool'));
-            $groupingselect = html_writer::start_tag('div', array('class' => 'fitem')).
-                              html_writer::tag('div', $groupingtitle, array('class' => 'fitemtitle')).
-                              html_writer::tag('div', $groupingelement, array('class' => 'felement')).
-                              html_writer::end_tag('div');
-
-            $options = array("-1" => get_string('nonconflicting', 'grouptool'),
-                             "0"  => get_string('all'));
-            $groups = groups_get_all_groups($this->course->id, null, $grouping, 'g.id, g.name');
-            foreach ($groups as $key => $group) {
-                $membercount = $DB->count_records('groups_members', array('groupid' => $group->id));
-                if ($membercount == 0) {
-                    continue;
-                }
-                $options[$key] = $group->name.' ('.$membercount.')';
-            }
-
-            $filterelement = html_writer::select($options, 'filter', $filter, false);
-            $filterselect = html_writer::start_tag('div', array('class' => 'fitem')).
-                            html_writer::tag('div', $filtertitle, array('class' => 'fitemtitle')).
-                            html_writer::tag('div', $filterelement, array('class' => 'felement')).
-                            html_writer::end_tag('div');
-
-            $refreshtitle = "";
-            $refreshelement = html_writer::tag('button', get_string('refresh_table_button', 'grouptool'), array(
-                    'type'  => 'submit',
-                    'name'  => 'refresh_table',
-                    'value' => 'true'));
-            $refreshbutton = html_writer::start_tag('div', array('class' => 'fitem')).
-                             html_writer::tag('div', ($refreshtitle != "" ? $refreshtitle : "&nbsp;"),
-                                              array('class' => 'fitemtitle')).
-                             html_writer::tag('div', $refreshelement, array('class' => 'felement')).
-                             html_writer::end_tag('div');
-
-            $legend = html_writer::tag('legend', get_string('filters_legend', 'grouptool'));
-            $filterelements = html_writer::tag('fieldset',
-                                               $legend.$activityselect.$mygroupsonlychkbox.
-                                               $incompleteonlychkbox.$overwritechkbox.$groupingselect.
-                                               $filterselect.$refreshbutton,
-                                               array('class' => 'clearfix'));
             if ($filter > 0) {
-                $tablehtml = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
-                                                      $filter, $selected);
+                $table = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
+                    $filter, $selected);
             } else {
-                $tablehtml = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
-                                                      $filter, $selected, $missingsource);
+                $table = $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
+                    $filter, $selected, $missingsource);
             }
 
-            $formcontent = html_writer::tag('div', $hiddenelements.$filterelements.$tablehtml,
-                                            array('class' => 'clearfix'));
+            $formdata = ['id'             => $this->cm->id,
+                         'course'         => $this->course,
+                         'mygroupsonly'   => $mygroupsonly,
+                         'incompleteonly' => $incompleteonly,
+                         'overwrite'      => $overwrite,
+                         'grouping'       => $grouping,
+                         'filter'         => $filter,
+                         'table'          => $table];
+            $mform = new \mod_grouptool\grading_form($PAGE->url, $formdata, 'post', '', ['class' => 'mform',
+                                                                                         'id'    => 'grading_form',
+                                                                                         'name'  => 'grading_form']);
 
             $params = new stdClass();
             $params->lang = current_language();
             $params->contextid  = $this->context->id;
             $PAGE->requires->js_call_amd('mod_grouptool/grading', 'initializer', array($params));
 
-            $formattr = array(
-                    'method' => 'post',
-                    'action' => $PAGE->url,
-                    'name'   => 'grading_form',
-                    'id'     => 'grading_form',
-                    'class'  => 'mform');
-            // Print form!
-            echo html_writer::tag('form', $formcontent, $formattr);
+            $mform->display();
         }
 
     }
