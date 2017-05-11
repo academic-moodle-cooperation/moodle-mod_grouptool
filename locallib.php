@@ -5562,13 +5562,14 @@ class mod_grouptool {
                     groups_get_grouping_name($groupingid).'_'.get_string('overview', 'grouptool');
         } else {
             $filename = $coursename . '_' . $grouptoolname . '_' .
-                    get_string('group').' '.get_string('overview', 'grouptool');
+                    get_string('group').'_'.get_string('overview', 'grouptool');
         }
+        $filename .= '.txt';
         ob_clean();
         header('Content-Type: text/plain');
         header('Content-Length: ' . strlen($filecontent));
-        header('Content-Disposition: attachment; filename="'.$filename.'.txt"; filename*="'.
-               rawurlencode($filename).'.txt"');
+        header('Content-Disposition: attachment; filename="'.str_replace(array(' ', '"'), array('_', ''), $filename).
+               '"; filename*="'.rawurlencode($filename).'"');
         header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
         echo $filecontent;
@@ -7267,7 +7268,7 @@ class mod_grouptool {
         header('Content-Length: ' . strlen($filecontent));
         header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1!
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in past!
-        header('Content-Disposition: attachment; filename="'.$filename.'.txt";'.
+        header('Content-Disposition: attachment; filename="'.str_replace(array(' ', '"'), array('_', ''), $filename).'.txt";'.
                ' filename*="'.rawurlencode($filename).'.txt"');
         header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
