@@ -180,9 +180,9 @@ class mod_grouptool {
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
                 $url = new moodle_url($continue);
-                $continue = new single_button($url, get_string('continue'), 'post');
+                $continue = new single_button($url, get_string('continue'), 'post', true);
             } else if ($continue instanceof moodle_url) {
-                $continue = new single_button($continue, get_string('continue'), 'post');
+                $continue = new single_button($continue, get_string('continue'), 'post', true);
             } else {
                 throw new coding_exception('The continue param to grouptool::confirm() must be either a'.
                                            ' URL (string/moodle_url) or a single_button instance.');
@@ -202,11 +202,19 @@ class mod_grouptool {
             }
         }
 
-        $output = $OUTPUT->box_start('generalbox', 'notice');
+        $output = $OUTPUT->box_start('generalbox modal modal-dialog modal-in-page show', 'notice');
+        $output .= $OUTPUT->box_start('modal-content', 'modal-content');
+        $output .= $OUTPUT->box_start('modal-header', 'modal-header');
+        $output .= html_writer::tag('h4', get_string('confirm'));
+        $output .= $OUTPUT->box_end();
+        $output .= $OUTPUT->box_start('modal-body', 'modal-body');
         $output .= html_writer::tag('p', $message);
+        $output .= $OUTPUT->box_end();
+        $output .= $OUTPUT->box_start('modal-footer', 'modal-footer');
         $cancel = ($cancel != null) ? $OUTPUT->render($cancel) : "";
-        $output .= html_writer::tag('div', $OUTPUT->render($continue) . $cancel,
-                                    array('class' => 'buttons'));
+        $output .= html_writer::tag('div', $OUTPUT->render($continue) . $cancel, array('class' => 'buttons'));
+        $output .= $OUTPUT->box_end();
+        $output .= $OUTPUT->box_end();
         $output .= $OUTPUT->box_end();
         return $output;
     }
