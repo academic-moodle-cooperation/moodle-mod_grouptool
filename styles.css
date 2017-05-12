@@ -91,6 +91,16 @@
     margin-left: 1em;
 }
 
+.path-mod-grouptool tr.mod_grouptool_sortlist_entry td {
+    -webkit-transition: padding-top,padding-bottom 600ms ease; /* Safari */
+    transition: padding-top,padding-bottom 600ms ease;
+}
+
+.path-mod-grouptool tr.slidup.mod_grouptool_sortlist_entry td {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .path-mod-grouptool .draggable_item .checkbox_container {
     margin-left: 3px;
     margin-right: 5px;

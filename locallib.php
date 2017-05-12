@@ -1390,13 +1390,13 @@ class mod_grouptool {
                 break;
             }
 
-            $params = new stdClass();
-            $params->lang = current_language();
-            $params->contextid  = $this->context->id;
-            $params->filter = $curfilter;
-            $params->filterid = $filter;
-            $params->globalsize = $this->grouptool->grpsize;
-            $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', array($params));
+            $params = ['cmid'       => $this->cm->id,
+                       'filter'     => $curfilter,
+                       'filterid'   => $filter,
+                       'filterall'  => GROUPTOOL_FILTER_ALL,
+                       'globalsize' => $this->grouptool->grpsize,
+                       'usesize'    => $this->grouptool->use_size];
+            $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', $params);
         }
     }
 

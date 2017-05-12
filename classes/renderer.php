@@ -55,7 +55,11 @@ class renderer extends \plugin_renderer_base {
             $sortlist->groups[$id]->checked = !empty($sortlist->selected[$id]);
             $sortlist->groups[$id]->missing = ($group->status == null);
             // Ensure the keys are right!
-            $sortlist->groups[$id]->groupings = array_values($group->groupings);
+            if (!empty($group->groupings)) {
+                $sortlist->groups[$id]->groupingids = array_keys($group->groupings);
+            } else {
+                $sortlist->groups[$id]->groupingids = array();
+            }
             $sortlist->groups[$id]->id = $id;
             $sortlist->groups[$id]->order = !empty($group->order) ? $group->order : 999999;
         }
@@ -71,13 +75,7 @@ class renderer extends \plugin_renderer_base {
 
         $html = $OUTPUT->render_from_template('mod_grouptool/sortlist', $context);
 
-        // Init JS!
-        $context = \context_module::instance($sortlist->cm->id);
-
-        $params = new \stdClass();
-        $params->lang = current_language();
-        $params->contextid  = $context->id;
-        $PAGE->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', array($params));
+        $PAGE->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', array($sortlist->cm->id));
 
         return $html;
     }

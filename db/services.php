@@ -32,7 +32,7 @@ $services = array(
                 'mod_grouptool_resize_group',
                 'mod_grouptool_activate_group',
                 'mod_grouptool_deactivate_group',
-                'mod_grouptool_reorder_group',
+                'mod_grouptool_reorder_groups',
                 'mod_grouptool_swap_groups'),
         /* If set, the web service user need this capability to access
         * any function of this service. For example: 'some/capability:specified'. */
@@ -88,7 +88,7 @@ $functions = array(
     ),
     'mod_grouptool_reorder_groups' => array(
         'classname'   => 'mod_grouptool_external',
-        'methodname'  => 'reorder_group',
+        'methodname'  => 'reorder_groups',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Set order for multiple groups.',
         'type'        => 'write',

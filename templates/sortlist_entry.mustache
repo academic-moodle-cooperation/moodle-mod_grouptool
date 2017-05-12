@@ -30,6 +30,7 @@
     Context variables required for this template:
     * status - If group's active or inactive
     * missing - If agrp-entry's missing in the DB (shouldn't occure)
+    * slidup - Add class slidup (used for replacements via JS)
     * groupings - Array with group's grouping-IDs
     * id - Group's ID
     * checked - whether or not the group should be selected
@@ -43,6 +44,7 @@
     {
         "status": true,
         "missing": false,
+        "slidup": false,
         "groupings": [1, 7, 9, 12],
         "id": 3,
         "checked": true,
@@ -54,54 +56,53 @@
     }
 
 }}
-<tr class="mod_grouptool_sortlist_entry draggable_item {{^status}}dimmed_text{{/status}}
-    {{#missing}}missing_agrp{{/missing}}">
-    <td class="checkbox_container"><input type="checkbox" name="selected[]"
-                                          class="checkbox_status class0 {{#groupings}} class{{.}}{{/groupings}}"
-                                          value="{{id}}" {{#checked}}checked{{/checked}} /></td>
-    <td class="buttons js_invisible"
-        data-drag="{{id}}">{{#pix}} i/dragdrop, core, {{#str}} drag, grouptool {{/str}}{{/pix}}</td>
-    <td class="grpname">
+<tr class="mod_grouptool_sortlist_entry draggable_item{{^status}} dimmed_text{{/status}}{{#missing}} missing_agrp{{/missing}}{{!
+           }}{{#slidup}} slidup{{/slidup}}" {{!
+    }}data-groupings='[0{{#groupingids}}, {{.}}{{/groupingids}}]' data-order="{{order}}" data-id="{{id}}" data-status="{{status}}"
+    {{!
+    }}data-name="{{name}}" {{#usesize}}data-size="{{size}}"{{/usesize}}>
+    <td class="checkbox_container"><div><input type="checkbox" name="selected[]" {{!
+                                        }}class="checkbox_status class0 {{#groupingids}} class{{.}}{{/groupingids}}" {{!
+                                        }}value="{{id}}" {{#checked}}checked{{/checked}} /></div></td>
+    <td class="buttons js_invisible" data-drag><div>{{!
+        }}{{#pix}} i/dragdrop, core, {{#str}} drag, grouptool {{/str}}{{/pix}}</div</td>
+    <td class="grpname"><div>
+        <input type="hidden" name="name[{{id}}]" value="{{name}}" class="form-control" />
         <span class="text">{{name}}</span>
-        <input type="hidden" name="name[{{id}}]" value="{{name}}" />
-        <a href="{{pageurl}}&rename={{id}}" data-renameid="{{id}}" title="{{#str}}rename, core{{/str}}">
+        <a href="{{pageurl}}&rename={{id}}" data-rename title="{{#str}}rename, core{{/str}}">
             {{#pix}}t/editstring, core, {{#str}}rename, core{{/str}}{{/pix}}</a>
         <input type="hidden" name="order[{{id}}]" value="{{order}}" class="sort_order" />
-    </td>
+    </div></td>
     {{#usesize}}
-        <td class="size addfield">
-            <span class="text">{{size}}</span>
-            <input type="hidden" name="size[{{id}}" value="{{size}}" />
-            <a href="{{pageurl}}&resize={{id}}" data-resizeid="{{id}}" title="{{#str}}resize, mod_grouptool{{/str}}"
-               class="resizebutton">{{#pix}} t/editstring, core, {{#str}}resize, mod_grouptool{{/str}}{{/pix}}</a>
-        </td>
+        <td class="size addfield"><div>
+            <input type="hidden" name="size[{{id}}]" value="{{size}}" class="form-control" />
+            <span class="text">{{size}}</span>{{!
+            }}<a href="{{pageurl}}&resize={{id}}" data-resize title="{{#str}}resize, mod_grouptool{{/str}}" {{!
+               }}class="resizebutton">{{#pix}} t/editstring, core, {{#str}}resize, mod_grouptool{{/str}}{{/pix}}</a>
+        </div></td>
     {{/usesize}}
-    <td class="buttons">
-        <a href="{{pageurl}}&toggle={{id}}" data-toggleid="{{id}}" data-status="{{status}}"
-           title="{{#status}}{{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}"
-           class="{{#status}}{{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}">
-            {{#status}}{{#pix}} active, mod_grouptool, {{#str}}active, core{{/str}}{{/pix}}{{/status}}
-            {{^status}}{{#pix}} inactive, mod_grouptool, {{#str}}inactive, core{{/str}}{{/pix}}{{/status}}
-
-        </a>
-    </td>
-    <td class="buttons">
-        <a href="{{pageurl}}&moveup={{id}}" data-moveupid="{{id}}" class="moveupbutton"
-           title="{{#str}}moveup, mod_grouptool{{/str}}">
-            {{#pix}} i/up, core, {{#str}}moveup, mod_grouptool{{/str}}{{/pix}}
-        </a>
-    </td>
-    <td class="buttons">
-        <a href="{{pageurl}}&movedown={{id}}" data-movedownid="{{id}}" class="movedownbutton"
-           title="{{#str}}movedown, mod_grouptool{{/str}}">
-            {{#pix}} i/down, core, {{#str}}movedown, mod_grouptool{{/str}}{{/pix}}
-        </a>
-    </td>
-    <td class="buttons">
-        <a href="{{pageurl}}&delete={{id}}" data-deleteid="{{id}}" class="deletebutton"
-           title="{{#str}}delete, core{{/str}}">
-            {{#pix}} i/delete, core, {{#str}}delete, core{{/str}}{{/pix}}
-        </a>
-    </td>
-
+    <td class="buttons"><div>
+        <a href="{{pageurl}}&toggle={{id}}" data-toggle data-status="{{status}}" {{!
+           }}title="{{#status}}{{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}" {{!
+           }}class="{{#status}}{{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}">{{!
+            }}{{#status}}{{#pix}} active, mod_grouptool, {{#str}}active, core{{/str}}{{/pix}}{{/status}}{{!
+            }}{{^status}}{{#pix}} inactive, mod_grouptool, {{#str}}inactive, core{{/str}}{{/pix}}{{/status}}{{!
+        }}</a>
+    </div></td>
+    <td class="buttons"><div>
+        <a href="{{pageurl}}&moveup={{id}}" data-moveup class="moveupbutton" title="{{#str}}moveup, mod_grouptool{{/str}}">{{!
+            }}{{#pix}} i/up, core, {{#str}}moveup, mod_grouptool{{/str}}{{/pix}}{{!
+        }}</a>
+    </div></td>
+    <td class="buttons"><div>
+        <a href="{{pageurl}}&movedown={{id}}" data-movedown class="movedownbutton" {{!
+           }}title="{{#str}}movedown, mod_grouptool{{/str}}">{{!
+            }}{{#pix}} i/down, core, {{#str}}movedown, mod_grouptool{{/str}}{{/pix}}{{!
+        }}</a>
+    </div></td>
+    <td class="buttons"><div>
+        <a href="{{pageurl}}&delete={{id}}" data-delete class="deletebutton" title="{{#str}}delete, core{{/str}}">{{!
+            }}{{#pix}} i/delete, core, {{#str}}delete, core{{/str}}{{/pix}}{{!
+        }}</a>
+    </div></td>
 </tr>

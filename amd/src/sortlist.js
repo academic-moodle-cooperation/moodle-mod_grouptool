@@ -25,19 +25,23 @@
  /**
   * @module mod_grouptool/sortlist
   */
-define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log'], function($, jqui, config, str, murl, log) {
+define(['jquery', 'jqueryui', 'core/ajax', 'core/config', 'core/templates', 'core/str', 'core/url', 'core/log',
+        'core/notification'], function($, jqui, ajax, config, templates, str, murl, log, notif) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/sortlist
      */
     var Sortlist = function() {
-
-        this.contextid = 0;
-        this.lang = 'en';
-
+        this.cmid = 0;
     };
 
+    /**
+     * Change the checked checkboxes due to action in checkbox-controller!
+     *
+     * @param e
+     * @param newstate
+     */
     Sortlist.prototype.update_checkboxes = function(e, newstate) {
 
         var selector = '';
@@ -75,232 +79,192 @@ define(['jquery', 'jqueryui', 'core/config', 'core/str', 'core/url', 'core/log']
         }
     };
 
+    /**
+     * Start of dragging!
+     *
+     * @param e
+     * @param ui
+     */
     Sortlist.prototype.dragStartHandler = function(e, ui) {
         // Get our drag object!
         var helper = ui.helper;
 
-        helper.find('.movedownbutton').css('visibility', 'visible');
-        helper.find('.moveupbutton').css('visibility', 'visible');
+        helper.find('a[data-movedown], a[data-moveup]').css('visibility', 'visible');
     };
 
-    Sortlist.prototype.dragEndHandler = function() {
+    /**
+     * End of drag!
+     */
+    Sortlist.prototype.dragEndHandler = function(e) {
         // Set the hidden fields containing the sort order new!
-        var neworderparams = {};
+        var neworderparams = [];
 
-        $('table.drag_list tr.draggable_item').find('.movedownbutton, .movelupbutton').css('visibility', 'visible');
-        $('table.drag_list tr.draggable_item').first().find('.movelupbutton').css('visibility', 'hidden');
-        $('table.drag_list tr.draggable_item').last().find('.moveldownbutton').css('visibility', 'hidden');
+        var sortlist_entries = $('.mod_grouptool_sortlist_body .mod_grouptool_sortlist_entry');
+        sortlist_entries.find('a[data-movedown], a[data-moveup]').css('visibility', 'visible');
+        sortlist_entries.first().find('a[data-moveup]').css('visibility', 'hidden');
+        sortlist_entries.last().find('a[data-movedown]').css('visibility', 'hidden');
 
-        $('table.drag_list tr.draggable_item td input.sort_order').each(function(index, current) {
-            current = $(current);
-            current.attr('value', index + 1);
+        sortlist_entries.each(function(index) {
+            // Using attr here, to have updated values seen in the HTML too!
+            $(this).attr('order', index + 1);
+            $(this).find('input[name="order[' + $(this).data('id') + ']"]').val(index + 1);
 
             // Add new order to new order params!
-            neworderparams[current.attr('name')] = current.val();
-
+            neworderparams.push({groupid: $(this).data('id'),
+                                 order: index + 1});
         });
 
         if (neworderparams !== '') {
-            var contextid = $('.path-mod-grouptool .drag_list tbody').data('context');
-            var infoNode = '';
-            // Start AJAX Call to update order in DB!
-            var cfg = {
-                method: 'POST',
-                url: config.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                data: $.extend({ 'action': 'reorder', 'sesskey': M.cfg.sesskey, 'contextid': contextid},
-                               neworderparams),
-                headers: { 'X-Transaction': 'POST reorder groups'},
-                dataType: 'json',
-                beforeSend: function() {
-                    if (infoNode !== '') {
-                        infoNode.fadeOut(600).delay(600).remove();
-                    }
-                    log.info("Start AJAX Call to reorder groups", "grouptool");
-                },
-                complete: function() {
-                    log.info("AJAX Call to reorder groups completed", "grouptool");
-                },
-                success: function(response, status) {
-                    var tmpnode = '';
-                    if (response.error) {
-                        tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" + response.error + "</div>");
-                        $('table.drag_list').before(tmpnode);
-                        infoNode = $('div.infonode');
-                        infoNode.fadeIn(600);
-                        // Remove after 60 seconds automatically!
-                        window.setTimeout(function() {
-                            infoNode.fadeOut(600).delay(600).remove();
-                        }, 60 * 1000);
-                        log.info("AJAX Call to reorder groups successfull\nError ocured:" + response.error + "\n" + status,
-                                 "grouptool");
-                    } else {
-                        tmpnode = $("<div class=\"infonode alert-success\" style=\"display:none\">" + response.message + "</div>");
-                        $('table.drag_list').before(tmpnode);
-                        infoNode = $('div.infonode');
-                        infoNode.fadeIn(600);
-                        window.setTimeout(function() {
-                            infoNode.fadeOut(600).delay(600).remove();
-                        }, 5 * 1000);
-                        log.info("AJAX Call to reorder groups successfull\n" + response.message + "\n" + status, "grouptool");
-                    }
-                },
-                error: function(jqXHR, status, error) {
-                    // Show message!
-                    log.error("AJAX Call to reorder groups failure\nStatus: " + status + "\nError:" + error, "grouptool");
-                },
-                end: function() {
-                    log.info("AJAX Call to reorder groups ended", "grouptool");
+            var requests = ajax.call([{
+                methodname: 'mod_grouptool_reorder_groups',
+                args: {cmid: e.data.cmid, order: neworderparams},
+                fail: notif.exception
+            }]);
+            requests[0].then(function(result) {
+                var context = {
+                    'message': '',
+                    'extraclasses': 'infonode'
+                };
+                var template = 'core/notification_success';
+                var autoFadeOut = 5 * 1000;
+
+                if (result.error) {
+                    template = 'core/notification_error';
+                    context.message = result.error;
+                    autoFadeOut = 60 * 1000;
+                    log.info("AJAX Call to reorder groups successfull\nError ocured:" + result.error + "\n" + status, "grouptool");
+                } else {
+                    context.message = result.message;
+                    log.info("AJAX Call to reorder groups successfull\n" + result.message + "\n" + status, "grouptool");
                 }
-            };
-            $.ajax(cfg);
+
+                templates.render(template, context).then(function(html) {
+                    var infoNode = $(html);
+                    infoNode.hide(0);
+                    $('table.drag_list').before(infoNode);
+                    infoNode.slideDown(600, function() {
+                        window.setTimeout(function () {
+                            infoNode.slideUp(600, function () {
+                                infoNode.remove();
+                            });
+                        }, autoFadeOut);
+                    });
+                }).fail(notif.exception);
+            });
         }
     };
 
-    Sortlist.prototype.moveDown = function(e) { // Move the node 1 element down!
+    /**
+     * Move the element 1 position down!
+     *
+     * @param e
+     */
+    Sortlist.prototype.moveDown = function(e) {
         // Swap sort-order-values!
         e.target = $(e.target);
-        var this_order = e.target.closest('.draggable_item').find('.sort_order').val();
-        var other_order = e.target.closest('.draggable_item').next('.draggable_item').find('.sort_order').val();
+        var nodeA = e.target.closest('.mod_grouptool_sortlist_entry');
+        var nodeB = e.target.closest('.mod_grouptool_sortlist_entry').next('.mod_grouptool_sortlist_entry');
+        var this_order = nodeA.data('order');
+        var other_order = nodeB.data('order');
 
         // Stop the button from submitting!
         e.preventDefault();
         e.stopPropagation();
 
-        var contextid = e.data.contextid;
+        var requests = ajax.call([{
+            methodname: 'mod_grouptool_swap_groups',
+            args: {cmid: e.data.cmid, a: nodeA.data('id'), b: nodeB.data('id')},
+            fail: notif.exception
+        }]);
+        requests[0].then(function(result) {
+            if (result.error) {
+                notif.exception(result.error);
+            } else {
+                // Swap list-elements!
+                nodeB.after(nodeA.clone(true));
+                nodeA.replaceWith(nodeB);
 
-        var valuefrom = e.target.closest('.draggable_item').next('.draggable_item').find('input[name="selected[]"]');
-        // Start AJAX Call to update order in DB!
-        var cfg = {
-            method: 'POST',
-            url: M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-            data: {
-                'action': 'swap',
-                'sesskey': config.sesskey,
-                'contextid': contextid,
-                'groupA': e.target.closest('.draggable_item').find('input[name="selected[]"]').val(),
-                'groupB': valuefrom.val()
-            },
-            headers: { 'X-Transaction': 'POST reorder groups'},
-            beforeSend: function() {
-                log.info("Start AJAX Call to reorder groups", "grouptool");
-            },
-            complete: function() {
-                log.info("AJAX Call to reorder groups completed", "grouptool");
-            },
-            success: function(response, status) {
-                if (response.error) {
-                    log.info("AJAX Call to reorder groups successfull\nError occured:" + response.error + "\n" + status,
-                             "grouptool");
-                } else {
-                    log.info("AJAX Call to reorder groups successfull\n" + response.message + "\n" + status, "grouptool");
-                }
-            },
-            failure: function(jqXHR, status, error) {
-                // Show message!
-                log.error("AJAX Call to reorder groups failure\nStatus: " + status + "\nError:" + error, "grouptool");
-            },
-            end: function() {
-                log.info("AJAX Call to reorder groups ended", "grouptool");
+                nodeA.data('order', other_order);
+                nodeA.find('input[name="order[' + nodeA.data('id') + ']"]').val(other_order);
+                nodeB.data('order', this_order);
+                nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(this_order);
+                log.info(result.message);
             }
-        };
-        $.ajax(cfg);
-
-        // Swap list-elements!
-        var nodeA = e.target.closest('.draggable_item');
-        var nodeB = e.target.closest('.draggable_item').next('.draggable_item');
-        nodeB.after(nodeA.clone(true));
-        nodeA.replaceWith(nodeB);
-
-        e.target.closest('.draggable_item').find('input.sort_order').val(other_order);
-        e.target.closest('.draggable_item').prev('.draggable_item').find('input.sort_order').val(this_order);
+        });
     };
 
-    Sortlist.prototype.moveUp = function(e) { // Move the node 1 element up!
+    /**
+     * Move the element 1 position up!
+     *
+     * @param e
+     */
+    Sortlist.prototype.moveUp = function(e) {
         // Swap sort-order-values!
         e.target = $(e.target);
-        var this_order = e.target.closest('.draggable_item').find('.sort_order').val();
-        var other_order = e.target.closest('.draggable_item').prev('.draggable_item').find('.sort_order').val();
+        var nodeA = e.target.closest('.mod_grouptool_sortlist_entry');
+        var nodeB = e.target.closest('.mod_grouptool_sortlist_entry').prev('.mod_grouptool_sortlist_entry');
+
+        var this_order = nodeA.data('order');
+        var other_order = nodeB.data('order');
 
         // Stop the button from submitting!
         e.preventDefault();
         e.stopPropagation();
 
-        var contextid = e.data.contextid;
-        var valuefrom = e.target.closest('.draggable_item').prev('.draggable_item').find('input[name="selected[]"]');
-        // Start AJAX Call to update order in DB!
-        var cfg = {
-            method: 'POST',
-            url: M.cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-            data: {
-                'action': 'swap',
-                'sesskey': config.sesskey,
-                'contextid': contextid,
-                'groupA': e.target.closest('.draggable_item').find('input[name="selected[]"]').val(),
-                'groupB': valuefrom.val()
-            },
-            headers: { 'X-Transaction': 'POST reorder groups'},
-            beforeSend: function() {
-                log.info("Start AJAX Call to reorder groups", "grouptool");
-            },
-            complete: function() {
-                log.info("AJAX Call to reorder groups completed", "grouptool");
-            },
-            success: function(response, status) {
-                if (response.error) {
-                    log.error("AJAX Call to reorder groups successfull\nError ocured:" + response.error + "\n" + status,
-                              "grouptool");
-                } else {
-                    log.info("AJAX Call to reorder groups successfull\n" + response.message + "\n" + status, "grouptool");
-                }
-            },
-            failure: function(jqXHR, status, error) {
-                // Show message!
-                log.error("AJAX Call to reorder groups failure\nStatus: " + status + "\nErrortext:" + error, "grouptool");
-            },
-            end: function() {
-                log.info("AJAX Call to reorder groups ended", "grouptool");
+        var requests = ajax.call([{
+            methodname: 'mod_grouptool_swap_groups',
+            args: {cmid: e.data.cmid, a: nodeA.data('id'), b: nodeB.data('id')},
+            fail: notif.exception
+        }]);
+        requests[0].then(function(result) {
+            if (result.error) {
+                notif.exception(result.error);
+            } else {
+                // Swap list-elements!
+                nodeB.before(nodeA.clone(true));
+                nodeA.replaceWith(nodeB);
+
+                nodeA.data('order', other_order);
+                nodeA.find('input[name="order[' + nodeA.data('id') + ']"]').val(other_order);
+                nodeB.data('order', this_order);
+                nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(this_order);
+                log.info(result.message);
             }
-        };
-
-        $.ajax(cfg);
-
-        e.target.closest('.draggable_item').find('input.sort_order').val(other_order);
-        e.target.closest('.draggable_item').prev('.draggable_item').find('input.sort_order').val(this_order);
-
-        // Swap list-elements!
-        var nodeA = e.target.closest('.draggable_item');
-        var nodeB = e.target.closest('.draggable_item').prev('.draggable_item');
-        nodeA.before(nodeB.clone(true));
-        nodeB.replaceWith(nodeA);
+        });
     };
 
     var instance = new Sortlist();
 
-    instance.initializer = function(param) { // Parameter 'param' contains the parameter values!
+    instance.initializer = function(cmid) { // Parameter 'param' contains the parameter values!
 
-        instance.contextid = param.contextid;
-        instance.lang = param.lang;
+        instance.cmid = cmid;
 
         log.info('Initialize Grouptool sortlist', 'grouptool');
-        $('.path-mod-grouptool .drag_list tbody').data('context', instance.contextid);
-        $('.path-mod-grouptool .drag_list tbody').sortable({
-            containment: '.drag_list tbody',
+        $('.path-mod-grouptool .mod_grouptool_sortlist .mod_grouptool_sortlist_body').sortable({
+            containment: '.mod_grouptool_sortlist .mod_grouptool_sortlist_body',
             cursor: 'move',
             delay: 150,
-            handle: '.drag_image',
-            items: ' .draggable_item',
+            handle: '[data-drag]',
+            items: ' .mod_grouptool_sortlist_entry',
             opacity: 0.5,
             helper: 'clone',
             axis: 'y',
             start: instance.dragStartHandler,
-            stop: instance.dragEndHandler
+            stop: function(e, ui) {
+                e.data = instance;
+                instance.dragEndHandler(e, ui);
+            }
         });
         // Enable the drag-symbols when JS is enabled :)!
-        $('.path-mod-grouptool .drag_list .draggable_item .drag_image').removeClass('js_invisible');
+        var dragnodes = $('.path-mod-grouptool .mod_grouptool_sortlist tr[data-id] [data-drag]');
+        $('.path-mod-grouptool .mod_grouptool_sortlist tr .js_invisible').removeClass('js_invisible');
+        dragnodes.removeClass('js_invisible');
+        dragnodes.css('cursor', 'pointer');
 
         // Add JS-Eventhandler for each move-up/down-button-click (=images)!
-        $('.path-mod-grouptool .buttons .movedownbutton').on('click', null, this, instance.moveDown);
-        $('.path-mod-grouptool .buttons .moveupbutton').on('click', null, this, instance.moveUp);
+        var sortlistnode = $('.path-mod-grouptool .mod_grouptool_sortlist');
+        sortlistnode.on('click', 'tr[data-id] a[data-movedown]', this, instance.moveDown);
+        sortlistnode.on('click','tr[data-id] a[data-moveup]', this, instance.moveUp);
 
         // Enhanced checkbox-controller functionality!
         var checkbox_controls_action = $('button[name="do_class_action"]');

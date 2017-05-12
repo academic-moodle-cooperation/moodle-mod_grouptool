@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_grouptool/sortlist
+    @template mod_grouptool/sortlist_body
 
-    Grouptool's sortlist template.
+    Grouptool's sortlist template's table body.
 
     The purpose of this template is to display the sortlist.
 
@@ -37,9 +37,7 @@
     Example context (json):
     {
         "usesize": true,
-        "pageurl": "https://example.com/mod/grouptool/view.php?id=1",
-        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1"
-        "statushelpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
+        "pageurl": "https://example.com/mod/grouptool/view.php?id=3&tab=administration",
         "groups": [
             {
                 "status": true,
@@ -74,24 +72,6 @@
         ]
     }
 }}
-<div class="mod_grouptool_sortlist">
-    {{>mod_grouptool/sortlist_addon}}
-    <div class="drag_area">
-        <table class="table table-hover drag_list">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th class="js_invisible"></th>
-                    <th>{{#str}} name, core {{/str}}</th>
-                    {{#usesize}}<th>{{#str}} size, core {{/str}}</th>{{/usesize}}
-                    <th>{{#str}} groupstatus, mod_grouptool {{/str}}{{#statushelpicon}}{{>core/help_icon}}{{/statushelpicon}}</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            {{>mod_grouptool/sortlist_body}}
-        </table>
-    </div>
-    {{>mod_grouptool/sortlist_addon}}
-</div>
+<tbody class="mod_grouptool_sortlist_body">
+    {{#groups}}{{>mod_grouptool/sortlist_entry}}{{/groups}}
+</tbody>

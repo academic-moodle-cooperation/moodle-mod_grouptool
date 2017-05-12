@@ -25,21 +25,18 @@
  /**
   * @module mod_grouptool/administration
   */
-define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'core/log'], function($, cfg, str, murl, notif, log) {
+define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/notification', 'core/log'],
+        function($, cfg, templates, ajax, str, murl, notif, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/administration
      */
     var Administration = function() {
-        this.contextid = 0;
-
-        this.lang = 'en';
-
+        this.cmid = 0;
         this.filter = null;
-
-        this.filterid = null;
-
+        //this.filterid = null;
+        this.filterall = null;
         this.globalsize = 3;
     };
 
@@ -53,11 +50,15 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         e.preventDefault();
         e.stopPropagation();
 
-        // Get group id!
-        e.target = $(e.target);
-        var grpid = e.target.attr('name').replace ( /[^\d]/g, '' );
+        var context = {};
+        var requests = [];
 
-        var button = e.target.closest('a');
+        // Get group id!
+        e.target = $(e.target).closest('[data-rename]');
+        var node = e.target.closest('tr');
+        var grpid = node.data('id');
+
+        var button = e.target;
         var field = button.prevAll('input[type=hidden]');
         var text = button.prevAll('span.text');
         var infoNode = '';
@@ -76,38 +77,40 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
             }
 
             if (e.which === 13) { // Enter!
-                var ajcfg = {
-                    method: 'POST',
-                    url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                    data: {
-                        'action': 'rename',
-                        'groupid': grpid,
-                        'name': field.val(),
-                        'sesskey': cfg.sesskey,
-                        'contextid': e.data.contextid
-                    },
-                    headers: { 'X-Transaction': 'POST rename group ' + grpid},
-                    dataType: 'json',
-                    beforeSend: function() {
-                        if (infoNode) {
-                            infoNode.fadeOut(600, function() { infoNode.remove(); });
-                        }
-                        log.info("Start AJAX Call to rename group " + grpid, "grouptool");
-                    },
-                    complete: function() {
-                        log.info("AJAX Call to rename group " + grpid + " completed", "grouptool");
-                    },
-                    success: function(response, status) {
-                        if (response.error) {
-                            text.before("<div class=\"infonode alert-error\" style=\"display:none\">" + response.error + "</div>");
-                            infoNode = $("div.infonode");
+                requests = ajax.call([{
+                    methodname: 'mod_grouptool_rename_group',
+                    args: {cmid: e.data.cmid, groupid: grpid, name: field.val()},
+                    fail: notif.exception
+                }]);
+                if (infoNode) {
+                    infoNode.fadeOut(600);
+                    infoNode.remove();
+                }
+                requests[0].then(function(result) {
+                    if (result.error) {
+                        context = {
+                            'message': result.error
+                        };
+                        templates.render('core/notification_error', context).then(function(html) {
+                            infoNode = $(html);
+                            infoNode.hide();
+                            node.find('.grpname div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 60 * 1000);
-                        } else {
-                            var startdiv = "<div class=\"infonode alert-success\" style=\"display:none\">";
-                            text.before(startdiv + response.message + "</div>");
-                            infoNode = $("div.infonode");
+                            window.setTimeout(function () {
+                                infoNode.fadeOut(600, function () {
+                                    infoNode.remove();
+                                });
+                            }, 60 * 1000);
+                        }).fail(notif.exception);
+                    } else {
+                        context = {
+                            'message': result.message
+                        };
+                        templates.render('core/notification_success', context).then(function(html) {
+                            infoNode = $(html);
+                            infoNode.hide();
+                            node.find('.grpname div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             text.html(field.val());
                             field.fadeOut(600, function() {
@@ -118,32 +121,12 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                             });
                             field.off('keydown');
                             window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 5 * 1000);
-                        }
-                        log.info("AJAX Call to rename group " + grpid + " successfull\n" + status, "grouptool");
-                    },
-                    error: function(jqXHR, status, error) {
-                        // Show message!
-                        var startdiv = "<div class=\"infonode alert-error\" style=\"display:none\">";
-                        var tmpnode = $(startdiv + status + "<br />" + "<span class=\"small\">" + error + "</span></div>");
-                        infoNode = text.before(tmpnode);
-                        infoNode.fadeIn(600);
-                        log.error("AJAX Call to rename group " + grpid + " failure", "grouptool");
-                    },
-                    end: function() {
-                        log.info("AJAX Call to rename group " + grpid + " ended", "grouptool");
-                    },
-                    statusCode: {
-                        404: function() {
-                            log.error("404: URL not found!", "grouptool");
-                        },
-                        500: function() {
-                            log.error("500: Internal server error!", "grouptool");
-                        }
-                    },
-                    timeout: 60000,
-                };
+                        }).fail(notif.exception);
 
-                $.ajax(ajcfg);
+                        log.info("AJAX Call to rename group " + grpid + " successfull\n" + status, "grouptool");
+                    }
+                });
+
             } else if (e.which === 27) { // Escape!
                 field.fadeOut(600, function() {
                     text.hide();
@@ -156,7 +139,7 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                 if (infoNode) {
                     infoNode.fadeOut(600, function() { infoNode.remove(); });
                 }
-                field.off('keydown');
+                field.unbind('key');
             }
         });
     };
@@ -172,17 +155,24 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         e.stopPropagation();
 
         // Get group id!
-        e.target = $(e.target);
-        var grpid = e.target.attr('name').replace ( /[^\d]/g, '' );
+        e.target = $(e.target).closest('[data-resize]');
+        var node = e.target.closest('tr');
+        var grpid = node.data('id');
+
+        var cmid = e.data.instance.cmid;
 
         var strings = e.data.strings;
-        var admin = e.data.admin;
+        var globalsize = e.data.globalsize;
 
-        var button = e.target.closest('a');
+        var button = e.target;
         var field = button.prevAll('input[type=hidden]');
         var text = button.prevAll('span.text');
         var infoNode = '';
         var helpNode = '';
+
+        var context = {};
+        var requests = [];
+
         button.fadeOut(600);
         field.fadeOut(600);
         text.fadeOut(600, function() {
@@ -190,63 +180,65 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
             field.fadeIn(600);
             field.focus();
             field.select();
-            var tmpnode = $("<div class=\"helpnode alert-info\" style=\"display:none\">" + strings.resizehelp + "</div>");
-            text.before(tmpnode);
-            helpNode = $('div.helpnode');
-            helpNode.fadeIn(600);
+            var context = {
+                'message': strings.resizehelp
+            };
+            templates.render('core/notification_info', context).then(function(html) {
+                helpNode = $(html);
+                helpNode.hide();
+                node.find('.size div').prepend(helpNode);
+                helpNode.fadeIn(600);
+            }).fail(notif.exception);
         });
-        field.on('keydown', function(e) {
+        field.on('keydown', null, null, function(e) {
             if (e.which === 13 || e.which === 27) {
                 e.preventDefault();
                 e.stopPropagation();
             }
 
             if (e.which === 13) { // Enter!
-                // TODO start AJAX Call and process Response!
-                var ajcfg = {
-                    method: 'POST',
-                    url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                    data: {
-                        'action': 'resize',
-                        'groupid': grpid,
-                        'size': field.val(),
-                        'sesskey': cfg.sesskey,
-                        'contextid': admin.contextid
-                    },
-                    headers: { 'X-Transaction': 'POST resize group ' + grpid},
-                    dataType: 'json',
-                    beforeSend: function() {
-                        if (infoNode) {
-                            infoNode.fadeOut(600);
-                            infoNode.remove();
-                        }
-                        if (helpNode) {
-                            helpNode.fadeOut(600);
-                            helpNode.remove();
-                        }
-                        log.info("Start AJAX Call to resize group " + grpid, "grouptool");
-                    },
-                    complete: function() {
-                        log.info("AJAX Call to resize group " + grpid + " completed", "grouptool");
-                    },
-                    success: function(response, status) {
-                        var tmpnode = '';
-                        if (response.error) {
-                            tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" + response.error + "</div>");
-                            text.before(tmpnode);
-                            infoNode = $('div.infonode');
+                requests = ajax.call([{
+                    methodname: 'mod_grouptool_resize_group',
+                    args: {cmid: parseInt(cmid), groupid: grpid, size: parseInt(field.val())},
+                    fail: notif.exception
+                }]);
+                if (infoNode) {
+                    infoNode.fadeOut(600);
+                    infoNode.remove();
+                }
+                if (helpNode) {
+                    helpNode.fadeOut(600);
+                    helpNode.remove();
+                }
+                requests[0].then(function(result) {
+                    if (result.error) {
+                        context = {
+                            'message': result.error
+                        };
+                        templates.render('core/notification_error', context).then(function(html) {
+                            infoNode = $(html);
+                            infoNode.hide();
+                            node.find('.size div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 60 * 1000);
-                        } else {
-                            var divstart = "<div class=\"infonode alert-success\" style=\"display:none\">";
-                            tmpnode = $(divstart + response.message + "</div>");
-                            text.before(tmpnode);
-                            infoNode = $('div.infonode');
+                            window.setTimeout(function () {
+                                infoNode.fadeOut(600, function () {
+                                    infoNode.remove();
+                                });
+                            }, 60 * 1000);
+                        }).fail(notif.exception);
+                    } else {
+                        context = {
+                            'message': result.message
+                        };
+                        templates.render('core/notification_success', context).then(function(html) {
+                            infoNode = $(html);
+                            infoNode.hide();
+                            node.find('.size div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             var newvalue = field.val();
                             if (newvalue === '') {
-                                text.html(admin.globalsize + '*');
+                                text.html(globalsize + '*');
                             } else {
                                 text.html(newvalue);
                             }
@@ -258,37 +250,12 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
                                 field.off('keydown');
                             });
                             window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 5 * 1000);
-                        }
-                        log.info("AJAX Call to resize group " + grpid + " successfull\n" + status, "grouptool");
-                    },
-                    error: function(jqXHR, status, error) {
-                        // Show message!
-                        jqXHR = null;
-                        var tmpnode = $("<div class=\"infonode alert-error\" style=\"display:none\">" + status + "</div>");
-                        infoNode = text.before(tmpnode);
-                        infoNode.fadeIn(600);
-                        log.error("AJAX Call to resize group " + grpid + " failure" + "\n" + error, "grouptool");
-                    },
-                    end: function() {
-                        log.info("AJAX Call to resize group " + grpid + " ended", "grouptool");
-                    },
-                    statusCode: {
-                        404: function() {
-                            log.error("404: URL not found!", "grouptool");
-                        },
-                        500: function() {
-                            log.error("500: Internal server error!", "grouptool");
-                        }
-                    },
-                    timeout: 60000,
-                };
+                        }).fail(notif.exception);
+                    }
+                    log.info("AJAX Call to resize group " + grpid + " successfull\n" + status, "grouptool");
+                });
 
-                $.ajax(ajcfg);
-
-            } else if (e.which === 27) {
-                e.preventDefault();
-                e.stopPropagation();
-
+            } else if (e.which === 27) { // Escape!
                 field.fadeOut(600, function() {
                     text.hide();
                     field.attr('type', 'hidden');
@@ -317,167 +284,185 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         e.preventDefault();
         e.stopPropagation();
 
-        e.target = $(e.target);
-        var grpid = e.target.attr('name').replace ( /[^\d]/g, '' );
+        var requests = [];
+        var context = {};
+
+        e.target = $(e.target).closest("[data-toggle]");
+
+        var node = e.target.closest('tr');
+
+        var grpid = node.data('id');
 
         log.info('TOGGLE GROUP ' + grpid, "grouptool");
 
-        var ajcfg;
+        var status = node.data('status');
 
-        if (e.target.hasClass('active')) {
+        if (status === 1 || status === true) {
             // Set inactive (via AJAX Request)!
             log.info('DEACTIVATE GROUP ' + grpid + '!', "grouptool");
 
-            ajcfg = {
-                method: 'POST',
-                url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                data: {
-                    'action': 'deactivate',
-                    'groupid': grpid,
-                    'sesskey': cfg.sesskey,
-                    'contextid': e.data.contextid,
-                    'filter': e.data.filterid,
-                },
-                headers: { 'X-Transaction': 'POST rename group ' + grpid},
-                dataType: 'json',
-                beforeSend: function() {
-                    var text = "Start AJAX Call to deactivate group " + grpid + "\n";
-                    var urlparams = "?action=deactivate&groupid=" + grpid + "&sesskey=" + cfg.sesskey;
-                    var urlparams2 = "&contextid=" + e.data.contextid;
-                    log.info(text + ajcfg.url + urlparams + urlparams2, "grouptool");
-                },
-                complete: function() {
-                    log.info("AJAX Call to deactivate group " + grpid + " completed", "grouptool");
-                },
-                success: function(response, status) {
-                    var inactivestr = str.get_string('inactive', 'mod_grouptool');
-                    if (response.error) {
-                        var text = "AJAX Call to deactivate group " + grpid + " successfull but error occured:\n";
-                        log.info(text + response.error + "\n" + status, "grouptool");
-                    } else {
-                        if (e.data.filter === 'active') {
-                            e.target.closest('tr').fadeOut(600, function() {
-                                e.target.closest('tr').remove();
-                                if (response.noentriesmessage !== '') {
-                                    $('div.sortlist_container').fadeOut(600, function() {
-                                        $('div.sortlist_container').html(response.noentriesmessage);
-                                        $('div.sortlist_container').fadeIn(600);
+            requests = ajax.call([{
+                methodname: 'mod_grouptool_deactivate_group',
+                args: {cmid: e.data.cmid, groupid: grpid},
+                fail: notif.exception
+            }]);
+            requests[0].then(function(result) {
+                if (result.error) {
+                    var text = "AJAX Call to deactivate group " + grpid + " successfull but error occured:\n";
+                    log.info(text + result.error + "\n" + status, "grouptool");
+                } else {
+                    if (e.data.filter === 'active') {
+                        node.find('td div').slideUp(600).promise().done(function() {
+                            node.remove();
+                            if (!$('div.sortlist_container tr').length) {
+                                /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
+                                 * for all groups sortlist! */
+                                str.get_strings([{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
+                                                 {'key': 'nogroupschoose', 'component': 'mod_grouptool'}]).done(function (s) {
+                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {'id': e.data.cmid,
+                                                                                           'tab': 'group_administration',
+                                                                                           'filter': e.data.filterall});
+                                    var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
+                                    var context = {
+                                        'message': s[0] + link
+                                    };
+                                    var sortlistcontainer = $('div.sortlist_container');
+                                    sortlistcontainer.fadeOut(600, function() {
+                                        templates.render('core/notification_info', context).then(function(html) {
+                                            sortlistcontainer.html(html);
+                                            sortlistcontainer.fadeIn(600);
+                                        }).fail(notif.exception);
                                     });
+                                }).fail(notif.exception);
+                            }
+                        });
+                    } else {
+                        // Render the element again and display it!
+                        context = { "status": false,
+                            "missing": false,
+                            "groupings": e.target.closest('tr').data('groupings'),
+                            "id": grpid,
+                            "checked": e.target.closest('tr').find('input[type=checkbox]').prop('checked'),
+                            "name": e.target.closest('tr').data('name'),
+                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", { 'id': e.data.cmid,
+                                'tab': 'administration'}),
+                            "order": e.target.closest('tr').data('order'),
+                            "usesize": !!e.data.usesize,
+                            "size": e.target.closest('tr').data('size') };
+                        var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
+                        // This will call the function to load and render our template.
+                        node.toggleClass('slidup');
+                        node.find('td div').slideUp(600).promise().done(function() {
+                            templatepromise.then(function (html) {
+                                var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
+                                var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
+                                if (firstinactive.length) {
+                                    node.detach();
+                                    node.insertBefore(firstinactive);
+                                } else if (lastactive.length) {
+                                    node.detach();
+                                    node.insertAfter(lastactive);
                                 }
-                            });
-                        } else {
-                            // Else set URL and alt of new image!
-                            e.target.closest('tr').fadeOut('fadeOut', function() {
-                                e.target.closest('tr').addClass('dimmed_text');
-                                $(e.target).removeClass('active').addClass('inactive');
-                                e.target.attr('src', murl.imageUrl('inactive', 'mod_grouptool'));
-                                inactivestr.done(function (s) {
-                                    e.target.attr('alt', s);
-                                }).fail(function (ex) {
-                                    log.error("Error retrieving string: " + ex, "grouptool");
-                                });
-                                e.target.closest('tr').fadeIn(600);
-                            });
-                            // And add class dimmed_text to row!
-                        }
-                        log.info("AJAX Call to deactivate group " + grpid + " successfull\n" + response.message + "\n" + status,
-                                 "grouptool");
+                                var newnode = $(html);
+                                newnode.addClass('slidup');
+                                newnode.find('td div').slideUp(0);
+                                node.replaceWith(newnode);
+                                newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
+                                newnode.toggleClass('slidup');
+                                newnode.find('td div').slideDown(600);
+                                node = newnode;
+                            }).fail(notif.exception);
+                        });
                     }
-                },
-                error: function() {
-                    // Show message!
-                    log.error("AJAX Call to deactivate group " + grpid + " failure", "grouptool");
-                },
-                end: function() {
-                    log.info("AJAX Call to deactivate group " + grpid + " ended", "grouptool");
-                },
-                timeout: 60000,
-            };
-
-            $.ajax(ajcfg);
-
-        } else if (e.target.hasClass('inactive')) {
-
+                    log.info("AJAX Call to deactivate group " + grpid + " successfull\n" + result.message + "\n" + status,
+                        "grouptool");
+                }
+            });
+        } else if (status === 0 || status === false) {
             // Set active (via AJAX Request)!
             log.info('ACTIVATE GROUP ' + grpid + '!', "grouptool");
 
-            ajcfg = {
-                method: 'POST',
-                url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                data: {
-                    'action': 'activate',
-                    'groupid': grpid,
-                    'sesskey': cfg.sesskey,
-                    'contextid': e.data.contextid,
-                    'filter': e.data.filterid
-                },
-                headers: { 'X-Transaction': 'POST rename group ' + grpid},
-                beforeSend: function() {
-                    var params = '&contextid=' + e.data.contextid;
-                    var logurl = ajcfg.url + '?action=deactivate' + '&groupid=' + grpid + '&sesskey=' + cfg.sesskey + params;
-                    log.info('Start AJAX Call to activate group ' + grpid + "\n" + logurl, "grouptool");
-                },
-                complete: function() {
-                    log.info("AJAX Call to activate group " + grpid + " completed", "grouptool");
-                },
-                success: function(response, status) {
-                    var activestr = str.get_string('active', 'mod_grouptool');
-                    if (response.error) {
-                        var text = "AJAX Call to activate group " + grpid + " successfull but error occured:\n";
-                        log.info(text + response.error + "\n" + status, "grouptool");
-                    } else {
-                        if (e.data.filter === 'inactive') {
-                            // If showing only active remove from list!
-                            e.target.closest('tr').fadeOut(600, function() {
-                                e.target.closest('tr').remove();
-                                if (response.noentriesmessage !== '') {
-                                    $('div.sortlist_container').fadeOut(600, function() {
-                                        $('div.sortlist_container').html(response.noentriesmessage);
-                                        $('div.sortlist_container').fadeIn(600);
+            requests = ajax.call([{
+                methodname: 'mod_grouptool_activate_group',
+                args: {cmid: e.data.cmid, groupid: grpid},
+                fail: notif.exception
+            }]);
+            requests[0].then(function(result) {
+                if (result.error) {
+                    var text = "AJAX Call to activate group " + grpid + " successfull but error occured:\n";
+                    log.info(text + result.error + "\n" + status, "grouptool");
+                } else {
+                    if (e.data.filter === 'inactive') {
+                        // If showing only inactive remove from list!
+                        node.find('td div').slideUp(600).promise().done(function() {
+                            node.remove();
+                            if (!$('div.sortlist_container tr').length) {
+                                /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
+                                 * for all groups sortlist! */
+                                str.get_strings([{'key': 'nogroupsinactive', 'component': 'mod_grouptool'},
+                                                 {'key': 'nogroupschoose', 'component': 'mod_grouptool'}]).done(function (s) {
+                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {'id': e.data.cmid,
+                                                                                           'tab': 'group_administration',
+                                                                                           'filter': e.data.filterall});
+                                    var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
+                                    context = {
+                                        'message': s[0] + link
+                                    };
+                                    var sortlistcontainer = $('div.sortlist_container');
+                                    sortlistcontainer.fadeOut(600, function() {
+                                        templates.render('core/notification_info', context).then(function(html) {
+                                            sortlistcontainer.html(html);
+                                            sortlistcontainer.fadeIn(600);
+                                        }).fail(notif.exception);
                                     });
+                                }).fail(notif.exception);
+                            }
+                        });
+                    } else {
+                        // Replace sortlist entry!
+                        // This will call the function to load and render our template.
+                        context = { "status": true,
+                            "missing": false,
+                            "groupings": node.data('groupings'),
+                            "id": grpid,
+                            "checked": node.find('input[type=checkbox]').prop('checked'),
+                            "name": node.data('name'),
+                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", { 'id': e.data.cmid,
+                                'tab': 'administration'}),
+                            "order": node.data('order'),
+                            "usesize": !!e.data.usesize,
+                            "size": node.data('size') };
+                        var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
+                        node.toggleClass('slidup');
+                        e.target.closest('tr').find('td div').slideUp(600).promise().done(function() {
+                            templatepromise.then(function (html) {
+                                var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
+                                var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
+                                if (lastactive.length) {
+                                    node.detach();
+                                    node.insertAfter(lastactive);
+                                } else if (firstinactive.length) {
+                                    node.detach();
+                                    node.insertBefore(firstinactive);
                                 }
-                            });
-                        } else {
-                            // Else set URL and alt of new image!
-                            e.target.closest('tr').fadeOut(600, function() {
-                                e.target.closest('tr').removeClass('dimmed_text');
-                                e.target.removeClass('inactive').addClass('active');
-                                e.target.attr('src', murl.imageUrl('active', 'mod_grouptool'));
-                                activestr.done(function (s) {
-                                    e.target.attr('alt', s);
-                                }).fail(function (ex) {
-                                    log.error('Error while retrieving string: ' + ex, "grouptool");
-                                });
-                                // TODO move node in list to correct position?
-                                e.target.closest('tr').fadeIn(600);
-                            });
-                        }
-                        log.info("AJAX Call to activate group " + grpid + " successfull\n" + response.message, "grouptool");
-                    }
-                },
-                error: function(jqXHR, status, error) {
-                    // Show message!
-                    log.error("AJAX Call to activate group " + grpid + " failure\n" + status + "\n" + error, "grouptool");
-                },
-                end: function() {
-                    log.info("AJAX Call to activate group " + grpid + " ended", "info", "grouptool");
-                },
-                statusCode: {
-                    404: function() {
-                        log.error("404: URL not found!", "grouptool");
-                    },
-                    500: function() {
-                        log.error("500: Internal server error!", "grouptool");
-                    }
-                },
-                timeout: 60000,
-            };
+                                var newnode = $(html);
+                                newnode.addClass('slidup');
+                                newnode.find('td div').slideUp(0);
+                                node.replaceWith(newnode);
+                                newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
+                                newnode.toggleClass('slidup');
+                                newnode.find('td div').slideDown(600);
+                                node = newnode;
 
-            $.ajax(ajcfg);
-
+                            }).fail(notif.exception);
+                        });
+                    }
+                    log.info("AJAX Call to activate group " + grpid + " successfull\n" + result.message, "grouptool");
+                }
+            });
         } else {
             // Error!
-            log.error('Group with id ' + grpid + ' must have either class "active" or "inactive"!', "grouptool");
+            log.error('Group with id ' + grpid + ' must have either status 1 or 0!', "grouptool");
         }
     };
 
@@ -491,9 +476,12 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         e.stopPropagation();
 
         // Get group id!
-        e.target = $(e.target);
-        var grpid = e.target.attr('name').replace( /[^\d]/g, '' );
-        var admin = e.data.admin;
+        e.target = $(e.target).closest('[data-delete]');
+
+        var node = e.target.closest('tr');
+
+        var grpid = node.data('id');
+
         var strings = e.data.strings;
 
         notif.confirm(strings.title, strings.confirm, strings.yes, strings.no, function() {
@@ -504,50 +492,20 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
 
             log.info('DELTE GROUP ' + grpid + '!', "grouptool");
 
-            var ajcfg = {
-                method: 'POST',
-                url: cfg.wwwroot + "/mod/grouptool/editgroup_ajax.php",
-                data: {
-                    action: 'delete',
-                    groupid: grpid,
-                    sesskey: cfg.sesskey,
-                    contextid: admin.contextid
-                },
-                headers: { 'X-Transaction': 'POST rename group ' + grpid},
-                beforeSend: function() {
-                    log.info("Start AJAX Call to delete group " + grpid,
-                             "grouptool");
-                },
-                complete: function() {
-                    log.info("AJAX Call to delete group " + grpid + " completed",
-                             "grouptool");
-                },
-                success: function(response, status) {
-                    if (!response.error) {
-                        // Success, remove the corresponding table entry...
-                        $('#delete_' + grpid).closest('tr').fadeOut(600, function() { this.remove(); });
-                    }
-                    log.info("AJAX Call to delete group " + grpid + " successfull\n" + status, "grouptool");
-                },
-                error: function() {
-                    // Show message!
-                    log.error("AJAX Call to rename group " + grpid + " failure", "grouptool");
-                },
-                end: function() {
-                    log.info("AJAX Call to rename group " + grpid + " ended", "grouptool");
-                },
-                statusCode: {
-                    404: function() {
-                        log.error("404: URL not found!", "grouptool");
-                    },
-                    500: function() {
-                        log.error("500: Internal server error!", "grouptool");
-                    }
-                },
-                timeout: 60000,
-            };
-
-            $.ajax(ajcfg);
+            var requests = ajax.call([{
+                methodname: 'mod_grouptool_delete_group',
+                args: {cmid: e.data.cmid, groupid: grpid},
+                fail: notif.exception
+            }]);
+            requests[0].then(function(result) {
+                if (!result.error) {
+                    // Success, remove the corresponding table entry...
+                    node.find('td div').slideUp(600).promise().done(function() { node.remove(); });
+                } else {
+                    notif.exception(result.error);
+                }
+                log.info("AJAX Call to delete group " + grpid + " successfull\n" + status, "grouptool");
+            });
         });
     };
 
@@ -558,21 +516,23 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
      * @access public
      * @return void
      */
-    instance.initializer = function(params) { // Param 'cfg' contains the parameter values!
+    instance.initializer = function(cmid, filter, filterid, filterall, globalsize, usesize) {
 
-        this.contextid = params.contextid;
-        this.lang = params.lang;
-        this.filter = params.filter;
-        this.filterid = params.filterid;
-        this.globalsize = params.globalsize;
+        this.cmid = cmid;
+        this.filter = filter;
+        this.filterid = filterid;
+        this.filterall = filterall;
+        this.globalsize = globalsize;
+        this.usesize = usesize;
 
         log.info('Initalize Grouptool group administration', "grouptool");
-        $('.path-mod-grouptool a.renamebutton').on('click', null, this, this.renamegroup);
+        $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-rename]', this, this.renamegroup);
         log.debug("Init edit size button", "grouptool");
         str.get_strings([{key: 'ajax_edit_size_help', component: 'mod_grouptool'}]).done(function(s) {
             var strings = { resizehelp: s[0] };
             log.debug("String successfully retrieved: " + s, "grouptool");
-            $('.path-mod-grouptool a.resizebutton').on('click', null, {strings: strings, admin: instance}, instance.resizegroup);
+            var resizedata = {instance: instance, strings: strings, globalsize: instance.globalsize};
+            $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-resize]', resizedata, instance.resizegroup);
         }).fail(function(ex) {
             log.error("Error while retrieving string: " + ex, "grouptool");
         });
@@ -583,11 +543,12 @@ define(['jquery', 'core/config', 'core/str', 'core/url', 'core/notification', 'c
         str.get_strings(stringstofetch).done(function(s) {
             log.info("Strings successfully retrieved: " + s, "grouptool");
             var strings = { title: s[0], confirm: s[1], yes: s[2], no: s[3] };
-            $('.path-mod-grouptool a.deletebutton').on('click', null, {strings: strings, admin: instance}, instance.deletegroup);
+            $('.path-mod-grouptool .mod_grouptool_sortlist').on('click', 'tr[data-id] a[data-delete]',
+                    {cmid: instance.cmid, strings: strings}, instance.deletegroup);
         }).fail(function(ex) {
             log.error("Error while retrieving strings: " + ex, "grouptool");
         });
-        $('.path-mod-grouptool a.togglebutton').on('click', null, this, this.togglegroup);
+        $('.path-mod-grouptool .mod_grouptool_sortlist').on('click', 'tr[data-id] a[data-toggle]', this, this.togglegroup);
     };
 
     return instance;

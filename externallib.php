@@ -35,7 +35,7 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_delete_group_parameters() {
+    public static function delete_group_parameters() {
         return new external_function_parameters(
             array('cmid'    => new external_value(PARAM_INT, 'course module id'),
                   'groupid' => new external_value(PARAM_INT, 'group id'))
@@ -56,9 +56,9 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_delete_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid));
+        $params = self::validate_parameters(self::delete_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -77,7 +77,7 @@ class mod_grouptool_external extends external_api {
     public static function delete_group_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 
@@ -85,13 +85,13 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_rename_group_parameters() {
-        // Function get_onlinetextpreveiw_parameters() always return an external_function_parameters().
+    public static function rename_group_parameters() {
+        // Function onlinetextpreveiw_parameters() always return an external_function_parameters().
         // The external_function_parameters constructor expects an array of external_description.
         return new external_function_parameters(
             array('cmid'    => new external_value(PARAM_INT, 'course module id'),
                   'groupid' => new external_value(PARAM_INT, 'group id'),
-                  'name'    => new external_value(PARAM_ALPHANUMEXT, 'new name'))
+                  'name'    => new external_value(PARAM_TEXT, 'new name'))
         );
     }
 
@@ -110,10 +110,10 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_rename_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid,
+        $params = self::validate_parameters(self::rename_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid,
                                                                                        'name' => $name));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -151,7 +151,7 @@ class mod_grouptool_external extends external_api {
     public static function rename_group_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 
@@ -159,11 +159,11 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_resize_group_parameters() {
+    public static function resize_group_parameters() {
         return new external_function_parameters(
             array('cmid'    => new external_value(PARAM_INT, 'course module id'),
                   'groupid' => new external_value(PARAM_INT, 'group id'),
-                  'size'    => new external_value(PARAM_INT, 'size or 0'))
+                  'size'    => new external_value(PARAM_TEXT, 'size or 0'))
         );
     }
 
@@ -182,10 +182,10 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_resize_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid,
+        $params = self::validate_parameters(self::resize_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid,
                                                                                        'size' => $size));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -196,8 +196,8 @@ class mod_grouptool_external extends external_api {
                   FROM {grouptool_agrps} agrps
              LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
                  WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
-        $params = array('grouptoolid' => $cm->instance, 'groupid' => $params['groupid']);
-        $regs = $DB->count_records_sql($sql, $params);
+        $sqlparams = array('grouptoolid' => $cm->instance, 'groupid' => $params['groupid']);
+        $regs = $DB->count_records_sql($sql, $sqlparams);
         if (empty($params['size'])) {
             // Disable individual size for this group!
             $DB->set_field('grouptool_agrps', 'grpsize', null, array('groupid' => $params['groupid'],
@@ -244,7 +244,7 @@ class mod_grouptool_external extends external_api {
     public static function resize_group_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 
@@ -252,7 +252,7 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_activate_group_parameters() {
+    public static function activate_group_parameters() {
         return new external_function_parameters(
             array('cmid'    => new external_value(PARAM_INT, 'course module id'),
                   'groupid' => new external_value(PARAM_INT, 'group id'))
@@ -273,9 +273,9 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_activate_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid));
+        $params = self::validate_parameters(self::activate_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -290,6 +290,8 @@ class mod_grouptool_external extends external_api {
             $result->message = "Activated group ".$params['groupid']." in grouptool ".$cm->instance."!";
         }
 
+        // TODO noentriesmessage?!?
+
         return $result;
     }
 
@@ -300,7 +302,7 @@ class mod_grouptool_external extends external_api {
     public static function activate_group_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 
@@ -308,7 +310,7 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_deactivate_group_parameters() {
+    public static function deactivate_group_parameters() {
         return new external_function_parameters(
             array('cmid'    => new external_value(PARAM_INT, 'course module id'),
                   'groupid' => new external_value(PARAM_INT, 'group id'))
@@ -329,9 +331,9 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_deactivate_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid));
+        $params = self::validate_parameters(self::deactivate_group_parameters(), array('cmid' => $cmid, 'groupid' => $groupid));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -356,7 +358,7 @@ class mod_grouptool_external extends external_api {
     public static function deactivate_group_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 
@@ -364,11 +366,8 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_reorder_groups_parameters() {
-        // Function get_onlinetextpreveiw_parameters() always return an external_function_parameters().
-        // The external_function_parameters constructor expects an array of external_description.
+    public static function reorder_groups_parameters() {
         return new external_function_parameters(
-        // An external_description can be: external_value, external_single_structure or an external_multiple structure!
             array('cmid'  => new external_value(PARAM_INT, 'course module id'),
                   'order' => new external_multiple_structure(
                       new external_single_structure(array(
@@ -393,9 +392,9 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_reorder_groups_parameters(), array('cmid' => $cmid, 'order' => $order));
+        $params = self::validate_parameters(self::reorder_groups_parameters(), array('cmid' => $cmid, 'order' => $order));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -406,22 +405,22 @@ class mod_grouptool_external extends external_api {
         $failed = array();
 
         foreach ($params['order'] as $cur) {
-            if (!$DB->record_exists('grouptool_agrps', array('groupid' => $cur->groupid, 'grouptoolid' => $cm->instance))) {
+            if (!$DB->record_exists('grouptool_agrps', array('groupid' => $cur['groupid'], 'grouptoolid' => $cm->instance))) {
                 // Insert missing record!
                 $newrecord = new stdClass();
-                $newrecord->groupid = $cur->groupid;
+                $newrecord->groupid = $cur['groupid'];
                 $newrecord->grouptoolid = $cm->instance;
                 $newrecord->active = 0;
-                $newrecord->sort_order = $cur->order;
+                $newrecord->sort_order = $cur['order'];
                 $DB->insert_record('grouptool_agrps', $newrecord);
-                $missing[] = "groupid ".$cur->groupid;
+                $missing[] = "groupid ".$cur['groupid'];
             } else {
-                $DB->set_field('grouptool_agrps', 'sort_order', $cur->order, array('groupid'     => $cur->groupid,
-                                                                                   'grouptoolid' => $cm->instance));
-                if (!$DB->record_exists('grouptool_agrps', array('groupid' => $cur->groupid,
+                $DB->set_field('grouptool_agrps', 'sort_order', $cur['order'], array('groupid'     => $cur['groupid'],
+                                                                                     'grouptoolid' => $cm->instance));
+                if (!$DB->record_exists('grouptool_agrps', array('groupid' => $cur['groupid'],
                     'grouptoolid' => $cm->instance,
-                    'sort_order'  => $cur->order))) {
-                    $failed[] = "groupid ".$cur->groupid;
+                    'sort_order'  => $cur['order']))) {
+                    $failed[] = "groupid ".$cur['groupid'];
                 }
             }
         }
@@ -429,8 +428,9 @@ class mod_grouptool_external extends external_api {
             $result->error = "Failed to set order for:\n".implode(", ", $failed);
         } else if (count($missing)) {
             $result->message = "Everything went OK, but we had to insert missing entries:\n".implode(", ", $missing);
+            $result->inserted = $missing;
         } else {
-            $result->message = "Everything went OK!";
+            $result->message = get_string('', '');
         }
 
         return $result;
@@ -443,7 +443,7 @@ class mod_grouptool_external extends external_api {
     public static function reorder_groups_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 
@@ -451,7 +451,7 @@ class mod_grouptool_external extends external_api {
      * Returns description of method parameters
      * @return external_function_parameters
      */
-    public static function get_swap_groups_parameters() {
+    public static function swap_groups_parameters() {
         return new external_function_parameters(
             array('cmid' => new external_value(PARAM_INT, 'course module id'),
                   'a'    => new external_value(PARAM_INT, 'group A id'),
@@ -474,9 +474,9 @@ class mod_grouptool_external extends external_api {
         $result->error = false;
 
         // Parameters validation!
-        $params = self::validate_parameters(self::get_swap_groups_parameters(), array('cmid' => $cmid, 'a' => $a, 'b' => $b));
+        $params = self::validate_parameters(self::swap_groups_parameters(), array('cmid' => $cmid, 'a' => $a, 'b' => $b));
 
-        $cm = get_coursemodule_from_id('publication', $params['cmid'], 0, false, MUST_EXIST);
+        $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
         $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
         $context = context_module::instance($cm->id);
         self::validate_context($context);
@@ -504,7 +504,7 @@ class mod_grouptool_external extends external_api {
     public static function swap_groups_returns() {
         return new external_single_structure(array(
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_ALPHANUMEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
         ));
     }
 }

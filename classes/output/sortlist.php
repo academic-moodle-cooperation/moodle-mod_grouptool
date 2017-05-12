@@ -163,6 +163,9 @@ class sortlist implements \renderable {
                 $groupdata[$key] = $group;
                 $groupdata[$key]->selected = 0;
                 $groupdata[$key]->order = $runningidx;
+                if ($group->status !== null) {
+                    $groupdata[$key]->status = $group->status ? true : false;
+                }
                 $runningidx++;
                 $groupdata[$key]->groupings = $DB->get_records_sql_menu("
                                                     SELECT DISTINCT groupingid, name

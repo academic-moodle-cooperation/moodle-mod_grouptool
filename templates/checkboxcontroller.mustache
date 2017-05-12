@@ -42,9 +42,9 @@
 
 }}
 <div>
-    <label for="classes" class="form-check">
-        {{#str}} checkbox_control_header, grouptool {{/str}}{{#helpicon}}{{>core/help_icon}}{{/helpicon}}
-    </label>
+    <label for="classes" class="form-check">{{!
+        }}{{#str}} checkbox_control_header, grouptool {{/str}}{{#helpicon}}{{>core/help_icon}}{{/helpicon}}{{!
+    }}</label>
     <div class="form-check form-check-inline">
         <select name="classes[]" multiple="multiple" class="form-control">
             <options>
@@ -56,23 +56,22 @@
     </div>
 
     <div class="form-check form-check-inline">
-        <label class="nowrap form-check-label">
-            <input type="radio" name="class_action" id="select" value="select" class="select_all form-check-input" />
-            {{# str }} select, mod_grouptool {{/str}}
-        </label>
+        <label class="nowrap form-check-label">{{!
+            }}<input type="radio" name="class_action" id="select" value="select" class="select_all form-check-input" />{{!
+            }}{{# str }} select, mod_grouptool {{/str}}{{!
+        }}</label>
     </div>
     <div class="form-check form-check-inline">
-        <label class="nowrap form-check-label">
-            <input type="radio" name="class_action" id="deselect" value="deselect" class="select_none form-check-input" />
-            {{# str }} deselect, mod_grouptool {{/str}}
-        </label>
+        <label class="nowrap form-check-label">{{!
+            }}<input type="radio" name="class_action" id="deselect" value="deselect" class="select_none form-check-input" />{{!
+            }}{{# str }} deselect, mod_grouptool {{/str}}{{!
+        }}</label>
     </div>
     <div class="form-check form-check-inline">
-        <label class="nowrap form-check-label">
-            <input type="radio" name="class_action" id="toggle" value="toggle" class="toggle_selection form-check-input" />
-            {{# str }} invert, mod_grouptool {{/str}}
-        </label>
+        <label class="nowrap form-check-label">{{!
+            }}<input type="radio" name="class_action" id="toggle" value="toggle" class="toggle_selection form-check-input" />{{!
+            }}{{# str }} invert, mod_grouptool {{/str}}{{!
+        }}</label>
     </div>
-
     <button name="do_class_action" value="go" class="btn btn-primary">{{# str }} go, core {{/ str }}</button>
 </div>
