@@ -1,0 +1,54 @@
+{{!
+    This file is part of mod_grouptool for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_grouptool/sortlist_wrapper
+
+    Grouptool's simple checkbox-controller and size info.
+
+    Is used before and after the sortlist-table and outputs a simple checkbox-controller (check all/none) and Infos about group
+    sizes.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * usesize whether or not groupsize is used
+    * pageurl URL to the current grouptool page
+    * courseediturl URL to the course-edit-page
+
+    Example context (json):
+    {
+        "usesize": true,
+        "pageurl": "https://example.com/mod/grouptool/view.php?id=1",
+        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1"
+    }
+
+}}
+<div class="mod_grouptool_sortlist_wrapper">
+    <span {{#usesize}}class="text-left"{{/usesize}}>
+        <a href="{{pageurl}}&class_action=select&do_class_action=1" class="simple_select_all"
+           title="{{#str}}all, core{{/str}}">{{#str}}all, core{{/str}}</a>
+        /
+        <a href="{{pageurl}}&class_action=deselect&do_class_action=1" class="simple_select_none"
+           title="{{#str}}none, core{{/str}}">{{#str}}none, core{{/str}}</a>
+    </span>
+    {{#usesize}}<a href="{{courseediturl}}" class="text-info text-right pull-right">
+            {{#str}} individual_size_info, mod_grouptool{{/str}}</a>{{/usesize}}
+</div>

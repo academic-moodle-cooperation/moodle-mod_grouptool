@@ -1,0 +1,101 @@
+{{!
+    This file is part of mod_grouptool for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_grouptool/sortlist
+
+    Grouptool's sortlist template.
+
+    The purpose of this template is to display the sortlist.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * usesize - whether or not size is used
+    * pageurl - URL to grouptool's view.php
+    * courseediturl - URL to course edit page
+    * statushelpicon statushelpicon displayed besides title
+    * options Array with groupingids & grouping names
+
+    Example context (json):
+    {
+        "usesize": true,
+        "pageurl": "https://example.com/mod/grouptool/view.php?id=1",
+        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1"
+        "statushelpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
+        "groups": [
+            {
+                "status": true,
+                "missing": false,
+                "groupings": [1, 7, 9, 12],
+                "id": 3,
+                "checked": true,
+                "name": "Awesome group #1",
+                "order": 2,
+                "size": 5
+            },
+            {
+                "status": false,
+                "missing": false,
+                "groupings": [1, 2, 5],
+                "id": 2,
+                "checked": true,
+                "name": "First group",
+                "order": 1,
+                "size": 10
+            },
+            {
+                "status": true,
+                "missing": false,
+                "groupings": [1, 2, 5, 7, 9, 12],
+                "id": 1,
+                "checked": true,
+                "name": "This groups in every grouping",
+                "order": 99999,
+                "size": 3
+            }
+        ]
+    }
+}}
+<div class="mod_grouptool_sortlist">
+    {{>mod_grouptool/sortlist_wrapper}}
+    <div class="drag_area">
+        <table class="table table-hover mod_grouptool_sortlist drag_list">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="js_invisible"></th>
+                    <th>{{#str}} name, core {{/str}}</th>
+                    {{#usesize}}<th>{{#str}} size, core {{/str}}</th>{{/usesize}}
+                    <th>{{#str}} groupstatus, mod_grouptool {{/str}}{{#statushelpicon}}{{>core/help_icon}}{{/statushelpicon}}</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#groups}}
+                    {{>mod_grouptool/sortlist_entry}}
+                {{/groups}}
+            </tbody>
+        </table>
+    </div>
+    {{>mod_grouptool/sortlist_wrapper}}
+</div>
