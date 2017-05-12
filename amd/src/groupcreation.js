@@ -55,26 +55,22 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
 
         e.preventDefault();
 
-        var nodeclass = $(e.target).attr('class');
-        var classes = nodeclass.split(' ');
+        var node = $(e.target);
 
         var tag = '';
 
-        for(var i = 0; i < classes.length; i++) {
-            if (classes[i] !== 'tag') {
-                if (classes[i] === 'number') {
-                    tag = '#';
-                } else if (classes[i] === 'alpha') {
-                    tag = '@';
-                } else {
-                    tag = '[' + classes[i] + ']';
-                }
-            }
-        }
+        tag = node.data('nametag');
+
         var content = targetfield.val();
-        targetfield.val(content + tag);
-        targetfield.attr('value', content + tag);
-        targetfield.attr('defaultValue', content + tag);
+        var caretPos = targetfield[0].selectionStart;
+
+        targetfield.val(content.substring(0, caretPos) + tag + content.substring(caretPos));
+
+        // And now restore focus and caret position!
+        targetfield.focus();
+        var postpos = caretPos + tag.length;
+        targetfield[0].selectionStart = postpos;
+        targetfield[0].selectionEnd = postpos;
     };
 
     Groupcreation.prototype.modechange = function(e) {
@@ -112,8 +108,8 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
 
         log.info('Initialise grouptool group creation js...', 'grouptool');
         // Add JS-Eventhandler for each tag!
-        $('.tag').on('click', null, this, this.add_tag);
-        $('.tag').css('cursor', 'pointer');
+        $('[data-nametag]').on('click', null, this, this.add_tag);
+        $('[data-nametag]').css('cursor', 'pointer');
 
         $('input[name="mode"]').on('change', null, this, this.modechange);
     };

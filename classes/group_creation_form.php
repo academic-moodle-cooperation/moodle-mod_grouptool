@@ -24,6 +24,8 @@
  */
 namespace mod_grouptool;
 
+use \html_writer as html_writer;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
@@ -202,10 +204,14 @@ class group_creation_form extends \moodleform {
             $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
+            $tags = array();
+            foreach (GROUPTOOL_NAME_TAGS as $tag) {
+                $tags[] = html_writer::tag('span', $tag, array('class' => 'nametag', 'data-nametag' => $tag));
+            }
+
             $naminggrp = array();
             $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', array('size' => '64'));
-            $naminggrp[] =& $mform->createElement('static', 'tags', '',
-                                                  get_string('name_scheme_tags', 'grouptool'));
+            $naminggrp[] =& $mform->createElement('static', 'tags', '', implode("", $tags));
             $namingstd = get_config('mod_grouptool', 'name_scheme');
             $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
             $mform->setDefault('namingscheme', $namingstd);

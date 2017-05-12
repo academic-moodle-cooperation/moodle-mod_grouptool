@@ -371,12 +371,6 @@ $string['mustbegtoeqmin'] = 'Has to be greater than or equal the minimum';
 $string['mustbeposint'] = 'Has to be a positive integer (>= 1).';
 $string['mygroups_only_label'] = 'Show only sources entries I graded';
 $string['myoverview_registrations_missing'] = 'Registrations missing';
-$string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
-<span class="tag lastname">[lastname]</span>
-<span class="tag idnumber">[idnumber]</span>
-<span class="tag username">[username]</span>
-<span class="tag alpha">@</span>
-<span class="tag number">#</span>';
 $string['nameschemenotunique'] = 'Group names from this name scheme are not unique ({$a}). Please choose another one or use # (numeric index) or @ (alphabetic index) to create unique group names.';
 $string['namingscheme'] = 'Name scheme';
 $string['namingscheme_help'] = '<p>The Name scheme defines how groups will be named automatically when you add new groups.</p>
@@ -581,3 +575,10 @@ $string['includedeleted_help'] = 'If checked, deleted users won\'t get filtered 
 $string['group_or_member_count'] = 'Group/Member count';
 // Deprecated since version 3.2!
 $string['queues_max'] = 'Max. simultaneous queue-places per participant';
+// Deprecated since version 3.3!
+$string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
+<span class="tag lastname">[lastname]</span>
+<span class="tag idnumber">[idnumber]</span>
+<span class="tag username">[username]</span>
+<span class="tag alpha">@</span>
+<span class="tag number">#</span>';

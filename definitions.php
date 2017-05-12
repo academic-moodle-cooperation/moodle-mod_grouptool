@@ -26,6 +26,11 @@
  defined('MOODLE_INTERNAL') || die();
 
 /**
+ * GROUPTOOL_NAME_TAGS - the tags available for grouptool's group naming schemes
+ */
+define('GROUPTOOL_NAME_TAGS', ['[firstname]', '[lastname]', '[idnumber]', '[username]', '@', '#']);
+
+/**
  * GROUPTOOL_N_M_GROUPS - group creation mode where N groups with a groupsize of M members are created
  */
 define('GROUPTOOL_N_M_GROUPS', 4);

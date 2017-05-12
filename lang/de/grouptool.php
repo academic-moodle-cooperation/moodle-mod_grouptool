@@ -371,12 +371,6 @@ $string['mustbegtoeqmin'] = 'Muss größer als das oder gleich dem Minimum sein!
 $string['mustbeposint'] = 'Muss eine positive ganze Zahl sein (>= 1)';
 $string['mygroups_only_label'] = 'Zeige nur Quellen, die ich bewertet habe';
 $string['myoverview_registrations_missing'] = 'Anmeldungen fehlen';
-$string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
-<span class="tag lastname">[lastname]</span>
-<span class="tag idnumber">[idnumber]</span>
-<span class="tag username">[username]</span>
-<span class="tag alpha">@</span>
-<span class="tag number">#</span>';
 $string['nameschemenotunique'] = 'Gruppennamen, die aus diesem Namensschema erzeugt werden, sind nicht einzigartig ({$a}). Bitte wählen Sie ein anderes Namensschema oder benutzen Sie # (laufende Nummer) oder @ (alphabetische Repräsentation) um eindeutige Gruppennamen zu erzeugen.';
 $string['namingscheme'] = 'Namensschema';
 $string['namingscheme_help'] = '<p>Das Namensschema definiert, wie Gruppen beim Erstellen automatisch benannt werden. </p>
@@ -581,3 +575,10 @@ $string['includedeleted_help'] = 'Wenn aktiviert werden gelöschte Nutzer/innen 
 $string['group_or_member_count'] = 'Gruppen- bzw. Mitgliederanzahl';
 // Deprecated since version 3.2!
 $string['queues_max'] = 'Max. gleichzeitige Plätze in Wartelisten je Teilnehmer/in';
+// Deprecated since version 3.3!
+$string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
+<span class="tag lastname">[lastname]</span>
+<span class="tag idnumber">[idnumber]</span>
+<span class="tag username">[username]</span>
+<span class="tag alpha">@</span>
+<span class="tag number">#</span>';
