@@ -63,29 +63,43 @@
     <table>
         <thead>
             <tr>
-                <td>Status{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td><td>User</td>{{#showidnumber}}<td>IDNumber</td>{{/showidnumber}}
+                <td>Status{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td>
+                <td>User</td>
+                {{#showidnumber}}<td>IDNumber</td>{{/showidnumber}}
             </tr>
         </thead>
         <tbody>
             {{#absregs}}<tr>
-                <td>✔</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                <td>✔</td>
+                <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
+                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/absregs}}
             {{#gtregs}}<tr>
-                <td>+</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                <td>+</td>
+                <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
+                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/gtregs}}
             {{#mregs}}<tr>
-                <td>?</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                <td>?</td>
+                <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
+                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/mregs}}
             {{! NO REGISTRATIONS }}{{^absregs}}{{^gtregs}}{{^mregs}}<tr class="regentry reg">
-                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_registrations">{{# str }} no_registrations, mod_grouptool {{/ str }}</td>
+                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_registrations">{{!
+                    }}{{# str }} no_registrations, mod_grouptool {{/ str }}<{{!
+                }}</td>
             </tr>{{/mregs}}{{/gtregs}}{{/absregs}}{{! END OF NO REGISTRATIONS }}
         </tbody>
         <tbody>
             {{#queued}}<tr class="queueentry queue">
-                <td>{{rank}}</td><td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>{{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                <td>{{rank}}</td>
+                <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
+                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/queued}}
             {{! NOBODY QUEUED }}{{^queued}}<tr class="queueentry queue">
-                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_queues">{{# str }} nobody_queued, mod_grouptool {{/ str }}</td>
+                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_queues">{{!
+                }}{{# str }} nobody_queued, mod_grouptool {{/ str }}{{!
+                }}</td>
             </tr>{{/queued}}{{! END OF NOBODY QUEUED }}
         </tbody>
     </table>
