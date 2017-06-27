@@ -285,9 +285,12 @@ class mod_grouptool_external extends external_api {
         $DB->set_field('grouptool_agrps', 'active', 1, array('groupid' => $params['groupid'], 'grouptoolid' => $cm->instance));
         if ($DB->get_field('grouptool_agrps', 'active',
                            array('groupid' => $params['groupid'], 'grouptoolid' => $cm->instance)) == 0) {
-            $result->error = "Couldn't activate group ".$params['groupid']." in grouptool ".$cm->instance."!";
+            $a = stdClass();
+            $a->groupid = $params['groupid'];
+            $a->grouptoolid = $cm->instance;
+            $result->error = get_string('error_activating_group', 'grouptool', $a);
         } else {
-            $result->message = "Activated group ".$params['groupid']." in grouptool ".$cm->instance."!";
+            $result->message = get_string('activated_group', 'grouptool');
         }
 
         // TODO noentriesmessage?!?
@@ -343,9 +346,12 @@ class mod_grouptool_external extends external_api {
         $DB->set_field('grouptool_agrps', 'active', 0, array('groupid' => $params['groupid'], 'grouptoolid' => $cm->instance));
         if ($DB->get_field('grouptool_agrps', 'active',
                            array('groupid' => $params['groupid'], 'grouptoolid' => $cm->instance)) == 1) {
-            $result->error = "Couldn't deactivate group ".$params['groupid']." in grouptool ".$cm->instance."!";
+            $a = stdClass();
+            $a->groupid = $params['groupid'];
+            $a->grouptoolid = $cm->instance;
+            $result->error = get_string('error_deactivating_group', 'grouptool', $a);
         } else {
-            $result->message = "Deactivated group ".$params['groupid']." in grouptool ".$cm->instance."!";
+            $result->message = get_string('deactivated_group', 'grouptool');
         }
 
         return $result;
@@ -425,12 +431,12 @@ class mod_grouptool_external extends external_api {
             }
         }
         if (count($failed)) {
-            $result->error = "Failed to set order for:\n".implode(", ", $failed);
+            $result->error = get_string('error_saving_new_order', 'grouptool', implode(", ", $failed));
         } else if (count($missing)) {
-            $result->message = "Everything went OK, but we had to insert missing entries:\n".implode(", ", $missing);
+            $result->message = get_string('changes_saved', 'grouptool');
             $result->inserted = $missing;
         } else {
-            $result->message = get_string('', '');
+            $result->message = get_string('changes_saved', 'grouptool');
         }
 
         return $result;
@@ -491,8 +497,13 @@ class mod_grouptool_external extends external_api {
                                                                             'grouptoolid' => $cm->instance));
         $DB->set_field('grouptool_agrps', 'sort_order', $aorder, array('groupid'     => $b,
                                                                             'grouptoolid' => $cm->instance));
-        $result->message = "Swapped from GroupA(".$a."|".$aorder.") GroupB(".$b."|".$border.") to GroupA(".
-                           $a."|".$border.") GroupB(".$b."|".$aorder.")!";
+        // This will only be displayed in the developer console, so we can hardcode the string here!
+        $data = new stdClass();
+        $data->groupa = $a;
+        $data->groupb = $b;
+        $data->aorder = $aorder;
+        $data->border = $border;
+        $result->message = get_string('swapped_groups', 'grouptool', $a);
 
         return $result;
     }

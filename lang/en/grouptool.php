@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activated_group'] = 'Activated group';
 $string['activated_groups'] = 'Activated groups!';
 $string['active'] = 'Active';
 $string['activegroups'] = 'Active groups';
@@ -104,6 +105,7 @@ $string['change_group'] = 'Change group';
 $string['change_group_to'] = 'Continue with group-change to {$a->groupname}?';
 $string['change_group_to_success'] = 'Group-change successful! {$a->username} is now registered in group {$a->groupname}!';
 $string['you_change_group_to_success'] = 'Group-change successful! You are now registered in group {$a->groupname}!';
+$string['changes_saved'] = 'Changes saved';
 $string['checkbox_control_header'] = 'De-/select groups and groupings';
 $string['checkbox_control_header_help'] = '<p>By using this function you can activate/ deactivate groups of one or more groupings within your grouptool:
     <ol>
@@ -159,6 +161,7 @@ $string['copy_grades_errors'] = 'At least 1 error occurred during copying of gra
 $string['couldnt_move_down'] = 'Could not move group down!';
 $string['couldnt_move_up'] = 'Could not move group up!';
 $string['could_not_add'] = 'Could not add {$a->username} to group {$a->groupname}';
+$string['deactivated_group'] = 'Deactivated group';
 $string['deactivated_groups'] = 'Deactivated groups!';
 $string['define_amount_groups'] = 'Define number of groups N';
 $string['define_amount_members'] = 'Define number of group members M';
@@ -174,8 +177,11 @@ $string['duedate'] = 'Registration end';
 $string['duedate_help'] = 'End of registration period. After this date students are no longer able to register themselves and teacher get access to resolving-queues-functionality, etc.';
 $string['duedateno'] = 'No due date';
 $string['early'] = '{$a} early';
+$string['error_activating_group'] = 'Error while activating group {$a->groupid} in grouptool {$a->grouptoolid}!';
 $string['error_at'] = 'Error at';
+$string['error_deactivating_group'] = 'Error while deactivating group {$a->groupid} in grouptool {$a->grouptoolid}!';
 $string['error_getting_data'] = 'Error while getting group data! Either none or more than 1 group where returned!';
+$string['error_saving_new_order'] = 'Error while saving new order for groups: {$a}';
 $string['eventagrpcreated'] = 'Active-group created';
 $string['eventagrpdeleted'] = 'Active-group deleted';
 $string['eventagrpsupdated'] = 'Active-groups updated';
@@ -516,6 +522,7 @@ $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li><li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li><li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li><li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li></ul>';
 $string['successfully_deleted_groups'] = 'Successfully deleted groups!';
+$string['swapped_groups'] = 'Swapped groups {$a->a} (order {$a->aorder}) and {$a->b} (order {$a->border})!';
 $string['switched_to_all_groups'] = 'Changed group filter to all groups!';
 $string['target'] = 'Target';
 $string['too_many_queue_places'] = 'Can\'t queue {$a->username} in group {$a->groupname} because {$a->username} is already queued in too many groups!';

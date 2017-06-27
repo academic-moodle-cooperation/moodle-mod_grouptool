@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['activated_group'] = 'Gruppe aktiviert';
 $string['activated_groups'] = 'Gruppen aktiviert!';
 $string['active'] = 'Aktiv';
 $string['activegroups'] = 'Aktive Gruppen';
@@ -104,6 +105,7 @@ $string['change_group'] = 'Gruppe wechseln';
 $string['change_group_to'] = 'Soll mit Gruppenwechsel zu {$a->groupname} fortgefahren werden?';
 $string['change_group_to_success'] = 'Gruppenwechsel erfolgreich! {$a->username} ist nun in der Gruppe {$a->groupname} registriert!';
 $string['you_change_group_to_success'] = 'Ihr Gruppenwechsel war erfolgreich! Sie sind nun in der Gruppe {$a->groupname} registriert!';
+$string['changes_saved'] = 'Änderungen gespeichert';
 $string['checkbox_control_header'] = 'Gruppen/Gruppierungen auswählen';
 $string['checkbox_control_header_help'] = '<p>Mit dieser Funktion können Sie gezielt Gruppen aus einer/ mehreren Gruppierung(en) in Ihrer Gruppenverwaltung aktivieren oder deaktivieren:
 <ol>
@@ -159,6 +161,7 @@ $string['copy_grades_errors'] = 'Zumindest 1 Fehler trat während des Übertrage
 $string['couldnt_move_down'] = 'Gruppe konnte nicht nach unten verschoben werden!';
 $string['couldnt_move_up'] = 'Gruppe konnte nicht nach oben verschoben werden!';
 $string['could_not_add'] = 'Konnte {$a->username} nicht zu Gruppe {$a->groupname} hinzufügen!';
+$string['deactivated_group'] = 'Gruppe deaktiviert';
 $string['deactivated_groups'] = 'Gruppen deaktiviert!';
 $string['define_amount_groups'] = 'Gruppenanzahl N festlegen';
 $string['define_amount_members'] = 'Mitgliederanzahl M festlegen';
@@ -174,8 +177,11 @@ $string['duedate'] = 'Anmeldeende';
 $string['duedate_help'] = 'Ende des Anmeldezeitraums. Nach diesem Datum können sich Teilnehmer/innen nicht mehr selbstständig anmelden und Trainer/innen erhalten u.a. Zugriff auf die Warteschlangenauflösung.';
 $string['duedateno'] = 'Keine Deadline';
 $string['early'] = '{$a} rechtzeitig';
+$string['error_activating_group'] = 'Fehler beim Aktivieren der Gruppe {$a->groupid} in der Gruppenverwaltung {$a->grouptoolid}!';
 $string['error_at'] = 'Fehler bei';
+$string['error_deactivating_group'] = 'Fehler beim Deaktivieren der Gruppe {$a->groupid} in der Gruppenverwaltung {$a->grouptoolid}!';
 $string['error_getting_data'] = 'Fehler beim Auslesen der Gruppendaten! Entweder keine oder mehrere Gruppen wurden zurückgegeben!';
+$string['error_saving_new_order'] = 'Fehler, beim speichern der neuen Reihenfolge für Gruppen: {$a}';
 $string['eventagrpcreated'] = 'Aktive Gruppe erstellt';
 $string['eventagrpdeleted'] = 'Aktive Gruppe gelöscht';
 $string['eventagrpsupdated'] = 'Aktive Gruppen aktualisiert';
@@ -518,6 +524,7 @@ $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> angemeldet in Moodle-Gruppe und Gruppenverwaltung</li><li><span style="font-weight:bold">?</span> angemeldet in Moodle-Gruppe, nicht aber in der Gruppenverwaltung</li><li><span style="font-weight:bold">+</span> angemeldet in der Gruppenverwaltung, nicht aber in Moodle-Gruppe</li><li><span style="font-weight:bold">1, 2, 3...</span> auf Warteliste in der Gruppenverwaltung</li></ul>';
 $string['successfully_deleted_groups'] = 'Gruppen erfolgreich gelöscht!';
+$string['swapped_groups'] = 'Gruppen {$a->a} (Reihenfolge {$a->aorder}) und {$a->b} (Reihenfolge {$a->border}) wurde getauscht!';
 $string['switched_to_all_groups'] = 'Ändere Gruppenfilter zu "Alle"!';
 $string['target'] = 'Ziel';
 $string['too_many_queue_places'] = 'Kann {$a->username} nicht in Warteliste der Gruppe {$a->groupname} eintragen, weil {$a->username} bereits in zu vielen Wartelisten eingetragen ist!';
