@@ -66,6 +66,11 @@ class mod_grouptool {
     const FILTER_INACTIVE = 2;
 
     /**
+     * NAME_TAGS - the tags available for grouptool's group naming schemes
+     */
+    const NAME_TAGS = ['[firstname]', '[lastname]', '[idnumber]', '[username]', '@', '#'];
+
+    /**
      * HIDE_GROUPMEMBERS - never show groupmembers no matter what...
      */
     const HIDE_GROUPMEMBERS = GROUPTOOL_HIDE_GROUPMEMBERS;

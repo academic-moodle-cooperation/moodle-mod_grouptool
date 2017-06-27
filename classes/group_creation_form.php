@@ -205,7 +205,7 @@ class group_creation_form extends \moodleform {
             $mform->disabledif ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
             $tags = array();
-            foreach (GROUPTOOL_NAME_TAGS as $tag) {
+            foreach (\mod_grouptool::NAME_TAGS as $tag) {
                 $tags[] = html_writer::tag('span', $tag, array('class' => 'nametag', 'data-nametag' => $tag));
             }
 
