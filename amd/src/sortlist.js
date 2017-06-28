@@ -25,8 +25,8 @@
  /**
   * @module mod_grouptool/sortlist
   */
-define(['jquery', 'jqueryui', 'core/ajax', 'core/config', 'core/templates', 'core/str', 'core/url', 'core/log',
-        'core/notification'], function($, jqui, ajax, config, templates, str, murl, log, notif) {
+define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/log', 'core/notification'], function($, jqui, ajax,
+        templates, str, log, notif) {
 
     /**
      * @constructor
@@ -110,8 +110,10 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/config', 'core/templates', 'cor
             $(this).find('input[name="order[' + $(this).data('id') + ']"]').val(index + 1);
 
             // Add new order to new order params!
-            neworderparams.push({groupid: $(this).data('id'),
-                                 order: index + 1});
+            neworderparams.push({
+                groupid: $(this).data('id'),
+                order: index + 1
+            });
         });
 
         if (neworderparams !== '') {

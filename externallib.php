@@ -140,7 +140,6 @@ class mod_grouptool_external extends external_api {
             }
         }
 
-
         return $result;
     }
 
@@ -293,7 +292,7 @@ class mod_grouptool_external extends external_api {
             $result->message = get_string('activated_group', 'grouptool');
         }
 
-        // TODO noentriesmessage?!?
+        // TODO no entries message ?!?
 
         return $result;
     }

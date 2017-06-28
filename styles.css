@@ -97,8 +97,8 @@
 }
 
 .path-mod-grouptool tr.slidup.mod_grouptool_sortlist_entry td {
-    padding-top: 0;
     padding-bottom: 0;
+    padding-top: 0;
 }
 
 .path-mod-grouptool .draggable_item .checkbox_container {

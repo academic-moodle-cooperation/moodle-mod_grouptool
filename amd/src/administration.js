@@ -25,8 +25,8 @@
  /**
   * @module mod_grouptool/administration
   */
-define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/notification', 'core/log'],
-        function($, cfg, templates, ajax, str, murl, notif, log) {
+define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/notification', 'core/log'], function($, templates,
+        ajax, str, murl, notif, log) {
 
     /**
      * @constructor
@@ -35,7 +35,6 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
     var Administration = function() {
         this.cmid = 0;
         this.filter = null;
-        //this.filterid = null;
         this.filterall = null;
         this.globalsize = 3;
     };
@@ -317,11 +316,14 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                             if (!$('div.sortlist_container tr').length) {
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
                                  * for all groups sortlist! */
-                                str.get_strings([{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
-                                                 {'key': 'nogroupschoose', 'component': 'mod_grouptool'}]).done(function (s) {
-                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {'id': e.data.cmid,
-                                                                                           'tab': 'group_administration',
-                                                                                           'filter': e.data.filterall});
+                                var stringstofetch = [{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
+                                                      {'key': 'nogroupschoose', 'component': 'mod_grouptool'}];
+                                str.get_strings(stringstofetch).done(function (s) {
+                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {
+                                        'id': e.data.cmid,
+                                        'tab': 'group_administration',
+                                        'filter': e.data.filterall
+                                    });
                                     var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
                                     var context = {
                                         'message': s[0] + link
@@ -338,7 +340,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                         });
                     } else {
                         // Render the element again and display it!
-                        context = { "status": false,
+                        context = {
+                            "status": false,
                             "missing": false,
                             "groupings": e.target.closest('tr').data('groupings'),
                             "id": grpid,
@@ -348,7 +351,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                                 'tab': 'administration'}),
                             "order": e.target.closest('tr').data('order'),
                             "usesize": !!e.data.usesize,
-                            "size": e.target.closest('tr').data('size') };
+                            "size": e.target.closest('tr').data('size')
+                        };
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
                         // This will call the function to load and render our template.
                         node.toggleClass('slidup');
@@ -399,11 +403,16 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                             if (!$('div.sortlist_container tr').length) {
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
                                  * for all groups sortlist! */
-                                str.get_strings([{'key': 'nogroupsinactive', 'component': 'mod_grouptool'},
-                                                 {'key': 'nogroupschoose', 'component': 'mod_grouptool'}]).done(function (s) {
-                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {'id': e.data.cmid,
-                                                                                           'tab': 'group_administration',
-                                                                                           'filter': e.data.filterall});
+                                var stringstofetch = [
+                                    {'key': 'nogroupsinactive', 'component': 'mod_grouptool'},
+                                    {'key': 'nogroupschoose', 'component': 'mod_grouptool'}
+                                ];
+                                str.get_strings(stringstofetch).done(function (s) {
+                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {
+                                        'id': e.data.cmid,
+                                        'tab': 'group_administration',
+                                        'filter': e.data.filterall
+                                    });
                                     var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
                                     context = {
                                         'message': s[0] + link
@@ -421,7 +430,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                     } else {
                         // Replace sortlist entry!
                         // This will call the function to load and render our template.
-                        context = { "status": true,
+                        context = {
+                            "status": true,
                             "missing": false,
                             "groupings": node.data('groupings'),
                             "id": grpid,
@@ -431,7 +441,8 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                                 'tab': 'administration'}),
                             "order": node.data('order'),
                             "usesize": !!e.data.usesize,
-                            "size": node.data('size') };
+                            "size": node.data('size')
+                        };
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
                         node.toggleClass('slidup');
                         e.target.closest('tr').find('td div').slideUp(600).promise().done(function() {
@@ -453,7 +464,6 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
                                 newnode.toggleClass('slidup');
                                 newnode.find('td div').slideDown(600);
                                 node = newnode;
-
                             }).fail(notif.exception);
                         });
                     }
@@ -536,10 +546,12 @@ define(['jquery', 'core/config', 'core/templates', 'core/ajax', 'core/str', 'cor
         }).fail(function(ex) {
             log.error("Error while retrieving string: " + ex, "grouptool");
         });
-        var stringstofetch = [{key: 'confirm_delete_title', component: 'mod_grouptool'},
-                              {key: 'confirm_delete', component: 'mod_grouptool'},
-                              {key: 'yes', component: 'moodle'},
-                              {key: 'no', component: 'moodle'}];
+        var stringstofetch = [
+            {key: 'confirm_delete_title', component: 'mod_grouptool'},
+            {key: 'confirm_delete', component: 'mod_grouptool'},
+            {key: 'yes', component: 'moodle'},
+            {key: 'no', component: 'moodle'}
+        ];
         str.get_strings(stringstofetch).done(function(s) {
             log.info("Strings successfully retrieved: " + s, "grouptool");
             var strings = { title: s[0], confirm: s[1], yes: s[2], no: s[3] };
