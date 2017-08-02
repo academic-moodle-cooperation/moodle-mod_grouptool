@@ -4466,41 +4466,43 @@ class mod_grouptool {
                     $mform->addElement('static', 'queues', get_string('queues', 'grouptool'), $queuescumulative);
                 }
 
-                if (!empty($this->grouptool->timeavailable)) {
-                    $mform->addElement('static', 'availabledate', get_string('availabledate', 'grouptool'),
-                                       userdate($this->grouptool->timeavailable, get_string('strftimedatetime')));
-                }
-
-                if (!empty($this->grouptool->timedue)) {
-                    $textdue = userdate($this->grouptool->timedue, get_string('strftimedatetime'));
-                } else {
-                    $textdue = get_string('noregistrationdue', 'grouptool');
-                }
-                $mform->addElement('static', 'registrationdue', get_string('registrationdue', 'grouptool'), $textdue);
-
-                if (!empty($this->grouptool->allow_unreg)) {
-                    $unregtext = get_string('allowed', 'grouptool');
-                } else {
-                    $unregtext = get_string('not_permitted', 'grouptool');
-                }
-                $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'), $unregtext);
-
-                if (!empty($this->grouptool->allow_multiple)) {
-                    if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
-                        $data = array('min' => $this->grouptool->choose_min,
-                                      'max' => $this->grouptool->choose_max);
-                        $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
-                    } else if ($this->grouptool->choose_min) {
-                        $minmaxtext = get_string('choose_min_text', 'grouptool', $this->grouptool->choose_min);
-                    } else if ($this->grouptool->choose_max) {
-                        $minmaxtext = get_string('choose_max_text', 'grouptool', $this->grouptool->choose_max);
+                if (!empty($this->grouptool->allow_reg)) {
+                    if (!empty($this->grouptool->timeavailable)) {
+                        $mform->addElement('static', 'availabledate', get_string('availabledate', 'grouptool'),
+                            userdate($this->grouptool->timeavailable, get_string('strftimedatetime')));
                     }
-                    $mform->addElement('static', 'minmax', get_string('choose_minmax_title', 'grouptool'), $minmaxtext);
-                }
 
-                if (!empty($this->grouptool->use_queue)) {
-                    $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
-                                       get_string('active', 'grouptool'));
+                    if (!empty($this->grouptool->timedue)) {
+                        $textdue = userdate($this->grouptool->timedue, get_string('strftimedatetime'));
+                    } else {
+                        $textdue = get_string('noregistrationdue', 'grouptool');
+                    }
+                    $mform->addElement('static', 'registrationdue', get_string('registrationdue', 'grouptool'), $textdue);
+
+                    if (!empty($this->grouptool->allow_unreg)) {
+                        $unregtext = get_string('allowed', 'grouptool');
+                    } else {
+                        $unregtext = get_string('not_permitted', 'grouptool');
+                    }
+                    $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'), $unregtext);
+
+                    if (!empty($this->grouptool->allow_multiple)) {
+                        if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
+                            $data = array('min' => $this->grouptool->choose_min,
+                                'max' => $this->grouptool->choose_max);
+                            $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
+                        } else if ($this->grouptool->choose_min) {
+                            $minmaxtext = get_string('choose_min_text', 'grouptool', $this->grouptool->choose_min);
+                        } else if ($this->grouptool->choose_max) {
+                            $minmaxtext = get_string('choose_max_text', 'grouptool', $this->grouptool->choose_max);
+                        }
+                        $mform->addElement('static', 'minmax', get_string('choose_minmax_title', 'grouptool'), $minmaxtext);
+                    }
+
+                    if (!empty($this->grouptool->use_queue)) {
+                        $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
+                            get_string('active', 'grouptool'));
+                    }
                 }
 
                 // Intro-text if set!
