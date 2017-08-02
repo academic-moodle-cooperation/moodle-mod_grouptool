@@ -252,9 +252,9 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         $grouptool = $this->create_instance();
-        $this->assertNotEmpty($grouptool);
+        self::assertNotEmpty($grouptool);
 
-        $this->assertTrue($DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->get_grouptool()->id)));
+        self::assertTrue($DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->get_grouptool()->id)));
     }
 
     /**
@@ -281,33 +281,33 @@ class grouptool_registration_test extends advanced_testcase {
         // Preview only!
         // Check if user 0 can be registrated in groups 0 and 1!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, true);
-        $this->assertEquals(get_string('register_in_group', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[1]]->name;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, true);
-        $this->assertEquals(get_string('register_in_group', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group', 'grouptool', $message), $text);
 
         // Register user 0 in groups 0 and 1, first should work, second should fail with certain exception!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
         $message->groupname = $agrps[$agrpids[0]]->name;
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         try {
             $text = null;
             $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, false);
         } catch (\mod_grouptool\local\exception\registration $e) {
-            $this->assertInstanceOf('\mod_grouptool\local\exception\exceeduserreglimit', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\exceeduserreglimit', $e);
         }
-        $this->assertEquals(null, $text);
+        self::assertEquals(null, $text);
 
         // Register user 1 in group 0 and user 2 in group 1!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[1]->id, false);
         $message->groupname = $agrps[$agrpids[0]]->name;
         $message->username = fullname($this->students[1]);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         // Register another user in the second group!
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[2]->id, false);
         $message->groupname = $agrps[$agrpids[1]]->name;
         $message->username = fullname($this->students[2]);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         // Exceed group size in group 0 by trying to register user 3 as third member - first a preview, then the real try!
         $message->groupname = $agrps[$agrpids[0]]->name;
@@ -316,9 +316,9 @@ class grouptool_registration_test extends advanced_testcase {
         try {
             $text = $grouptool->register_in_agrp($agrpids[0], $this->students[3]->id, false);
         } catch (\mod_grouptool\local\exception\registration $e) {
-            $this->assertInstanceOf('\mod_grouptool\local\exception\exceedgroupsize', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\exceedgroupsize', $e);
         }
-        $this->assertEquals('', $text);
+        self::assertEquals('', $text);
 
         // Teardown fixture!
         $grouptool = null;
@@ -353,29 +353,29 @@ class grouptool_registration_test extends advanced_testcase {
         // Preview only!
         // Check if user 3 can be queued in group 0!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[3]->id, true);
-        $this->assertEquals(get_string('queue_in_group', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group', 'grouptool', $message), $text);
 
         // Queue user 3 in group 0!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[3]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
 
         // User 3 can't be registered anymore anywhere else, due to user's registration limit!
         $text = null;
         try {
             $text = $grouptool->register_in_agrp($agrpids[1], $this->students[3]->id, false);
         } catch (\mod_grouptool\local\exception\registration $e) {
-            $this->assertInstanceOf('\mod_grouptool\local\exception\exceeduserreglimit', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\exceeduserreglimit', $e);
         }
-        $this->assertEquals('', $text);
+        self::assertEquals('', $text);
 
         // User 4 can't be queued anymore, due to group's queue limit!
         $text = null;
         try {
             $text = $grouptool->register_in_agrp($agrpids[0], $this->students[4]->id, false);
         } catch (\mod_grouptool\local\exception\registration $e) {
-            $this->assertInstanceOf('\mod_grouptool\local\exception\exceedgroupqueuelimit', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\exceedgroupqueuelimit', $e);
         }
-        $this->assertEquals('', $text);
+        self::assertEquals('', $text);
 
         // Teardown fixture!
         $grouptool = null;
@@ -404,56 +404,56 @@ class grouptool_registration_test extends advanced_testcase {
         // Exercise SUT & Validate outcome!
         // Allocate a place first and continue with registering user 0 in groups 0, 1 and 2!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
-        $this->assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[1]]->name;
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[2]]->name;
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[2], $this->students[0]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         // Repeat the procedure with user 1!
         $message->username = fullname($this->students[1]);
         $message->groupname = $agrps[$agrpids[0]]->name;
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[1]->id, false);
-        $this->assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[1]]->name;
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[1]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[2]]->name;
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[2], $this->students[1]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         // Mark user 2 for being queued in group 0 and register him in group 4!
         $text = null;
         $message->groupname = $agrps[$agrpids[0]]->name;
         $message->username = fullname($this->students[2]);
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[2]->id, false);
-        $this->assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
         $text = null;
         $message->groupname = $agrps[$agrpids[4]]->name;
         $message->username = fullname($this->students[2]);
         $text = $grouptool->register_in_agrp($agrpids[4], $this->students[2]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $text = null;
 
         // Now try to queue user 2 in group 1 too, exceeding user's queue limitation!
         try {
             $text = $grouptool->register_in_agrp($agrpids[1], $this->students[2]->id, false);
         } catch (\mod_grouptool\local\exception\registration $e) {
-            $this->assertInstanceOf('\mod_grouptool\local\exception\exceeduserqueuelimit', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\exceeduserqueuelimit', $e);
         }
-        $this->assertEquals('', $text);
+        self::assertEquals('', $text);
 
         // Register user 2 in group 3 instead, which should work!
         $message->groupname = $agrps[$agrpids[3]]->name;
         $text = $grouptool->register_in_agrp($agrpids[3], $this->students[2]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         // Teardown fixture!
         $grouptool = null;
@@ -482,51 +482,51 @@ class grouptool_registration_test extends advanced_testcase {
 
         // Prepare by registering users 0 and 1 in group 0!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->username = fullname($this->students[1]);
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[1]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
 
         // Exercise SUT!
 
         // Check possibility of and make a group change for students 0 and 1 to group 1!
         $message->username = fullname($this->students[0]);
         $grouptool->can_change_group($agrpids[1], $this->students[0]->id, $message);
-        $this->assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[0]->id));
+        self::assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[0]->id));
         $message->username = fullname($this->students[1]);
         $grouptool->can_change_group($agrpids[1], $this->students[1]->id, $message);
-        $this->assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[1]->id));
+        self::assertTrue($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[1]->id));
         $message->username = fullname($this->students[2]);
         // Groupchange for student 2 fails, because he's neither registered nor queued or marked anywhere!
         try {
             $grouptool->can_change_group($agrpids[1], $this->students[2]->id, $message);
         } catch (\mod_grouptool\local\exception\registration $e) {
             $text = $e->getMessage();
-            $this->assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
-            $this->assertEquals($comptext, $text);
+            self::assertEquals($comptext, $text);
         }
-        $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[2]->id));
+        self::assertFalse($grouptool->qualifies_for_groupchange($agrpids[1], $this->students[2]->id));
 
         $message->groupname = $agrps[$agrpids[1]]->name;
 
         // Now check groupchanges by calling register_in_agrp() handling change detection automatically!
         $message->username = fullname($this->students[0]);
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, true);
-        $this->assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
+        self::assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
 
         $message->username = fullname($this->students[1]);
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[1]->id, true);
-        $this->assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
+        self::assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
 
         // And move the users!
         $message->username = fullname($this->students[0]);
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         $message->username = fullname($this->students[1]);
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[1]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
 
         /* TODO: disallow unreg, registration present (marked, queued or registered),
          *       too many registrations, exceed group size, exceed user queue limit... */
@@ -559,17 +559,17 @@ class grouptool_registration_test extends advanced_testcase {
 
         // Prepare by registering user 0 in groups 0 and 1 and user 2 in groups 2 and 3!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
-        $this->assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[1]]->name;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[0]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[2]]->name;
         $message->username = fullname($this->students[2]);
         $text = $grouptool->register_in_agrp($agrpids[2], $this->students[2]->id, false);
-        $this->assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
         $message->groupname = $agrps[$agrpids[3]]->name;
         $text = $grouptool->register_in_agrp($agrpids[3], $this->students[2]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         // Exercise SUT!
 
@@ -579,17 +579,17 @@ class grouptool_registration_test extends advanced_testcase {
             $grouptool->can_change_group($agrpids[4], $this->students[2]->id, $message);
         } catch (\mod_grouptool\local\exception\registration $e) {
             $text = $e->getMessage();
-            $this->assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
-            $this->assertEquals($comptext, $text);
+            self::assertEquals($comptext, $text);
         }
-        $this->assertFalse($grouptool->qualifies_for_groupchange($agrpids[4], $this->students[2]->id));
+        self::assertFalse($grouptool->qualifies_for_groupchange($agrpids[4], $this->students[2]->id));
 
         // Now we give the method the param to know where to unregister user!
         $text = $grouptool->can_change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
-        $this->assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
+        self::assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
         $text = $grouptool->change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
         /* TODO: disallow unreg, registration present (marked, queued or registered),
          *       too many registrations, exceed group size, exceed user queue limit... */
@@ -642,47 +642,47 @@ class grouptool_registration_test extends advanced_testcase {
 
         // Register the users and queue them! Users 0,1,2 in group 0 and users 3,4,5 in group 1!
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[0]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->username = fullname($this->students[1]);
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[1]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
         $message->username = fullname($this->students[2]);
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[0], $this->students[2]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
 
         $message->groupname = $agrps[$agrpids[1]]->name;
         $message->username = fullname($this->students[3]);
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[3]->id, false);
-        $this->assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
         $message->username = fullname($this->students[4]);
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[4]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
         $message->username = fullname($this->students[5]);
         $text = null;
         $text = $grouptool->register_in_agrp($agrpids[1], $this->students[5]->id, false);
-        $this->assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
 
         // Now resolve queues - preview first!
         list($error, $message) = $grouptool->resolve_queues(true);
         if ($error) {
             echo $message;
         }
-        $this->assertFalse($error);
+        self::assertFalse($error);
 
         // Now do the work!
         list($error, $message) = $grouptool->resolve_queues();
         if ($error) {
             echo $message;
         }
-        $this->assertFalse($error);
+        self::assertFalse($error);
 
         // Now check if there are any entries left in the DB?!?
         $params = array($agrpids[0], $agrpids[1]);
-        $this->assertFalse($DB->record_exists_select('grouptool_queued', "agrpid = ? OR agrpid = ?", $params));
+        self::assertFalse($DB->record_exists_select('grouptool_queued', "agrpid = ? OR agrpid = ?", $params));
 
         // Teardown fixture!
         $grouptool = null;
