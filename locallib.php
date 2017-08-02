@@ -320,6 +320,7 @@ class mod_grouptool {
      * Adds an agrp-entry for newly created group!
      *
      * @param int $groupid Group ID to add agrp entry for!
+     * @return stdClass (new) agrp record
      */
     protected function add_agrp_entry($groupid) {
         global $DB;
@@ -347,6 +348,8 @@ class mod_grouptool {
                 $DB->set_field('grouptool_agrps', 'active', 1, array('id' => $newagrp->id));
             }
         }
+
+        return $newagrp;
     }
 
     /**
@@ -512,7 +515,7 @@ class mod_grouptool {
                 $newgroup->courseid = $this->course->id;
                 $newgroup->name     = $group['name'];
                 $groupid = groups_create_group($newgroup);
-                $this->add_agrp_entry($groupid);
+                $newagrp = $this->add_agrp_entry($groupid);
                 $createdgroups[] = $groupid;
                 foreach ($group['members'] as $user) {
                     groups_add_member($groupid, $user->id);
@@ -661,7 +664,7 @@ class mod_grouptool {
                 $newgroup->name     = $group;
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
-                $this->add_agrp_entry($groupid);
+                $newagrp = $this->add_agrp_entry($groupid);
                 if (!empty($data->numberofmembers) && ($data->numberofmembers != $this->grouptool->grpsize)) {
                     $DB->set_field('grouptool_agrps', 'grpsize', $data->numberofmembers, array('id' => $newagrp->id));
                 }
