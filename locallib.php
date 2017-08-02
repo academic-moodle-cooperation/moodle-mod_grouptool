@@ -620,8 +620,10 @@ class mod_grouptool {
                 $a->field = get_string('number_of_members', 'grouptool');
                 $a->globalsize = $this->grouptool->grpsize;
                 if ($data->numberofmembers != $this->grouptool->grpsize) {
-                    echo $OUTPUT->notification(get_string('groupsize_individual_gets_enabled', 'grouptool', $a), 'info');
-                } else {
+                    if (!$this->grouptool->use_individual) {
+                        echo $OUTPUT->notification(get_string('groupsize_individual_gets_enabled', 'grouptool', $a), 'info');
+                    }
+                } else if (!$this->grouptool->use_size) {
                     echo $OUTPUT->notification(get_string('groupsize_gets_enabled', 'grouptool', $a), 'info');
                 }
             }
