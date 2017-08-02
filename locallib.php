@@ -4563,9 +4563,9 @@ class mod_grouptool {
                                                           "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql, $params);
                     $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
                     $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
-                    if (!empty($group->registered)
-                        && $this->get_rank_in_queue($group->registered, $userid) != false) {
-                        // User is allready registered --> unreg button!
+                    if (!empty($group->registered) && $this->is_registration_open()
+                            && $this->get_rank_in_queue($group->registered, $userid) != false) {
+                        // User is already registered --> unreg button!
                         if ($this->grouptool->allow_unreg) {
                             $label = get_string('unreg', 'grouptool');
                             $buttonattr = array('type'  => 'submit',
@@ -4580,7 +4580,7 @@ class mod_grouptool {
                                                        get_string('registered_on_rank',
                                                                   'grouptool', $regrank),
                                                        array('class' => 'rank'));
-                    } else if (!empty($group->queued)
+                    } else if (!empty($group->queued) && $this->is_registration_open()
                         && $this->get_rank_in_queue($group->queued, $userid) != false) {
                         // We're sorry, but user's already queued in this group!
                         if ($this->grouptool->allow_unreg) {
@@ -4601,7 +4601,7 @@ class mod_grouptool {
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('grp_marked', 'grouptool'),
                                                        array('class' => 'rank'));
-                    } else if ($this->qualifies_for_groupchange($group->agrpid, $USER->id)) {
+                    } else if ($this->is_registration_open() && $this->qualifies_for_groupchange($group->agrpid, $USER->id)) {
                         // Groupchange!
                         $label = get_string('change_group', 'grouptool');
                         if ($this->grouptool->use_size
@@ -4617,7 +4617,7 @@ class mod_grouptool {
                                              'class' => 'regbutton btn '.$class);
                         $grouphtml .= html_writer::tag('button', $label, $buttonattr);
 
-                    } else {
+                    } else if ($this->is_registration_open()) {
                         $message = new stdClass();
                         $message->username = fullname($USER);
                         $message->groupname = $group->name;
