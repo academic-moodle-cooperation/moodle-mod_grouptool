@@ -2974,8 +2974,15 @@ class mod_grouptool {
 
                 return $return;
             } catch (\mod_grouptool\local\exception\notenoughregs $e) {
-                // Pass it on!
-                throw $e;
+                /* The user has not enough registrations, queue entries or marks,
+                 * so we try to mark the user! (Exceptions get handled above!) */
+                if ($previewonly) {
+                    list(, $return) = $this->can_be_marked($agrpid, $userid, $message);
+                } else {
+                    $return = $this->mark_for_reg($agrpid, $userid, $message);
+                }
+
+                return $return;
             }
         } catch (\mod_grouptool\local\exception\notenoughregs $e) {
             /* The user has not enough registrations, queue entries or marks,
@@ -3111,7 +3118,7 @@ class mod_grouptool {
             if (!$this->grouptool->use_queue) {
                 // We can't register the user nor queue the user!
                 throw new \mod_grouptool\local\exception\exceedgroupsize();
-            } else if (count($groupdata->queues) >= $this->grouptool->groups_queues_limit) {
+            } else if (count($groupdata->queued) >= $this->grouptool->groups_queues_limit) {
                 throw new \mod_grouptool\local\exception\exceedgroupqueuelimit();
             }
 
