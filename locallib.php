@@ -2998,8 +2998,6 @@ class mod_grouptool {
      * @return bool whether or not user qualifies for a group change
      */
     protected function qualifies_for_groupchange($agrpid, $userid) {
-        global $DB, $USER;
-
         // Not really used here, but at least empty values needed by can_change_group()!
         $message = new stdClass();
         $message->username = '';
@@ -3008,6 +3006,8 @@ class mod_grouptool {
         try {
             $this->can_change_group($agrpid, $userid, $message);
         } catch (Exception $e) {
+            return false;
+        } catch (Throwable $e) {
             return false;
         }
 
@@ -3075,7 +3075,7 @@ class mod_grouptool {
             $userid = $USER->id;
         }
 
-        $groupdata = $this->get_active_groups(false, false, $agrpid);
+        $groupdata = $this->get_active_groups(true, true, $agrpid);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
@@ -3106,7 +3106,8 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\registration('groupchange_from_non_unique_reg');
         }
 
-        if ($this->grouptool->use_size && !empty($groupdata->registered) && (count($groupdata->registered) > $groupdata->grpsize)) {
+        if ($this->grouptool->use_size && !empty($groupdata->registered)
+                && (count($groupdata->registered) >= $groupdata->grpsize)) {
             if (!$this->grouptool->use_queue) {
                 // We can't register the user nor queue the user!
                 throw new \mod_grouptool\local\exception\exceedgroupsize();
@@ -3587,16 +3588,16 @@ class mod_grouptool {
         $marks = $this->count_user_marks($userid);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
+            throw new \mod_grouptool\local\exception\exceedgroupsize();
+        }
+
         if ($max <= ($marks + $userregs + $queues)) {
             throw new \mod_grouptool\local\exception\exceeduserreglimit();
         }
         if ($min > ($marks + $userregs + $queues + 1)) {
             // Not enough registrations/queues/marks!
             throw new \mod_grouptool\local\exception\notenoughregs();
-        }
-
-        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
-            throw new \mod_grouptool\local\exception\exceedgroupsize();
         }
 
         if ($userid != $USER->id) {
@@ -4604,9 +4605,9 @@ class mod_grouptool {
                         // Groupchange!
                         $label = get_string('change_group', 'grouptool');
                         if ($this->grouptool->use_size
-                            && count($group->registered) >= $group->grpsize) {
-                                $label .= ' ('.get_string('queue', 'grouptool').')';
-                                $class = "btn-secondary";
+                                && count($group->registered) >= $group->grpsize) {
+                            $label .= ' (' . get_string('queue', 'grouptool') . ')';
+                            $class = "btn-secondary";
                         } else {
                             $class = "btn-primary";
                         }
