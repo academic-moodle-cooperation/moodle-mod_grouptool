@@ -267,19 +267,28 @@ class mod_grouptool_observer {
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
                 \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
             }
-            $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);
-            foreach ($agrps as $cur) {
-                if (empty($cms[$cur->grouptoolid])) {
-                    $cms[$cur->grouptoolid] = get_coursemodule_from_instance('grouptool', $cur->grouptoolid);
+
+            /* We get problems if multiple grouptool instances with different settings are in a course and some delete their
+             * references while group has been recreated by another instance! */
+            if ($grouprecreated && !empty($agrpids)) {
+                // Group has already ben recreated due to another instance, just deactivate it!
+                list($sqlids, $sqlparams) = $DB->get_in_or_equal($agrpids);
+                $DB->set_field_select('grouptool_agrps', 'active', 0, "id ".$sqlids, $sqlparams);
+            } else if (!empty($agrpids)) {
+                $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);
+                foreach ($agrps as $cur) {
+                    if (empty($cms[$cur->grouptoolid])) {
+                        $cms[$cur->grouptoolid] = get_coursemodule_from_instance('grouptool', $cur->grouptoolid);
+                    }
+                    // Trigger event!
+                    $logdata = new stdClass();
+                    $logdata->id = $cur->id;
+                    $logdata->cmid = $cms[$cur->grouptoolid]->id;
+                    $logdata->groupid = $cur->groupid;
+                    $logdata->agrpid = $cur->id;
+                    $logdata->courseid = $data->courseid;
+                    \mod_grouptool\event\agrp_deleted::create_from_object($logdata);
                 }
-                // Trigger event!
-                $logdata = new stdClass();
-                $logdata->id = $cur->id;
-                $logdata->cmid = $cms[$cur->grouptoolid]->id;
-                $logdata->groupid = $cur->groupid;
-                $logdata->agrpid = $cur->id;
-                $logdata->courseid = $data->courseid;
-                \mod_grouptool\event\agrp_deleted::create_from_object($logdata);
             }
         }
 

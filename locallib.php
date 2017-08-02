@@ -317,6 +317,33 @@ class mod_grouptool {
     }
 
     /**
+     *  Adds all missin agrp-entries for this instance!
+     */
+    public function add_missing_agrps() {
+        global $DB;
+
+        // Get all course's group-IDs!
+        $groupids = groups_get_all_groups($this->course->id, 0, 0, 'g.id');
+        $groupids = array_keys($groupids);
+        // Get all group-IDs which have active group entries!
+        $ok = $DB->get_fieldset_select('grouptool_agrps', "DISTINCT groupid", "grouptoolid = ?", array($this->grouptool->id));
+        $missing = array_diff($groupids, $ok);
+
+        if (!empty($missing)) {
+            $added = [];
+            foreach ($missing as $cur) {
+                $newgrp = $this->add_agrp_entry($cur);
+                $added[] = $newgrp->id;
+            }
+            if (!empty($added)) {
+                // Set them inactive!
+                list($addedsql, $addedparams) = $DB->get_in_or_equal($added);
+                $DB->set_field_select('grouptool_agrps', 'active', 0, "id ".$addedsql, $addedparams);
+            }
+        }
+    }
+
+    /**
      * Adds an agrp-entry for newly created group!
      *
      * @param int $groupid Group ID to add agrp entry for!
@@ -1075,6 +1102,9 @@ class mod_grouptool {
         global $SESSION, $OUTPUT, $PAGE, $DB, $USER, $CFG;
 
         $output = $PAGE->get_renderer('mod_grouptool');
+
+        // Repair possibly missing agrps...
+        $this->add_missing_agrps();
 
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
