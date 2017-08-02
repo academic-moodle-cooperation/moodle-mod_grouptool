@@ -88,7 +88,7 @@ if ($creategrps || $creategrpgs || $admingrps) {
     if ($creategrps && ($admingrps || $creategrpgs)) {
         $row['administration'] = new tabobject('administration',
                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                               '&amp;tab=administration',
+                                               '&amp;tab=group_admin',
                                                get_string('administration', 'grouptool'),
                                                get_string('administration_alt', 'grouptool'),
                                                false);
@@ -107,7 +107,7 @@ if ($creategrps || $creategrpgs || $admingrps) {
     } else if ($creategrps) {
         $row['administration'] = new tabobject('administration',
                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                               '&amp;tab=administration',
+                                               '&amp;tab=group_admin',
                                                get_string('administration', 'grouptool'),
                                                get_string('administration_alt', 'grouptool'),
                                                false);
@@ -120,7 +120,7 @@ if ($creategrps || $creategrpgs || $admingrps) {
     } else if ($creategrpgs || $admingrps) {
         $row['administration'] = new tabobject('administration',
                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                               '&amp;tab=administration',
+                                               '&amp;tab=group_admin',
                                                get_string('administration', 'grouptool'),
                                                get_string('administration_alt', 'grouptool'),
                                                false);
