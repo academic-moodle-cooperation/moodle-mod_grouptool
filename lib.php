@@ -843,7 +843,7 @@ function grouptool_reset_course_form_defaults() {
  * @param int $toid User ID to whom will be copied
  */
 function grouptool_copy_assign_grades($id, $fromid, $toid) {
-    global $DB;
+    global $DB, $CFG;
 
     $source = $DB->get_records('assign_grades', array('assignment' => $id, 'userid' => $fromid), 'id DESC', '*', 0, 1);
     if (!is_array($toid)) {
@@ -933,6 +933,21 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                     $DB->insert_record('assignfeedback_file', $newfeedbackfile);
                 }
             }
+        }
+
+        // User must have an assign_submission record, or the grade wont be displayed properly!
+        if (!$DB->record_exists('assign_submission', array('assignment' => $id, 'userid' => $curid))) {
+            require_once($CFG->dirroot.'/mod/assign/locallib.php');
+            $rec = new stdClass();
+            $rec->assignment = $id;
+            $rec->userid = $curid;
+            $rec->timecreated = time();
+            $rec->timemodified = $rec->timecreated;
+            $rec->groupid = 0;
+            $rec->attemptnumber = 0;
+            $rec->latest = 1;
+            $rec->status = ASSIGN_SUBMISSION_STATUS_NEW;
+            $DB->insert_record('assign_submission', $rec);
         }
     }
 }
