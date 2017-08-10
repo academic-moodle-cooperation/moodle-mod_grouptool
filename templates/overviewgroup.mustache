@@ -89,10 +89,9 @@
 <div class="box generalbox groupcontainer p-y-1 {{#inactive}}dimmed_text{{/inactive}}" id="yui_3_17_2_1_1494398782636_28">
     <div class="groupinfo">
         <h3>{{name}}{{!
-            }}{{#outdated}}<span class="badge badge-info">{{#str}} outdated, mod_grouptool {{/str}}</span>{{/outdated}}{{!
-            }}{{#uptodate}}<span class="badge badge-success">{{#str}} uptodate, mod_grouptool {{/str}}</span>{{/uptodate}}{{!
-            }}{{#inactive}}<span class="badge badge-default">{{#str}} inactive, core {{/str}}</span>{{/inactive}}{{!
-        }}</h3>
+            }}{{#outdated}}<small class="p-l-1"><i class="fa fa-user-circle text-info" title = "{{!
+            }}{{#str}} not_synced_reg_present, mod_grouptool {{/str}}" aria-hidden="true"></i></small>{{/outdated}}
+        </h3>
         <div class="download"><span class="title">{{#str}} download, core {{/str}}:</span>{{!
             }}<a href="{{downloadurl}}&format={{formattxt}}">.TXT</a>{{!
             }}<a href="{{downloadurl}}&format={{formatxlsx}}">.XLSX</a>{{!

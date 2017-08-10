@@ -415,6 +415,7 @@ $string['not_graded_by_me'] = 'Graded by another user';
 $string['not_in_queue_or_registered'] = '{$a->username} is neither registered nor queued in group {$a->groupname}';
 $string['not_permitted'] = 'Not permitted';
 $string['not_registered'] = 'You\'re not yet registered!';
+$string['not_synced_reg_present'] = 'not syncronized registrations present';
 $string['you_are_not_in_queue_or_registered'] = 'You are neither registered nor queued in group {$a->groupname}';
 $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';

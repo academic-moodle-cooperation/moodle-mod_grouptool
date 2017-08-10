@@ -415,6 +415,7 @@ $string['not_graded_by_me'] = 'Wurde von jemand anders benotet';
 $string['not_in_queue_or_registered'] = '{$a->username} ist weder in der Gruppe {$a->groupname} angemeldet noch in deren Warteliste gereiht.';
 $string['not_permitted'] = 'Nicht erlaubt';
 $string['not_registered'] = 'Sie sind noch nirgends angemeldet!';
+$string['not_synced_reg_present'] = 'nichtsynchronisierte Anmeldungen vorhanden';
 $string['you_are_not_in_queue_or_registered'] = 'Sie sind weder in der Gruppe {$a->groupname} angemeldet noch in deren Warteliste gereiht.';
 $string['nothing_to_push'] = 'Nichts zu übernehmen!';
 $string['nowhere_queued'] = 'Keine Wartelisteneinträge';
