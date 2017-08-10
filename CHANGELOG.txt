@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+3.3.0 (2017-08-10)
+------------------
+
+* Moodle 3.3 compatible version
+* [FEATURE] #4076 support for FontAwesome icons
+* [FEATURE] #4416 action events guiding users what has to be done (also deprecated grouptool_print_overview())
+* [FIXED] #4574 fixed a bug where multiple grouptool instances with different settings for handling deleted groups caused the groups
+                to be not manageable anymore if they got restored by another instance
+* [FIXED] #4574 fixed copied grades not being fully shown immediately in mod_assign
+* [FIXED] #4655 removed class "course-content" from HTML body causing wrong styles for nodes with class "current"
+* [CHANGED] #4570 hide self registration info's if self registration is deactivated
+* [CHANGED] #4575 group size activation warning will be only displayed if group size isn't already active
+* [CHANGED] #4435 AJAX uses now Moodle's webservices/external functions API
+* [CHANGED] #4285 improve code structure and style
+* many other small to medium improvements
+
+
 3.2.0 (2017-01-25)
 ------------------
 

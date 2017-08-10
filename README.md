@@ -48,7 +48,7 @@ joint project during the semester.
 Requirements
 ------------
 
-The plugin is available for Moodle 2.5+. This version is for Moodle 3.2.
+The plugin is available for Moodle 2.5+. This version is for Moodle 3.3.
 
 
 Installation
@@ -70,14 +70,15 @@ administrators in the grouptool module:
 
 * default naming scheme (text field)
 * allow self-enrolment (checkbox)
-* show group members (checkbox)
+* show group members (drop down)
 * immediate enrolment (checkbox)
 * allow unenrolment (checkbox)
 * general default group size (text field)
 * limited group size (checkbox)
 * define different group sizes (checkbox)
 * use waiting lists (checkbox)
-* maximum number of waiting lists a participant can be on at the same time (checkbox)
+* maximum number of waiting lists a participant can be on at the same time (text field)
+* maximum number of waiting list entrys a group can have at the same time (text field)
 * multiple enrolments (checkbox)
 * minimum number of groups to be selected (text field)
 * maximum number of groups to be selected (text field)
@@ -85,6 +86,9 @@ administrators in the grouptool module:
   - when adding a group member (drop down)
   - when deleting a group member (drop down)
   - when deleting a group (drop down)
+* import settings
+  - force registration
+  - fields to identify user
 
 
 Documentation
