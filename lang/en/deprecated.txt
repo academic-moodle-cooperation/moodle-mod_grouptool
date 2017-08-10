@@ -6,3 +6,5 @@ includedeleted,mod_grouptool
 includedeleted_help,mod_grouptool
 name_scheme_tags,mod_grouptool
 queues_max,mod_grouptool
+cfg_max_queues,mod_grouptool
+cfg_max_queues_desc,mod_grouptool

@@ -417,7 +417,6 @@ function xmldb_grouptool_upgrade($oldversion) {
                      "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!".
                      html_writer::empty_tag('br')."<br />";
                 continue;
-                throw new coding_exception("'$name' could not be uniquely selected in DB!");
             }
         }
         foreach ($settingsnames as $cur) {
@@ -506,6 +505,15 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2017050100, 'grouptool');
+    }
+
+    if ($oldversion < 2017080900) {
+        $maxqueues = get_config('mod_grouptool', 'max_queues');
+        if ($maxqueues !== false) {
+            set_config('users_queues_limit', $maxqueues, 'mod_grouptool');
+            set_config('groups_queues_limit', 0, 'mod_grouptool');
+            $DB->delete_records('config_plugins', array('name' => 'max_queues', 'plugin' => 'mod_grouptool'));
+        }
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.

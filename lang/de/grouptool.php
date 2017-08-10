@@ -75,6 +75,8 @@ $string['cfg_choose_min'] = 'Mindestanzahl zu wählender Gruppen';
 $string['cfg_choose_min_desc'] = 'In wie vielen Gruppen sollen Teilnehmer/innen standardmäßig minimal angemeldet sein?';
 $string['cfg_force_importreg'] = 'Erzwinge Anmeldung in der Gruppenverwaltung';
 $string['cfg_force_importreg_desc'] = 'Erzwingt die Anmeldung innerhalb der Gruppenverwaltungsinstanz für Teilnehmer/innen, die via Gruppenverwaltung in Moodle-Gruppen importiert wurden.';
+$string['cfg_groups_queues_limit'] = 'Wartelistenplätze je Gruppe';
+$string['cfg_groups_queues_limit_desc'] = 'Gibt an wie viele Teilnehmer/innen standardmäßig zeitgleich in der Warteliste einer Gruppe gereiht sein dürfen.';
 $string['cfg_grpsize'] = 'Allgemeine Standardgruppengröße';
 $string['cfg_grpsize_desc'] = 'Standardgruppengröße, die überall in der Gruppenverwaltung verwendet wird';
 $string['cfg_ifgroupdeleted'] = 'Bei Gruppenlöschung';
@@ -87,8 +89,6 @@ $string['cfg_immediate_reg'] = 'Sofortige Anmeldung';
 $string['cfg_immediate_reg_desc'] = 'Soll jede Anmeldung automatisch zu den Moodle-Gruppen durchgereicht werden?';
 $string['cfg_importfields'] = 'Vergleichsfelder für Import';
 $string['cfg_importfields_desc'] = 'Gibt an mit welchen Feldern der Nutzer/innen-Tabelle beim Import verglichen werden soll. Die Felder werden sequenziell durchsucht, bis möglichst genau ein einziger Treffer gefunden wurde. Mögliche/Sinnvolle Werte sind z.B.: username, idnumber, email. ACHTUNG: es erfolgt keine Kontrolle auf richtige Schreibweise. Erlaubte Zeichen: a-z, A-Z, \',\'';
-$string['cfg_max_queues'] = 'Max. Wartelistenplätze pro Teilnehmer/in';
-$string['cfg_max_queues_desc'] = 'Gibt an in wie vielen Gruppen Teilnehmer/innen standardmäßig zeitgleich in der Warteliste gereiht sein dürfen.';
 $string['cfg_moodlesync_head'] = 'Synchronisationsverhalten';
 $string['cfg_moodlesync_head_info'] = 'Wie sich die Gruppenverwaltungsinstanz bei hinzugefügten/gelöschten Mitgliedern/Gruppen in Moodle verhalten soll';
 $string['cfg_name_scheme'] = 'Standard-Namensschema';
@@ -101,6 +101,8 @@ $string['cfg_use_queue'] = 'Wartelisten verwenden';
 $string['cfg_use_queue_desc'] = 'Gibt an, ob standardmäßig Wartelisten bei überfüllten Gruppen verwendet werden sollen';
 $string['cfg_use_size'] = 'Begrenze Gruppengrößen';
 $string['cfg_use_size_desc'] = 'Gibt an, ob standardmäßig nur begrenzte Plätze pro Gruppe verfügbar sein sollen.';
+$string['cfg_users_queues_limit'] = 'Wartelistenplätze je Teilnehmer/in';
+$string['cfg_users_queues_limit_desc'] = 'Gibt an in wie vielen Gruppen Teilnehmer/innen standardmäßig zeitgleich in der Warteliste gereiht sein dürfen.';
 $string['change_group'] = 'Gruppe wechseln';
 $string['change_group_to'] = 'Soll mit Gruppenwechsel zu {$a->groupname} fortgefahren werden?';
 $string['change_group_to_success'] = 'Gruppenwechsel erfolgreich! {$a->username} ist nun in der Gruppe {$a->groupname} registriert!';
@@ -588,6 +590,8 @@ $string['group_or_member_count'] = 'Gruppen- bzw. Mitgliederanzahl';
 // Deprecated since version 3.2!
 $string['queues_max'] = 'Max. gleichzeitige Plätze in Wartelisten je Teilnehmer/in';
 // Deprecated since version 3.3!
+$string['cfg_max_queues'] = 'Max. Wartelistenplätze pro Teilnehmer/in';
+$string['cfg_max_queues_desc'] = 'Gibt an in wie vielen Gruppen Teilnehmer/innen standardmäßig zeitgleich in der Warteliste gereiht sein dürfen.';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>
 <span class="tag idnumber">[idnumber]</span>

@@ -75,6 +75,8 @@ $string['cfg_choose_min'] = 'Choose minimum';
 $string['cfg_choose_min_desc'] = 'How many groups have users to choose minimum by default?';
 $string['cfg_force_importreg'] = 'Force registration in grouptool';
 $string['cfg_force_importreg_desc'] = 'Force via grouptool in moodle-group imported users to be force-registered in that grouptool instance also.';
+$string['cfg_groups_queues_limit'] = 'Queue places per group';
+$string['cfg_groups_queues_limit_desc'] = 'Determines how many different students can be queued in a group at the same time by default.';
 $string['cfg_grpsize'] = 'Global standard group size';
 $string['cfg_grpsize_desc'] = 'Standard group size used everywhere in grouptool';
 $string['cfg_ifgroupdeleted'] = 'If groups get deleted';
@@ -87,8 +89,6 @@ $string['cfg_immediate_reg'] = 'Immediate registration';
 $string['cfg_immediate_reg_desc'] = 'Should every registration be passed through to the moodle-groups?';
 $string['cfg_importfields'] = 'Compare fields for import';
 $string['cfg_importfields_desc'] = 'Defines which fields in user table are to be compared to the data when importing users. The fields are searched one-by-one until a unique match is found. Possible/useful values are for example: username, idnumber, email. ATTENTION: there\'s no check for correct field names. Permitted characters: a-z, A-Z and \',\'';
-$string['cfg_max_queues'] = 'Max. simultaneous queue-places per participant';
-$string['cfg_max_queues_desc'] = 'Determines in how many different groups a user can be queued at the same time by default.';
 $string['cfg_moodlesync_head'] = 'Synchronisation behaviour';
 $string['cfg_moodlesync_head_info'] = 'How grouptools should behave if moodle group members are added/deleted or single groups are deleted';
 $string['cfg_name_scheme'] = 'Standard name scheme';
@@ -101,6 +101,8 @@ $string['cfg_use_queue'] = 'Use queueing';
 $string['cfg_use_queue_desc'] = 'If queueing registrations on full groups should be used by default.';
 $string['cfg_use_size'] = 'Use group size';
 $string['cfg_use_size_desc'] = 'If group size should be limited by default';
+$string['cfg_users_queues_limit'] = 'Queue places per user';
+$string['cfg_users_queues_limit_desc'] = 'Determines in how many different groups a user can be queued at the same time by default.';
 $string['change_group'] = 'Change group';
 $string['change_group_to'] = 'Continue with group-change to {$a->groupname}?';
 $string['change_group_to_success'] = 'Group-change successful! {$a->username} is now registered in group {$a->groupname}!';
@@ -586,6 +588,8 @@ $string['group_or_member_count'] = 'Group/Member count';
 // Deprecated since version 3.2!
 $string['queues_max'] = 'Max. simultaneous queue-places per participant';
 // Deprecated since version 3.3!
+$string['cfg_max_queues'] = 'Max. simultaneous queue-places per participant';
+$string['cfg_max_queues_desc'] = 'Determines in how many different groups a user can be queued at the same time by default.';
 $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
 <span class="tag lastname">[lastname]</span>
 <span class="tag idnumber">[idnumber]</span>
