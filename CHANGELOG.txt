@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.3.1 (017-08-16)
+------------------
+
+* [FIXED] #4663 fix failing CLI upgrades due to non disabled capability checks when updating calendar events
+
+
 3.3.0 (2017-08-10)
 ------------------
 
