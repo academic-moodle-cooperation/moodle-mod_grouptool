@@ -497,7 +497,7 @@ function xmldb_grouptool_upgrade($oldversion) {
             $cur->name = $cmnames[$cur->instance];
             $cur->type = CALENDAR_EVENT_TYPE_ACTION;
             $cur->timesort = $cur->timestart;
-            $calendarevent->update($cur);
+            $calendarevent->update($cur, false);
             $i++;
             $pbar->update($i, $count, 'Update events...');
         }
