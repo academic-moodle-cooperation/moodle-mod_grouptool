@@ -29,6 +29,14 @@ require_once($CFG->libdir .'/grouplib.php');
 require_once($CFG->dirroot.'/group/lib.php');
 require_once($CFG->dirroot . "/mod/grouptool/locallib.php");
 
+/**
+ * Grouptool's external class containing all external functions!
+ *
+ * @package       mod_grouptool
+ * @author        Philipp Hager
+ * @copyright     2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_grouptool_external extends external_api {
 
     /**
