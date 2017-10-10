@@ -1,7 +1,20 @@
 CHANGELOG
 =========
 
-3.3.1 (017-08-16)
+3.3.2 (2017-10-10)
+------------------
+
+* [FIXED] #4754 fixed problems with grouptool_refresh_events() callback due to paramters having been changed
+                between Moodle 3.3.1 and 3.3.2
+* [CHANGED] #4682 updated travis.yml to use moodle-plugin-ci version 2 and run behat tests in firefox and chrome
+* fixed overall coding style
+* added and improved some PHPDoc and JSDoc comments
+* added a missing plugin-upgrade-savepoint
+* fixed templates HTML and example JSON
+* made mustache tests in travis optional so https://github.com/moodlerooms/moodle-plugin-ci/issues/62 won't break the build
+
+
+3.3.1 (2017-08-16)
 ------------------
 
 * [FIXED] #4663 fix failing CLI upgrades due to non disabled capability checks when updating calendar events
