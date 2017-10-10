@@ -170,7 +170,7 @@ function grouptool_update_instance(stdClass $grouptool) {
         $instance->push_registrations();
     }
 
-    grouptool_refresh_events($grouptool->course, $grouptool->instance);
+    grouptool_refresh_events($grouptool->course, $grouptool);
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', array($grouptool->course));
     foreach ($coursegroups as $groupid) {
@@ -197,43 +197,48 @@ function grouptool_update_instance(stdClass $grouptool) {
  *
  * This standard function will check all instances of this module
  * and make sure there are up-to-date vents created for each of them.
- * If course = 0, then every grouptool event in the site is checked, else
+ * If courseid = 0, then every grouptool event in the site is checked, else
  * only grouptool events belonging to the course specified are checked.
  * This function is used, in it's new format, by restore_refresh_events()
  *
- * @param int $course (optional) If zero then all Grouptools for all courses are covered
- * @param int $grouptoolid (optional) If zero then only course filter is active!
+ * TODO this callback changed in 3.3.2 and we quick fixed it but should take a look at at for 3.4!
  *
- * @throws coding_exception
- *
- * @return bool Always returns true
+ * @param int $courseid
+ * @param int|stdClass $instance Assign module instance or ID.
+ * @param int|stdClass $cm Course module object or ID (not used in this module).
+ * @return bool
  */
-function grouptool_refresh_events($course = 0, $grouptoolid = 0) {
+function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $DB, $CFG;
-
     require_once($CFG->dirroot.'/calendar/lib.php');
 
-    if ($grouptoolid == 0) {
-        if ($course == 0) {
-            $cond = array();
-        } else {
-            $cond = array('course' => $course);
+    // If we have instance information then we can just update the one event instead of updating all events.
+    if (isset($instance)) {
+        if (!is_object($instance)) {
+            $instance = $DB->get_record('grouptool', array('id' => $instance), '*', MUST_EXIST);
         }
+        $grouptools = [$instance->id => $instance];
     } else {
-        if ($course == 0) {
-            $cond = array('id' => $grouptoolid);
-        } else {
-            $cond = array('id' => $grouptoolid, 'course' => $course);
-        }
-    }
+        $cond = [];
 
-    if (!$grouptools = $DB->get_records('grouptool', $cond)) {
-        return true;
+        if ($courseid) {
+            // Make sure that the course id is numeric.
+            if (!is_numeric($courseid)) {
+                return false;
+            }
+            $cond['course'] = $courseid;
+        }
+
+        if (!$grouptools = $DB->get_records('grouptool', $cond)) {
+            return true;
+        }
     }
 
     if ($grouptools) {
         foreach ($grouptools as $grouptool) {
-            $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
+            if (count($grouptools) > 1 || !isset($cm) || !is_object($cm)) {
+                $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
+            }
 
             // Start with creating the event.
             $event = new stdClass();
