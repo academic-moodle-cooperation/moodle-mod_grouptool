@@ -42,7 +42,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
      * @param e
      * @param newstate
      */
-    Sortlist.prototype.update_checkboxes = function(e, newstate) {
+    Sortlist.prototype.updateCheckboxes = function(e, newstate) {
 
         var selector = '';
 
@@ -278,7 +278,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                     if ($(current).prop('checked') === true) {
                         newstate = $(current).val();
                         log.info('Update checkboxes \'' + newstate + '\'!');
-                        instance.update_checkboxes(e, newstate);
+                        instance.updateCheckboxes(e, newstate);
                     }
                 });
 
