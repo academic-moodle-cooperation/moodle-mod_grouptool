@@ -514,6 +514,9 @@ function xmldb_grouptool_upgrade($oldversion) {
             set_config('groups_queues_limit', 0, 'mod_grouptool');
             $DB->delete_records('config_plugins', array('name' => 'max_queues', 'plugin' => 'mod_grouptool'));
         }
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2017080900, 'grouptool');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.
