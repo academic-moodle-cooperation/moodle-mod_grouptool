@@ -32,23 +32,28 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
      */
     var Groupcreation = function() {
         this.SELECTORS = {
-            FIELDSETCONTAINSADVANCED : 'fieldset.containsadvancedelements',
-            DIVFITEMADVANCED : 'div.fitem.advanced',
-            DIVFCONTAINER : 'div.fcontainer',
-            MORELESSLINK : 'fieldset.containsadvancedelements .moreless-toggler',
-            MORELESSLINKONLY : '.moreless-toggler',
+            FIELDSETCONTAINSADVANCED: 'fieldset.containsadvancedelements',
+            DIVFITEMADVANCED: 'div.fitem.advanced',
+            DIVFCONTAINER: 'div.fcontainer',
+            MORELESSLINK: 'fieldset.containsadvancedelements .moreless-toggler',
+            MORELESSLINKONLY: '.moreless-toggler',
             MODEINPUT: 'input[name=mode]:checked'
         };
         this.CSS = {
-            SHOW : 'show',
+            SHOW: 'show',
             MORELESSACTIONS: 'moreless-actions',
-            MORELESSTOGGLER : 'moreless-toggler',
-            SHOWLESS : 'moreless-less'
+            MORELESSTOGGLER: 'moreless-toggler',
+            SHOWLESS: 'moreless-less'
         };
         this.fromtomode = -1;
     };
 
-    Groupcreation.prototype.add_tag = function(e) {
+    /**
+     * Adds a tag
+     *
+     * @param e
+     */
+    Groupcreation.prototype.addTag = function(e) {
         log.info('Add tag...', 'grouptool');
 
         var targetfield = $('input[name=namingscheme]');
@@ -73,6 +78,11 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
         targetfield[0].selectionEnd = postpos;
     };
 
+    /**
+     * Makes advanced fields visible according to certain mode changes
+     *
+     * @param e
+     */
     Groupcreation.prototype.modechange = function(e) {
         log.info('Modechange!', 'grouptool');
         e.target = $(e.target);
@@ -93,7 +103,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
                 statuselement.val(1);
                 str.get_string('showless', 'form').done(function(s) {
                     morelesslink.html(s);
-                }).fail( function(e) {
+                }).fail(function(e) {
                     log.error('Failed getting string showless from form!' + e, 'grouptool');
                 });
                 morelesslink.addClass(e.data.CSS.SHOWLESS);
@@ -103,12 +113,17 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
 
     var instance = new Groupcreation();
 
+    /**
+     * AMD initializer
+     *
+     * @param params
+     */
     instance.initializer = function(params) {
         this.fromtomode = params.fromtomode;
 
         log.info('Initialise grouptool group creation js...', 'grouptool');
         // Add JS-Eventhandler for each tag!
-        $('[data-nametag]').on('click', null, this, this.add_tag);
+        $('[data-nametag]').on('click', null, this, this.addTag);
         $('[data-nametag]').css('cursor', 'pointer');
 
         $('input[name="mode"]').on('change', null, this, this.modechange);

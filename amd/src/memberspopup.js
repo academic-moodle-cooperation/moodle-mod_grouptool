@@ -60,7 +60,7 @@ define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str'
                 $('#registration_form').on('click', 'span.memberstooltip > a', null, function(e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    var element = $( e.target );
+                    var element = $(e.target);
 
                     var statushelp = element.parents('form').data('statushelp');
 

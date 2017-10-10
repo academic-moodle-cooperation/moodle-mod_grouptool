@@ -27,6 +27,9 @@
  */
 define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, str, log) {
 
+    /**
+     * @constructor
+     */
     var Grading = function() {
         this.contextid = 0;
         this.lang = '';
@@ -37,7 +40,12 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
         };
     };
 
-    Grading.prototype.update_groups = function(e) {
+    /**
+     * Updates the groups according to selected groupings
+     *
+     * @param e
+     */
+    Grading.prototype.updateGroups = function(e) {
         var groupingid = 0;
 
         log.info("Update groups!", "grouptool");
@@ -51,8 +59,8 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
         var contextid = e.data.contextid;
 
         var cfg = {
-            method : 'get',
-            url : config.wwwroot + '/mod/grouptool/groupinggroups_ajax.php',
+            method: 'get',
+            url: config.wwwroot + '/mod/grouptool/groupinggroups_ajax.php',
             data: {
                 'groupingid': groupingid,
                 'lang': config.lang,
@@ -94,9 +102,14 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
 
     var instance = new Grading();
 
+    /**
+     * Initializer
+     *
+     * @param params
+     */
     instance.initializer = function(params) {
         instance.contextid = params.contextid;
-        $(this.SELECTORS.GROUPINGSELECT).on('change', null, this, instance.update_groups);
+        $(this.SELECTORS.GROUPINGSELECT).on('change', null, this, instance.updateGroups);
 
         var selects = $('#grading_form input[name="selected[]"]');
 

@@ -39,11 +39,11 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         this.globalsize = 3;
     };
 
-     /**
-      * Rename 1 moodle group via AJAX request.
-      * @access private
-      * @return void
-      */
+    /**
+     * Rename 1 moodle group via AJAX request.
+     *
+     * @param e
+     */
     Administration.prototype.renamegroup = function(e) {
         log.info('Rename Group!', 'grouptool');
         e.preventDefault();
@@ -96,8 +96,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             node.find('.grpname div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function () {
-                                infoNode.fadeOut(600, function () {
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
                                     infoNode.remove();
                                 });
                             }, 60 * 1000);
@@ -119,7 +119,11 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                 button.fadeIn(600);
                             });
                             field.off('keydown');
-                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 5 * 1000);
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
+                                    infoNode.remove();
+                                });
+                            }, 5 * 1000);
                         }).fail(notif.exception);
 
                         log.info("AJAX Call to rename group " + grpid + " successfull\n" + status, "grouptool");
@@ -136,7 +140,9 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                     button.fadeIn(600);
                 });
                 if (infoNode) {
-                    infoNode.fadeOut(600, function() { infoNode.remove(); });
+                    infoNode.fadeOut(600, function() {
+                        infoNode.remove();
+                    });
                 }
                 field.unbind('key');
             }
@@ -145,8 +151,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
 
     /**
      * Change maximum group size of 1 moodle group via AJAX request.
-     * @access private
-     * @return void
+     *
+     * @param e
      */
     Administration.prototype.resizegroup = function(e) {
         log.info('Resize Group!', 'grouptool');
@@ -220,8 +226,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             node.find('.size div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function () {
-                                infoNode.fadeOut(600, function () {
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
                                     infoNode.remove();
                                 });
                             }, 60 * 1000);
@@ -248,7 +254,11 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                 button.fadeIn(600);
                                 field.off('keydown');
                             });
-                            window.setTimeout(function() { infoNode.fadeOut(600, function() { infoNode.remove(); }); }, 5 * 1000);
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
+                                    infoNode.remove();
+                                });
+                            }, 5 * 1000);
                         }).fail(notif.exception);
                     }
                     log.info("AJAX Call to resize group " + grpid + " successfull\n" + status, "grouptool");
@@ -264,10 +274,14 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                     button.fadeIn(600);
                 });
                 if (infoNode) {
-                    infoNode.fadeOut(600, function() { infoNode.remove(); });
+                    infoNode.fadeOut(600, function() {
+                        infoNode.remove();
+                    });
                 }
                 if (helpNode) {
-                    helpNode.fadeOut(600, function() { infoNode.remove(); });
+                    helpNode.fadeOut(600, function() {
+                        infoNode.remove();
+                    });
                 }
                 field.unbind('key');
             }
@@ -276,8 +290,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
 
     /**
      * Toggle 1 group (active/inactive) and change symbol or remove the HTML node respectively.
-     * @access private
-     * @return void
+     *
+     * @param e
      */
     Administration.prototype.togglegroup = function(e) {
         e.preventDefault();
@@ -318,7 +332,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                  * for all groups sortlist! */
                                 var stringstofetch = [{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
                                                       {'key': 'nogroupschoose', 'component': 'mod_grouptool'}];
-                                str.get_strings(stringstofetch).done(function (s) {
+                                str.get_strings(stringstofetch).done(function(s) {
                                     var url = murl.relativeUrl('/mod/grouptool/view.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
@@ -347,8 +361,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             "id": grpid,
                             "checked": e.target.closest('tr').find('input[type=checkbox]').prop('checked'),
                             "name": e.target.closest('tr').data('name'),
-                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", { 'id': e.data.cmid,
-                                'tab': 'administration'}),
+                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", {
+                                'id': e.data.cmid,
+                                'tab': 'administration'
+                            }),
                             "order": e.target.closest('tr').data('order'),
                             "usesize": !!e.data.usesize,
                             "size": e.target.closest('tr').data('size')
@@ -357,7 +373,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         // This will call the function to load and render our template.
                         node.toggleClass('slidup');
                         node.find('td div').slideUp(600).promise().done(function() {
-                            templatepromise.then(function (html) {
+                            templatepromise.then(function(html) {
                                 var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
                                 var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
                                 if (firstinactive.length) {
@@ -407,7 +423,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                     {'key': 'nogroupsinactive', 'component': 'mod_grouptool'},
                                     {'key': 'nogroupschoose', 'component': 'mod_grouptool'}
                                 ];
-                                str.get_strings(stringstofetch).done(function (s) {
+                                str.get_strings(stringstofetch).done(function(s) {
                                     var url = murl.relativeUrl('/mod/grouptool/view.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
@@ -437,8 +453,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             "id": grpid,
                             "checked": node.find('input[type=checkbox]').prop('checked'),
                             "name": node.data('name'),
-                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", { 'id': e.data.cmid,
-                                'tab': 'administration'}),
+                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", {
+                                'id': e.data.cmid,
+                                'tab': 'administration'
+                            }),
                             "order": node.data('order'),
                             "usesize": !!e.data.usesize,
                             "size": node.data('size')
@@ -446,7 +464,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
                         node.toggleClass('slidup');
                         e.target.closest('tr').find('td div').slideUp(600).promise().done(function() {
-                            templatepromise.then(function (html) {
+                            templatepromise.then(function(html) {
                                 var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
                                 var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
                                 if (lastactive.length) {
@@ -478,8 +496,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
 
     /**
      * Delete one moodle group via AJAX request.
-     * @access private
-     * @return void
+     *
+     * @param e
      */
     Administration.prototype.deletegroup = function(e) {
         e.preventDefault();
@@ -510,7 +528,9 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
             requests[0].then(function(result) {
                 if (!result.error) {
                     // Success, remove the corresponding table entry...
-                    node.find('td div').slideUp(600).promise().done(function() { node.remove(); });
+                    node.find('td div').slideUp(600).promise().done(function() {
+                        node.remove();
+                    });
                 } else {
                     notif.exception(result.error);
                 }
@@ -523,8 +543,13 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
 
     /**
      * Initialize the JS (save params and attach event handler).
-     * @access public
-     * @return void
+     *
+     * @param cmid
+     * @param filter
+     * @param filterid
+     * @param filterall
+     * @param globalsize
+     * @param usesize
      */
     instance.initializer = function(cmid, filter, filterid, filterall, globalsize, usesize) {
 
@@ -539,7 +564,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-rename]', this, this.renamegroup);
         log.debug("Init edit size button", "grouptool");
         str.get_strings([{key: 'ajax_edit_size_help', component: 'mod_grouptool'}]).done(function(s) {
-            var strings = { resizehelp: s[0] };
+            var strings = {resizehelp: s[0]};
             log.debug("String successfully retrieved: " + s, "grouptool");
             var resizedata = {instance: instance, strings: strings, globalsize: instance.globalsize};
             $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-resize]', resizedata, instance.resizegroup);
@@ -554,7 +579,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         ];
         str.get_strings(stringstofetch).done(function(s) {
             log.info("Strings successfully retrieved: " + s, "grouptool");
-            var strings = { title: s[0], confirm: s[1], yes: s[2], no: s[3] };
+            var strings = {title: s[0], confirm: s[1], yes: s[2], no: s[3]};
             $('.path-mod-grouptool .mod_grouptool_sortlist').on('click', 'tr[data-id] a[data-delete]',
                     {cmid: instance.cmid, strings: strings}, instance.deletegroup);
         }).fail(function(ex) {

@@ -39,15 +39,15 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Change the checked checkboxes due to action in checkbox-controller!
      *
-     * @param e
-     * @param newstate
+     * @param e Event object
+     * @param newstate select|deselect|toggle
      */
     Sortlist.prototype.updateCheckboxes = function(e, newstate) {
 
         var selector = '';
 
         // Get all selected groupids and construct selector!
-        $('select[name="classes[]"] option:selected').each( function(idx, current) {
+        $('select[name="classes[]"] option:selected').each(function(idx, current) {
             if (selector !== '') {
                 selector += ', ';
             }
@@ -58,7 +58,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
         e.preventDefault();
 
         switch (newstate) {
-            case 'select': //check
+            case 'select': // Check!
                 checkboxes.prop('checked', true);
                 break;
             case 'deselect': // Uncheck!
@@ -82,8 +82,8 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Start of dragging!
      *
-     * @param e
-     * @param ui
+     * @param e Event object
+     * @param ui Jquery UI instance
      */
     Sortlist.prototype.dragStartHandler = function(e, ui) {
         // Get our drag object!
@@ -94,17 +94,19 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
 
     /**
      * End of drag!
+     *
+     * @param e Event object
      */
     Sortlist.prototype.dragEndHandler = function(e) {
         // Set the hidden fields containing the sort order new!
         var neworderparams = [];
 
-        var sortlist_entries = $('.mod_grouptool_sortlist_body .mod_grouptool_sortlist_entry');
-        sortlist_entries.find('a[data-movedown], a[data-moveup]').css('visibility', 'visible');
-        sortlist_entries.first().find('a[data-moveup]').css('visibility', 'hidden');
-        sortlist_entries.last().find('a[data-movedown]').css('visibility', 'hidden');
+        var sortlistEntries = $('.mod_grouptool_sortlist_body .mod_grouptool_sortlist_entry');
+        sortlistEntries.find('a[data-movedown], a[data-moveup]').css('visibility', 'visible');
+        sortlistEntries.first().find('a[data-moveup]').css('visibility', 'hidden');
+        sortlistEntries.last().find('a[data-movedown]').css('visibility', 'hidden');
 
-        sortlist_entries.each(function(index) {
+        sortlistEntries.each(function(index) {
             // Using attr here, to have updated values seen in the HTML too!
             $(this).attr('order', index + 1);
             $(this).find('input[name="order[' + $(this).data('id') + ']"]').val(index + 1);
@@ -145,8 +147,8 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                     infoNode.hide(0);
                     $('table.drag_list').before(infoNode);
                     infoNode.slideDown(600, function() {
-                        window.setTimeout(function () {
-                            infoNode.slideUp(600, function () {
+                        window.setTimeout(function() {
+                            infoNode.slideUp(600, function() {
                                 infoNode.remove();
                             });
                         }, autoFadeOut);
@@ -159,15 +161,15 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Move the element 1 position down!
      *
-     * @param e
+     * @param e Event object
      */
     Sortlist.prototype.moveDown = function(e) {
         // Swap sort-order-values!
         e.target = $(e.target);
         var nodeA = e.target.closest('.mod_grouptool_sortlist_entry');
         var nodeB = e.target.closest('.mod_grouptool_sortlist_entry').next('.mod_grouptool_sortlist_entry');
-        var this_order = nodeA.data('order');
-        var other_order = nodeB.data('order');
+        var thisOrder = nodeA.data('order');
+        var otherOrder = nodeB.data('order');
 
         // Stop the button from submitting!
         e.preventDefault();
@@ -186,10 +188,10 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 nodeB.after(nodeA.clone(true));
                 nodeA.replaceWith(nodeB);
 
-                nodeA.data('order', other_order);
-                nodeA.find('input[name="order[' + nodeA.data('id') + ']"]').val(other_order);
-                nodeB.data('order', this_order);
-                nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(this_order);
+                nodeA.data('order', otherOrder);
+                nodeA.find('input[name="order[' + nodeA.data('id') + ']"]').val(otherOrder);
+                nodeB.data('order', thisOrder);
+                nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(thisOrder);
                 log.info(result.message);
             }
         });
@@ -198,7 +200,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Move the element 1 position up!
      *
-     * @param e
+     * @param e Event object
      */
     Sortlist.prototype.moveUp = function(e) {
         // Swap sort-order-values!
@@ -206,8 +208,8 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
         var nodeA = e.target.closest('.mod_grouptool_sortlist_entry');
         var nodeB = e.target.closest('.mod_grouptool_sortlist_entry').prev('.mod_grouptool_sortlist_entry');
 
-        var this_order = nodeA.data('order');
-        var other_order = nodeB.data('order');
+        var thisOrder = nodeA.data('order');
+        var otherOrder = nodeB.data('order');
 
         // Stop the button from submitting!
         e.preventDefault();
@@ -226,10 +228,10 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 nodeB.before(nodeA.clone(true));
                 nodeA.replaceWith(nodeB);
 
-                nodeA.data('order', other_order);
-                nodeA.find('input[name="order[' + nodeA.data('id') + ']"]').val(other_order);
-                nodeB.data('order', this_order);
-                nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(this_order);
+                nodeA.data('order', otherOrder);
+                nodeA.find('input[name="order[' + nodeA.data('id') + ']"]').val(otherOrder);
+                nodeB.data('order', thisOrder);
+                nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(thisOrder);
                 log.info(result.message);
             }
         });
@@ -237,7 +239,12 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
 
     var instance = new Sortlist();
 
-    instance.initializer = function(cmid) { // Parameter 'param' contains the parameter values!
+    /**
+     * Initializer
+     *
+     * @param cmid
+     */
+    instance.initializer = function(cmid) {
 
         instance.cmid = cmid;
 
@@ -266,15 +273,15 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
         // Add JS-Eventhandler for each move-up/down-button-click (=images)!
         var sortlistnode = $('.path-mod-grouptool .mod_grouptool_sortlist');
         sortlistnode.on('click', 'tr[data-id] a[data-movedown]', this, instance.moveDown);
-        sortlistnode.on('click','tr[data-id] a[data-moveup]', this, instance.moveUp);
+        sortlistnode.on('click', 'tr[data-id] a[data-moveup]', this, instance.moveUp);
 
         // Enhanced checkbox-controller functionality!
-        var checkbox_controls_action = $('button[name="do_class_action"]');
-        if (checkbox_controls_action) {
-            checkbox_controls_action.on('click', function(e) {
+        var checkboxControlsAction = $('button[name="do_class_action"]');
+        if (checkboxControlsAction) {
+            checkboxControlsAction.on('click', function(e) {
                 // Get the new state and continue!
                 var newstate = '';
-                $('input[name="class_action"]').each(function (idx, current) {
+                $('input[name="class_action"]').each(function(idx, current) {
                     if ($(current).prop('checked') === true) {
                         newstate = $(current).val();
                         log.info('Update checkboxes \'' + newstate + '\'!');
