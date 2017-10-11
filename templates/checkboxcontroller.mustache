@@ -36,22 +36,19 @@
         "helpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
         "options": [
             { "id": 1, "name": "Groupingname 1" },
-            { "id": 2, "name": "Groupingname 2" },
+            { "id": 2, "name": "Groupingname 2" }
         ]
     }
 
 }}
 <div>
-    <label for="classes" class="form-check">{{!
+    <label for="classes[]" class="form-check">{{!
         }}{{#str}} checkbox_control_header, grouptool {{/str}}{{#helpicon}}{{>core/help_icon}}{{/helpicon}}{{!
     }}</label>
     <div class="form-check form-check-inline">
         <select name="classes[]" multiple="multiple" class="form-control">
-            <options>
-                <option value="0">{{# str }} all, core {{/str}}</option>
-                {{#options}}
-                <option value="{{id}}" >{{name}}</option>
-            {{/options}}</options>
+            <option value="0">{{# str }} all, core {{/str}}</option>{{#options}}
+            <option value="{{id}}">{{name}}</option>{{/options}}
         </select>
     </div>
 

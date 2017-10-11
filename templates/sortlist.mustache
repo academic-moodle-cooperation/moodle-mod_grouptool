@@ -38,7 +38,7 @@
     {
         "usesize": true,
         "pageurl": "https://example.com/mod/grouptool/view.php?id=1",
-        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1"
+        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1",
         "statushelpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
         "groups": [
             {
@@ -90,7 +90,9 @@
                     <th></th>
                 </tr>
             </thead>
-            {{>mod_grouptool/sortlist_body}}
+            <tbody class="mod_grouptool_sortlist_body">
+                {{#groups}}{{>mod_grouptool/sortlist_entry}}{{/groups}}
+            </tbody>
         </table>
     </div>
     {{>mod_grouptool/sortlist_addon}}

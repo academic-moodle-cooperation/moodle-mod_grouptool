@@ -42,24 +42,24 @@
         "showidnumber": true,
         "absregs": [
             { "id": 1, "fullname": "John Doe", "idnumber": "4567890" },
-            { "id": 2, "fullname": "Jane Doe", "idnumber": "7890123" },
+            { "id": 2, "fullname": "Jane Doe", "idnumber": "7890123" }
         ],
         "gtregs": [
             { "id": 3, "fullname": "Jessica Jones", "idnumber": "" },
-            { "id": 4, "fullname": "Luke Cage", "idnumber": "0123456" },
+            { "id": 4, "fullname": "Luke Cage", "idnumber": "0123456" }
         ],
         "mregs": [
             { "id": 5, "fullname": "Barry Allen", "idnumber": "-" },
-            { "id": 6, "fullname": "Bruce Banner", "idnumber": "-" },
+            { "id": 6, "fullname": "Bruce Banner", "idnumber": "-" }
         ],
-        "mregs": [
+        "queued": [
             { "id": 7, "fullname": "Barry Allen", "idnumber": "-", "rank": "1" },
-            { "id": 8, "fullname": "Bruce Banner", "idnumber": "-", "rank": "2" },
+            { "id": 8, "fullname": "Bruce Banner", "idnumber": "-", "rank": "2" }
         ]
     }
 
 }}
-<div class="showmembersoverlay" role="tooltip" aria-describedby="{{id}}">
+<div class="showmembersoverlay" role="tooltip">
     <table>
         <thead>
             <tr>
@@ -86,7 +86,7 @@
             </tr>{{/mregs}}
             {{! NO REGISTRATIONS }}{{^absregs}}{{^gtregs}}{{^mregs}}<tr class="regentry reg">
                 <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_registrations">{{!
-                    }}{{# str }} no_registrations, mod_grouptool {{/ str }}<{{!
+                    }}{{# str }} no_registrations, mod_grouptool {{/ str }}{{!
                 }}</td>
             </tr>{{/mregs}}{{/gtregs}}{{/absregs}}{{! END OF NO REGISTRATIONS }}
         </tbody>
