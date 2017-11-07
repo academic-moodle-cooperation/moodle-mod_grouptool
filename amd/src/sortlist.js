@@ -39,8 +39,8 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Change the checked checkboxes due to action in checkbox-controller!
      *
-     * @param e Event object
-     * @param newstate select|deselect|toggle
+     * @param {Event} e Event object
+     * @param {string} newstate select|deselect|toggle
      */
     Sortlist.prototype.updateCheckboxes = function(e, newstate) {
 
@@ -82,8 +82,8 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Start of dragging!
      *
-     * @param e Event object
-     * @param ui Jquery UI instance
+     * @param {Event} e Event object
+     * @param {object} ui Jquery UI instance
      */
     Sortlist.prototype.dragStartHandler = function(e, ui) {
         // Get our drag object!
@@ -95,7 +95,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * End of drag!
      *
-     * @param e Event object
+     * @param {Event} e Event object
      */
     Sortlist.prototype.dragEndHandler = function(e) {
         // Set the hidden fields containing the sort order new!
@@ -153,21 +153,25 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                             });
                         }, autoFadeOut);
                     });
+
+                    return this;
                 }).fail(notif.exception);
-            });
+
+                return this;
+            }).fail(notif.exception);
         }
     };
 
     /**
      * Move the element 1 position down!
      *
-     * @param e Event object
+     * @param {Event} e Event object
      */
     Sortlist.prototype.moveDown = function(e) {
         // Swap sort-order-values!
-        e.target = $(e.target);
-        var nodeA = e.target.closest('.mod_grouptool_sortlist_entry');
-        var nodeB = e.target.closest('.mod_grouptool_sortlist_entry').next('.mod_grouptool_sortlist_entry');
+        var target = $(e.target);
+        var nodeA = target.closest('.mod_grouptool_sortlist_entry');
+        var nodeB = target.closest('.mod_grouptool_sortlist_entry').next('.mod_grouptool_sortlist_entry');
         var thisOrder = nodeA.data('order');
         var otherOrder = nodeB.data('order');
 
@@ -194,19 +198,21 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(thisOrder);
                 log.info(result.message);
             }
-        });
+
+            return this;
+        }).fail(notif.exception);
     };
 
     /**
      * Move the element 1 position up!
      *
-     * @param e Event object
+     * @param {Event} e Event object
      */
     Sortlist.prototype.moveUp = function(e) {
         // Swap sort-order-values!
-        e.target = $(e.target);
-        var nodeA = e.target.closest('.mod_grouptool_sortlist_entry');
-        var nodeB = e.target.closest('.mod_grouptool_sortlist_entry').prev('.mod_grouptool_sortlist_entry');
+        var target = $(e.target);
+        var nodeA = target.closest('.mod_grouptool_sortlist_entry');
+        var nodeB = target.closest('.mod_grouptool_sortlist_entry').prev('.mod_grouptool_sortlist_entry');
 
         var thisOrder = nodeA.data('order');
         var otherOrder = nodeB.data('order');
@@ -234,7 +240,9 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 nodeB.find('input[name="order[' + nodeB.data('id') + ']"]').val(thisOrder);
                 log.info(result.message);
             }
-        });
+
+            return this;
+        }).fail(notif.exception);
     };
 
     var instance = new Sortlist();
@@ -242,7 +250,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
     /**
      * Initializer
      *
-     * @param cmid
+     * @param {int} cmid
      */
     instance.initializer = function(cmid) {
 
@@ -259,9 +267,9 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
             helper: 'clone',
             axis: 'y',
             start: instance.dragStartHandler,
-            stop: function(e, ui) {
+            stop: function(e) {
                 e.data = instance;
-                instance.dragEndHandler(e, ui);
+                instance.dragEndHandler(e);
             }
         });
         // Enable the drag-symbols when JS is enabled :)!

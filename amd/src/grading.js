@@ -43,7 +43,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
     /**
      * Updates the groups according to selected groupings
      *
-     * @param e
+     * @param {Event} e Event object
      */
     Grading.prototype.updateGroups = function(e) {
         var groupingid = 0;
@@ -74,9 +74,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
 
                 if (!data.error) {
                     var options = '';
-                    var oldsel = -1;
-
-                    oldsel = $(e.data.SELECTORS.GROUPSELECT).val();
+                    var oldsel = $(e.data.SELECTORS.GROUPSELECT).val();
 
                     for (var i = 0; i < data.length; i++) {
                         if ($(e.data.SELECTORS.GROUPSELECT).filter(' option[value="' + data[i].id + '"]')
@@ -105,22 +103,23 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
     /**
      * Initializer
      *
-     * @param params
+     * @param {object} params
      */
     instance.initializer = function(params) {
         instance.contextid = params.contextid;
         $(this.SELECTORS.GROUPINGSELECT).on('change', null, this, instance.updateGroups);
 
-        var selects = $('#grading_form input[name="selected[]"]');
+        var form = $('#grading_form');
+        var selects = form.find('input[name="selected[]"]');
 
-        $('#grading_form').on('click', '.checkboxcontroller a.select_all', function(e) {
+        form.on('click', '.checkboxcontroller a.select_all', function(e) {
             e.stopPropagation();
             e.preventDefault();
 
             // Select all!
             selects.prop('checked', true);
         });
-        $('#grading_form').on('click', '.checkboxcontroller a.select_none', function(e) {
+        form.on('click', '.checkboxcontroller a.select_none', function(e) {
             e.stopPropagation();
             e.preventDefault();
 

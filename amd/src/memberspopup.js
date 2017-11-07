@@ -38,6 +38,10 @@ define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str'
 
     var instance = new Memberspopup();
 
+    /**
+     * Initializes the JS module
+     * @param {object} config
+     */
     instance.initializer = function(config) {
 
         instance.showidnumber = config.showidnumber;

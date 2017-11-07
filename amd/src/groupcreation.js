@@ -45,13 +45,12 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
             MORELESSTOGGLER: 'moreless-toggler',
             SHOWLESS: 'moreless-less'
         };
-        this.fromtomode = -1;
     };
 
     /**
      * Adds a tag
      *
-     * @param e
+     * @param {Event} e Event object
      */
     Groupcreation.prototype.addTag = function(e) {
         log.info('Add tag...', 'grouptool');
@@ -62,9 +61,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
 
         var node = $(e.target);
 
-        var tag = '';
-
-        tag = node.data('nametag');
+        var tag = node.data('nametag');
 
         var content = targetfield.val();
         var caretPos = targetfield[0].selectionStart;
@@ -116,15 +113,16 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
     /**
      * AMD initializer
      *
-     * @param params
+     * @param {object} params
      */
     instance.initializer = function(params) {
         this.fromtomode = params.fromtomode;
 
         log.info('Initialise grouptool group creation js...', 'grouptool');
         // Add JS-Eventhandler for each tag!
-        $('[data-nametag]').on('click', null, this, this.addTag);
-        $('[data-nametag]').css('cursor', 'pointer');
+        var nametag = $('[data-nametag]');
+        nametag.on('click', null, this, this.addTag);
+        nametag.css('cursor', 'pointer');
 
         $('input[name="mode"]').on('change', null, this, this.modechange);
     };

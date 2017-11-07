@@ -1431,10 +1431,9 @@ class mod_grouptool {
 
             $params = ['cmid'       => $this->cm->id,
                        'filter'     => $curfilter,
-                       'filterid'   => $filter,
                        'filterall'  => GROUPTOOL_FILTER_ALL,
                        'globalsize' => $this->grouptool->grpsize,
-                       'usesize'    => $this->grouptool->use_size];
+                       'usesize'    => (bool)$this->grouptool->use_size];
             $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', $params);
         }
     }
