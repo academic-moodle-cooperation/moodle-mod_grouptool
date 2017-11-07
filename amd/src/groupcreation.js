@@ -75,56 +75,17 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, st
         targetfield[0].selectionEnd = postpos;
     };
 
-    /**
-     * Makes advanced fields visible according to certain mode changes
-     *
-     * @param e
-     */
-    Groupcreation.prototype.modechange = function(e) {
-        log.info('Modechange!', 'grouptool');
-        e.target = $(e.target);
-        var fieldset = e.target.closest(e.data.SELECTORS.FIELDSETCONTAINSADVANCED);
-
-        var modevalue = $(e.data.SELECTORS.MODEINPUT).val();
-        if ((parseInt(modevalue) === parseInt(e.data.fromtomode))
-            && !fieldset.find(e.data.SELECTORS.DIVFITEMADVANCED).hasClass(e.data.CSS.SHOW)) {
-            log.info('Make advanced fields visible!', 'grouptool');
-            // Toggle collapsed class.
-            $(e.data.SELECTORS.DIVFITEMADVANCED).toggleClass(e.data.CSS.SHOW);
-            var morelesslink = $(e.data.SELECTORS.MORELESSLINKONLY);
-
-            // Get corresponding hidden variable.
-            var statuselement = $('input[name=mform_showmore_' + fieldset.get('id') + ']');
-            // Invert it and change the link text.
-            if (statuselement.val() === '0') {
-                statuselement.val(1);
-                str.get_string('showless', 'form').done(function(s) {
-                    morelesslink.html(s);
-                }).fail(function(e) {
-                    log.error('Failed getting string showless from form!' + e, 'grouptool');
-                });
-                morelesslink.addClass(e.data.CSS.SHOWLESS);
-            }
-        }
-    };
-
     var instance = new Groupcreation();
 
     /**
      * AMD initializer
-     *
-     * @param {object} params
      */
-    instance.initializer = function(params) {
-        this.fromtomode = params.fromtomode;
-
+    instance.initializer = function() {
         log.info('Initialise grouptool group creation js...', 'grouptool');
         // Add JS-Eventhandler for each tag!
         var nametag = $('[data-nametag]');
         nametag.on('click', null, this, this.addTag);
         nametag.css('cursor', 'pointer');
-
-        $('input[name="mode"]').on('change', null, this, this.modechange);
     };
 
     return instance;

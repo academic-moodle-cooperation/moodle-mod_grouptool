@@ -93,7 +93,7 @@ class groupings_creation_form extends \moodleform {
 
         $mform->addElement('text', 'name', get_string('groupingname', 'group'));
         $mform->setType('name', PARAM_MULTILANG);
-        $mform->disabledif ('name', 'target', 'noteq', '-1');
+        $mform->hideIf ('name', 'target', 'noteq', '-1');
 
         $grp = array();
         $grp[] = $mform->createElement('submit', 'createGroupings', get_string('create_assign_groupings',

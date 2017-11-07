@@ -157,7 +157,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('immediate_reg', (($immediatereg !== false) ? $immediatereg : 0));
         $mform->addHelpButton('immediate_reg', 'immediate_reg', 'grouptool');
-        $mform->disabledif ('immediate_reg', 'allow_reg', 'equal', 1);
+        $mform->hideIf ('immediate_reg', 'allow_reg', 'eq', 0);
 
         $mform->addElement('selectyesno', 'allow_unreg', get_string('allow_unreg', 'grouptool'));
         $allowunreg = get_config('mod_grouptool', 'allow_unreg');
@@ -166,7 +166,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('allow_unreg', (($allowunreg !== false) ? $allowunreg : 0));
         $mform->addHelpButton('allow_unreg', 'allow_unreg', 'grouptool');
-        $mform->disabledif ('allow_unreg', 'allow_reg', 'equal', 1);
+        $mform->hideIf ('allow_unreg', 'allow_reg', 'eq', 0);
 
         $size = array();
         $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'),
@@ -188,8 +188,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setDefault('use_size', (($usesize !== false) ? $usesize : 0));
         $mform->addGroup($size, 'size_grp', get_string('size', 'grouptool'), ' ', false);
         $mform->addHelpButton('size_grp', 'size_grp', 'grouptool');
-        $mform->disabledif ('grpsize', 'use_size', 'notchecked');
-        $mform->disabledif ('grpsize', 'allow_reg', 'equal', 1);
+        $mform->disabledIf ('grpsize', 'use_size', 'notchecked');
+        $mform->hideIf ('size_grp', 'allow_reg', 'eq', 0);
 
         $mform->addElement('checkbox', 'use_individual', get_string('use_individual', 'grouptool'));
         $mform->setType('use_individual', PARAM_BOOL);
@@ -199,8 +199,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('use_individual', (($useindividual !== false) ? $useindividual : 0));
         $mform->addHelpButton('use_individual', 'use_individual', 'grouptool');
-        $mform->disabledif ('use_individual', 'allow_reg', 'equal', 1);
-        $mform->disabledif ('use_individual', 'use_size', 'notchecked');
+        $mform->hideIf ('use_individual', 'allow_reg', 'eq', 0);
+        $mform->hideIf ('use_individual', 'use_size', 'notchecked');
 
         /*
          * ---------------------------------------------------------------------
@@ -229,7 +229,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('use_queue', (($usequeue !== false) ? $usequeue : 0));
         if ($queues <= 0) {
-            $mform->disabledIf('use_queue', 'allow_reg', 'equal', 1);
+            $mform->hideIf('use_queue', 'allow_reg', 'eq', 0);
         }
 
         $queue = array();
@@ -250,11 +250,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->addHelpButton('users_queues_grp', 'users_queues_limit', 'grouptool');
         if ($queues <= 0) {
-            $mform->disabledIf('users_queues_limit', 'use_queue', 'notchecked');
             $mform->disabledIf('users_queues_limit', 'limit_users_queues', 'notchecked');
+            $mform->hideIf('users_queues_grp', 'use_queue', 'notchecked');
         }
-        $mform->disabledIf('users_queues_limit', 'allow_reg', 'equal', 1);
-        $mform->disabledIf('limit_users_queues', 'allow_reg', 'equal', 1);
+        $mform->hideIf('users_queues_grp', 'allow_reg', 'eq', 0);
 
         $queue = array();
         $queue[] = $mform->createElement('text', 'groups_queues_limit', '', array('size' => '3'));
@@ -274,11 +273,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->addHelpButton('groups_queues_grp', 'groups_queues_limit', 'grouptool');
         if ($queues <= 0) {
-            $mform->disabledIf('groups_queues_limit', 'use_queue', 'notchecked');
+            $mform->hideIf('groups_queues_grp', 'use_queue', 'notchecked');
             $mform->disabledIf('groups_queues_limit', 'limit_groups_queues', 'notchecked');
         }
-        $mform->disabledIf('groups_queues_limit', 'allow_reg', 'equal', 1);
-        $mform->disabledIf('limit_groups_queues', 'allow_reg', 'equal', 1);
+        $mform->hideIf('groups_queues_grp', 'allow_reg', 'eq', 0);
 
         // Prevent user from unsetting if user is registered in multiple groups!
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
@@ -295,7 +293,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('allow_multiple', (($allowmultiple !== false) ? $allowmultiple : 0));
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
-        $mform->disabledif ('allow_multiple', 'allow_reg', 'eq', 0);
+        $mform->hideIf ('allow_multiple', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            array('size' => '3'));
@@ -305,7 +303,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('choose_min', (($choosemin !== false) ? $choosemin : 1));
-        $mform->disabledif ('choose_min', 'allow_reg', 'eq', 0);
+        $mform->hideIf ('choose_min', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
                            array('size' => '3'));
@@ -315,13 +313,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('choose_max', (($choosemax !== false) ? $choosemax : 1));
-        $mform->disabledif ('choose_max', 'allow_reg', 'eq', 0);
+        $mform->hideIf ('choose_max', 'allow_reg', 'eq', 0);
 
         if ($maxregs > 1) {
             $mform->freeze('allow_multiple');
         } else {
-            $mform->disabledif ('choose_max', 'allow_multiple', 'notchecked');
-            $mform->disabledif ('choose_min', 'allow_multiple', 'notchecked');
+            $mform->hideIf ('choose_max', 'allow_multiple', 'notchecked');
+            $mform->hideIf ('choose_min', 'allow_multiple', 'notchecked');
         }
         /*
          * ---------------------------------------------------------
