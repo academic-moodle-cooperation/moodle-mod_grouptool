@@ -36,6 +36,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// TODO split tabs in different PHP files and define it only when really needed (=import-tab, needed for progress bar)!
+// @codingStandardsIgnoreLine
+if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')) {
+    // @codingStandardsIgnoreLine
+    define('NO_OUTPUT_BUFFERING', true);
+// @codingStandardsIgnoreLine
+}
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
