@@ -183,7 +183,7 @@ $string['error_activating_group'] = 'Fehler beim Aktivieren der Gruppe {$a->grou
 $string['error_at'] = 'Fehler bei';
 $string['error_deactivating_group'] = 'Fehler beim Deaktivieren der Gruppe {$a->groupid} in der Gruppenverwaltung {$a->grouptoolid}!';
 $string['error_getting_data'] = 'Fehler beim Auslesen der Gruppendaten! Entweder keine oder mehrere Gruppen wurden zurückgegeben!';
-$string['error_saving_new_order'] = 'Fehler, beim speichern der neuen Reihenfolge für Gruppen: {$a}';
+$string['error_saving_new_order'] = 'Fehler, beim Speichern der neuen Reihenfolge für Gruppen: {$a}';
 $string['eventagrpcreated'] = 'Aktive Gruppe erstellt';
 $string['eventagrpdeleted'] = 'Aktive Gruppe gelöscht';
 $string['eventagrpsupdated'] = 'Aktive Gruppen aktualisiert';
@@ -197,7 +197,7 @@ $string['eventqueueentrycreated'] = 'Warteschlangeneintrag erstellt';
 $string['eventqueueentrydeleted'] = 'Warteschlangeneintrag gelöscht';
 $string['eventregistrationcreated'] = 'Anmeldung erstellt';
 $string['eventregistrationdeleted'] = 'Anmeldung gelöscht';
-$string['eventregistrationpushstarted'] = 'Registierungsübertragung gestartet';
+$string['eventregistrationpushstarted'] = 'Registrierungsübertragung gestartet';
 $string['eventuserimported'] = 'Nutzer/innen importiert';
 $string['eventusermoved'] = 'Teilnehmer/in verschoben';
 $string['eventuserlistexported'] = 'Exportierte Teilnehmer/innenliste';
@@ -369,7 +369,7 @@ $string['messageprovider:grouptool_moveupreg'] = 'Anmeldung durch Nachrücken in
 $string['missing_source_selection'] = 'Keine Quelle ausgewählt!';
 $string['modulename'] = 'Gruppenverwaltung';
 $string['modulenameplural'] = 'Gruppenverwaltungen';
-$string['modulename_help'] = 'Die Gruppenverwaltung umfasst mehrere Aufgabenbereiche in Verbindung mit Gruppen:<ul><li>Sie erlaubt es Gruppen auf verschiedene Art und Weise (Angabe von Anzahl an Gruppen/Gruppenmitgliedern, 1-Personen-Gruppen) sowie Gruppierungen für jede Kursgruppe zu erzeugen.</li><li>Weiters kann sie benutzt werden um es Teilnehmer/innen zu ermöglichen sich selbst innerhalb eines gewissen Zeitraumes zu Gruppen anzumelden.</li><li>Mit ihrere Hilfe lassen sich Gruppenbenotungen durchführen, d.h. eine Aktivitätsbenotung von einem Teilnehmer/einer Teilnehmerin auf andere Gruppenmitglieder zu übertragen.</li><li>Es ist auch möglich Gruppen schnell zu befüllen, indem Nutzer/innen mittels Liste mit Matrikelnummern in eine bestimmmte Gruppe importiert werden.</li><li>Überblick über alle Gruppen sowie deren Anmeldungen/Wartelisten/etc in verschiedene Formate (PDF/XLSX/ODS/TXT) exportierbar.</li><li>Exportierbare Liste aller im Kurs eingeschriebener Teilnehmer/innen mit ihren Gruppenanmeldungen, Wartelistenplätzen, etc. (ebenfalls exportierbar).</li></ul><p>(!) Beachten Sie, dass die Gruppen der Gruppenverwaltung sich grundlegend von den Moodle Standardgruppen des Kurses unterscheiden. Um Konsistenz zwischen den Standardgruppen und den Gruppenverwaltungsgruppen zu bewahren, stellen Sie alle Parameter unter dem Abschnitt „Verhalten bei Änderungen in Moodle-Gruppen“ mit Hilfe des Drop Down Menüs auf „Folge Änderungen“ ein.</p>';
+$string['modulename_help'] = 'Die Gruppenverwaltung umfasst mehrere Aufgabenbereiche in Verbindung mit Gruppen:<ul><li>Sie erlaubt es Gruppen auf verschiedene Art und Weise (Angabe von Anzahl an Gruppen/Gruppenmitgliedern, 1-Personen-Gruppen) sowie Gruppierungen für jede Kursgruppe zu erzeugen.</li><li>Weiters kann sie benutzt werden um es Teilnehmer/innen zu ermöglichen sich selbst innerhalb eines gewissen Zeitraumes zu Gruppen anzumelden.</li><li>Mit ihrer Hilfe lassen sich Gruppenbenotungen durchführen, d.h. eine Aktivitätsbenotung von einem Teilnehmer/einer Teilnehmerin auf andere Gruppenmitglieder zu übertragen.</li><li>Es ist auch möglich Gruppen schnell zu befüllen, indem Nutzer/innen mittels Liste mit Matrikelnummern in eine bestimmte Gruppe importiert werden.</li><li>Überblick über alle Gruppen sowie deren Anmeldungen/Wartelisten/etc in verschiedene Formate (PDF/XLSX/ODS/TXT) exportierbar.</li><li>Exportierbare Liste aller im Kurs eingeschriebener Teilnehmer/innen mit ihren Gruppenanmeldungen, Wartelistenplätzen, etc. (ebenfalls exportierbar).</li></ul><p>(!) Beachten Sie, dass die Gruppen der Gruppenverwaltung sich grundlegend von den Moodle Standardgruppen des Kurses unterscheiden. Um Konsistenz zwischen den Standardgruppen und den Gruppenverwaltungsgruppen zu bewahren, stellen Sie alle Parameter unter dem Abschnitt „Verhalten bei Änderungen in Moodle-Gruppen“ mit Hilfe des Drop Down Menüs auf „Folge Änderungen“ ein.</p>';
 $string['moodlesync'] = 'Verhalten bei Änderungen in Moodle-Gruppen';
 $string['moodlesync_help'] = 'Wie sich die Gruppenverwaltung verhalten soll, wenn Gruppenmitglieder/Gruppen in Moodle hinzugefügt/entfernt werden';
 $string['movedown'] = 'Nach unten verschieben';
@@ -387,7 +387,7 @@ $string['namingscheme_help'] = '<p>Das Namensschema definiert, wie Gruppen beim 
 <p>Hierbei ist folgendes zu beachten:<br />
 <ol><li>Der Gruppenname muss immer einzigartig in Ihrem Kurs sein (d.h. es können nicht mehrere Gruppen idente Namen tragen).</li>
 <li>Sollen mehrere Gruppen hinzugefügt werden, müssen zwingend "Tags" verwendet werden, die die Gruppen eindeutig bezeichnen.</li></ol></p>
-<p>Jeder "Tag" wird für die Gruppennamen durch Telnehmer/innen-Informationen ersetzt. Die Tags in [] sind mit Teilnehmer/innen-Daten verknüpft und die # und @ werden durch eine laufende Nummer bzw. alphabetische Repräsentation dieser ersetzt. Wenn JavaScript aktiviert ist, können Sie durch Klicken auf die Tags, diese dem Namensschema anhängen. Bitte beachten Sie, dass jeder Gruppenname innerhalb des Kurses einzigartig sein muss und ändern Sie bei entsprechenden Problemen das Namensschema!</p>';
+<p>Jeder "Tag" wird für die Gruppennamen durch Teilnehmer/innen-Informationen ersetzt. Die Tags in [] sind mit Teilnehmer/innen-Daten verknüpft und die # und @ werden durch eine laufende Nummer bzw. alphabetische Repräsentation dieser ersetzt. Wenn JavaScript aktiviert ist, können Sie durch Klicken auf die Tags, diese dem Namensschema anhängen. Bitte beachten Sie, dass jeder Gruppenname innerhalb des Kurses einzigartig sein muss und ändern Sie bei entsprechenden Problemen das Namensschema!</p>';
 $string['number_of_groups'] = 'Gruppenanzahl N';
 $string['number_of_members'] = 'Mitgliederanzahl M';
 $string['no_conflictfree_to_display'] = 'Keine konfliktfreien Gruppen anzuzeigen. Stattdessen alle angezeigt!';
