@@ -1,9 +1,17 @@
 CHANGELOG
 =========
-3.4-dev
+3.4.0 (2018-01-10)
 ------------------
 
-*
+* Moodle 3.4 compatible version
+* pin node version to 8.9 in travis.yml
+* [UPDATE] #4845 fix some JS (coding style, etc.)
+* [UPDATE] #4843 hide currently unused form elements instead of disabling them
+* [FIXED] wrong color mentioned in help string
+* [UPDATE] #4843 updated checkboxcontroller styling
+* [FIXED] #5055 some typos in german lang strings (also in AMOS)
+* [FIXED] #5057 disabled output buffering and compression on a page with progress bar
+* [UPDATE] improve usability of self registration tab by expanding groups-fieldset by default
 
 
 3.3.2 (2017-10-10)
