@@ -4530,6 +4530,7 @@ class mod_grouptool {
             $groups = $this->get_active_groups();
 
             $mform->addElement('header', 'groups', get_string('groups'));
+            $mform->setExpanded('groups');
 
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
