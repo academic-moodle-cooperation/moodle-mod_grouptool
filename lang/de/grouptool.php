@@ -132,8 +132,8 @@ $string['choose_min_max_text'] = 'Sie müssen zwischen <span style="font-weight:
 $string['choose_targetgroup'] = 'Import in Gruppe';
 $string['chooseactivity'] = 'Sie müssen eine Aktivität auswählen, bevor Daten angezeigt werden können!';
 $string['create_1_person_groups'] = '1-Personen-Gruppen erstellen';
-$string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89), <strong>ohne automatische Zuordnung</strong> von Mitglieder';
-$string['create_n_m_groups'] = 'N Gruppen mit M Mitgliedern erstellen, <strong>ohne automatische Zuordnung</strong> von Mitglieder';
+$string['create_fromto_groups'] = 'Gruppen von X bis Y erstellen (z.B. von 34 bis 89), <strong>ohne automatische Zuordnung</strong> von Mitgliedern';
+$string['create_n_m_groups'] = 'N Gruppen mit M Mitgliedern erstellen, <strong>ohne automatische Zuordnung</strong> von Mitgliedern';
 $string['createGroups'] = 'Gruppen erstellen';
 $string['createGroupings'] = 'Gruppierungen erstellen/zuweisen';
 $string['create_assign_groupings'] = 'Gruppierungen erstellen/zuweisen';
