@@ -2705,7 +2705,7 @@ class mod_grouptool {
                 groups_add_member($groupdata->id, $newrecord->userid);
             }
             $allowm = $this->grouptool->allow_multiple;
-            $usrregcnt = $this->get_user_reg_count(0, $newrecord->userid);
+            $usrregcnt = $this->get_user_reg_count($newrecord->userid);
             $max = $this->grouptool->choose_max;
             if (($allowm && ( $usrregcnt >= $max) ) || !$allowm) {
                 $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
@@ -3498,7 +3498,7 @@ class mod_grouptool {
          * otherwise display an info and remove marked entry. */
         $usermarks = $this->get_user_marks($userid);
 
-        $queues = $this->get_user_queues_count(0, $userid);
+        $queues = $this->get_user_queues_count($userid);
         $queueswithmarks = $queues;
         foreach ($usermarks as $cur) {
             if ($cur->type != 'reg') {
@@ -3518,7 +3518,7 @@ class mod_grouptool {
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
-        $userregs = $this->get_user_reg_count(0, $userid);
+        $userregs = $this->get_user_reg_count($userid);
         $marks = $this->count_user_marks($userid);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
@@ -3608,8 +3608,8 @@ class mod_grouptool {
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // Check if enough (queue) places are available, otherwise display an info and remove marked entry.
-        $userregs = $this->get_user_reg_count($this->grouptool->id, $userid);
-        $queues = $this->get_user_queues_count($this->grouptool->id, $userid);
+        $userregs = $this->get_user_reg_count($userid);
+        $queues = $this->get_user_queues_count($userid);
         $marks = $this->count_user_marks($userid);
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
@@ -3679,16 +3679,12 @@ class mod_grouptool {
     /**
      * returns number of queue-entries for a particular user in a particular grouptool-instance
      *
-     * @param int $grouptoolid optional stats from which grouptool-instance should be obtained?
-     *                                  uses this->grouptool->id if zero
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
      * @return int count of queues in specified instance for specified user
      */
-    protected function get_user_queues_count($grouptoolid=0, $userid=0) {
+    protected function get_user_queues_count($userid=0) {
         global $DB, $USER;
-        if (empty($grouptoolid)) {
-            $grouptoolid = $this->grouptool->id;
-        }
+
         if (empty($userid)) {
             $userid = $USER->id;
         }
@@ -3710,17 +3706,12 @@ class mod_grouptool {
     /**
      * returns number of reg-entries for a particular user in a particular grouptool-instance
      *
-     * @param int $grouptoolid optional stats from which grouptool-instance should be obtained?
-     *                                  uses this->grouptool->id if zero
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
      * @return int count of queues in specified instance for specified user
      */
-    protected function get_user_reg_count($grouptoolid=0, $userid=0) {
+    protected function get_user_reg_count($userid=0) {
         global $DB, $USER;
 
-        if (empty($grouptoolid)) {
-            $grouptoolid = $this->grouptool->id;
-        }
         if (empty($userid)) {
             $userid = $USER->id;
         }
@@ -3908,15 +3899,8 @@ class mod_grouptool {
         // Trigger event!
         \mod_grouptool\event\dequeuing_started::create_from_object($this->cm)->trigger();
 
-        if (empty($grouptoolid)) {
-            $grouptoolid = $this->grouptool->id;
-            $grouptool = $this->grouptool;
-            $context = $this->context;
-        } else {
-            $cmid = get_coursemodule_from_instance('grouptool', $grouptoolid);
-            $grouptool = $DB->get_record('grouptool', array('id' => $grouptoolid), '*', MUST_EXIST);
-            $context = context_module::instance($cmid->id);
-        }
+        $grouptool = $this->grouptool;
+        $context = $this->context;
 
         require_capability('mod/grouptool:register_students', $context);
 
