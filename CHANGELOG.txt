@@ -1,5 +1,14 @@
 CHANGELOG
 =========
+3.4.1 (2018-03-14)
+------------------
+
+* [FIXED] #5280 users were not promoted from queue to registered when certain ways of unregistereing were used
+* [FIXED] #5281 queues were not resolved, due to the code just calling the preview instead of doing anything
+* [FIXED] #5226 fixed 2 german lang strings missing an 'n' at the end
+* [CHANGED] #5282 messages about user movements when resolving queues were improved
+
+
 3.4.0 (2018-01-10)
 ------------------
 
