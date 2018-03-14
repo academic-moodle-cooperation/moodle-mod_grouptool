@@ -3163,6 +3163,7 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
+     * @throws dml_exception
      * @return string success message
      */
     protected function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
@@ -3196,9 +3197,9 @@ class mod_grouptool {
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1", array($this->grouptool->id));
         list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
-        $userregs = $DB->count_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
+        $userregs = $DB->get_records_select('grouptool_registered', "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql,
                                               $params);
-        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
+        $userqueues = $DB->get_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql, $params);
         if ($oldagrpid !== null) {
             $sql = "SELECT queued.*, agrp.groupid
                       FROM {grouptool_queued} queued
@@ -3210,6 +3211,8 @@ class mod_grouptool {
                 $DB->delete_records('grouptool_queued', array('id' => $queue->id));
                 // Trigger the event!
                 \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $queue);
+                // Let other queued be promoted to registered status!
+                $this->fill_from_queue($queue->agrpid);
             }
             $sql = "SELECT reg.*, agrp.groupid
                       FROM {grouptool_registered} reg
@@ -3224,8 +3227,10 @@ class mod_grouptool {
                 }
                 // Trigger the event!
                 \mod_grouptool\event\registration_deleted::create_direct($this->cm, $reg);
+                // Let other queued be promoted to registered status!
+                $this->fill_from_queue($reg->agrpid);
             }
-        } else if ($userqueues == 1) {
+        } else if (count($userqueues) == 1) {
             // Delete his queue!
             $queues = $DB->get_records_sql("SELECT queued.*, agrp.groupid
                                               FROM {grouptool_queued} queued
@@ -3235,8 +3240,11 @@ class mod_grouptool {
             foreach ($queues as $cur) {
                 // Trigger the event!
                 \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur);
+
+                // Let other queued be promoted to registered status!
+                $this->fill_from_queue($cur->agrpid);
             }
-        } else if ($userregs == 1) {
+        } else if (count($userregs) == 1) {
             $oldgrp = $DB->get_field_sql("SELECT agrp.groupid
                                             FROM {grouptool_registered} reg
                                             JOIN {grouptool_agrps} agrp ON agrp.id = reg.agrpid
@@ -3251,6 +3259,9 @@ class mod_grouptool {
             // Trigger the event!
             $reg->groupid = $oldgrp;
             \mod_grouptool\event\registration_deleted::create_direct($this->cm, $reg);
+
+            // Let other queued be promoted to registered status!
+            $this->fill_from_queue($reg->agrpid);
         } else {
             throw new \mod_grouptool\exception\registration(get_string('groupchange_from_non_unique_reg', 'grouptool'));
         }
