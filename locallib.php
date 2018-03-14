@@ -4314,7 +4314,7 @@ class mod_grouptool {
                 }
             } else if ($action == 'resolvequeues') {
                 require_capability('mod/grouptool:register_students', $this->context);
-                list($error, $confirmmessage) = $this->resolve_queues(true); // Try only!
+                list($error, $confirmmessage) = $this->resolve_queues();
                 if ($error == -1) {
                     $error = true;
                 }
