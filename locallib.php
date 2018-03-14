@@ -3890,6 +3890,9 @@ class mod_grouptool {
      *
      * @param bool $previewonly show only preview of actions
      * @return array ($error, $message)
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function resolve_queues($previewonly = false) {
         global $DB, $USER;
@@ -3905,6 +3908,8 @@ class mod_grouptool {
         require_capability('mod/grouptool:register_students', $context);
 
         $agrps = $this->get_active_groups(false, false, 0, 0, 0, false);
+        list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'reg');
+        list($agrpsql2, $params2) = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'queue');
 
         if (!empty($agrps)) {
             $agrpids = array_keys($agrps);
@@ -3956,6 +3961,11 @@ class mod_grouptool {
         $i = 0;
 
         if (!empty($groupsdata) && !empty($queueentries)) {
+            $fullnames = $DB->get_records_sql_menu("SELECT DISTINCT u.id, ".$DB->sql_fullname()."
+                                                  FROM {user} u
+                                             LEFT JOIN {grouptool_queued} q ON q.userid = u.id AND q.agrpid ".$agrpsql2."
+                                             LEFT JOIN {grouptool_registered} r ON r.userid = u.id AND r.agrpid ".$agrpsql."
+                                                 WHERE (r.id IS NOT NULL OR q.id IS NOT NULL)", $params + $params2);
             $planned = new stdClass();
             $curgroup = null;
             $maxregs = !empty($this->grouptool->allow_multiple) ? $this->grouptool->choose_max : 1;
@@ -3963,8 +3973,7 @@ class mod_grouptool {
             $message = new stdClass();
             foreach ($queueentries as $queue) {
                 // Get first non-full group!
-                while (($curgroup == null)
-                       ||($curgroup->grpsize <= $curgroup->registered)) {
+                while (($curgroup == null) || ($curgroup->grpsize <= $curgroup->registered)) {
                     if ($curgroup === null) {
                         $curgroup = current($groupsdata);
                     } else {
@@ -4031,8 +4040,10 @@ class mod_grouptool {
                         $class = $curerror ? 'error' : 'success';
                         $data = new stdClass();
                         $data->userid = $queue->userid;
+                        $data->user = $fullnames[$queue->userid];
                         $data->agrpid = $queue->agrpid;
-                        $data->current_grp = $curgroup->id;
+                        $data->to_group = groups_get_group_name($curgroup->groupid);
+                        $data->from_group = groups_get_group_name($groupsdata[$queue->agrpid]->groupid);
                         $data->current_text = $curtext;
                         $movetext = get_string('user_move_prev', 'grouptool', $data);
                         $returntext .= html_writer::tag('div', $movetext, array('class' => $class));
@@ -4054,8 +4065,10 @@ class mod_grouptool {
                         $class = $curerror ? 'error' : 'success';
                         $data = new stdClass();
                         $data->userid = $queue->userid;
+                        $data->user = $fullnames[$queue->userid];
                         $data->agrpid = $queue->agrpid;
-                        $data->current_grp = $curgroup->id;
+                        $data->to_group = groups_get_group_name($curgroup->groupid);
+                        $data->from_group = groups_get_group_name($groupsdata[$queue->agrpid]->groupid);
                         $data->current_text = $curtext;
                         $movedtext = get_string('user_moved', 'grouptool', $data);
                         $returntext .= html_writer::tag('div', $movedtext, array('class' => $class));
