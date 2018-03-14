@@ -1794,7 +1794,7 @@ class mod_grouptool {
                             unset($radioattr['disabled']);
                             $radioattr['type'] = 'hidden';
                             $gradeinfocont .= html_writer::empty_tag('input', $radioattr);
-                        } else if (count($userwithgrades > 1)) {
+                        } else if (count($userwithgrades) > 1) {
                             $gradeinfocont = html_writer::empty_tag('input', $radioattr);
                         }
                         $gradeinfocont .= ' '.fullname($groupmembers[$key])." (".$finalgrade->formatted_grade;
