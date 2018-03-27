@@ -2932,8 +2932,6 @@ class mod_grouptool {
     protected function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
         global $USER, $DB;
 
-        $grouptool = $this->grouptool;
-
         if (empty($userid)) {
             $userid = $USER->id;
             require_capability('mod/grouptool:register', $this->context);
@@ -3981,7 +3979,8 @@ class mod_grouptool {
                     }
                     if ($curgroup === false) {
                         $error = true;
-                        $returntext .= html_writer::tag('div', get_string('all_groups_full', 'grouptool', $queue->userid),
+                        $username = $DB->get_field('user', $DB->sql_fullname('firstname', 'lastname'), ['id' => $queue->userid]);
+                        $returntext .= html_writer::tag('div', get_string('all_groups_full', 'grouptool', $username),
                                                         array('class' => 'error'));
                         return array($error, $returntext);
                     } else {

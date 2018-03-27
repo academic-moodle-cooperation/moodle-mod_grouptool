@@ -35,7 +35,7 @@ $string['administration'] = 'Administration';
 $string['administration_alt'] = 'Group(ing) creation, and settings for active groups of this instance';
 $string['agroups'] = 'Active groups';
 $string['ajax_edit_size_help'] = 'Save new size with &lt;Enter&gt;, use &lt;ESC&gt; to get abort, leave empty to delete individual size';
-$string['all_groups_full'] = 'User with ID {$a} could not be registered in any group because all groups are full!';
+$string['all_groups_full'] = '{$a} could not be registered in any group because all groups are full!';
 $string['allowed'] = 'Allowed';
 $string['allow_multiple'] = 'Multiple registrations';
 $string['allow_multiple_help'] = 'Enable students to register in more than 1 group at the same time. You have to specify how many groups they have to choose at least (= minimum groups to choose) and how many groups they are allowed to choose maximum (= maximum groups to choose).';
