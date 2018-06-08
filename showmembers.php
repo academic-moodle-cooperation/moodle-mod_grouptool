@@ -143,7 +143,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     }
 
     // This will call the function to load and render our template.
-    $class = 'col-xs-12 offset-xs-0 col-lg-8 offset-lg-2';
+    $class = 'col-12 offset-0 col-xl-8 offset-xl-2';
     echo $OUTPUT->box($OUTPUT->render_from_template('mod_grouptool/groupmembers', $context), $class);
 }
 

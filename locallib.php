@@ -1460,6 +1460,8 @@ class mod_grouptool {
                 require_capability('mod/grouptool:create_groups', $this->context);
                 // Create groups!
                 $data = $SESSION->grouptool->view_administration;
+                $error = false;
+                $preview = '';
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1545,6 +1547,17 @@ class mod_grouptool {
                         }
                         list($error, $preview) = $this->create_fromto_groups($data);
                         break;
+                }
+                if (!$error && has_capability('mod/grouptool:administrate_groups', $this->context)) {
+                    $linktext = '<i class="fa fa-long-arrow-right" aria-hidden="true"></i>' .
+                            get_string('group_administration', 'grouptool');
+                    $urlparams = [
+                            'id' => $this->cm->id,
+                            'tab' => 'group_admin'
+                    ];
+                    $preview .= html_writer::link(new moodle_url('/mod/grouptool/view.php', $urlparams), $linktext, [
+                            'class' => 'ml-1'
+                    ]);
                 }
                 $preview = $OUTPUT->notification($preview, $error ? 'error' : 'info');
                 echo $OUTPUT->box(html_writer::tag('div', $preview, array('class' => 'centered')),
