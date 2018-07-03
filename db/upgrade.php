@@ -519,6 +519,16 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2017080900, 'grouptool');
     }
 
+    if ($oldversion < 2018060100) {
+        // TODO version number!
+        // Replace unprefixed user preference mygroups_only with mod_grouptool_mygroups_only!
+        $select = 'name LIKE "mygroups_only"';
+        $DB->set_field_select('user_preferences', 'name', 'mod_grouptool_mygroups_only', $select);
+
+        // Checkmark savepoint reached.
+        upgrade_mod_savepoint(true, 2018060100, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

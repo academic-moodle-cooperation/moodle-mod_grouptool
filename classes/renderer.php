@@ -41,8 +41,9 @@ class renderer extends \plugin_renderer_base {
     /**
      * Render a sortable list of groups with some additional controls
      *
-     * @param \mod_grouptool\sortlist $sortlist Sortlist to render
-     * @return string
+     * @param sortlist $sortlist Sortlist to render
+     * @return bool|string
+     * @throws \moodle_exception
      */
     public function render_sortlist(sortlist $sortlist) {
         global $PAGE, $OUTPUT;
@@ -58,7 +59,7 @@ class renderer extends \plugin_renderer_base {
             if (!empty($group->groupings)) {
                 $sortlist->groups[$id]->groupingids = array_keys($group->groupings);
             } else {
-                $sortlist->groups[$id]->groupingids = array();
+                $sortlist->groups[$id]->groupingids = [];
             }
             $sortlist->groups[$id]->id = $id;
             $sortlist->groups[$id]->order = !empty($group->order) ? $group->order : 999999;
@@ -67,7 +68,7 @@ class renderer extends \plugin_renderer_base {
         $context = new stdClass();
         $context->usesize = $sortlist->usesize;
         $context->pageurl = $PAGE->url->out();
-        $url = new \moodle_url('/course/modedit.php', array('update' => $sortlist->cm->id, 'return' => 1));
+        $url = new \moodle_url('/course/modedit.php', ['update' => $sortlist->cm->id, 'return' => 1]);
         $context->courseediturl = $url->out();
         $statushelpicon = new \help_icon('groupstatus', 'grouptool');
         $context->statushelpicon = $statushelpicon->export_for_template($OUTPUT);
@@ -75,7 +76,7 @@ class renderer extends \plugin_renderer_base {
 
         $html = $OUTPUT->render_from_template('mod_grouptool/sortlist', $context);
 
-        $PAGE->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', array($sortlist->cm->id));
+        $PAGE->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', [$sortlist->cm->id]);
 
         return $html;
     }
