@@ -109,9 +109,9 @@ $string['change_group_to_success'] = 'Group-change successful! {$a->username} is
 $string['you_change_group_to_success'] = 'Group-change successful! You are now registered in group {$a->groupname}!';
 $string['changes_saved'] = 'Changes saved';
 $string['checkbox_control_header'] = 'De-/select groups and groupings';
-$string['checkbox_control_header_help'] = '<p>By using this function you can activate/ deactivate groups of one or more groupings within your grouptool:
+$string['checkbox_control_header_help'] = '<p>By using this function you can activate/deactivate groups of one or more groupings within your grouptool:
     <ol>
-        <li>Choose in the multiple-select field "All" (all available groups will be activated/deactivated), one grouping or several groupings (by using Ctrl + Click).</li>
+        <li>Choose in the multiple-select field "All" (all available groups will be activated/deactivated), one grouping or several groupings (by switching to multiselect using the small icon next to it and using Ctrl + Click).</li>
         <li>Use one of the following options "Select/ Deselect/ Invert":
             <ul>
                 <li><b>Select:</b> The groups of the chosen grouping(s) will be activated.</li>
@@ -508,6 +508,8 @@ $string['search:activity'] = 'Grouptool - activity information';
 $string['selected'] = 'Selected';
 $string['select'] = 'Select';
 $string['selectfromcohort'] = 'Select members from cohort';
+$string['selectmultiple'] = 'select multiple';
+$string['selectsingle'] = 'select single';
 $string['selfregistration'] = 'Registration';
 $string['selfregistration_alt'] = 'Register to one or more groups (depending on settings)';
 $string['setactive'] = 'Activate';

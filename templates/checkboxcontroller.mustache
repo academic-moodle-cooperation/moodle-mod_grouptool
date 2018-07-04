@@ -41,33 +41,31 @@
     }
 
 }}
-<div>
-    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-        <label for="classes[]" class="form-check">{{!
-            }}{{#str}} checkbox_control_header, grouptool {{/str}}{{#helpicon}}{{>core/help_icon}}{{/helpicon}}{{!
+<div class="mod_grouptool_checkboxcontroller">
+    <label for="classes[]" class="form-check-inline">{{!
+        }}{{#str}} checkbox_control_header, grouptool {{/str}}{{#helpicon}}{{>core/help_icon}}{{/helpicon}}{{!
+    }}</label>
+    <div class="btn-group align-items-center">
+        <select name="classes[]" class="custom-select btn-outline-primary">
+            <option value="0" selected>{{# str }} all, core {{/str}}</option>{{#options}}
+            <option value="{{id}}">{{name}}</option>{{/options}}
+        </select>
+    </div>
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label class="nowrap btn btn-outline-primary">{{!
+            }}<input type="radio" name="class_action" id="select" value="select" class="select_all form-check-input" />{{!
+            }}{{# str }} select, mod_grouptool {{/str}}{{!
         }}</label>
-        <div class="btn-group">
-            <select name="classes[]" multiple="multiple" class="form-control btn-outline-primary">
-                <option value="0" selected>{{# str }} all, core {{/str}}</option>{{#options}}
-                <option value="{{id}}">{{name}}</option>{{/options}}
-            </select>
-        </div>
-        <div class="btn-group" data-toggle="buttons">
-            <label class="nowrap btn btn-outline-primary">{{!
-                }}<input type="radio" name="class_action" id="select" value="select" class="select_all form-check-input" />{{!
-                }}{{# str }} select, mod_grouptool {{/str}}{{!
-            }}</label>
-            <label class="nowrap btn btn-outline-primary">{{!
-                }}<input type="radio" name="class_action" id="deselect" value="deselect" class="select_none form-check-input" />{{!
-                }}{{# str }} deselect, mod_grouptool {{/str}}{{!
-            }}</label>
-            <label class="nowrap btn btn-outline-primary">{{!
-                }}<input type="radio" name="class_action" id="toggle" value="toggle" class="toggle_selection form-check-input" />{{!
-                }}{{# str }} invert, mod_grouptool {{/str}}{{!
-            }}</label>
-        </div>
-        <div class="btn-group" data-toggle="buttons">
-            <button name="do_class_action" value="go" class="btn btn-primary">{{# str }} go, core {{/ str }}</button>
-        </div>
+        <label class="nowrap btn btn-outline-primary">{{!
+            }}<input type="radio" name="class_action" id="deselect" value="deselect" class="select_none form-check-input" />{{!
+            }}{{# str }} deselect, mod_grouptool {{/str}}{{!
+        }}</label>
+        <label class="nowrap btn btn-outline-primary">{{!
+            }}<input type="radio" name="class_action" id="toggle" value="toggle" class="toggle_selection form-check-input" />{{!
+            }}{{# str }} invert, mod_grouptool {{/str}}{{!
+        }}</label>
+    </div>
+    <div class="btn-group" data-toggle="buttons">
+        <button name="do_class_action" value="go" class="btn btn-primary">{{# str }} go, core {{/ str }}</button>
     </div>
 </div>

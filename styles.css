@@ -84,13 +84,6 @@
     text-align: left;
 }
 
-.path-mod-grouptool input.select_all,
-.path-mod-grouptool input.select_none,
-.path-mod-grouptool input.toggle_selection {
-    clear: none;
-    margin-left: 1em;
-}
-
 .path-mod-grouptool tr.mod_grouptool_sortlist_entry td {
     -webkit-transition: padding-top, padding-bottom 600ms ease; /* Safari */
     transition: padding-top, padding-bottom 600ms ease;

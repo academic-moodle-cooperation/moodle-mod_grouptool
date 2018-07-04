@@ -286,6 +286,10 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
         // Enhanced checkbox-controller functionality!
         var checkboxControlsAction = $('button[name="do_class_action"]');
         if (checkboxControlsAction) {
+            require(['mod_grouptool/multiseltoggle'], function(toggle) {
+                var select = $('select[name="classes[]"]');
+                toggle.enable(select.get()[0]);
+            });
             checkboxControlsAction.on('click', function(e) {
                 // Get the new state and continue!
                 var newstate = '';
