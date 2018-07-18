@@ -7491,6 +7491,8 @@ class mod_grouptool {
         } else {
             return array_merge([$head], $rows);
         }
+
+        return true;
     }
 
     /**

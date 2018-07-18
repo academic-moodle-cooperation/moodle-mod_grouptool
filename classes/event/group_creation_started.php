@@ -177,6 +177,7 @@ class group_creation_started extends \core\event\base {
                        "' as pattern for the groupnames".$add.".";
             break;
         }
+        return '';
     }
 
     /**

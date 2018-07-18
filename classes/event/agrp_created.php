@@ -99,6 +99,8 @@ class agrp_created extends \core\event\base {
                    $this->data['other']['id']." for '{$this->objecttable}' with the course module id '".
                    $this->contextinstanceid."' for group with id '".$this->data['other']['groupid'].".";
         }
+
+        return '';
     }
 
     /**

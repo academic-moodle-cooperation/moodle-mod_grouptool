@@ -627,8 +627,8 @@ class pdf extends \pdf {
         if ($getheightonly) {
             // Restore previous object!
             $this->rollbackTransaction(true);
-            return $height;
         }
+        return $height;
     }
 
 }

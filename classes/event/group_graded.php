@@ -100,6 +100,8 @@ class group_graded extends \core\event\base {
                        " with course module id '$this->contextinstanceid'.";
             break;
         }
+
+        return '';
     }
 
     /**
