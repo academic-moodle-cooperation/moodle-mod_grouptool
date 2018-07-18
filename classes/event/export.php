@@ -125,7 +125,7 @@ abstract class export extends \core\event\base {
         parent::validate_data();
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The '.$this->get_name().' event must define objectid and object table.');
+            throw new \coding_exception('The '.self::get_name().' event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {

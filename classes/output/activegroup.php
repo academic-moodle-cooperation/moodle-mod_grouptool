@@ -126,7 +126,7 @@ class activegroup {
                                                   LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
                                                       WHERE groupid = ?", [$groupid]);
 
-        return $this->construct_from_obj($obj);
+        return self::construct_from_obj($obj);
     }
 
     /**

@@ -100,20 +100,20 @@ class grouptool_registration_test extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        $this->course = $this->getDataGenerator()->create_course();
+        $this->course = self::getDataGenerator()->create_course();
         $this->teachers = [];
         for ($i = 0; $i < self::DEFAULT_TEACHER_COUNT; $i++) {
-            array_push($this->teachers, $this->getDataGenerator()->create_user());
+            array_push($this->teachers, self::getDataGenerator()->create_user());
         }
 
         $this->editingteachers = [];
         for ($i = 0; $i < self::DEFAULT_EDITING_TEACHER_COUNT; $i++) {
-            array_push($this->editingteachers, $this->getDataGenerator()->create_user());
+            array_push($this->editingteachers, self::getDataGenerator()->create_user());
         }
 
         $this->students = [];
         for ($i = 0; $i < self::DEFAULT_STUDENT_COUNT; $i++) {
-            array_push($this->students, $this->getDataGenerator()->create_user());
+            array_push($this->students, self::getDataGenerator()->create_user());
         }
 
         $this->groups = [];
@@ -140,7 +140,7 @@ class grouptool_registration_test extends advanced_testcase {
 
         $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
         foreach ($this->teachers as $i => $teacher) {
-            $this->getDataGenerator()->enrol_user($teacher->id,
+            self::getDataGenerator()->enrol_user($teacher->id,
                                                   $this->course->id,
                                                   $teacherrole->id);
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $teacher);
@@ -148,7 +148,7 @@ class grouptool_registration_test extends advanced_testcase {
 
         $editingteacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         foreach ($this->editingteachers as $i => $editingteacher) {
-            $this->getDataGenerator()->enrol_user($editingteacher->id,
+            self::getDataGenerator()->enrol_user($editingteacher->id,
                                                   $this->course->id,
                                                   $editingteacherrole->id);
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $editingteacher);
@@ -156,13 +156,13 @@ class grouptool_registration_test extends advanced_testcase {
 
         $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         foreach ($this->students as $i => $student) {
-            $this->getDataGenerator()->enrol_user($student->id,
+            self::getDataGenerator()->enrol_user($student->id,
                                                   $this->course->id,
                                                   $studentrole->id);
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $student);
         }
 
-        $this->setAdminUser();
+        self::setAdminUser();
     }
 
     /**
@@ -175,27 +175,27 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
         $this->extrateachers = [];
         for ($i = 0; $i < self::EXTRA_TEACHER_COUNT; $i++) {
-            array_push($this->extrateachers, $this->getDataGenerator()->create_user());
+            array_push($this->extrateachers, self::getDataGenerator()->create_user());
         }
 
         $this->extraeditingteachers = [];
         for ($i = 0; $i < self::EXTRA_EDITING_TEACHER_COUNT; $i++) {
-            array_push($this->extraeditingteachers, $this->getDataGenerator()->create_user());
+            array_push($this->extraeditingteachers, self::getDataGenerator()->create_user());
         }
 
         $this->extrastudents = [];
         for ($i = 0; $i < self::EXTRA_STUDENT_COUNT; $i++) {
-            array_push($this->extrastudents, $this->getDataGenerator()->create_user());
+            array_push($this->extrastudents, self::getDataGenerator()->create_user());
         }
 
         $this->extrasuspendedstudents = [];
         for ($i = 0; $i < self::EXTRA_SUSPENDED_COUNT; $i++) {
-            array_push($this->extrasuspendedstudents, $this->getDataGenerator()->create_user());
+            array_push($this->extrasuspendedstudents, self::getDataGenerator()->create_user());
         }
 
         $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
         foreach ($this->extrateachers as $i => $teacher) {
-            $this->getDataGenerator()->enrol_user($teacher->id,
+            self::getDataGenerator()->enrol_user($teacher->id,
                                                   $this->course->id,
                                                   $teacherrole->id);
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $teacher);
@@ -203,7 +203,7 @@ class grouptool_registration_test extends advanced_testcase {
 
         $editingteacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         foreach ($this->extraeditingteachers as $i => $editingteacher) {
-            $this->getDataGenerator()->enrol_user($editingteacher->id,
+            self::getDataGenerator()->enrol_user($editingteacher->id,
                                                   $this->course->id,
                                                   $editingteacherrole->id);
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $editingteacher);
@@ -211,7 +211,7 @@ class grouptool_registration_test extends advanced_testcase {
 
         $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         foreach ($this->extrastudents as $i => $student) {
-            $this->getDataGenerator()->enrol_user($student->id,
+            self::getDataGenerator()->enrol_user($student->id,
                                                   $this->course->id,
                                                   $studentrole->id);
             if ($i < (self::EXTRA_STUDENT_COUNT / 2)) {
@@ -220,7 +220,7 @@ class grouptool_registration_test extends advanced_testcase {
         }
 
         foreach ($this->extrasuspendedstudents as $i => $suspendedstudent) {
-            $this->getDataGenerator()->enrol_user($suspendedstudent->id,
+            self::getDataGenerator()->enrol_user($suspendedstudent->id,
                                                   $this->course->id,
                                                   $studentrole->id, 'manual', 0, 0, ENROL_USER_SUSPENDED);
             if ($i < (self::EXTRA_SUSPENDED_COUNT / 2)) {
@@ -241,7 +241,7 @@ class grouptool_registration_test extends advanced_testcase {
     protected function create_instance($params=[]) {
         global $DB;
 
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_grouptool');
+        $generator = self::getDataGenerator()->get_plugin_generator('mod_grouptool');
         $params['course'] = $this->course->id;
         $instance = $generator->create_instance($params);
         $cm = get_coursemodule_from_instance('grouptool', $instance->id);
