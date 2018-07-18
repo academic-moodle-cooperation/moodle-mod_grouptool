@@ -415,24 +415,49 @@ class mod_grouptool {
         // Allocate members from the selected role to groups!
         $usercnt = count($users);
         switch ($data->allocateby) {
-            case 'no':
             case 'random':
+                srand($data->seed);
+                shuffle($users);
+                break;
+            case 'no':
             case 'lastname':
-                $orderby = 'lastname, firstname';
+                uasort($users, function($a, $b) {
+                    $cmp = strcmp($a->lastname, $b->lastname);
+                    if ($cmp == 0) {
+                        return strcmp($a->firstname, $b->firstname);
+                    }
+                    if ($cmp == 0) {
+                        $cmp = strcmp($a->idnumber, $b->idnumber);
+                    }
+                    return $cmp;
+                });
                 break;
             case 'firstname':
-                $orderby = 'firstname, lastname';
+                uasort($users, function($a, $b) {
+                    $cmp = strcmp($a->firstname, $b->firstname);
+                    if ($cmp == 0) {
+                        $cmp = strcmp($a->lastname, $b->lastname);
+                    }
+                    if ($cmp == 0) {
+                        $cmp = strcmp($a->idnumber, $b->idnumber);
+                    }
+                    return $cmp;
+                });
                 break;
             case 'idnumber':
-                $orderby = 'idnumber';
+                uasort($users, function($a, $b) {
+                    $cmp = strcmp($a->idnumber, $b->idnumber);
+                    if ($cmp == 0) {
+                        $cmp = strcmp($a->lastname, $b->lastname);
+                    }
+                    if ($cmp == 0) {
+                        $cmp = strcmp($a->firstname, $b->firstname);
+                    }
+                    return $cmp;
+                });
                 break;
             default:
                 print_error('unknoworder');
-        }
-
-        if ($data->allocateby == 'random') {
-            srand($data->seed);
-            shuffle($users);
         }
 
         $groups = [];
@@ -1542,6 +1567,8 @@ class mod_grouptool {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
                         switch ($data->allocateby) {
+                            default:
+                                print_error('unknoworder');
                             case 'no':
                             case 'random':
                             case 'lastname':
@@ -1553,8 +1580,6 @@ class mod_grouptool {
                             case 'idnumber':
                                 $orderby = 'idnumber';
                                 break;
-                            default:
-                                print_error('unknoworder');
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
@@ -1566,6 +1591,8 @@ class mod_grouptool {
                     case GROUPTOOL_MEMBERS_AMOUNT:
                         // Allocate members from the selected role to groups!
                         switch ($data->allocateby) {
+                            default:
+                                print_error('unknoworder');
                             case 'no':
                             case 'random':
                             case 'lastname':
@@ -1577,8 +1604,6 @@ class mod_grouptool {
                             case 'idnumber':
                                 $orderby = 'idnumber';
                                 break;
-                            default:
-                                print_error('unknoworder');
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                               $data->cohortid, $orderby);
@@ -1669,6 +1694,8 @@ class mod_grouptool {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!
                     switch ($data->allocateby) {
+                        default:
+                            print_error('unknoworder');
                         case 'no':
                         case 'random':
                         case 'lastname':
@@ -1680,8 +1707,6 @@ class mod_grouptool {
                         case 'idnumber':
                             $orderby = 'idnumber';
                             break;
-                        default:
-                            print_error('unknoworder');
                     }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $data->cohortid, $orderby);
@@ -1694,6 +1719,8 @@ class mod_grouptool {
                 case GROUPTOOL_MEMBERS_AMOUNT:
                     // Allocate members from the selected role to groups!
                     switch ($data->allocateby) {
+                        default:
+                            print_error('unknoworder');
                         case 'no':
                         case 'random':
                         case 'lastname':
@@ -1705,8 +1732,6 @@ class mod_grouptool {
                         case 'idnumber':
                             $orderby = 'idnumber';
                             break;
-                        default:
-                            print_error('unknoworder');
                     }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $data->cohortid, $orderby);
