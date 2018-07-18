@@ -49,7 +49,8 @@ class activity extends \core_search\base_activity {
      * Add the attached description files.
      *
      * @param document $document The current document
-     * @return null
+     * @throws \dml_missing_record_exception
+     * @throws \coding_exception
      */
     public function attach_files($document) {
         $fs = get_file_storage();

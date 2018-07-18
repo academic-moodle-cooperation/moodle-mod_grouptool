@@ -39,6 +39,8 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
      * Defines the structure to be backed up for grouptool and it's elements
      *
      * @return object the root element for the backup structure
+     * @throws base_step_exception
+     * @throws base_element_struct_exception
      */
     protected function define_structure() {
 

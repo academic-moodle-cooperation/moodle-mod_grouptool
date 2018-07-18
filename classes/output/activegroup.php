@@ -99,6 +99,7 @@ class activegroup {
      * @param int $groupid ID of related moodle-group
      * @param int $grouptoolid ID of related grouptool instance
      * @return \mod_grouptool\output\activegroup active group object
+     * @throws \dml_exception
      */
     public function get_by_groupid($groupid, $grouptoolid) {
         global $DB;
@@ -132,6 +133,7 @@ class activegroup {
      * Load active groups related groupings
      *
      * @return void
+     * @throws \dml_exception
      */
     public function load_groupings() {
         global $DB;

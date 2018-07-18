@@ -50,7 +50,8 @@ class groupings_created extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param int[] $ids array of ids (integers)
-     * @return \mod_grouptool\groupings_created event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_from_object(\stdClass $cm, array $ids) {
         $event = self::create([
@@ -65,6 +66,7 @@ class groupings_created extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
@@ -101,6 +103,7 @@ class groupings_created extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventgroupingscreated', 'grouptool');

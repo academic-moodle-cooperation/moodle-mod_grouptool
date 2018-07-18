@@ -41,6 +41,9 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 class group_resize_form extends \moodleform {
     /**
      * Definition of resize form
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     protected function definition() {
         global $DB;
@@ -98,6 +101,8 @@ class group_resize_form extends \moodleform {
      * @param array $files array of uploaded files "element_name"=>tmp_file_path
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function validation($data, $files) {
         global $DB;

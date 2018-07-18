@@ -62,7 +62,7 @@ class pdf extends \pdf {
     protected $width = [];
 
     /**
-     * @var char[] $align numerical array of chars, used for storage of column-header-alignment
+     * @var [] $align numerical array of chars, used for storage of column-header-alignment
      * each index corresponds to the index in {@link $data}, {@link $width} and {@link $align}
      * use 'C' for center, 'L' for left and 'R' for right
      */
@@ -84,6 +84,7 @@ class pdf extends \pdf {
      * @param string $format The format used for pages
      * @param bool $unicode TRUE means that the input text is unicode (default = true)
      * @param string $encoding Charset encoding (used only when converting back html entities); default is UTF-8.
+     * @throws \coding_exception
      */
     public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8') {
         global $SITE, $USER;
@@ -153,9 +154,10 @@ class pdf extends \pdf {
      *
      * @param string $coursename the name of the course
      * @param string $grouptoolname name of grouptool instance
-     * @param timestamp $timeavailable time since the checkmark is available
-     * @param timemstamp $timedue time due to which students can submit
+     * @param int $timeavailable time since the checkmark is available
+     * @param int $timedue time due to which students can submit
      * @param string $viewname the checkmark-modulename to view
+     * @throws \coding_exception
      */
     public function set_overview_header_data($coursename='coursename', $grouptoolname='grouptoolname', $timeavailable=0, $timedue=0,
                                              $viewname='viewname') {
@@ -179,9 +181,10 @@ class pdf extends \pdf {
      *
      * @param string $coursename the name of the course
      * @param string $grouptoolname name of the grouptoolinstance
-     * @param timestamp $timeavailable time since the checkmark is available
-     * @param timemstamp $timedue time due to which students can submit
+     * @param int $timeavailable time since the checkmark is available
+     * @param int $timedue time due to which students can submit
      * @param string $viewname the checkmark-modulename to view
+     * @throws \coding_exception
      */
     public function set_userlist_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
                                              $viewname ) {
@@ -205,9 +208,10 @@ class pdf extends \pdf {
      *
      * @param string $coursename the name of the course
      * @param string $grouptoolname name of the grouptoolinstance
-     * @param timestamp $timeavailable time since the checkmark is available
-     * @param timemstamp $timedue time due to which students can submit
+     * @param int $timeavailable time since the checkmark is available
+     * @param int $timedue time due to which students can submit
      * @param string $viewname the grouptool-modulename to view
+     * @throws \coding_exception
      */
     public function set_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
                                     $viewname) {
@@ -320,11 +324,11 @@ class pdf extends \pdf {
      * add_grp_overview writes data about 1 group to pdf
      *
      * @param string $groupname
-     * @param stdClass $groupinfo some statistic data about the group
-     * @param stdClass[] $registration the users registered in grouptool-group
-     * @param stdClass[] $queue the queued users
-     * @param stdClass[] $moodlemembers the users registered in moodle-group
-     *
+     * @param string $groupinfo some statistic data about the group
+     * @param \stdClass[] $registration the users registered in grouptool-group
+     * @param \stdClass[] $queue the queued users
+     * @param \stdClass[] $moodlemembers the users registered in moodle-group
+     * @throws \coding_exception
      */
     public function add_grp_overview($groupname, $groupinfo, $registration=[], $queue=[], $moodlemembers = []) {
         $fill = 0;
@@ -403,6 +407,8 @@ class pdf extends \pdf {
 
     /**
      * Writes the table header for overview tables to the PDF
+     *
+     * @throws \coding_exception
      */
     private function add_overview_table_header() {
         // Print table-header!
@@ -457,11 +463,12 @@ class pdf extends \pdf {
      * @param string $name of user
      * @param string|integer $idnumber of user
      * @param string $email user's email
-     * @param stdClass[] $registrations
-     * @param stdClass[] $queues
+     * @param \stdClass[] $registrations
+     * @param \stdClass[] $queues
      * @param bool $header if it's a header-row or not
      * @param bool $getheightonly return only the height of the row
-     * @return void|int height of written row
+     * @return int height of written row
+     * @throws \coding_exception
      *
      */
     public function add_userdata($name, $idnumber, $email, $registrations, $queues, $header=false,

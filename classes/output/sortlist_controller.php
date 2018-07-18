@@ -43,6 +43,7 @@ class sortlist_controller implements \renderable {
      * Constructor
      *
      * @param \mod_grouptool\output\sortlist $sortlist Sortlist to be used without
+     * @throws \coding_exception
      */
     public function __construct(sortlist &$sortlist) {
         global $SESSION;

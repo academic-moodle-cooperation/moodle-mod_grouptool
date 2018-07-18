@@ -53,7 +53,8 @@ class user_imported extends \core\event\base {
      * @param int $agrp active group id
      * @param int $group group id
      * @param int $user user id
-     * @return \mod_grouptool\user_imported event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function import_forced(\stdClass $cm, $id, $agrp, $group, $user) {
         $event = self::create([
@@ -75,7 +76,8 @@ class user_imported extends \core\event\base {
      * @param \stdClass $cm course module object
      * @param int $group group id
      * @param int $user user id
-     * @return \mod_grouptool\user_imported event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function import(\stdClass $cm, $group, $user) {
         $event = self::create([
@@ -110,6 +112,7 @@ class user_imported extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventuserimported', 'grouptool');
@@ -119,6 +122,7 @@ class user_imported extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", [

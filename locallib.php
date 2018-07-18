@@ -100,6 +100,9 @@ class mod_grouptool {
      * @param stdClass $grouptool usually null, but if we have it we pass it to save db access
      * @param stdClass $cm usually null, but if we have it we pass it to save db access
      * @param stdClass $course usually null, but if we have it we pass it to save db access
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public function __construct($cmid, $grouptool=null, $cm=null, $course=null) {
         global $DB;
@@ -179,6 +182,8 @@ class mod_grouptool {
      *                                                  Cancel answer. Can also be a moodle_url or
      *                                                  string URL
      * @return string HTML fragment
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function confirm($message, $continue, $cancel = null) {
         global $OUTPUT;
@@ -318,6 +323,9 @@ class mod_grouptool {
 
     /**
      *  Adds all missin agrp-entries for this instance!
+     *
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function add_missing_agrps() {
         global $DB;
@@ -348,6 +356,7 @@ class mod_grouptool {
      *
      * @param int $groupid Group ID to add agrp entry for!
      * @return stdClass (new) agrp record
+     * @throws dml_exception
      */
     protected function add_agrp_entry($groupid) {
         global $DB;
@@ -391,6 +400,10 @@ class mod_grouptool {
      * @param int $numgrps how many groups should be created
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     private function create_groups($data, $users, $userpergrp, $numgrps, $previewonly = false) {
         global $DB, $USER;
@@ -602,6 +615,10 @@ class mod_grouptool {
      * @param stdClass $data data from administration-form with all settings for group creation
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     private function create_fromto_groups($data, $previewonly = false) {
         global $DB, $OUTPUT;
@@ -750,6 +767,10 @@ class mod_grouptool {
      * @param string $groupingname optional name for created grouping
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     private function create_one_person_groups($users, $namescheme = "[idnumber]", $grouping = 0, $groupingname = null,
                                               $previewonly = false) {
@@ -920,6 +941,9 @@ class mod_grouptool {
      * @param int $courseid optional id of course to create for
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     private function create_group_groupings($courseid = null, $previewonly = false) {
         global $SESSION, $OUTPUT;
@@ -1032,6 +1056,9 @@ class mod_grouptool {
      * @param string $name name for new grouping if $target = -1
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     private function update_grouping($target, $name = null, $previewonly = false) {
         global $SESSION, $OUTPUT;
@@ -1116,6 +1143,11 @@ class mod_grouptool {
 
     /**
      * Outputs the content of the administration tab and manages actions taken in this tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view_administration() {
         global $SESSION, $OUTPUT, $PAGE, $DB, $USER, $CFG;
@@ -1477,6 +1509,11 @@ class mod_grouptool {
 
     /**
      * Outputs the content of the creation tab and manages actions taken in this tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view_creation() {
         global $SESSION, $OUTPUT;
@@ -1572,6 +1609,7 @@ class mod_grouptool {
                                                                               $data->groupingname);
                         $preview = $prev;
                         break;
+                    /** @noinspection PhpMissingBreakStatementInspection */
                     case GROUPTOOL_N_M_GROUPS:
                         /* Shortcut here: create_fromto_groups does exactly what we want,
                          * with from = 1 and to = number of groups to create! */
@@ -1700,6 +1738,7 @@ class mod_grouptool {
                                                                           true);
                     $preview = $prev;
                     break;
+                /** @noinspection PhpMissingBreakStatementInspection */
                 case GROUPTOOL_N_M_GROUPS:
                     /* Shortcut here: create_fromto_groups does exactly what we want,
                      * with from = 1 and to = number of groups to create! */
@@ -1749,6 +1788,9 @@ class mod_grouptool {
      * @param int[] $missingsource optional array with ids of entries for whom no source has been selected
      *                             (just to display a clue to select a source)
      * @return string HTML Fragment containing checkbox-controller and dependencies
+     * @throws coding_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     private function get_grading_table($activity, $mygroupsonly, $incompleteonly, $filter, $selected, $missingsource = []) {
         global $OUTPUT, $USER, $PAGE;
@@ -2029,6 +2071,9 @@ class mod_grouptool {
      * @param bool $overwrite optional overwrite existing grades (std: false)
      * @param bool $previewonly optional just return preview data
      * @return array ($error, $message)
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     private function copy_grades($activity, $mygroupsonly, $selected, $source, $overwrite = false,
                                  $previewonly = false) {
@@ -2359,6 +2404,11 @@ class mod_grouptool {
 
     /**
      * view grading-tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view_grading() {
         global $PAGE, $CFG, $OUTPUT, $USER, $DB;
@@ -2625,6 +2675,8 @@ class mod_grouptool {
      *                                    instead of {grouptool_agrps}.id
      * @param bool $includeinactive optional include also inactive groups - despite the method being called get_active_groups()!
      * @return array of objects containing all necessary information about chosen active groups
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
                                        $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false) {
@@ -2744,6 +2796,9 @@ class mod_grouptool {
      *
      * @param int $agrpid Active group to fill
      * @return bool true if everything went fine!
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function fill_from_queue($agrpid) {
         global $DB, $CFG;
@@ -2880,9 +2935,12 @@ class mod_grouptool {
      * @param int $agrpid active-group-id to unregister/unqueue user from
      * @param int $userid user to unregister/unqueue
      * @param bool $previewonly (optional) don't act, just return a preview
+     * @return string $message if everything went right
      * @throws \mod_grouptool\local\exception\notenoughregs If the user hasn't enough registrations!
      * @throws \mod_grouptool\local\exception\registration In any other case, where the user can't be unregistered!
-     * @return string $message if everything went right
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
         global $USER, $DB;
@@ -3018,13 +3076,16 @@ class mod_grouptool {
      * @param int $agrpid active-group-id to register/queue user to
      * @param int $userid user to register/queue
      * @param bool $previewonly optional don't act, just return a preview
+     * @return string status message
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\exceedgroupsize
      * @throws \mod_grouptool\local\exception\regpresent
      * @throws \mod_grouptool\local\exception\registration
-     * @return string status message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
         global $USER, $DB;
@@ -3153,6 +3214,8 @@ class mod_grouptool {
      * @param stdClass $groupdata Object with group info
      * @param stdClass $message (optional) cached data for the language strings
      * @throws \mod_grouptool\local\exception\regpresent
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function check_reg_present($agrpid, $userid, $groupdata, $message) {
         global $USER;
@@ -3192,12 +3255,15 @@ class mod_grouptool {
      * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message cached data for the language strings
      * @param int $oldagrpid (optional) ID of former active group
+     * @return string 'string' status message
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return array with 'boolean' if queued or not and 'string' status message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function can_change_group($agrpid, $userid, $message, $oldagrpid = null) {
         global $USER;
@@ -3253,13 +3319,15 @@ class mod_grouptool {
      * @param int $userid (optional) ID of user to change group for or null ($USER->id is used).
      * @param stdClass $message (optional) prepared message object containing username and groupname or null.
      * @param int $oldagrpid (optional) ID of former active group
+     * @return string success message
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
+     * @throws coding_exception
      * @throws dml_exception
-     * @return string success message
+     * @throws required_capability_exception
      */
     protected function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
         global $DB, $USER;
@@ -3394,6 +3462,11 @@ class mod_grouptool {
      * @param int $userid User's ID
      * @param bool $change (optional) true if check is used for group change!
      * @return array $userregs, $userqueues, $marks, $min, $max
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function check_users_regs_limits($userid, $change=false) {
         global $DB;
@@ -3434,10 +3507,14 @@ class mod_grouptool {
      * @param int $agrpid ID of the active group
      * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message cached data for the language strings
+     * @return array (queued, string) status message
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return array (queued, string) status message
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function can_be_marked($agrpid, $userid, $message) {
         global $USER;
@@ -3481,10 +3558,14 @@ class mod_grouptool {
      * @param int $agrpid ID of active group to mark registration for.
      * @param int $userid (optional) ID of user to mark registration for or null ($USER->id is used).
      * @param stdClass $message (optional) prepared message object containing username and groupname or null.
+     * @return string success message
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return string success message
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function mark_for_reg($agrpid, $userid, $message) {
         global $DB, $USER;
@@ -3515,6 +3596,9 @@ class mod_grouptool {
      *
      * @param int $userid (optional) ID of user to mark registration for or null ($USER->id is used).
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function convert_marks_to_regs($userid) {
         global $DB, $USER;
@@ -3555,6 +3639,7 @@ class mod_grouptool {
      * @param int $agrpid ID of the active group
      * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @return string status message
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
@@ -3562,7 +3647,9 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\notenoughregs
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return string status message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function can_be_queued($agrpid, $userid = null, $message = null) {
         global $USER, $DB;
@@ -3642,6 +3729,7 @@ class mod_grouptool {
      * @param int $agrpid ID of the active group
      * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message prepared message object containing username and groupname or null
+     * @return string status string
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
@@ -3649,7 +3737,9 @@ class mod_grouptool {
      * @throws \mod_grouptool\local\exception\notenoughregs
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return string status string
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function add_queue_entry($agrpid, $userid, $message) {
         global $DB, $USER;
@@ -3684,12 +3774,15 @@ class mod_grouptool {
      * @param int $agrpid ID of the active group
      * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message prepared message object containing username and groupname or null
+     * @return string status message
      * @throws \mod_grouptool\local\exception\exceedgroupsize
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\notenoughregs
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return string status message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function can_be_registered($agrpid, $userid, $message) {
         global $USER;
@@ -3737,12 +3830,15 @@ class mod_grouptool {
      * @param int $agrpid ID of the active group
      * @param int $userid (optional) ID of user to register or null (then $USER->id is used)
      * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @return string status message
      * @throws \mod_grouptool\local\exception\exceedgroupsize
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
      * @throws \mod_grouptool\local\exception\notenoughregs
      * @throws \mod_grouptool\local\exception\registration
      * @throws \mod_grouptool\local\exception\regpresent
-     * @return string status message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function add_registration($agrpid, $userid, $message) {
         global $DB, $USER;
@@ -3780,6 +3876,9 @@ class mod_grouptool {
      *
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
      * @return int count of queues in specified instance for specified user
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function get_user_queues_count($userid=0) {
         global $DB, $USER;
@@ -3807,6 +3906,9 @@ class mod_grouptool {
      *
      * @param int $userid optional user for whom stats should be obtained? uses $USER->id if zero
      * @return int count of queues in specified instance for specified user
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function get_user_reg_count($userid=0) {
         global $DB, $USER;
@@ -3853,6 +3955,7 @@ class mod_grouptool {
      * @param int[]|int $data array with regs/queues for a group like returned by get_active_groups() or agrpid
      * @param int $userid user for whom data should be returned
      * @return int rank in queue/registration (registration only via $data-array)
+     * @throws dml_exception
      */
     private function get_rank_in_queue($data=0, $userid=0) {
         global $DB, $USER;
@@ -3893,7 +3996,10 @@ class mod_grouptool {
      *
      * @param int $userid id of user for whom data should be added
      *                    or 0 (=$USER) or null (=no userdata)
-     * @return object object containing information about active groups
+     * @return stdClass object containing information about active groups
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function get_registration_stats($userid=null) {
         global $USER, $DB;
@@ -3908,6 +4014,7 @@ class mod_grouptool {
         $return->reg_users = 0;
 
         switch ($userid) {
+            /** @noinspection PhpMissingBreakStatementInspection */
             case null:
                 $userid = $USER->id;
             default:
@@ -4228,6 +4335,9 @@ class mod_grouptool {
      *
      * @param int $userid (optional) User-ID for which the marks should be returned
      * @return stdClass[] Users marks
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function get_user_marks($userid=0) {
         global $DB, $USER, $OUTPUT;
@@ -4284,6 +4394,9 @@ class mod_grouptool {
      * Delete users marks
      *
      * @param int $userid (optional) User for whom the marks should be deleted
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function delete_user_marks($userid=0) {
         global $DB;
@@ -4301,6 +4414,9 @@ class mod_grouptool {
      *
      * @param int $userid (optional) User for whom the marks should be counted
      * @return int amount of users marks
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function count_user_marks($userid=0) {
         $marks = $this->get_user_marks($userid);
@@ -4314,6 +4430,7 @@ class mod_grouptool {
      * @param int $agrpid activegroup id which should be checked
      * @param int $userid (optional) User for whom the group should be checked
      * @return bool true if marked
+     * @throws dml_exception
      */
     public function grpmarked($agrpid, $userid=0) {
         global $DB, $USER;
@@ -4345,6 +4462,9 @@ class mod_grouptool {
      * Returns the amount of registrations missing in this grouptool instance.
      *
      * @return int amount of missing registrations (includes queues!)
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function get_missing_registrations() {
         global $DB;
@@ -4402,6 +4522,11 @@ class mod_grouptool {
 
     /**
      * view selfregistration-tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view_selfregistration() {
         global $OUTPUT, $DB, $USER, $PAGE;
@@ -4893,6 +5018,8 @@ class mod_grouptool {
      * @param int|bool $queuerank The queue rank in this active group
      *                            (false if not queued or null if it has to be determined for the current user)
      * @return bool true if user can show, false if not!
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function canshowmembers($agrp = null, $regrank = null, $queuerank = null) {
         global $DB, $USER;
@@ -4946,6 +5073,7 @@ class mod_grouptool {
      *
      * @param int $userid ID of user to force enrol!
      * @throws coding_exception Thrown if smthg very unexpected happened (couldn't instantiate manual enrol instance or similar)
+     * @throws dml_exception
      */
     protected function force_enrol_student($userid) {
         global $CFG, $DB;
@@ -4984,6 +5112,8 @@ class mod_grouptool {
      * @param bool $forceregistration Force registration in grouptool
      * @param bool $previewonly optional preview only, don't take any action
      * @return array ($error, $message)
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function import($groups, $data, $ignored = [], $forceregistration = false, $previewonly = false) {
         global $DB, $OUTPUT, $USER;
@@ -5282,6 +5412,10 @@ class mod_grouptool {
 
     /**
      * view import-tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function view_import() {
         global $PAGE, $OUTPUT;
@@ -5341,7 +5475,11 @@ class mod_grouptool {
      * @param int $groupid optional get only this group (groupid not agroupid!)
      * @param bool $onlydata optional return object with raw data not html-fragment-string
      * @param bool $includeinactive optional include inactive groups too!
-     * @return string|object either html-fragment representing table or raw data as object
+     * @return array|int|string either html-fragment representing table or raw data as object
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function group_overview_table($groupingid = 0, $groupid = 0, $onlydata = false, $includeinactive = false) {
         global $OUTPUT, $CFG, $DB;
@@ -5595,7 +5733,11 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param int $includeinactive optional include inactive groups too!
+     * @param bool $includeinactive optional include inactive groups too!
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_overview_pdf($groupid=0, $groupingid=0, $includeinactive=false) {
         global $USER;
@@ -5672,7 +5814,11 @@ class mod_grouptool {
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      * @param bool $includeinactive optional include inactive groups too!
-     * @return object raw data
+     * @return array|int|string raw data
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_overview_raw($groupid=0, $groupingid=0, $includeinactive=false) {
         return $this->group_overview_table($groupid, $groupingid, true, $includeinactive);
@@ -5683,7 +5829,11 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param int $includeinactive optional include inactive groups too!
+     * @param bool $includeinactive optional include inactive groups too!
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_overview_txt($groupid=0, $groupingid=0, $includeinactive=false) {
         ob_start();
@@ -5760,9 +5910,10 @@ class mod_grouptool {
     /**
      * Fill workbook (either XLSX or ODS) with data
      *
-     * @param MoodleExcelWorkbook $workbook workbook to put data into
+     * @param MoodleExcelWorkbook|MoodleODSWorkbook $workbook workbook to put data into
      * @param stdClass[] $groups which groups from whom to include data
      * @param string[] $collapsed array with collapsed columns
+     * @throws coding_exception
      */
     private function overview_fill_workbook(&$workbook, $groups, $collapsed=[]) {
         global $CFG;
@@ -5977,6 +6128,7 @@ class mod_grouptool {
                     $hidden = in_array('email', $collapsed) ? true : false;
                     $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['email'], null, $hidden);
+                    /** @noinspection PhpUnusedLocalVariableInspection */
                     $k++; // ...k = n+2!
                 }
 
@@ -6020,6 +6172,7 @@ class mod_grouptool {
                         $hidden = in_array('email', $collapsed) ? true : false;
                         $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
+                        /** @noinspection PhpUnusedLocalVariableInspection */
                         $k++; // ...k = n+2!
                     }
                 }
@@ -6059,6 +6212,7 @@ class mod_grouptool {
                             $k++; // ...k = n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $reg['email'], $regentrylast);
+                            /** @noinspection PhpUnusedLocalVariableInspection */
                             $k++; // ...k = n+2!
                         }
 
@@ -6090,6 +6244,7 @@ class mod_grouptool {
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['email'], $regentrylast);
+                                /** @noinspection PhpUnusedLocalVariableInspection */
                                 $k++; // ...k = n+2!
                             }
                         }
@@ -6145,6 +6300,7 @@ class mod_grouptool {
                             $k++; // ...k = n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $mreg['email'], $regentrylast);
+                            /** @noinspection PhpUnusedLocalVariableInspection */
                             $k++; // ...k = n+2!
                         }
 
@@ -6176,6 +6332,7 @@ class mod_grouptool {
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['email'], $regentrylast);
+                                /** @noinspection PhpUnusedLocalVariableInspection */
                                 $k++; // ...k = n+2!
                             }
                         }
@@ -6217,6 +6374,7 @@ class mod_grouptool {
                             $k++; // ...k = n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $queue['email'], $regentrylast);
+                            /** @noinspection PhpUnusedLocalVariableInspection */
                             $k++; // ...k = n+2!
                         }
 
@@ -6248,6 +6406,7 @@ class mod_grouptool {
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['email'], $regentrylast);
+                                /** @noinspection PhpUnusedLocalVariableInspection */
                                 $k++; // ...k = n+2!
                             }
                         }
@@ -6279,6 +6438,10 @@ class mod_grouptool {
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      * @param bool $includeinactive optional include inactive groups too!
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_overview_ods($groupid=0, $groupingid=0, $includeinactive=false) {
         global $CFG;
@@ -6314,6 +6477,10 @@ class mod_grouptool {
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      * @param bool $includeinactive optional include inactive groups too!
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_overview_xlsx($groupid = 0, $groupingid = 0, $includeinactive=false) {
         global $CFG;
@@ -6351,6 +6518,7 @@ class mod_grouptool {
      * @param int $grouptoolid optional get stats for this grouptool-instance
      *                                  uses $this->instance if zero
      * @return array (global out of sync, array of objects with sync-status for each group)
+     * @throws dml_exception
      */
     private function get_sync_status($grouptoolid = 0) {
         global $DB;
@@ -6386,6 +6554,9 @@ class mod_grouptool {
      * @param int $groupingid optional only for this grouping
      * @param bool $previewonly optional get only the preview
      * @return array($error, $message)
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function push_registrations($groupid=0, $groupingid=0, $previewonly=false) {
         global $DB, $CFG;
@@ -6456,6 +6627,9 @@ class mod_grouptool {
      *
      * @param stdClass $group active group object, for which the members should be displayed
      * @return string HTML fragment
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     private function render_members_link($group) {
         global $CFG, $DB;
@@ -6566,6 +6740,11 @@ class mod_grouptool {
 
     /**
      * view overview tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view_overview() {
         global $PAGE, $OUTPUT;
@@ -6674,6 +6853,7 @@ class mod_grouptool {
      * @param moodle_url $url Base URL to use
      * @param int $groupingid Currently active grouping ID or 0
      * @return single_select
+     * @throws coding_exception
      */
     protected function get_grouping_select($url, $groupingid) {
         $groupings = groups_get_all_groupings($this->course->id);
@@ -6693,6 +6873,9 @@ class mod_grouptool {
      * @param int $groupingid Currently active grouping ID or 0
      * @param int $groupid Currently active group ID or 0
      * @return single_select
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function get_groups_select($url, $groupingid, $groupid) {
         global $OUTPUT;
@@ -6721,6 +6904,7 @@ class mod_grouptool {
      * @param moodle_url $url Base URL to use
      * @param int $orientation Currently active orientation
      * @return single_select
+     * @throws coding_exception
      */
     protected function get_orientation_select($url, $orientation) {
         static $options = null;
@@ -6743,6 +6927,9 @@ class mod_grouptool {
      * @param int|array $userids optional get only this user(s)
      * @param stdClass[] $orderby array how data should be sorted (column as key and ASC/DESC as value)
      * @return stdClass[] array of objects records from DB with all necessary data
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = []) {
         global $DB, $OUTPUT;
@@ -6854,6 +7041,7 @@ class mod_grouptool {
      * @param string $search column-name to print link for
      * @return string html-fragment with icon to show column or column header text with icon to hide
      *                              column
+     * @throws moodle_exception
      */
     private function collapselink($collapsed = [], $search) {
         global $PAGE, $OUTPUT;
@@ -6874,6 +7062,8 @@ class mod_grouptool {
      * @param moodle_url $downloadurl The base download URL to use
      * @param int $groupid (optional) ID of group to use for the download or 0 for all groups download
      * @return string HTML snippet with download links encapsulated in DIV
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     protected function get_download_links($downloadurl, $groupid = 0) {
         if (has_capability('mod/grouptool:export', $this->context)) {
@@ -6909,7 +7099,11 @@ class mod_grouptool {
      * @param stdClass[] $orderby optional current order-by array
      * @param string[] $collapsed optional current array with collapsed columns
      * @param bool $onlydata optional return object with raw data not html-fragment-string
-     * @return string|object either html-fragment representing table or raw data as object
+     * @return stdClass[]|bool true if table is output or raw data as array of objects
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function userlist_table($groupingid = 0, $groupid = 0, $orderby = array(),
                                    $collapsed = array(), $onlydata = false) {
@@ -7306,6 +7500,10 @@ class mod_grouptool {
      * @param int $groupingid optional get only this grouping
      * @param stdClass[] $orderby optional current order-by array
      * @param string[] $collapsed optional current array with collapsed columns
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_userlist_pdf($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7387,7 +7585,11 @@ class mod_grouptool {
      * @param int $groupingid optional get only this grouping
      * @param stdClass[] $orderby optional current order-by array
      * @param string[] $collapsed optional current array with collapsed columns
-     * @return stdClass raw data
+     * @return bool|object[] raw data
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_userlist_raw($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7401,6 +7603,10 @@ class mod_grouptool {
      * @param int $groupingid optional get only this grouping
      * @param stdClass[] $orderby optional current order-by array
      * @param string[] $collapsed optional current array with collapsed columns
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_userlist_txt($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7477,9 +7683,10 @@ class mod_grouptool {
     /**
      * fills workbook (either XLSX or ODS) with data
      *
-     * @param MoodleExcelWorkbook $workbook workbook to put data into
+     * @param MoodleExcelWorkbook|MoodleODSWorkbook $workbook workbook to put data into
      * @param stdClass[] $data userdata with headline at index 0
      * @param string[] $collapsed (optional) currently collapsed columns
+     * @throws coding_exception
      */
     protected function userlist_fill_workbook(&$workbook, $data, $collapsed=[]) {
         global $CFG;
@@ -7730,8 +7937,11 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param stdClass[] $orderby optional current order-by array
      * @param string[] $collapsed optional current array with collapsed columns
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_userlist_ods($groupid=0, $groupingid=0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7770,6 +7980,10 @@ class mod_grouptool {
      * @param int $groupingid optional get only this grouping
      * @param stdClass[] $orderby optional current order-by array
      * @param string[] $collapsed optional current array with collapsed columns
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function download_userlist_xlsx($groupid = 0, $groupingid = 0, $orderby=array(),
                                           $collapsed=array()) {
@@ -7805,6 +8019,11 @@ class mod_grouptool {
 
     /**
      * view userlist tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function view_userlist() {
         global $PAGE, $OUTPUT;

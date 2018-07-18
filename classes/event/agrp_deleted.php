@@ -48,8 +48,9 @@ class agrp_deleted extends \core\event\base {
     /**
      * Create object from data object and set properties.
      *
-     * @param stdClass $data event data
-     * @return \mod_grouptool\agrp_deleted event object
+     * @param \stdClass $data event data
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_from_object($data) {
         $event = self::create([
@@ -64,6 +65,7 @@ class agrp_deleted extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
@@ -100,6 +102,7 @@ class agrp_deleted extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventagrpdeleted', 'grouptool');

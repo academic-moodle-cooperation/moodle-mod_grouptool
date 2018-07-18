@@ -50,7 +50,8 @@ class queue_entry_created extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $regdata data of the created queue entry
-     * @return \mod_grouptool\queue_entry_created event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
@@ -83,6 +84,7 @@ class queue_entry_created extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventqueueentrycreated', 'grouptool');
@@ -92,6 +94,7 @@ class queue_entry_created extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/grouptool/view.php", [

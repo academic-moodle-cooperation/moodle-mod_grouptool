@@ -50,7 +50,8 @@ class queue_entry_deleted extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
-     * @return \mod_grouptool\queue_entry_deleted event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = 'event';
@@ -67,7 +68,8 @@ class queue_entry_deleted extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
-     * @return \mod_grouptool\queue_entry_deleted event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_limit_violation(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->reason = 'registration limit violation';
@@ -84,7 +86,8 @@ class queue_entry_deleted extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
-     * @return \mod_grouptool\queue_entry_deleted event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_direct(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = null;
@@ -124,6 +127,7 @@ class queue_entry_deleted extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventqueueentrydeleted', 'grouptool');
@@ -133,6 +137,7 @@ class queue_entry_deleted extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", [

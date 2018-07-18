@@ -30,6 +30,14 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param int $oldversion
  * @return bool
+ * @throws coding_exception
+ * @throws ddl_change_structure_exception
+ * @throws ddl_exception
+ * @throws ddl_field_missing_exception
+ * @throws ddl_table_missing_exception
+ * @throws dml_exception
+ * @throws downgrade_exception
+ * @throws upgrade_exception
  */
 function xmldb_grouptool_upgrade($oldversion) {
     global $DB, $CFG;

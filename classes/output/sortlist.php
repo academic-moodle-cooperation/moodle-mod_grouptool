@@ -58,6 +58,8 @@ class sortlist implements \renderable {
      * @param int $courseid ID of related course
      * @param \stdClass $cm course module object
      * @param int $filter optional current filter (active/inactive/all)
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function __construct($courseid, $cm, $filter=null) {
         global $SESSION, $DB, $OUTPUT;
@@ -127,7 +129,9 @@ class sortlist implements \renderable {
      * Load the groups from DB
      *
      * @param int $courseid Course for whom to fetch the groups
-     * @param \stdClass $cm course module object
+     * @param \stdClass|int $cm course module object or ID
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function loadgroups($courseid, $cm) {
         global $DB;
@@ -226,6 +230,8 @@ class sortlist implements \renderable {
 
     /**
      * Update the element selected-state if corresponding params are set
+     *
+     * @throws \coding_exception
      */
     public function _refresh_select_state() {
         global $COURSE;

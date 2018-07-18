@@ -48,6 +48,7 @@ class userlist_exported extends export {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventuserlistexported', 'grouptool');

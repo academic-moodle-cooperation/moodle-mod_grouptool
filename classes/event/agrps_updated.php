@@ -49,7 +49,8 @@ class agrps_updated extends \core\event\base {
      * Convenience method to create from course-module object
      *
      * @param \stdClass $cm course module object
-     * @return \mod_grouptool\agrps_updated event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_convenient(\stdClass $cm) {
         $event = self::create([
@@ -66,7 +67,8 @@ class agrps_updated extends \core\event\base {
      * @param string $pattern pattern for group names
      * @param int $numgrps number of created groups
      * @param int|0 $groupingid optional id of grouping used for these groups (0 if not in grouping)
-     * @return \mod_grouptool\agrps_updated event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_groupcreation(\stdClass $cm, $pattern, $numgrps, $groupingid = 0) {
         $event = self::create([
@@ -85,6 +87,7 @@ class agrps_updated extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
@@ -146,6 +149,7 @@ class agrps_updated extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventagrpsupdated', 'grouptool');

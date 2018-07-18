@@ -41,6 +41,7 @@ class regpresent extends registration {
      *
      * @param string $text (optional) Text to be used
      * @param string $a (optional) Additional data used by language string
+     * @throws \coding_exception
      */
     public function __construct($text = '', $a = null) {
         if ($text == '') {

@@ -52,7 +52,8 @@ class group_creation_started extends \core\event\base {
      * @param string $pattern name scheme used when creating groups
      * @param int $amount number of created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \mod_grouptool\group_creation_started event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_groupamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
@@ -75,7 +76,8 @@ class group_creation_started extends \core\event\base {
      * @param string $pattern name scheme used when creating groups
      * @param int $amount number of created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \mod_grouptool\group_creation_started event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_memberamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
@@ -99,7 +101,8 @@ class group_creation_started extends \core\event\base {
      * @param int $from lowest index for created groups
      * @param int $to highest index for created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \mod_grouptool\group_creation_started event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_fromto(\stdClass $cm, $pattern, $from, $to, $grouping = 0) {
         $event = self::create([
@@ -122,7 +125,8 @@ class group_creation_started extends \core\event\base {
      * @param \stdClass $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \mod_grouptool\group_creation_started event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_person(\stdClass $cm, $pattern, $grouping = 0) {
         $event = self::create([
@@ -179,6 +183,7 @@ class group_creation_started extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventgroupcreationstarted', 'grouptool');
@@ -188,6 +193,7 @@ class group_creation_started extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);

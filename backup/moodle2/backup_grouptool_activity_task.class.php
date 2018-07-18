@@ -47,6 +47,9 @@ class backup_grouptool_activity_task extends backup_activity_task {
 
     /**
      * Define (add) particular steps this activity can have
+     *
+     * @throws base_task_exception
+     * @throws backup_step_exception
      */
     protected function define_my_steps() {
         // Grouptool only has one structure step!

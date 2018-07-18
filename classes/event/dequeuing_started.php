@@ -49,7 +49,8 @@ class dequeuing_started extends \core\event\base {
      * Convenience method to create the event object from the course module object
      *
      * @param \stdClass $cm course module object
-     * @return \mod_grouptool\dequeuing_started event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_from_object(\stdClass $cm) {
         $event = self::create([
@@ -73,6 +74,7 @@ class dequeuing_started extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventdequeuingstarted', 'grouptool');
@@ -82,6 +84,7 @@ class dequeuing_started extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);

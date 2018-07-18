@@ -41,6 +41,8 @@ class mod_grouptool_observer {
      *
      * @param \core\event\group_member_added $event Event object containing useful data
      * @return bool true if success
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function group_member_added(\core\event\group_member_added $event) {
         global $DB;
@@ -117,6 +119,9 @@ class mod_grouptool_observer {
      *
      * @param \core\event\group_member_removed $event Event object containing useful data
      * @return bool true if success
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function group_member_removed(\core\event\group_member_removed $event) {
         global $DB, $CFG;
@@ -180,6 +185,9 @@ class mod_grouptool_observer {
      *
      * @param \core\event\group_deleted $event Event object containing useful data
      * @return bool true if success
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function group_deleted(\core\event\group_deleted $event) {
         global $CFG, $DB;
@@ -299,6 +307,8 @@ class mod_grouptool_observer {
      *
      * @param  \core\event\group_created $event Event object containing useful data
      * @return bool true if success
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function group_created(\core\event\group_created $event) {
         global $DB;

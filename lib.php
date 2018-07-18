@@ -66,7 +66,9 @@ function grouptool_supports($feature) {
  * of the new instance.
  *
  * @param stdClass $grouptool An object from the form in mod_form.php
- * @return int The id of the newly inserted grouptool record
+ * @return bool|int The id of the newly inserted grouptool record
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function grouptool_add_instance(stdClass $grouptool) {
     global $DB;
@@ -130,7 +132,10 @@ function grouptool_add_instance(stdClass $grouptool) {
  * will update an existing instance with new data.
  *
  * @param stdClass $grouptool An object from the form in mod_form.php
- * @return boolean Success/Fail
+ * @return bool Success/Fail
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function grouptool_update_instance(stdClass $grouptool) {
     global $DB, $CFG;
@@ -211,6 +216,8 @@ function grouptool_update_instance(stdClass $grouptool) {
  * @param int|stdClass $instance Assign module instance or ID.
  * @param int|stdClass $cm Course module object or ID (not used in this module).
  * @return bool
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $DB, $CFG;
@@ -311,6 +318,8 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
  * function looks through all the queues and moves users from queue to reg if there's place
  *
  * @param stdClass|int $grouptool grouptool object or grouptoolid
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function grouptool_update_queues($grouptool = 0) {
     global $DB;
@@ -399,6 +408,8 @@ function grouptool_update_queues($grouptool = 0) {
  *
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function grouptool_delete_instance($id) {
     global $DB;
@@ -440,6 +451,7 @@ function grouptool_delete_instance($id) {
  * @param stdClass $coursemodule The coursemodule object (record).
  * @return cached_cm_info|bool An object on information that the courses
  *                             will know about (most noticeably, an icon).
+ * @throws dml_exception
  */
 function grouptool_get_coursemodule_info($coursemodule) {
     global $DB;
@@ -484,6 +496,8 @@ function grouptool_get_extra_capabilities() {
  * @param stdClass $course course object
  * @param stdClass $module module object
  * @param cm_info $cm course module info object
+ * @throws coding_exception
+ * @throws moodle_exception
  */
 function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
     if ($course->id != $module->course) {
@@ -557,6 +571,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
  * @param int $timesubmitted
  * @param int $timedue
  * @return array string color class, string html-fragment
+ * @throws coding_exception
  */
 function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
     if ($timesubmitted == null) {
@@ -597,6 +612,9 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
  * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  * @param stdClass[] $courses
  * @param string[][] $htmlarray
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function grouptool_print_overview($courses, &$htmlarray) {
     global $CFG;
@@ -673,6 +691,9 @@ function grouptool_print_overview($courses, &$htmlarray) {
  * @param stdClass $grouptool Grouptool DB record with additional coursemodule property set!
  * @param context $context Context instance
  * @return string HTML snippet with user's registration details
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function grouptool_get_user_reg_details($grouptool, $context) {
     global $USER;
@@ -771,6 +792,8 @@ function grouptool_get_user_reg_details($grouptool, $context) {
  *
  * @param stdClass $data the data submitted from the reset course.
  * @return array status array
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function grouptool_reset_userdata($data) {
     global $CFG, $DB;
@@ -834,6 +857,7 @@ function grouptool_reset_userdata($data) {
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the grouptool.
  * @param MoodleQuickForm $mform form passed by reference
+ * @throws coding_exception
  */
 function grouptool_reset_course_form_definition(MoodleQuickForm &$mform) {
     $mform->addElement('header', 'grouptoolheader', get_string('modulenameplural', 'grouptool'));
@@ -872,6 +896,8 @@ function grouptool_reset_course_form_defaults() {
  * @param int $id Assignment ID
  * @param int $fromid User ID from whom will be copied
  * @param int $toid User ID to whom will be copied
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function grouptool_copy_assign_grades($id, $fromid, $toid) {
     global $DB, $CFG;
@@ -1014,6 +1040,9 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
  *
  * @param calendar_event $event
  * @return bool Returns true if the event is visible to the current user, false otherwise.
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
     global $CFG;
@@ -1044,7 +1073,10 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
  *
  * @param calendar_event $event
  * @param \core_calendar\action_factory $factory
- * @return \core_calendar\local\event\entities\action_interface|null
+ * @return \core_calendar\local\event\entities\action_interface|\core_calendar\local\event\value_objects\action
+ * @throws coding_exception
+ * @throws dml_exception
+ * @throws moodle_exception
  */
 function mod_grouptool_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
     global $CFG, $USER;

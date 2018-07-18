@@ -44,6 +44,9 @@ class grading_form extends \moodleform {
 
     /**
      * Definition of import form
+     *
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     protected function definition() {
         global $CFG, $DB;

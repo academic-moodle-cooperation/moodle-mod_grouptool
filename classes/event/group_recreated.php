@@ -49,7 +49,8 @@ class group_recreated extends \core\event\base {
      * Convenience method to create event object from data
      *
      * @param \stdClass $data data of recreated group
-     * @return \mod_grouptool\group_recreated event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_from_object($data) {
         $event = self::create([
@@ -64,6 +65,7 @@ class group_recreated extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/grouptool/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
@@ -100,6 +102,7 @@ class group_recreated extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventgrouprecreated', 'grouptool');

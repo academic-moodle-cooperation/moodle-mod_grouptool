@@ -91,6 +91,9 @@ class grouptool_registration_test extends advanced_testcase {
 
     /**
      * Setup function - we will create a course and add an grouptool instance to it.
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     protected function setUp() {
         global $DB;
@@ -163,7 +166,10 @@ class grouptool_registration_test extends advanced_testcase {
     }
 
     /**
-     * For tests that make sense to use alot of data, create extra students/teachers.
+     * For tests that make sense to use a lot of data, create extra students/teachers.
+     *
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function create_extra_users() {
         global $DB;
@@ -227,7 +233,10 @@ class grouptool_registration_test extends advanced_testcase {
      * Convenience function to create a testable instance of an assignment acc.
      *
      * @param array $params Array of parameters to pass to the generator
-     * @return testable_assign Testable wrapper around the assign class.
+     * @return testable_grouptool Testable wrapper around the assign class.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     protected function create_instance($params=[]) {
         global $DB;
@@ -247,6 +256,10 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic creation of grouptool instance
      *
      * 2 Assertions
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function test_create_instance() {
         global $DB;
@@ -261,6 +274,11 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic registration to a single group
      *
      * 9 Assertions
+     *
+     * @throws Throwable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function test_single() {
         global $DB;
@@ -330,6 +348,11 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic registration to a single group
      *
      * 6 Assertions
+     *
+     * @throws Throwable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function test_single_queue() {
         global $DB;
@@ -389,6 +412,11 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests basic registration to multiple groups with queues
      *
      * 11 Assertions
+     *
+     * @throws Throwable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function test_multiple_queue() {
         global $DB;
@@ -467,9 +495,14 @@ class grouptool_registration_test extends advanced_testcase {
 
 
     /**
-     * Tests if no error will be wrongly displayed if everythings correct
+     * Tests if no error will be wrongly displayed if everything's correct
      *
      * 13 Assertions
+     *
+     * @throws Throwable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function test_groupchange_single() {
         global $DB;
@@ -545,9 +578,14 @@ class grouptool_registration_test extends advanced_testcase {
     }
 
     /**
-     * Tests if no error will be wrongly displayed if everythings correct
+     * Tests if no error will be wrongly displayed if everything's correct
      *
      * 10 Assertions
+     *
+     * @throws Throwable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function test_groupchange_multiple() {
         global $DB;
@@ -614,6 +652,8 @@ class grouptool_registration_test extends advanced_testcase {
      *
      * @param testable_grouptool $grouptool The grouptool instance to fetch data for
      * @return array agrps, agrpids, message-object
+     * @throws dml_exception
+     * @throws required_capability_exception
      */
     protected function get_agrps_and_prepare_message($grouptool) {
         // Get all active groups indexed by active group ID!
@@ -634,6 +674,12 @@ class grouptool_registration_test extends advanced_testcase {
      * Tests resolving of queues
      *
      * 11 Assertions
+     *
+     * @throws Throwable
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_queue_resolving() {
         global $DB;
@@ -727,13 +773,8 @@ class testable_grouptool extends mod_grouptool {
      * @param int $agrpid active-group-id to register/queue user to
      * @param int $userid user to register/queue
      * @param bool $previewonly optional don't act, just return a preview
-     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserreglimit
-     * @throws \mod_grouptool\local\exception\exceedgroupsize
-     * @throws \mod_grouptool\local\exception\regpresent
-     * @throws \mod_grouptool\local\exception\registration
      * @return string status message
+     * @throws Throwable
      */
     public function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
         try {
@@ -751,9 +792,8 @@ class testable_grouptool extends mod_grouptool {
      * @param int $agrpid active-group-id to unregister/unqueue user from
      * @param int $userid user to unregister/unqueue
      * @param bool $previewonly (optional) don't act, just return a preview
-     * @throws \mod_grouptool\local\exception\notenoughregs If the user hasn't enough registrations!
-     * @throws \mod_grouptool\local\exception\registration In any other case, where the user can't be unregistered!
      * @return string $message if everything went right
+     * @throws Throwable
      */
     protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
         try {
@@ -771,6 +811,7 @@ class testable_grouptool extends mod_grouptool {
      * @param int $agrpid ID of the active group
      * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @return bool whether or not user qualifies for a group change
+     * @throws Throwable
      */
     public function qualifies_for_groupchange($agrpid, $userid) {
         try {
@@ -789,12 +830,8 @@ class testable_grouptool extends mod_grouptool {
      * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message (optional) cached data for the language strings
      * @param int $oldagrpid (optional) ID of former active group
-     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserreglimit
-     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
-     * @throws \mod_grouptool\local\exception\registration
-     * @throws \mod_grouptool\local\exception\regpresent
-     * @return array with 'boolean' if queued or not and 'string' status message
+     * @return string status message
+     * @throws Throwable
      */
     public function can_change_group($agrpid, $userid=0, $message=null, $oldagrpid = null) {
         try {
@@ -813,12 +850,8 @@ class testable_grouptool extends mod_grouptool {
      * @param int $userid (optional) ID of user to change group for or null ($USER->id is used).
      * @param stdClass $message (optional) prepared message object containing username and groupname or null.
      * @param int $oldagrpid (optional) ID of former active group
-     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserreglimit
-     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
-     * @throws \mod_grouptool\local\exception\registration
-     * @throws \mod_grouptool\local\exception\regpresent
      * @return string success message
+     * @throws Throwable
      */
     public function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
         try {

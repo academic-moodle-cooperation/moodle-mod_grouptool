@@ -84,8 +84,10 @@ class renderer extends \plugin_renderer_base {
     /**
      * Get message stating no groups are to be displayed
      *
-     * @param \mod_grouptool\sortlist $sortlist Sortlist to render message for
+     * @param sortlist $sortlist Sortlist to render message for
      * @return string HTML snippet
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     protected function get_no_groups_info(sortlist $sortlist) {
         global $PAGE, $OUTPUT;
@@ -115,8 +117,10 @@ class renderer extends \plugin_renderer_base {
     /**
      * Render a controller for the sortable list of groups
      *
-     * @param \mod_grouptool\sortlist_controller $controller Sortlist controller to render
+     * @param sortlist_controller $controller Sortlist controller to render
      * @return    string
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     protected function render_sortlist_controller(sortlist_controller $controller) {
         global $OUTPUT;

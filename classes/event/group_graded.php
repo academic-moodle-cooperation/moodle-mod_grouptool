@@ -50,7 +50,8 @@ class group_graded extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $data grading data to log
-     * @return \mod_grouptool\group_graded event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_direct(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
@@ -68,7 +69,8 @@ class group_graded extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $data grading data to log
-     * @return \mod_grouptool\group_graded event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_without_groupid(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
@@ -104,6 +106,7 @@ class group_graded extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventgroupgraded', 'grouptool');
@@ -113,6 +116,7 @@ class group_graded extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         if ($this->data['other']['type'] == 'users') {

@@ -41,6 +41,8 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
 class import_confirm_form extends \moodleform {
     /**
      * Definition of import form
+     *
+     * @throws \coding_exception
      */
     protected function definition() {
         $mform = $this->_form;

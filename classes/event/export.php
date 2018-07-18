@@ -87,6 +87,7 @@ abstract class export extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/download.php", [
@@ -100,6 +101,7 @@ abstract class export extends \core\event\base {
      * Return the legacy event log data.
      *
      * @return array|null
+     * @throws \moodle_exception
      */
     protected function get_legacy_logdata() {
         return [

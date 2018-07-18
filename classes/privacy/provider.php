@@ -119,8 +119,9 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
      *
      *
      * @param approved_contextlist $contextlist contexts that we are writing data out from.
-     * @throws \dml_exception
      * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
@@ -201,8 +202,8 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
     }
 
     /**
-     * Export overrides for this assignment.
-     * TODO
+     * Export overrides for this grouptool.
+     *
      * @param  \context $context Context
      * @param  \mod_grouptool $grouptool The publication object.
      * @param  \stdClass $user The user object.

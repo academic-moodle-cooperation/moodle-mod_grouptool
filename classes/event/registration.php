@@ -50,7 +50,8 @@ abstract class registration extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $regdata registration entries data
-     * @return \mod_grouptool\registration_created event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = 'event';
@@ -67,7 +68,8 @@ abstract class registration extends \core\event\base {
      *
      * @param \stdClass $cm course module object
      * @param \stdClass $regdata registration entries data
-     * @return \mod_grouptool\registration_created event object
+     * @return \core\event\base event object
+     * @throws \coding_exception
      */
     public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
@@ -92,6 +94,7 @@ abstract class registration extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventregistrationcreated', 'grouptool');
@@ -101,6 +104,7 @@ abstract class registration extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/grouptool/view.php", ['id'      => $this->contextinstanceid,
@@ -128,6 +132,7 @@ abstract class registration extends \core\event\base {
      *
      * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();

@@ -49,7 +49,9 @@ class agrp_created extends \core\event\base {
      * Create the event object and set properties.
      *
      * @param \stdClass $cm Course-Module object
-     * @param \mod_grouptool\agrp_created $agrp active-group object which has been created
+     * @param \stdClass $agrp active-group object which has been created
+     * @return \core\event\base
+     * @throws \coding_exception
      */
     public static function create_from_object(\stdClass $cm, $agrp) {
         $event = self::create([
@@ -64,6 +66,7 @@ class agrp_created extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url("/mod/$this->objecttable/view.php", ['id'  => $this->contextinstanceid, 'tab' => 'overview']);
@@ -102,6 +105,7 @@ class agrp_created extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventagrpcreated', 'grouptool');
@@ -110,8 +114,8 @@ class agrp_created extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();

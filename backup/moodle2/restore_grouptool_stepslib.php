@@ -39,6 +39,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * Defines the structure for grouptool and it's elements to be restored
      *
      * @return object the root element for the backup structure
+     * @throws base_step_exception
      */
     protected function define_structure() {
 
@@ -68,6 +69,8 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * Process restoration of 1 grouptool instance
      *
      * @param stdClass $data data for this grouptool entry
+     * @throws base_step_exception
+     * @throws dml_exception
      */
     protected function process_grouptool($data) {
         global $DB;
@@ -101,6 +104,8 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * Process restoration of 1 of grouptool instances active-group
      *
      * @param stdClass $data data for this grouptools active group entry
+     * @throws dml_exception
+     * @throws restore_step_exception
      */
     protected function process_grouptool_agrp($data) {
         global $DB;
@@ -131,6 +136,8 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * Process the restoration of a single registration for an active-group
      *
      * @param stdClass $data data for this registration entry
+     * @throws dml_exception
+     * @throws restore_step_exception
      */
     protected function process_agrp_registration($data) {
         global $DB;
@@ -170,6 +177,8 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      * Process the restoration of a single queue-entry for an active-group
      *
      * @param stdClass $data data for this queue entry
+     * @throws dml_exception
+     * @throws restore_step_exception
      */
     protected function process_agrp_queue($data) {
         global $DB;

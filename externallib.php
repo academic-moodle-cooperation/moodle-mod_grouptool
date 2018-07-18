@@ -58,6 +58,13 @@ class mod_grouptool_external extends external_api {
      * @param int $cmid course module ID
      * @param int $groupid group ID
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function delete_group($cmid, $groupid) {
         global $DB;
@@ -114,6 +121,13 @@ class mod_grouptool_external extends external_api {
      * @param int $groupid group ID
      * @param string $name the new name for the group
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function rename_group($cmid, $groupid, $name) {
         global $DB;
@@ -148,6 +162,7 @@ class mod_grouptool_external extends external_api {
             groups_update_group($group);
             if ($params['name'] != $DB->get_field('groups', 'name', ['id' => $params['groupid']])) {
                 // Error happened...
+                /** @noinspection SpellCheckingInspection */
                 $result->error = get_string('couldnt_rename_group', 'grouptool', $params['name']);
             } else {
                 $result->message = get_string('renamed_group', 'grouptool', $params['name']);
@@ -189,6 +204,13 @@ class mod_grouptool_external extends external_api {
      * @param int $groupid group ID
      * @param int $size the new group size
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function resize_group($cmid, $groupid, $size) {
         global $DB;
@@ -227,6 +249,7 @@ class mod_grouptool_external extends external_api {
             ]);
             if (!empty($dbsize)) {
                 // Error happened...
+                /** @noinspection SpellCheckingInspection */
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
             } else {
                 $result->message = get_string('resized_group', 'grouptool', $params['size']);
@@ -245,6 +268,7 @@ class mod_grouptool_external extends external_api {
                             'grouptoolid' => $cm->instance
                     ])) {
                 // Error happened...
+                /** @noinspection SpellCheckingInspection */
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
             } else {
                 $result->message = get_string('resized_group', 'grouptool', $params['size']);
@@ -290,6 +314,13 @@ class mod_grouptool_external extends external_api {
      * @param int $cmid course module ID
      * @param int $groupid group ID
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function activate_group($cmid, $groupid) {
         global $DB;
@@ -353,6 +384,13 @@ class mod_grouptool_external extends external_api {
      * @param int $cmid course module ID
      * @param int $groupid group ID
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function deactivate_group($cmid, $groupid) {
         global $DB;
@@ -419,6 +457,13 @@ class mod_grouptool_external extends external_api {
      * @param int $cmid course module ID
      * @param stdClass[] $order array of objects containing groupid and order-number!
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function reorder_groups($cmid, $order) {
         global $DB;
@@ -507,6 +552,13 @@ class mod_grouptool_external extends external_api {
      * @param int $a group ID of first group
      * @param int $b group ID of second group
      * @return stdClass containing possible error message and (return)message
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws require_login_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function swap_groups($cmid, $a, $b) {
         global $DB;

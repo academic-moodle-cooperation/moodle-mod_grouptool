@@ -50,6 +50,7 @@ class registration_deleted extends registration {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventregistrationdeleted', 'grouptool');
