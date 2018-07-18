@@ -107,7 +107,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addElement('advcheckbox', 'alwaysshowdescription', $name);
         $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'grouptool');
         $mform->setDefault('alwaysshowdescription', 1);
-        $mform->disabledif ('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
+        $mform->disabledIf('alwaysshowdescription', 'timeavailable[enabled]', 'notchecked');
 
         /*
          * ---------------------------------------------------------
