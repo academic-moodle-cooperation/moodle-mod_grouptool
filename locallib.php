@@ -5923,6 +5923,7 @@ class mod_grouptool {
 
             $columnwidth = [7, 22, 14, 17]; // Unit: mm!
 
+            $allgroupsworksheet = false;
             if (count($groups) > 1) {
                 // General information? unused at the moment!
                 $allgroupsworksheet = $workbook->add_worksheet(get_string('all'));
@@ -5931,9 +5932,6 @@ class mod_grouptool {
                 $allgroupsworksheet->set_column(1, 1, $columnwidth[1]);
                 $allgroupsworksheet->set_column(2, 2, $columnwidth[2]);
                 $allgroupsworksheet->set_column(3, 3, $columnwidth[3]);
-                $generalsheet = true;
-            } else {
-                $generalsheet = false;
             }
 
             $legendworksheet = $workbook->add_worksheet(get_string('status', 'grouptool').' '.
@@ -6045,7 +6043,7 @@ class mod_grouptool {
                 // Groupname as headline!
                 $groupworksheets[$key]->write_string(0, 0, $groupname, $headlineformat);
                 $groupworksheets[$key]->merge_cells(0, 0, 0, 3);
-                if ($generalsheet) {
+                if ($allgroupsworksheet !== false) {
                     $allgroupsworksheet->write_string($j, 0, $groupname, $headlineformat);
                     $allgroupsworksheet->merge_cells($j, 0, $j, 3);
                 }
@@ -6066,7 +6064,7 @@ class mod_grouptool {
                 $groupworksheets[$key]->write_string(5, 0, $groupinfo[3][0], $groupinfoformat1);
                 $groupworksheets[$key]->merge_cells(5, 0, 5, 1);
                 $groupworksheets[$key]->write(5, 2, $groupinfo[3][1], $groupinfoformat2);
-                if ($generalsheet) {
+                if ($allgroupsworksheet !== false) {
                     $allgroupsworksheet->write_string($j + 2, 0, $groupinfo[0][0],
                                                       $groupinfoformat1);
                     $allgroupsworksheet->merge_cells($j + 2, 0, $j + 2, 1);
@@ -6134,7 +6132,7 @@ class mod_grouptool {
                     $k++; // ...k = n+2!
                 }
 
-                if ($generalsheet) {
+                if ($allgroupsworksheet !== false) {
                     $k = 0;
                     $allgroupsworksheet->write_string($j + 7, $k, get_string('status', 'grouptool'),
                                                       $regheadformat);
@@ -6218,7 +6216,7 @@ class mod_grouptool {
                             $k++; // ...k = n+2!
                         }
 
-                        if ($generalsheet) {
+                        if ($allgroupsworksheet !== false) {
                             $k = 0;
                             $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['status'],
                                                               $regentryformat);
@@ -6258,7 +6256,7 @@ class mod_grouptool {
                                                                     'grouptool'),
                                                          $noregentriesformat);
                     $groupworksheets[$key]->merge_cells(8 + $i, 0, 8 + $i, 3);
-                    if ($generalsheet) {
+                    if ($allgroupsworksheet !== false) {
                         $allgroupsworksheet->write_string($j + 8 + $i, 0,
                                                           get_string('no_registrations',
                                                                      'grouptool'),
@@ -6306,7 +6304,7 @@ class mod_grouptool {
                             $k++; // ...k = n+2!
                         }
 
-                        if ($generalsheet) {
+                        if ($allgroupsworksheet !== false) {
                             $k = 0;
                             $allgroupsworksheet->write_string($j + 8 + $i, $k, '?',
                                                               $regentryformat);
@@ -6330,7 +6328,7 @@ class mod_grouptool {
                                     $k++; // ...k = n+x!
                                 }
                             } else {
-                                $allgroupsworksheets->write_string($j + 8 + $i, $k, $mreg['idnumber'], $regentryformat);
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['idnumber'], $regentryformat);
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['email'], $regentrylast);
@@ -6380,7 +6378,7 @@ class mod_grouptool {
                             $k++; // ...k = n+2!
                         }
 
-                        if ($generalsheet) {
+                        if ($allgroupsworksheet !== false) {
                             $k = 0;
                             $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['rank'],
                                                               $regentryformat);
@@ -6404,7 +6402,7 @@ class mod_grouptool {
                                     $k++; // ...k = n+x!
                                 }
                             } else {
-                                $allgroupsworksheets->write_string($j + 8 + $i, $k, $queue['idnumber'], $regentryformat);
+                                $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['idnumber'], $regentryformat);
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['email'], $regentrylast);
@@ -6419,7 +6417,7 @@ class mod_grouptool {
                                                          get_string('nobody_queued', 'grouptool'),
                                                          $noqueueentriesformat);
                     $groupworksheets[$key]->merge_cells(8 + $i, 0, 8 + $i, 3);
-                    if ($generalsheet) {
+                    if ($allgroupsworksheet !== false) {
                         $allgroupsworksheet->write_string($j + 8 + $i, 0,
                                                           get_string('nobody_queued',
                                                                      'grouptool'),
