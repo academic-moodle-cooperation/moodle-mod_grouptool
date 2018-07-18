@@ -573,7 +573,7 @@ class mod_grouptool {
 
             // Save the groups data!
             foreach ($groups as $group) {
-                if (@groups_get_group_by_name($this->course->id, $group['name'])) {
+                if (groups_get_group_by_name($this->course->id, $group['name'])) {
                     $error = get_string('groupnameexists', 'group', $group['name']);
                     $failed = true;
                     continue;
