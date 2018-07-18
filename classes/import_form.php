@@ -24,6 +24,8 @@
  */
 namespace mod_grouptool;
 
+use \mod_grouptool\output\sortlist;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
@@ -72,8 +74,8 @@ class import_form extends \moodleform {
             $mform->addElement('header', 'groupuser_import', get_string('groupuser_import',
                                                                         'grouptool'));
 
-            $active = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
-            $inactive = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
+            $active = new sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
+            $inactive = new sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
             $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup', 'grouptool'), null,
                     ['size' => 15]);

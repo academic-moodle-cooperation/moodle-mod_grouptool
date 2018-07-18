@@ -25,6 +25,8 @@
 
 namespace mod_grouptool\search;
 
+use \core_search\document;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
