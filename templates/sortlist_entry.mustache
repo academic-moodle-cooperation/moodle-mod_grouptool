@@ -61,7 +61,7 @@
     }}data-groupings='[0{{#groupingids}}, {{.}}{{/groupingids}}]' data-order="{{order}}" data-id="{{id}}" data-status="{{status}}"
     {{!
     }}data-name="{{name}}" {{#usesize}}data-size="{{size}}"{{/usesize}}>
-    <td class="checkbox_container"><div><input type="checkbox" name="selected[]" {{!
+    <td class="checkbox_container"><div><input type="checkbox" name="selected[]" title="{{#str}}select, grouptool{{/str}}" {{!
                                         }}class="checkbox_status class0 {{#groupingids}} class{{.}}{{/groupingids}}" {{!
                                         }}value="{{id}}" {{#checked}}checked{{/checked}} /></div></td>
     <td class="buttons js_invisible" data-drag><div>{{!
