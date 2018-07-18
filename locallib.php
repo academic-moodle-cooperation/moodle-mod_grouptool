@@ -1363,9 +1363,9 @@ class mod_grouptool {
             }
         }
 
-        if (($bulkaction = optional_param('bulkaction', null, PARAM_ALPHA))
-            && (optional_param('start_bulkaction', 0, PARAM_BOOL))) {
+        $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
         $selected = optional_param_array('selected', [], PARAM_INT);
+        if ($bulkaction && $selected && optional_param('start_bulkaction', 0, PARAM_BOOL)) {
             switch ($bulkaction) {
                 case 'activate':  // ...also via ajax bulk action?
                     // Activate now!
