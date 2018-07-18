@@ -5320,7 +5320,7 @@ class mod_grouptool {
                         } else {
                             $imported[] = $userinfo->id;
                             $row->cells[] = get_string('import_user', 'grouptool', $data);
-                            $row->attributes['class'] = 'notifysuccess';
+                            $row->attributes['class'] = 'success';
                         }
                         if ($forceregistration && empty($agrp[$group])) {
                             /* Registering in an non active Grouptool-group would cause problems
