@@ -4036,6 +4036,7 @@ class mod_grouptool {
                 break;
             case 0:
                 $groups = $this->get_active_groups();
+                break;
         }
 
         foreach ($groups as $group) {
