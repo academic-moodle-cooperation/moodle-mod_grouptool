@@ -3081,7 +3081,7 @@ class mod_grouptool {
             $text = get_string('not_in_queue_or_registered', 'grouptool', $message);
         }
 
-        throw new \mod_grouptool\exception\registration($text);
+        throw new \mod_grouptool\local\exception\registration($text);
     }
 
     /**
@@ -3444,7 +3444,7 @@ class mod_grouptool {
             // Let other queued be promoted to registered status!
             $this->fill_from_queue($reg->agrpid);
         } else {
-            throw new \mod_grouptool\exception\registration(get_string('groupchange_from_non_unique_reg', 'grouptool'));
+            throw new \mod_grouptool\local\exception\registration(get_string('groupchange_from_non_unique_reg', 'grouptool'));
         }
 
         // Register him in the new group!
