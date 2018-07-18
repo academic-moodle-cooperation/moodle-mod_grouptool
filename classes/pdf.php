@@ -51,7 +51,7 @@ class pdf extends \pdf {
      * @var string[] $header numerical array of strings, used for storage of column-headers
      * each index corresponds to the index in {@link $data}, {@link $width} and {@link $align}
      */
-    protected $header = array();
+    protected $header = [];
 
     /**
      * @var float[] $width numerical array of floats, used for storage of column-header-widths
@@ -59,14 +59,14 @@ class pdf extends \pdf {
      * If index in $width is set to null the corresponding column-width gets calculated
      * automatically (the same calculated width is used for each of those columns)
      */
-    protected $width = array();
+    protected $width = [];
 
     /**
      * @var char[] $align numerical array of chars, used for storage of column-header-alignment
      * each index corresponds to the index in {@link $data}, {@link $width} and {@link $align}
      * use 'C' for center, 'L' for left and 'R' for right
      */
-    protected $align = array();
+    protected $align = [];
 
     /** @var int|null used to calculate heights of text-blocks */
     protected $normalheight = null;
@@ -97,8 +97,8 @@ class pdf extends \pdf {
         $this->setPageOrientation($orientation);
 
         // Set document information!
-        $this->SetCreator(format_string($SITE->fullname, true, array('context' => context_course::instance(SITEID))).' | '.
-                          get_string('pluginname', 'grouptool'));
+        $this->SetCreator(format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]).' | '.
+                get_string('pluginname', 'grouptool'));
         $this->SetAuthor(fullname($USER));
 
         // Set header/footer!
@@ -159,14 +159,14 @@ class pdf extends \pdf {
      */
     public function set_overview_header_data($coursename='coursename', $grouptoolname='grouptoolname', $timeavailable=0, $timedue=0,
                                              $viewname='viewname') {
-        $this->header1 = array();
+        $this->header1 = [];
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
         $this->header1[3] = empty($timeavailable) ? get_string('availabledateno', 'grouptool') : userdate($timeavailable);
         $this->header1[4] = get_string('groupoverview', 'grouptool');
 
-        $this->header2 = array();
+        $this->header2 = [];
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
@@ -185,14 +185,14 @@ class pdf extends \pdf {
      */
     public function set_userlist_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
                                              $viewname ) {
-        $this->header1 = array();
+        $this->header1 = [];
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
         $this->header1[3] = empty($timeavailable) ? get_string('availabledateno', 'grouptool') : userdate($timeavailable);
         $this->header1[4] = get_string('userlist', 'grouptool');
 
-        $this->header2 = array();
+        $this->header2 = [];
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
@@ -211,14 +211,14 @@ class pdf extends \pdf {
      */
     public function set_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
                                     $viewname) {
-        $this->header1 = array();
+        $this->header1 = [];
         $this->header1[0] = get_string('course').":";
         $this->header1[1] = $coursename;
         $this->header1[2] = get_string('availabledate', 'grouptool').":";
         $this->header1[3] = empty($timeavailable) ? get_string('availabledateno', 'grouptool') : userdate($timeavailable);
         $this->header1[4] = get_string('overview', 'grouptool');
 
-        $this->header2 = array();
+        $this->header2 = [];
         $this->header2[0] = get_string('modulename', 'grouptool').":";
         $this->header2[1] = $grouptoolname;
         $this->header2[2] = get_string('duedate', 'grouptool').":";
@@ -326,7 +326,7 @@ class pdf extends \pdf {
      * @param stdClass[] $moodlemembers the users registered in moodle-group
      *
      */
-    public function add_grp_overview($groupname, $groupinfo, $registration=array(), $queue=array(), $moodlemembers = array()) {
+    public function add_grp_overview($groupname, $groupinfo, $registration=[], $queue=[], $moodlemembers = []) {
         $fill = 0;
 
         // Calculate height.
@@ -505,20 +505,22 @@ class pdf extends \pdf {
         if (isset($SESSION->mod_grouptool->userlist->collapsed)) {
             $collapsed = $SESSION->mod_grouptool->userlist->collapsed;
         } else {
-            $collapsed = array();
+            $collapsed = [];
         }
 
-        $basicwidths = array('fullname' => 0.225,
-                             'idnumber' => 0.15,
-                             'email' => 0.225,
-                             'registrations' => 0.225,
-                             'queues' => 0.175);
+        $basicwidths = [
+                'fullname' => 0.225,
+                'idnumber' => 0.15,
+                'email' => 0.225,
+                'registrations' => 0.225,
+                'queues' => 0.175
+        ];
         $totalwidth = array_sum($basicwidths);
         $colapsedwidth = $totalwidth;
         foreach ($collapsed as $column) {
             $colapsedwidth -= $basicwidths[$column];
         }
-        $widths = array();
+        $widths = [];
         foreach ($basicwidths as $column => $width) {
             $widths[$column] = $width * ($totalwidth / $colapsedwidth) * $writewidth;
         }
@@ -530,21 +532,21 @@ class pdf extends \pdf {
             $this->Multicell($widths['fullname'], $height, $name, $borderf, 'L', $fill, 0, null,
                              null, true, 1, false, false, $height, 'M', true);
             if ($getheightonly) {
-                $height = max(array($height, $this->getLastH()));
+                $height = max([$height, $this->getLastH()]);
             }
         }
         if (!in_array('idnumber', $collapsed)) {
             $this->Multicell($widths['idnumber'], $height, $idnumber, $border, 'L', $fill, 0, null,
                              null, true, 1, false, false, $height, 'M', true);
             if ($getheightonly) {
-                $height = max(array($height, $this->getLastH()));
+                $height = max([$height, $this->getLastH()]);
             }
         }
         if (!in_array('email', $collapsed)) {
             $this->Multicell($widths['email'], $height, $email, $border, 'L', $fill, 0, null, null,
                              true, 1, false, false, $height, 'M', true);
             if ($getheightonly) {
-                $height = max(array($height, $this->getLastH()));
+                $height = max([$height, $this->getLastH()]);
             }
         }
         if (!in_array('registrations', $collapsed)) {
@@ -554,7 +556,7 @@ class pdf extends \pdf {
                     $this->Multicell($widths['registrations'], $height, $registrationsstring,
                                      $border, 'L', $fill, 0, null, null, true, 1, false, false,
                                      $height, 'M', false);
-                    $height = count($registrations) * max(array($height, $this->getLastH()));
+                    $height = count($registrations) * max([$height, $this->getLastH()]);
                 } else {
                     $this->Multicell($widths['registrations'], $height, $registrationsstring,
                                      $border, 'L', $fill, 0, null, null, true, 1, false, false,
@@ -565,7 +567,7 @@ class pdf extends \pdf {
                 $this->Multicell($widths['registrations'], $height, $registrations, $border, 'L',
                                 $fill, 0, null, null, true, 1, false, false, $height, 'M', true);
                 if ($getheightonly) {
-                    $height = max(array($height, $this->getLastH()));
+                    $height = max([$height, $this->getLastH()]);
                 }
                 $this->SetFont('', '');
             } else {
@@ -574,14 +576,14 @@ class pdf extends \pdf {
                                  get_string('no_registrations', 'grouptool'), $border, 'L', $fill,
                                  0, null, null, true, 1, false, false, $height, 'M', true);
                 if ($getheightonly) {
-                    $height = max(array($height, $this->getLastH()));
+                    $height = max([$height, $this->getLastH()]);
                 }
                 $this->SetFont('', '');
             }
         }
         if (!in_array('queues', $collapsed)) {
             if (!empty($queues) && is_array($queues)) {
-                $queuesstrings = array();
+                $queuesstrings = [];
                 foreach ($queues as $queue) {
                     $queuesstrings[] = $queue['name'].' (#'.$queue['rank'].')';
                 }
@@ -589,7 +591,7 @@ class pdf extends \pdf {
                     $this->Multicell(0, $height, implode("\n", $queuesstrings), $borderl,
                                      'L', $fill, 0, null, null, true, 1, false, false, $height,
                                      'M', false);
-                    $height = count($queues) * max(array($height, $this->getLastH()));
+                    $height = count($queues) * max([$height, $this->getLastH()]);
                 } else {
                     $this->Multicell(0, $height, implode("\n", $queuesstrings), $borderl,
                                      'L', $fill, 0, null, null, true, 1, false, false, $height,
@@ -600,7 +602,7 @@ class pdf extends \pdf {
                 $this->Multicell(0, $height, $queues, $borderl, 'L', $fill, 0, null, null,
                                  true, 1, false, false, $height, 'M', true);
                 if ($getheightonly) {
-                    $height = max(array($height, $this->getLastH()));
+                    $height = max([$height, $this->getLastH()]);
                 }
                 $this->SetFont('', '');
             } else {
@@ -609,7 +611,7 @@ class pdf extends \pdf {
                                  'L', $fill, 0, null, null, true, 1, false, false, $height,
                                  'M', true);
                 if ($getheightonly) {
-                    $height = max(array($height, $this->getLastH()));
+                    $height = max([$height, $this->getLastH()]);
                 }
                 $this->SetFont('', '');
             }

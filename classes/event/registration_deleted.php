@@ -61,8 +61,13 @@ class registration_deleted extends registration {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'unregister',
-                     "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-                     'agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'], $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'unregister',
+            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
+            'agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
+            $this->contextinstanceid
+        ];
     }
 }

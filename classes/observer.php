@@ -50,34 +50,34 @@ class mod_grouptool_observer {
                 FROM {grouptool} grpt
                 JOIN {grouptool_agrps} agrp ON agrp.grouptoolid = grpt.id
                 WHERE (agrp.groupid = ?) AND (agrp.active = ?) AND (grpt.ifmemberadded = ?)";
-        $params = array($event->objectid, 1, GROUPTOOL_FOLLOW);
+        $params = [$event->objectid, 1, GROUPTOOL_FOLLOW];
         if (! $grouptools = $DB->get_records_sql($sql, $params)) {
             return true;
         }
 
         $agrpssql = "SELECT agrps.grouptoolid AS grouptoolid, agrps.id AS id FROM {grouptool_agrps} agrps
         WHERE agrps.groupid = :groupid";
-        $agrp = $DB->get_records_sql($agrpssql, array('groupid' => $event->objectid));
+        $agrp = $DB->get_records_sql($agrpssql, ['groupid' => $event->objectid]);
 
         $regsql = "SELECT reg.agrpid AS id
                      FROM {grouptool_agrps} agrps
                INNER JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid
                     WHERE reg.modified_by >= 0 AND agrps.groupid = :groupid AND reg.userid = :userid";
-        $regs = $DB->get_records_sql($regsql, array('groupid' => $event->objectid,
-                                                    'userid'  => $event->relateduserid));
+        $regs = $DB->get_records_sql($regsql, ['groupid' => $event->objectid,
+                                               'userid'  => $event->relateduserid]);
         $markssql = "SELECT reg.agrpid, reg.id, reg.userid, reg.timestamp
                        FROM {grouptool_agrps} agrps
                  INNER JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid
                       WHERE reg.modified_by = -1 AND agrps.groupid = :groupid AND reg.userid = :userid";
-        $marks = $DB->get_records_sql($markssql, array('groupid' => $event->objectid,
-                                                       'userid'  => $event->relateduserid));
+        $marks = $DB->get_records_sql($markssql, ['groupid' => $event->objectid,
+                                                  'userid'  => $event->relateduserid]);
 
         $queuesql = "SELECT queue.agrpid AS agrpid, queue.id AS id
                        FROM {grouptool_agrps} agrps
                   LEFT JOIN {grouptool_queued} queue ON agrps.id = queue.agrpid
                       WHERE agrps.groupid = :groupid AND queue.userid = :userid";
-        $queues = $DB->get_records_sql($queuesql, array('groupid' => $event->objectid,
-                                                        'userid'  => $event->relateduserid));
+        $queues = $DB->get_records_sql($queuesql, ['groupid' => $event->objectid,
+                                                   'userid'  => $event->relateduserid]);
         foreach ($grouptools as $grouptool) {
             if (!key_exists($grouptool->agrpid, $regs)) {
                 $reg = new stdClass();
@@ -85,22 +85,22 @@ class mod_grouptool_observer {
                 $reg->userid = $event->relateduserid;
                 $reg->timestamp = time();
                 $reg->modified_by = 0; // There's no way we can get the teachers id!
-                if (!$DB->record_exists('grouptool_registered', array('agrpid' => $reg->agrpid,
-                                                                      'userid' => $reg->userid))) {
+                if (!$DB->record_exists('grouptool_registered', ['agrpid' => $reg->agrpid,
+                                                                 'userid' => $reg->userid])) {
                     $reg->id = $DB->insert_record('grouptool_registered', $reg);
                     $reg->groupid = $event->objectid;
                     $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
                     \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
                 }
                 if (key_exists($grouptool->agrpid, $queues)) {
-                    $DB->delete_records('grouptool_queued', array('id' => $queues[$grouptool->agrpid]->id));
+                    $DB->delete_records('grouptool_queued', ['id' => $queues[$grouptool->agrpid]->id]);
                 }
             } else if (key_exists($grouptool->agrpid, $marks)) {
                 $record = $marks[$grouptool->agrpid];
                 $record->modified_by = 0;
                 $DB->update_record('grouptool_registered', $record);
                 if (key_exists($grouptool->agrpid, $queues)) {
-                    $DB->delete_records('grouptool_queued', array('id' => $queues[$grouptool->agrpid]->id));
+                    $DB->delete_records('grouptool_queued', ['id' => $queues[$grouptool->agrpid]->id]);
                 }
                 $reg->groupid = $event->objectid;
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
@@ -128,14 +128,14 @@ class mod_grouptool_observer {
                            FROM {grouptool}
                      RIGHT JOIN {grouptool_agrps} agrp ON agrp.grouptoolid = {grouptool}.id
                           WHERE agrp.groupid = ?";
-        $params = array($event->objectid);
+        $params = [$event->objectid];
         if (! $grouptools = $DB->get_records_sql($sql, $params)) {
             return true;
         }
         $sql = "SELECT agrps.grouptoolid grouptoolid, agrps.id id
                   FROM {grouptool_agrps} agrps
                  WHERE agrps.groupid = :groupid";
-        $agrp = $DB->get_records_sql($sql, array('groupid' => $event->objectid));
+        $agrp = $DB->get_records_sql($sql, ['groupid' => $event->objectid]);
         foreach ($grouptools as $grouptool) {
             switch ($grouptool->ifmemberremoved) {
                 case GROUPTOOL_FOLLOW:
@@ -145,9 +145,9 @@ class mod_grouptool_observer {
                              WHERE reg.userid = :userid
                                    AND agrps.grouptoolid = :grouptoolid
                                    AND agrps.groupid = :groupid";
-                    if ($regs = $DB->get_records_sql($sql, array('grouptoolid' => $grouptool->id,
-                                                                 'userid'      => $event->relateduserid,
-                                                                 'groupid'     => $event->objectid))) {
+                    if ($regs = $DB->get_records_sql($sql, ['grouptoolid' => $grouptool->id,
+                                                            'userid'      => $event->relateduserid,
+                                                            'groupid'     => $event->objectid])) {
                         $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
                         foreach ($regs as $reg) {
                             // Trigger event!
@@ -185,14 +185,14 @@ class mod_grouptool_observer {
         global $CFG, $DB;
 
         $data = $event->get_record_snapshot('groups', $event->objectid);
-        $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $data->courseid], '*', MUST_EXIST);
 
         if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
             return true;
         }
 
         $grouprecreated = false;
-        $agrpids = array();
+        $agrpids = [];
         foreach ($grouptools as $grouptool) {
             $cmid = $grouptool->coursemodule;
             switch ($grouptool->ifgroupdeleted) {
@@ -202,19 +202,18 @@ class mod_grouptool_observer {
                         $newid = $DB->insert_record('groups', $data, true);
                         if ($newid !== false) {
                             // Delete auto-inserted agrp.
-                            if ($DB->record_exists('grouptool_agrps', array('groupid' => $newid))) {
-                                $DB->delete_records('grouptool_agrps', array('groupid' => $newid));
+                            if ($DB->record_exists('grouptool_agrps', ['groupid' => $newid])) {
+                                $DB->delete_records('grouptool_agrps', ['groupid' => $newid]);
                             }
                             // Update reference.
-                            if ($DB->record_exists('grouptool_agrps', array('groupid' => $data->id))) {
-                                $DB->set_field('grouptool_agrps', 'groupid', $newid,
-                                               array('groupid' => $data->id));
+                            if ($DB->record_exists('grouptool_agrps', ['groupid' => $data->id])) {
+                                $DB->set_field('grouptool_agrps', 'groupid', $newid, ['groupid' => $data->id]);
                             }
                             // Trigger event!
-                            $logdata = array('cmid'     => $cmid,
-                                             'groupid'  => $data->id,
-                                             'newid'    => $newid,
-                                             'courseid' => $data->courseid);
+                            $logdata = (object)['cmid'     => $cmid,
+                                                'groupid'  => $data->id,
+                                                'newid'    => $newid,
+                                                'courseid' => $data->courseid];
                             \mod_grouptool\event\group_recreated::create_from_object($logdata)->trigger();
 
                             if ($grouptool->immediate_reg) {
@@ -236,8 +235,8 @@ class mod_grouptool_observer {
                     }
                     break;
                 case GROUPTOOL_DELETE_REF:
-                    if ($agrpid = $DB->get_field('grouptool_agrps', 'id', array('groupid'     => $data->id,
-                                                                                'grouptoolid' => $grouptool->id))) {
+                    if ($agrpid = $DB->get_field('grouptool_agrps', 'id', ['groupid'     => $data->id,
+                                                                           'grouptoolid' => $grouptool->id])) {
                         $agrpids[] = $agrpid;
                     }
                     break;
@@ -245,7 +244,7 @@ class mod_grouptool_observer {
         }
         if (count($agrpids) > 0) {
             $agrps = $DB->get_records_list('grouptool_agrps', 'id', $agrpids);
-            $cms = array();
+            $cms = [];
             $regs = $DB->get_records_list('grouptool_registered', 'agrpid', $agrpids);
             $DB->delete_records_list('grouptool_registered', 'agrpid', $agrpids);
             foreach ($regs as $cur) {
@@ -305,7 +304,7 @@ class mod_grouptool_observer {
         global $DB;
 
         $data = $event->get_record_snapshot('groups', $event->objectid);
-        $course = $DB->get_record('course', array('id' => $data->courseid));
+        $course = $DB->get_record('course', ['id' => $data->courseid]);
 
         if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
             return true;
@@ -323,8 +322,8 @@ class mod_grouptool_observer {
                 $newagrp->sort_order = $sortorder[$grouptool->id]->max + 1;
             }
             $newagrp->active = 0;
-            if (!$DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->id,
-                                                             'groupid'     => $data->id))) {
+            if (!$DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->id,
+                                                        'groupid'     => $data->id])) {
                 $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp);
                 // Trigger event!
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);

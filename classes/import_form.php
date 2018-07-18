@@ -53,7 +53,7 @@ class import_form extends \moodleform {
         $this->context = \context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-        $course = $DB->get_record('course', array('id' => $cm->course));
+        $course = $DB->get_record('course', ['id' => $cm->course]);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'import');
@@ -70,10 +70,10 @@ class import_form extends \moodleform {
             $inactive = new \mod_grouptool\output\sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
             $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup', 'grouptool'), null,
-                                            array('size' => 15));
+                    ['size' => 15]);
 
             if (!empty($active->groups)) {
-                $options = array();
+                $options = [];
                 foreach ($active->groups as $grp) {
                     $options[$grp->groupid] = $grp->name;
                 }
@@ -81,7 +81,7 @@ class import_form extends \moodleform {
             }
 
             if (!empty($inactive->groups)) {
-                $options = array();
+                $options = [];
                 foreach ($inactive->groups as $grp) {
                     $options[$grp->groupid] = $grp->name;
                 }
@@ -92,9 +92,11 @@ class import_form extends \moodleform {
             $mform->setType('groups', PARAM_INT);
             $mform->addRule('groups', null, 'required', null, 'client');
 
-            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), array('wrap' => 'virtual',
-                                                                                              'rows' => '20',
-                                                                                              'cols' => '50'));
+            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
+                'wrap' => 'virtual',
+                'rows' => '20',
+                'cols' => '50'
+            ]);
             $mform->addHelpButton('data', 'userlist', 'grouptool');
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');

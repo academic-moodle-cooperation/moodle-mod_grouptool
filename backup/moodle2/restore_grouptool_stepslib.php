@@ -42,7 +42,7 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
      */
     protected function define_structure() {
 
-        $paths = array();
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
 
         $grouptool = new restore_path_element('grouptool', '/activity/grouptool');

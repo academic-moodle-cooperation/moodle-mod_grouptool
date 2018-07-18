@@ -46,20 +46,20 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated!
-        $grouptool = new backup_nested_element('grouptool', array('id'), array(
+        $grouptool = new backup_nested_element('grouptool', ['id'], [
                 'name', 'intro', 'introformat', 'alwaysshowdescription', 'timecreated', 'timemodified', 'timedue', 'timeavailable',
                 'show_members', 'allow_reg', 'immediate_reg', 'allow_unreg', 'grpsize', 'use_size', 'use_individual', 'use_queue',
                 'users_queues_limit', 'groups_queues_limit', 'allow_multiple', 'choose_min', 'choose_max',
-                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted'));
+                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted']);
         $agrps = new backup_nested_element('agrps');
-        $agrp = new backup_nested_element('agrp', array('id'), array(
-                'grouptoolid', 'groupid', 'sort_order', 'grpsize', 'active'));
+        $agrp = new backup_nested_element('agrp', ['id'], [
+                'grouptoolid', 'groupid', 'sort_order', 'grpsize', 'active']);
         $registrations = new backup_nested_element('registrations');
-        $registration = new backup_nested_element('registration', array('id'), array(
-                'agrpid', 'userid', 'timestamp', 'modified_by'));
+        $registration = new backup_nested_element('registration', ['id'], [
+                'agrpid', 'userid', 'timestamp', 'modified_by']);
         $queues = new backup_nested_element('queues');
-        $queue = new backup_nested_element('queue', array('id'), array(
-                'agrpid', 'userid', 'timestamp'));
+        $queue = new backup_nested_element('queue', ['id'], [
+                'agrpid', 'userid', 'timestamp']);
 
         // We begin building the tree.
         $grouptool->add_child($agrps);
@@ -70,13 +70,12 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
         $queues->add_child($queue);
 
         // We define sources.
-        $grouptool->set_source_table('grouptool', array('id' => backup::VAR_ACTIVITYID));
-        $agrp->set_source_table('grouptool_agrps', array('grouptoolid' => backup::VAR_PARENTID));
+        $grouptool->set_source_table('grouptool', ['id' => backup::VAR_ACTIVITYID]);
+        $agrp->set_source_table('grouptool_agrps', ['grouptoolid' => backup::VAR_PARENTID]);
         // All the rest of elements only happen if we are including user info!
         if ($userinfo) {
-            $registration->set_source_table('grouptool_registered',
-                                            array('agrpid' => backup::VAR_PARENTID));
-            $queue->set_source_table('grouptool_queued', array('agrpid' => backup::VAR_PARENTID));
+            $registration->set_source_table('grouptool_registered', ['agrpid' => backup::VAR_PARENTID]);
+            $queue->set_source_table('grouptool_queued', ['agrpid' => backup::VAR_PARENTID]);
         }
 
         // We define id annotations.

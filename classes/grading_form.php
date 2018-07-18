@@ -66,7 +66,7 @@ class grading_form extends \moodleform {
         if ($modinfo = get_fast_modinfo($this->_customdata['course'])) {
             $sections = $modinfo->get_sections();
             foreach ($sections as $curnumber => $sectionmodules) {
-                $activities = array();
+                $activities = [];
                 $sectiontext = course_get_format($this->_customdata['course'])->get_section_name($curnumber);
 
                 foreach ($sectionmodules as $curcmid) {
@@ -100,7 +100,7 @@ class grading_form extends \moodleform {
         $mform->addElement($activityselect);
 
         $mform->addElement('advcheckbox', 'mygroups_only', null, get_string('mygroups_only_label', 'grouptool'),
-                array('group' => '1'), array(0, 1));
+                ['group' => '1'], [0, 1]);
         $mform->setDefault('mygroups_only', $this->_customdata['mygroupsonly']);
         if (!has_capability('mod/grouptool:grade', $this->context)) {
             $mform->setConstant('mygroups_only', 1);
@@ -108,26 +108,28 @@ class grading_form extends \moodleform {
         }
 
         $mform->addElement('advcheckbox', 'incomplete_only', null, get_string('incomplete_only_label', 'grouptool'),
-            array('group' => '1'), array(0, 1));
+                ['group' => '1'], [0, 1]);
         $mform->setDefault('incomplete_only', $this->_customdata['incompleteonly']);
 
         $mform->addElement('advcheckbox', 'overwrite', null, get_string('overwrite_label', 'grouptool'),
-            array('group' => '1'), array(0, 1));
+                ['group' => '1'], [0, 1]);
         $mform->setDefault('overwrite', $this->_customdata['overwrite']);
 
         $groupings = groups_get_all_groupings($this->_customdata['course']->id);
-        $options = array("0" => get_string('all'));
+        $options = ["0" => get_string('all')];
         foreach ($groupings as $currentgrouping) {
             $options[$currentgrouping->id] = $currentgrouping->name;
         }
         $mform->addElement('select', 'grouping', get_string('grading_grouping_select_title', 'grouptool'), $options);
         $mform->setDefault('grouping', $this->_customdata['grouping']);
 
-        $options = array("-1" => get_string('nonconflicting', 'grouptool'),
-                         "0"  => get_string('all'));
+        $options = [
+            "-1" => get_string('nonconflicting', 'grouptool'),
+            "0"  => get_string('all')
+        ];
         $groups = groups_get_all_groups($this->_customdata['course']->id, null, $this->_customdata['grouping'], 'g.id, g.name');
         foreach ($groups as $key => $group) {
-            $membercount = $DB->count_records('groups_members', array('groupid' => $group->id));
+            $membercount = $DB->count_records('groups_members', ['groupid' => $group->id]);
             if ($membercount == 0) {
                 continue;
             }

@@ -52,10 +52,10 @@ class agrps_updated extends \core\event\base {
      * @return \mod_grouptool\agrps_updated event object
      */
     public static function create_convenient(\stdClass $cm) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-        ));
+        ]);
         return $event;
     }
 
@@ -69,13 +69,15 @@ class agrps_updated extends \core\event\base {
      * @return \mod_grouptool\agrps_updated event object
      */
     public static function create_groupcreation(\stdClass $cm, $pattern, $numgrps, $groupingid = 0) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-            'other' => array('pattern' => $pattern,
-                             'numgrps' => $numgrps,
-                             'grouping' => $groupingid),
-        ));
+            'other' => [
+                'pattern' => $pattern,
+                'numgrps' => $numgrps,
+                'grouping' => $groupingid
+            ],
+        ]);
         return $event;
     }
 
@@ -85,8 +87,7 @@ class agrps_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php",
-                               array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -96,18 +97,23 @@ class agrps_updated extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         if (!empty($this->data['other']['pattern'])) {
-            return array($this->courseid, $this->objecttable, 'create groups',
-                         'view.php?id=' . $this->contextinstanceid.'&tab=overview',
-                         'create groups namescheme:'.$this->data['other']['pattern'].
-                         ' numgroups:'.$this->data['other']['numgrps'],
-                         $this->contextinstanceid);
+            return [
+                $this->courseid,
+                $this->objecttable,
+                'create groups',
+                'view.php?id=' . $this->contextinstanceid.'&tab=overview',
+                'create groups namescheme:'.$this->data['other']['pattern'].' numgroups:'.$this->data['other']['numgrps'],
+                $this->contextinstanceid
+            ];
         }
-        return array($this->courseid,
-                     $this->objecttable,
-                     'update agrps',
-                     'view.php?id='.$this->contextinstanceid.'&tab=overview',
-                     $this->objectid,
-                     $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'update agrps',
+            'view.php?id='.$this->contextinstanceid.'&tab=overview',
+            $this->objectid,
+            $this->contextinstanceid
+        ];
     }
 
     /**

@@ -70,10 +70,10 @@ class import_confirm_form extends \moodleform {
 
         $mform->addElement('html', $this->_customdata['confirmmessage']);
 
-        $buttonarray = array();
+        $buttonarray = [];
         $buttonarray[] = &$mform->createElement('submit', 'confirm', get_string('continue'));
         $buttonarray[] = &$mform->createElement('cancel');
-        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
     }
 
     /**

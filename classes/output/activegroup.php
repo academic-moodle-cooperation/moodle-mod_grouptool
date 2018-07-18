@@ -69,7 +69,7 @@ class activegroup {
      * @param int[] $groupings (optional) array of active groups grouping ids
      * @param bool $selected (optional) selection status of active group (selected or not)
      */
-    public function __construct($id, $groupid, $grouptoolid, $name, $size, $order, $status, $groupings=array(), $selected=0) {
+    public function __construct($id, $groupid, $grouptoolid, $name, $size, $order, $status, $groupings=[], $selected=false) {
         $this->id = $id;
         $this->groupid = $groupid;
         $this->grouptoolid = $grouptoolid;
@@ -112,7 +112,7 @@ class activegroup {
              LEFT JOIN {grouptool} grptl ON agrp.grouptoolid = grptl.id
                  WHERE agrp.groupid = ? AND agrp.grouptoolid = ?";
 
-        $obj = $DB->get_record_sql($sql, array($groupid, $grouptoolid));
+        $obj = $DB->get_record_sql($sql, [$groupid, $grouptoolid]);
 
         if (empty($obj->use_size)) {
             $obj->size = null;
@@ -123,7 +123,7 @@ class activegroup {
         $obj->groupings = $DB->get_records_sql_menu("SELECT groupingid, name
                                                        FROM {groupings_groups}
                                                   LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
-                                                      WHERE groupid = ?", array($groupid));
+                                                      WHERE groupid = ?", [$groupid]);
 
         return $this->construct_from_obj($obj);
     }
@@ -139,6 +139,6 @@ class activegroup {
         $this->groupings = $DB->get_records_sql_menu("SELECT groupingid, name
                                                         FROM {groupings_groups}
                                                    LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
-                                                       WHERE groupid = ?", array($this->groupid));
+                                                       WHERE groupid = ?", [$this->groupid]);
     }
 }

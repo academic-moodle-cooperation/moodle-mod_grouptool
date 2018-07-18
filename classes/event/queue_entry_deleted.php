@@ -54,11 +54,11 @@ class queue_entry_deleted extends \core\event\base {
      */
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = 'event';
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $entrydata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$entrydata,
-        ));
+        ]);
         return $event;
     }
 
@@ -71,11 +71,11 @@ class queue_entry_deleted extends \core\event\base {
      */
     public static function create_limit_violation(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->reason = 'registration limit violation';
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $entrydata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$entrydata,
-        ));
+        ]);
         return $event;
     }
 
@@ -89,11 +89,11 @@ class queue_entry_deleted extends \core\event\base {
     public static function create_direct(\stdClass $cm, \stdClass $entrydata) {
         $entrydata->source = null;
         $entrydata->reason = null;
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $entrydata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$entrydata,
-        ));
+        ]);
         return $event;
     }
 
@@ -135,9 +135,11 @@ class queue_entry_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid,
-                                                                        'tab' => 'overview',
-                                                                    'groupid' => $this->data['other']['groupid']));
+        return new \moodle_url("/mod/$this->objecttable/view.php", [
+            'id'      => $this->contextinstanceid,
+            'tab'     => 'overview',
+            'groupid' => $this->data['other']['groupid']
+        ]);
     }
 
     /**
@@ -146,10 +148,14 @@ class queue_entry_deleted extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'unqueue',
-                           "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-                           'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
-                           $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'unqueue',
+            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
+            'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
+            $this->contextinstanceid
+        ];
     }
 
     /**

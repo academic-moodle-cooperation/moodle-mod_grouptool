@@ -52,11 +52,11 @@ class group_recreated extends \core\event\base {
      * @return \mod_grouptool\group_recreated event object
      */
     public static function create_from_object($data) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $data['newid'],
             'context' => \context_module::instance($data['cmid']),
             'other' => $data
-        ));
+        ]);
         return $event;
     }
 
@@ -66,7 +66,7 @@ class group_recreated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/grouptool/view.php", array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/grouptool/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -75,8 +75,14 @@ class group_recreated extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'recreate group with id \''.$this->data['other']['groupid'].'\'',
-                     'view.php?id='.$this->contextinstanceid.'&tab=overview', $this->objectid, $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'recreate group with id \''.$this->data['other']['groupid'].'\'',
+            'view.php?id='.$this->contextinstanceid.'&tab=overview',
+            $this->objectid,
+            $this->contextinstanceid
+        ];
     }
 
     /**

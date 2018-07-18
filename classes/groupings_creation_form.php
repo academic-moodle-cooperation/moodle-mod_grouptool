@@ -53,7 +53,7 @@ class groupings_creation_form extends \moodleform {
         $mform->setType('id', PARAM_INT);
         $this->context = \context_module::instance($this->_customdata['id']);
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-        $course = $DB->get_record('course', array('id' => $cm->course));
+        $course = $DB->get_record('course', ['id' => $cm->course]);
 
         foreach ($this->_customdata['selected'] as $select) {
             $mform->addElement('hidden', 'selected['.$select.']');
@@ -77,12 +77,12 @@ class groupings_creation_form extends \moodleform {
         $mform->setType('start_bulkaction', PARAM_BOOL);
 
         $groupingel = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
-        $options = array('' => get_string('choose', 'grouptool'));
+        $options = ['' => get_string('choose', 'grouptool')];
         $options['-1'] = get_string('onenewgrouping', 'grouptool');
         $options['-2'] = get_string('onenewgroupingpergroup', 'grouptool');
         $groupingel->addOptGroup("", $options);
         if ($groupings = groups_get_all_groupings($course->id)) {
-            $options = array();
+            $options = [];
             foreach ($groupings as $grouping) {
                 $options[$grouping->id] = strip_tags(format_string($grouping->name));
             }
@@ -95,11 +95,11 @@ class groupings_creation_form extends \moodleform {
         $mform->setType('name', PARAM_MULTILANG);
         $mform->hideIf ('name', 'target', 'noteq', '-1');
 
-        $grp = array();
+        $grp = [];
         $grp[] = $mform->createElement('submit', 'createGroupings', get_string('create_assign_groupings',
                                                                                'grouptool'));
         $grp[] = $mform->createElement('cancel');
-        $mform->addGroup($grp, 'actionbuttons', '', array(' '), false);
+        $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);
     }
 
@@ -115,7 +115,7 @@ class groupings_creation_form extends \moodleform {
      */
     public function validation($data, $files) {
         $parenterrors = parent::validation($data, $files);
-        $errors = array();
+        $errors = [];
 
         if (($data['target'] == -1) && empty($data['name'])) {
             $errors['name'] = get_string('required');

@@ -31,7 +31,7 @@ $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
 $context = context_module::instance($cmid);
 $PAGE->set_context($context);
-$url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', array('id' => $cmid));
+$url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', ['id' => $cmid]);
 $PAGE->set_url($url);
 $instance = new mod_grouptool($cmid);
 
@@ -89,33 +89,33 @@ switch ($tab) {
     case 'overview':
         require_capability('mod/grouptool:view_regs_group_view', $context);
         // Trigger overview event.
-        $event = \mod_grouptool\event\overview_exported::create(array(
-            'objectid' => $cm->instance,
-            'context'  => context_module::instance($cm->id),
-            'other'    => array(
+        $event = \mod_grouptool\event\overview_exported::create([
+                'objectid' => $cm->instance,
+                'context'  => context_module::instance($cm->id),
+                'other'    => [
                 'tab' => $tab,
                 'format_readable' => $readableformat,
                 'format' => $format,
                 'groupid' => $groupid,
                 'groupingid' => $groupingid,
-            ),
-        ));
+                ],
+        ]);
         $event->trigger();
     break;
     case 'userlist':
         require_capability('mod/grouptool:view_regs_course_view', $context);
         // Trigger userlist event.
-        $event = \mod_grouptool\event\userlist_exported::create(array(
-            'objectid' => $cm->instance,
-            'context'  => context_module::instance($cm->id),
-            'other'    => array(
+        $event = \mod_grouptool\event\userlist_exported::create([
+                'objectid' => $cm->instance,
+                'context'  => context_module::instance($cm->id),
+                'other'    => [
                 'tab' => $tab,
                 'format_readable' => $readableformat,
                 'format' => $format,
                 'groupid' => $groupid,
                 'groupingid' => $groupingid,
-            ),
-        ));
+                ],
+        ]);
         $event->trigger();
     break;
 }

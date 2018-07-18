@@ -54,11 +54,11 @@ abstract class registration extends \core\event\base {
      */
     public static function create_via_eventhandler(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = 'event';
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $regdata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$regdata,
-        ));
+        ]);
         return $event;
     }
 
@@ -71,11 +71,11 @@ abstract class registration extends \core\event\base {
      */
     public static function create_direct(\stdClass $cm, \stdClass $regdata) {
         $regdata->source = null;
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $regdata->id,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$regdata,
-        ));
+        ]);
         return $event;
     }
 
@@ -103,9 +103,9 @@ abstract class registration extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/grouptool/view.php", array('id'      => $this->contextinstanceid,
-                                                                'tab'     => 'overview',
-                                                                'groupid' => $this->data['other']['groupid']));
+        return new \moodle_url("/mod/grouptool/view.php", ['id'      => $this->contextinstanceid,
+                                                           'tab'     => 'overview',
+                                                           'groupid' => $this->data['other']['groupid']]);
     }
 
     /**
@@ -114,10 +114,13 @@ abstract class registration extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, 'grouptool', 'register',
-                           "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-                           'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
-                           $this->contextinstanceid);
+        return [
+            $this->courseid,
+            'grouptool',
+            'register',
+            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
+            'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
+            $this->contextinstanceid];
     }
 
     /**

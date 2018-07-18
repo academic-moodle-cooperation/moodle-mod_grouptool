@@ -52,10 +52,10 @@ class registration_push_started extends \core\event\base {
      * @return \mod_grouptool\registration_push_started event object
      */
     public static function create_from_object(\stdClass $cm) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-        ));
+        ]);
         return $event;
     }
 
@@ -84,7 +84,7 @@ class registration_push_started extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -93,8 +93,14 @@ class registration_push_started extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'start registration push',
-                     'view.php?id='.$this->contextinstanceid.'&tab=overview', $this->objectid, $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'start registration push',
+            'view.php?id='.$this->contextinstanceid.'&tab=overview',
+            $this->objectid,
+            $this->contextinstanceid
+        ];
     }
 
     /**

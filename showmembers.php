@@ -31,8 +31,8 @@ $agrpid = required_param('agrpid', PARAM_INT);
 
 $grouptoolid = $DB->get_field_sql('SELECT agrp.grouptoolid AS grouptoolid
                                      FROM {grouptool_agrps} agrp
-                                    WHERE agrp.id = ?', array($agrpid), MUST_EXIST);
-$grouptool = $DB->get_record('grouptool', array('id' => $grouptoolid), '*', MUST_EXIST);
+                                    WHERE agrp.id = ?', [$agrpid], MUST_EXIST);
+$grouptool = $DB->get_record('grouptool', ['id' => $grouptoolid], '*', MUST_EXIST);
 
 $PAGE->set_url('/mod/grouptool/showmembers.php');
 $coursecontext = context_course::instance($grouptool->course);
@@ -51,7 +51,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     && !has_capability('mod/grouptool:view_regs_course_view', $context)
     && !$grouptool->canshowmembers($agrpid)) {
     echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
-                          array('class' => 'reg'));
+                          ['class' => 'reg']);
 } else {
 
     $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context)
@@ -63,14 +63,14 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     echo $OUTPUT->heading($group->name, 2, 'showmembersheading');
 
     // Add data attributes for JS!
-    $registered = array();
+    $registered = [];
     if (!empty($group->registered)) {
         foreach ($group->registered as $cur) {
             $registered[] = $cur->userid;
         }
     }
     $members = array_keys($group->moodle_members);
-    $queued = array();
+    $queued = [];
     if (!empty($group->queued)) {
         foreach ($group->queued as $cur) {
             $queued[$cur->userid] = $cur->userid;
@@ -103,42 +103,50 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     }
     $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
 
-    $context->absregs = array();
+    $context->absregs = [];
     if (!empty($absregs)) {
         foreach ($absregs as $cur) {
             // These user records are fully fetched in $group->moodle_members!
-            $context->absregs[] = array('idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
-                                        'fullname' => fullname($group->moodle_members[$cur]),
-                                        'id'       => $cur);
+            $context->absregs[] = [
+                    'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                    'fullname' => fullname($group->moodle_members[$cur]),
+                    'id'       => $cur
+            ];
         }
     }
 
-    $context->gtregs = array();
+    $context->gtregs = [];
     if (!empty($gtregs)) {
         foreach ($gtregs as $cur) {
-            $context->gtregs[] = array('idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
-                                       'fullname' => fullname($users[$cur]),
-                                       'id'       => $cur);
+            $context->gtregs[] = [
+                    'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                    'fullname' => fullname($users[$cur]),
+                    'id'       => $cur
+            ];
         }
     }
 
-    $context->mregs = array();
+    $context->mregs = [];
     if (!empty($mdlregs)) {
         foreach ($mdlregs as $cur) {
-            $context->mregs[] = array('idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
-                                      'fullname' => fullname($group->moodle_members[$cur]),
-                                      'id'       => $cur);
+            $context->mregs[] = [
+                    'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                    'fullname' => fullname($group->moodle_members[$cur]),
+                    'id'       => $cur
+            ];
         }
     }
 
-    $context->queued = array();
+    $context->queued = [];
     if (!empty($queued)) {
-        $queuedlist = $DB->get_records('grouptool_queued', array('agrpid' => $group->agrpid), 'timestamp ASC');
+        $queuedlist = $DB->get_records('grouptool_queued', ['agrpid' => $group->agrpid], 'timestamp ASC');
         foreach ($queued as $cur) {
-            $context->queued[] = array('idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
-                                       'fullname' => fullname($users[$cur]),
-                                       'id'       => $cur,
-                                       'rank'     => $this->get_rank_in_queue($queuedlist, $cur));
+            $context->queued[] = [
+                    'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                    'fullname' => fullname($users[$cur]),
+                    'id'       => $cur,
+                    'rank'     => $this->get_rank_in_queue($queuedlist, $cur)
+            ];
         }
     }
 

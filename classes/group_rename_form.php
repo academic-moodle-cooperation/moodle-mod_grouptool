@@ -56,7 +56,7 @@ class group_rename_form extends \moodleform {
         $mform->setType('instance', PARAM_INT);
 
         $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
-        $course = $DB->get_record('course', array('id' => $cm->course));
+        $course = $DB->get_record('course', ['id' => $cm->course]);
         $this->course = $course;
 
         $mform->addElement('hidden', 'tab');
@@ -78,10 +78,10 @@ class group_rename_form extends \moodleform {
         $mform->setDefault('courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $grp = array();
+        $grp = [];
         $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
         $grp[] = $mform->createElement('cancel');
-        $mform->addGroup($grp, 'actionbuttons', '', array(' '), false);
+        $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);
 
     }
@@ -104,7 +104,7 @@ class group_rename_form extends \moodleform {
             $errors['name'] = get_string('choose_group', 'grouptool');
         } else {
             $group = groups_get_group_by_name($this->course->id, $data['name']);
-            $group = $DB->get_record('groups', array('id' => $group));
+            $group = $DB->get_record('groups', ['id' => $group]);
             if (!empty($group) && ($group->id != $data['rename'])) {
                 $errors['name'] = get_string('groupnameexists', 'group', $data['name']);
             }

@@ -44,8 +44,10 @@ require_login($course, false, $cm);
 
 $contextid = null; // Now we have a context object throw away the id from the user!
 $PAGE->set_context($context);
-$PAGE->set_url('/mod/grouptool/groupinggroups_ajax.php', array('contextid' => $context->id,
-                                                               'groupingid'    => $groupingid));
+$PAGE->set_url('/mod/grouptool/groupinggroups_ajax.php', [
+        'contextid' => $context->id,
+        'groupingid'    => $groupingid
+]);
 
 // Get groupings groups.
 $nonconf = new stdClass();
@@ -54,10 +56,10 @@ $nonconf->name = get_string('nonconflicting', 'grouptool');
 $all = new stdClass();
 $all->id = 0;
 $all->name = get_string('all');
-$options = array($nonconf, $all);
+$options = [$nonconf, $all];
 $groups = groups_get_all_groups($course->id, null, $groupingid, 'g.id, g.name');
 foreach ($groups as $key => $group) {
-    $membercount = $DB->count_records('groups_members', array('groupid' => $group->id));
+    $membercount = $DB->count_records('groups_members', ['groupid' => $group->id]);
     if ($membercount == 0) {
         continue;
     }

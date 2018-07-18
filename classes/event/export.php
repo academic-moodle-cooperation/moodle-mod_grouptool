@@ -89,9 +89,11 @@ abstract class export extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/download.php", array('id' => $this->contextinstanceid,
-                                                                             'tab' => $this->exportsubject,
-                                                                             'format' => $this->data['other']['format']));
+        return new \moodle_url("/mod/$this->objecttable/download.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => $this->exportsubject,
+            'format' => $this->data['other']['format']
+        ]);
     }
 
     /**
@@ -100,12 +102,15 @@ abstract class export extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'export',
-                     "download.php?id=".$this->contextinstanceid."&groupingid=".$this->data['other']['groupingid'].
-                     "&groupid=".$this->data['other']['groupid']."&tab=".$this->exportsubject."&format=".
-                     $this->data['other']['format'],
-                     get_string($this->exportsubject, 'grouptool').' '.$this->data['other']['format_readable'],
-                     $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'export',
+            "download.php?id=".$this->contextinstanceid."&groupingid=".$this->data['other']['groupingid'].
+                "&groupid=".$this->data['other']['groupid']."&tab=".$this->exportsubject."&format=".$this->data['other']['format'],
+            get_string($this->exportsubject, 'grouptool').' '.$this->data['other']['format_readable'],
+            $this->contextinstanceid
+        ];
     }
 
     /**

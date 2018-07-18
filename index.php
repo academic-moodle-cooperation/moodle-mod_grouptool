@@ -28,20 +28,20 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 $id = required_param('id', PARAM_INT);   // Course.
 
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 
 require_course_login($course);
 
 /* TRIGGER THE VIEW ALL EVENT */
-$event = \mod_grouptool\event\course_module_instance_list_viewed::create(array(
+$event = \mod_grouptool\event\course_module_instance_list_viewed::create([
     'context' => context_course::instance($course->id)
-));
+]);
 $event->trigger();
 /* END OF VIEW ALL EVENT */
 
 $coursecontext = context_course::instance($course->id);
 $PAGE->set_pagelayout('incourse');
-$PAGE->set_url('/mod/grouptool/index.php', array('id' => $id));
+$PAGE->set_url('/mod/grouptool/index.php', ['id' => $id]);
 $PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($coursecontext);
@@ -50,22 +50,26 @@ echo $OUTPUT->header();
 
 if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
     notice(get_string('nogrouptools', 'grouptool'), new moodle_url('/course/view.php',
-                                                                   array('id' => $course->id)));
+                                                                   ['id' => $course->id]));
 }
 
 $table = new html_table();
 
 if ($course->format == 'weeks') {
-    $table->head  = array(get_string('week'), get_string('name'), get_string('info'),
-                          get_string('moduleintro'));
-    $table->align = array('center', 'left', 'left', 'left');
+    $table->head  = [
+            get_string('week'), get_string('name'), get_string('info'),
+            get_string('moduleintro')
+    ];
+    $table->align = ['center', 'left', 'left', 'left'];
 } else if ($course->format == 'topics') {
-    $table->head  = array(get_string('topic'), get_string('name'), get_string('info'),
-                          get_string('moduleintro'));
-    $table->align = array('center', 'left', 'left', 'left', 'left');
+    $table->head  = [
+            get_string('topic'), get_string('name'), get_string('info'),
+            get_string('moduleintro')
+    ];
+    $table->align = ['center', 'left', 'left', 'left', 'left'];
 } else {
-    $table->head  = array(get_string('name'), get_string('info'), get_string('moduleintro'));
-    $table->align = array('left', 'left', 'left', 'left');
+    $table->head  = [get_string('name'), get_string('info'), get_string('moduleintro')];
+    $table->align = ['left', 'left', 'left', 'left'];
 }
 
 foreach ($grouptools as $grouptool) {
@@ -81,14 +85,16 @@ foreach ($grouptools as $grouptool) {
     if (has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_regs_course_view', $context)
         || has_capability('mod/grouptool:view_regs_group_view', $context)) {
-        $attrib = array('title' => $strgrouptool,
-                        'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule);
+        $attrib = [
+                'title' => $strgrouptool,
+                'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule
+        ];
         if ($grouptool->visible) {
             $attrib['class'] = 'dimmed';
         }
         list($colorclass, $unused) = grouptool_display_lateness(time(), $grouptool->timedue);
 
-        $attr = array('class' => 'info');
+        $attr = ['class' => 'info'];
         if ($grouptool->timeavailable > time()) {
             $str .= html_writer::tag('div', get_string('availabledate', 'grouptool').': '.
                     html_writer::tag('span', userdate($grouptool->timeavailable)),
@@ -97,7 +103,7 @@ foreach ($grouptools as $grouptool) {
         if ($grouptool->timedue) {
             $str .= html_writer::tag('div', $strduedate.': '.
                                             html_writer::tag('span', userdate($grouptool->timedue),
-                                                             array('class' => (($colorclass == 'late') ? ' late' : ''))),
+                                                             ['class' => (($colorclass == 'late') ? ' late' : '')]),
                                      $attr);
         } else {
             $str .= html_writer::tag('div', $strduedateno, $attr);
@@ -110,19 +116,19 @@ foreach ($grouptools as $grouptool) {
             && (has_capability('mod/grouptool:view_regs_group_view', $context)
             || has_capability('mod/grouptool:view_regs_course_view', $context)))
         || has_capability('mod/grouptool:register', $context)) {
-        $str = html_writer::tag('div', $str.$details, array('class' => 'grouptool overview'));
+        $str = html_writer::tag('div', $str.$details, ['class' => 'grouptool overview']);
     }
 
     $info = $str;
 
     if (!$grouptool->visible) {
         $link = html_writer::link(
-                new moodle_url('/mod/grouptool/view.php', array('id' => $grouptool->coursemodule)),
+                new moodle_url('/mod/grouptool/view.php', ['id' => $grouptool->coursemodule]),
                 format_string($grouptool->name, true),
-                array('class' => 'dimmed'));
+                ['class' => 'dimmed']);
     } else {
         $link = html_writer::link(
-                new moodle_url('/mod/grouptool/view.php', array('id' => $grouptool->coursemodule)),
+                new moodle_url('/mod/grouptool/view.php', ['id' => $grouptool->coursemodule]),
                 format_string($grouptool->name, true));
     }
 
@@ -133,9 +139,9 @@ foreach ($grouptools as $grouptool) {
     }
 
     if ($course->format == 'weeks' or $course->format == 'topics') {
-        $table->data[] = array($grouptool->section, $link, $info, $intro);
+        $table->data[] = [$grouptool->section, $link, $info, $intro];
     } else {
-        $table->data[] = array($link, $info, $intro);
+        $table->data[] = [$link, $info, $intro];
     }
 }
 

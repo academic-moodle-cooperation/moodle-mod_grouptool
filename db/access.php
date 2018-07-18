@@ -25,154 +25,154 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-        'mod/grouptool:addinstance' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_COURSE,
-                'legacy' => array(
-                        'editingteacher' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW,
-                )
-        ),
+$capabilities = [
+        'mod/grouptool:addinstance' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_COURSE,
+            'legacy' => [
+                'editingteacher' => CAP_ALLOW,
+                'teacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW,
+            ]
+        ],
 
-        'mod/grouptool:view_description' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'guest' => CAP_ALLOW,
-                        'student' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:view_description' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'guest' => CAP_ALLOW,
+                'student' => CAP_ALLOW,
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:view_own_registration' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'student' => CAP_ALLOW,
-                )
-        ),
+        'mod/grouptool:view_own_registration' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'student' => CAP_ALLOW,
+            ]
+        ],
 
-        'mod/grouptool:export' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:export' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:view_groups' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'student' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:view_groups' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'student' => CAP_ALLOW,
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:view_regs_group_view' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:view_regs_group_view' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:view_regs_course_view' => array(
-                'captype' => 'read',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:view_regs_course_view' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:register' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'student' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:register' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'student' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:grade' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:grade' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:grade_own_group' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:grade_own_group' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:administrate_groups' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:administrate_groups' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:create_groups' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:create_groups' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:create_groupings' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:create_groupings' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:move_students' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+        'mod/grouptool:move_students' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 
-        'mod/grouptool:register_students' => array(
-                'captype' => 'write',
-                'contextlevel' => CONTEXT_MODULE,
-                'legacy' => array(
-                        'teacher' => CAP_ALLOW,
-                        'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
-);
+        'mod/grouptool:register_students' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
+];
 

@@ -56,8 +56,8 @@ class group_resize_form extends \moodleform {
         $mform->setType('instance', PARAM_INT);
 
         $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
-        $course = $DB->get_record('course', array('id' => $cm->course));
-        $group = $DB->get_record('groups', array('id' => $this->_customdata['resize']));
+        $course = $DB->get_record('course', ['id' => $cm->course]);
+        $group = $DB->get_record('groups', ['id' => $this->_customdata['resize']]);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_admin');
@@ -82,10 +82,10 @@ class group_resize_form extends \moodleform {
         $mform->setDefault('courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $grp = array();
+        $grp = [];
         $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
         $grp[] = $mform->createElement('cancel');
-        $mform->addGroup($grp, 'actionbuttons', '', array(' '), false);
+        $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);
     }
 
@@ -108,7 +108,7 @@ class group_resize_form extends \moodleform {
      FROM {grouptool_agrps} agrps
 LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
     WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
-        $params = array('grouptoolid' => $data['instance'], 'groupid' => $data['resize']);
+        $params = ['grouptoolid' => $data['instance'], 'groupid' => $data['resize']];
         $regs = $DB->count_records_sql($sql, $params);
         if (($data['size'] != '') && (clean_param($data['size'], PARAM_INT) <= 0)) {
                 $errors['size'] = get_string('grpsizezeroerror', 'grouptool');
@@ -116,9 +116,11 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
             $errors['size'] = get_string('toomanyregs', 'grouptool');
         } else {
             $DB->set_field('grouptool_agrps', 'grpsize', $data['size'],
-                           array('groupid' => $data['resize'], 'grouptoolid' => $data['instance']));
-            if ($data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', array('groupid'     => $data['resize'],
-                                                                                    'grouptoolid' => $data['instance']))) {
+                           ['groupid' => $data['resize'], 'grouptoolid' => $data['instance']]);
+            if ($data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
+                        'groupid'     => $data['resize'],
+                        'grouptoolid' => $data['instance']
+                    ])) {
                 // Error happened...
                 $errors['size'] = get_string('couldnt_resize_group', 'grouptool', $data['size']);
             }

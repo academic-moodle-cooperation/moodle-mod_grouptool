@@ -53,11 +53,11 @@ class groupings_created extends \core\event\base {
      * @return \mod_grouptool\groupings_created event object
      */
     public static function create_from_object(\stdClass $cm, array $ids) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => $ids,
-        ));
+        ]);
         return $event;
     }
 
@@ -67,7 +67,7 @@ class groupings_created extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -76,9 +76,14 @@ class groupings_created extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'create groupings', 'view.php?id='.
-                     $this->contextinstanceid.'&tab=overview', 'create groupings for groups:'.implode("|", $this->data['other']),
-                     $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'create groupings',
+            'view.php?id='.$this->contextinstanceid.'&tab=overview',
+            'create groupings for groups:'.implode("|", $this->data['other']),
+            $this->contextinstanceid
+        ];
     }
 
     /**

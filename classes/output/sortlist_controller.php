@@ -48,13 +48,13 @@ class sortlist_controller implements \renderable {
         global $SESSION;
         $this->sortlist = $sortlist;
 
-        $classes = optional_param_array('classes', array(0), \PARAM_INT);
+        $classes = optional_param_array('classes', [0], \PARAM_INT);
         $action = optional_param('class_action', 0, \PARAM_ALPHA);
         $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);
 
         if (!empty($gobutton) && ($classes != null) && (count($classes) != 0) && !empty($action)) {
 
-            $groups = array();
+            $groups = [];
             foreach ($classes as $groupingid) {
                 $groups = array_merge($groups, groups_get_all_groups($this->sortlist->cm->course, 0, $groupingid));
             }

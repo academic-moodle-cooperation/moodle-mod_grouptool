@@ -92,17 +92,17 @@ class renderer extends \plugin_renderer_base {
 
         switch ($sortlist->filter) {
             case \mod_grouptool::FILTER_ACTIVE:
-                $url = new \moodle_url($PAGE->url, array('filter' => \mod_grouptool::FILTER_ALL));
+                $url = new \moodle_url($PAGE->url, ['filter' => \mod_grouptool::FILTER_ALL]);
                 $message = get_string('nogroupsactive', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_INACTIVE:
-                $url = new \moodle_url($PAGE->url, array('filter' => \mod_grouptool::FILTER_ALL));
+                $url = new \moodle_url($PAGE->url, ['filter' => \mod_grouptool::FILTER_ALL]);
                 $message = get_string('nogroupsinactive', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_ALL:
-                $url = new \moodle_url($PAGE->url, array('tab' => 'group_creation'));
+                $url = new \moodle_url($PAGE->url, ['tab' => 'group_creation']);
                 $message = get_string('nogroups', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
                 break;

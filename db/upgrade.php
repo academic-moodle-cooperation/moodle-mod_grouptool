@@ -117,15 +117,13 @@ function xmldb_grouptool_upgrade($oldversion) {
         $pbar->update(3, $count, "drop key agrp_id...");
         // Define key agrp_id (foreign) to be dropped form grouptool_registered.
         $table = new xmldb_table('grouptool_registered');
-        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps',
-                             array('id'));
+        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, ['agrp_id'], 'grouptool_agrps', ['id']);
         // Launch drop key agrp_id.
         $dbman->drop_key($table, $key);
 
         $pbar->update(4, $count, "drop index agrp_id-user_id...");
         // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
-        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE,
-                                 array('agrp_id', 'user_id'));
+        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, ['agrp_id', 'user_id']);
         // Conditionally launch drop index agrp_id-user_id.
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
@@ -141,15 +139,13 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         $pbar->update(6, $count, "restore altered key agrp_id...");
         // Define key agrp_id (foreign) to be added to grouptool_registered.
-        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps',
-                             array('id'));
+        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, ['agrp_id'], 'grouptool_agrps', ['id']);
         // Launch add key agrp_id.
         $dbman->add_key($table, $key);
 
         $pbar->update(7, $count, "restore altered index agrp_id-user_id...");
         // Define index agrp_id-user_id (unique) to be added to grouptool_registered.
-        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE,
-                                 array('agrp_id', 'user_id'));
+        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, ['agrp_id', 'user_id']);
         // Conditionally launch add index agrp_id-user_id.
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
@@ -158,15 +154,13 @@ function xmldb_grouptool_upgrade($oldversion) {
         $pbar->update(8, $count, "drop key agrp_id...");
         // Define key agrp_id (foreign) to be dropped form grouptool_registered.
         $table = new xmldb_table('grouptool_queued');
-        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps',
-                             array('id'));
+        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, ['agrp_id'], 'grouptool_agrps', ['id']);
         // Launch drop key agrp_id.
         $dbman->drop_key($table, $key);
 
         $pbar->update(9, $count, "drop index agrp_id-user_id...");
         // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
-        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE,
-                                 array('agrp_id', 'user_id'));
+        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, ['agrp_id', 'user_id']);
         // Conditionally launch drop index agrp_id-user_id.
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
@@ -181,15 +175,13 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         $pbar->update(11, $count, "restore altered key agrp_id...");
         // Define key agrp_id (foreign) to be added to grouptool_registered.
-        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps',
-                             array('id'));
+        $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, ['agrp_id'], 'grouptool_agrps', ['id']);
         // Launch add key agrp_id.
         $dbman->add_key($table, $key);
 
         $pbar->update(12, $count, "restore altered index agrp_id-user_id...");
         // Define index agrp_id-user_id (unique) to be added to grouptool_registered.
-        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE,
-                                 array('agrp_id', 'user_id'));
+        $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, ['agrp_id', 'user_id']);
         // Conditionally launch add index agrp_id-user_id.
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
@@ -291,13 +283,13 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Define key grouptool_id (foreign) to be dropped form grouptool_agrps!
         $table = new xmldb_table('grouptool_agrps');
-        $key = new xmldb_key('grouptool_id', XMLDB_KEY_FOREIGN, array('grouptool_id'), 'grouptool', array('id'));
+        $key = new xmldb_key('grouptool_id', XMLDB_KEY_FOREIGN, ['grouptool_id'], 'grouptool', ['id']);
         // Launch drop key grouptool_id.
         $dbman->drop_key($table, $key);
-        $key = new xmldb_key('group_id', XMLDB_KEY_FOREIGN, array('group_id'), 'groups', array('id'));
+        $key = new xmldb_key('group_id', XMLDB_KEY_FOREIGN, ['group_id'], 'groups', ['id']);
         // Launch drop key group_id.
         $dbman->drop_key($table, $key);
-        $index = new xmldb_index('grouptool-group', XMLDB_INDEX_UNIQUE, array('grouptool_id', 'group_id'));
+        $index = new xmldb_index('grouptool-group', XMLDB_INDEX_UNIQUE, ['grouptool_id', 'group_id']);
         // Conditionally launch drop index grouptool-group.
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
@@ -311,13 +303,13 @@ function xmldb_grouptool_upgrade($oldversion) {
         $dbman->rename_field($table, $field, 'groupid');
 
         // Restore keys and index!
-        $key = new xmldb_key('grouptoolid', XMLDB_KEY_FOREIGN, array('grouptoolid'), 'grouptool', array('id'));
+        $key = new xmldb_key('grouptoolid', XMLDB_KEY_FOREIGN, ['grouptoolid'], 'grouptool', ['id']);
         // Launch add key grouptoolid.
         $dbman->add_key($table, $key);
-        $key = new xmldb_key('groupid', XMLDB_KEY_FOREIGN, array('groupid'), 'groups', array('id'));
+        $key = new xmldb_key('groupid', XMLDB_KEY_FOREIGN, ['groupid'], 'groups', ['id']);
         // Launch add key groupid.
         $dbman->add_key($table, $key);
-        $index = new xmldb_index('grouptool-group', XMLDB_INDEX_UNIQUE, array('grouptoolid', 'groupid'));
+        $index = new xmldb_index('grouptool-group', XMLDB_INDEX_UNIQUE, ['grouptoolid', 'groupid']);
         // Conditionally launch add index grouptool-group.
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
@@ -327,20 +319,22 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     // The following code has code of 2 upgrade steps compressed to a foreach!
-    $tables = array(2013112701 => new xmldb_table('grouptool_registered'),
-                    2013112702 => new xmldb_table('grouptool_queued'));
+    $tables = [
+            2013112701 => new xmldb_table('grouptool_registered'),
+            2013112702 => new xmldb_table('grouptool_queued')
+    ];
     foreach ($tables as $vers => $table) {
         if ($oldversion < $vers) {
             // Define key agrp_id (foreign) to be dropped form grouptool_queued.
-            $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, array('agrp_id'), 'grouptool_agrps', array('id'));
+            $key = new xmldb_key('agrp_id', XMLDB_KEY_FOREIGN, ['agrp_id'], 'grouptool_agrps', ['id']);
             // Launch drop key agrp_id.
             $dbman->drop_key($table, $key);
             // Define key user_id (foreign) to be dropped form grouptool_registered.
-            $key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, array('user_id'), 'user', array('id'));
+            $key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, ['user_id'], 'user', ['id']);
             // Launch drop key user_id.
             $dbman->drop_key($table, $key);
              // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
-            $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, array('agrp_id', 'user_id'));
+            $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, ['agrp_id', 'user_id']);
             // Conditionally launch drop index agrp_id-user_id.
             if ($dbman->index_exists($table, $index)) {
                 $dbman->drop_index($table, $index);
@@ -354,13 +348,13 @@ function xmldb_grouptool_upgrade($oldversion) {
             $dbman->rename_field($table, $field, 'userid');
 
             // Restore keys and index!
-            $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, array('agrpid'), 'grouptool_agrps', array('id'));
+            $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, ['agrpid'], 'grouptool_agrps', ['id']);
             // Launch add key agrpid.
             $dbman->add_key($table, $key);
-            $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+            $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
             // Launch add key userid.
             $dbman->add_key($table, $key);
-            $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, array('agrpid', 'userid'));
+            $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, ['agrpid', 'userid']);
             // Conditionally launch add index agrpiduserid.
             if (!$dbman->index_exists($table, $index)) {
                 $dbman->add_index($table, $index);
@@ -396,12 +390,14 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     if ($oldversion < 2014110703) {
         // Move module settings from config table to config_plugins!
-        $settingsnames = array('requiremodintro', 'name_scheme', 'allow_reg',
-                               'show_members', 'immediate_reg', 'allow_unreg',
-                               'grpsize', 'use_size', 'use_individual', 'use_queue',
-                               'max_queues', 'allow_multiple', 'choose_min', 'choose_max',
-                               'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted',
-                               'force_importreg', 'importfields');
+        $settingsnames = [
+                'requiremodintro', 'name_scheme', 'allow_reg',
+                'show_members', 'immediate_reg', 'allow_unreg',
+                'grpsize', 'use_size', 'use_individual', 'use_queue',
+                'max_queues', 'allow_multiple', 'choose_min', 'choose_max',
+                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted',
+                'force_importreg', 'importfields'
+        ];
         // Check if everything is all right!
         foreach ($settingsnames as $key => $cur) {
             $name = 'grouptool_'.$cur;
@@ -411,7 +407,7 @@ function xmldb_grouptool_upgrade($oldversion) {
                      html_writer::empty_tag('br')."<br />";
                 continue;
             }
-            if ($DB->count_records('config', array('name' => $name)) != 1) {
+            if ($DB->count_records('config', ['name' => $name]) != 1) {
                 unset($settingsnames[$key]);
                 echo "Can't select setting for '".$name.
                      "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!".
@@ -423,7 +419,7 @@ function xmldb_grouptool_upgrade($oldversion) {
             $name = 'grouptool_'.$cur;
             set_config($cur, $CFG->$name, 'mod_grouptool');
             if (get_config('mod_grouptool', $cur) !== false) {
-                $DB->delete_records('config', array('name' => $name));
+                $DB->delete_records('config', ['name' => $name]);
             } else {
                 throw new coding_exception("'$name' could not be properly migrated, because of some coding error.");
             }
@@ -436,7 +432,7 @@ function xmldb_grouptool_upgrade($oldversion) {
     if ($oldversion < 2015042200) {
         // Fix a misspelled - and already corrected - string identifier blocking language customisations.
         $DB->set_field_select('tool_customlang', 'stringid', 'create_assign_groupings', $DB->sql_like('stringid', ':stringid'),
-                              array('stringid' => 'create_assign_Groupings'));
+                              ['stringid' => 'create_assign_Groupings']);
 
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2015042200, 'grouptool');
@@ -481,18 +477,22 @@ function xmldb_grouptool_upgrade($oldversion) {
         require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
 
         // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
-        $count = $DB->count_records('event', array('modulename' => 'grouptool',
-                                                   'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE));
-        $rs = $DB->get_recordset('event', array('modulename' => 'grouptool',
-                                                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE));
+        $count = $DB->count_records('event', [
+                'modulename' => 'grouptool',
+                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE
+        ]);
+        $rs = $DB->get_recordset('event', [
+                'modulename' => 'grouptool',
+                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE
+        ]);
         $i = 0;
-        $cmnames = array();
+        $cmnames = [];
         $pbar = new progress_bar('UpdateEvents', 500, true);
         $pbar->update($i, $count, 'Update events...');
         foreach ($rs as $cur) {
             $calendarevent = calendar_event::load($cur->id);
             if (!array_key_exists($cur->instance, $cmnames)) {
-                $cmnames[$cur->instance] = $DB->get_field('grouptool', 'name', array('id' => $cur->instance));
+                $cmnames[$cur->instance] = $DB->get_field('grouptool', 'name', ['id' => $cur->instance]);
             }
             $cur->name = $cmnames[$cur->instance];
             $cur->type = CALENDAR_EVENT_TYPE_ACTION;
@@ -512,7 +512,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         if ($maxqueues !== false) {
             set_config('users_queues_limit', $maxqueues, 'mod_grouptool');
             set_config('groups_queues_limit', 0, 'mod_grouptool');
-            $DB->delete_records('config_plugins', array('name' => 'max_queues', 'plugin' => 'mod_grouptool'));
+            $DB->delete_records('config_plugins', ['name' => 'max_queues', 'plugin' => 'mod_grouptool']);
         }
 
         // Checkmark savepoint reached.

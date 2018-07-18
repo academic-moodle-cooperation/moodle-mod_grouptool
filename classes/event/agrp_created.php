@@ -52,11 +52,11 @@ class agrp_created extends \core\event\base {
      * @param \mod_grouptool\agrp_created $agrp active-group object which has been created
      */
     public static function create_from_object(\stdClass $cm, $agrp) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $agrp->id,
             'context' => \context_module::instance($cm->id),
             'other' => (array)$agrp
-        ));
+        ]);
         return $event;
     }
 
@@ -66,9 +66,7 @@ class agrp_created extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php",
-                               array('id'  => $this->contextinstanceid,
-                                     'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php", ['id'  => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -77,12 +75,14 @@ class agrp_created extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid,
-                     $this->objecttable,
-                     'create agrp with id \''.$this->data['other']['id'].'\'',
-                     'view.php?id=' . $this->contextinstanceid.'&tab=overview',
-                     $this->objectid,
-                     $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'create agrp with id \''.$this->data['other']['id'].'\'',
+            'view.php?id=' . $this->contextinstanceid.'&tab=overview',
+            $this->objectid,
+            $this->contextinstanceid
+        ];
     }
 
     /**

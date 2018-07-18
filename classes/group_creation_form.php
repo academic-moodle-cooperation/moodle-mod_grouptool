@@ -72,8 +72,8 @@ class group_creation_form extends \moodleform {
         $this->context = \context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-        $course = $DB->get_record('course', array('id' => $cm->course));
-        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $cm->course]);
+        $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
         $coursecontext = \context_course::instance($cm->course);
 
         $mform->addElement('hidden', 'tab');
@@ -87,7 +87,7 @@ class group_creation_form extends \moodleform {
             $mform->addElement('header', 'group_creation', get_string('groupcreation',
                                                                       'grouptool'));
 
-            $options = array(0 => get_string('all'));
+            $options = [0 => get_string('all')];
             $options += $this->_customdata['roles'];
             $mform->addElement('select', 'roleid', get_string('selectfromrole', 'group'), $options);
             $student = get_archetype_roles('student');
@@ -101,7 +101,7 @@ class group_creation_form extends \moodleform {
             if ($canviewcohorts) {
                 $cohorts = cohort_get_available_cohorts($coursecontext, true, 0, 0);
                 if (count($cohorts) != 0) {
-                    $options = array(0 => get_string('anycohort', 'cohort'));
+                    $options = [0 => get_string('anycohort', 'cohort')];
                     foreach ($cohorts as $cohort) {
                          $options[$cohort->id] = $cohort->name;
                     }
@@ -110,7 +110,7 @@ class group_creation_form extends \moodleform {
                     $mform->setDefault('cohortid', '0');
                 }
             } else {
-                $cohorts = array();
+                $cohorts = [];
             }
 
             if (!$canviewcohorts || (count($cohorts) == 0)) {
@@ -122,7 +122,7 @@ class group_creation_form extends \moodleform {
             $mform->addElement('hidden', 'seed');
             $mform->setType('seed', PARAM_INT);
 
-            $radioarray = array();
+            $radioarray = [];
             $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('define_amount_groups', 'grouptool'),
                                                   GROUPTOOL_GROUPS_AMOUNT);
             $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('define_amount_members', 'grouptool'),
@@ -139,20 +139,20 @@ class group_creation_form extends \moodleform {
             $mform->setDefault('mode', GROUPTOOL_GROUPS_AMOUNT);
             $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
-            $mform->addElement('text', 'numberofgroups', get_string('number_of_groups', 'grouptool'), array('size' => '4'));
+            $mform->addElement('text', 'numberofgroups', get_string('number_of_groups', 'grouptool'), ['size' => '4']);
             $mform->hideIf('numberofgroups', 'mode', 'eq', GROUPTOOL_MEMBERS_AMOUNT);
             $mform->hideIf ('numberofgroups', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->hideIf ('numberofgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->setType('numberofgroups', PARAM_INT);
             $mform->setDefault('numberofgroups', 2);
 
-            $mform->addElement('text', 'numberofmembers', get_string('number_of_members', 'grouptool'), array('size' => '4'));
+            $mform->addElement('text', 'numberofmembers', get_string('number_of_members', 'grouptool'), ['size' => '4']);
             $mform->hideIf('numberofmembers', 'mode', 'eq', GROUPTOOL_GROUPS_AMOUNT);
             $mform->hideIf ('numberofmembers', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->setType('numberofmembers', PARAM_INT);
             $mform->setDefault('numberofmembers', $grouptool->grpsize);
 
-            $fromto = array();
+            $fromto = [];
             $fromto[] = $mform->createElement('text', 'from', get_string('from'));
             $mform->setDefault('from', 0);
             /*
@@ -174,8 +174,10 @@ class group_creation_form extends \moodleform {
              * with texts getting mapped to 0
              */
             $mform->setType('digits', PARAM_RAW);
-            $fromtoglue = array(' '.\html_writer::tag('label', '-', array('for' => 'id_from')).' ',
-                                ' '.\html_writer::tag('label', get_string('digits', 'grouptool'), array('for' => 'id_digits')).' ');
+            $fromtoglue = [
+                ' '.\html_writer::tag('label', '-', ['for' => 'id_from']).' ',
+                ' '.\html_writer::tag('label', get_string('digits', 'grouptool'), ['for' => 'id_digits']).' '
+            ];
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'), $fromtoglue, false);
             $mform->hideIf ('fromto', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
 
@@ -185,11 +187,13 @@ class group_creation_form extends \moodleform {
             $mform->hideIf ('nosmallgroups', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->hideIf ('nosmallgroups', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
-            $options = array('no'        => get_string('noallocation', 'group'),
-                             'random'    => get_string('random', 'group'),
-                             'firstname' => get_string('byfirstname', 'group'),
-                             'lastname'  => get_string('bylastname', 'group'),
-                             'idnumber'  => get_string('byidnumber', 'group'));
+            $options = [
+                'no'        => get_string('noallocation', 'group'),
+                'random'    => get_string('random', 'group'),
+                'firstname' => get_string('byfirstname', 'group'),
+                'lastname'  => get_string('bylastname', 'group'),
+                'idnumber'  => get_string('byidnumber', 'group')
+            ];
             $mform->addElement('select', 'allocateby', get_string('allocateby', 'group'), $options);
             if ($grouptool->allow_reg) {
                 $mform->setDefault('allocateby', 'no');
@@ -200,13 +204,13 @@ class group_creation_form extends \moodleform {
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
-            $tags = array();
+            $tags = [];
             foreach (\mod_grouptool::NAME_TAGS as $tag) {
-                $tags[] = html_writer::tag('span', $tag, array('class' => 'nametag', 'data-nametag' => $tag));
+                $tags[] = html_writer::tag('span', $tag, ['class' => 'nametag', 'data-nametag' => $tag]);
             }
 
-            $naminggrp = array();
-            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', array('size' => '64'));
+            $naminggrp = [];
+            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', ['size' => '64']);
             $naminggrp[] =& $mform->createElement('static', 'tags', '', implode("", $tags));
             $namingstd = get_config('mod_grouptool', 'name_scheme');
             $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
@@ -219,13 +223,13 @@ class group_creation_form extends \moodleform {
 
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 
-            $options = array('0' => get_string('no'));
+            $options = ['0' => get_string('no')];
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
                 $options['-1'] = get_string('onenewgrouping', 'grouptool');
             }
             $selectgroups->addOptGroup("", $options);
             if ($groupings = groups_get_all_groupings($course->id)) {
-                $options = array();
+                $options = [];
                 foreach ($groupings as $grouping) {
                     $options[$grouping->id] = strip_tags(format_string($grouping->name));
                 }
@@ -257,12 +261,12 @@ class group_creation_form extends \moodleform {
      */
     public function validation($data, $files) {
         $parenterrors = parent::validation($data, $files);
-        $errors = array();
+        $errors = [];
         if (!empty($data['createGroups']) && $data['grouping'] == "-1"
                 && (empty($data['groupingname']) || $data['groupingname'] == "")) {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
-        if (!empty($data['createGroups']) && in_array($data['mode'], array(GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS))
+        if (!empty($data['createGroups']) && in_array($data['mode'], [GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS])
                 && ($data['numberofgroups'] <= 0)) {
             $errors['numberofgroups'] = get_string('mustbeposint', 'grouptool');
         }

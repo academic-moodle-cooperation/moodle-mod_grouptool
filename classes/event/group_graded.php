@@ -55,11 +55,11 @@ class group_graded extends \core\event\base {
     public static function create_direct(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
         $data->type = 'group';
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$data,
-        ));
+        ]);
         return $event;
     }
 
@@ -73,11 +73,11 @@ class group_graded extends \core\event\base {
     public static function create_without_groupid(\stdClass $cm, \stdClass $data) {
         // Trigger overview event.
         $data->type = 'users';
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),
             'other'    => (array)$data,
-        ));
+        ]);
         return $event;
     }
 
@@ -116,16 +116,20 @@ class group_graded extends \core\event\base {
      */
     public function get_url() {
         if ($this->data['other']['type'] == 'users') {
-            return new \moodle_url("/mod/$this->objecttable/view.php", array('id'            => $this->contextinstanceid,
-                                                                             'tab'           => 'grading',
-                                                                             'activity'      => $this->data['other']['cmtouse'],
-                                                                             'refresh_table' => 1));
+            return new \moodle_url("/mod/$this->objecttable/view.php", [
+                'id'            => $this->contextinstanceid,
+                'tab'           => 'grading',
+                'activity'      => $this->data['other']['cmtouse'],
+                'refresh_table' => 1
+            ]);
         }
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id'            => $this->contextinstanceid,
-                                                                         'tab'           => 'grading',
-                                                                         'activity'      => $this->data['other']['cmtouse'],
-                                                                         'groupid'       => $this->data['other']['groupid'],
-                                                                         'refresh_table' => 1));
+        return new \moodle_url("/mod/$this->objecttable/view.php", [
+            'id'            => $this->contextinstanceid,
+            'tab'           => 'grading',
+            'activity'      => $this->data['other']['cmtouse'],
+            'groupid'       => $this->data['other']['groupid'],
+            'refresh_table' => 1
+        ]);
     }
 
     /**
@@ -135,15 +139,26 @@ class group_graded extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         if ($this->data['other']['type'] == 'users') {
-            return array($this->courseid, 'grouptool', 'grade group',
-                         "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
-                         "&refresh_table=1", "group-grade users ".implode(", ", $this->data['other']['selected']),
-                         $this->contextinstanceid);
+            return [
+                $this->courseid,
+                'grouptool',
+                'grade group',
+                "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
+                        "&refresh_table=1",
+                "group-grade users ".implode(", ",
+                $this->data['other']['selected']),
+                $this->contextinstanceid
+            ];
         }
-        return array($this->courseid, 'grouptool', 'grade group',
-                           "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
-                           "&groupid=".$this->data['other']['groupid']."&refresh_table=1",
-                           'group-grade group '.$this->data['other']['groupid'], $this->contextinstanceid);
+        return [
+            $this->courseid,
+            'grouptool',
+            'grade group',
+            "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
+                   "&groupid=".$this->data['other']['groupid']."&refresh_table=1",
+            'group-grade group '.$this->data['other']['groupid'],
+            $this->contextinstanceid
+        ];
     }
 
     /**

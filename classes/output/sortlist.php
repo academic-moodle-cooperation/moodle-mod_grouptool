@@ -38,9 +38,9 @@ class sortlist implements \renderable {
     /** @var string $tableclass CSS class for table */
     public $tableclass = 'coloredrows';
     /** @var \stdClass[] $groupings array of non-empty groupings of this course */
-    public $groupings = array();
+    public $groupings = [];
     /** @var \mod_grouptool\output\activegroup[] $groups array of activegroups */
-    public $groups = array();
+    public $groups = [];
     /** @var int $globalsize active groups standard/global group size */
     public $globalsize = 0;
     /** @var bool $usesize whether or not to use group size */
@@ -66,36 +66,44 @@ class sortlist implements \renderable {
 
         if ($moveup = optional_param('moveup', 0, PARAM_INT)) {
             // Move up!
-            $a = $DB->get_record('grouptool_agrps', array('groupid' => $moveup,
-                                                          'grouptoolid' => $cm->instance));
-            $b = $DB->get_record('grouptool_agrps', array('grouptoolid' => $a->grouptoolid,
-                                                          'sort_order' => ($a->sort_order - 1)));
+            $a = $DB->get_record('grouptool_agrps', [
+                'groupid' => $moveup,
+                'grouptoolid' => $cm->instance
+            ]);
+            $b = $DB->get_record('grouptool_agrps', [
+                'grouptoolid' => $a->grouptoolid,
+                'sort_order' => ($a->sort_order - 1)
+            ]);
             if (empty($a) || empty($b)) {
                 echo $OUTPUT->notification(get_string('couldnt_move_up', 'grouptool'), 'error');
             } else {
-                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, array('id' => $b->id));
-                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, array('id' => $a->id));
+                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, ['id' => $b->id]);
+                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, ['id' => $a->id]);
             }
         }
 
         if ($movedown = optional_param('movedown', 0, PARAM_INT)) {
             // Move up!
-            $a = $DB->get_record('grouptool_agrps', array('groupid' => $movedown,
-                                                          'grouptoolid' => $cm->instance));
-            $b = $DB->get_record('grouptool_agrps', array('grouptoolid' => $a->grouptoolid,
-                                                          'sort_order' => ($a->sort_order + 1)));
+            $a = $DB->get_record('grouptool_agrps', [
+                'groupid' => $movedown,
+                'grouptoolid' => $cm->instance
+            ]);
+            $b = $DB->get_record('grouptool_agrps', [
+                'grouptoolid' => $a->grouptoolid,
+                'sort_order' => ($a->sort_order + 1)
+            ]);
             if (empty($a) || empty($b)) {
                 echo $OUTPUT->notification(get_string('couldnt_move_down', 'grouptool'), 'error');
             } else {
-                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, array('id' => $b->id));
-                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, array('id' => $a->id));
+                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, ['id' => $b->id]);
+                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, ['id' => $a->id]);
             }
         }
 
         if ($courseid != null) {
             $this->loadgroups($courseid, $cm);
             $this->cm = $cm;
-            $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
+            $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance]);
             $this->usesize = $grouptool->use_size;
             $this->useindividual = $grouptool->use_individual;
         }
@@ -105,7 +113,7 @@ class sortlist implements \renderable {
             $SESSION->sortlist = new \stdClass();
         }
         if (!isset($SESSION->sortlist->selected)) {
-            $SESSION->sortlist->selected = array();
+            $SESSION->sortlist->selected = [];
         }
 
         if ($this->selected == null) {
@@ -124,11 +132,11 @@ class sortlist implements \renderable {
     public function loadgroups($courseid, $cm) {
         global $DB;
 
-        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance));
+        $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance]);
         // Prepare agrp-data!
         $coursegroups = groups_get_all_groups($courseid, null, null, "id");
         if (is_array($coursegroups) && !empty($coursegroups)) {
-            $groups = array();
+            $groups = [];
             foreach ($coursegroups as $group) {
                 $groups[] = $group->id;
             }
@@ -144,7 +152,7 @@ class sortlist implements \renderable {
             if (!is_object($cm)) {
                 $cm = get_coursemodule_from_id('grouptool', $cm);
             }
-            $params = array_merge(array($cm->instance), $params);
+            $params = array_merge([$cm->instance], $params);
             $groupdata = (array)$DB->get_records_sql("
                     SELECT MAX(grp.id) AS groupid, MAX(agrp.id) AS id,
                            MAX(agrp.grouptoolid) AS grouptoolid,  MAX(grp.name) AS name,
@@ -172,7 +180,7 @@ class sortlist implements \renderable {
                                                       FROM {groupings_groups}
                                                  LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
                                                      WHERE {groupings}.courseid = ? AND {groupings_groups}.groupid = ?",
-                                                                        array($courseid, $group->groupid));
+                                                                        [$courseid, $group->groupid]);
             }
         }
 
@@ -196,7 +204,7 @@ class sortlist implements \renderable {
                       FROM {groupings_groups}
                  LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
                      WHERE {groupings}.courseid = ?
-                  ORDER BY name ASC", array($courseid));
+                  ORDER BY name ASC", [$courseid]);
         }
     }
 
@@ -233,7 +241,7 @@ class sortlist implements \renderable {
         }
 
         if (!empty($action)) {
-            $groups = array();
+            $groups = [];
             foreach ($groupings as $groupingid) {
                 $groups = array_merge($groups, groups_get_all_groups($COURSE->id, 0, $groupingid));
             }

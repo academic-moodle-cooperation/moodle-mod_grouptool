@@ -56,11 +56,16 @@ class user_imported extends \core\event\base {
      * @return \mod_grouptool\user_imported event object
      */
     public static function import_forced(\stdClass $cm, $id, $agrp, $group, $user) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $id,
             'context'  => \context_module::instance($cm->id),
-            'other'    => array('agrp' => $agrp, 'group' => $group, 'user' => $user, 'type' => 'force'),
-        ));
+            'other'    => [
+                'agrp' => $agrp,
+                'group' => $group,
+                'user' => $user,
+                'type' => 'force'
+            ],
+        ]);
         return $event;
     }
 
@@ -73,11 +78,15 @@ class user_imported extends \core\event\base {
      * @return \mod_grouptool\user_imported event object
      */
     public static function import(\stdClass $cm, $group, $user) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => 0,
             'context'  => \context_module::instance($cm->id),
-            'other'    => array('group' => $group, 'user' => $user, 'type' => ''),
-        ));
+            'other'    => [
+                'group' => $group,
+                'user' => $user,
+                'type' => ''
+            ],
+        ]);
         return $event;
     }
 
@@ -112,9 +121,11 @@ class user_imported extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id'      => $this->contextinstanceid,
-                                                                         'tab'     => 'overview',
-                                                                         'groupid' => $this->data['other']['group']));
+        return new \moodle_url("/mod/$this->objecttable/view.php", [
+            'id'      => $this->contextinstanceid,
+            'tab'     => 'overview',
+            'groupid' => $this->data['other']['group']
+        ]);
     }
 
     /**
@@ -124,14 +135,24 @@ class user_imported extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         if ($this->data['other']['type'] == 'force') {
-            return array($this->courseid, 'grouptool', 'import',
-                               "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
-                               'group='.$this->data['other']['group'].' agrp='.$this->data['other']['agrp'].' user='.
-                               $this->data['other']['user'], $this->contextinstanceid);
+            return [
+                $this->courseid,
+                'grouptool',
+                'import',
+                "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
+                'group='.$this->data['other']['group'].' agrp='.$this->data['other']['agrp'].' user='.
+                        $this->data['other']['user'],
+                $this->contextinstanceid
+            ];
         } else {
-            return array($this->courseid, 'grouptool', 'import',
-                         "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
-                         'group='.$this->data['other']['group'].' user='.$this->data['other']['user'], $this->contextinstanceid);
+            return [
+                $this->courseid,
+                'grouptool',
+                'import',
+                "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
+                'group='.$this->data['other']['group'].' user='.$this->data['other']['user'],
+                $this->contextinstanceid
+            ];
         }
     }
 

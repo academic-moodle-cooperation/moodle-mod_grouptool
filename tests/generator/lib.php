@@ -49,7 +49,7 @@ class mod_grouptool_generator extends testing_module_generator {
 
         $timecreated = time();
 
-        $defaultsettings = array(
+        $defaultsettings = [
             'name' => 'Grouptool',
             'intro' => 'Introtext',
             'introformat' => 1,
@@ -73,7 +73,7 @@ class mod_grouptool_generator extends testing_module_generator {
             'ifmemberadded' => 1,
             'ifmemberremoved' => 1,
             'ifgroupdeleted' => 1,
-        );
+        ];
 
         foreach ($defaultsettings as $name => $value) {
             if (!isset($record->{$name})) {

@@ -24,82 +24,83 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$services = array(
-    'mod_grouptool_administrate_groups' => array(
-        'functions' => array (
+$services = [
+    'mod_grouptool_administrate_groups' => [
+            'functions' => [
                 'mod_grouptool_delete_group',
                 'mod_grouptool_rename_group',
                 'mod_grouptool_resize_group',
                 'mod_grouptool_activate_group',
                 'mod_grouptool_deactivate_group',
                 'mod_grouptool_reorder_groups',
-                'mod_grouptool_swap_groups'),
-        /* If set, the web service user need this capability to access
-        * any function of this service. For example: 'some/capability:specified'. */
-        'requiredcapability' => 'mod/grouptool:administrate_groups',
-        /* If enabled, the Moodle administrator must link some user to this service
-         * into the administration. */
-        'restrictedusers' => 0,
-        // If enabled, the service can be reachable on a default installation.
-        'enabled' => 1,
-    )
-);
+                'mod_grouptool_swap_groups'
+            ],
+            /* If set, the web service user need this capability to access
+            * any function of this service. For example: 'some/capability:specified'. */
+            'requiredcapability' => 'mod/grouptool:administrate_groups',
+            /* If enabled, the Moodle administrator must link some user to this service
+             * into the administration. */
+            'restrictedusers' => 0,
+            // If enabled, the service can be reachable on a default installation.
+            'enabled' => 1,
+    ]
+];
 
-$functions = array(
-    'mod_grouptool_delete_group' => array(
+$functions = [
+        'mod_grouptool_delete_group' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'delete_group',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Delete a single group.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-    'mod_grouptool_rename_group' => array(
+        ],
+        'mod_grouptool_rename_group' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'rename_group',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Rename a single group.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-    'mod_grouptool_resize_group' => array(
+        ],
+        'mod_grouptool_resize_group' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'resize_group',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Change group size.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-    'mod_grouptool_activate_group' => array(
+        ],
+        'mod_grouptool_activate_group' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'activate_group',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Set group to active for this grouptool instance.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-    'mod_grouptool_deactivate_group' => array(
+        ],
+        'mod_grouptool_deactivate_group' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'deactivate_group',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Set group to inactive for this grouptool instance.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-    'mod_grouptool_reorder_groups' => array(
+        ],
+        'mod_grouptool_reorder_groups' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'reorder_groups',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Set order for multiple groups.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-    'mod_grouptool_swap_groups' => array(
+        ],
+        'mod_grouptool_swap_groups' => [
         'classname'   => 'mod_grouptool_external',
         'methodname'  => 'swap_groups',
         'classpath'   => 'mod/grouptool/externallib.php',
         'description' => 'Swap positions of 2 groups.',
         'type'        => 'write',
         'ajax'        => true,
-    ),
-);
+        ],
+];

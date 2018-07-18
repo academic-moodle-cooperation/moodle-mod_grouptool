@@ -55,14 +55,16 @@ class group_creation_started extends \core\event\base {
      * @return \mod_grouptool\group_creation_started event object
      */
     public static function create_groupamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-            'other' => array( 'mode'     => 'groups_amount',
-                              'pattern'  => $pattern,
-                              'amount'   => $amount,
-                              'grouping' => $grouping),
-        ));
+            'other' => [
+                'mode'     => 'groups_amount',
+                'pattern'  => $pattern,
+                'amount'   => $amount,
+                'grouping' => $grouping
+            ],
+        ]);
         return $event;
     }
 
@@ -76,14 +78,16 @@ class group_creation_started extends \core\event\base {
      * @return \mod_grouptool\group_creation_started event object
      */
     public static function create_memberamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-            'other' => array( 'mode'     => 'members_amount',
-                              'pattern'  => $pattern,
-                              'amount'   => $amount,
-                              'grouping' => $grouping),
-        ));
+            'other' => [
+                'mode'     => 'members_amount',
+                'pattern'  => $pattern,
+                'amount'   => $amount,
+                'grouping' => $grouping
+            ],
+        ]);
         return $event;
     }
 
@@ -98,15 +102,17 @@ class group_creation_started extends \core\event\base {
      * @return \mod_grouptool\group_creation_started event object
      */
     public static function create_fromto(\stdClass $cm, $pattern, $from, $to, $grouping = 0) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-            'other' => array( 'mode'     => 'fromto',
-                              'pattern'  => $pattern,
-                              'from'     => $from,
-                              'to'         => $to,
-                              'grouping' => $grouping),
-        ));
+            'other' => [
+                'mode'     => 'fromto',
+                'pattern'  => $pattern,
+                'from'     => $from,
+                'to'         => $to,
+                'grouping' => $grouping
+            ],
+        ]);
         return $event;
     }
 
@@ -119,13 +125,15 @@ class group_creation_started extends \core\event\base {
      * @return \mod_grouptool\group_creation_started event object
      */
     public static function create_person(\stdClass $cm, $pattern, $grouping = 0) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
-            'other' => array( 'mode'     => '1-person-groups',
-                              'pattern'  => $pattern,
-                              'grouping' => $grouping),
-        ));
+            'other' => [
+                'mode'     => '1-person-groups',
+                'pattern'  => $pattern,
+                'grouping' => $grouping
+            ],
+        ]);
         return $event;
     }
 
@@ -182,7 +190,7 @@ class group_creation_started extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid, 'tab' => 'overview'));
+        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**

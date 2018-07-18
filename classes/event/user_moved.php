@@ -59,11 +59,15 @@ class user_moved extends \core\event\base {
      * @return \mod_grouptool\user_moved event object
      */
     public static function promotion_from_queue(\stdClass $cm, \stdClass $from, \stdClass $to) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $to->id,
             'context'  => \context_module::instance($cm->id),
-            'other'    => array('from' => (array)$from, 'to' => (array)$to, 'type' => 'promotion'),
-        ));
+            'other'    => [
+                'from' => (array)$from,
+                'to' => (array)$to,
+                'type' => 'promotion'
+            ],
+        ]);
         return $event;
     }
 
@@ -76,11 +80,15 @@ class user_moved extends \core\event\base {
      * @return \mod_grouptool\user_moved event object
      */
     public static function move(\stdClass $cm, \stdClass $from, \stdClass $to) {
-        $event = self::create(array(
+        $event = self::create([
             'objectid' => $to->id,
             'context'  => \context_module::instance($cm->id),
-            'other'    => array('from' => (array)$from, 'to' => (array)$to, 'type' => 'move'),
-        ));
+            'other'    => [
+                'from' => (array)$from,
+                'to' => (array)$to,
+                'type' => 'move'
+            ],
+        ]);
         return $event;
     }
 
@@ -123,9 +131,11 @@ class user_moved extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", array('id' => $this->contextinstanceid,
-                                                                        'tab' => 'overview',
-                                                                    'groupid' => $this->data['other']['to']['groupid']));
+        return new \moodle_url("/mod/$this->objecttable/view.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => 'overview',
+            'groupid' => $this->data['other']['to']['groupid']
+        ]);
     }
 
     /**
@@ -134,10 +144,15 @@ class user_moved extends \core\event\base {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid, $this->objecttable, 'move user',
-                           "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['to']['groupid'],
-                           'move user='.$this->data['other']['from']['userid'].' from agrp='.$this->data['other']['from']['agrpid'].
-                           ' to agrp='.$this->data['other']['to']['agrpid'], $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable,
+            'move user',
+            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['to']['groupid'],
+            'move user='.$this->data['other']['from']['userid'].' from agrp='.$this->data['other']['from']['agrpid'].
+                    ' to agrp='.$this->data['other']['to']['agrpid'],
+            $this->contextinstanceid
+        ];
     }
 
     /**

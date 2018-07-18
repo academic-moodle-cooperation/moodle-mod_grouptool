@@ -98,29 +98,29 @@ class grouptool_registration_test extends advanced_testcase {
         $this->resetAfterTest(true);
 
         $this->course = $this->getDataGenerator()->create_course();
-        $this->teachers = array();
+        $this->teachers = [];
         for ($i = 0; $i < self::DEFAULT_TEACHER_COUNT; $i++) {
             array_push($this->teachers, $this->getDataGenerator()->create_user());
         }
 
-        $this->editingteachers = array();
+        $this->editingteachers = [];
         for ($i = 0; $i < self::DEFAULT_EDITING_TEACHER_COUNT; $i++) {
             array_push($this->editingteachers, $this->getDataGenerator()->create_user());
         }
 
-        $this->students = array();
+        $this->students = [];
         for ($i = 0; $i < self::DEFAULT_STUDENT_COUNT; $i++) {
             array_push($this->students, $this->getDataGenerator()->create_user());
         }
 
-        $this->groups = array();
+        $this->groups = [];
         for ($i = 0; $i < self::GROUP_COUNT; $i++) {
-            array_push($this->groups, $this->getDataGenerator()->create_group(array('courseid' => $this->course->id)));
+            array_push($this->groups, self::getDataGenerator()->create_group(['courseid' => $this->course->id]));
         }
 
-        $this->timestamps = array();
-        $this->starts = array();
-        $this->stops = array();
+        $this->timestamps = [];
+        $this->starts = [];
+        $this->stops = [];
         for ($i = 0; $i < self::DEFAULT_TIMESTAMP_COUNT; $i++) {
             $hour = rand(0, 23);
             $minute = rand(0, 60);
@@ -135,7 +135,7 @@ class grouptool_registration_test extends advanced_testcase {
             array_push($this->stops, mktime($hour, $minute + (5 * $dur), $second, $month, $day, $year));
         }
 
-        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
         foreach ($this->teachers as $i => $teacher) {
             $this->getDataGenerator()->enrol_user($teacher->id,
                                                   $this->course->id,
@@ -143,7 +143,7 @@ class grouptool_registration_test extends advanced_testcase {
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $teacher);
         }
 
-        $editingteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $editingteacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         foreach ($this->editingteachers as $i => $editingteacher) {
             $this->getDataGenerator()->enrol_user($editingteacher->id,
                                                   $this->course->id,
@@ -151,7 +151,7 @@ class grouptool_registration_test extends advanced_testcase {
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $editingteacher);
         }
 
-        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         foreach ($this->students as $i => $student) {
             $this->getDataGenerator()->enrol_user($student->id,
                                                   $this->course->id,
@@ -167,27 +167,27 @@ class grouptool_registration_test extends advanced_testcase {
      */
     protected function create_extra_users() {
         global $DB;
-        $this->extrateachers = array();
+        $this->extrateachers = [];
         for ($i = 0; $i < self::EXTRA_TEACHER_COUNT; $i++) {
             array_push($this->extrateachers, $this->getDataGenerator()->create_user());
         }
 
-        $this->extraeditingteachers = array();
+        $this->extraeditingteachers = [];
         for ($i = 0; $i < self::EXTRA_EDITING_TEACHER_COUNT; $i++) {
             array_push($this->extraeditingteachers, $this->getDataGenerator()->create_user());
         }
 
-        $this->extrastudents = array();
+        $this->extrastudents = [];
         for ($i = 0; $i < self::EXTRA_STUDENT_COUNT; $i++) {
             array_push($this->extrastudents, $this->getDataGenerator()->create_user());
         }
 
-        $this->extrasuspendedstudents = array();
+        $this->extrasuspendedstudents = [];
         for ($i = 0; $i < self::EXTRA_SUSPENDED_COUNT; $i++) {
             array_push($this->extrasuspendedstudents, $this->getDataGenerator()->create_user());
         }
 
-        $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
+        $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
         foreach ($this->extrateachers as $i => $teacher) {
             $this->getDataGenerator()->enrol_user($teacher->id,
                                                   $this->course->id,
@@ -195,7 +195,7 @@ class grouptool_registration_test extends advanced_testcase {
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $teacher);
         }
 
-        $editingteacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $editingteacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
         foreach ($this->extraeditingteachers as $i => $editingteacher) {
             $this->getDataGenerator()->enrol_user($editingteacher->id,
                                                   $this->course->id,
@@ -203,7 +203,7 @@ class grouptool_registration_test extends advanced_testcase {
             groups_add_member($this->groups[$i % self::GROUP_COUNT], $editingteacher);
         }
 
-        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
         foreach ($this->extrastudents as $i => $student) {
             $this->getDataGenerator()->enrol_user($student->id,
                                                   $this->course->id,
@@ -229,7 +229,7 @@ class grouptool_registration_test extends advanced_testcase {
      * @param array $params Array of parameters to pass to the generator
      * @return testable_assign Testable wrapper around the assign class.
      */
-    protected function create_instance($params=array()) {
+    protected function create_instance($params=[]) {
         global $DB;
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_grouptool');
@@ -238,7 +238,7 @@ class grouptool_registration_test extends advanced_testcase {
         $cm = get_coursemodule_from_instance('grouptool', $instance->id);
         $context = context_module::instance($cm->id);
 
-        $DB->set_field('grouptool_agrps', 'active', 1, array('grouptoolid' => $instance->id));
+        $DB->set_field('grouptool_agrps', 'active', 1, ['grouptoolid' => $instance->id]);
 
         return new testable_grouptool($cm->id, $instance, $cm, $this->course);
     }
@@ -254,7 +254,7 @@ class grouptool_registration_test extends advanced_testcase {
         $grouptool = $this->create_instance();
         self::assertNotEmpty($grouptool);
 
-        self::assertTrue($DB->record_exists('grouptool_agrps', array('grouptoolid' => $grouptool->get_grouptool()->id)));
+        self::assertTrue($DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->get_grouptool()->id]));
     }
 
     /**
@@ -266,12 +266,14 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         // Just a single registration per user, with groupsize = 2 and no queue!
-        $grouptool = $this->create_instance(array('allow_reg' => 1,
-                                                  'allow_multiple' => 0,
-                                                  'use_size' => 1,
-                                                  'grpsize' => 2,
-                                                  'use_queue' => 0,
-                                                  'allow_unreg' => 0));
+        $grouptool = $this->create_instance([
+                'allow_reg' => 1,
+                'allow_multiple' => 0,
+                'use_size' => 1,
+                'grpsize' => 2,
+                'use_queue' => 0,
+                'allow_unreg' => 0
+        ]);
 
         // Get all active groups indexed by active group ID!
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
@@ -333,12 +335,14 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         // Just a single registration per user, with groupsize = 2 and queue!
-        $grouptool = $this->create_instance(array('allow_reg' => 1,
-                                                  'allow_multiple' => 0,
-                                                  'use_size' => 1,
-                                                  'grpsize' => 2,
-                                                  'use_queue' => 1,
-                                                  'allow_unreg' => 0));
+        $grouptool = $this->create_instance([
+                'allow_reg' => 1,
+                'allow_multiple' => 0,
+                'use_size' => 1,
+                'grpsize' => 2,
+                'use_queue' => 1,
+                'allow_unreg' => 0
+        ]);
 
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
         $message->username = fullname($this->students[3]);
@@ -390,15 +394,17 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
-        $grouptool = $this->create_instance(array('allow_reg' => 1,
-                                                  'allow_multiple' => 1,
-                                                  'choose_min' => 2,
-                                                  'choose_max' => 3,
-                                                  'use_size' => 1,
-                                                  'grpsize' => 2,
-                                                  'use_queue' => 1,
-                                                  'groups_queues_limit' => 1,
-                                                  'users_queues_limit' => 1));
+        $grouptool = $this->create_instance([
+                'allow_reg' => 1,
+                'allow_multiple' => 1,
+                'choose_min' => 2,
+                'choose_max' => 3,
+                'use_size' => 1,
+                'grpsize' => 2,
+                'use_queue' => 1,
+                'groups_queues_limit' => 1,
+                'users_queues_limit' => 1
+        ]);
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
@@ -469,14 +475,16 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         // Single registration per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
-        $grouptool = $this->create_instance(array('allow_reg' => 1,
-                                                  'allow_unreg' => 1,
-                                                  'allow_multiple' => 0,
-                                                  'use_size' => 1,
-                                                  'grpsize' => 1,
-                                                  'use_queue' => 1,
-                                                  'groups_queues_limit' => 1,
-                                                  'users_queues_limit' => 1));
+        $grouptool = $this->create_instance([
+                'allow_reg' => 1,
+                'allow_unreg' => 1,
+                'allow_multiple' => 0,
+                'use_size' => 1,
+                'grpsize' => 1,
+                'use_queue' => 1,
+                'groups_queues_limit' => 1,
+                'users_queues_limit' => 1
+        ]);
         // Get all active groups indexed by active group ID!
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
@@ -545,16 +553,18 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
-        $grouptool = $this->create_instance(array('allow_reg' => 1,
-                                                  'allow_unreg' => 1,
-                                                  'allow_multiple' => 1,
-                                                  'choose_max' => 3,
-                                                  'choose_min' => 2,
-                                                  'use_size' => 1,
-                                                  'grpsize' => 1,
-                                                  'use_queue' => 1,
-                                                  'groups_queues_limit' => 1,
-                                                  'users_queues_limit' => 1));
+        $grouptool = $this->create_instance([
+                'allow_reg' => 1,
+                'allow_unreg' => 1,
+                'allow_multiple' => 1,
+                'choose_max' => 3,
+                'choose_min' => 2,
+                'use_size' => 1,
+                'grpsize' => 1,
+                'use_queue' => 1,
+                'groups_queues_limit' => 1,
+                'users_queues_limit' => 1
+        ]);
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Prepare by registering user 0 in groups 0 and 1 and user 2 in groups 2 and 3!
@@ -613,9 +623,11 @@ class grouptool_registration_test extends advanced_testcase {
         $message->username = fullname($this->students[0]);
         $message->groupname = $agrps[$agrpids[0]]->name;
 
-        return array(0 => $agrps,
-                     1 => $agrpids,
-                     2 => $message);
+        return [
+                0 => $agrps,
+                1 => $agrpids,
+                2 => $message
+        ];
     }
 
     /**
@@ -627,15 +639,17 @@ class grouptool_registration_test extends advanced_testcase {
         global $DB;
 
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
-        $grouptool = $this->create_instance(array('allow_reg' => 1,
-                                                  'allow_multiple' => 1,
-                                                  'choose_min' => 1,
-                                                  'choose_max' => 3,
-                                                  'use_size' => 1,
-                                                  'grpsize' => 1,
-                                                  'use_queue' => 1,
-                                                  'groups_queues_limit' => 2,
-                                                  'users_queues_limit' => 1));
+        $grouptool = $this->create_instance([
+                'allow_reg' => 1,
+                'allow_multiple' => 1,
+                'choose_min' => 1,
+                'choose_max' => 3,
+                'use_size' => 1,
+                'grpsize' => 1,
+                'use_queue' => 1,
+                'groups_queues_limit' => 2,
+                'users_queues_limit' => 1
+        ]);
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
@@ -681,7 +695,7 @@ class grouptool_registration_test extends advanced_testcase {
         self::assertFalse($error);
 
         // Now check if there are any entries left in the DB?!?
-        $params = array($agrpids[0], $agrpids[1]);
+        $params = [$agrpids[0], $agrpids[1]];
         self::assertFalse($DB->record_exists_select('grouptool_queued', "agrpid = ? OR agrpid = ?", $params));
 
         // Teardown fixture!

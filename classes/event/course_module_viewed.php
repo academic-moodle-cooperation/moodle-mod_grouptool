@@ -50,9 +50,10 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php",
-                               array('id'  => $this->contextinstanceid,
-                                     'tab' => $this->data['other']['tab']));
+        return new \moodle_url("/mod/$this->objecttable/view.php", [
+            'id'  => $this->contextinstanceid,
+            'tab' => $this->data['other']['tab']
+        ]);
     }
 
     /**
@@ -61,10 +62,12 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return array|null
      */
     protected function get_legacy_logdata() {
-        return array($this->courseid,
-                     $this->objecttable, 'view',
-                     'view.php?id=' . $this->contextinstanceid,
-                     $this->objectid.' || '.$this->data['other']['name'],
-                     $this->contextinstanceid);
+        return [
+            $this->courseid,
+            $this->objecttable, 'view',
+            'view.php?id=' . $this->contextinstanceid,
+            $this->objectid.' || '.$this->data['other']['name'],
+            $this->contextinstanceid
+        ];
     }
 }

@@ -58,7 +58,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
            WHERE agrps.grouptoolid = :grouptoolid
                  AND reg.modified_by >= 0
         GROUP BY reg.userid) regcnts';
-            $params = array('grouptoolid' => $cm->instance);
+            $params = ['grouptoolid' => $cm->instance];
             $maxregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT COUNT(queue.id) AS queue
@@ -66,7 +66,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         JOIN {grouptool_agrps} agrps ON queue.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
              AND agrps.active = 1';
-            $params = array('grouptoolid' => $cm->instance);
+            $params = ['grouptoolid' => $cm->instance];
             $queues = $DB->get_field_sql($sql, $params);
         } else if ($course = optional_param('course', 0, PARAM_INT)) {
             $course = $DB->get_record('course', array('id' => $course));
@@ -100,13 +100,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setExpanded('availability', true);
 
         $name = get_string('availabledate', 'grouptool');
-        $options = array('optional' => true);
+        $options = ['optional' => true];
         $mform->addElement('date_time_selector', 'timeavailable', $name, $options);
         $mform->addHelpButton('timeavailable', 'availabledate', 'grouptool');
         $mform->setDefault('timeavailable', time());
 
         $name = get_string('duedate', 'grouptool');
-        $mform->addElement('date_time_selector', 'timedue', $name, array('optional' => true));
+        $mform->addElement('date_time_selector', 'timedue', $name, ['optional' => true]);
         $mform->addHelpButton('timedue', 'duedate', 'grouptool');
         $mform->setDefault('timedue', date('U', strtotime('+1week 23:55', time())));
 
@@ -136,11 +136,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setDefault('allow_reg', (($allowreg !== false) ? $allowreg : 1));
         $mform->addHelpButton('allow_reg', 'allow_reg', 'grouptool');
 
-        $options = array(GROUPTOOL_HIDE_GROUPMEMBERS               => get_string('no'),
-                         GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
-                         GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
-                         GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
-                         GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes'));
+        $options = [
+                GROUPTOOL_HIDE_GROUPMEMBERS               => get_string('no'),
+                GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
+                GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
+                GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
+                GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes')
+        ];
         $mform->addElement('select', 'show_members', get_string('show_members', 'grouptool'), $options);
         $showmembers = get_config('mod_grouptool', 'show_members');
         if ($showmembers === false) {
@@ -168,9 +170,9 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addHelpButton('allow_unreg', 'allow_unreg', 'grouptool');
         $mform->hideIf ('allow_unreg', 'allow_reg', 'eq', 0);
 
-        $size = array();
+        $size = [];
         $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'),
-                                        array('size' => '5'));
+                                        ['size' => '5']);
         $size[] = $mform->createElement('checkbox', 'use_size', '', get_string('use_size',
                                                                                'grouptool'));
         // We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0!
@@ -232,8 +234,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $mform->hideIf('use_queue', 'allow_reg', 'eq', 0);
         }
 
-        $queue = array();
-        $queue[] = $mform->createElement('text', 'users_queues_limit', '', array('size' => '3'));
+        $queue = [];
+        $queue[] = $mform->createElement('text', 'users_queues_limit', '', ['size' => '3']);
         $queue[] = $mform->createElement('checkbox', 'limit_users_queues', '', get_string('limit', 'grouptool'));
         $mform->addGroup($queue, 'users_queues_grp', get_string('users_queues_limit', 'grouptool'), ' ', false);
         $mform->setType('users_queues_limit', PARAM_INT);
@@ -255,8 +257,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->hideIf('users_queues_grp', 'allow_reg', 'eq', 0);
 
-        $queue = array();
-        $queue[] = $mform->createElement('text', 'groups_queues_limit', '', array('size' => '3'));
+        $queue = [];
+        $queue[] = $mform->createElement('text', 'groups_queues_limit', '', ['size' => '3']);
         $queue[] = $mform->createElement('checkbox', 'limit_groups_queues', '', get_string('limit', 'grouptool'));
         $mform->addGroup($queue, 'groups_queues_grp', get_string('groups_queues_limit', 'grouptool'), ' ', false);
         $mform->setType('groups_queues_limit', PARAM_INT);
@@ -296,7 +298,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->hideIf ('allow_multiple', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
-                           array('size' => '3'));
+                           ['size' => '3']);
         $mform->setType('choose_min', PARAM_INT);
         $choosemin = get_config('mod_grouptool', 'choose_min');
         if ($choosemin === false) {
@@ -306,7 +308,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->hideIf ('choose_min', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
-                           array('size' => '3'));
+                           ['size' => '3']);
         $mform->setType('choose_max', PARAM_INT);
         $choosemax = get_config('mod_grouptool', 'choose_max');
         if ($choosemax === false) {
@@ -332,9 +334,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addElement('header', 'moodlesync', get_string('moodlesync', 'grouptool'));
         $mform->addHelpButton('moodlesync', 'moodlesync', 'grouptool');
 
-        $options = array( GROUPTOOL_IGNORE => get_string('ignorechanges', 'grouptool'),
-                          GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool')
-                          );
+        $options = [
+                GROUPTOOL_IGNORE => get_string('ignorechanges', 'grouptool'),
+                GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool')
+        ];
 
         $mform->addElement('select', 'ifmemberadded', get_string('ifmemberadded', 'grouptool'),
                            $options);
@@ -356,8 +359,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('ifmemberremoved', (($ifmemberremoved !== false) ? $ifmemberremoved : GROUPTOOL_IGNORE));
 
-        $options = array( GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
-                          GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'));
+        $options = [
+                GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
+                GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool')
+        ];
         $mform->addElement('select', 'ifgroupdeleted', get_string('ifgroupdeleted', 'grouptool'),
                            $options);
         $mform->setType('ifgroupdeleted', PARAM_INT);
@@ -412,7 +417,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
     public function validation($data, $files) {
         global $DB;
         $parenterrors = parent::validation($data, $files);
-        $errors = array();
+        $errors = [];
         if (!empty($data['timedue']) && ($data['timedue'] <= $data['timeavailable'])) {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
         }
@@ -432,7 +437,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
        WHERE agrps.grouptoolid = :grouptoolid
              AND reg.modified_by >= 0
     GROUP BY reg.agrpid) regcnts';
-            $params = array('grouptoolid' => $data['instance']);
+            $params = ['grouptoolid' => $data['instance']];
             $maxgrpregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT MAX(regcnt)
@@ -442,7 +447,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
                WHERE agrps.grouptoolid = :grouptoolid
                      AND reg.modified_by >= 0
             GROUP BY reg.userid) regcnts';
-            $params = array('grouptoolid' => $data['instance']);
+            $params = ['grouptoolid' => $data['instance']];
             $maxuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT MIN(regcnt)
@@ -453,7 +458,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
                      AND reg.modified_by >= 0
             GROUP BY reg.userid) regcnts
        WHERE regcnt > 0';
-            $params = array('grouptoolid' => $data['instance']);
+            $params = ['grouptoolid' => $data['instance']];
             $minuserregs = $DB->get_field_sql($sql, $params);
             $sql = '
       SELECT COUNT(queue.id) AS queue
@@ -461,7 +466,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         JOIN {grouptool_agrps} agrps ON queue.agrpid = agrps.id
        WHERE agrps.grouptoolid = :grouptoolid
              AND agrps.active = 1';
-            $params = array('grouptoolid' => $data['instance']);
+            $params = ['grouptoolid' => $data['instance']];
             $queues = $DB->get_field_sql($sql, $params);
         } else {
             $maxgrpregs = 0;

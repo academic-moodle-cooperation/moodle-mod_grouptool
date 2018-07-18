@@ -53,11 +53,11 @@ $g  = optional_param('g', 0, PARAM_INT);
 
 if ($id) {
     $cm         = get_coursemodule_from_id('grouptool', $id, 0, false, MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $grouptool  = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course     = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+    $grouptool  = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 } else if ($g) {
-    $grouptool  = $DB->get_record('grouptool', array('id' => $g), '*', MUST_EXIST);
-    $course     = $DB->get_record('course', array('id' => $grouptool->course), '*', MUST_EXIST);
+    $grouptool  = $DB->get_record('grouptool', ['id' => $g], '*', MUST_EXIST);
+    $course     = $DB->get_record('course', ['id' => $grouptool->course], '*', MUST_EXIST);
     $cm         = get_coursemodule_from_instance('grouptool', $grouptool->id, $course->id, false, MUST_EXIST);
     $id = $cm->id;
 } else {
@@ -69,7 +69,7 @@ if ($id) {
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 // Print the page header!
-$PAGE->set_url('/mod/grouptool/view.php', array('id' => $cm->id));
+$PAGE->set_url('/mod/grouptool/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($grouptool->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -81,9 +81,9 @@ $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 echo $OUTPUT->header();
 // Print tabs according to users capabilities!
 
-$inactive = array();
-$tabs = array();
-$row = array();
+$inactive = [];
+$tabs = [];
+$row = [];
 $creategrps = has_capability('mod/grouptool:create_groups', $context);
 $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
@@ -239,11 +239,11 @@ if (empty($cm->uservisible)) {
 $context = context_course::instance($course->id);
 if (has_capability('moodle/course:managegroups', $context)) {
     // Print link to moodle groups!
-    $url = new moodle_url('/group/index.php', array('id' => $course->id));
+    $url = new moodle_url('/group/index.php', ['id' => $course->id]);
     $grpslnk = html_writer::link($url,
                                  get_string('viewmoodlegroups', 'grouptool'));
-    echo html_writer::tag('div', $grpslnk, array('class' => 'moodlegrpslnk'));
-    echo html_writer::tag('div', '', array('class' => 'clearer'));
+    echo html_writer::tag('div', $grpslnk, ['class' => 'moodlegrpslnk']);
+    echo html_writer::tag('div', '', ['class' => 'clearer']);
 }
 
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
@@ -251,14 +251,14 @@ $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
 $tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
 
 /* TRIGGER THE VIEW EVENT */
-$event = \mod_grouptool\event\course_module_viewed::create(array(
-    'objectid' => $cm->instance,
-    'context'  => context_module::instance($cm->id),
-    'other'    => array(
+$event = \mod_grouptool\event\course_module_viewed::create([
+        'objectid' => $cm->instance,
+        'context'  => context_module::instance($cm->id),
+        'other'    => [
         'tab' => $tab,
         'name' => $instance->get_name(),
-    ),
-));
+        ],
+]);
 $event->add_record_snapshot('course', $course);
 // In the next line you can use $PAGE->activityrecord if you have set it, or skip this line if you don't have a record.
 $event->add_record_snapshot($PAGE->cm->modname, $grouptool);
