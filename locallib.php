@@ -540,7 +540,7 @@ class mod_grouptool {
 
         } else {
             $grouping = null;
-            $createdgrouping = null;
+            $createdgrouping = 0;
             $createdgroups = [];
             $failed = false;
 
