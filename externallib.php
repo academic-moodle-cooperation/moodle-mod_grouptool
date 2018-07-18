@@ -103,7 +103,7 @@ class mod_grouptool_external extends external_api {
      * @return external_function_parameters
      */
     public static function rename_group_parameters() {
-        // Function onlinetextpreveiw_parameters() always return an external_function_parameters().
+        // Function onlinetextpreview_parameters() always return an external_function_parameters().
         // The external_function_parameters constructor expects an array of external_description.
         return new external_function_parameters(
             [
