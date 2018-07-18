@@ -4713,31 +4713,23 @@ class mod_grouptool {
                 }
 
                 if (!empty($regstat->registered)) {
+                    $regscumulative = [];
                     foreach ($regstat->registered as $registration) {
-                        if (empty($regscumulative)) {
-                            $regscumulative = $registration->grpname.
-                                                       ' ('.$registration->rank.')';
-                        } else {
-                            $regscumulative .= ', '.$registration->grpname.
-                                                        ' ('.$registration->rank.')';
-                        }
+                        $regscumulative[] = $registration->grpname.' ('.$registration->rank.')';
                     }
                     $mform->addElement('static', 'registrations', get_string('registrations', 'grouptool'),
-                                       html_writer::tag('div', $missingtext).$regscumulative);
+                                       html_writer::tag('div', $missingtext).implode(', ', $regscumulative));
                 } else {
                     $mform->addElement('static', 'registrations', get_string('registrations', 'grouptool'),
                                        html_writer::tag('div', $missingtext).get_string('not_registered', 'grouptool'));
                 }
 
                 if (!empty($regstat->queued)) {
+                    $queuescumulative = [];
                     foreach ($regstat->queued as $queue) {
-                        if (empty($queuescumulative)) {
-                            $queuescumulative = $queue->grpname.' ('.$queue->rank.')';
-                        } else {
-                            $queuescumulative .= ', '.$queue->grpname.' ('.$queue->rank.')';
-                        }
+                        $queuescumulative[] = $queue->grpname.' ('.$queue->rank.')';
                     }
-                    $mform->addElement('static', 'queues', get_string('queues', 'grouptool'), $queuescumulative);
+                    $mform->addElement('static', 'queues', get_string('queues', 'grouptool'), implode(', ', $queuescumulative));
                 }
 
                 if (!empty($this->grouptool->allow_reg)) {
