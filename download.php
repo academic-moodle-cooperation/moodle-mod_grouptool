@@ -128,22 +128,21 @@ switch ($tab) {
         switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                echo $instance->download_overview_pdf($groupid, $groupingid, $includeinactive);
+                $instance->download_overview_pdf($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                echo $instance->download_overview_txt($groupid, $groupingid, $includeinactive);
+                $instance->download_overview_txt($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                echo $instance->download_overview_xlsx($groupid, $groupingid, $includeinactive);
+                $instance->download_overview_xlsx($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                echo $instance->download_overview_ods($groupid, $groupingid, $includeinactive);
+                $instance->download_overview_ods($groupid, $groupingid, $includeinactive);
                 break;
             default:
-
                 break;
         }
         break;
@@ -152,22 +151,21 @@ switch ($tab) {
         switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                echo $instance->download_userlist_pdf($groupid, $groupingid);
+                $instance->download_userlist_pdf($groupid, $groupingid);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                echo $instance->download_userlist_txt($groupid, $groupingid);
+                $instance->download_userlist_txt($groupid, $groupingid);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                echo $instance->download_userlist_xlsx($groupid, $groupingid);
+                $instance->download_userlist_xlsx($groupid, $groupingid);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                echo $instance->download_userlist_ods($groupid, $groupingid);
+                $instance->download_userlist_ods($groupid, $groupingid);
                 break;
             default:
-
                 break;
         }
         break;
