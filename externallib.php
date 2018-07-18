@@ -341,7 +341,7 @@ class mod_grouptool_external extends external_api {
         $DB->set_field('grouptool_agrps', 'active', 1, ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
         if ($DB->get_field('grouptool_agrps', 'active',
                            ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 0) {
-            $a = stdClass();
+            $a = new stdClass();
             $a->groupid = $params['groupid'];
             $a->grouptoolid = $cm->instance;
             $result->error = get_string('error_activating_group', 'grouptool', $a);
