@@ -1520,6 +1520,7 @@ class mod_grouptool {
                 case self::FILTER_INACTIVE:
                     $curfilter = 'inactive';
                 break;
+                default:
                 case self::FILTER_ALL:
                     $curfilter = 'all';
                 break;
