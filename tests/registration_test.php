@@ -286,7 +286,6 @@ class grouptool_registration_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_single() {
-
         // Just a single registration per user, with groupsize = 2 and no queue!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,

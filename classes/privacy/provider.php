@@ -22,10 +22,7 @@
  * @copyright  2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace mod_grouptool\privacy;
-
-defined('MOODLE_INTERNAL') || die();
 
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\metadata\provider as metadataprovider;
@@ -36,6 +33,8 @@ use \core_privacy\local\request\writer;
 use \core_privacy\local\request\approved_contextlist;
 use \core_privacy\local\request\transform;
 use \core_privacy\local\request\helper;
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 

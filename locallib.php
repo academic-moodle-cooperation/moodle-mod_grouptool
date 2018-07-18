@@ -2132,6 +2132,7 @@ class mod_grouptool {
             foreach ($selected as $group) {
                 $groupinfo = "";
                 $grouprows = [];
+
                 $sourcegrade = grade_grade::fetch_users_grades($gradeitem, $source[$group],
                                                                 false);
                 $sourcegrade = reset($sourcegrade);

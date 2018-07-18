@@ -76,8 +76,7 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Define field use_size to be added to grouptool.
         $table = new xmldb_table('grouptool');
-        $field = new xmldb_field('use_size', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL,
-                                 null, '0', 'choose_max');
+        $field = new xmldb_field('use_size', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'choose_max');
 
         // Conditionally launch add field use_size.
         if (!$dbman->field_exists($table, $field)) {
@@ -92,8 +91,7 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Rename field max_members on table grouptool_agrps to size.
         $table = new xmldb_table('grouptool_agrps');
-        $field = new xmldb_field('max_members', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null,
-                                 null, null, 'sort_order');
+        $field = new xmldb_field('max_members', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sort_order');
 
         // Launch rename field size.
         $dbman->rename_field($table, $field, 'size');
@@ -108,15 +106,13 @@ function xmldb_grouptool_upgrade($oldversion) {
         $pbar->update(1, $count, "Rename grouptool->max_members to grouptool->grpsize...");
         // Rename field max_members on table grouptool_agrps to size.
         $table = new xmldb_table('grouptool');
-        $field = new xmldb_field('max_members', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null,
-                                 null, null, 'allow_unreg');
+        $field = new xmldb_field('max_members', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'allow_unreg');
         // Launch rename field max_members --> grpsize.
         $dbman->rename_field($table, $field, 'grpsize');
         $pbar->update(1, $count, "Rename grouptool->max_members to grouptool_grpsize...finished");
         $pbar->update(2, $count, "Rename grouptool_agrps->size to grouptool_agrps->grpsize...");
         $table = new xmldb_table('grouptool_agrps');
-        $field = new xmldb_field('size', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, null, null, null,
-                                 'sort_order');
+        $field = new xmldb_field('size', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sort_order');
         // Launch rename field size --> grpsize.
         $dbman->rename_field($table, $field, 'grpsize');
         $pbar->update(2, $count, "Rename grouptool_agrps->size ".
@@ -140,8 +136,7 @@ function xmldb_grouptool_upgrade($oldversion) {
                       "rename field grouptool_registered->agroup_id ".
                       "to grouptool_registered->agrp_id...");
         // Rename field agroup_id on table grouptool_registered to agrp_id.
-        $field = new xmldb_field('agroup_id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-                                 XMLDB_NOTNULL, null, '0', 'id');
+        $field = new xmldb_field('agroup_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
         // Launch rename field agrp_id.
         $dbman->rename_field($table, $field, 'agrp_id');
 
@@ -176,8 +171,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         $pbar->update(10, $count,
                       "rename field grouptool_queued->agroup_id to grouptool_queued->agrp_id...");
         // Rename field agroup_id on table grouptool_registered to agrp_id.
-        $field = new xmldb_field('agroup_id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED,
-                                 XMLDB_NOTNULL, null, '0', 'id');
+        $field = new xmldb_field('agroup_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
         // Launch rename field agrp_id.
         $dbman->rename_field($table, $field, 'agrp_id');
 
@@ -204,8 +198,7 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Define field use_size to be added to grouptool.
         $table = new xmldb_table('grouptool');
-        $field = new xmldb_field('use_size', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL,
-                                 null, '0', 'grpsize');
+        $field = new xmldb_field('use_size', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'grpsize');
 
         // Conditionally launch add field use_size.
         if (!$dbman->field_exists($table, $field)) {
@@ -225,8 +218,7 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Define field active to be added to grouptool_agrps.
         $table = new xmldb_table('grouptool_agrps');
-        $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED, XMLDB_NOTNULL,
-                                 null, '0', 'grpsize');
+        $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'grpsize');
 
         // Conditionally launch add field active.
         if (!$dbman->field_exists($table, $field)) {
@@ -241,8 +233,7 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Define field ifmemberadded to be added to grouptool.
         $table = new xmldb_table('grouptool');
-        $field = new xmldb_field('ifmemberadded', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
-                                 XMLDB_NOTNULL, null, '0', 'choose_max');
+        $field = new xmldb_field('ifmemberadded', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'choose_max');
 
         // Conditionally launch add field ifmemberadded.
         if (!$dbman->field_exists($table, $field)) {
@@ -250,8 +241,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         }
 
         // Define field ifmemberremoved to be added to grouptool.
-        $field = new xmldb_field('ifmemberremoved', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
-                                 XMLDB_NOTNULL, null, '0', 'ifmemberadded');
+        $field = new xmldb_field('ifmemberremoved', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'ifmemberadded');
 
         // Conditionally launch add field ifmemberremoved.
         if (!$dbman->field_exists($table, $field)) {
@@ -259,8 +249,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         }
 
         // Define field ifgroupdeleted to be added to grouptool.
-        $field = new xmldb_field('ifgroupdeleted', XMLDB_TYPE_INTEGER, '4', XMLDB_UNSIGNED,
-                                 XMLDB_NOTNULL, null, '0', 'ifmemberremoved');
+        $field = new xmldb_field('ifgroupdeleted', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'ifmemberremoved');
 
         // Conditionally launch add field ifgroupdeleted.
         if (!$dbman->field_exists($table, $field)) {
@@ -275,7 +264,7 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Define field alwaysshowdescription to be added to grouptool.
         $table = new xmldb_table('grouptool');
-        $field = new xmldb_field('alwaysshowdescription', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'introformat');
+        $field = new xmldb_field('alwaysshowdescription', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'introformat');
 
         // Conditionally launch add field alwaysshowdescription.
         if (!$dbman->field_exists($table, $field)) {
