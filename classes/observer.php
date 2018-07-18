@@ -22,6 +22,14 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_grouptool;
+
+use \mod_grouptool\event\agrp_created;
+use \mod_grouptool\event\agrp_deleted;
+use \mod_grouptool\event\registration_created;
+use \mod_grouptool\event\registration_deleted;
+use \mod_grouptool\event\queue_entry_deleted;
+use \mod_grouptool\event\group_recreated;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -35,7 +43,7 @@ require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_grouptool_observer {
+class observer {
     /**
      * group_member_added
      *
@@ -82,7 +90,7 @@ class mod_grouptool_observer {
                                                    'userid'  => $event->relateduserid]);
         foreach ($grouptools as $grouptool) {
             if (!key_exists($grouptool->agrpid, $regs)) {
-                $reg = new stdClass();
+                $reg = new \stdClass();
                 $reg->agrpid = $agrp[$grouptool->id]->id;
                 $reg->userid = $event->relateduserid;
                 $reg->timestamp = time();
@@ -92,7 +100,7 @@ class mod_grouptool_observer {
                     $reg->id = $DB->insert_record('grouptool_registered', $reg);
                     $reg->groupid = $event->objectid;
                     $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
-                    \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $reg)->trigger();
+                    registration_created::create_via_eventhandler($cm, $reg)->trigger();
                 }
                 if (key_exists($grouptool->agrpid, $queues)) {
                     $DB->delete_records('grouptool_queued', ['id' => $queues[$grouptool->agrpid]->id]);
@@ -105,7 +113,7 @@ class mod_grouptool_observer {
                     $DB->delete_records('grouptool_queued', ['id' => $queues[$grouptool->agrpid]->id]);
                 }
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
-                \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $record)->trigger();
+                registration_created::create_via_eventhandler($cm, $record)->trigger();
             }
         }
         return true;
@@ -157,7 +165,7 @@ class mod_grouptool_observer {
                             // Trigger event!
                             $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false,
                                                                  MUST_EXIST);
-                            \mod_grouptool\event\registration_deleted::create_via_eventhandler($cm, $reg)->trigger();
+                            registration_deleted::create_via_eventhandler($cm, $reg)->trigger();
                         }
 
                         // Get next queued user and put him in the group (and delete queue entry)!
@@ -221,11 +229,11 @@ class mod_grouptool_observer {
                                                 'groupid'  => $data->id,
                                                 'newid'    => $newid,
                                                 'courseid' => $data->courseid];
-                            \mod_grouptool\event\group_recreated::create_from_object($logdata)->trigger();
+                            group_recreated::create_from_object($logdata)->trigger();
 
                             if ($grouptool->immediate_reg) {
                                 require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-                                $instance = new mod_grouptool($cmid, $grouptool);
+                                $instance = new \mod_grouptool($cmid, $grouptool);
                                 $instance->push_registrations();
                             }
                             $grouprecreated = true;
@@ -236,7 +244,7 @@ class mod_grouptool_observer {
                     } else {
                         if ($grouptool->immediate_reg) {
                             require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
-                            $instance = new mod_grouptool($cmid, $grouptool);
+                            $instance = new \mod_grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
                     }
@@ -260,7 +268,7 @@ class mod_grouptool_observer {
                                                                                              $agrps[$cur->agrpid]->grouptoolid);
                 }
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
-                \mod_grouptool\event\registration_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
+                registration_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
             }
             $queues = $DB->get_records_list('grouptool_queued', 'agrpid', $agrpids);
             $DB->delete_records_list('grouptool_queued', 'agrpid', $agrpids);
@@ -271,7 +279,7 @@ class mod_grouptool_observer {
                 }
                 // Trigger event!
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
-                \mod_grouptool\event\queue_entry_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
+                queue_entry_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
             }
 
             /* We get problems if multiple grouptool instances with different settings are in a course and some delete their
@@ -287,13 +295,13 @@ class mod_grouptool_observer {
                         $cms[$cur->grouptoolid] = get_coursemodule_from_instance('grouptool', $cur->grouptoolid);
                     }
                     // Trigger event!
-                    $logdata = new stdClass();
+                    $logdata = new \stdClass();
                     $logdata->id = $cur->id;
                     $logdata->cmid = $cms[$cur->grouptoolid]->id;
                     $logdata->groupid = $cur->groupid;
                     $logdata->agrpid = $cur->id;
                     $logdata->courseid = $data->courseid;
-                    \mod_grouptool\event\agrp_deleted::create_from_object($logdata);
+                    agrp_deleted::create_from_object($logdata);
                 }
             }
         }
@@ -322,7 +330,7 @@ class mod_grouptool_observer {
                                              FROM {grouptool_agrps} agrp
                                          GROUP BY agrp.grouptoolid");
         foreach ($grouptools as $grouptool) {
-            $newagrp = new StdClass();
+            $newagrp = new \stdClass();
             $newagrp->grouptoolid = $grouptool->id;
             $newagrp->groupid = $data->id;
             if (!array_key_exists($grouptool->id, $sortorder)) {
@@ -336,7 +344,7 @@ class mod_grouptool_observer {
                 $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp);
                 // Trigger event!
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
-                \mod_grouptool\event\agrp_created::create_from_object($cm, $newagrp)->trigger();
+                agrp_created::create_from_object($cm, $newagrp)->trigger();
             }
         }
         return true;
