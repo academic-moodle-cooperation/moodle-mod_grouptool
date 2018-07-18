@@ -89,6 +89,12 @@ class grouptool_registration_test extends advanced_testcase {
     /** @var array $timestamps List of 10 different timestamps */
     protected $timestamps = null;
 
+    /** @var array $starts List of starting timestamps */
+    protected $starts = null;
+
+    /** @var array $stops List of stopping timestamps */
+    protected $stops = null;
+
     /**
      * Setup function - we will create a course and add an grouptool instance to it.
      *
@@ -245,7 +251,6 @@ class grouptool_registration_test extends advanced_testcase {
         $params['course'] = $this->course->id;
         $instance = $generator->create_instance($params);
         $cm = get_coursemodule_from_instance('grouptool', $instance->id);
-        $context = context_module::instance($cm->id);
 
         $DB->set_field('grouptool_agrps', 'active', 1, ['grouptoolid' => $instance->id]);
 
@@ -281,7 +286,6 @@ class grouptool_registration_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_single() {
-        global $DB;
 
         // Just a single registration per user, with groupsize = 2 and no queue!
         $grouptool = $this->create_instance([
@@ -355,8 +359,6 @@ class grouptool_registration_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_single_queue() {
-        global $DB;
-
         // Just a single registration per user, with groupsize = 2 and queue!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -367,7 +369,7 @@ class grouptool_registration_test extends advanced_testcase {
                 'allow_unreg' => 0
         ]);
 
-        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        list(, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
         $message->username = fullname($this->students[3]);
 
         // Prepare by registering users 0 and 1 in group 0 and queue user 2 in group 0!
@@ -419,8 +421,6 @@ class grouptool_registration_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_multiple_queue() {
-        global $DB;
-
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -505,8 +505,6 @@ class grouptool_registration_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_groupchange_single() {
-        global $DB;
-
         // Single registration per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -588,8 +586,6 @@ class grouptool_registration_test extends advanced_testcase {
      * @throws moodle_exception
      */
     public function test_groupchange_multiple() {
-        global $DB;
-
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,

@@ -104,7 +104,6 @@ class mod_grouptool_observer {
                 if (key_exists($grouptool->agrpid, $queues)) {
                     $DB->delete_records('grouptool_queued', ['id' => $queues[$grouptool->agrpid]->id]);
                 }
-                $reg->groupid = $event->objectid;
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
                 \mod_grouptool\event\registration_created::create_via_eventhandler($cm, $record)->trigger();
             }

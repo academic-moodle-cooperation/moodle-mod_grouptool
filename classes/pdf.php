@@ -358,12 +358,10 @@ class pdf extends \pdf {
         $this->setFontSize(1.0 * NORMLINEHEIGHT);
         $this->MultiCell(0, $normalheight, $groupinfo, 0, 'L', false, 1, null, null, true, 1,
                          true, false, $normalheight, 'M', true);
-        $margins = $this->getMargins();
-        $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
         $this->ln();
         // Insert registrations & queue tables!
         if (count($registration)) {
-            $this->add_overview_table_header($writewidth, $normalheight);
+            $this->add_overview_table_header();
             foreach ($registration as $row) {
                 $this->add_overview_row($row['status'], $row['name'], $row['idnumber'], $row['email'], $fill);
             }
@@ -377,7 +375,7 @@ class pdf extends \pdf {
 
         if (count($moodlemembers) >= 1) {
             if (count($registration) == 0) {
-                $this->add_overview_table_header($writewidth, $normalheight);
+                $this->add_overview_table_header();
             }
             foreach ($moodlemembers as $row) {
                 $this->add_overview_row('?', $row['name'], $row['idnumber'], $row['email'], $fill);

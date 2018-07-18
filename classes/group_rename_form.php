@@ -39,6 +39,9 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class group_rename_form extends \moodleform {
+    /** @var \stdClass */
+    private $course = null;
+
     /**
      * Definition of rename form
      *

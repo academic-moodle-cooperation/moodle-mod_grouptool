@@ -39,6 +39,8 @@ require_once($CFG->dirroot.'/mod/grouptool/lib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_confirm_form extends \moodleform {
+    /** @var \context_module */
+    private $context = null;
     /**
      * Definition of import form
      *

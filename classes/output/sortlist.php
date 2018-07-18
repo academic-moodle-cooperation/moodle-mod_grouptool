@@ -51,6 +51,12 @@ class sortlist implements \renderable {
     public $filter = null;
     /** @var \stdClass $cm course module object */
     public $cm = null;
+    /** @var array */
+    public $selected = [];
+    /** @var int */
+    private $globalgrpsize = 0;
+    /** @var array */
+    public $_options = [];
 
     /**
      * Constructor
@@ -242,27 +248,27 @@ class sortlist implements \renderable {
             return;
         }
 
-        if ( $groupings == null || count($groupings) == 0 ) {
+        if ($this->groupings == null || count($this->groupings) == 0 ) {
             return;
         }
 
         if (!empty($action)) {
             $groups = [];
-            foreach ($groupings as $groupingid) {
+            foreach ($this->groupings as $groupingid) {
                 $groups = array_merge($groups, groups_get_all_groups($COURSE->id, 0, $groupingid));
             }
 
             foreach ($groups as $current) {
                 switch ($action) {
                     case 'select':
-                        $sortlist->groups[$current->id]['selected'] = 1;
+                        $this->groups[$current->id]['selected'] = 1;
                         break;
                     case 'deselect':
-                        $sortlist->groups[$current->id]['selected'] = 0;
+                        $this->groups[$current->id]['selected'] = 0;
                         break;
                     case 'toggle':
-                        $next = !$sortlist->groups[$current->id]['selected'];
-                        $sortlist->groups[$current->id]['selected'] = $next;
+                        $next = !$this->groups[$current->id]['selected'];
+                        $this->groups[$current->id]['selected'] = $next;
                         break;
                 }
             }

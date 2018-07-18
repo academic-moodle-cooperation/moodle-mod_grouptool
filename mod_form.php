@@ -45,14 +45,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
      * @throws dml_exception
      */
     public function definition() {
+        global $DB, $OUTPUT;
 
-        global $CFG, $DB, $OUTPUT;
         $mform = $this->_form;
         $maxregs = 0;
         $queues = 0;
         if ($update = optional_param('update', 0, PARAM_INT)) {
             $cm = get_coursemodule_from_id('grouptool', $update);
-            $course = $DB->get_record('course', array('id' => $cm->course));
             $sql = '
   SELECT MAX(regcnt)
     FROM (SELECT COUNT(reg.id) AS regcnt
@@ -71,10 +70,6 @@ class mod_grouptool_mod_form extends moodleform_mod {
              AND agrps.active = 1';
             $params = ['grouptoolid' => $cm->instance];
             $queues = $DB->get_field_sql($sql, $params);
-        } else if ($course = optional_param('course', 0, PARAM_INT)) {
-            $course = $DB->get_record('course', array('id' => $course));
-        } else {
-            $course = 0;
         }
 
         $mform->addElement('hidden', 'max_regs', $maxregs);
@@ -85,13 +80,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Adding the standard "name" field!
-        $mform->addElement('text', 'name', get_string('grouptoolname', 'grouptool'),
-                           array('size' => '64'));
-        if (!empty($CFG->formatstringstriptags)) {
-            $mform->setType('name', PARAM_TEXT);
-        } else {
-            $mform->setType('name', PARAM_CLEAN);
-        }
+        $mform->addElement('text', 'name', get_string('grouptoolname', 'grouptool'), ['size' => '64']);
+        $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
         $mform->addHelpButton('name', 'grouptoolname', 'grouptool');

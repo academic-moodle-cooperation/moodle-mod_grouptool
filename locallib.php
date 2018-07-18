@@ -704,6 +704,7 @@ class mod_grouptool {
                                                                        $data->to, $groupingid)->trigger();
 
             // Save the groups data!
+            $error = '';
             foreach ($groups as $group) {
                 if (groups_get_group_by_name($this->course->id, $group)) {
                     $error = get_string('groupnameexists', 'group', $group);
@@ -850,6 +851,7 @@ class mod_grouptool {
             \mod_grouptool\event\group_creation_started::create_person($this->cm, $namescheme, $groupingid)->trigger();
 
             // Save the groups data!
+            $error = '';
             foreach ($groups as $group) {
                 if (groups_get_group_by_name($this->course->id, $group['name'])) {
                     $error = get_string('groupnameexists', 'group', $group['name']);
@@ -1070,6 +1072,7 @@ class mod_grouptool {
         if (isset($this->course->id)) {
             $courseid = $this->course->id;
         } else {
+            $courseid = 0;
             print_error('coursemisconf');
         }
 
@@ -1204,17 +1207,16 @@ class mod_grouptool {
                 $target = required_param('target', PARAM_INT);
                 switch ($target) { // ...grpg_target | grpg_groupingname | use_all (0 sel | 1 all).
                     case 0: // Invalid - no action! TODO Add message!
-                        $error = true;
                         $preview = '';
                         break;
                     case -2: // One grouping per group!
-                        list($error, $preview) = $this->create_group_groupings();
+                        list(, $preview) = $this->create_group_groupings();
                         break;
                     case -1: // One new grouping for all!
-                        list($error, $preview) = $this->update_grouping($target, required_param('name', PARAM_ALPHANUMEXT));
+                        list(, $preview) = $this->update_grouping($target, required_param('name', PARAM_ALPHANUMEXT));
                         break;
                     default:
-                        list($error, $preview) = $this->update_grouping($target);
+                        list(, $preview) = $this->update_grouping($target);
                         break;
                 }
                 $preview = html_writer::tag('div', $preview, ['class' => 'centered']);
@@ -1662,6 +1664,7 @@ class mod_grouptool {
             $SESSION->grouptool->view_administration = $fromform;
             $data = $SESSION->grouptool->view_administration;
             $preview = "";
+            $error = false;
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!
@@ -1897,6 +1900,8 @@ class mod_grouptool {
                             $gradeinfocont .= html_writer::empty_tag('input', $radioattr);
                         } else if (count($userwithgrades) > 1) {
                             $gradeinfocont = html_writer::empty_tag('input', $radioattr);
+                        } else {
+                            $gradeinfocont = '';
                         }
                         $gradeinfocont .= ' '.fullname($groupmembers[$key])." (".$finalgrade->formatted_grade;
                         if (strip_tags($finalgrade->str_feedback) != "") {
@@ -2098,8 +2103,9 @@ class mod_grouptool {
             $previewtable = new html_table();
             $previewtable->attributes['class'] = 'table table-hover grading_previewtable';
         } else {
-            $info = "";
+            $previewtable = new stdClass();
         }
+        $info = "";
 
         $gradeitems = grade_item::fetch_all([
                 'itemtype'     => 'mod',
@@ -2116,9 +2122,6 @@ class mod_grouptool {
         if (is_array($source)) { // Then we are in multigroup mode (filter = 0 || -1)!
             $sourceusers = $DB->get_records_list('user', 'id', $source);
             $groups = groups_get_all_groups($this->course->id);
-            if (!isset($previewtable)) {
-                $previewtable = new stdClass();
-            }
 
             $previewtable->head = [
                     get_string('groups')." (".count($selected).")",
@@ -2411,7 +2414,7 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function view_grading() {
-        global $PAGE, $CFG, $OUTPUT, $USER, $DB;
+        global $PAGE, $OUTPUT, $USER;
 
         if (!has_capability('mod/grouptool:grade', $this->context)
                 && !has_capability('mod/groputool:grade_own_groups', $this->context)) {
@@ -2494,7 +2497,6 @@ class mod_grouptool {
 
         // Reset process if some evil hacker tried to do smth!
         if (!$confirm && (!data_submitted() || !confirm_sesskey())) {
-            $refreshtable = false;
             $step = 0;
         }
 
@@ -2516,9 +2518,9 @@ class mod_grouptool {
                     }
                 }
                 if (!empty($selected)) {
-                    list($error, $preview) = $this->copy_grades($activity, $mygroupsonly,
-                                                                $selected, $source, $overwrite,
-                                                                true);
+                    list(, $preview) = $this->copy_grades($activity, $mygroupsonly,
+                                                          $selected, $source, $overwrite,
+                                                          true);
                     $continue = new moodle_url("view.php?id=".$this->cm->id, [
                             'tab'           => 'grading',
                             'confirm'       => 'true',
@@ -2565,9 +2567,9 @@ class mod_grouptool {
                 }
 
                 if (!empty($selected) && (count($missingsource) == 0)) {
-                    list($error, $preview) = $this->copy_grades($activity, $mygroupsonly,
-                                                                $selected, $source, $overwrite,
-                                                                true);
+                    list(, $preview) = $this->copy_grades($activity, $mygroupsonly,
+                                                          $selected, $source, $overwrite,
+                                                          true);
                     $continue = new moodle_url("view.php?id=".$this->cm->id, [
                             'tab'           => 'grading',
                             'confirm'       => 'true',
@@ -2801,7 +2803,7 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function fill_from_queue($agrpid) {
-        global $DB, $CFG;
+        global $DB, $CFG, $OUTPUT;
 
         if (empty($this->grouptool->use_queue)) {
             return true;
@@ -3574,7 +3576,6 @@ class mod_grouptool {
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
-        $groupdata = reset($groupdata);
 
         $this->can_be_marked($agrpid, $userid, $message);
 
@@ -4541,6 +4542,7 @@ class mod_grouptool {
             // Execution has been confirmed!
             $hideform = 0;
             $action = optional_param('action', 'reg', PARAM_ALPHA);
+            $confirmmessage = '';
             if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
                 $agrpid = required_param('group', PARAM_INT);
@@ -4578,6 +4580,8 @@ class mod_grouptool {
             // Display confirm-dialog!
             $hideform = 1;
             $reg = optional_param_array('reg', null, PARAM_INT);
+            $action = false;
+            $agrpid = -1;
             if ($reg != null) {
                 $agrpid = array_keys($reg);
                 $agrpid = reset($agrpid);
@@ -4745,6 +4749,7 @@ class mod_grouptool {
                     $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'), $unregtext);
 
                     if (!empty($this->grouptool->allow_multiple)) {
+                        $minmaxtext = '';
                         if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
                             $data = [
                                     'min' => $this->grouptool->choose_min,
@@ -5024,8 +5029,6 @@ class mod_grouptool {
     public function canshowmembers($agrp = null, $regrank = null, $queuerank = null) {
         global $DB, $USER;
 
-        $showmembers = false;
-
         if ($regrank === null
             || $queuerank === null) {
             if (is_numeric($agrp)) {
@@ -5133,9 +5136,7 @@ class mod_grouptool {
         }
         $imported = [];
         $columns = $DB->get_columns('user');
-        if (empty($field) || !key_exists($field, $columns)) {
-            $field = 'idnumber';
-        }
+
         $agrp = [];
         foreach ($groups as $group) {
             $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
@@ -5501,7 +5502,6 @@ class mod_grouptool {
         $groupinfo = groups_get_all_groups($this->grouptool->course);
         $userinfo = [];
         $syncstatus = $this->get_sync_status();
-        $context = context_module::instance($this->cm->id);
         if (!$onlydata && count($agrps)) {
             // Global-downloadlinks!
             echo $this->get_download_links($downloadurl);
@@ -5740,8 +5740,6 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function download_overview_pdf($groupid=0, $groupingid=0, $includeinactive=false) {
-        global $USER;
-
         $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $pdf = new \mod_grouptool\pdf();
@@ -6559,7 +6557,7 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function push_registrations($groupid=0, $groupingid=0, $previewonly=false) {
-        global $DB, $CFG;
+        global $DB, $OUTPUT;
 
         // Trigger the event!
         \mod_grouptool\event\registration_push_started::create_from_object($this->cm)->trigger();
@@ -6768,11 +6766,11 @@ class mod_grouptool {
             $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
             if ($pushtomdl) {
                 list($error, $message) = $this->push_registrations($groupid, $groupingid);
-            }
-            if ($error) {
-                echo $OUTPUT->notification($message, 'error');
-            } else {
-                echo $OUTPUT->notification($message, 'success');
+                if ($error) {
+                    echo $OUTPUT->notification($message, 'error');
+                } else {
+                    echo $OUTPUT->notification($message, 'success');
+                }
             }
         } else if (data_submitted() && confirm_sesskey()) {
             // Display confirm-dialog!
@@ -7096,8 +7094,6 @@ class mod_grouptool {
      *
      * @param int $groupingid optional get only this grouping
      * @param int $groupid optional get only this group (groupid not agroupid!)
-     * @param stdClass[] $orderby optional current order-by array
-     * @param string[] $collapsed optional current array with collapsed columns
      * @param bool $onlydata optional return object with raw data not html-fragment-string
      * @return stdClass[]|bool true if table is output or raw data as array of objects
      * @throws coding_exception
@@ -7105,11 +7101,9 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function userlist_table($groupingid = 0, $groupid = 0, $orderby = array(),
-                                   $collapsed = array(), $onlydata = false) {
+    public function userlist_table($groupingid = 0, $groupid = 0, $onlydata = false) {
         global $OUTPUT, $CFG, $DB, $PAGE, $SESSION;
 
-        $context = context_module::instance($this->cm->id);
         if (!isset($SESSION->mod_grouptool->userlist)) {
             $SESSION->mod_grouptool->userlist = new stdClass();
         }
@@ -7153,6 +7147,7 @@ class mod_grouptool {
             $SESSION->mod_grouptool->userlist->collapsed = $collapsed;
         }
 
+        $downloadurl = '';
         if (!$onlydata) {
             flush();
             $orientation = optional_param('orientation', 0, PARAM_BOOL);
@@ -7251,6 +7246,19 @@ class mod_grouptool {
         }
         $groupinfo = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
 
+        // We create a dummy user-object to get the fullname-format!
+        $dummy = new stdClass();
+        $namefields = get_all_user_name_fields();
+        foreach ($namefields as $namefield) {
+            $dummy->$namefield = $namefield;
+        }
+        $fullnameformat = fullname($dummy);
+        // Now get the ones used in fullname in the correct order!
+        $namefields = order_in_string($namefields, $fullnameformat);
+
+        $head = [];
+        $rows = [];
+
         if (!$onlydata) {
             echo html_writer::start_tag('table',
                                         ['class' => 'centeredblock userlist table table-striped table-hover table-condensed']);
@@ -7309,16 +7317,6 @@ class mod_grouptool {
             echo html_writer::end_tag('tr');
             echo html_writer::end_tag('thead');
         } else {
-            // We create a dummy user-object to get the fullname-format!
-            $dummy = new stdClass();
-            $namefields = get_all_user_name_fields();
-            foreach ($namefields as $namefield) {
-                $dummy->$namefield = $namefield;
-            }
-            $fullnameformat = fullname($dummy);
-            // Now get the ones used in fullname in the correct order!
-            $namefields = order_in_string($namefields, $fullnameformat);
-
             $head = ['name'          => get_string('fullname')];
             foreach ($namefields as $namefield) {
                 $head[$namefield] = get_user_field_name($namefield);
@@ -7500,18 +7498,13 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param stdClass[] $orderby optional current order-by array
-     * @param string[] $collapsed optional current array with collapsed columns
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_userlist_pdf($groupid=0, $groupingid=0, $orderby=array(),
-                                          $collapsed=array()) {
-        global $USER;
-
-        $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
+    public function download_userlist_pdf($groupid=0, $groupingid=0) {
+        $data = $this->userlist_table($groupingid, $groupid, true);
 
         $pdf = new \mod_grouptool\pdf();
 
@@ -7585,17 +7578,14 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param stdClass[] $orderby optional current order-by array
-     * @param string[] $collapsed optional current array with collapsed columns
      * @return bool|object[] raw data
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_userlist_raw($groupid=0, $groupingid=0, $orderby=array(),
-                                          $collapsed=array()) {
-        return $this->userlist_table($groupid, $groupingid, $orderby, $collapsed, true);
+    public function download_userlist_raw($groupid=0, $groupingid=0) {
+        return $this->userlist_table($groupid, $groupingid, true);
     }
 
     /**
@@ -7603,22 +7593,19 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param stdClass[] $orderby optional current order-by array
-     * @param string[] $collapsed optional current array with collapsed columns
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_userlist_txt($groupid=0, $groupingid=0, $orderby=array(),
-                                          $collapsed=array()) {
+    public function download_userlist_txt($groupid=0, $groupingid=0) {
         ob_start();
 
         $coursename = $this->course->fullname;
         $grouptoolname = $this->grouptool->name;
 
-        $lines = array();
-        $users = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
+        $lines = [];
+        $users = $this->userlist_table($groupingid, $groupid, true);
         if (count($users) > 0) {
             foreach ($users as $key => $user) {
                 if ($key == 0) { // Headline!
@@ -7694,18 +7681,8 @@ class mod_grouptool {
         global $CFG;
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         if (count($data) > 0) {
-            if (count($data) > 1) {
-                // General information? unused at the moment!
-                $worksheet = $workbook->add_worksheet(get_string('all'));
-                if (is_a($worksheet, 'Moodle_Excel_Worksheet')) {
-                    if ($orientation) {
-                        $worksheet->pear_excel_worksheet->setLandscape();
-                    } else {
-                        $worksheet->pear_excel_worksheet->setPortrait();
-                    }
-                }
 
-            }
+            $worksheet = false;
 
             // Prepare formats!
             $headlineprop = [
@@ -7782,6 +7759,10 @@ class mod_grouptool {
             ]; // Unit: mm!
 
             foreach ($data as $key => $user) {
+                if ($worksheet === false && count($data) > 1) {
+                    // General information? unused at the moment!
+                    $worksheet = $workbook->add_worksheet(get_string('all'));
+                }
                 if ($key == 0) {
                     // Headline!
                     $k = 0;
@@ -7945,8 +7926,7 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_userlist_ods($groupid=0, $groupingid=0, $orderby=array(),
-                                          $collapsed=array()) {
+    public function download_userlist_ods($groupid=0, $groupingid=0, $collapsed=[]) {
         global $CFG;
 
         require_once($CFG->libdir . "/odslib.class.php");
@@ -7956,7 +7936,7 @@ class mod_grouptool {
 
         $workbook = new MoodleODSWorkbook("-");
 
-        $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
+        $data = $this->userlist_table($groupingid, $groupid, true);
 
         $this->userlist_fill_workbook($workbook, $data, $collapsed);
 
@@ -7980,15 +7960,12 @@ class mod_grouptool {
      *
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
-     * @param stdClass[] $orderby optional current order-by array
-     * @param string[] $collapsed optional current array with collapsed columns
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_userlist_xlsx($groupid = 0, $groupingid = 0, $orderby=array(),
-                                          $collapsed=array()) {
+    public function download_userlist_xlsx($groupid = 0, $groupingid = 0) {
         global $CFG;
 
         require_once($CFG->libdir . "/excellib.class.php");
@@ -7998,7 +7975,7 @@ class mod_grouptool {
 
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
 
-        $data = $this->userlist_table($groupingid, $groupid, $orderby, $collapsed, true);
+        $data = $this->userlist_table($groupingid, $groupid, true);
 
         $this->userlist_fill_workbook($workbook, $data);
 

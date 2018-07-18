@@ -39,6 +39,8 @@ require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class groupings_creation_form extends \moodleform {
+    /** @var \context_module */
+    protected $context = null;
 
     /**
      * Definition of administration form
