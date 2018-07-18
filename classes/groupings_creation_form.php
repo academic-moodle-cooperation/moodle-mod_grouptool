@@ -97,7 +97,7 @@ class groupings_creation_form extends \moodleform {
         $mform->addHelpButton('target', 'groupingselect', 'grouptool');
 
         $mform->addElement('text', 'name', get_string('groupingname', 'group'));
-        $mform->setType('name', PARAM_MULTILANG);
+        $mform->setType('name', PARAM_TEXT);
         $mform->hideIf ('name', 'target', 'noteq', '-1');
 
         $grp = [];

@@ -246,7 +246,7 @@ class group_creation_form extends \moodleform {
             }
             if (has_capability('mod/grouptool:create_groupings', $this->context)) {
                 $mform->addElement('text', 'groupingname', get_string('groupingname', 'group'));
-                $mform->setType('groupingname', PARAM_MULTILANG);
+                $mform->setType('groupingname', PARAM_TEXT);
                 $mform->hideIf ('groupingname', 'grouping', 'noteq', '-1');
             }
 
