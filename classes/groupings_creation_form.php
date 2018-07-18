@@ -26,9 +26,12 @@ namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/formslib.php');
-require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
-require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+// $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
+if (isset($CFG)) {
+    require_once($CFG->libdir . '/formslib.php');
+    require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
+    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+}
 
 /**
  * class representing the moodleform used in the administration tab

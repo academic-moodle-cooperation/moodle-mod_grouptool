@@ -36,7 +36,10 @@ use \core_privacy\local\request\helper;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+// $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
+if (isset($CFG)) {
+    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+}
 
 /**
  * Privacy class for requesting user data.

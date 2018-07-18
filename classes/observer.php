@@ -33,7 +33,10 @@ use \mod_grouptool\event\group_recreated;
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
+// $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
+if (isset($CFG)) {
+    require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
+}
 
 /**
  * mod_grouptool_observer handles events due to changes in moodle core which affect grouptool
