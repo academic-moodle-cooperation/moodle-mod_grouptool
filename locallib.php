@@ -2875,34 +2875,20 @@ class mod_grouptool {
                 }
             }
 
-            $strgrouptools = get_string("modulenameplural", "grouptool");
+            $context = (object)[
+                    'course' => $this->course,
+                    'courseurl' => $CFG->wwwroot."/course/view.php?id=".$this->course->id,
+                    'coursegrouptoolsurl' => $CFG->wwwroot."/mod/grouptool/index.php?id=".$this->course->id,
+                    'grouptoolurl' => $CFG->wwwroot."/mod/grouptool/view.php?id=".$this->cm->id,
+                    'grouptoolname' => format_string($this->grouptool->name, true),
+                    'groupname' => $groupdata->name,
+                    'message' => get_string('register_you_in_group_success', 'grouptool', (object)[
+                        'groupname' => $groupdata->name
+                    ]),
+            ];
 
-            $postsubject = $this->course->shortname.': '.$strgrouptools.': '.
-                           format_string($this->grouptool->name, true);
-            $posttext  = $this->course->shortname.' -> '.$strgrouptools.' -> '.
-                         format_string($this->grouptool->name, true)."\n";
-            $posttext .= "----------------------------------------------------------\n";
-            $posttext .= get_string("register_you_in_group_successmail",
-                                    "grouptool", $message)."\n";
-            $posttext .= "----------------------------------------------------------\n";
-            $usermailformat = $DB->get_field('user', 'mailformat',
-                                             array('id' => $newrecord->userid));
-            if ($usermailformat == 1) {  // HTML!
-                $posthtml = "<p><font face=\"sans-serif\">";
-                $posthtml = "<a href=\"".$CFG->wwwroot."/course/view.php?id=".
-                            $this->course->id."\">".$this->course->shortname."</a> ->";
-                $posthtml = "<a href=\"".$CFG->wwwroot."/mod/grouptool/index.php?id=".
-                            $this->course->id."\">".$strgrouptools."</a> ->";
-                $posthtml = "<a href=\"".$CFG->wwwroot."/mod/grouptool/view.php?id=".
-                            $this->cm->id."\">".format_string($this->grouptool->name,
-                                                              true)."</a></font></p>";
-                $posthtml .= "<hr /><font face=\"sans-serif\">";
-                $posthtml .= "<p>".get_string("register_you_in_group_successmailhtml",
-                                              "grouptool", $message)."</p>";
-                $posthtml .= "</font><hr />";
-            } else {
-                $posthtml = "";
-            }
+            $postsubject = $this->course->shortname.': '.get_string('modulenameplural', 'grouptool').': '.
+                    format_string($this->grouptool->name, true);
 
             $messageuser = $DB->get_record('user', ['id' => $newrecord->userid]);
             $moodlemessage = new \core\message\message();
@@ -2913,10 +2899,10 @@ class mod_grouptool {
             $moodlemessage->userfrom          = $userfrom;
             $moodlemessage->userto            = $messageuser;
             $moodlemessage->subject           = $postsubject;
-            $moodlemessage->fullmessage       = $posttext;
+            $moodlemessage->fullmessage       = get_string('registrationnotification', 'mod_grouptool', $context);
             $moodlemessage->fullmessageformat = FORMAT_HTML;
-            $moodlemessage->fullmessagehtml   = $posthtml;
-            $moodlemessage->smallmessage      = get_string('register_you_in_group_success', 'grouptool', $message);
+            $moodlemessage->fullmessagehtml   = $OUTPUT->render_from_template('mod_grouptool/registrationnotification', $context);
+            $moodlemessage->smallmessage      = $context->message;
             $moodlemessage->notification      = 1;
             $moodlemessage->contexturl        = $CFG->wwwroot.'/mod/grouptool/view.php?id='.$this->cm->id;
             $moodlemessage->contexturlname    = $this->grouptool->name;

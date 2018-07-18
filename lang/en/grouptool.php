@@ -483,6 +483,10 @@ $string['register_you_in_group'] = 'Are you sure you want to register in group {
 $string['register_you_in_group_success'] = 'You successfully registered in group {$a->groupname}!';
 $string['register_you_in_group_successmail'] = 'You successfully registered in group {$a->groupname}!';
 $string['register_you_in_group_successmailhtml'] = 'You successfully registered in group {$a->groupname}!';
+$string['registrationnotification'] = '{$a->course->shortname} -> {$a->modulenameplural} -> {$a->grouptoolname}
+----------------------------------------------------------
+{$a->message}
+----------------------------------------------------------';
 $string['registrationdue'] = 'Registration due to';
 $string['registrations'] = 'Group-registrations';
 $string['registrations_missing'] = '{$a} registrations missing';
@@ -537,7 +541,12 @@ $string['sources_missing'] = 'There\'s at least 1 group without a chosen source 
 $string['sortlist_no_data'] = 'There are no groups present at the moment!';
 $string['start'] = 'Start';
 $string['status'] = 'Status';
-$string['status_help'] = '<ul><li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li><li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li><li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li><li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li></ul>';
+$string['status_help'] = '<ul>
+<li><strong>✔</strong> registered in Moodle-group and grouptool</li>
+<li><strong>?</strong> registered in Moodle-group but not in grouptool</li>
+<li><strong>+</strong> registered in grouptool but not in Moodle-group</li>
+<li><strong>1, 2, 3...</strong> queued in grouptool</li>
+</ul>';
 $string['successfully_deleted_groups'] = 'Successfully deleted groups!';
 $string['swapped_groups'] = 'Swapped groups {$a->a} (order {$a->aorder}) and {$a->b} (order {$a->border})!';
 $string['switched_to_all_groups'] = 'Changed group filter to all groups!';
