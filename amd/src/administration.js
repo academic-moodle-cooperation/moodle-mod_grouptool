@@ -544,7 +544,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                 return;
             }
 
-            log.info('DELTE GROUP ' + grpid + '!', "grouptool");
+            log.info('DELETE GROUP ' + grpid + '!', "grouptool");
 
             var requests = ajax.call([{
                 methodname: 'mod_grouptool_delete_group',
@@ -586,7 +586,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         this.globalsize = globalsize;
         this.usesize = usesize;
 
-        log.info('Initalize Grouptool group administration', "grouptool");
+        log.info('Initialize Grouptool group administration', "grouptool");
         $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-rename]', this, this.renamegroup);
         log.debug("Init edit size button", "grouptool");
         str.get_strings([{key: 'ajax_edit_size_help', component: 'mod_grouptool'}]).done(function(s) {

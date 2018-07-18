@@ -3,7 +3,7 @@ CHANGELOG
 3.4.1 (2018-03-14)
 ------------------
 
-* [FIXED] #5280 users were not promoted from queue to registered when certain ways of unregistereing were used
+* [FIXED] #5280 users were not promoted from queue to registered when certain ways of unregistering were used
 * [FIXED] #5281 queues were not resolved, due to the code just calling the preview instead of doing anything
 * [FIXED] #5226 fixed 2 german lang strings missing an 'n' at the end
 * [CHANGED] #5282 messages about user movements when resolving queues were improved
@@ -26,7 +26,7 @@ CHANGELOG
 3.3.2 (2017-10-10)
 ------------------
 
-* [FIXED] #4754 fixed problems with grouptool_refresh_events() callback due to paramters having been changed
+* [FIXED] #4754 fixed problems with grouptool_refresh_events() callback due to parameters having been changed
                 between Moodle 3.3.1 and 3.3.2
 * [CHANGED] #4682 updated travis.yml to use moodle-plugin-ci version 2 and run behat tests in firefox and chrome
 * fixed overall coding style
@@ -94,10 +94,10 @@ CHANGELOG
 * [REMOVED] #3058 Deprecated gif icon
 * [CHANGED] #3328 Fix warning when importing in inactive group
 * [CHANGED] #3299 Replaced custom form with moodleform in self registration
-* [FIXED] #3326 Fixed JS in group administration not showing error messages due to removing them immediatly
+* [FIXED] #3326 Fixed JS in group administration not showing error messages due to removing them immediately
 * [CHANGED] #3327 Send messages to users if they get promoted from queue due to unregistration or changed groupsize
 * [FIXED] #3327 Fix users not being promoted from queue if groupsize changes individually
-* other small bugfixes and improvements (whitespace fixes, removed unused and commented out code)
+* other small bug fixes and improvements (whitespace fixes, removed unused and commented out code)
 
 
 3.0.0 (2016-05-07)
@@ -125,7 +125,7 @@ CHANGELOG
 * [FIXED] #2834 Improve text describing non individual group sizes
 * [FIXED] #2825 Deadline calendar events being duplicated instead of updated for each instance edit
 * [FIXED] #2818 Add some missing lang strings
-* [FIXED] #2694 Replace Studierende with Teilnehmer/innen and Lehrende with Trainer/innen in GER
+* [FIXED] #2694 Replace "Studierende" with "Teilnehmer/innen" and "Lehrende" with "Trainer/innen" in german
   language file
 * [FIXED] Link's URLs if grouptool is called via g parameter in view.php
 * [FIXED] Fixed some smaller bugs and improve coding style and documentation

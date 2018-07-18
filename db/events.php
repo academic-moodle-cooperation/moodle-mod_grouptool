@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Definition of events observerd by mod_grouptool to handle certain circumstances
+ * Definition of events observed by mod_grouptool to handle certain circumstances
  *
  * @package   mod_grouptool
  * @author    Philipp Hager

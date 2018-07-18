@@ -103,7 +103,7 @@ class restore_grouptool_activity_task extends restore_activity_task {
                                         'view administration',
                                         'view.php?id={course_module}&tab=administration',
                                         '{grouptool}');
-        $rules[] = new restore_log_rule('grouptoolk',
+        $rules[] = new restore_log_rule('grouptool',
                                         'view grading',
                                         'view.php?id={course_module}&tab=grading',
                                         '{grouptool}');
