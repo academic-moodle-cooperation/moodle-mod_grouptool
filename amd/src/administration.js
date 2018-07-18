@@ -552,6 +552,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                 fail: notif.exception
             }]);
             requests[0].then(function(result) {
+                // So now the group's maybe recreated by grouptool instances set to do so, show notifications!
+                notif.fetchNotifications();
                 if (!result.error) {
                     // Success, remove the corresponding table entry...
                     node.find('td div').slideUp(600).promise().done(function() {

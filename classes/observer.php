@@ -30,6 +30,7 @@ use \mod_grouptool\event\registration_created;
 use \mod_grouptool\event\registration_deleted;
 use \mod_grouptool\event\queue_entry_deleted;
 use \mod_grouptool\event\group_recreated;
+use \core\notification;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -228,10 +229,12 @@ class observer {
                                 $DB->set_field('grouptool_agrps', 'groupid', $newid, ['groupid' => $data->id]);
                             }
                             // Trigger event!
-                            $logdata = (object)['cmid'     => $cmid,
-                                                'groupid'  => $data->id,
-                                                'newid'    => $newid,
-                                                'courseid' => $data->courseid];
+                            $logdata = (object)[
+                                'cmid'     => $cmid,
+                                'groupid'  => $data->id,
+                                'newid'    => $newid,
+                                'courseid' => $data->courseid
+                            ];
                             group_recreated::create_from_object($logdata)->trigger();
 
                             if ($grouptool->immediate_reg) {
@@ -240,6 +243,12 @@ class observer {
                                 $instance->push_registrations();
                             }
                             $grouprecreated = true;
+                            $infodata = new \stdClass();
+                            $infodata->groupname = $data->name;
+                            $infodata->grouptoolname = $grouptool->name;
+                            $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
+                            notification::add(get_string('notification:group_recreated', 'grouptool', $infodata),
+                                    notification::INFO);
                         } else {
                             print_error('error', 'moodle');
                             return false;
@@ -250,6 +259,12 @@ class observer {
                             $instance = new \mod_grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
+                        $infodata = new \stdClass();
+                        $infodata->groupname = $data->name;
+                        $infodata->grouptoolname = $grouptool->name;
+                        $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
+                        notification::add(get_string('notification:registrations_recreated', 'grouptool', $infodata),
+                                notification::INFO);
                     }
                     break;
                 case GROUPTOOL_DELETE_REF:

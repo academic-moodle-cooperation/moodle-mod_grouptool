@@ -52,11 +52,11 @@ class group_recreated extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_from_object($data) {
+    public static function create_from_object(\stdClass $data) {
         $event = self::create([
-            'objectid' => $data['newid'],
-            'context' => \context_module::instance($data['cmid']),
-            'other' => $data
+            'objectid' => $data->newid,
+            'context' => \context_module::instance($data->cmid),
+            'other' => (array)$data
         ]);
         return $event;
     }
