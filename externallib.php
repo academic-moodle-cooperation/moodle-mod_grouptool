@@ -162,7 +162,6 @@ class mod_grouptool_external extends external_api {
             groups_update_group($group);
             if ($params['name'] != $DB->get_field('groups', 'name', ['id' => $params['groupid']])) {
                 // Error happened...
-                /** @noinspection SpellCheckingInspection */
                 $result->error = get_string('couldnt_rename_group', 'grouptool', $params['name']);
             } else {
                 $result->message = get_string('renamed_group', 'grouptool', $params['name']);
@@ -249,7 +248,6 @@ class mod_grouptool_external extends external_api {
             ]);
             if (!empty($dbsize)) {
                 // Error happened...
-                /** @noinspection SpellCheckingInspection */
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
             } else {
                 $result->message = get_string('resized_group', 'grouptool', $params['size']);
@@ -268,7 +266,6 @@ class mod_grouptool_external extends external_api {
                             'grouptoolid' => $cm->instance
                     ])) {
                 // Error happened...
-                /** @noinspection SpellCheckingInspection */
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
             } else {
                 $result->message = get_string('resized_group', 'grouptool', $params['size']);

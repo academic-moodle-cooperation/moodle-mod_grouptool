@@ -1637,7 +1637,6 @@ class mod_grouptool {
                                                                               $data->groupingname);
                         $preview = $prev;
                         break;
-                    /** @noinspection PhpMissingBreakStatementInspection */
                     case GROUPTOOL_N_M_GROUPS:
                         /* Shortcut here: create_fromto_groups does exactly what we want,
                          * with from = 1 and to = number of groups to create! */
@@ -1767,7 +1766,6 @@ class mod_grouptool {
                                                                           true);
                     $preview = $prev;
                     break;
-                /** @noinspection PhpMissingBreakStatementInspection */
                 case GROUPTOOL_N_M_GROUPS:
                     /* Shortcut here: create_fromto_groups does exactly what we want,
                      * with from = 1 and to = number of groups to create! */
@@ -3975,7 +3973,7 @@ class mod_grouptool {
         global $DB, $USER;
 
         if (is_array($data)) { // It's the queue itself!
-            uasort($data, [&$this, "cmptimestamp"]);
+            uasort($data, [$this, "cmptimestamp"]);
             $i = 1;
             foreach ($data as $entry) {
                 if ($entry->userid == $userid) {
@@ -4028,7 +4026,6 @@ class mod_grouptool {
         $return->reg_users = 0;
 
         switch ($userid) {
-            /** @noinspection PhpMissingBreakStatementInspection */
             case null:
                 $userid = $USER->id;
             default:
@@ -6130,7 +6127,6 @@ class mod_grouptool {
                     $hidden = in_array('email', $collapsed) ? true : false;
                     $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['email'], null, $hidden);
-                    /** @noinspection PhpUnusedLocalVariableInspection */
                     $k++; // ...k = n+2!
                 }
 
@@ -6174,7 +6170,6 @@ class mod_grouptool {
                         $hidden = in_array('email', $collapsed) ? true : false;
                         $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
-                        /** @noinspection PhpUnusedLocalVariableInspection */
                         $k++; // ...k = n+2!
                     }
                 }
@@ -6214,7 +6209,6 @@ class mod_grouptool {
                             $k++; // ...k = n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $reg['email'], $regentrylast);
-                            /** @noinspection PhpUnusedLocalVariableInspection */
                             $k++; // ...k = n+2!
                         }
 
@@ -6246,7 +6240,6 @@ class mod_grouptool {
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['email'], $regentrylast);
-                                /** @noinspection PhpUnusedLocalVariableInspection */
                                 $k++; // ...k = n+2!
                             }
                         }
@@ -6302,7 +6295,6 @@ class mod_grouptool {
                             $k++; // ...k = n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $mreg['email'], $regentrylast);
-                            /** @noinspection PhpUnusedLocalVariableInspection */
                             $k++; // ...k = n+2!
                         }
 
@@ -6334,7 +6326,6 @@ class mod_grouptool {
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['email'], $regentrylast);
-                                /** @noinspection PhpUnusedLocalVariableInspection */
                                 $k++; // ...k = n+2!
                             }
                         }
@@ -6376,7 +6367,6 @@ class mod_grouptool {
                             $k++; // ...k = n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $queue['email'], $regentrylast);
-                            /** @noinspection PhpUnusedLocalVariableInspection */
                             $k++; // ...k = n+2!
                         }
 
@@ -6408,7 +6398,6 @@ class mod_grouptool {
                                 $k++; // ...k = n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['email'], $regentrylast);
-                                /** @noinspection PhpUnusedLocalVariableInspection */
                                 $k++; // ...k = n+2!
                             }
                         }

@@ -34,7 +34,7 @@ use \core\notification;
 
 defined('MOODLE_INTERNAL') || die;
 
-// $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
+// Global variable $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
 if (isset($CFG)) {
     require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 }
