@@ -265,7 +265,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
                 $export->queues[] = [
                         'group' => $agrps[$cur->agrpid]->name,
                         'status' => $strqueued,
-                        'timestamp' => transform::datetime($cur->timemodified)
+                        'timestamp' => transform::datetime($cur->timestamp)
                 ];
             }
         }
