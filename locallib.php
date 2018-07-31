@@ -2846,7 +2846,7 @@ class mod_grouptool {
                                            WHERE grouptoolid = ?', [$this->grouptool->id]);
         list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
         $sql = "SELECT queued.id, MAX(agrp.groupid) AS groupid, MAX(queued.agrpid) AS agrpid,
-                       MAX(queued.userid) AS userid, MAX(queued.timestamp),
+                       MAX(queued.userid) AS userid, MAX(queued.timestamp) AS timestamp,
                        (COUNT(DISTINCT reg.id) < ?) AS priority
                   FROM {grouptool_queued} queued
              LEFT JOIN {grouptool_agrps} agrp ON agrp.id = queued.agrpid
@@ -4144,7 +4144,7 @@ class mod_grouptool {
 
                 $queueentries = $DB->get_records_sql("
                       SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
-                             MAX(queued.timestamp), (COUNT(DISTINCT reg.id) < ?) AS priority
+                             MAX(queued.timestamp) AS timestamp, (COUNT(DISTINCT reg.id) < ?) AS priority
                         FROM {grouptool_queued} queued
                    LEFT JOIN {grouptool_registered} reg ON queued.userid = reg.userid AND reg.agrpid ".$agrpssql.
                                                                                     " AND reg.modified_by >= 0

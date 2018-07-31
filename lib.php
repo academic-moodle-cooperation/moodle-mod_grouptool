@@ -343,7 +343,7 @@ function grouptool_update_queues($grouptool = 0) {
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
             // We use MAX to trick Postgres into thinking this is an full GROUP BY statement.
-            $sql = "SELECT queued.id AS id, MAX(queued.agrpid) AS agrpid, MAX(queued.timestamp),
+            $sql = "SELECT queued.id AS id, MAX(queued.agrpid) AS agrpid, MAX(queued.timestamp) AS timestamp,
                            MAX(queued.userid) AS userid, (regs < ?) AS priority, MAX(reg.regs) AS regs
                       FROM {grouptool_queued} queued
                  LEFT JOIN (SELECT userid, COUNT(DISTINCT id) AS regs
