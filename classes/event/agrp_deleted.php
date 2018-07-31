@@ -52,7 +52,7 @@ class agrp_deleted extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_from_object($data) {
+    public static function create_from_object(\stdClass $data) {
         $event = self::create([
             'objectid' => $data->id,
             'context' => \context_module::instance($data->cmid),

@@ -53,7 +53,7 @@ class agrp_created extends \core\event\base {
      * @return \core\event\base
      * @throws \coding_exception
      */
-    public static function create_from_object(\stdClass $cm, $agrp) {
+    public static function create_from_object(\stdClass $cm, \stdClass $agrp) {
         $event = self::create([
             'objectid' => $agrp->id,
             'context' => \context_module::instance($cm->id),
