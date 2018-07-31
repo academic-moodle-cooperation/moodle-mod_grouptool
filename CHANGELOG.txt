@@ -1,5 +1,22 @@
 CHANGELOG
 =========
+3.5.0 (2018-07-01)
+------------------
+
+* [FEATURE] #5379 implemented privacy API, so we're GDPR conform
+* [FEATURE] #5054 if groups are now recreated due to a grouptool's settings, the user gets notified via info-notification also we
+*                 disabled the groups' deletion buttons as soon as there's a grouptool instance set to recreate the groups in the
+*                 course
+* [FIXED]   #5556 due to some missing column aliases, some registrations promoted from the queue have no correct timestamp, this is
+*                 fixed for future entries, but current entries can't be fixed automatically
+* [CHANGED] #5086 removed german lang strings from repository
+* [CHANGED] #4764 added link to group administration in groups-created-success message
+* [CHANGED] #4765 checkboxcontroller on group administration now has 'all' selected by default
+* [CHANGED] #5512 checkboxcontroller now uses updated Bootstrap classes
+* [CHANGED] #5085 lots of code-style improvements, much coding style improvements, unused vars, etc.
+* [CHANGED] updated travis.yml once more
+
+
 3.4.1 (2018-03-14)
 ------------------
 
