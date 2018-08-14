@@ -1499,10 +1499,14 @@ class mod_grouptool {
             $actions = [
                 '' => get_string('choose', 'grouptool'),
                 'activate' => get_string('setactive', 'grouptool'),
-                'deactivate' => get_string('setinactive', 'grouptool'),
-                'delete' => get_string('delete'),
-                'grouping' => get_string('createinsertgrouping', 'grouptool'),
+                'deactivate' => get_string('setinactive', 'grouptool')
             ];
+            if (!($this->grouptool->ifgroupdeleted === GROUPTOOL_RECREATE_GROUP)
+                    && !$DB->record_exists('grouptool', ['course' => $this->cm->course,
+                                                         'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP])) {
+                $actions['delete'] = get_string('delete');
+            }
+            $actions['grouping'] = get_string('createinsertgrouping', 'grouptool');
 
             $grp = [];
             $grp[] =& $mform->createElement('static', 'with_selection', '', get_string('with_selection', 'grouptool'));

@@ -46,7 +46,7 @@ class renderer extends \plugin_renderer_base {
      * @throws \moodle_exception
      */
     public function render_sortlist(sortlist $sortlist) {
-        global $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT, $DB;
 
         if (empty($sortlist->groups) || !is_array($sortlist->groups) || count($sortlist->groups) == 0) {
             return $this->get_no_groups_info($sortlist);
@@ -73,6 +73,11 @@ class renderer extends \plugin_renderer_base {
         $statushelpicon = new \help_icon('groupstatus', 'grouptool');
         $context->statushelpicon = $statushelpicon->export_for_template($OUTPUT);
         $context->groups = array_values($sortlist->groups);
+
+        if ($DB->record_exists('grouptool', ['course' => $sortlist->cm->course, 'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP])) {
+            // Disable delete-Buttons if the group(s) would get recreated anyways...
+            $context->nodeletion = true;
+        }
 
         $html = $OUTPUT->render_from_template('mod_grouptool/sortlist', $context);
 

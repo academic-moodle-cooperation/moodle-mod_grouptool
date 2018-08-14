@@ -529,6 +529,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         e.preventDefault();
         e.stopPropagation();
 
+        if ($(e.target).closest('[data-delete]').hasClass('disabled')) {
+            return;
+        }
+
         // Get group id!
         var target = $(e.target).closest('[data-delete]');
 

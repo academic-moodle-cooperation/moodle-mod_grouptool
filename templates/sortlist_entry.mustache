@@ -39,6 +39,7 @@
     * order - Group's order (integer or 99999 if nothings set)
     * usesize - If groupsize is used
     * size - Group's size
+    * nodeletion - If the groups' delete button should be disabled (used when any grouptool would recreate the group!)
 
     Example context (json):
     {
@@ -52,7 +53,8 @@
         "pageurl": "https://example.com/mod/grouptool/view.php?id=3&tab=administration",
         "order": 1,
         "usesize": true,
-        "size": 5
+        "size": 5,
+        "nodeletion": true
     }
 
 }}
@@ -101,8 +103,12 @@
         }}</a>
     </div></td>
     <td class="buttons"><div>
-        <a href="{{pageurl}}&delete={{id}}" data-delete class="deletebutton" title="{{#str}}delete, core{{/str}}">{{!
-            }}{{#pix}} i/delete, core, {{#str}}delete, core{{/str}}{{/pix}}{{!
+        <a href="{{^nodeletion}}{{pageurl}}&delete={{id}}{{/nodeletion}}" data-delete{{!
+           }} class="deletebutton {{#nodeletion}} disabled{{/nodeletion}}"{{!
+           }}{{^nodeletion}} title="{{#str}}delete, core{{/str}}"{{/nodeletion}}{{!
+           }}{{#nodeletion}} disabled aria-disabled="true" title="{{#str}}nodeletion, grouptool{{/str}}"{{/nodeletion}}>{{!
+            }}{{^nodeletion}}{{#pix}} i/delete, core, {{#str}}delete, core{{/str}}{{/pix}}{{/nodeletion}}{{!
+            }}{{#nodeletion}}{{#pix}} i/delete, core, {{#str}}nodeletion, grouptool{{/str}}{{/pix}}{{/nodeletion}}{{!
         }}</a>
     </div></td>
 </tr>

@@ -401,6 +401,7 @@ $string['no_target_selected'] = 'There\'s no destination for the copy operation 
 $string['no_users_to_display'] = 'No users to display!';
 $string['noaccess'] = 'You have no access to this module (maybe you do not belong to the right group?)!';
 $string['nobody_queued'] = 'Nobody queued';
+$string['nodeletion'] = 'Deletion of this group is disabled, due to at least one grouptool instance in this course being set to recreate the group on deletion!';
 $string['nogroups'] = 'No groups in this course.';
 $string['nogroupsactive'] = 'No active groups in this grouptool.';
 $string['nogroupsinactive'] = 'No inactive groups in this grouptool.';
