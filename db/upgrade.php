@@ -517,10 +517,9 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2018060100) {
-        // TODO version number!
         // Replace unprefixed user preference mygroups_only with mod_grouptool_mygroups_only!
-        $select = 'name LIKE "mygroups_only"';
-        $DB->set_field_select('user_preferences', 'name', 'mod_grouptool_mygroups_only', $select);
+        $DB->set_field_select('user_preferences', 'name', 'mod_grouptool_mygroups_only', $DB->sql_like('name', ':name'),
+                ['name' => 'mygroups_only']);
 
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2018060100, 'grouptool');
