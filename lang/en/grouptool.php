@@ -420,7 +420,7 @@ $string['not_permitted'] = 'Not permitted';
 $string['not_registered'] = 'You\'re not yet registered!';
 $string['not_synced_reg_present'] = 'not syncronized registrations present';
 $string['notification:group_recreated'] = 'The group "{$a->groupname}" has been recreated due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">"{$a->grouptoolname}"</a> being set to recreate deleted groups.';
-$string['notification:registrations_recreated'] = 'The group\'s "{$a->groupname}" members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">"{$a->grouptoolname}"</a> being set to recreate deleted groups. The group itself was recrated by another grouptool instance.';
+$string['notification:registrations_recreated'] = 'The group\'s "{$a->groupname}" members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">"{$a->grouptoolname}"</a> being set to recreate deleted groups. The group itself was recreated by another grouptool instance.';
 $string['you_are_not_in_queue_or_registered'] = 'You are neither registered nor queued in group {$a->groupname}';
 $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';
