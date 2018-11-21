@@ -333,7 +333,7 @@ $string['ifmemberremoved_help'] = 'Should grouptool registrations be deleted if 
 $string['ignorechanges'] = 'Ignore changes';
 $string['ignored_not_found_users'] = 'At least one user could not be added to the group!';
 $string['ignoring_not_found_users'] = 'At least one user has not been found in database. All those users will be ignored!';
-$string['immediate_reg'] = 'Immediate registrations';
+$string['immediate_reg'] = 'Immediate registration';
 $string['immediate_reg_help'] = 'If enabled the (de)registrations will be forwarded to the moodle-system. If not enabled the registrations get cached in grouptool and can be pushed to the moodle-system by the teacher.';
 $string['import'] = 'Import';
 $string['importbutton'] = 'Import users';
@@ -420,7 +420,7 @@ $string['not_permitted'] = 'Not permitted';
 $string['not_registered'] = 'You\'re not yet registered!';
 $string['not_synced_reg_present'] = 'not syncronized registrations present';
 $string['notification:group_recreated'] = 'The group "{$a->groupname}" has been recreated due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">"{$a->grouptoolname}"</a> being set to recreate deleted groups.';
-$string['notification:registrations_recreated'] = 'The group\'s "{$a->groupname}" members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">"{$a->grouptoolname}"</a> being set to recreate deleted groups. The group itself was recreated by another grouptool instance.';
+$string['notification:registrations_recreated'] = 'The group\'s "{$a->groupname}" members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">"{$a->grouptoolname}"</a> being set to recreate deleted groups. The group itself was recrated by another grouptool instance.';
 $string['you_are_not_in_queue_or_registered'] = 'You are neither registered nor queued in group {$a->groupname}';
 $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';
@@ -490,7 +490,7 @@ $string['registrationnotification'] = '{$a->course->shortname} -> {$a->modulenam
 ----------------------------------------------------------
 {$a->message}
 ----------------------------------------------------------';
-$string['registrationdue'] = 'Registration due to';
+$string['registrationdue'] = 'Registration end';
 $string['registrations'] = 'Group-registrations';
 $string['registrations_missing'] = '{$a} registrations missing';
 $string['registration_missing'] = '1 registration missing';
