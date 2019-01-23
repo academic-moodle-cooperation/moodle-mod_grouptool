@@ -33,6 +33,9 @@ use \core_privacy\local\request\writer;
 use \core_privacy\local\request\approved_contextlist;
 use \core_privacy\local\request\transform;
 use \core_privacy\local\request\helper;
+use \core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -49,7 +52,7 @@ if (isset($CFG)) {
  * @copyright  2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, pluginprovider, preference_provider {
+class provider implements metadataprovider, pluginprovider, preference_provider, core_userlist_provider {
     /**
      * Provides meta data that is stored about a user with mod_publication
      *
@@ -115,6 +118,89 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
 
         return $contextlist;
     }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+
+        $params = [
+                'modulename' => 'grouptool',
+                'contextid' => $context->id,
+                'contextlevel' => CONTEXT_MODULE
+        ];
+
+        // Get all who are queued or registered or marked or have modified, but only real users, no empty values!
+        foreach (['grouptool_queued' => ['userid'],
+                  'grouptool_registered' => ['userid', 'modified_by']] as $table => $fields) {
+            foreach ($fields as $field) {
+                $sql = "SELECT r." . $field . "
+                          FROM {context} ctx
+                          JOIN {course_modules} cm ON cm.id = ctx.instanceid
+                          JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                          JOIN {grouptool} g ON g.id = cm.instance
+                          JOIN {grouptool_agrps} a ON g.id = a.grouptoolid
+                          JOIN {" . $table . "} r ON a.id = r.agrpid
+                         WHERE ctx.id = :contextid AND ctx.contextlevel = :contextlevel AND r." . $field . " > 0";
+                $userlist->add_from_sql($field, $sql, $params);
+            }
+        }
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+
+        $context = $userlist->get_context();
+
+        if ($context->contextlevel == CONTEXT_MODULE) {
+            // Apparently we can't trust anything that comes via the context.
+            // Go go mega query to find out it we have an checkmark context that matches an existing checkmark.
+            $sql = "SELECT g.*
+                    FROM {grouptool} g
+                    JOIN {course_modules} cm ON g.id = cm.instance AND g.course = cm.course
+                    JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
+                    JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextmodule
+                    WHERE ctx.id = :contextid";
+            $params = ['modulename' => 'grouptool', 'contextmodule' => CONTEXT_MODULE, 'contextid' => $context->id];
+            $grouptool = $DB->get_record_sql($sql, $params);
+            // If we have an id over zero then we can proceed.
+            if (!empty($grouptool) && $grouptool->id > 0) {
+                $userids = $userlist->get_userids();
+                if (count($userids) <= 0) {
+                    return;
+                }
+
+                $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
+
+                $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', 'grouptoolid = ?', [$grouptool->id]);
+                list($agrpsql, $agrpparams) = $DB->get_in_or_equal($agrpids, SQL_PARAMS_NAMED, 'agrp');
+
+                list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+
+                $DB->delete_records_select('grouptool_registered', "agrpid ".$agrpsql." AND userid ".$usersql,
+                        $agrpparams + $userparams);
+                $DB->delete_records_select('grouptool_queued', "agrpid ".$agrpsql." AND userid ".$usersql,
+                        $agrpparams + $userparams);
+                $instance = new \mod_grouptool($cm->id, $grouptool, $cm);
+                foreach ($agrpids as $cur) {
+                    $instance->fill_from_queue($cur);
+                }
+            }
+        }
+    }
+
 
     /**
      * Write out the user data filtered by contexts.
@@ -362,5 +448,15 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
                 $agrpparams + ['userid' => $user->id, 'modifierid' => $user->id]);
         $DB->delete_records_select('grouptool_queued', "userid = :userid AND agrpid ".$agrpssql,
                 $agrpparams + ['userid' => $user->id]);
+
+        $grouptools = $DB->get_records_list('grouptool', 'id', $grouptoolids);
+        foreach ($grouptools as $cur) {
+            $cm = get_coursemodule_from_instance('grouptool', $cur->id);
+            $grouptool = new \mod_grouptool($cm->id, $cur, $cm);
+            $gtagrps = array_keys($grouptool->get_active_groups(false, false, 0, 0, 0, false));
+            foreach (array_intersect($agrpids, $gtagrps) as $agrpid) {
+                $grouptool->fill_from_queue($agrpid);
+            }
+        }
     }
 }
