@@ -3115,7 +3115,7 @@ class mod_grouptool {
         $regopen = ($this->grouptool->allow_reg
                     && (($this->grouptool->timedue == 0)
                         || (time() < $this->grouptool->timedue))
-                    && ($this->grouptool->timeavailable < time()));
+                    && ($this->grouptool->timeavailable <= time()));
 
         if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
