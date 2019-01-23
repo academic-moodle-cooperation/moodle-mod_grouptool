@@ -10,7 +10,7 @@ Feature: In a course, a teacher should be able to add a new grouptool
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@teacher.com |
       | student1 | Student | 1 | student1@students.com |
-	And the following "courses" exist:
+    And the following "courses" exist:
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 0|
     And the following "course enrolments" exist:
