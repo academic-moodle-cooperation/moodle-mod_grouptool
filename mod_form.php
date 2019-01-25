@@ -164,10 +164,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->hideIf ('allow_unreg', 'allow_reg', 'eq', 0);
 
         $size = [];
-        $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'),
-                                        ['size' => '5']);
-        $size[] = $mform->createElement('checkbox', 'use_size', '', get_string('use_size',
-                                                                               'grouptool'));
+        $size[] = $mform->createElement('text', 'grpsize', get_string('size', 'grouptool'), ['size' => '5']);
+        $size[] = $mform->createElement('checkbox', 'use_size', '', get_string('use_size', 'grouptool'));
         // We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0!
         $mform->setType('grpsize', PARAM_RAW);
         $grpsize = get_config('mod_grouptool', 'grpsize');
@@ -225,6 +223,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setDefault('use_queue', (($usequeue !== false) ? $usequeue : 0));
         if ($queues <= 0) {
             $mform->hideIf('use_queue', 'allow_reg', 'eq', 0);
+            $mform->hideIf('use_queue', 'use_size', 'notchecked');
         }
 
         $queue = [];
@@ -236,7 +235,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if ($maxqueues === false) {
             throw new coding_exception('invalid_param');
         }
-        if (!$maxqueues) {
+        if (empty($maxqueues)) {
             $mform->setDefault('users_queues_limit', 0);
             $mform->setDefault('limit_users_queues', 0);
         } else {
@@ -249,6 +248,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $mform->hideIf('users_queues_grp', 'use_queue', 'notchecked');
         }
         $mform->hideIf('users_queues_grp', 'allow_reg', 'eq', 0);
+        $mform->hideIf('users_queues_grp', 'use_size', 'notchecked');
 
         $queue = [];
         $queue[] = $mform->createElement('text', 'groups_queues_limit', '', ['size' => '3']);
@@ -259,7 +259,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if ($maxqueues === false) {
             throw new coding_exception('invalid_param');
         }
-        if (!$maxqueues) {
+        if (empty($maxqueues)) {
             $mform->setDefault('groups_queues_limit', 0);
             $mform->setDefault('limit_groups_queues', 0);
         } else {
@@ -272,6 +272,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $mform->disabledIf('groups_queues_limit', 'limit_groups_queues', 'notchecked');
         }
         $mform->hideIf('groups_queues_grp', 'allow_reg', 'eq', 0);
+        $mform->hideIf('groups_queues_grp', 'use_size', 'notchecked');
 
         // Prevent user from unsetting if user is registered in multiple groups!
         $mform->addElement('checkbox', 'allow_multiple', get_string('allow_multiple', 'grouptool'));
@@ -389,9 +390,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
     public function data_preprocessing(&$defaultvalues) {
         if (array_key_exists('users_queues_limit', $defaultvalues) && ($defaultvalues['users_queues_limit'] > 0)) {
             $defaultvalues['limit_users_queues'] = 1;
+        } else {
+            $defaultvalues['limit_users_queues'] = 0;
         }
         if (array_key_exists('groups_queues_limit', $defaultvalues) && ($defaultvalues['groups_queues_limit'] > 0)) {
             $defaultvalues['limit_groups_queues'] = 1;
+        } else {
+            $defaultvalues['limit_groups_queues'] = 0;
         }
 
         parent::data_preprocessing($defaultvalues);

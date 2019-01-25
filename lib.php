@@ -149,7 +149,7 @@ function grouptool_update_instance(stdClass $grouptool) {
     if (!isset($grouptool->use_individual)) {
         $grouptool->use_individual = 0;
     }
-    if (!isset($grouptool->use_queue)) {
+    if (!isset($grouptool->use_queue) || ($grouptool->use_size == 0)) {
         $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id) AS count
                                             FROM {grouptool_agrps} agrps
                                        LEFT JOIN {grouptool_queued} queues ON queues.agrpid = agrps.id
@@ -161,6 +161,12 @@ function grouptool_update_instance(stdClass $grouptool) {
             $grouptool->users_queues_limit = 0;
             $grouptool->groups_queues_limit = 0;
         }
+    }
+    if (!isset($grouptool->users_queues_limit) || empty($grouptool->limit_users_queues)) {
+        $grouptool->users_queues_limit = 0;
+    }
+    if (!isset($grouptool->groups_queues_limit) || empty($grouptool->limit_groups_queues)) {
+        $grouptool->groups_queues_limit = 0;
     }
     if (!isset($grouptool->allow_multiple)) {
         $grouptool->allow_multiple = 0;
