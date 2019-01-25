@@ -1,5 +1,24 @@
 CHANGELOG
 =========
+3.6.0 (2019-01-20)
+------------------
+
+* Moodle 3.6 compatible version
+* merged PR #11 from from germanvaleroelizondo/master fixing a typo in lang strings
+* [FEATURE] #5731 added a first behat test adding a grouptool instance
+* [FEATURE] #5752 add new core_userlist_provider methods to privacy provider
+* [FEATURE] #5834 enable users to look at groups/registrations in frozen contexts and export them
+* [FIXED] #5602 fix calculation for fast unit tests
+* [FIXED] #5874 fix queue limits for users and groups not being deactivateable
+* [FIXED] #5872 prevent users from reaching incorrect_tabs (per default, or otherwise)
+* [CHANGED] #5705 standardized labels and strings
+* [CHANGED] #5706 unify appearance of information in language strings
+* [CHANGED] #5602 reorganized unit test
+* [CHANGED] #5602 replace tab in feature file with spaces
+* [CHANGED] #5602 remove leading slashes in namespace and use statements
+* [UPDATE] #5602 update .travis.yml
+
+
 3.5.1 (2018-08-28)
 ------------------
 
