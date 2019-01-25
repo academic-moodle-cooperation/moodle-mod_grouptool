@@ -370,6 +370,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         }).fail(notif.exception);
                     } else {
                         // Render the element again and display it!
+                        var viewparams = {
+                            'id': e.data.cmid,
+                            'tab': 'administration'
+                        };
                         context = {
                             "status": false,
                             "missing": false,
@@ -377,10 +381,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             "id": grpid,
                             "checked": target.closest('tr').find('input[type=checkbox]').prop('checked'),
                             "name": target.closest('tr').data('name'),
-                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", {
-                                'id': e.data.cmid,
-                                'tab': 'administration'
-                            }),
+                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", viewparams, false),
                             "order": target.closest('tr').data('order'),
                             "usesize": !!e.data.usesize,
                             "size": target.closest('tr').data('size')
@@ -467,6 +468,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         });
                     } else {
                         // Replace sortlist entry!
+                        var viewparams = {
+                            'id': e.data.cmid,
+                            'tab': 'administration'
+                        };
                         // This will call the function to load and render our template.
                         context = {
                             "status": true,
@@ -475,10 +480,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             "id": grpid,
                             "checked": node.find('input[type=checkbox]').prop('checked'),
                             "name": node.data('name'),
-                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", {
-                                'id': e.data.cmid,
-                                'tab': 'administration'
-                            }),
+                            "pageurl": murl.relativeUrl("/mod/grouptool/view.php", viewparams, false),
                             "order": node.data('order'),
                             "usesize": !!e.data.usesize,
                             "size": node.data('size')
