@@ -350,6 +350,7 @@ $string['import_skipped'] = 'Skipped user <strong>{$a->fullname}</strong> for gr
 $string['import_user'] = 'Import <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) in group <strong>{$a->groupname}</strong> succeeded.';
 $string['import_user_prev'] = 'Import <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) in group <strong>{$a->groupname}</strong>.';
 $string['import_user_problem'] = 'Problem during import of <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong> - <strong>{$a->id}</strong>) in group <strong>{$a->groupname}</strong>.';
+$string['incorrect_tab'] = 'Incorrect tab, this tab is not available!';
 $string['inactive'] = 'Inactive';
 $string['inactivegroups'] = 'Inactive groups';
 $string['inactivegroups_hide'] = 'Hide inactive groups';
