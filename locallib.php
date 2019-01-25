@@ -169,6 +169,25 @@ class mod_grouptool {
     }
 
     /**
+     * @param tabobject[] $tabs
+     * @param string|null $tab
+     */
+    public static function translate_top_level_tabs(array $tabs, string $tab = null) {
+        global $SESSION;
+
+        // Now translate, if there's a top level tab chosen, which has just child-tabs!
+        switch ($tab) {
+            case 'users':
+            case 'administration':
+                if (!empty($tabs[$tab]->subtree)) {
+                    $tab = key($tabs[$tab]->subtree);
+                    $SESSION->mod_grouptool->currenttab = $tab;
+                }
+                break;
+        }
+    }
+
+    /**
      * Print a message along with button choices for Continue/Cancel
      *
      * If a string or moodle_url is given instead of a single_button, method defaults to post.

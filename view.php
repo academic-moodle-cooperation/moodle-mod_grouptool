@@ -197,7 +197,14 @@ if (has_capability('mod/grouptool:view_regs_group_view', $context)
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
 }
+
+// We won't iterate recursively over it right now, if we'll get more levels, we'll have to!
 $availabletabs = array_keys($row);
+foreach ($availabletabs as $cur) {
+    if (!empty($row[$cur]->subtree)) {
+        $availabletabs = array_merge($availabletabs, array_keys($row[$cur]->subtree));
+    }
+}
 
 $modinfo = get_fast_modinfo($course);
 $cm = $modinfo->get_cm($cm->id);
@@ -212,7 +219,8 @@ if (empty($cm->uservisible)) {
 
     if (!isset($SESSION->mod_grouptool->currenttab)
             || ($SESSION->mod_grouptool->currenttab == 'noaccess')
-            || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
+            || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')
+            || !in_array($SESSION->mod_grouptool->currenttab, $availabletabs)) {
         // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:create_groupings', $context)
                 || has_capability('mod/grouptool:administrate_groups', $context)) {
@@ -227,10 +235,14 @@ if (empty($cm->uservisible)) {
         }
     }
 
+    mod_grouptool::translate_top_level_tabs($row, $tab);
+
     echo $OUTPUT->tabtree($row, $SESSION->mod_grouptool->currenttab, $inactive);
 } else if (count($row) == 1) {
     $SESSION->mod_grouptool->currenttab = current($availabletabs);
     $tab = current($availabletabs);
+
+    mod_grouptool::translate_top_level_tabs($row, $tab);
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
     $tab = 'noaccess';
@@ -266,7 +278,6 @@ $event->trigger();
 /* END OF VIEW EVENT */
 
 switch ($tab) {
-    case 'administration':
     case 'group_admin':
         $instance->view_administration();
         break;
