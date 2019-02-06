@@ -146,7 +146,9 @@ if (has_capability('mod/grouptool:grade', $context)
                                     false);
 }
 if (has_capability('mod/grouptool:register_students', $context)
-        || has_capability('mod/grouptool:register', $context)) {
+        || has_capability('mod/grouptool:register', $context)
+        || has_capability('mod/grouptool:view_own_registration', $context)
+        || has_capability('mod/grouptool:view_groups', $context)) {
     $row['selfregistration'] = new tabobject('selfregistration',
                                              $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
                                              '&amp;tab=selfregistration',

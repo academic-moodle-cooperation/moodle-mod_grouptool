@@ -4860,7 +4860,7 @@ class mod_grouptool {
                     if (!empty($group->registered) && $this->is_registration_open()
                             && $this->get_rank_in_queue($group->registered, $userid) != false) {
                         // User is already registered --> unreg button!
-                        if ($this->grouptool->allow_unreg) {
+                        if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
                             $label = get_string('unreg', 'grouptool');
                             $buttonattr = [
                                     'type'  => 'submit',
@@ -4879,7 +4879,7 @@ class mod_grouptool {
                     } else if (!empty($group->queued) && $this->is_registration_open()
                         && $this->get_rank_in_queue($group->queued, $userid) != false) {
                         // We're sorry, but user's already queued in this group!
-                        if ($this->grouptool->allow_unreg) {
+                        if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
                             $label = get_string('unqueue', 'grouptool');
                             $buttonattr = [
                                     'type'  => 'submit',
@@ -4899,7 +4899,8 @@ class mod_grouptool {
                         $grouphtml .= html_writer::tag('span',
                                                        get_string('grp_marked', 'grouptool'),
                                                        ['class' => 'rank']);
-                    } else if ($this->is_registration_open() && $this->qualifies_for_groupchange($group->agrpid, $USER->id)) {
+                    } else if ($this->is_registration_open() && $this->qualifies_for_groupchange($group->agrpid, $USER->id)
+                            && has_capability('mod/grouptool:register', $this->context)) {
                         // Groupchange!
                         $label = get_string('change_group', 'grouptool');
                         if ($this->grouptool->use_size
@@ -4928,38 +4929,41 @@ class mod_grouptool {
                                 // Can be registered?
                                 $this->can_be_registered($group->agrpid, $USER->id, $message);
 
-                                // Register button!
-                                $label = get_string('register', 'grouptool');
-                                $buttonattr = [
-                                        'type'  => 'submit',
-                                        'name'  => 'reg['.$group->agrpid.']',
-                                        'value' => $group->agrpid,
-                                        'class' => 'regbutton btn btn-primary'
-                                ];
-                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-
+                                if (has_capability('mod/grouptool:register', $this->context)) {
+                                    // Register button!
+                                    $label = get_string('register', 'grouptool');
+                                    $buttonattr = [
+                                            'type' => 'submit',
+                                            'name' => 'reg[' . $group->agrpid . ']',
+                                            'value' => $group->agrpid,
+                                            'class' => 'regbutton btn btn-primary'
+                                    ];
+                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                                }
                             } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
                                 if (!$this->grouptool->use_queue) {
                                     throw new \mod_grouptool\local\exception\exceedgroupsize();
                                 } else {
-                                    // There's no place left in the group, so we try to queue the user!
-                                    $this->can_be_queued($group->agrpid, $USER->id, $message);
+                                    if (has_capability('mod/grouptool:register', $this->context)) {
+                                        // There's no place left in the group, so we try to queue the user!
+                                        $this->can_be_queued($group->agrpid, $USER->id, $message);
 
-                                    // Queue button!
-                                    $label = get_string('queue', 'grouptool');
-                                    $buttonattr = [
-                                            'type'  => 'submit',
-                                            'name'  => 'reg['.$group->agrpid.']',
-                                            'value' => $group->agrpid,
-                                            'class' => 'queuebutton btn btn-secondary'
-                                    ];
-                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                                        // Queue button!
+                                        $label = get_string('queue', 'grouptool');
+                                        $buttonattr = [
+                                                'type' => 'submit',
+                                                'name' => 'reg[' . $group->agrpid . ']',
+                                                'value' => $group->agrpid,
+                                                'class' => 'queuebutton btn btn-secondary'
+                                        ];
+                                        $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                                    }
                                 }
                             } catch (\mod_grouptool\local\exception\notenoughregs $e) {
                                 /* The user has not enough registrations, queue entries or marks,
                                  * so we try to mark the user! (Exceptions get handled above!) */
                                 list($queued, ) = $this->can_be_marked($group->agrpid, $USER->id, $message);
-                                if (!$queued) {
+                                if (!$queued && has_capability('mod/grouptool:register', $this->context)) {
                                     // Register button!
                                     $label = get_string('register', 'grouptool');
                                     $buttonattr = [
@@ -4969,7 +4973,7 @@ class mod_grouptool {
                                             'class' => 'regbutton btn btn-primary'
                                     ];
                                     $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                                } else {
+                                } else if (has_capability('mod/grouptool:register', $this->context)) {
                                     // Queue button!
                                     $label = get_string('queue', 'grouptool');
                                     $buttonattr = [
