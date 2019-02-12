@@ -24,7 +24,7 @@
  */
 namespace mod_grouptool;
 
-use \context_course as context_course;
+use context_course;
 
 defined('MOODLE_INTERNAL') || die();
 

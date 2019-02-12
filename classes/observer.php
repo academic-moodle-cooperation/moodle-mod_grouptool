@@ -24,13 +24,13 @@
  */
 namespace mod_grouptool;
 
-use \mod_grouptool\event\agrp_created;
-use \mod_grouptool\event\agrp_deleted;
-use \mod_grouptool\event\registration_created;
-use \mod_grouptool\event\registration_deleted;
-use \mod_grouptool\event\queue_entry_deleted;
-use \mod_grouptool\event\group_recreated;
-use \core\notification;
+use mod_grouptool\event\agrp_created;
+use mod_grouptool\event\agrp_deleted;
+use mod_grouptool\event\registration_created;
+use mod_grouptool\event\registration_deleted;
+use mod_grouptool\event\queue_entry_deleted;
+use mod_grouptool\event\group_recreated;
+use core\notification;
 
 defined('MOODLE_INTERNAL') || die;
 

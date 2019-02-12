@@ -24,7 +24,7 @@
  */
 namespace mod_grouptool\output;
 
-use \stdClass as stdClass;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 

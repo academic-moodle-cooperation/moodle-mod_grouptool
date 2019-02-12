@@ -24,7 +24,7 @@
  */
 namespace mod_grouptool;
 
-use \mod_grouptool\output\sortlist;
+use mod_grouptool\output\sortlist;
 
 defined('MOODLE_INTERNAL') || die();
 

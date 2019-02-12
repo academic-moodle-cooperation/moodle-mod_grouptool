@@ -24,7 +24,7 @@
  */
 namespace mod_grouptool;
 
-use \html_writer as html_writer;
+use html_writer;
 
 defined('MOODLE_INTERNAL') || die();
 
