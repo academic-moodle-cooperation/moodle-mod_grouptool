@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+
+3.7.0 (unreleased)
+------------------
+
+* [CHANGED] #5571 calculation of total value change from size to queued + registered
+
+
 3.6.0 (2019-01-20)
 ------------------
 

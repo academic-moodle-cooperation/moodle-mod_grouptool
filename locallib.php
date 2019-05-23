@@ -19,6 +19,7 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
+ * @author    Hannes Laimer
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -5575,9 +5576,9 @@ class mod_grouptool {
                 $free = '∞';
             }
 
-            $groupdata->total = $size;
-            $groupdata->registered = count($registered);
             $groupdata->queued = count($queued);
+            $groupdata->registered = count($registered);
+            $groupdata->total = $groupdata->registered + $groupdata->queued;
             $groupdata->free = $free;
             $groupdata->reg_data = [];
             $groupdata->queue_data = [];
