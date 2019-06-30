@@ -1,9 +1,9 @@
 CHANGELOG
 =========
 
-3.7.0 (unreleased)
+3.7.0 (2019-05-21)
 ------------------
-
+* [FEATURE] #6008 mode helptext splitted
 * [FEATURE] #6128 report-editdates support added
 * [CHANGED] #5571 calculation of total value change from size to queued + registered
 

@@ -129,23 +129,28 @@ class group_creation_form extends \moodleform {
 
             $mform->addElement('hidden', 'seed');
             $mform->setType('seed', PARAM_INT);
+            global $OUTPUT;
 
             $radioarray = [];
-            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('define_amount_groups', 'grouptool'),
+            $selectionname = get_string('groupcreationmode', 'grouptool');
+            $radioarray[0] = $mform->addElement('radio', 'mode', $selectionname, get_string('define_amount_groups', 'grouptool'),
                                                   GROUPTOOL_GROUPS_AMOUNT);
-            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('define_amount_members', 'grouptool'),
+            $radioarray[1] = $mform->addElement('radio', 'mode', '', get_string('define_amount_members', 'grouptool'),
                                                   GROUPTOOL_MEMBERS_AMOUNT);
-            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('create_1_person_groups', 'grouptool'),
+            $radioarray[2] = $mform->addElement('radio', 'mode', '', get_string('create_1_person_groups', 'grouptool'),
                                                   GROUPTOOL_1_PERSON_GROUPS);
-            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('create_fromto_groups', 'grouptool'),
+            $radioarray[3] = $mform->addElement('radio', 'mode', '', get_string('create_fromto_groups', 'grouptool'),
                                                   GROUPTOOL_FROMTO_GROUPS);
-            $radioarray[] = $mform->createElement('radio', 'mode', '', get_string('create_n_m_groups', 'grouptool'),
+            $radioarray[4] = $mform->addElement('radio', 'mode', '', get_string('create_n_m_groups', 'grouptool'),
                                                   GROUPTOOL_N_M_GROUPS);
-            $mform->addGroup($radioarray, 'modearray',
-                             get_string('groupcreationmode', 'grouptool'),
-                             \html_writer::empty_tag('br'), false);
+
+            $radioarray[0]->_helpbutton = $OUTPUT->help_icon('define_amount_groups', 'grouptool', '');
+            $radioarray[1]->_helpbutton = $OUTPUT->help_icon('define_amount_members', 'grouptool', '');
+            $radioarray[2]->_helpbutton = $OUTPUT->help_icon('create_1_person_groups', 'grouptool', '');
+            $radioarray[3]->_helpbutton = $OUTPUT->help_icon('create_fromto_groups', 'grouptool', '');
+            $radioarray[4]->_helpbutton = $OUTPUT->help_icon('create_n_m_groups', 'grouptool', '');
+
             $mform->setDefault('mode', GROUPTOOL_GROUPS_AMOUNT);
-            $mform->addHelpButton('modearray', 'groupcreationmode', 'grouptool');
 
             $mform->addElement('text', 'numberofgroups', get_string('number_of_groups', 'grouptool'), ['size' => '4']);
             $mform->hideIf('numberofgroups', 'mode', 'eq', GROUPTOOL_MEMBERS_AMOUNT);

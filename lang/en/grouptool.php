@@ -133,8 +133,18 @@ $string['choose_min_max_text'] = 'You have to choose between <strong>{$a->min}</
 $string['choose_targetgroup'] = 'Import into group';
 $string['chooseactivity'] = 'You have to choose an activity before data can be displayed!';
 $string['create_1_person_groups'] = 'Create 1 person groups';
+$string['create_1_person_groups_help'] = 'Create 1-person-groups - here a group for each chosen user is created. Besides # and @ you can use the following tags which will be replaced with the users data:
+<ul>
+<li>[username] - the user\'s username</li>
+<li>[firstname] - the user\'s first name</li>
+<li>[lastname] - the user\'s last name</li>
+<li>[idnumber] - the user\'s idnumber</li>
+</ul>
+If some data is missing the tag will be replaced by tagnameXX where XX stands for the number of the group.';
 $string['create_fromto_groups'] = 'Create groups with numbers from an interval (i.e. from 34 to 89), <strong>without automatic allocation</strong> of group members';
+$string['create_fromto_groups_help'] = 'Create groups with numbers from an interval (i.e. from 34 to 89) - use this mode to create (missing) groups (i.e. Group 4, Group 5, Group 6). Just insert limits and how many digits you wish to use at least for the names (i.e. 1, 01, 001, 0001...). It is possible to define a certain group size with "Number of group Members M". There will be <strong>no automatic allocation</strong> of group members.';
 $string['create_n_m_groups'] = 'Create N groups for M members, <strong>without automatic allocation</strong> of group members';
+$string['create_n_m_groups_help'] = 'Create N groups for M members - Create with this modus a specific number of groups (N groups) with a specific groupsize (M members), e.g. seven groups with space for three members each. There will be <strong>no automatic allocation</strong> of group members.';
 $string['createGroups'] = 'Create groups';
 $string['create_assign_groupings'] = 'Create/Assign groupings';
 $string['create_groups_confirm'] = 'Continue to create groups as previewed above?';
@@ -166,7 +176,14 @@ $string['could_not_add'] = 'Could not add <strong>{$a->username}</strong> to gro
 $string['deactivated_group'] = 'Deactivated group';
 $string['deactivated_groups'] = 'Deactivated groups!';
 $string['define_amount_groups'] = 'Define number of groups N';
+$string['define_amount_groups_help'] = '<li>Define number of groups N - You choose users from which role to use for group creation and enter the desired amount of groups in Group/Member count text field. In name scheme you can enter a name scheme for the groups using
+<ul>groupcreationmode_m_amount
+<li># (will be replaced with the group-number) and</li>
+<li>@ (will be replaced with a letter-representation of the group number)</li>
+</ul>
+Then the chosen users get spread on the desired amount of groups.</li>';
 $string['define_amount_members'] = 'Define number of group members M';
+$string['define_amount_members_help'] = 'Define number of group members M - Here you tell the grouptool how many members each group should ideally have. The needed amount of groups will be calculated automatically. If you check prevent last small group the users in this group get spread on the others if the last groups fill-ratio lies under 70%.';
 $string['delete_reference'] = 'Delete from grouptool';
 $string['description'] = 'Description';
 $string['deselect'] = 'Deselect';
@@ -238,34 +255,6 @@ $string['group_creation_failed'] = 'Creation of groups failed!';
 $string['group_creation_success'] = 'Successfully created groups!';
 $string['groupcreation'] = 'Group creation';
 $string['groupcreationmode'] = 'Mode';
-$string['groupcreationmode_help'] = 'Choose how groups should be created:<br />
-<ul>
-<li>Define number of groups N - You choose users from which role to use for group creation and enter the desired amount of groups in Group/Member count text field. In name scheme you can enter a name scheme for the groups using
-<ul>
-<li># (will be replaced with the group-number) and</li>
-<li>@ (will be replaced with a letter-representation of the group number)</li>
-</ul>
-Then the chosen users get spread on the desired amount of groups.</li>
-<li>
-Define number of group members M - Here you tell the grouptool how many members each group should ideally have. The needed amount of groups will be calculated automatically. If you check prevent last small group the users in this group get spread on the others if the last groups fill-ratio lies under 70%.
-</li>
-<li>
-Create 1-person-groups - here a group for each chosen user is created. Besides # and @ you can use the following tags which will be replaced with the users data:
-<ul>
-<li>[username] - the user\'s username</li>
-<li>[firstname] - the user\'s first name</li>
-<li>[lastname] - the user\'s last name</li>
-<li>[idnumber] - the user\'s idnumber</li>
-</ul>
-If some data is missing the tag will be replaced by tagnameXX where XX stands for the number of the group.
-</li>
-<li>
-Create groups with numbers from an interval (i.e. from 34 to 89) - use this mode to create (missing) groups (i.e. Group 4, Group 5, Group 6). Just insert limits and how many digits you wish to use at least for the names (i.e. 1, 01, 001, 0001...). It is possible to define a certain group size with "Number of group Members M". There will be <strong>no automatic allocation</strong> of group members.
-</li>
-<li>
-Create N groups for M members - Create with this modus a specific number of groups (N groups) with a specific groupsize (M members), e.g. seven groups with space for three members each. There will be <strong>no automatic allocation</strong> of group members.
-</li>
-</ul>';
 $string['groupfromtodigits'] = 'From, to &amp; digits in group names:';
 $string['groupinfo'] = 'Group information';
 $string['grouping_assign_success'] = 'Were successfully assigned:';
