@@ -94,7 +94,7 @@ class mod_grouptool_external extends external_api {
     public static function delete_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 
@@ -178,7 +178,7 @@ class mod_grouptool_external extends external_api {
     public static function rename_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 
@@ -288,7 +288,7 @@ class mod_grouptool_external extends external_api {
     public static function resize_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 
@@ -358,7 +358,7 @@ class mod_grouptool_external extends external_api {
     public static function activate_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 
@@ -426,7 +426,7 @@ class mod_grouptool_external extends external_api {
     public static function deactivate_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 
@@ -524,7 +524,7 @@ class mod_grouptool_external extends external_api {
     public static function reorder_groups_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 
@@ -607,7 +607,7 @@ class mod_grouptool_external extends external_api {
     public static function swap_groups_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_TEXT, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
     }
 }
