@@ -7203,9 +7203,9 @@ class mod_grouptool {
                   FROM {user} u
              LEFT JOIN ($esql) eu ON eu.id=u.id
                  WHERE u.deleted = 0 AND eu.id=u.id ";
-        if (!empty($groupingid)) {
+        $groups = groups_get_all_groups($this->course->id, 0, $groupingid);
+        if (!empty($groupingid) && !empty($groups)) {
             // Get all groupings groups!
-            $groups = groups_get_all_groups($this->course->id, 0, $groupingid);
             $ufields = user_picture::fields('u', ['idnumber']);
             $groupingusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupingusers)) {
