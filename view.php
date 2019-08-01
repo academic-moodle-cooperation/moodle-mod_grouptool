@@ -157,11 +157,21 @@ if (has_capability('mod/grouptool:register_students', $context)
                                              false);
 }
 if (has_capability('mod/grouptool:register_students', $context)) {
-    $row['import'] = new tabobject('import',
+    $row['multiple'] = new tabobject('multiple',
                                    $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
-                                   get_string('import', 'grouptool'),
-                                   get_string('import_desc', 'grouptool'),
+                                   get_string('multiple', 'grouptool'),
+                                   get_string('multiple_desc', 'grouptool'),
                                    false);
+    $row['multiple']->subtree['import'] = new tabobject('import',
+        $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
+        get_string('import', 'grouptool'),
+        get_string('import_desc', 'grouptool'),
+        false);
+    $row['multiple']->subtree['unregister'] = new tabobject('unregister',
+        $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=unregister',
+        get_string('unregister', 'grouptool'),
+        get_string('unregister_desc', 'grouptool'),
+        false);
 }
 if (has_capability('mod/grouptool:view_regs_group_view', $context)
     && has_capability('mod/grouptool:view_regs_course_view', $context)) {
@@ -294,6 +304,9 @@ switch ($tab) {
         break;
     case 'import':
         $instance->view_import();
+        break;
+    case 'unregister':
+        $instance->view_unregister();
         break;
     case 'overview':
         $instance->view_overview();

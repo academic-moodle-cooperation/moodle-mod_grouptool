@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains mod_grouptool's import form
+ * Contains mod_grouptool's unregister form
  *
  * @package   mod_grouptool
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Hannes Laimer
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_grouptool;
@@ -36,19 +36,19 @@ if (isset($CFG)) {
 }
 
 /**
- * class representing the moodleform used in the import-tab
+ * class representing the moodleform used in the unregister-tab
  *
  * @package   mod_grouptool
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Hannes Laimer
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class import_form extends \moodleform {
+class unregister_form extends \moodleform {
     /** @var \context_module */
     private $context = null;
 
     /**
-     * Definition of import form
+     * Definition of unregister form
      *
      * @throws \coding_exception
      * @throws \dml_exception
@@ -67,21 +67,21 @@ class import_form extends \moodleform {
         $course = $DB->get_record('course', ['id' => $cm->course]);
 
         $mform->addElement('hidden', 'tab');
-        $mform->setDefault('tab', 'import');
+        $mform->setDefault('tab', 'unregister');
         $mform->setType('tab', PARAM_TEXT);
 
         if (has_capability('mod/grouptool:register_students', $this->context)) {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed
              */
-            $mform->addElement('header', 'groupuser_import', get_string('groupuser_import',
+            $mform->addElement('header', 'groupuser_unregister', get_string('groupuser_unregister',
                                                                         'grouptool'));
 
             $active = new sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
             $inactive = new sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
-            $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup_import', 'grouptool'), null,
-                    ['size' => 15]);
+            $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup_unregister', 'grouptool'),
+                null, ['size' => 15]);
 
             if (!empty($active->groups)) {
                 $options = [];
@@ -112,18 +112,12 @@ class import_form extends \moodleform {
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');
 
-            $mform->addElement('advcheckbox', 'forceregistration', '', get_string('forceregistration', 'grouptool'));
-            $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
-            if ($forceimportreg = get_config('mod_grouptool', 'force_importreg')) {
-                $mform->setDefault('forceregistration', $forceimportreg);
-            }
-
-            $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
+            $mform->addElement('submit', 'submitbutton', get_string('unregisterbutton', 'grouptool'));
         }
     }
 
     /**
-     * Validation for import form
+     * Validation for unregister form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *

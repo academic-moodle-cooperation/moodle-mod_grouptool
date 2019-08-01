@@ -3967,6 +3967,209 @@ class mod_grouptool {
                                        WHERE modified_by >= 0 AND userid = ? AND agrpid '.$sql, $params);
     }
 
+    public function unregister($groups, $data, $previewonly = false) {
+        global $DB, $OUTPUT;
+
+        $message = "";
+        $error = false;
+        $users = preg_split("/[ ,;\t\n\r]+/", $data);
+        // Prevent selection of all users if one of the above defined characters are in the beginning!
+        foreach ($users as $key => $user) {
+            if (empty($user)) {
+                unset($users[$key]);
+            }
+        }
+        $groupinfo = [];
+        foreach ($groups as $group) {
+            $groupinfo[$group] = groups_get_group($group);
+        }
+
+        $unregistered = [];
+
+        $agrp = [];
+        $groupname = [];
+        foreach ($groups as $group) {
+            $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
+                'grouptoolid' => $this->grouptool->id,
+                'groupid'     => $group
+            ], IGNORE_MISSING);
+            $groupname[$group] = $DB->get_field('groups', 'name', [
+                'id'     => $group
+            ], IGNORE_MISSING);
+
+            if (!$DB->record_exists('grouptool_agrps', [
+                'grouptoolid' => $this->grouptool->id,
+                'groupid'     => $group,
+                'active'      => 1
+            ])) {
+                $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning', 'grouptool',
+                    $groupname[$group]), 'error');
+            }
+        }
+        if (false !== ($gtimportfields = get_config('mod_grouptool', 'importfields'))) {
+            $importfields = explode(',', $gtimportfields);
+        } else {
+            $importfields = ['username', 'idnumber'];
+        }
+        $prevtable = new html_table();
+        $prevtable->attributes['class'] = 'importpreview table table-striped table-hover';
+        $prevtable->id = 'unregisterpreview';
+        $prevtable->head = [get_string('fullname')];
+        foreach ($importfields as $field) {
+            $prevtable->head[] = get_string($field);
+        }
+        $prevtable->head[] = get_string('status');
+        $prevtable->data = [];
+        $pbar = new progress_bar('checkmarkimportprogress', 500, true);
+        $count = count($users);
+        $processed = 0;
+        $pbar->update($processed, $count, get_string('unregister_progress_start', 'grouptool'));
+        core_php_time_limit::raise(count($users) * 5);
+        raise_memory_limit(MEMORY_HUGE);
+        foreach ($users as $user) {
+            $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
+            foreach ($importfields as $field) {
+                $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
+                $sql .= ' AND deleted = 0';
+                $param = ['userpattern' => $user];
+
+                $userinfo = $DB->get_records_sql($sql, $param);
+
+                if (empty($userinfo)) {
+                    $param['userpattern'] = '%'.$user;
+                    $userinfo = $DB->get_records_sql($sql, $param);
+                } else if (count($userinfo) == 1) {
+                    break;
+                }
+
+                if (empty($userinfo)) {
+                    $param['userpattern'] = $user.'%';
+                    $userinfo = $DB->get_records_sql($sql, $param);
+                } else if (count($userinfo) == 1) {
+                    break;
+                }
+
+                if (empty($userinfo)) {
+                    $param['userpattern'] = '%'.$user.'%';
+                    $userinfo = $DB->get_records_sql($sql, $param);
+                } else if (count($userinfo) == 1) {
+                    break;
+                }
+
+                if (!empty($userinfo) && count($userinfo) == 1) {
+                    break;
+                }
+            }
+            $row = new html_table_row();
+            if (empty($userinfo)) {
+                $row->cells[] = new html_table_cell($OUTPUT->notification(get_string('user_not_found', 'grouptool', $user),
+                    'error'));
+                $row->cells[0]->colspan = count($prevtable->head);
+                $error = true;
+            } else if (count($userinfo) > 1) {
+                $tmprows = [];
+                foreach ($userinfo as $currentuser) {
+                    $tmprow = new html_table_row();
+                    $tmprow->cells = [];
+                    $tmprow->cells[] = new html_table_cell(fullname($currentuser));
+                    foreach ($importfields as $curfield) {
+                        $tmprow->cells[] = new html_table_cell($currentuser->$curfield);
+                    }
+                    $tmprows[] = $tmprow;
+                }
+                $curkey = count($tmprows[0]->cells);
+                $tmprows[0]->cells[$curkey] = new html_table_cell($OUTPUT->notification(get_string('found_multiple', 'grouptool'),
+                    'error'));
+                $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
+                foreach ($tmprows as $tmprow) {
+                    $prevtable->data[] = $tmprow;
+                }
+                $error = true;
+                // We've added multiple rows manually and can continue with the next user!
+                continue;
+            } else {
+                $userinfo = reset($userinfo);
+                $row->cells = [new html_table_cell(fullname($userinfo))];
+                foreach ($importfields as $curfield) {
+                    $row->cells[] = new html_table_cell(empty($userinfo->$curfield) ? '' : $userinfo->$curfield);
+                }
+                if (!is_enrolled($this->context, $userinfo->id)) {
+
+                    // We have to catch deleted users now, give a message and continue!
+                    if (!empty($userinfo->deleted)) {
+                        $userinfo->fullname = fullname($userinfo);
+                        $text = get_string('user_is_deleted', 'grouptool', $userinfo);
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, 'error'));
+                        $error = true;
+                        continue;
+                    }
+                }
+                $usersnoningroup = [];
+                foreach ($groups as $group) {
+                    $data = [
+                        'id' => $userinfo->id,
+                        'idnumber' => $userinfo->idnumber,
+                        'fullname' => fullname($userinfo),
+                        'groupname' => $groupname[$group]
+                    ];
+                    if (!$previewonly && $userinfo) {
+                        $pbar->update($processed, $count,
+                            get_string('unregister_progress_unregister', 'grouptool').' '.fullname($userinfo).'...');
+                        if ($DB->record_exists('groups_members', [
+                            'groupid' => $group,
+                            'userid' => $data['id']
+                        ])) {
+                            $DB->delete_records('groups_members', [
+                                'groupid' => $group,
+                                'userid' => $data['id']
+                            ]);
+                        }
+                        if (!$DB->record_exists('grouptool_registered', [
+                            'agrpid' => $agrp[$group],
+                            'userid' => $data['id']
+                        ]) &&
+                            !$DB->record_exists('grouptool_queued', [
+                                'agrpid' => $agrp[$group],
+                                'userid' => $data['id']
+                            ])) {
+                            $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
+                            $row->attributes['class'] = 'success';
+                            continue;
+                        }
+
+                        $unregistered[] = $userinfo->id;
+                        $row->cells[] = get_string('unregister_user', 'grouptool', $data);
+                        $row->attributes['class'] = 'success';
+                    } else if ($userinfo) {
+                        if (!$DB->record_exists_select('grouptool_registered', "agrpid = :agrpid AND userid = :userid",
+                            ['agrpid' => $agrp[$group], 'userid' => $userinfo->id])) {
+                            $cell = get_string('unregister_conflict_user_not_in_group', 'grouptool', $data);
+                            $row->cells[] = $cell;
+                            $row->attributes['class'] = 'prevconflict';
+                        } else {
+                            $row->cells[] = get_string('unregister_user_prev', 'grouptool', $data);
+                            $row->attributes['class'] = 'prevsuccess';
+                        }
+                    }
+                }
+            }
+            $prevtable->data[] = $row;
+            unset($row);
+            $processed++;
+        }
+        $processed++;
+        if (!$previewonly) {
+            $pbar->update($processed, $count, get_string('unregister_progress_completed', 'grouptool'));
+        } else {
+            $pbar->update($processed, $count, get_string('unregister_progress_preview_completed', 'grouptool'));
+        }
+        $message .= html_writer::table($prevtable);
+        return [$error, $message];
+    }
+
+
+
+
     /**
      * helperfunction compares to objects using a particular timestamp-property
      *
@@ -5486,6 +5689,61 @@ class mod_grouptool {
             ];
             // The form data will be fetched through required_param()! TODO gotta refactor this in the future!
             $confirmform = new \mod_grouptool\import_confirm_form($PAGE->url, $formdata);
+
+            echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered');
+            if ($error) {
+                echo $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), 'error');
+            }
+
+            $confirmform->display();
+
+        } else {
+            $form->display();
+        }
+
+    }
+
+    /**
+     * view unregister-tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
+    public function view_unregister() {
+        global $PAGE, $OUTPUT;
+        require_capability('mod/grouptool:register_students', $this->context);
+
+        $id = $this->cm->id;
+        $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);
+
+        if (optional_param('confirm', 0, PARAM_BOOL)) {
+            $groups = required_param_array('group', PARAM_INT);
+            $data = required_param('data', PARAM_NOTAGS);
+            $ignored = [];
+            foreach ($groups as $group) {
+                $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
+            }
+            list($error, $message) = $this->unregister($groups, $data, false);
+
+            if (!empty($error)) {
+                $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'), 'error').
+                    html_writer::empty_tag('br').$message;
+            }
+            echo html_writer::tag('div', $message, ['class' => 'centered']);
+        }
+
+        if ($fromform = $form->get_data()) {
+            // Display confirm message - so we "try" only!
+            list($error, $confirmmessage) = $this->unregister($fromform->groups, $fromform->data, true);
+            $formdata = [
+                'id'                => $id,
+                'groups'            => $fromform->groups,
+                'data'              => $fromform->data,
+                'confirmmessage'    => $confirmmessage
+            ];
+            // The form data will be fetched through required_param()! TODO gotta refactor this in the future!
+            $confirmform = new \mod_grouptool\unregister_confirm_form($PAGE->url, $formdata);
 
             echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered');
             if ($error) {
