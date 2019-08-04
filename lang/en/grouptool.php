@@ -19,6 +19,7 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
+ * @author    Hannes Laimer
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -416,6 +417,8 @@ $string['not_registered'] = 'You\'re not yet registered!';
 $string['not_synced_reg_present'] = 'not syncronized registrations present';
 $string['notification:group_recreated'] = 'The group <strong>{$a->groupname}</strong> has been recreated due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}"><strong>{$a->grouptoolname}</strong></a> being set to recreate deleted groups.';
 $string['notification:registrations_recreated'] = 'The group\'s <strong>{$a->groupname}</strong> members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}"><strong>{$a->grouptoolname}</strong></a> being set to recreate deleted groups. The group itself was recrated by another grouptool instance.';
+$string['notenoughtotalgroups'] = 'The set minimum exceeds the total amount of {$a} groups in this instance!';
+$string['notenoughactivegroups'] = 'The set minimum exceeds the amount of active groups({$a}) in this instance!';
 $string['you_are_not_in_queue_or_registered'] = 'You are neither registered nor queued in group <strong>{$a->groupname}</strong>';
 $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';

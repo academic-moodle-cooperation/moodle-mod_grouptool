@@ -19,6 +19,7 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
+ * @author    Hannes Laimer
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -495,10 +496,22 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['queue_grp'] = get_string('queuespresenterror', 'grouptool');
         }
 
-        if (!empty($data['allow_multiple']) && ($data['choose_min'] < 0)) {
-            $errors['choose_min'] = get_string('mustbegtoeqmin', 'grouptool');
+        if (!empty($data['allow_multiple'])) {
+            $sql = "SELECT COUNT(*)
+                    FROM {grouptool_agrps}
+                    WHERE grouptoolid = :id AND active = :status
+                    GROUP BY active;";
+            $activegroupcount = $DB->count_records_sql($sql, ['id' => $data['instance'], 'status' => 1]);
+            $inactivegroupcount = $DB->count_records_sql($sql, ['id' => $data['instance'], 'status' => 0]);
+            $total = $activegroupcount + $inactivegroupcount;
+            if ($data['choose_min'] < 0) {
+                $errors['choose_min'] = get_string('mustbegtoeqmin', 'grouptool');
+            } else if ($total < $data['choose_min']) {
+                $errors['choose_min'] = get_string('notenoughtotalgroups', 'grouptool', $total);
+            } else if ($activegroupcount < $data['choose_min']) {
+                $errors['choose_min'] = get_string('notenoughactivegroups', 'grouptool', $activegroupcount);
+            }
         }
-
         if (!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {
             $errors['choose_max'] = get_string('mustbeposint', 'grouptool');
         }
