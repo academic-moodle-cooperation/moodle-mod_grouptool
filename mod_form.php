@@ -499,8 +499,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['allow_multiple'])) {
             $sql = "SELECT COUNT(*)
                     FROM {grouptool_agrps}
-                    WHERE grouptoolid = :id AND active = :status
-                    GROUP BY active;";
+                    WHERE grouptoolid = :id AND active = :status;";
             $activegroupcount = $DB->count_records_sql($sql, ['id' => $data['instance'], 'status' => 1]);
             $inactivegroupcount = $DB->count_records_sql($sql, ['id' => $data['instance'], 'status' => 0]);
             $total = $activegroupcount + $inactivegroupcount;
