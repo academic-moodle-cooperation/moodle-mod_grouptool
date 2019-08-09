@@ -506,9 +506,17 @@ class mod_grouptool_mod_form extends moodleform_mod {
             if ($data['choose_min'] < 0) {
                 $errors['choose_min'] = get_string('mustbegtoeqmin', 'grouptool');
             } else if ($total < $data['choose_min']) {
-                $errors['choose_min'] = get_string('notenoughtotalgroups', 'grouptool', $total);
+                $errors['choose_min'] = get_string('notenoughtotalgroups_min', 'grouptool', $total);
             } else if ($activegroupcount < $data['choose_min']) {
-                $errors['choose_min'] = get_string('notenoughactivegroups', 'grouptool', $activegroupcount);
+                $errors['choose_min'] = get_string('notenoughactivegroups_min', 'grouptool', $activegroupcount);
+            }
+
+            if ($data['choose_max'] < 0) {
+                $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
+            } else if ($total < $data['choose_max']) {
+                $errors['choose_max'] = get_string('notenoughtotalgroups_max', 'grouptool', $total);
+            } else if ($activegroupcount < $data['choose_max']) {
+                $errors['choose_max'] = get_string('notenoughactivegroups_max', 'grouptool', $activegroupcount);
             }
         }
         if (!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {
