@@ -7260,7 +7260,11 @@ class mod_grouptool {
             $sql .= " AND u.id ".$userssql;
             $params = array_merge($params, $groupparams);
         }
-        $users = $DB->get_records_sql($sql, $params);
+        if(!empty($groups)) {
+            $users = $DB->get_records_sql($sql, $params);
+        } else {
+            $users = [];
+        }
 
         if (!$onlydata) {
             echo $this->get_download_links($downloadurl);
@@ -7272,10 +7276,19 @@ class mod_grouptool {
             $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
         } else {
             if (!$onlydata) {
-                echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display', 'grouptool'), 'error'),
-                                  'centered generalbox');
+                if(!empty($groups)) {
+                    echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display', 'grouptool'), 'error'),
+                        'centered generalbox');
+                } else {
+                    echo $OUTPUT->box($OUTPUT->notification(get_string('no_data_to_display', 'grouptool'), 'error'),
+                        'centered generalbox');
+                }
             } else {
-                return get_string('no_users_to_display', 'grouptool');
+                if(!empty($groups)) {
+                    return get_string('no_users_to_display', 'grouptool');
+                }
+                return get_string('no_data_to_display', 'grouptool');
+
             }
         }
         $groupinfo = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
