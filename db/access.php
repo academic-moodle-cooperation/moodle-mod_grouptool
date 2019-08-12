@@ -174,5 +174,15 @@ $capabilities = [
                 'manager' => CAP_ALLOW
             ]
         ],
+
+        'mod/grouptool:unregister_students' => [
+            'captype' => 'write',
+            'contextlevel' => CONTEXT_MODULE,
+            'legacy' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 ];
 

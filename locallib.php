@@ -2979,7 +2979,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
+    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false) {
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -2996,7 +2996,7 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
-        if (empty($this->grouptool->allow_unreg)) {
+        if (!$force && empty($this->grouptool->allow_unreg)) {
             throw new \mod_grouptool\local\exception\registration('unreg_not_allowed');
         }
 
@@ -3967,7 +3967,7 @@ class mod_grouptool {
                                        WHERE modified_by >= 0 AND userid = ? AND agrpid '.$sql, $params);
     }
 
-    public function unregister($groups, $data, $previewonly = false) {
+    public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false) {
         global $DB, $OUTPUT;
 
         $message = "";
@@ -4020,7 +4020,7 @@ class mod_grouptool {
         }
         $prevtable->head[] = get_string('status');
         $prevtable->data = [];
-        $pbar = new progress_bar('checkmarkimportprogress', 500, true);
+        $pbar = new progress_bar('unregisterprogress', 500, true);
         $count = count($users);
         $processed = 0;
         $pbar->update($processed, $count, get_string('unregister_progress_start', 'grouptool'));
@@ -4115,7 +4115,7 @@ class mod_grouptool {
                     if (!$previewonly && $userinfo) {
                         $pbar->update($processed, $count,
                             get_string('unregister_progress_unregister', 'grouptool').' '.fullname($userinfo).'...');
-                        if ($DB->record_exists('groups_members', [
+                        if ($unregfrommgroups && $DB->record_exists('groups_members', [
                             'groupid' => $group,
                             'userid' => $data['id']
                         ])) {
@@ -4136,7 +4136,7 @@ class mod_grouptool {
                             $row->attributes['class'] = 'success';
                             continue;
                         }
-
+                        $this->unregister_from_agrp($agrp[$group], $userinfo->id);
                         $unregistered[] = $userinfo->id;
                         $row->cells[] = get_string('unregister_user', 'grouptool', $data);
                         $row->attributes['class'] = 'success';
@@ -5712,7 +5712,7 @@ class mod_grouptool {
      */
     public function view_unregister() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:register_students', $this->context);
+        require_capability('mod/grouptool:unregister_students', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);
@@ -5720,11 +5720,12 @@ class mod_grouptool {
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             $groups = required_param_array('group', PARAM_INT);
             $data = required_param('data', PARAM_NOTAGS);
+            $unregfrommgroups = optional_param('unregfrommgroups', 1, PARAM_BOOL);
             $ignored = [];
             foreach ($groups as $group) {
                 $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
             }
-            list($error, $message) = $this->unregister($groups, $data, false);
+            list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'), 'error').
@@ -5735,11 +5736,13 @@ class mod_grouptool {
 
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
-            list($error, $confirmmessage) = $this->unregister($fromform->groups, $fromform->data, true);
+            list($error, $confirmmessage) =
+                $this->unregister($fromform->groups, $fromform->data, $fromform->unregfrommgroups, true);
             $formdata = [
                 'id'                => $id,
                 'groups'            => $fromform->groups,
                 'data'              => $fromform->data,
+                'unregfrommgroups'  => $fromform->unregfrommgroups,
                 'confirmmessage'    => $confirmmessage
             ];
             // The form data will be fetched through required_param()! TODO gotta refactor this in the future!

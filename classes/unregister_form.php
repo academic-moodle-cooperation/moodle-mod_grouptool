@@ -112,6 +112,10 @@ class unregister_form extends \moodleform {
             $mform->addRule('data', null, 'required', null, 'client');
             $mform->addRule('data', null, 'required', null, 'server');
 
+            $mform->addElement('advcheckbox', 'unregfrommgroups', '', get_string('unregfrommgroups', 'grouptool'));
+            $mform->addHelpButton('unregfrommgroups', 'unregfrommgroups', 'grouptool');
+            $mform->setDefault('unregfrommgroups', true);
+
             $mform->addElement('submit', 'submitbutton', get_string('unregisterbutton', 'grouptool'));
         }
     }

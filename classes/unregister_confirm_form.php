@@ -71,6 +71,10 @@ class unregister_confirm_form extends \moodleform {
         $mform->setDefault('data', $this->_customdata['data']);
         $mform->setType('data', PARAM_NOTAGS);
 
+        $mform->addElement('hidden', 'unregfrommgroups');
+        $mform->setDefault('unregfrommgroups', $this->_customdata['unregfrommgroups']);
+        $mform->setType('unregfrommgroups', PARAM_BOOL);
+
         $mform->addElement('html', $this->_customdata['confirmmessage']);
 
         $buttonarray = [];

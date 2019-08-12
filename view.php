@@ -32,13 +32,15 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
+ * @author    Hannes Laimer
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// TODO split tabs in different PHP files and define it only when really needed (=import-tab, needed for progress bar)!
+// TODO split tabs in different PHP files and define it only when really needed (=import-tab , needed for progress bar)!
 // @codingStandardsIgnoreLine
-if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')) {
+if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
+    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister')) {
     // @codingStandardsIgnoreLine
     define('NO_OUTPUT_BUFFERING', true);
 // @codingStandardsIgnoreLine
@@ -156,22 +158,27 @@ if (has_capability('mod/grouptool:register_students', $context)
                                              get_string('selfregistration_alt', 'grouptool'),
                                              false);
 }
-if (has_capability('mod/grouptool:register_students', $context)) {
+if (has_capability('mod/grouptool:register_students', $context)
+        || has_capability('mod/grouptool:unregister_students', $context)) {
     $row['multiple'] = new tabobject('multiple',
                                    $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
                                    get_string('multiple', 'grouptool'),
                                    get_string('multiple_desc', 'grouptool'),
                                    false);
-    $row['multiple']->subtree['import'] = new tabobject('import',
-        $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
-        get_string('import', 'grouptool'),
-        get_string('import_desc', 'grouptool'),
-        false);
-    $row['multiple']->subtree['unregister'] = new tabobject('unregister',
-        $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=unregister',
-        get_string('unregister', 'grouptool'),
-        get_string('unregister_desc', 'grouptool'),
-        false);
+    if (has_capability('mod/grouptool:register_students', $context)) {
+        $row['multiple']->subtree['import'] = new tabobject('import',
+            $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=import',
+            get_string('import', 'grouptool'),
+            get_string('import_desc', 'grouptool'),
+            false);
+    }
+    if (has_capability('mod/grouptool:unregister_students', $context)) {
+        $row['multiple']->subtree['unregister'] = new tabobject('unregister',
+            $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=unregister',
+            get_string('unregister', 'grouptool'),
+            get_string('unregister_desc', 'grouptool'),
+            false);
+    }
 }
 if (has_capability('mod/grouptool:view_regs_group_view', $context)
     && has_capability('mod/grouptool:view_regs_course_view', $context)) {
