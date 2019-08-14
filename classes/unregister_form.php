@@ -70,7 +70,7 @@ class unregister_form extends \moodleform {
         $mform->setDefault('tab', 'unregister');
         $mform->setType('tab', PARAM_TEXT);
 
-        if (has_capability('mod/grouptool:register_students', $this->context)) {
+        if (has_capability('mod/grouptool:unregister_students', $this->context)) {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed
              */

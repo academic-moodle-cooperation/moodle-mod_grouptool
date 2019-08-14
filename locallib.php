@@ -2972,6 +2972,7 @@ class mod_grouptool {
      * @param int $agrpid active-group-id to unregister/unqueue user from
      * @param int $userid user to unregister/unqueue
      * @param bool $previewonly (optional) don't act, just return a preview
+     * @param bool $force (optional) ignore setting for allowing deregistration (needed for multi-deregistration)
      * @return string $message if everything went right
      * @throws \mod_grouptool\local\exception\notenoughregs If the user hasn't enough registrations!
      * @throws \mod_grouptool\local\exception\registration In any other case, where the user can't be unregistered!
@@ -2992,7 +2993,7 @@ class mod_grouptool {
                          || (time() < $this->grouptool->timedue))
                     && ($this->grouptool->timeavailable < time()));
 
-        if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$force && !$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
@@ -4115,15 +4116,6 @@ class mod_grouptool {
                     if (!$previewonly && $userinfo) {
                         $pbar->update($processed, $count,
                             get_string('unregister_progress_unregister', 'grouptool').' '.fullname($userinfo).'...');
-                        if ($unregfrommgroups && $DB->record_exists('groups_members', [
-                            'groupid' => $group,
-                            'userid' => $data['id']
-                        ])) {
-                            $DB->delete_records('groups_members', [
-                                'groupid' => $group,
-                                'userid' => $data['id']
-                            ]);
-                        }
                         if (!$DB->record_exists('grouptool_registered', [
                             'agrpid' => $agrp[$group],
                             'userid' => $data['id']
@@ -4136,7 +4128,18 @@ class mod_grouptool {
                             $row->attributes['class'] = 'success';
                             continue;
                         }
-                        $this->unregister_from_agrp($agrp[$group], $userinfo->id);
+
+                        if ($unregfrommgroups && $DB->record_exists('groups_members', [
+                                'groupid' => $group,
+                                'userid' => $data['id']
+                            ])) {
+                            $DB->delete_records('groups_members', [
+                                'groupid' => $group,
+                                'userid' => $data['id']
+                            ]);
+                        }
+
+                        $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
                         $unregistered[] = $userinfo->id;
                         $row->cells[] = get_string('unregister_user', 'grouptool', $data);
                         $row->attributes['class'] = 'success';

@@ -304,6 +304,7 @@ $string['grouptool:grade'] = 'Copy grades from a group-member to others';
 $string['grouptool:grade_own_group'] = 'Copy grades from a group-member to others if the original grade has been given by me';
 $string['grouptool:register'] = 'Register self in an active group using grouptool';
 $string['grouptool:register_students'] = 'Register students in an active group using grouptool. (Also used for resolving queues)';
+$string['grouptool:unregister_students'] = 'Deregister students from groups using grouptool.';
 $string['grouptool:move_students'] = 'Move students to other groups.';
 $string['grouptool:view_description'] = 'View grouptools description';
 $string['grouptool:view_groups'] = 'View active groups';

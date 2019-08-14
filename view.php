@@ -160,24 +160,29 @@ if (has_capability('mod/grouptool:register_students', $context)
 }
 if (has_capability('mod/grouptool:register_students', $context)
         || has_capability('mod/grouptool:unregister_students', $context)) {
-    $row['multiple'] = new tabobject('multiple',
-                                   $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=import',
-                                   get_string('multiple', 'grouptool'),
-                                   get_string('multiple_desc', 'grouptool'),
-                                   false);
-    if (has_capability('mod/grouptool:register_students', $context)) {
-        $row['multiple']->subtree['import'] = new tabobject('import',
+    $importtab = new tabobject('import',
+        $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=import',
+        get_string('import', 'grouptool'),
+        get_string('import_desc', 'grouptool'),
+        false);
+    $unregtab = new tabobject('unregister',
+        $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=unregister',
+        get_string('unregister', 'grouptool'),
+        get_string('unregister_desc', 'grouptool'),
+        false);
+    if(has_capability('mod/grouptool:register_students', $context)
+        && has_capability('mod/grouptool:unregister_students', $context)) { // can unregister and register
+        $row['multiple'] = new tabobject('multiple',
             $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=import',
-            get_string('import', 'grouptool'),
-            get_string('import_desc', 'grouptool'),
+            get_string('multiple', 'grouptool'),
+            get_string('multiple_desc', 'grouptool'),
             false);
-    }
-    if (has_capability('mod/grouptool:unregister_students', $context)) {
-        $row['multiple']->subtree['unregister'] = new tabobject('unregister',
-            $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=unregister',
-            get_string('unregister', 'grouptool'),
-            get_string('unregister_desc', 'grouptool'),
-            false);
+        $row['multiple']->subtree['import'] = $importtab;
+        $row['multiple']->subtree['unregister'] = $unregtab;
+    } elseif (has_capability('mod/grouptool:register_students', $context)) { // can register
+        $row['import'] = $importtab;
+    } else { // can unregister
+        $row['unregister'] = $unregtab;
     }
 }
 if (has_capability('mod/grouptool:view_regs_group_view', $context)
