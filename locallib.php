@@ -3968,6 +3968,102 @@ class mod_grouptool {
                                        WHERE modified_by >= 0 AND userid = ? AND agrpid '.$sql, $params);
     }
 
+
+    /**
+     * checks the found userdata, and return error rows if no user was found or multiple were fund
+     * @param array $userinfo data that was found
+     * @param array $user the data given by the user
+     * @param array $importfields the fields which were checked
+     * @return array rows for the table, possibly empty if exactly one user was found
+     * @throws coding_exception
+     */
+    private function check_userinfo($userinfo, $user, $importfields) {
+        global $OUTPUT;
+        $errorrows = [];
+        if (empty($userinfo)) {
+            $errorrows[0] = new html_table_row();
+            $errorrows[0]->cells[] = new html_table_cell($OUTPUT->notification(
+                get_string('user_not_found', 'grouptool', $user), 'error'));
+            // E$errorrows[0]<->cells[0]d->colspan = count($prevtable->head);?
+        } else if (count($userinfo) > 1) {
+            foreach ($this->generate_multiple_users_table($userinfo, $importfields) as $tmprow) {
+                $errorrows[] = $tmprow;
+            }
+        }
+        return $errorrows;
+    }
+
+    /**
+     * Searches users based on the information given and the fields to consider
+     * @param array $importfields the fields to check
+     * @param array $user the data for thse fields
+     * @return array the found user/s
+     * @throws dml_exception
+     */
+    private function find_userinfo($importfields, $user) {
+        global $DB;
+        $userinfo = [];
+        foreach ($importfields as $field) {
+            $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
+            $sql .= ' AND deleted = 0';
+            $param = ['userpattern' => $user];
+
+            $userinfo = $DB->get_records_sql($sql, $param);
+
+            if (empty($userinfo)) {
+                $param['userpattern'] = '%'.$user;
+                $userinfo = $DB->get_records_sql($sql, $param);
+            } else if (count($userinfo) == 1) {
+                break;
+            }
+
+            if (empty($userinfo)) {
+                $param['userpattern'] = $user.'%';
+                $userinfo = $DB->get_records_sql($sql, $param);
+            } else if (count($userinfo) == 1) {
+                break;
+            }
+
+            if (empty($userinfo)) {
+                $param['userpattern'] = '%'.$user.'%';
+                $userinfo = $DB->get_records_sql($sql, $param);
+            } else if (count($userinfo) == 1) {
+                break;
+            }
+
+            if (!empty($userinfo) && count($userinfo) == 1) {
+                break;
+            }
+        }
+        return $userinfo;
+    }
+
+    /**
+     * Generates the table with information about the users that were found multiple times
+     * @param array $userinfo the users which were found
+     * @param array $importfields the based on which those users were found
+     * @return array table rows
+     * @throws coding_exception
+     */
+    private function generate_multiple_users_table($userinfo, $importfields) {
+        global $OUTPUT;
+        $tmprows = [];
+        foreach ($userinfo as $currentuser) {
+            $tmprow = new html_table_row();
+            $tmprow->cells = [];
+            $tmprow->cells[] = new html_table_cell(fullname($currentuser));
+            foreach ($importfields as $curfield) {
+                $tmprow->cells[] = new html_table_cell($currentuser->$curfield);
+            }
+            $tmprows[] = $tmprow;
+        }
+        $curkey = count($tmprows[0]->cells);
+        $tmprows[0]->cells[$curkey] = new html_table_cell($OUTPUT->notification(get_string('found_multiple', 'grouptool'),
+            'error'));
+        $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
+        return $tmprows;
+    }
+
     public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false) {
         global $DB, $OUTPUT;
 
@@ -4028,84 +4124,33 @@ class mod_grouptool {
         core_php_time_limit::raise(count($users) * 5);
         raise_memory_limit(MEMORY_HUGE);
         foreach ($users as $user) {
+            $userinfo = $this->find_userinfo($importfields, $user);
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
-            foreach ($importfields as $field) {
-                $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-                $sql .= ' AND deleted = 0';
-                $param = ['userpattern' => $user];
-
-                $userinfo = $DB->get_records_sql($sql, $param);
-
-                if (empty($userinfo)) {
-                    $param['userpattern'] = '%'.$user;
-                    $userinfo = $DB->get_records_sql($sql, $param);
-                } else if (count($userinfo) == 1) {
-                    break;
-                }
-
-                if (empty($userinfo)) {
-                    $param['userpattern'] = $user.'%';
-                    $userinfo = $DB->get_records_sql($sql, $param);
-                } else if (count($userinfo) == 1) {
-                    break;
-                }
-
-                if (empty($userinfo)) {
-                    $param['userpattern'] = '%'.$user.'%';
-                    $userinfo = $DB->get_records_sql($sql, $param);
-                } else if (count($userinfo) == 1) {
-                    break;
-                }
-
-                if (!empty($userinfo) && count($userinfo) == 1) {
-                    break;
-                }
-            }
             $row = new html_table_row();
-            if (empty($userinfo)) {
-                $row->cells[] = new html_table_cell($OUTPUT->notification(get_string('user_not_found', 'grouptool', $user),
-                    'error'));
-                $row->cells[0]->colspan = count($prevtable->head);
+            $errors = 0;
+            foreach ($this->check_userinfo($userinfo, $user, $importfields) as $errorrow) {
+                $prevtable->data[] = $errorrow;
+                $errors++;
                 $error = true;
-            } else if (count($userinfo) > 1) {
-                $tmprows = [];
-                foreach ($userinfo as $currentuser) {
-                    $tmprow = new html_table_row();
-                    $tmprow->cells = [];
-                    $tmprow->cells[] = new html_table_cell(fullname($currentuser));
-                    foreach ($importfields as $curfield) {
-                        $tmprow->cells[] = new html_table_cell($currentuser->$curfield);
-                    }
-                    $tmprows[] = $tmprow;
-                }
-                $curkey = count($tmprows[0]->cells);
-                $tmprows[0]->cells[$curkey] = new html_table_cell($OUTPUT->notification(get_string('found_multiple', 'grouptool'),
-                    'error'));
-                $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
-                foreach ($tmprows as $tmprow) {
-                    $prevtable->data[] = $tmprow;
-                }
-                $error = true;
-                // We've added multiple rows manually and can continue with the next user!
-                continue;
-            } else {
+            }
+            if ($errors == 0) {
                 $userinfo = reset($userinfo);
                 $row->cells = [new html_table_cell(fullname($userinfo))];
                 foreach ($importfields as $curfield) {
                     $row->cells[] = new html_table_cell(empty($userinfo->$curfield) ? '' : $userinfo->$curfield);
                 }
                 if (!is_enrolled($this->context, $userinfo->id)) {
-
-                    // We have to catch deleted users now, give a message and continue!
-                    if (!empty($userinfo->deleted)) {
-                        $userinfo->fullname = fullname($userinfo);
+                    $userinfo->fullname = fullname($userinfo);
+                    if (empty($userinfo->deleted)) {
+                        $text = get_string('user_is_not_enrolled', 'grouptool', $userinfo);
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, 'error'));
+                    } else {
                         $text = get_string('user_is_deleted', 'grouptool', $userinfo);
                         $row->cells[] = new html_table_cell($OUTPUT->notification($text, 'error'));
-                        $error = true;
-                        continue;
                     }
+                    $error = true;
+                    continue;
                 }
-                $usersnoningroup = [];
                 foreach ($groups as $group) {
                     $data = [
                         'id' => $userinfo->id,
@@ -5439,65 +5484,14 @@ class mod_grouptool {
         raise_memory_limit(MEMORY_HUGE);
         foreach ($users as $user) {
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
-            foreach ($importfields as $field) {
-                $sql = 'SELECT * FROM {user} WHERE '.$DB->sql_like($field, ':userpattern');
-                $sql .= ' AND deleted = 0';
-                $param = ['userpattern' => $user];
-
-                $userinfo = $DB->get_records_sql($sql, $param);
-
-                if (empty($userinfo)) {
-                    $param['userpattern'] = '%'.$user;
-                    $userinfo = $DB->get_records_sql($sql, $param);
-                } else if (count($userinfo) == 1) {
-                    break;
-                }
-
-                if (empty($userinfo)) {
-                    $param['userpattern'] = $user.'%';
-                    $userinfo = $DB->get_records_sql($sql, $param);
-                } else if (count($userinfo) == 1) {
-                    break;
-                }
-
-                if (empty($userinfo)) {
-                    $param['userpattern'] = '%'.$user.'%';
-                    $userinfo = $DB->get_records_sql($sql, $param);
-                } else if (count($userinfo) == 1) {
-                    break;
-                }
-
-                if (!empty($userinfo) && count($userinfo) == 1) {
-                    break;
-                }
-            }
+            $userinfo = $this->find_userinfo($importfields, $user);
             $row = new html_table_row();
-            if (empty($userinfo)) {
-                $row->cells[] = new html_table_cell($OUTPUT->notification(get_string('user_not_found', 'grouptool', $user),
-                                                                          'error'));
-                $row->cells[0]->colspan = count($prevtable->head);
-                $error = true;
-            } else if (count($userinfo) > 1) {
-                $tmprows = [];
-                foreach ($userinfo as $currentuser) {
-                    $tmprow = new html_table_row();
-                    $tmprow->cells = [];
-                    $tmprow->cells[] = new html_table_cell(fullname($currentuser));
-                    foreach ($importfields as $curfield) {
-                        $tmprow->cells[] = new html_table_cell($currentuser->$curfield);
-                    }
-                    $tmprows[] = $tmprow;
-                }
-                $curkey = count($tmprows[0]->cells);
-                $tmprows[0]->cells[$curkey] = new html_table_cell($OUTPUT->notification(get_string('found_multiple', 'grouptool'),
-                                                                                        'error'));
-                $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
-                foreach ($tmprows as $tmprow) {
-                    $prevtable->data[] = $tmprow;
+            $errorrows = $this->check_userinfo($userinfo, $user, $importfields);
+            if (!empty($errorrows)) {
+                foreach ($errorrows as $r) {
+                    $prevtable->data[] = $r;
                 }
                 $error = true;
-                // We've added multiple rows manually and can continue with the next user!
-                continue;
             } else {
                 $userinfo = reset($userinfo);
                 $row->cells = [new html_table_cell(fullname($userinfo))];

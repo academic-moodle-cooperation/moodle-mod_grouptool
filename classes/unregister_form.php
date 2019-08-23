@@ -56,31 +56,31 @@ class unregister_form extends \moodleform {
     protected function definition() {
         global $DB;
 
-        $mform = $this->_form;
+        $mdlform = $this->_form;
 
-        $mform->addElement('hidden', 'id');
-        $mform->setDefault('id', $this->_customdata['id']);
-        $mform->setType('id', PARAM_INT);
+        $mdlform->addElement('hidden', 'id');
+        $mdlform->setDefault('id', $this->_customdata['id']);
+        $mdlform->setType('id', PARAM_INT);
         $this->context = \context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', ['id' => $cm->course]);
 
-        $mform->addElement('hidden', 'tab');
-        $mform->setDefault('tab', 'unregister');
-        $mform->setType('tab', PARAM_TEXT);
+        $mdlform->addElement('hidden', 'tab');
+        $mdlform->setDefault('tab', 'unregister');
+        $mdlform->setType('tab', PARAM_TEXT);
 
         if (has_capability('mod/grouptool:unregister_students', $this->context)) {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed
              */
-            $mform->addElement('header', 'groupuser_unregister', get_string('groupuser_unregister',
+            $mdlform->addElement('header', 'groupuser_unregister', get_string('groupuser_unregister',
                                                                         'grouptool'));
 
             $active = new sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
             $inactive = new sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
-            $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup_unregister', 'grouptool'),
+            $groups = $mdlform->createElement('selectgroups', 'groups', get_string('choose_targetgroup_unregister', 'grouptool'),
                 null, ['size' => 15]);
 
             if (!empty($active->groups)) {
@@ -99,24 +99,24 @@ class unregister_form extends \moodleform {
                 $groups->addOptGroup(get_string('inactivegroups', 'grouptool'), $options);
             }
             $groups->setMultiple(true);
-            $mform->addElement($groups);
-            $mform->setType('groups', PARAM_INT);
-            $mform->addRule('groups', null, 'required', null, 'client');
+            $mdlform->addElement($groups);
+            $mdlform->setType('groups', PARAM_INT);
+            $mdlform->addRule('groups', null, 'required', null, 'client');
 
-            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
+            $mdlform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
                 'wrap' => 'virtual',
                 'rows' => '20',
                 'cols' => '50'
             ]);
-            $mform->addHelpButton('data', 'userlist', 'grouptool');
-            $mform->addRule('data', null, 'required', null, 'client');
-            $mform->addRule('data', null, 'required', null, 'server');
+            $mdlform->addHelpButton('data', 'userlist', 'grouptool');
+            $mdlform->addRule('data', null, 'required', null, 'client');
+            $mdlform->addRule('data', null, 'required', null, 'server');
 
-            $mform->addElement('advcheckbox', 'unregfrommgroups', '', get_string('unregfrommgroups', 'grouptool'));
-            $mform->addHelpButton('unregfrommgroups', 'unregfrommgroups', 'grouptool');
-            $mform->setDefault('unregfrommgroups', true);
+            $mdlform->addElement('advcheckbox', 'unregfrommgroups', '', get_string('unregfrommgroups', 'grouptool'));
+            $mdlform->addHelpButton('unregfrommgroups', 'unregfrommgroups', 'grouptool');
+            $mdlform->setDefault('unregfrommgroups', true);
 
-            $mform->addElement('submit', 'submitbutton', get_string('unregisterbutton', 'grouptool'));
+            $mdlform->addElement('submit', 'submitbutton', get_string('unregisterbutton', 'grouptool'));
         }
     }
 

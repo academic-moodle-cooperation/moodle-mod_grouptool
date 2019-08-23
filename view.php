@@ -170,8 +170,8 @@ if (has_capability('mod/grouptool:register_students', $context)
         get_string('unregister', 'grouptool'),
         get_string('unregister_desc', 'grouptool'),
         false);
-    if(has_capability('mod/grouptool:register_students', $context)
-        && has_capability('mod/grouptool:unregister_students', $context)) { // can unregister and register
+    if (has_capability('mod/grouptool:register_students', $context)
+        && has_capability('mod/grouptool:unregister_students', $context)) { // Can unregister and register.
         $row['multiple'] = new tabobject('multiple',
             $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&amp;tab=import',
             get_string('multiple', 'grouptool'),
@@ -179,9 +179,9 @@ if (has_capability('mod/grouptool:register_students', $context)
             false);
         $row['multiple']->subtree['import'] = $importtab;
         $row['multiple']->subtree['unregister'] = $unregtab;
-    } elseif (has_capability('mod/grouptool:register_students', $context)) { // can register
+    } else if (has_capability('mod/grouptool:register_students', $context)) { // Can only register.
         $row['import'] = $importtab;
-    } else { // can unregister
+    } else { // Can only unregister.
         $row['unregister'] = $unregtab;
     }
 }
