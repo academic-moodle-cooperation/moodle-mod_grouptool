@@ -178,12 +178,12 @@ $string['could_not_add'] = 'Could not add <strong>{$a->username}</strong> to gro
 $string['deactivated_group'] = 'Deactivated group';
 $string['deactivated_groups'] = 'Deactivated groups!';
 $string['define_amount_groups'] = 'Define number of groups N';
-$string['define_amount_groups_help'] = '<li>Define number of groups N - You choose users from which role to use for group creation and enter the desired amount of groups in Group/Member count text field. In name scheme you can enter a name scheme for the groups using
-<ul>groupcreationmode_m_amount
+$string['define_amount_groups_help'] = 'Define number of groups N - You choose users from which role to use for group creation and enter the desired amount of groups in Group/Member count text field. In name scheme you can enter a name scheme for the groups using
+<ul>
 <li># (will be replaced with the group-number) and</li>
 <li>@ (will be replaced with a letter-representation of the group number)</li>
 </ul>
-Then the chosen users get spread on the desired amount of groups.</li>';
+Then the chosen users get spread on the desired amount of groups.';
 $string['define_amount_members'] = 'Define number of group members M';
 $string['define_amount_members_help'] = 'Define number of group members M - Here you tell the grouptool how many members each group should ideally have. The needed amount of groups will be calculated automatically. If you check prevent last small group the users in this group get spread on the others if the last groups fill-ratio lies under 70%.';
 $string['delete_reference'] = 'Delete from grouptool';
