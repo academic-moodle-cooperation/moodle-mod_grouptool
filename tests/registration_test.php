@@ -402,28 +402,142 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
         $text = $grouptool->testable_register_in_agrp($agrpids[3], $this->students[2]->id, false);
         self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
+        // User 4 will be marked for reg in group 5!
+        $message->groupname = $agrps[$agrpids[4]]->name;
+        $message->username = fullname($this->students[3]);
+        $text = $grouptool->testable_register_in_agrp($agrpids[4], $this->students[3]->id, false);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+
+        // User 4 will be registered in group 6!
+        $message->groupname = $agrps[$agrpids[5]]->name;
+        $text = $grouptool->testable_register_in_agrp($agrpids[5], $this->students[3]->id, false);
+        self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
+
+        // User 5 will be marked for reg in group 5!
+        $message->username = fullname($this->students[4]);
+        $message->groupname = $agrps[$agrpids[4]]->name;
+        $text = $grouptool->testable_register_in_agrp($agrpids[4], $this->students[4]->id, false);
+        self::assertEquals(get_string('place_allocated_in_group_success', 'grouptool', $message), $text);
+
+        // User 5 can't be marked twice for registration in group 5!
+        $thrown = true;
+        try {
+            $grouptool->testable_register_in_agrp($agrpids[4], $this->students[4]->id, false);
+        } catch (\mod_grouptool\local\exception\regpresent $e) {
+            $thrown = true;
+            $text = $e->getMessage();
+            self::assertInstanceOf('\mod_grouptool\local\exception\regpresent', $e);
+            $comptext = get_string('already_marked', 'grouptool', $message);
+            self::assertEquals($comptext, $text);
+        }
+        self::assertTrue($thrown);
+
+        // User 5 will be queued in group 6!
+        $message->username = fullname($this->students[4]);
+        $message->groupname = $agrps[$agrpids[5]]->name;
+        $text = $grouptool->testable_register_in_agrp($agrpids[5], $this->students[4]->id, false);
+        self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
+
+        // We are not allowed to queue user 1 for group 5 since queue is already full(user4 is reg and user5 is queued)!
+        $thrown = false;
+        $message->username = fullname($this->students[0]);
+        $message->groupname = $agrps[$agrpids[4]]->name;
+        try {
+            $grouptool->testable_register_in_agrp($agrpids[4], $this->students[0]->id, false);
+        } catch (\mod_grouptool\local\exception\exceedgroupqueuelimit $e) {
+            $thrown = true;
+            $text = $e->getMessage();
+            self::assertInstanceOf('\mod_grouptool\local\exception\exceedgroupqueuelimit', $e);
+            $comptext = get_string('exceedgroupqueuelimit', 'grouptool', $message);
+            self::assertEquals($comptext, $text);
+        }
+        self::assertTrue($thrown);
+
+        // Set group queue size to 2 to check if the correct exception is thrown!
+        $grouptool->get_grouptool()->groups_queues_limit = 2;
+
+        // We are not allowed to queue user 5 for group 5 since user 5 is already in queue!
+        $thrown = false;
+        $message->username = fullname($this->students[4]);
+        try {
+            $grouptool->testable_register_in_agrp($agrpids[4], $this->students[4]->id, false);
+        } catch (\mod_grouptool\local\exception\regpresent $e) {
+            $thrown = true;
+            $text = $e->getMessage();
+            self::assertInstanceOf('\mod_grouptool\local\exception\regpresent', $e);
+            $comptext = get_string('already_queued', 'grouptool', $message);
+            self::assertEquals($comptext, $text);
+        }
+        self::assertTrue($thrown);
+        $grouptool->get_grouptool()->groups_queues_limit = 1;
+
+        // We are not allowed to register user 4 twice in group 5!
+        $thrown = false;
+        try {
+            $message->username = fullname($this->students[3]);
+            $grouptool->testable_register_in_agrp($agrpids[4], $this->students[3]->id, false);
+        } catch (\mod_grouptool\local\exception\regpresent $e) {
+            $thrown = true;
+            $text = $e->getMessage();
+            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            $comptext = get_string('already_registered', 'grouptool', $message);
+            self::assertEquals($comptext, $text);
+        }
+        self::assertTrue($thrown);
+
         // Exercise SUT!
 
         // Try to change to group 4 with user 2, fails because we can't determine where to unreg the user!
+        $thrown = false;
         $message->groupname = $agrps[$agrpids[4]]->name;
         try {
             $grouptool->testable_can_change_group($agrpids[4], $this->students[2]->id, $message);
         } catch (\mod_grouptool\local\exception\registration $e) {
+            $thrown = true;
             $text = $e->getMessage();
             self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
             self::assertEquals($comptext, $text);
         }
+        self::assertTrue($thrown);
         self::assertFalse($grouptool->testable_qualifies_for_groupchange($agrpids[4], $this->students[2]->id));
 
         // Now we give the method the param to know where to unregister user!
-        $text = $grouptool->testable_can_change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
+        $message->groupname = $agrps[$agrpids[6]]->name;
+        $message->username = fullname($this->students[2]);
+        $text = $grouptool->testable_can_change_group($agrpids[6], $this->students[2]->id, $message, $agrpids[2]);
         self::assertEquals(get_string('change_group_to', 'grouptool', $message), $text);
-        $text = $grouptool->testable_change_group($agrpids[4], $this->students[2]->id, $message, $agrpids[2]);
+        $text = $grouptool->testable_change_group($agrpids[6], $this->students[2]->id, $message, $agrpids[2]);
         self::assertEquals(get_string('register_in_group_success', 'grouptool', $message), $text);
 
-        /* TODO: disallow unreg, registration present (marked, queued or registered),
-         *       too many registrations, exceed group size, exceed user queue limit... */
+        // Disable unregistration in order to check if correct exception is thrown!
+        $grouptool->get_grouptool()->allow_unreg = 0;
+
+        // We can't change the group since unreg is disabled!
+        $thrown = false;
+        try {
+            $grouptool->testable_can_change_group($agrpids[2], $this->students[2]->id, $message, $agrpids[2]);
+        } catch (\mod_grouptool\local\exception\registration $e) {
+            $thrown = true;
+            $text = $e->getMessage();
+            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            $comptext = get_string('unreg_not_allowed', 'grouptool');
+            self::assertEquals($comptext, $text);
+        }
+        self::assertTrue($thrown);
+
+        $grouptool->get_grouptool()->allow_unreg = 1;
+
+        try {
+            $grouptool->testable_can_change_group($agrpids[2], $this->students[2]->id, $message, $agrpids[2]);
+        } catch (\mod_grouptool\local\exception\registration $e) {
+            $text = $e->getMessage();
+            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            $comptext = get_string('unreg_not_allowed', 'grouptool');
+            self::assertEquals($comptext, $text);
+        }
+
+        /* TODO: too many registrations, exceed group size, exceed user queue limit... */
 
         // Teardown fixture!
         $data = null;
