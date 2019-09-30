@@ -24,11 +24,11 @@ before_script:
     - moodle-plugin-ci phpdoc
     - moodle-plugin-ci phpcpd
     - moodle-plugin-ci phpcbf
-    - moodle-plugin-ci phpmd
     - moodle-plugin-ci codechecker
     - moodle-plugin-ci validate
     - moodle-plugin-ci phpunit
     - moodle-plugin-ci behat
+    - moodle-plugin-ci phpmd
 
 code_checker:
   <<: *job_definition
