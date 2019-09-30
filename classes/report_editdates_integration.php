@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Contains report editdates integration
+ *
+ * @package   mod_grouptool
+ * @author    Andreas Krieger
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 defined('MOODLE_INTERNAL') || die;
 
 
@@ -29,11 +37,23 @@ require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 class mod_grouptool_report_editdates_integration
 extends report_editdates_mod_date_extractor {
 
+    /**
+     * mod_grouptool_report_editdates_integration constructor.
+     *
+     * @param object $course the course
+     */
     public function __construct($course) {
         parent::__construct($course, 'grouptool');
         parent::load_data();
     }
 
+    /**
+     * Gets settings
+     *
+     * @param cm_info $cm
+     * @return array
+     * @throws coding_exception
+     */
     public function get_settings(cm_info $cm) {
         $grouptool = $this->mods[$cm->instance];
 
@@ -49,6 +69,14 @@ extends report_editdates_mod_date_extractor {
                 );
     }
 
+    /**
+     * Validates the passed dates
+     *
+     * @param cm_info $cm
+     * @param array $dates
+     * @return array
+     * @throws coding_exception
+     */
     public function validate_dates(cm_info $cm, array $dates) {
         $errors = array();
         if (!empty($dates['timedue']) && ($dates['timedue'] <= $dates['timeavailable'])) {
@@ -58,6 +86,14 @@ extends report_editdates_mod_date_extractor {
         return $errors;
     }
 
+    /**
+     * Saves the passed dates
+     *
+     * @param cm_info $cm
+     * @param array $dates
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function save_dates(cm_info $cm, array $dates) {
         global $DB, $COURSE, $CFG;
 

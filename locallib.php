@@ -170,6 +170,8 @@ class mod_grouptool {
     }
 
     /**
+     * Translates top level tabs.
+     *
      * @param tabobject[] $tabs
      * @param string|null $tab
      */
@@ -4064,6 +4066,20 @@ class mod_grouptool {
         return $tmprows;
     }
 
+    /**
+     * Unregisters users from groups according to the passed parameters
+     *
+     * @param array $groups the groups from which to unreg.
+     * @param string $data data that identifies the users
+     * @param bool $unregfrommgroups also unreg. from moodle groups
+     * @param bool $previewonly only preview
+     * @return array
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
     public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false) {
         global $DB, $OUTPUT;
 
