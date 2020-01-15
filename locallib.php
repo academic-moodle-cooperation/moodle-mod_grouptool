@@ -3986,7 +3986,6 @@ class mod_grouptool {
             $errorrows[0] = new html_table_row();
             $errorrows[0]->cells[] = new html_table_cell($OUTPUT->notification(
                 get_string('user_not_found', 'grouptool', $user), 'error'));
-            // E$errorrows[0]<->cells[0]d->colspan = count($prevtable->head);?
         } else if (count($userinfo) > 1) {
             foreach ($this->generate_multiple_users_table($userinfo, $importfields) as $tmprow) {
                 $errorrows[] = $tmprow;
@@ -4139,6 +4138,8 @@ class mod_grouptool {
         $pbar->update($processed, $count, get_string('unregister_progress_start', 'grouptool'));
         core_php_time_limit::raise(count($users) * 5);
         raise_memory_limit(MEMORY_HUGE);
+        $followchangessetting =
+            $DB->get_field('grouptool', 'ifmemberremoved', array('id' => $this->grouptool->id)) == GROUPTOOL_FOLLOW;
         foreach ($users as $user) {
             $userinfo = $this->find_userinfo($importfields, $user);
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
@@ -4189,8 +4190,7 @@ class mod_grouptool {
                             $row->attributes['class'] = 'success';
                             continue;
                         }
-
-                        if ($unregfrommgroups && $DB->record_exists('groups_members', [
+                        if ($followchangessetting && $DB->record_exists('groups_members', [
                                 'groupid' => $group,
                                 'userid' => $data['id']
                             ])) {
@@ -4199,8 +4199,9 @@ class mod_grouptool {
                                 'userid' => $data['id']
                             ]);
                         }
-
-                        $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
+                        if ($unregfrommgroups) {
+                            $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
+                        }
                         $unregistered[] = $userinfo->id;
                         $row->cells[] = get_string('unregister_user', 'grouptool', $data);
                         $row->attributes['class'] = 'success';
