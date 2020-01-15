@@ -445,13 +445,13 @@ class pdf extends \pdf {
         $normalheight = $this->normalheight;
 
         $this->MultiCell(0.1 * $writewidth, $normalheight, $status, 'TR', 'C', $fill || $forcefill, 0, null, null, true,
-                         1, false, false, $normalheight, 'M', true);
+                         1, true, false, $normalheight, 'M', true);
         $this->MultiCell(0.3 * $writewidth, $normalheight, $name, 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
-                         1, false, false, $normalheight, 'M', true);
+                         1, true, false, $normalheight, 'M', true);
         $this->MultiCell(0.2 * $writewidth, $normalheight, $idnumber, 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
-                         1, false, false, $normalheight, 'M', true);
+                         1, true, false, $normalheight, 'M', true);
         $this->MultiCell(0.4 * $writewidth, $normalheight, $email, 'TL', 'L', $fill || $forcefill, 1, null, null, true,
-                         1, false, false, $normalheight, 'M', true);
+                         1, true, false, $normalheight, 'M', true);
         $fill ^= 1;
     }
 

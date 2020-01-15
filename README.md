@@ -48,7 +48,7 @@ joint project during the semester.
 Requirements
 ------------
 
-The plugin is available for Moodle 2.5+. This version is for Moodle 3.7.
+The plugin is available for Moodle 2.5+. This version is for Moodle 3.8.
 
 
 Installation
