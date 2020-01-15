@@ -603,6 +603,7 @@ class mod_grouptool {
                 $newgroup = new stdClass();
                 $newgroup->courseid = $this->course->id;
                 $newgroup->name     = $group['name'];
+                $newgroup->enablemessaging = $data->enablegroupmessaging == 1 ? 1 : null;
                 $groupid = groups_create_group($newgroup);
                 $newagrp = $this->add_agrp_entry($groupid);
                 $createdgroups[] = $groupid;
@@ -761,6 +762,7 @@ class mod_grouptool {
                 $newgroup = new stdClass();
                 $newgroup->courseid = $this->course->id;
                 $newgroup->name     = $group;
+                $newgroup->enablemessaging = $data->enablegroupmessaging == 1 ? 1 : null;
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
                 $newagrp = $this->add_agrp_entry($groupid);
@@ -814,6 +816,7 @@ class mod_grouptool {
      *                      >0 => assign groups to grouping with that id
      * @param string $groupingname optional name for created grouping
      * @param bool $previewonly optional only show preview of created groups
+     * @param int $enablegroupmessaging optional enable messaging within group (default: no)
      * @return array ( 0 => error, 1 => message )
      * @throws coding_exception
      * @throws dml_exception
@@ -821,7 +824,7 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     private function create_one_person_groups($users, $namescheme = "[idnumber]", $grouping = 0, $groupingname = null,
-                                              $previewonly = false) {
+                                              $previewonly = false, $enablegroupmessaging=0) {
         global $DB, $USER;
 
         require_capability('mod/grouptool:create_groups', $this->context);
@@ -908,6 +911,7 @@ class mod_grouptool {
                 $newgroup = new stdClass();
                 $newgroup->courseid = $this->course->id;
                 $newgroup->name     = $group['name'];
+                $newgroup->enablemessaging = $enablegroupmessaging == 1 ? 1 : null;
                 $groupid = groups_create_group($newgroup);
                 // Insert into agrp-table!
                 $newagrp = new stdClass();
@@ -1660,7 +1664,9 @@ class mod_grouptool {
                         list($error, $prev) = $this->create_one_person_groups($users,
                                                                               $data->namingscheme,
                                                                               $data->grouping,
-                                                                              $data->groupingname);
+                                                                              $data->groupingname,
+                                                                              false,
+                                                                              $data->enablegroupmessaging);
                         $preview = $prev;
                         break;
                     case GROUPTOOL_N_M_GROUPS:
@@ -1789,7 +1795,8 @@ class mod_grouptool {
                                                                           $data->namingscheme,
                                                                           $data->grouping,
                                                                           $data->groupingname,
-                                                                          true);
+                                                                          true,
+                                                                          $data->enablegroupmessaging);
                     $preview = $prev;
                     break;
                 case GROUPTOOL_N_M_GROUPS:
