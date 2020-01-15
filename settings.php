@@ -130,9 +130,12 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading('mod_grouptool/addinstanceset', get_string('cfg_addinstanceset_head', 'grouptool'),
             get_string('cfg_addinstanceset_head_info', 'grouptool')));
 
+    $settings->add(new admin_setting_configtext('mod_grouptool/importfields', get_string('cfg_importfields', 'grouptool'),
+        get_string('cfg_importfields_desc', 'grouptool'), 'username,idnumber', "/^((?![^a-zA-Z,]).)*$/"));
+
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/force_importreg', get_string('cfg_force_importreg', 'grouptool'),
             get_string('cfg_force_importreg_desc', 'grouptool'), 0));
 
-    $settings->add(new admin_setting_configtext('mod_grouptool/importfields', get_string('cfg_importfields', 'grouptool'),
-            get_string('cfg_importfields_desc', 'grouptool'), 'username,idnumber', "/^((?![^a-zA-Z,]).)*$/"));
+    $settings->add(new admin_setting_configcheckbox('mod_grouptool/force_dereg', get_string('cfg_force_dereg', 'grouptool'),
+        get_string('cfg_force_dereg_desc', 'grouptool'), 0));
 }

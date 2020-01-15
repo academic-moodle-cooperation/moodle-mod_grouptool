@@ -114,7 +114,9 @@ class unregister_form extends \moodleform {
 
             $mdlform->addElement('advcheckbox', 'unregfrommgroups', '', get_string('unregfrommgroups', 'grouptool'));
             $mdlform->addHelpButton('unregfrommgroups', 'unregfrommgroups', 'grouptool');
-            $mdlform->setDefault('unregfrommgroups', true);
+            if ($forcedereg = get_config('mod_grouptool', 'force_dereg')) {
+                $mdlform->setDefault('unregfrommgroups', $forcedereg);
+            }
 
             $mdlform->addElement('submit', 'submitbutton', get_string('unregisterbutton', 'grouptool'));
         }
