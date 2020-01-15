@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+3.8.0 (2020-01-15)
+------------------
+
+* [FEATURE] #6358 added possibility to enable messaging in group-creation
+
 3.7.1 (2019-09-02)
 ------------------
 
