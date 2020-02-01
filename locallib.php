@@ -3061,7 +3061,7 @@ class mod_grouptool {
                     'agrpid' => $agrpid,
                     'userid' => $userid
             ]);
-            if (!empty($this->grouptool->immediate_reg)) {
+            if (!$force && !empty($this->grouptool->immediate_reg)) {
                 groups_remove_member($groupdata->id, $userid);
             }
             foreach ($records as $data) {
@@ -4145,8 +4145,7 @@ class mod_grouptool {
         $pbar->update($processed, $count, get_string('unregister_progress_start', 'grouptool'));
         core_php_time_limit::raise(count($users) * 5);
         raise_memory_limit(MEMORY_HUGE);
-        $followchangessetting =
-            $DB->get_field('grouptool', 'ifmemberremoved', array('id' => $this->grouptool->id)) == GROUPTOOL_FOLLOW;
+        $followchangessetting = $DB->get_field('grouptool', 'ifmemberremoved', array('id' => $this->grouptool->id));
         foreach ($users as $user) {
             $userinfo = $this->find_userinfo($importfields, $user);
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
@@ -4205,7 +4204,19 @@ class mod_grouptool {
                                 'groupid' => $group,
                                 'userid' => $data['id']
                             ]);
+
+                            $time = time();
+                            $DB->set_field('groups', 'timemodified', $time, array('id' => $group));
+
+                            cache_helper::invalidate_by_definition('core', 'user_group_groupings', array(), array($data['id']));
+
+                            $context = context_course::instance($this->grouptool->course);
+                            if ($conversation = \core_message\api::get_conversation_by_area('core_group',
+                                                                        'groups', $group, $context->id)) {
+                                \core_message\api::remove_members_from_conversation([$data['id']], $conversation->id);
+                            }
                         }
+
                         if ($unregfrommgroups) {
                             $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
                         }
