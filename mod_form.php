@@ -496,29 +496,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['queue_grp'] = get_string('queuespresenterror', 'grouptool');
         }
 
-        if (!empty($data['allow_multiple'])) {
-            $sql = "SELECT COUNT(*)
-                    FROM {grouptool_agrps}
-                    WHERE grouptoolid = :id AND active = :status;";
-            $activegroupcount = $DB->count_records_sql($sql, ['id' => $data['instance'], 'status' => 1]);
-            $inactivegroupcount = $DB->count_records_sql($sql, ['id' => $data['instance'], 'status' => 0]);
-            $total = $activegroupcount + $inactivegroupcount;
-            if ($data['choose_min'] < 0) {
-                $errors['choose_min'] = get_string('mustbegtoeqmin', 'grouptool');
-            } else if ($total < $data['choose_min']) {
-                $errors['choose_min'] = get_string('notenoughtotalgroups_min', 'grouptool', $total);
-            } else if ($activegroupcount < $data['choose_min']) {
-                $errors['choose_min'] = get_string('notenoughactivegroups_min', 'grouptool', $activegroupcount);
-            }
-
-            if ($data['choose_max'] < 0) {
-                $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
-            } else if ($total < $data['choose_max']) {
-                $errors['choose_max'] = get_string('notenoughtotalgroups_max', 'grouptool', $total);
-            } else if ($activegroupcount < $data['choose_max']) {
-                $errors['choose_max'] = get_string('notenoughactivegroups_max', 'grouptool', $activegroupcount);
-            }
+        if (!empty($data['allow_multiple']) && ($data['choose_min'] < 0)) {
+            $errors['choose_min'] = get_string('mustbegtoeqmin', 'grouptool');
         }
+
         if (!empty($data['allow_multiple']) && ($data['choose_max'] <= 0)) {
             $errors['choose_max'] = get_string('mustbeposint', 'grouptool');
         }
