@@ -4,6 +4,7 @@ CHANGELOG
 3.8.0 (2020-01-15)
 ------------------
 
+* [BUG] #6495 removed bug which caused a debugging warning to pop up
 * [FEATURE] #5708 Removed: "Warning if not enough groups are available for min. registrations added"
 * [FEATURE] #6358 added possibility to enable messaging in group-creation
 
