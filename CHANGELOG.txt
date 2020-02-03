@@ -5,14 +5,8 @@ CHANGELOG
 ------------------
 
 * [BUG] #6495 removed bug which caused a debugging warning to pop up
-* [FEATURE] #5708 Removed: "Warning if not enough groups are available for min. registrations added"
 * [FEATURE] #6358 added possibility to enable messaging in group-creation
-
-3.7.1 (2019-09-02)
-------------------
-
 * [BUG] #6258 Typos fixed
-* [FEATURE] #5708 Warning if not enough groups are available for min. registrations added
 * [FEATURE] #5295 Deregister user the same way they can be added
 
 
