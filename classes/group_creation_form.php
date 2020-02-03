@@ -250,10 +250,6 @@ class group_creation_form extends \moodleform {
             }
             $mform->addElement($selectgroups);
 
-            $mform->addElement('select', 'enablegroupmessaging', get_string('enablemessaging', 'group'),
-                array(0 => 'No', 1 => 'Yes'));
-            $mform->addHelpButton('enablegroupmessaging', 'enablemessaging', 'group');
-
             if ($groupings) {
                 $mform->setDefault('grouping', '0');
             }
@@ -262,6 +258,10 @@ class group_creation_form extends \moodleform {
                 $mform->setType('groupingname', PARAM_TEXT);
                 $mform->hideIf ('groupingname', 'grouping', 'noteq', '-1');
             }
+
+            $mform->addElement('select', 'enablegroupmessaging', get_string('enablemessaging', 'group'),
+                array(0 => 'No', 1 => 'Yes'));
+            $mform->addHelpButton('enablegroupmessaging', 'enablemessaging', 'group');
 
             $mform->addElement('submit', 'createGroups', get_string('createGroups', 'grouptool'));
         }
