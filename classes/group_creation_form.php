@@ -260,7 +260,7 @@ class group_creation_form extends \moodleform {
             }
 
             $mform->addElement('select', 'enablegroupmessaging', get_string('enablemessaging', 'group'),
-                array(0 => 'No', 1 => 'Yes'));
+                array(0 => get_string('no'), 1 => get_string('yes')));
             $mform->addHelpButton('enablegroupmessaging', 'enablemessaging', 'group');
 
             $mform->addElement('submit', 'createGroups', get_string('createGroups', 'grouptool'));
