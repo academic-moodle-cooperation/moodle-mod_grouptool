@@ -222,11 +222,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('use_queue', (($usequeue !== false) ? $usequeue : 0));
-        if ($queues <= 0) {
-            $mform->hideIf('use_queue', 'allow_reg', 'eq', 0);
-            $mform->hideIf('use_queue', 'use_size', 'notchecked');
-        }
+        $mform->addHelpButton('use_queue', 'use_queue', 'grouptool');
 
+        if ($queues <= 0) {
+            $mform->disabledIf('use_queue', 'allow_reg', 'eq', 0);
+            $mform->disabledIf('use_queue', 'use_size', 'notchecked');
+        }
         $queue = [];
         $queue[] = $mform->createElement('text', 'users_queues_limit', '', ['size' => '3']);
         $queue[] = $mform->createElement('checkbox', 'limit_users_queues', '', get_string('limit', 'grouptool'));
@@ -290,7 +291,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('allow_multiple', (($allowmultiple !== false) ? $allowmultiple : 0));
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
-        $mform->hideIf ('allow_multiple', 'allow_reg', 'eq', 0);
+        $mform->disabledIf ('allow_multiple', 'allow_reg', 'eq', 0);
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            ['size' => '3']);
