@@ -336,6 +336,7 @@ $string['importbutton'] = 'Import users';
 $string['import_conflict_user_queued'] = 'User <strong>{$a->fullname}</strong> is already queued in group <strong>{$a->groupname}</strong>!';
 $string['import_desc'] = 'Import users via list of ID-numbers into certain groups';
 $string['import_in_inactive_group_warning'] = 'Note: Group <strong>{$a}</strong> is currently inactive in the grouptool context and will therefore not be displayed. The import will only take place in the Moodle group. There will be no registration in this Grouptool instance!';
+$string['unregister_in_inactive_group_warning'] = 'Note: Group <strong>{$a}</strong> is currently inactive in the grouptool context and will therefore not be displayed. The deregisteration will only take place in the Moodle group. There will be no deregistrations in this Grouptool instance!';
 $string['import_in_inactive_group_rejected'] = 'The registration in grouptool group <strong>{$a}</strong> has been rejected due to it\'s inactivity. Activate the group in this grouptool to enable the registration.';
 $string['import_progress_completed'] = 'Import completed';
 $string['import_progress_preview_completed'] = 'Importpreview completed';
