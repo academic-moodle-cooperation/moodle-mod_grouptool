@@ -4121,7 +4121,7 @@ class mod_grouptool {
                 'groupid'     => $group,
                 'active'      => 1
             ])) {
-                $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning', 'grouptool',
+                $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
                     $groupname[$group]), 'error');
             }
         }
