@@ -3015,7 +3015,8 @@ class mod_grouptool {
             $userdata = $DB->get_record('user', ['id' => $userid]);
             $message->username = fullname($userdata);
         }
-        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        $groupdata = $this->get_active_groups(true, true, $agrpid, 0,
+                0, true, true);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
