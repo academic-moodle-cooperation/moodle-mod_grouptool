@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.8.1 (2020-02-23)
+------------------
+
+* [FEATURE] #6582 fixed langstring in warning for inactive group when deregistrating
+* [FEATURE] #6370 improved queue and multi registration section in the settings
+
+
 3.8.0 (2020-01-15)
 ------------------
 
