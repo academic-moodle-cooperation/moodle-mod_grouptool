@@ -232,7 +232,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $queue[] = $mform->createElement('text', 'users_queues_limit', '', ['size' => '3']);
         $queue[] = $mform->createElement('checkbox', 'limit_users_queues', '', get_string('limit', 'grouptool'));
         $mform->addGroup($queue, 'users_queues_grp', get_string('users_queues_limit', 'grouptool'), ' ', false);
-        $mform->setType('users_queues_limit', PARAM_INT);
+        $mform->setType('users_queues_limit', PARAM_TEXT);
         $maxqueues = get_config('mod_grouptool', 'users_queues_limit');
         if ($maxqueues === false) {
             throw new coding_exception('invalid_param');
@@ -256,7 +256,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $queue[] = $mform->createElement('text', 'groups_queues_limit', '', ['size' => '3']);
         $queue[] = $mform->createElement('checkbox', 'limit_groups_queues', '', get_string('limit', 'grouptool'));
         $mform->addGroup($queue, 'groups_queues_grp', get_string('groups_queues_limit', 'grouptool'), ' ', false);
-        $mform->setType('groups_queues_limit', PARAM_INT);
+        $mform->setType('groups_queues_limit', PARAM_TEXT);
         $maxqueues = get_config('mod_grouptool', 'groups_queues_limit');
         if ($maxqueues === false) {
             throw new coding_exception('invalid_param');
@@ -295,7 +295,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            ['size' => '3']);
-        $mform->setType('choose_min', PARAM_INT);
+        $mform->setType('choose_min', PARAM_TEXT);
         $choosemin = get_config('mod_grouptool', 'choose_min');
         if ($choosemin === false) {
             throw new coding_exception('invalid_param');
@@ -305,7 +305,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
                            ['size' => '3']);
-        $mform->setType('choose_max', PARAM_INT);
+        $mform->setType('choose_max', PARAM_TEXT);
         $choosemax = get_config('mod_grouptool', 'choose_max');
         if ($choosemax === false) {
             throw new coding_exception('invalid_param');
@@ -537,6 +537,9 @@ class mod_grouptool_mod_form extends moodleform_mod {
             }
         }
 
+        if (!empty($data['allow_multiple']) && preg_match('/[0-9]+/', $data['choose_min']) == 0) {
+            $errors['choose_min'] = get_string('mustbegt0', 'grouptool');
+        }
         return array_merge($parenterrors, $errors);
     }
 }
