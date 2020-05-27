@@ -537,7 +537,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             }
         }
 
-        if (!empty($data['allow_multiple']) && !ctype_digit($data['choose_min'])) {
+        if (!empty($data['allow_multiple']) && preg_match('/[0-9]+/', $data['choose_min']) == 0) {
             $errors['choose_min'] = get_string('mustbegt0', 'grouptool');
         }
         return array_merge($parenterrors, $errors);
