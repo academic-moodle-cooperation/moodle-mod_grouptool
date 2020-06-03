@@ -1516,7 +1516,6 @@ class mod_grouptool {
             }
         }
 
-
         if (!$dialog || !optional_param('start_bulkaction', 0, PARAM_BOOL)) {
             // Show form!
             $formaction = new moodle_url('/mod/grouptool/view.php', [
