@@ -1231,25 +1231,140 @@ class mod_grouptool {
         $inactivetabs = [];
 
         $filtertabs['active'] = new tabobject(self::FILTER_ACTIVE,
-                                              $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                              '&amp;tab=group_admin&filter='.self::FILTER_ACTIVE,
-                                              get_string('active', 'grouptool'),
-                                              '',
-                                              false);
+                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                '&amp;tab=group_admin&filter='.self::FILTER_ACTIVE,
+                get_string('active', 'grouptool'),
+                '',
+                false);
         $filtertabs['inactive'] = new tabobject(self::FILTER_INACTIVE,
-                                                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                                '&amp;tab=group_admin&filter='.self::FILTER_INACTIVE,
-                                                get_string('inactive'),
-                                                '',
-                                                false);
+                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                '&amp;tab=group_admin&filter='.self::FILTER_INACTIVE,
+                get_string('inactive'),
+                '',
+                false);
         $filtertabs['all'] = new tabobject(self::FILTER_ALL,
-                                           $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
-                                           '&amp;tab=group_admin&filter='.self::FILTER_ALL,
-                                           get_string('all'),
-                                           '',
-                                           false);
-        echo html_writer::tag('div', $OUTPUT->tabtree($filtertabs, $filter, $inactivetabs),
-                              ['id' => 'filtertabs']);
+                $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.
+                '&amp;tab=group_admin&filter='.self::FILTER_ALL,
+                get_string('all'),
+                '',
+                false);
+
+        $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
+        $selected = optional_param_array('selected', [], PARAM_INT);
+        $dialog = false;
+        if ($bulkaction && $selected && optional_param('start_bulkaction', 0, PARAM_BOOL)) {
+            switch ($bulkaction) {
+                case 'activate':  // ...also via ajax bulk action?
+                    // Activate now!
+                    $groups = optional_param_array('selected', null, PARAM_INT);
+                    if (!empty($groups)) {
+                        list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
+                        $DB->set_field_select("grouptool_agrps", "active", 1, " grouptoolid = ? AND groupid ".$grpsql,
+                                array_merge([$this->cm->instance], $grpparams));
+                    }
+                    echo $OUTPUT->notification(get_string('activated_groups', 'grouptool'), 'success');
+                    break;
+                case 'deactivate':  // ...also via ajax bulk action?
+                    // Deactivate now!
+                    $groups = optional_param_array('selected', null, PARAM_INT);
+                    if (!empty($groups)) {
+                        list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
+                        $DB->set_field_select("grouptool_agrps", "active", 0, " grouptoolid = ? AND groupid ".$grpsql,
+                                array_merge([$this->cm->instance], $grpparams));
+                    }
+                    echo $OUTPUT->notification(get_string('deactivated_groups', 'grouptool'), 'success');
+                    break;
+                case 'delete': // ...also via ajax bulk action?
+                    // Show confirmation dialogue!
+                    if (optional_param('confirm', 0, PARAM_BOOL)) {
+                        $groups = optional_param_array('selected', null, PARAM_INT);
+                        $groups = $DB->get_records_list('groups', 'id', $groups);
+                        foreach ($groups as $group) {
+                            groups_delete_group($group);
+                        }
+                        echo $OUTPUT->notification(get_string('successfully_deleted_groups', 'grouptool'), 'success');
+                    } else {
+                        $cancel = new moodle_url($PAGE->url, ['tab' => 'group_admin']);
+                        $params = ['confirm' => 1, 'bulkaction' => 'delete', 'start_bulkaction' => 1];
+                        $text = get_string('confirm_delete', 'grouptool').html_writer::start_tag('ul');
+                        $groups = $DB->get_records_list('groups', 'id', $selected);
+                        foreach ($selected as $select) {
+                            $params['selected['.$select.']'] = $select;
+                            $text .= html_writer::tag('li', $groups[$select]->name);
+                        }
+                        $text .= html_writer::end_tag('ul');
+                        $continue = new moodle_url($cancel, $params);
+
+                        echo $this->confirm($text, $continue, $cancel);
+                        echo $OUTPUT->footer();
+                        $dialog = true;
+                    }
+                    break;
+                case 'grouping':
+                    // Show grouping creation form!
+                    $selected = optional_param_array('selected', [], PARAM_INT);
+                    $mform = new \mod_grouptool\groupings_creation_form(null, [
+                            'id'       => $id,
+                            'selected' => $selected
+                    ]);
+                    $groups = $DB->get_records_list('groups', 'id', $selected);
+                    if ($mform->is_cancelled()) {
+                        $bulkaction = null;
+                        $selected = [];
+                    } else if ($fromform = $mform->get_data()) {
+                        // Some groupings should be created...
+                        if ($fromform->target == -2) { // One new grouping per group!
+                            foreach ($groups as $group) {
+                                $grouping = new stdClass();
+                                if (!$grouping->id = groups_get_grouping_by_name($this->course->id, $group->name)) {
+                                    $grouping = new stdClass();
+                                    $grouping->courseid = $this->course->id;
+                                    $grouping->name     = $group->name;
+                                    $grouping->id = groups_create_grouping($grouping);
+                                }
+                                // Insert group!
+                                groups_assign_grouping($grouping->id, $group->id);
+                            }
+                        } else if ($fromform->target == -1) { // One new grouping!
+                            // Create grouping if it doesn't exist...
+                            $grouping = new stdClass();
+                            if (!$grouping->id = groups_get_grouping_by_name($this->course->id, $fromform->name)) {
+                                $grouping = new stdClass();
+                                $grouping->courseid = $this->course->id;
+                                $grouping->name     = trim($fromform->name);
+                                $grouping->id = groups_create_grouping($grouping);
+                            }
+                            // Insert groups!
+                            foreach ($groups as $group) {
+                                groups_assign_grouping($grouping->id, $group->id);
+                            }
+                        } else if ($fromform->target > 0) { // Existing Grouping!
+                            $grouping = groups_get_grouping($fromform->target);
+                            if ($grouping) {
+                                foreach ($groups as $group) {
+                                    groups_assign_grouping($grouping->id, $group->id);
+                                }
+                            }
+                        }
+                        // ...redirect to show sortlist again!
+                        $url = new moodle_url('/mod/grouptool/view.php', [
+                                'id' => $this->cm->id,
+                                'tab' => 'group_admin',
+                                'filter' => $filter
+                        ]);
+                        echo $OUTPUT->notification(get_string('groupings_created_and_groups_added', 'grouptool'), 'info');
+                    } else {
+                        $mform->display();
+                        $dialog = true;
+                    }
+                    break;
+            }
+        }
+
+        if (!$dialog) {
+            echo html_writer::tag('div', $OUTPUT->tabtree($filtertabs, $filter, $inactivetabs),
+                    ['id' => 'filtertabs']);
+        }
 
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
@@ -1389,123 +1504,8 @@ class mod_grouptool {
             }
         }
 
-        $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
-        $selected = optional_param_array('selected', [], PARAM_INT);
-        if ($bulkaction && $selected && optional_param('start_bulkaction', 0, PARAM_BOOL)) {
-            switch ($bulkaction) {
-                case 'activate':  // ...also via ajax bulk action?
-                    // Activate now!
-                    $groups = optional_param_array('selected', null, PARAM_INT);
-                    if (!empty($groups)) {
-                        list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
-                        $DB->set_field_select("grouptool_agrps", "active", 1, " grouptoolid = ? AND groupid ".$grpsql,
-                                              array_merge([$this->cm->instance], $grpparams));
-                    }
-                    echo $OUTPUT->notification(get_string('activated_groups', 'grouptool'), 'success');
-                    $continue = new moodle_url($PAGE->url, ['tab' => 'group_admin']);
-                    echo $this->confirm('', $continue);
-                break;
-                case 'deactivate':  // ...also via ajax bulk action?
-                    // Deactivate now!
-                    $groups = optional_param_array('selected', null, PARAM_INT);
-                    if (!empty($groups)) {
-                        list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
-                        $DB->set_field_select("grouptool_agrps", "active", 0, " grouptoolid = ? AND groupid ".$grpsql,
-                                              array_merge([$this->cm->instance], $grpparams));
-                    }
-                    echo $OUTPUT->notification(get_string('deactivated_groups', 'grouptool'), 'success');
-                    $continue = new moodle_url($PAGE->url, ['tab' => 'group_admin']);
-                    echo $this->confirm('', $continue);
-                break;
-                case 'delete': // ...also via ajax bulk action?
-                    // Show confirmation dialogue!
-                    if (optional_param('confirm', 0, PARAM_BOOL)) {
-                        $groups = optional_param_array('selected', null, PARAM_INT);
-                        $groups = $DB->get_records_list('groups', 'id', $groups);
-                        foreach ($groups as $group) {
-                            groups_delete_group($group);
-                        }
-                        echo $OUTPUT->notification(get_string('successfully_deleted_groups', 'grouptool'), 'success');
-                        $continue = new moodle_url($PAGE->url, ['tab' => 'group_admin']);
-                        echo $this->confirm('', $continue);
-                    } else {
-                        $cancel = new moodle_url($PAGE->url, ['tab' => 'group_admin']);
-                        $params = ['confirm' => 1, 'bulkaction' => 'delete', 'start_bulkaction' => 1];
-                        $text = get_string('confirm_delete', 'grouptool').html_writer::start_tag('ul');
-                        $groups = $DB->get_records_list('groups', 'id', $selected);
-                        foreach ($selected as $select) {
-                            $params['selected['.$select.']'] = $select;
-                            $text .= html_writer::tag('li', $groups[$select]->name);
-                        }
-                        $text .= html_writer::end_tag('ul');
-                        $continue = new moodle_url($cancel, $params);
 
-                        echo $this->confirm($text, $continue, $cancel);
-                        echo $OUTPUT->footer();
-                        die;
-                    }
-                break;
-                case 'grouping':
-                    // Show grouping creation form!
-                    $selected = optional_param_array('selected', [], PARAM_INT);
-                    $mform = new \mod_grouptool\groupings_creation_form(null, [
-                            'id'       => $id,
-                            'selected' => $selected
-                    ]);
-                    $groups = $DB->get_records_list('groups', 'id', $selected);
-                    if ($mform->is_cancelled()) {
-                        $bulkaction = null;
-                        $selected = [];
-                    } else if ($fromform = $mform->get_data()) {
-                        // Some groupings should be created...
-                        if ($fromform->target == -2) { // One new grouping per group!
-                            foreach ($groups as $group) {
-                                $grouping = new stdClass();
-                                if (!$grouping->id = groups_get_grouping_by_name($this->course->id, $group->name)) {
-                                    $grouping = new stdClass();
-                                    $grouping->courseid = $this->course->id;
-                                    $grouping->name     = $group->name;
-                                    $grouping->id = groups_create_grouping($grouping);
-                                }
-                                // Insert group!
-                                groups_assign_grouping($grouping->id, $group->id);
-                            }
-                        } else if ($fromform->target == -1) { // One new grouping!
-                            // Create grouping if it doesn't exist...
-                            $grouping = new stdClass();
-                            if (!$grouping->id = groups_get_grouping_by_name($this->course->id, $fromform->name)) {
-                                $grouping = new stdClass();
-                                $grouping->courseid = $this->course->id;
-                                $grouping->name     = trim($fromform->name);
-                                $grouping->id = groups_create_grouping($grouping);
-                            }
-                            // Insert groups!
-                            foreach ($groups as $group) {
-                                groups_assign_grouping($grouping->id, $group->id);
-                            }
-                        } else if ($fromform->target > 0) { // Existing Grouping!
-                            $grouping = groups_get_grouping($fromform->target);
-                            if ($grouping) {
-                                foreach ($groups as $group) {
-                                    groups_assign_grouping($grouping->id, $group->id);
-                                }
-                            }
-                        }
-                        // ...redirect to show sortlist again!
-                        $url = new moodle_url('/mod/grouptool/view.php', [
-                                'id' => $this->cm->id,
-                                'tab' => 'group_admin',
-                                'filter' => $filter
-                        ]);
-                        $text = $OUTPUT->notification(get_string('groupings_created_and_groups_added', 'grouptool'), 'info');
-                        echo $this->confirm($text, $url);
-                    } else {
-                        $mform->display();
-                    }
-                break;
-            }
-        }
-        if (!$bulkaction || !$selected || !optional_param('start_bulkaction', 0, PARAM_BOOL)) {
+        if (!$dialog || !optional_param('start_bulkaction', 0, PARAM_BOOL)) {
             // Show form!
             $formaction = new moodle_url('/mod/grouptool/view.php', [
                     'id' => $this->cm->id,
