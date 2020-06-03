@@ -718,10 +718,12 @@ class mod_grouptool {
                 $a->globalsize = $this->grouptool->grpsize;
                 if ($data->numberofmembers != $this->grouptool->grpsize) {
                     if (!$this->grouptool->use_individual) {
-                        echo $OUTPUT->notification(get_string('groupsize_individual_gets_enabled', 'grouptool', $a), 'info');
+                        echo $OUTPUT->notification(get_string('groupsize_individual_gets_enabled', 'grouptool', $a),
+                                \core\output\notification::NOTIFY_INFO);
                     }
                 } else if (!$this->grouptool->use_size) {
-                    echo $OUTPUT->notification(get_string('groupsize_gets_enabled', 'grouptool', $a), 'info');
+                    echo $OUTPUT->notification(get_string('groupsize_gets_enabled', 'grouptool', $a),
+                            \core\output\notification::NOTIFY_INFO);
                 }
             }
 
@@ -1041,7 +1043,7 @@ class mod_grouptool {
                 } else {
                     $text = get_string('grouping_exists_error', 'grouptool');
                 }
-                $cell = new html_table_cell($OUTPUT->notification($text, 'error'));
+                $cell = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                 $row[] = $cell;
                 $error = true;
             } else {
@@ -1054,7 +1056,7 @@ class mod_grouptool {
                         } else {
                             $text = get_string('group_assign_error', 'grouptool');
                         }
-                        $cell = new html_table_cell($OUTPUT->notification($text, 'error'));
+                        $cell = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                         $row[] = $cell;
                         $error = true;
                     } else {
@@ -1062,7 +1064,7 @@ class mod_grouptool {
                             $content = $group->name;
                         } else {
                             $content = $OUTPUT->notification(get_string('grouping_creation_success', 'grouptool', $group->name),
-                                                             'success');
+                                                             \core\output\notification::NOTIFY_SUCCESS);
                         }
                         $cell = new html_table_cell($content);
                         $row[] = $cell;
@@ -1074,7 +1076,7 @@ class mod_grouptool {
                     } else {
                         $text = get_string('grouping_creation_error', 'grouptool');
                     }
-                    $cell = new html_table_cell($OUTPUT->notification($text, 'error'));
+                    $cell = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                     $row[] = $cell;
                     $error = true;
                 }
@@ -1135,7 +1137,7 @@ class mod_grouptool {
                 } else {
                     $text = get_string('grouping_exists_error', 'grouptool');
                 }
-                return [0 => true, 1 => $OUTPUT->notification($text, 'error')];
+                return [0 => true, 1 => $OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR)];
             } else {
                 if (empty($previewonly)) {
                     // Create grouping and set as target.
@@ -1143,9 +1145,9 @@ class mod_grouptool {
                     $grouping->name = $name;
                     $grouping->courseid = $courseid;
                     $target = groups_create_grouping($grouping);
-                    $return = $OUTPUT->notification(get_string('grouping_creation_only_success', 'grouptool'), 'success');
+                    $return = $OUTPUT->notification(get_string('grouping_creation_only_success', 'grouptool'), \core\output\notification::NOTIFY_SUCCESS);
                 } else {
-                    $return = $OUTPUT->notification(get_string('grouping_creation_only_success_prev', 'grouptool'), 'info');
+                    $return = $OUTPUT->notification(get_string('grouping_creation_only_success_prev', 'grouptool'), \core\output\notification::NOTIFY_INFO);
                 }
             }
         }
@@ -1173,18 +1175,18 @@ class mod_grouptool {
             if ($previewonly) {
                 if (!empty($success)) {
                     $return .= $OUTPUT->notification(get_string('grouping_assign_success_prev', 'grouptool').
-                                                     html_writer::empty_tag('br').implode(', ', $success), 'info');
+                                                     html_writer::empty_tag('br').implode(', ', $success), \core\output\notification::NOTIFY_INFO);
                 }
                 if ($error) {
                     $return .= $OUTPUT->notification(get_string('grouping_assign_error_prev', 'grouptool').
-                                                     html_writer::empty_tag('br').implode(', ', $failure), 'error');
+                                                     html_writer::empty_tag('br').implode(', ', $failure), \core\output\notification::NOTIFY_ERROR);
                 }
             } else {
                 $return .= $OUTPUT->notification(get_string('grouping_assign_success', 'grouptool').html_writer::empty_tag('br').
-                                                 implode(', ', $success), 'success');
+                                                 implode(', ', $success), \core\output\notification::NOTIFY_SUCCESS);
                 if ($error) {
                     $return .= $OUTPUT->notification(get_string('grouping_assign_error', 'grouptool').html_writer::empty_tag('br').
-                                                     implode(', ', $failure), 'error');
+                                                     implode(', ', $failure), \core\output\notification::NOTIFY_ERROR);
                 }
             }
         }
@@ -1259,20 +1261,22 @@ class mod_grouptool {
                     $groups = optional_param_array('selected', null, PARAM_INT);
                     if (!empty($groups)) {
                         list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
-                        $DB->set_field_select("grouptool_agrps", "active", 1, " grouptoolid = ? AND groupid ".$grpsql,
-                                array_merge([$this->cm->instance], $grpparams));
+                        $DB->set_field_select("grouptool_agrps", "active", 1,
+                                " grouptoolid = ? AND groupid ".$grpsql, array_merge([$this->cm->instance], $grpparams));
                     }
-                    echo $OUTPUT->notification(get_string('activated_groups', 'grouptool'), 'success');
+                    echo $OUTPUT->notification(get_string('activated_groups', 'grouptool'),
+                            \core\output\notification::NOTIFY_SUCCESS);
                     break;
                 case 'deactivate':  // ...also via ajax bulk action?
                     // Deactivate now!
                     $groups = optional_param_array('selected', null, PARAM_INT);
                     if (!empty($groups)) {
                         list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
-                        $DB->set_field_select("grouptool_agrps", "active", 0, " grouptoolid = ? AND groupid ".$grpsql,
-                                array_merge([$this->cm->instance], $grpparams));
+                        $DB->set_field_select("grouptool_agrps", "active", 0,
+                                " grouptoolid = ? AND groupid ".$grpsql, array_merge([$this->cm->instance], $grpparams));
                     }
-                    echo $OUTPUT->notification(get_string('deactivated_groups', 'grouptool'), 'success');
+                    echo $OUTPUT->notification(get_string('deactivated_groups', 'grouptool'),
+                            \core\output\notification::NOTIFY_SUCCESS);
                     break;
                 case 'delete': // ...also via ajax bulk action?
                     // Show confirmation dialogue!
@@ -1282,7 +1286,8 @@ class mod_grouptool {
                         foreach ($groups as $group) {
                             groups_delete_group($group);
                         }
-                        echo $OUTPUT->notification(get_string('successfully_deleted_groups', 'grouptool'), 'success');
+                        echo $OUTPUT->notification(get_string('successfully_deleted_groups', 'grouptool'),
+                                \core\output\notification::NOTIFY_SUCCESS);
                     } else {
                         $cancel = new moodle_url($PAGE->url, ['tab' => 'group_admin']);
                         $params = ['confirm' => 1, 'bulkaction' => 'delete', 'start_bulkaction' => 1];
@@ -1352,7 +1357,7 @@ class mod_grouptool {
                                 'tab' => 'group_admin',
                                 'filter' => $filter
                         ]);
-                        echo $OUTPUT->notification(get_string('groupings_created_and_groups_added', 'grouptool'), 'info');
+                        echo $OUTPUT->notification(get_string('groupings_created_and_groups_added', 'grouptool'), 'confirm');
                     } else {
                         $mform->display();
                         $dialog = true;
@@ -1491,7 +1496,7 @@ class mod_grouptool {
             if (!empty($toggle)) {
                 $conditions = ['grouptoolid' => $this->cm->instance, 'groupid' => $toggle];
                 if (!$DB->record_exists('grouptool_agrps', $conditions)) {
-                    echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_found', 'grouptool'), 'error'),
+                    echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_found', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                       'generalbox');
                 } else {
                     $record = $DB->get_record('grouptool_agrps', $conditions);
@@ -1693,7 +1698,8 @@ class mod_grouptool {
                             'class' => 'ml-1'
                     ]);
                 }
-                $preview = $OUTPUT->notification($preview, $error ? 'error' : 'info');
+                $preview = $OUTPUT->notification($preview, $error ? \core\output\notification::NOTIFY_ERROR :
+                        \core\output\notification::NOTIFY_SUCCESS);
                 echo $OUTPUT->box(html_writer::tag('div', $preview, ['class' => 'centered']),
                                   'generalbox');
             }
@@ -1871,7 +1877,7 @@ class mod_grouptool {
         $table = new html_table();
 
         if ($activity == 0) {
-            return $OUTPUT->box($OUTPUT->notification(get_string('chooseactivity', 'grouptool'), 'error'), 'generalbox centered');
+            return $OUTPUT->box($OUTPUT->notification(get_string('chooseactivity', 'grouptool'), \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
         }
 
         // General table settings!
@@ -2073,7 +2079,7 @@ class mod_grouptool {
                     $data[] = $row;
                 }
             } else {
-                return $OUTPUT->box($OUTPUT->notification(get_string('no_grades_present', 'grouptool'), 'error'),
+                return $OUTPUT->box($OUTPUT->notification(get_string('no_grades_present', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                     'generalbox centered');
             }
         } else {
@@ -2082,15 +2088,15 @@ class mod_grouptool {
 
         if (empty($data)) {
             if ($filter == GROUPTOOL_FILTER_ALL) {
-                return $OUTPUT->box($OUTPUT->notification(get_string('no_data_to_display', 'grouptool'), 'error'),
+                return $OUTPUT->box($OUTPUT->notification(get_string('no_data_to_display', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                     'generalbox centered');
             } else if ($filter == GROUPTOOL_FILTER_NONCONFLICTING) {
-                return $OUTPUT->box($OUTPUT->notification(get_string('no_conflictfree_to_display', 'grouptool'), 'error'),
+                return $OUTPUT->box($OUTPUT->notification(get_string('no_conflictfree_to_display', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                     'centered').
                 $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
                                          GROUPTOOL_FILTER_ALL, $selected, $missingsource);
             } else {
-                return $OUTPUT->box($OUTPUT->notification(get_string('no_groupmembers_to_display', 'grouptool'), 'error'),
+                return $OUTPUT->box($OUTPUT->notification(get_string('no_groupmembers_to_display', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                     'centered').
                 $this->get_grading_table($activity, $mygroupsonly, $incompleteonly,
                                          GROUPTOOL_FILTER_ALL, $selected, $missingsource);
@@ -2608,7 +2614,7 @@ class mod_grouptool {
                         echo $preview.$this->confirm(get_string('copy_grades_confirm', 'grouptool'), $continue, $cancel);
                     }
                 } else {
-                    $boxcontent = $OUTPUT->notification(get_string('no_target_selected', 'grouptool'), 'error');
+                    $boxcontent = $OUTPUT->notification(get_string('no_target_selected', 'grouptool'), \core\output\notification::NOTIFY_ERROR);
                     echo $OUTPUT->box($boxcontent, 'generalbox');
                     unset($boxcontent);
                     $step = 0;
@@ -2658,13 +2664,13 @@ class mod_grouptool {
                     }
                 } else {
                     if (empty($selected)) {
-                        $boxcontent = $OUTPUT->notification(get_string('no_target_selected', 'grouptool'), 'error');
+                        $boxcontent = $OUTPUT->notification(get_string('no_target_selected', 'grouptool'), \core\output\notification::NOTIFY_ERROR);
                         echo $OUTPUT->box($boxcontent, 'generalbox');
                         unset($boxcontent);
                         $step = 0;
                     }
                     if (count($missingsource) != 0) {
-                        $boxcontent = $OUTPUT->notification(get_string('sources_missing', 'grouptool'), 'error');
+                        $boxcontent = $OUTPUT->notification(get_string('sources_missing', 'grouptool'), \core\output\notification::NOTIFY_ERROR);
                         echo $OUTPUT->box($boxcontent, 'generalbox');
                         unset($boxcontent);
                         $step = 0;
@@ -2680,11 +2686,11 @@ class mod_grouptool {
             list($error, $info) = $this->copy_grades($activity, $mygroupsonly, $selected, $source,
                                                      $overwrite);
             if ($error) {
-                $boxcontent = $OUTPUT->notification(get_string('copy_grades_errors', 'grouptool'), 'error').$info;
+                $boxcontent = $OUTPUT->notification(get_string('copy_grades_errors', 'grouptool'), \core\output\notification::NOTIFY_ERROR).$info;
                 echo $OUTPUT->box($boxcontent, 'generalbox tumargin');
                 unset($boxcontent);
             } else {
-                $boxcontent = $OUTPUT->notification(get_string('copy_grades_success', 'grouptool'), 'success').$info;
+                $boxcontent = $OUTPUT->notification(get_string('copy_grades_success', 'grouptool'), \core\output\notification::NOTIFY_SUCCESS).$info;
                 echo $OUTPUT->box($boxcontent, 'generalbox tumargin');
                 unset($boxcontent);
             }
@@ -3993,7 +3999,7 @@ class mod_grouptool {
         if (empty($userinfo)) {
             $errorrows[0] = new html_table_row();
             $errorrows[0]->cells[] = new html_table_cell($OUTPUT->notification(
-                get_string('user_not_found', 'grouptool', $user), 'error'));
+                get_string('user_not_found', 'grouptool', $user), \core\output\notification::NOTIFY_ERROR));
         } else if (count($userinfo) > 1) {
             foreach ($this->generate_multiple_users_table($userinfo, $importfields) as $tmprow) {
                 $errorrows[] = $tmprow;
@@ -4068,7 +4074,7 @@ class mod_grouptool {
         }
         $curkey = count($tmprows[0]->cells);
         $tmprows[0]->cells[$curkey] = new html_table_cell($OUTPUT->notification(get_string('found_multiple', 'grouptool'),
-            'error'));
+            \core\output\notification::NOTIFY_ERROR));
         $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
         return $tmprows;
     }
@@ -4123,7 +4129,7 @@ class mod_grouptool {
                 'active'      => 1
             ])) {
                 $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
-                    $groupname[$group]), 'error');
+                    $groupname[$group]), \core\output\notification::NOTIFY_ERROR);
             }
         }
         if (false !== ($gtimportfields = get_config('mod_grouptool', 'importfields'))) {
@@ -4167,10 +4173,10 @@ class mod_grouptool {
                     $userinfo->fullname = fullname($userinfo);
                     if (empty($userinfo->deleted)) {
                         $text = get_string('user_is_not_enrolled', 'grouptool', $userinfo);
-                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, 'error'));
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                     } else {
                         $text = get_string('user_is_deleted', 'grouptool', $userinfo);
-                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, 'error'));
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                     }
                     $error = true;
                     continue;
@@ -4701,7 +4707,7 @@ class mod_grouptool {
                     $info = new stdClass();
                     $info->grpname = groups_get_group_name($cur->groupid);
                     $info->userid = $userid;
-                    echo $OUTPUT->notification(get_string('already_occupied', 'grouptool', $info), 'error');
+                    echo $OUTPUT->notification(get_string('already_occupied', 'grouptool', $info), \core\output\notification::NOTIFY_ERROR);
                     $DB->delete_records('grouptool_registered', ['id' => $id]);
                     unset($marks[$id]);
                 }
@@ -4893,9 +4899,9 @@ class mod_grouptool {
                 }
             }
             if ($error === true) {
-                echo $OUTPUT->notification($confirmmessage, 'error');
+                echo $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
             } else {
-                echo $OUTPUT->notification($confirmmessage, 'success');
+                echo $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
             }
         } else if (data_submitted() && confirm_sesskey()) {
 
@@ -5467,7 +5473,7 @@ class mod_grouptool {
                     'active'      => 1
             ])) {
                 $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning', 'grouptool',
-                                                             $groupinfo[$group]->name), 'error');
+                                                             $groupinfo[$group]->name), \core\output\notification::NOTIFY_ERROR);
             }
             // We use MAX to trick Postgres into thinking this is a full GROUP BY statement!
             $sql = '     SELECT agrps.id AS id, MAX(agrps.groupid) AS grpid, COUNT(regs.id) AS regs,
@@ -5487,12 +5493,12 @@ class mod_grouptool {
                 if ($cur->indi && !empty($cur->size)) {
                     if (($cur->regs + $usercnt) > $cur->size) {
                         $message .= html_writer::tag('div', $OUTPUT->notification(get_string('overflowwarning', 'grouptool', $cur),
-                                                                                  'error'));
+                                                                                  \core\output\notification::NOTIFY_ERROR));
                     }
                 } else {
                     if (($cur->regs + $usercnt) > $cur->globalsize) {
                         $message .= html_writer::tag('div', $OUTPUT->notification(get_string('overflowwarning', 'grouptool', $cur),
-                                                                                  'error'));
+                                                                                  \core\output\notification::NOTIFY_ERROR));
                     }
                 }
             }
@@ -5551,9 +5557,9 @@ class mod_grouptool {
                     try {
                         $this->force_enrol_student($userinfo->id);
                     } catch (Exception $e) {
-                        $row->cells[] = new html_table_cell($OUTPUT->notification($e->getMessage(), 'error'));
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($e->getMessage(), \core\output\notification::NOTIFY_ERROR));
                     } catch (Throwable $t) {
-                        $row->cells[] = new html_table_cell($OUTPUT->notification($t->getMessage(), 'error'));
+                        $row->cells[] = new html_table_cell($OUTPUT->notification($t->getMessage(), \core\output\notification::NOTIFY_ERROR));
                     }
                 }
                 foreach ($groups as $group) {
@@ -5577,7 +5583,7 @@ class mod_grouptool {
 
                         if (!groups_add_member($group, $userinfo->id)) {
                             $error = true;
-                            $notification = $OUTPUT->notification(get_string('import_user_problem', 'grouptool', $data), 'error');
+                            $notification = $OUTPUT->notification(get_string('import_user_problem', 'grouptool', $data), \core\output\notification::NOTIFY_ERROR);
                             $row->cells[] = new html_table_cell($notification);
                             $row->attributes['class'] = 'error';
                         } else {
@@ -5605,7 +5611,7 @@ class mod_grouptool {
                             $agrp[$group]->id = $DB->insert_record('grouptool_agrps', $agrp[$group]);
                             \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp[$group])->trigger();
                             $notification = $OUTPUT->notification(get_string('import_in_inactive_group_rejected',
-                                                                             'grouptool', $agrp[$group]), 'error');
+                                                                             'grouptool', $agrp[$group]), \core\output\notification::NOTIFY_ERROR);
                             $row->cells[] = $notification;
                             $row->attributes['class'] = 'error';
                             $agrp[$group] = $agrp[$group]->id;
@@ -5703,7 +5709,7 @@ class mod_grouptool {
             list($error, $message) = $this->import($groups, $data, $ignored, $forceregistration);
 
             if (!empty($error)) {
-                $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'), 'error').
+                $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'), \core\output\notification::NOTIFY_ERROR).
                            html_writer::empty_tag('br').$message;
             }
             echo html_writer::tag('div', $message, ['class' => 'centered']);
@@ -5725,7 +5731,7 @@ class mod_grouptool {
 
             echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered');
             if ($error) {
-                echo $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), 'error');
+                echo $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), \core\output\notification::NOTIFY_ERROR);
             }
 
             $confirmform->display();
@@ -5761,7 +5767,7 @@ class mod_grouptool {
             list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false);
 
             if (!empty($error)) {
-                $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'), 'error').
+                $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'), \core\output\notification::NOTIFY_ERROR).
                     html_writer::empty_tag('br').$message;
             }
             echo html_writer::tag('div', $message, ['class' => 'centered']);
@@ -5783,7 +5789,7 @@ class mod_grouptool {
 
             echo $OUTPUT->heading(get_string('preview', 'grouptool'), 2, 'centered');
             if ($error) {
-                echo $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), 'error');
+                echo $OUTPUT->notification(get_string('ignoring_not_found_users', 'grouptool'), \core\output\notification::NOTIFY_ERROR);
             }
 
             $confirmform->display();
@@ -6007,7 +6013,7 @@ class mod_grouptool {
 
         if (count($agrps) == 0) {
             $boxcontent = $OUTPUT->notification(get_string('no_data_to_display', 'grouptool'),
-                                                'error');
+                                                \core\output\notification::NOTIFY_ERROR);
             $return = $OUTPUT->box($boxcontent, 'generalbox centered');
             if (!$onlydata) {
                 echo $return;
@@ -6913,9 +6919,9 @@ class mod_grouptool {
                             try {
                                 $this->force_enrol_student($reg->userid);
                             } catch (Exception $e) {
-                                $return[] = $OUTPUT->notification($e->getMessage(), 'error');
+                                $return[] = $OUTPUT->notification($e->getMessage(), \core\output\notification::NOTIFY_ERROR);
                             } catch (Throwable $t) {
-                                $return[] = $OUTPUT->notification($t->getMessage(), 'error');
+                                $return[] = $OUTPUT->notification($t->getMessage(), \core\output\notification::NOTIFY_ERROR);
                             }
                         }
                         if (groups_add_member($groupid, $reg->userid)) {
@@ -7095,9 +7101,9 @@ class mod_grouptool {
             if ($pushtomdl) {
                 list($error, $message) = $this->push_registrations($groupid, $groupingid);
                 if ($error) {
-                    echo $OUTPUT->notification($message, 'error');
+                    echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_ERROR);
                 } else {
-                    echo $OUTPUT->notification($message, 'success');
+                    echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_SUCCESS);
                 }
             }
         } else if (data_submitted() && confirm_sesskey()) {
@@ -7218,7 +7224,7 @@ class mod_grouptool {
             $url->param('groupid', 0);
             echo $OUTPUT->box($OUTPUT->notification(get_string('group_not_in_grouping', 'grouptool').
                                                     html_writer::empty_tag('br').
-                                                    get_string('switched_to_all_groups', 'grouptool'), 'error'),
+                                                    get_string('switched_to_all_groups', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                               'generalbox centered');
         }
         return new single_select($url, 'groupid', $options, $groupid, false);
@@ -7271,7 +7277,7 @@ class mod_grouptool {
         } else {
              $agrpsql = '';
              $agrpparams = [];
-             echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'), 'error'),
+             echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                'generalbox centered');
         }
 
@@ -7566,7 +7572,7 @@ class mod_grouptool {
             $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
         } else {
             if (!$onlydata) {
-                echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display', 'grouptool'), 'error'),
+                echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display', 'grouptool'), \core\output\notification::NOTIFY_ERROR),
                                   'centered generalbox');
             } else {
                 return get_string('no_users_to_display', 'grouptool');
