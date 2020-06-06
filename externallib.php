@@ -259,7 +259,6 @@ class mod_grouptool_external extends external_api {
         } else {
             $DB->set_field('grouptool_agrps', 'grpsize', $params['size'],
                 ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
-            $DB->set_field('grouptool', 'use_individual', 1, ['id' => $cm->instance]);
             $DB->set_field('grouptool', 'use_size', 1, ['id' => $cm->instance]);
             if ($params['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
                             'groupid'     => $params['groupid'],

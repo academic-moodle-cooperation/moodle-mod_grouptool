@@ -45,8 +45,6 @@ class sortlist implements \renderable {
     public $globalsize = 0;
     /** @var bool $usesize whether or not to use group size */
     public $usesize = 0;
-    /** @var bool $useindividual whether or not to use individual group size per activegroup */
-    public $useindividual = 0;
     /** @var int $filter current filter (all/active/inactive) */
     public $filter = null;
     /** @var \stdClass $cm course module object */
@@ -113,7 +111,6 @@ class sortlist implements \renderable {
             $this->cm = $cm;
             $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance]);
             $this->usesize = $grouptool->use_size;
-            $this->useindividual = $grouptool->use_individual;
         }
 
         $this->selected = optional_param_array('selected', null, \PARAM_BOOL);
@@ -198,7 +195,7 @@ class sortlist implements \renderable {
             $this->globalgrpsize = $grouptool->grpsize ? $grouptool->grpsize : get_config('mod_grouptool', 'grpsize');
 
             foreach ($groupdata as $key => $group) {
-                if ($grouptool->use_size && (!$grouptool->use_individual || ($groupdata[$key]->size == null))) {
+                if ($grouptool->use_size && (($groupdata[$key]->size == null))) {
                     $groupdata[$key]->size = $this->globalgrpsize.'*';
                 }
 

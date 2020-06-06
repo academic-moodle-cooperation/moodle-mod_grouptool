@@ -78,9 +78,6 @@ function grouptool_add_instance(stdClass $grouptool) {
     if (!isset($grouptool->use_size)) {
         $grouptool->use_size = 0;
     }
-    if (!isset($grouptool->use_individual)) {
-        $grouptool->use_individual = 0;
-    }
     if (!isset($grouptool->use_queue)) {
         $grouptool->use_queue = 0;
     }
@@ -145,9 +142,6 @@ function grouptool_update_instance(stdClass $grouptool) {
 
     if (!isset($grouptool->use_size)) {
         $grouptool->use_size = 0;
-    }
-    if (!isset($grouptool->use_individual)) {
-        $grouptool->use_individual = 0;
     }
     if (!isset($grouptool->use_queue) || ($grouptool->use_size == 0)) {
         $queues = $DB->count_records_sql("SELECT COUNT(DISTINCT queues.id) AS count
@@ -345,7 +339,7 @@ function grouptool_update_queues($grouptool = 0) {
                                                  WHERE agrpid '.$agrpsql.' AND modified_by >= 0
                                               GROUP BY agrpid', $params);
         foreach ($agrps as $agrpid => $agrp) {
-            $size = empty($grouptool->use_individual) || empty($agrp->grpsize) ? $grouptool->grpsize : $agrp->grpsize;
+            $size = empty($agrp->grpsize) ? $grouptool->grpsize : $agrp->grpsize;
             $min = empty($grouptool->allow_multiple) ? 0 : $grouptool->choose_min;
             $max = empty($grouptool->allow_multiple) ? 1 : $grouptool->choose_max;
             // We use MAX to trick Postgres into thinking this is an full GROUP BY statement.

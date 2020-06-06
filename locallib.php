@@ -716,11 +716,7 @@ class mod_grouptool {
                 $a = new stdClass();
                 $a->field = get_string('number_of_members', 'grouptool');
                 $a->globalsize = $this->grouptool->grpsize;
-                if ($data->numberofmembers != $this->grouptool->grpsize) {
-                    if (!$this->grouptool->use_individual) {
-                        echo $OUTPUT->notification(get_string('groupsize_individual_gets_enabled', 'grouptool', $a), 'info');
-                    }
-                } else if (!$this->grouptool->use_size) {
+                if ($data->numberofmembers != $this->grouptool->grpsize && !$this->grouptool->use_size) {
                     echo $OUTPUT->notification(get_string('groupsize_gets_enabled', 'grouptool', $a), 'info');
                 }
             }
@@ -790,9 +786,6 @@ class mod_grouptool {
                 // Activate group size if we already used it when creating groups!
                 if (!empty($data->numberofmembers)) {
                     $this->grouptool->use_size = true;
-                    if ($data->numberofmembers != $this->grouptool->grpsize) {
-                        $this->grouptool->use_individual = true;
-                    }
                     $DB->update_record('grouptool', $this->grouptool);
                 }
 
@@ -1312,15 +1305,6 @@ class mod_grouptool {
                             'groupid'     => $fromform->resize,
                             'grouptoolid' => $this->cm->instance
                     ]);
-                    if (!$DB->record_exists_select('grouptool_agrps', "grpsize IS NOT NULL AND grouptoolid = ?",
-                                                  [$this->cm->instance])) {
-                        // Deactivate usage of individual group sizes!
-                        $this->grouptool->use_individual = 0;
-                        $update = new stdClass();
-                        $update->id = $this->cm->instance;
-                        $update->use_individual = 0;
-                        $DB->update_record('grouptool', $update);
-                    }
                 } else {
                     $group = new stdClass();
                     $group->id = $DB->get_field('grouptool_agrps', 'id', [
@@ -1329,14 +1313,6 @@ class mod_grouptool {
                     ]);
                     $group->grpsize = $fromform->size;
                     $DB->update_record('grouptool_agrps', $group);
-                    if (empty($this->grouptool->use_individual)) {
-                        // Activate usage of individual group sizes!
-                        $this->grouptool->use_individual = 1;
-                        $update = new stdClass();
-                        $update->id = $this->cm->instance;
-                        $update->use_individual = 1;
-                        $DB->update_record('grouptool', $update);
-                    }
                 }
             } else if (!$gform->is_cancelled()) {
                 $data = new stdClass();
@@ -1701,7 +1677,7 @@ class mod_grouptool {
         }
 
         // Create the form-object!
-        $showgrpsize = $this->grouptool->use_size && $this->grouptool->use_individual;
+        $showgrpsize = $this->grouptool->use_size;
         $mform = new \mod_grouptool\group_creation_form(null, [
                 'id'           => $id,
                 'roles'        => $rolenames,
@@ -2766,7 +2742,7 @@ class mod_grouptool {
         }
 
         if (!empty($this->grouptool->use_size)) {
-            if (empty($this->grouptool->use_individual)) {
+            if (false) {
                 $sizesql = " ".$this->grouptool->grpsize." grpsize,";
             } else {
                 $grouptoolgrpsize = get_config('mod_grouptool', 'grpsize');
@@ -2817,7 +2793,7 @@ class mod_grouptool {
                 }
             }
 
-            if ((!empty($this->grouptool->use_size) && !$this->grouptool->use_individual)
+            if ((!empty($this->grouptool->use_size))
                     || ($this->grouptool->use_queue && $includequeues)
                     || ($includeregs)) {
                 $keys = array_keys($groupdata);
@@ -4518,7 +4494,7 @@ class mod_grouptool {
                                                         ['class' => 'error']);
                         return [$error, $returntext];
                     } else {
-                        $tmpuseindividual = $grouptool->use_individual && !empty($curgroup->grpsize);
+                        $tmpuseindividual = !empty($curgroup->grpsize);
                         $curgroup->grpsize = $tmpuseindividual ? $curgroup->grpsize : $grouptool->grpsize;
                         unset($tmpuseindividual);
                     }
@@ -5858,7 +5834,7 @@ class mod_grouptool {
             core_php_time_limit::raise(30 * (count($registered) + count($members) + count($queued)));
 
             if (!empty($this->grouptool->use_size)) {
-                if (!empty($this->grouptool->use_individual) && !empty($agrp->grpsize)) {
+                if (!empty($agrp->grpsize)) {
                     $size = $agrp->grpsize;
                     $free = $agrp->grpsize - count($registered);
                 } else {

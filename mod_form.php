@@ -185,16 +185,6 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->disabledIf ('grpsize', 'use_size', 'notchecked');
         $mform->hideIf ('size_grp', 'allow_reg', 'eq', 0);
 
-        $mform->addElement('checkbox', 'use_individual', get_string('use_individual', 'grouptool'));
-        $mform->setType('use_individual', PARAM_BOOL);
-        $useindividual = get_config('mod_grouptool', 'use_individual');
-        if ($useindividual === false) {
-            throw new coding_exception('invalid_param');
-        }
-        $mform->setDefault('use_individual', (($useindividual !== false) ? $useindividual : 0));
-        $mform->addHelpButton('use_individual', 'use_individual', 'grouptool');
-        $mform->hideIf ('use_individual', 'allow_reg', 'eq', 0);
-        $mform->hideIf ('use_individual', 'use_size', 'notchecked');
 
         /*
          * ---------------------------------------------------------------------
@@ -426,7 +416,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         if (!empty($data['use_size'])
             && (($data['grpsize'] <= 0) || !ctype_digit($data['grpsize']))
-            && empty($data['use_individual'])) {
+            ) {
             $errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
         }
         if (!empty($data['instance'])) {
@@ -477,7 +467,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $queues = 0;
         }
         if (!empty($data['use_size']) && ($data['grpsize'] < $maxgrpregs)
-            && empty($data['use_individual'])) {
+            ) {
             if (empty($errors['size_grp'])) {
                 $errors['size_grp'] = get_string('toomanyregs', 'grouptool');
             } else {
