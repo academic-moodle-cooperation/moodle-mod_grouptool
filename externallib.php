@@ -252,7 +252,7 @@ class mod_grouptool_external extends external_api {
             } else {
                 $result->message = get_string('resized_group', 'grouptool', $params['size']);
             }
-        } else if (preg_match('/[1-9]\d*/',clean_param($params['size'], PARAM_INT)) == 0) {
+        } else if (preg_match('/[1-9]\d*/', clean_param($params['size'], PARAM_INT)) == 0) {
             $result->error = get_string('grpsizezeroerror', 'grouptool');
         } else if (!empty($regs) && $params['size'] < $regs) {
             $result->error = get_string('toomanyregs', 'grouptool');

@@ -185,7 +185,6 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->disabledIf ('grpsize', 'use_size', 'notchecked');
         $mform->hideIf ('size_grp', 'allow_reg', 'eq', 0);
 
-
         /*
          * ---------------------------------------------------------------------
          */
