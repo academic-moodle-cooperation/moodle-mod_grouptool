@@ -236,7 +236,7 @@ class mod_grouptool_external extends external_api {
                  WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
         $sqlparams = ['grouptoolid' => $cm->instance, 'groupid' => $params['groupid']];
         $regs = $DB->count_records_sql($sql, $sqlparams);
-        if (empty($params['size'])) {
+        if (empty($params['size']) && $params['size'] != '0') {
             // Disable individual size for this group!
             $DB->set_field('grouptool_agrps', 'grpsize', null, [
                     'groupid' => $params['groupid'],
@@ -252,12 +252,12 @@ class mod_grouptool_external extends external_api {
             } else {
                 $result->message = get_string('resized_group', 'grouptool', $params['size']);
             }
-        } else if ((clean_param($params['size'], PARAM_INT) < 0) || !ctype_digit($params['size'])) {
+        } else if (preg_match('/[1-9]\d*/',clean_param($params['size'], PARAM_INT)) == 0) {
             $result->error = get_string('grpsizezeroerror', 'grouptool');
         } else if (!empty($regs) && $params['size'] < $regs) {
             $result->error = get_string('toomanyregs', 'grouptool');
         } else {
-            $DB->set_field('grouptool_agrps', 'grpsize', $params['size'],
+            $DB->set_field('grouptool_agrps', 'grpsize', clean_param($params['size'], PARAM_INT),
                 ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
             $DB->set_field('grouptool', 'use_size', 1, ['id' => $cm->instance]);
             if ($params['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
