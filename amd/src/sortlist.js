@@ -137,25 +137,25 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                     context.message = result.error;
                     autoFadeOut = 60 * 1000;
                     log.info("AJAX Call to reorder groups successfull\nError ocured:" + result.error + "\n" + status, "grouptool");
+                    templates.render(template, context).then(function(html) {
+                        var infoNode = $(html);
+                        infoNode.hide(0);
+                        $('table.drag_list').before(infoNode);
+                        infoNode.slideDown(600, function() {
+                            window.setTimeout(function() {
+                                infoNode.slideUp(600, function() {
+                                    infoNode.remove();
+                                });
+                            }, autoFadeOut);
+                        });
+
+                        return this;
+                    }).fail(notif.exception);
                 } else {
                     context.message = result.message;
                     log.info("AJAX Call to reorder groups successfull\n" + result.message + "\n" + status, "grouptool");
                 }
 
-                templates.render(template, context).then(function(html) {
-                    var infoNode = $(html);
-                    infoNode.hide(0);
-                    $('table.drag_list').before(infoNode);
-                    infoNode.slideDown(600, function() {
-                        window.setTimeout(function() {
-                            infoNode.slideUp(600, function() {
-                                infoNode.remove();
-                            });
-                        }, autoFadeOut);
-                    });
-
-                    return this;
-                }).fail(notif.exception);
 
                 return this;
             }).fail(notif.exception);
