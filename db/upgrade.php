@@ -540,7 +540,6 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2020061000, 'grouptool');
     }
-    
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
