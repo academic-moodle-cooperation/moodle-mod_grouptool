@@ -108,11 +108,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         context = {
                             'message': result.message
                         };
-                        templates.render('core/notification_success', context).then(function(html) {
-                            infoNode = $(html);
-                            infoNode.hide();
-                            node.find('.grpname div').prepend(infoNode);
-                            infoNode.fadeIn(600);
+                        templates.render('core/notification_success', context).then(function() {
+
                             text.html(field.val());
                             field.fadeOut(600, function() {
                                 field.attr('value', field.val());
@@ -121,11 +118,6 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                 button.fadeIn(600);
                             });
                             field.off('keydown');
-                            window.setTimeout(function() {
-                                infoNode.fadeOut(600, function() {
-                                    infoNode.remove();
-                                });
-                            }, 5 * 1000);
 
                             return this;
                         }).fail(notif.exception);
