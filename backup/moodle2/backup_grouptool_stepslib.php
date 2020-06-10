@@ -50,7 +50,7 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
         // Define each element separated!
         $grouptool = new backup_nested_element('grouptool', ['id'], [
                 'name', 'intro', 'introformat', 'alwaysshowdescription', 'timecreated', 'timemodified', 'timedue', 'timeavailable',
-                'show_members', 'allow_reg', 'immediate_reg', 'allow_unreg', 'grpsize', 'use_size', 'use_individual', 'use_queue',
+                'show_members', 'allow_reg', 'immediate_reg', 'allow_unreg', 'grpsize', 'use_size', 'use_queue',
                 'users_queues_limit', 'groups_queues_limit', 'allow_multiple', 'choose_min', 'choose_max',
                 'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted']);
         $agrps = new backup_nested_element('agrps');

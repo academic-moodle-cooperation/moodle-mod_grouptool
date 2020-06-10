@@ -525,6 +525,23 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2018060100, 'grouptool');
     }
 
+    // Get rid of obsolete use_individual field
+    if ($oldversion < 2020061000) {
+
+        // Define field use_individual to be dropped from grouptool.
+        $table = new xmldb_table('grouptool');
+        $field = new xmldb_field('use_individual');
+
+        // Conditionally launch drop field use_individual.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2020061000, 'grouptool');
+    }
+
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }

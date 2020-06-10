@@ -5447,7 +5447,7 @@ class mod_grouptool {
             }
             // We use MAX to trick Postgres into thinking this is a full GROUP BY statement!
             $sql = '     SELECT agrps.id AS id, MAX(agrps.groupid) AS grpid, COUNT(regs.id) AS regs,
-                                MAX(grptl.use_individual) AS indi, MAX(grptl.grpsize) AS globalsize, MAX(agrps.grpsize) AS size,
+                                MAX(grptl.grpsize) AS globalsize, MAX(agrps.grpsize) AS size,
                                 MAX(grptl.name) AS instancename
                            FROM {grouptool_agrps} agrps
                            JOIN {grouptool} grptl ON agrps.grouptoolid = grptl.id
@@ -5460,7 +5460,7 @@ class mod_grouptool {
             $agrps = $DB->get_records_sql($sql, ['grpid' => $group]);
             $usercnt = count($users);
             foreach ($agrps as $cur) {
-                if ($cur->indi && !empty($cur->size)) {
+                if (!empty($cur->size)) {
                     if (($cur->regs + $usercnt) > $cur->size) {
                         $message .= html_writer::tag('div', $OUTPUT->notification(get_string('overflowwarning', 'grouptool', $cur),
                                                                                   'error'));
