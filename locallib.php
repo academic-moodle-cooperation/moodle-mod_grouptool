@@ -1355,7 +1355,7 @@ class mod_grouptool {
                                 'filter' => $filter
                         ]);
                         echo $OUTPUT->notification(get_string('groupings_created_and_groups_added',
-                                'grouptool'), 'confirm');
+                                'grouptool'),  \core\output\notification::NOTIFY_SUCCESS);
                     } else {
                         $mform->display();
                         $dialog = true;

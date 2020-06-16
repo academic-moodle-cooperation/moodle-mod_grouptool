@@ -20,14 +20,15 @@
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @author    Hannes Laimer
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Daniel Binder
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020061000;
-$plugin->requires  = 2020060700;
+$plugin->version   = 2020061500;
+$plugin->requires  = 2020061300;
 $plugin->component = 'mod_grouptool';
 $plugin->maturity  = MATURITY_ALPHA;
 $plugin->release   = "v3.9.0";
