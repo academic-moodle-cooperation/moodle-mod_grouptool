@@ -107,7 +107,6 @@ class activegroup {
         $sql = "SELECT agrp.id AS id, agrp.grouptoolid AS grouptoolid, agrp.groupid AS groupid,
                        agrp.grpsize AS size, agrp.sort_order AS order, agrp.active AS status,
                        grp.name AS name, grouptool.use_size AS use_size, grouptool.grpsize AS globalsize,
-                       grouptool.use_individual AS individualsize
                   FROM {grouptool_agrps} agrp
              LEFT JOIN {groups} grp ON agrp.groupid = grp.id
              LEFT JOIN {grouptool} grptl ON agrp.grouptoolid = grptl.id
@@ -117,7 +116,7 @@ class activegroup {
 
         if (empty($obj->use_size)) {
             $obj->size = null;
-        } else if (empty($obj->individualsize)) {
+        } else {
             $obj->size = $obj->globalsize;
         }
 

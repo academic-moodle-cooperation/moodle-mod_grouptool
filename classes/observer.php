@@ -140,7 +140,7 @@ class observer {
         $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
                                 {grouptool}.use_queue, {grouptool}.immediate_reg, {grouptool}.allow_multiple,
                                 {grouptool}.choose_max, {grouptool}.choose_min, {grouptool}.grpsize,
-                                {grouptool}.name, {grouptool}.use_size, {grouptool}.use_individual
+                                {grouptool}.name, {grouptool}.use_size
                            FROM {grouptool}
                      RIGHT JOIN {grouptool_agrps} agrp ON agrp.grouptoolid = {grouptool}.id
                           WHERE agrp.groupid = ?";

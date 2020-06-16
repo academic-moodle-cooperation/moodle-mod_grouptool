@@ -73,10 +73,6 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/use_size', get_string('cfg_use_size', 'grouptool'),
             get_string('cfg_use_size_desc', 'grouptool'), 0));
 
-    // Use individual size per group?
-    $settings->add(new admin_setting_configcheckbox('mod_grouptool/use_individual', get_string('cfg_use_individual', 'grouptool'),
-            get_string('cfg_use_individual_desc', 'grouptool'), 0));
-
     // Use queues?
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/use_queue', get_string('cfg_use_queue', 'grouptool'),
             get_string('cfg_use_queue_desc', 'grouptool'), 0));

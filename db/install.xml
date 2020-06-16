@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/grouptool/db" VERSION="20170125" COMMENT="XMLDB file for Moodle mod/grouptool"
+<XMLDB PATH="mod/grouptool/db" VERSION="20200610" COMMENT="XMLDB file for Moodle mod/grouptool"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -22,7 +22,6 @@
         <FIELD NAME="allow_unreg" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="grpsize" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="global groupsize for this instance"/>
         <FIELD NAME="use_size" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="use_individual" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="use_queue" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="users_queues_limit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Limits the amount of queue places a single user can occupy"/>
         <FIELD NAME="groups_queues_limit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Limits the amount of available queue places per group."/>

@@ -204,7 +204,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
             if (e.which === 13) { // Enter!
                 requests = ajax.call([{
                     methodname: 'mod_grouptool_resize_group',
-                    args: {cmid: parseInt(cmid), groupid: grpid, size: parseInt(field.val())},
+                    args: {cmid: parseInt(cmid), groupid: grpid, size: field.val()},
                     fail: notif.exception
                 }]);
                 if (infoNode) {
