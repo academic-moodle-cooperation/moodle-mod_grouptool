@@ -4867,11 +4867,11 @@ class mod_grouptool {
     public function view_selfregistration() {
         global $OUTPUT, $DB, $USER, $PAGE;
 
-        //Include js for filters.
+        // Include js for filters.
         $USER->ajax_updatable_user_prefs['mod_grouptool_hideoccupied'] = true;
         $params = new StdClass();
-        $pref_hideoccupied = get_user_preferences('mod_grouptool_hideoccupied',false);
-        if ($pref_hideoccupied === 'true') {
+        $prefhideoccupied = get_user_preferences('mod_grouptool_hideoccupied', false);
+        if ($prefhideoccupied === 'true') {
             $params->filterunoccupied = true;
         } else {
             $params->filterunoccupied = false;
@@ -5134,9 +5134,9 @@ class mod_grouptool {
 
             $mform->addElement('header', 'groups', get_string('groups'));
             $mform->setExpanded('groups');
-            //Checkbox control for only unoccupied groups filter.
+            // Checkbox control for only unoccupied groups filter.
             $mform->addElement('html', '<div><label class="form-check-inline">
-                                                <input type="checkbox" name="filterunoccupied" 
+                                                <input type="checkbox" name="filterunoccupied"
                                                 id="filterunoccupied" class="form-check-input"> ' .
                                                 get_string('filterunoccupied', 'grouptool') . '</label></div>');
 
