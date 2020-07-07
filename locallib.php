@@ -4700,7 +4700,9 @@ class mod_grouptool {
         $agrps = $DB->get_fieldset_select('grouptool_agrps', 'id',
                                           'grouptoolid = ?',
                                           [$this->cm->instance]);
-
+        if (empty($agrps)) {
+            return null;
+        }
         list($agrpssql, $params) = $DB->get_in_or_equal($agrps);
         $params[] = $userid;
 
@@ -4772,7 +4774,9 @@ class mod_grouptool {
      */
     public function count_user_marks($userid=0) {
         $marks = $this->get_user_marks($userid);
-
+        if (empty($marks)) {
+            return 0;
+        }
         return count($marks);
     }
 
