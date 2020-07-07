@@ -3819,6 +3819,18 @@ class mod_grouptool {
         }
     }
 
+    /**
+     *
+     * Checks if a given count of userregs, queues and marks matches the limits for a given group
+     *
+     * @param stdClass $group Group which should be checked against the counts
+     * @param int $userregs Count of group registrations of a user
+     * @param int $queues Count of queue registrations of a user
+     * @param int $marks Count of marks (inactive registrations) of a user
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     */
     protected function check_can_be_registered($group, $userregs, $queues, $marks) {
         $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
@@ -3832,11 +3844,10 @@ class mod_grouptool {
             // Not enough registrations/queues/marks!
             throw new \mod_grouptool\local\exception\notenoughregs();
         }
-        return true;
     }
 
     /**
-     * Check if user can be registered, else throw exception!
+     * Checks if user can be registered, else throw exception!
      *
      * @param int $agrpid ID of the active group
      * @param int $userid ID of user to queue or null (then $USER->id is used)
@@ -3878,7 +3889,6 @@ class mod_grouptool {
         } else {
             return get_string('register_you_in_group', 'grouptool', $message);
         }
-
 
     }
 
