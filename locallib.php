@@ -5140,7 +5140,7 @@ class mod_grouptool {
             }
             $groups = $this->get_active_groups(true, true);
 
-            // Preperation for loop
+            // Preperation for loop.
             $userregs = $this->get_user_reg_count($userid);
             $userqueues = $this->get_user_queues_count($userid);
             $usermarks = $this->count_user_marks($userid);
@@ -5155,9 +5155,6 @@ class mod_grouptool {
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
                 // Prepare formular-content for registration-action!
                 foreach ($groups as $key => &$group) {
-                    //$group = $this->get_active_groups(true, true, 0, $key);
-                    //$group = current($group);
-
                     $registered = count($group->registered);
                     $grpsize = ($this->grouptool->use_size) ? $group->grpsize : "∞";
                     $grouphtml = html_writer::tag('span', get_string('registered', 'grouptool').
@@ -5170,7 +5167,7 @@ class mod_grouptool {
                                                        ['class' => 'queued']);
                     }
 
-                    // Could become a performance problem when groups fill up
+                    // Could become a performance problem when groups fill up!
                     if (!empty($group->registered)) {
                         $regrank = $this->get_rank_in_queue($group->registered, $USER->id);
                     } else {
@@ -5181,7 +5178,6 @@ class mod_grouptool {
                     } else {
                         $queuerank = false;
                     }
-
 
                     // We have to determine if we can show the members link!
                     $showmembers = $this->canshowmembers($group->agrpid, $regrank, $queuerank);
