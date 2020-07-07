@@ -3819,6 +3819,22 @@ class mod_grouptool {
         }
     }
 
+    protected function check_can_be_registered($group, $userregs, $queues, $marks) {
+        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
+        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        if ($this->grouptool->use_size && (count($group->registered) >= $group->grpsize)) {
+            throw new \mod_grouptool\local\exception\exceedgroupsize();
+        }
+        if ($max <= ($marks + $userregs + $queues)) {
+            throw new \mod_grouptool\local\exception\exceeduserreglimit();
+        }
+        if ($min > ($marks + $userregs + $queues + 1)) {
+            // Not enough registrations/queues/marks!
+            throw new \mod_grouptool\local\exception\notenoughregs();
+        }
+        return true;
+    }
+
     /**
      * Check if user can be registered, else throw exception!
      *
@@ -3854,25 +3870,16 @@ class mod_grouptool {
         $userregs = $this->get_user_reg_count($userid);
         $queues = $this->get_user_queues_count($userid);
         $marks = $this->count_user_marks($userid);
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
-        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
-            throw new \mod_grouptool\local\exception\exceedgroupsize();
-        }
 
-        if ($max <= ($marks + $userregs + $queues)) {
-            throw new \mod_grouptool\local\exception\exceeduserreglimit();
-        }
-        if ($min > ($marks + $userregs + $queues + 1)) {
-            // Not enough registrations/queues/marks!
-            throw new \mod_grouptool\local\exception\notenoughregs();
-        }
+        $this->check_can_be_registered($groupdata, $userregs, $queues, $marks);
 
         if ($userid != $USER->id) {
             return get_string('register_in_group', 'grouptool', $message);
         } else {
             return get_string('register_you_in_group', 'grouptool', $message);
         }
+
+
     }
 
     /**
@@ -4866,7 +4873,7 @@ class mod_grouptool {
      */
     public function view_selfregistration() {
         global $OUTPUT, $DB, $USER, $PAGE;
-
+        echo "Start Time: " . microtime() . "</br>";
         $userid = $USER->id;
 
         $regopen = $this->is_registration_open();
@@ -4982,6 +4989,7 @@ class mod_grouptool {
              * $PAGE->url->param('sesskey', sesskey());
              * won't set sesskey param in $PAGE->url?!?
              */
+            echo "Form generation start: " . microtime() . "</br>";
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
@@ -5120,18 +5128,25 @@ class mod_grouptool {
                     $mform->addElement('html', $OUTPUT->box($intro, 'generalbox'));
                 }
             }
-            $groups = $this->get_active_groups();
+            $groups = $this->get_active_groups(true, true);
+
+            // Preperation for loop
+            $userregs = $this->get_user_reg_count($userid);
+            $userqueues = $this->get_user_queues_count($userid);
+            $usermarks = $this->count_user_marks($userid);
+            $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+
 
             $mform->addElement('header', 'groups', get_string('groups'));
             $mform->setExpanded('groups');
 
+            echo "Student view start: " . microtime() . "</br>";
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
-
                 // Prepare formular-content for registration-action!
                 foreach ($groups as $key => &$group) {
-                    $group = $this->get_active_groups(true, true, 0, $key);
-                    $group = current($group);
+                    //$group = $this->get_active_groups(true, true, 0, $key);
+                    //$group = current($group);
 
                     $registered = count($group->registered);
                     $grpsize = ($this->grouptool->use_size) ? $group->grpsize : "∞";
@@ -5145,6 +5160,7 @@ class mod_grouptool {
                                                        ['class' => 'queued']);
                     }
 
+                    // Could become a performance problem when groups fill up
                     if (!empty($group->registered)) {
                         $regrank = $this->get_rank_in_queue($group->registered, $USER->id);
                     } else {
@@ -5156,6 +5172,7 @@ class mod_grouptool {
                         $queuerank = false;
                     }
 
+
                     // We have to determine if we can show the members link!
                     $showmembers = $this->canshowmembers($group->agrpid, $regrank, $queuerank);
                     if ($showmembers) {
@@ -5165,15 +5182,7 @@ class mod_grouptool {
                     /* If we include inactive groups and there's someone registered in one of these,
                      * the label gets displayed incorrectly.
                      */
-                    $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1",
-                                                        [$this->grouptool->id]);
-                    list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
-                    array_unshift($params, $userid);
-                    $userregs = $DB->count_records_select('grouptool_registered',
-                                                          "modified_by >= 0 AND userid = ? AND agrpid ".$agrpsql, $params);
-                    $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid ".$agrpsql,
-                            $params);
-                    $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+
                     if (!empty($group->registered) && $this->is_registration_open()
                             && $this->get_rank_in_queue($group->registered, $userid) != false) {
                         // User is already registered --> unreg button!
@@ -5244,7 +5253,7 @@ class mod_grouptool {
                         try {
                             try {
                                 // Can be registered?
-                                $this->can_be_registered($group->agrpid, $USER->id, $message);
+                                $this->check_can_be_registered($group, $userregs, $userqueues, $usermarks);
 
                                 if (has_capability('mod/grouptool:register', $this->context)) {
                                     // Register button!
@@ -5347,6 +5356,7 @@ class mod_grouptool {
                     $mform->addElement('html', $grouphtml);
                 }
             }
+            echo "Student view end: " . microtime() . "</br>";
 
             if ($this->grouptool->show_members) {
                 $params = new stdClass();
@@ -5359,7 +5369,7 @@ class mod_grouptool {
                 // Require the JS to show group members (just once)!
                 $PAGE->requires->js_call_amd('mod_grouptool/memberspopup', 'initializer', [$params]);
             }
-
+            echo "End Time: " . microtime() . "</br>";
             $mform->display();
         }
     }
