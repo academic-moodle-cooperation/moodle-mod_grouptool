@@ -5145,7 +5145,6 @@ class mod_grouptool {
             $userqueues = $this->get_user_queues_count($userid);
             $usermarks = $this->count_user_marks($userid);
             $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
-            
             $mform->addElement('header', 'groups', get_string('groups'));
             $mform->setExpanded('groups');
 
