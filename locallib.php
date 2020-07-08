@@ -4899,7 +4899,6 @@ class mod_grouptool {
         }
         $PAGE->requires->js_call_amd('mod_grouptool/filter', 'init', [$params]);
 
-        echo "Start Time: " . microtime() . "</br>";
         $userid = $USER->id;
         $regopen = $this->is_registration_open();
 
@@ -5014,7 +5013,6 @@ class mod_grouptool {
              * $PAGE->url->param('sesskey', sesskey());
              * won't set sesskey param in $PAGE->url?!?
              */
-            echo "Form generation start: " . microtime() . "</br>";
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
@@ -5168,7 +5166,6 @@ class mod_grouptool {
                                                 id="filterunoccupied" class="form-check-input"> ' .
                                                 get_string('filterunoccupied', 'grouptool') . '</label></div>');
 
-            echo "Student view start: " . microtime() . "</br>";
             // Student view!
             if (has_capability("mod/grouptool:view_groups", $this->context)) {
                 // Prepare formular-content for registration-action!
@@ -5381,7 +5378,6 @@ class mod_grouptool {
                     $mform->addElement('html', $grouphtml);
                 }
             }
-            echo "Student view end: " . microtime() . "</br>";
 
             if ($this->grouptool->show_members) {
                 $params = new stdClass();
@@ -5394,7 +5390,6 @@ class mod_grouptool {
                 // Require the JS to show group members (just once)!
                 $PAGE->requires->js_call_amd('mod_grouptool/memberspopup', 'initializer', [$params]);
             }
-            echo "End Time: " . microtime() . "</br>";
             $mform->display();
         }
     }
