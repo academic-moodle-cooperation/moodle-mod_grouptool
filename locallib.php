@@ -4887,9 +4887,20 @@ class mod_grouptool {
      */
     public function view_selfregistration() {
         global $OUTPUT, $DB, $USER, $PAGE;
+
+        // Include js for filters.
+        $USER->ajax_updatable_user_prefs['mod_grouptool_hideoccupied'] = true;
+        $params = new StdClass();
+        $prefhideoccupied = get_user_preferences('mod_grouptool_hideoccupied', false);
+        if ($prefhideoccupied === 'true') {
+            $params->filterunoccupied = true;
+        } else {
+            $params->filterunoccupied = false;
+        }
+        $PAGE->requires->js_call_amd('mod_grouptool/filter', 'init', [$params]);
+
         echo "Start Time: " . microtime() . "</br>";
         $userid = $USER->id;
-
         $regopen = $this->is_registration_open();
 
         // Process submitted form!
@@ -5151,6 +5162,11 @@ class mod_grouptool {
             $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
             $mform->addElement('header', 'groups', get_string('groups'));
             $mform->setExpanded('groups');
+            // Checkbox control for only unoccupied groups filter.
+            $mform->addElement('html', '<div><label class="form-check-inline">
+                                                <input type="checkbox" name="filterunoccupied"
+                                                id="filterunoccupied" class="form-check-input"> ' .
+                                                get_string('filterunoccupied', 'grouptool') . '</label></div>');
 
             echo "Student view start: " . microtime() . "</br>";
             // Student view!
@@ -5159,6 +5175,7 @@ class mod_grouptool {
                 foreach ($groups as $key => &$group) {
                     $registered = count($group->registered);
                     $grpsize = ($this->grouptool->use_size) ? $group->grpsize : "∞";
+
                     $grouphtml = html_writer::tag('span', get_string('registered', 'grouptool').
                                                           ": ".$registered."/".$grpsize,
                                                   ['class' => 'fillratio']);
@@ -5355,7 +5372,7 @@ class mod_grouptool {
                     } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
                         $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
                                                   html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-error');
+                                                  'generalbox group alert-error group-full');
                     } else {
                         $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
                                                   html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),

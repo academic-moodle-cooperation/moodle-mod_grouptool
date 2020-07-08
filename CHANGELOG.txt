@@ -5,6 +5,7 @@ CHANGELOG
 ------------------
 * [FEATURE] #6009 Remove redundant individual group size setting. Now group sizes can be changed
                   without activating an additional setting
+* [FEATURE] #6590 Add filter for only showing groups with free spots in the student group registation
 * [FEATURE] #6343 Implement various behat tests for admin settings
 * [FIXED] #5704 Fixed a bug that allowed non-numeric characters to be entered in certain fields in instance settings
 * [FIXED] #5713 Unified design and appearance of success messages and remove obsolete confirmation dialogues
