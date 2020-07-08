@@ -232,6 +232,7 @@ $string['general_registration_exception'] = 'A general registration exception oc
 $string['userlist'] = 'User-list';
 $string['userlist_alt'] = 'View list of users and their registrations. Export data about users and their groups in different formats (PDF, plain text, Excel, etc.).';
 $string['feedbackplural'] = 'Feedbacks';
+$string['filterunoccupied'] = 'Show only groups with free spots';
 $string['filters_legend'] = 'Filter data';
 $string['followchanges'] = 'Follow changes';
 $string['forceregistration'] = 'Force registration in grouptool';
