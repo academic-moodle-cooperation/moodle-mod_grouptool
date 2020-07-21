@@ -81,10 +81,10 @@ function grouptool_add_instance(stdClass $grouptool) {
     if (!isset($grouptool->use_queue)) {
         $grouptool->use_queue = 0;
     }
-    if (!isset($grouptool->users_queues_limit)) {
+    if (!isset($grouptool->users_queues_limit) || empty($grouptool->limit_users_queues)) {
         $grouptool->users_queues_limit = 0;
     }
-    if (!isset($grouptool->groups_queues_limit)) {
+    if (!isset($grouptool->groups_queues_limit) || empty($grouptool->limit_groups_queues)) {
         $grouptool->groups_queues_limit = 0;
     }
     if (!isset($grouptool->allow_multiple)) {
