@@ -34,6 +34,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
 /**
  * Unit Tests for mod/grouptool's privacy providers! TODO: finish these unit tests here!
+ * @group mod_grouptool
  *
  * @copyright  2019 Academic Moodle Cooperation https://www.academic-moodle-cooperation.org/
  * @author Philipp Hager <philipp.hager@tuwien.ac.at> strongly based on mod_assign's privacy unit tests!

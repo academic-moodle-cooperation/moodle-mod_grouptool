@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code
 
 /**
  * This class contains the test cases for functions in locallib.
+ * @group mod_grouptool
  *
  * @package   mod_grouptool
  * @author    Hannes Laimer

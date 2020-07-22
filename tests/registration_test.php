@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code
 
 /**
  * This class contains the test cases for the formular validation.
+ * @group mod_grouptool
  *
  * @package   mod_grouptool
  * @author    Philipp Hager

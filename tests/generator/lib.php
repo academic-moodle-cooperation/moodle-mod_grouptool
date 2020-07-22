@@ -39,7 +39,7 @@ class mod_grouptool_generator extends testing_module_generator {
 
     /**
      * Generator method creating a mod_grouptool instance.
-     * @
+     *
      *
      * @param array|stdClass $record (optional) Named array containing instance settings
      * @param array $options (optional) general options for course module. Can be merged into $record
