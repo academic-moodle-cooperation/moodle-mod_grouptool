@@ -9,6 +9,7 @@ CHANGELOG
 * [FEATURE] #6343 Implement various behat tests for admin settings
 * [FIXED] #5704 Fixed a bug that allowed non-numeric characters to be entered in certain fields in instance settings
 * [FIXED] #5713 Unified design and appearance of success messages and remove obsolete confirmation dialogues
+* [FIXED] #6681 Fixed a bug ignoring a non-set queue limit when creating an instance and setting default limits instead
 
 3.8.1 (2020-02-23)
 ------------------

@@ -40,6 +40,7 @@ class mod_grouptool_generator extends testing_module_generator {
     /**
      * Generator method creating a mod_grouptool instance.
      *
+     *
      * @param array|stdClass $record (optional) Named array containing instance settings
      * @param array $options (optional) general options for course module. Can be merged into $record
      * @return stdClass record from module-defined table with additional field cmid (corresponding id in course_modules table)
@@ -65,7 +66,9 @@ class mod_grouptool_generator extends testing_module_generator {
             'grpsize' => 3,
             'use_size' => 1,
             'use_queue' => 1,
+            'limit_users_queues' => 1,
             'users_queues_limit' => 2,
+            'limit_groups_queues' => 1,
             'groups_queues_limit' => 2,
             'allow_multiple' => 1,
             'choose_min' => 1,
