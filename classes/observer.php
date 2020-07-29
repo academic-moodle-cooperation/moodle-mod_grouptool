@@ -247,6 +247,7 @@ class observer {
                             $infodata->groupname = $data->name;
                             $infodata->grouptoolname = $grouptool->name;
                             $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
+                            $infodata->groupurl = (new \moodle_url('/group/members.php', ['group' => $newid]))->out();
                             notification::add(get_string('notification:group_recreated', 'grouptool', $infodata),
                                     notification::INFO);
                         } else {
@@ -263,6 +264,7 @@ class observer {
                         $infodata->groupname = $data->name;
                         $infodata->grouptoolname = $grouptool->name;
                         $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
+                        $infodata->groupurl = (new \moodle_url('/group/members.php', ['group' => $data->id]))->out();
                         notification::add(get_string('notification:registrations_recreated', 'grouptool', $infodata),
                                 notification::INFO);
                     }

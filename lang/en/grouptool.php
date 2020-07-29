@@ -420,8 +420,8 @@ $string['not_in_queue_or_registered'] = '<strong>{$a->username}</strong> is neit
 $string['not_permitted'] = 'Not permitted';
 $string['not_registered'] = 'You\'re not yet registered!';
 $string['not_synced_reg_present'] = 'not syncronized registrations present';
-$string['notification:group_recreated'] = 'The group <strong>{$a->groupname}</strong> has been recreated due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}"><strong>{$a->grouptoolname}</strong></a> being set to recreate deleted groups.';
-$string['notification:registrations_recreated'] = 'The group\'s <strong>{$a->groupname}</strong> members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}"><strong>{$a->grouptoolname}</strong></a> being set to recreate deleted groups. The group itself was recrated by another grouptool instance.';
+$string['notification:group_recreated'] = 'The group <a href="{$a->groupurl}" title="{$a->groupname}">{$a->groupname}</a> has been recreated due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">{$a->grouptoolname}</a> being set to recreate deleted groups.';
+$string['notification:registrations_recreated'] = 'The group\'s <a href="{$a->groupurl}" title="{$a->groupname}">{$a->groupname}</a> members have been added again due to grouptool <a href="{$a->grouptoolurl}" title="{$a->grouptoolname}">$a->grouptoolname}</a> being set to recreate deleted groups. The group itself was recrated by another grouptool instance.';
 $string['you_are_not_in_queue_or_registered'] = 'You are neither registered nor queued in group <strong>{$a->groupname}</strong>';
 $string['nothing_to_push'] = 'Nothing to push!';
 $string['nowhere_queued'] = 'Not queued';
