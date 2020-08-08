@@ -538,10 +538,10 @@ class mod_grouptool {
                 if (groups_get_group_by_name($this->course->id, $group['name']) || in_array($group['name'], $namestouse)) {
                     $error = true;
                     if (in_array($group['name'], $namestouse)) {
-                        $line[] = '<span class="notifyproblem">'.
+                        $line[] = '<span class="late">'.
                                   get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
                     } else {
-                        $line[] = '<span class="notifyproblem">'.
+                        $line[] = '<span class="late">'.
                                   get_string('groupnameexists', 'group', $group['name']).'</span>';
                     }
                 } else {
@@ -697,10 +697,10 @@ class mod_grouptool {
                 if (groups_get_group_by_name($this->course->id, $group) || in_array($group, $createdgroups)) {
                     $error = true;
                     if (in_array($group, $createdgroups)) {
-                        $line[] = '<span class="notifyproblem">'.
+                        $line[] = '<span class="late">'.
                                   get_string('nameschemenotunique', 'grouptool', $group).'</span>';
                     } else {
-                        $line[] = '<span class="notifyproblem">'.
+                        $line[] = '<span class="late">'.
                                   get_string('groupnameexists', 'group', $group).'</span>';
                     }
                 } else {
@@ -855,10 +855,10 @@ class mod_grouptool {
                      || in_array($group['name'], $groupnames)) {
                     $error = true;
                     if (in_array($group['name'], $groupnames)) {
-                        $line[] = '<span class="notifyproblem">'.
+                        $line[] = '<span class="late">'.
                                   get_string('nameschemenotunique', 'grouptool', $group['name']).'</span>';
                     } else {
-                        $line[] = '<span class="notifyproblem">'.
+                        $line[] = '<span class="late">'.
                                   get_string('groupnameexists', 'group', $group['name']).'</span>';
                     }
                 } else {
