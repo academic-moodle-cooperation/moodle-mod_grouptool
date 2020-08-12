@@ -3,7 +3,7 @@ Grouptool Module
 
 This file is part of the mod_grouptool plugin for Moodle - <http://moodle.org/>
 
-*Author:*    Philipp Hager, Hannes Laimer
+*Author:*    Philipp Hager, Hannes Laimer, Daniel Binder
 
 *Copyright:* 2014 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
