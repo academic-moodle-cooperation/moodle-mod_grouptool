@@ -5371,9 +5371,13 @@ class mod_grouptool {
                                                   html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
                                                   'generalbox group alert-error group-full');
                     } else {
+                        $classes = 'generalbox group empty';
+                        if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
+                            $classes .= ' group-full';
+                        }
                         $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
                                                   html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group empty');
+                                                  $classes);
                     }
                     $mform->addElement('html', $grouphtml);
                 }
