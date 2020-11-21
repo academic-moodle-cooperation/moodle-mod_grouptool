@@ -17,7 +17,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
 
   @javascript
   Scenario: Switch as an admin to the adminsettings of the module grouptool and change the value of "Use queueing" to "Yes". Then login as a teacher and add a new grouptool to a course and check whether the default value has changed.
-   Given I log in as "admin"
+    Given I log in as "admin"
     And I navigate to "Plugins > Activity modules > Grouptool" in site administration
     And I set the field "Use group size" to "1"
     And I set the field "Use queueing" to "1"
@@ -33,7 +33,6 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the field "Use queues" matches value "1"
-
     Then I log out
 
   @javascript
@@ -54,3 +53,4 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the field "Use queues" matches value ""
+    

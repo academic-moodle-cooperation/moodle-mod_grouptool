@@ -17,7 +17,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
 
   @javascript
   Scenario: Switch as an admin to the adminsettings of the module grouptool and change the value of "Show group members" to "No". Then login as a teacher and add a new grouptool to a course and check whether the default value has changed.
-   Given I log in as "admin"
+    Given I log in as "admin"
     And I navigate to "Plugins > Activity modules > Grouptool" in site administration
     And I set the field "Show group members" to "No"
     And I press "Save changes"
@@ -112,5 +112,4 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "Yes"
-
     Then I log out
