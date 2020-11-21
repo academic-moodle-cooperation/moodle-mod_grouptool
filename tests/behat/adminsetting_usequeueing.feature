@@ -53,4 +53,3 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the field "Use queues" matches value ""
-    
