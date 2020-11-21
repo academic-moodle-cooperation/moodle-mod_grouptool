@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.10.0 (2020-11-18)
+------------------
+* [FEATURE] #6774 Support for multilang format course names in export filenames [github pull #21 t-schroeder]
+
 3.9.0 (2020-06-15)
 ------------------
 * [FEATURE] #6009 Remove redundant individual group size setting. Now group sizes can be changed

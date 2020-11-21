@@ -50,13 +50,13 @@ class pdf extends \pdf {
 
     /**
      * @var string[] $header numerical array of strings, used for storage of column-headers
-     * each index corresponds to the index in {@link $data}, {@link $width} and {@link $align}
+     * each index corresponds to the index in {@see $data}, {@see $width} and {@see $align}
      */
     protected $header = [];
 
     /**
      * @var float[] $width numerical array of floats, used for storage of column-header-widths
-     * each index corresponds to the index in {@link $data}, {@link $width} and {@link $align}
+     * each index corresponds to the index in {@see $data}, {@see $width} and {@see $align}
      * If index in $width is set to null the corresponding column-width gets calculated
      * automatically (the same calculated width is used for each of those columns)
      */
@@ -64,7 +64,7 @@ class pdf extends \pdf {
 
     /**
      * @var [] $align numerical array of chars, used for storage of column-header-alignment
-     * each index corresponds to the index in {@link $data}, {@link $width} and {@link $align}
+     * each index corresponds to the index in {@see $data}, {@see $width} and {@see $align}
      * use 'C' for center, 'L' for left and 'R' for right
      */
     protected $align = [];
