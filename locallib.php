@@ -6150,7 +6150,7 @@ class mod_grouptool {
 
         $pdf = new \mod_grouptool\pdf();
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
         $timedue = $this->grouptool->timedue;
@@ -6210,7 +6210,8 @@ class mod_grouptool {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                     get_string('group').' '.get_string('overview', 'grouptool');
         }
-        $pdf->Output($filename.'.pdf', 'D');
+        $filename = clean_filename("$filename.pdf");
+        $pdf->Output($filename, 'D');
         exit();
     }
 
@@ -6289,7 +6290,7 @@ class mod_grouptool {
         }
         $filecontent = implode(GROUPTOOL_NL, $lines);
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -6302,7 +6303,7 @@ class mod_grouptool {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                     get_string('group').'_'.get_string('overview', 'grouptool');
         }
-        $filename .= '.txt';
+        $filename = clean_filename("$filename.txt");
         ob_clean();
         header('Content-Type: text/plain');
         header('Content-Length: ' . strlen($filecontent));
@@ -6851,7 +6852,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/odslib.class.php");
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -6864,13 +6865,14 @@ class mod_grouptool {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                     get_string('group').' '.get_string('overview', 'grouptool');
         }
+        $filename = clean_filename("$filename.ods");
         $workbook = new MoodleODSWorkbook("-");
 
         $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $this->overview_fill_workbook($workbook, $groups);
 
-        $workbook->send($filename.'.ods');
+        $workbook->send($filename);
         $workbook->close();
     }
 
@@ -6890,7 +6892,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -6905,13 +6907,14 @@ class mod_grouptool {
             $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
                                        get_string('group').' '.get_string('overview', 'grouptool'));
         }
+        $filename = clean_filename("$filename.xlsx");
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
 
         $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $this->overview_fill_workbook($workbook, $groups);
 
-        $workbook->send($filename.'.xlsx');
+        $workbook->send($filename);
         $workbook->close();
     }
 
@@ -7921,7 +7924,7 @@ class mod_grouptool {
 
         $pdf = new \mod_grouptool\pdf();
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
         $timedue = $this->grouptool->timedue;
@@ -7981,8 +7984,9 @@ class mod_grouptool {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                         get_string('userlist', 'grouptool');
         }
+        $filename = clean_filename("$filename.pdf");
 
-        $pdf->Output($filename.'.pdf', 'D');
+        $pdf->Output($filename, 'D');
         exit();
     }
 
@@ -8014,7 +8018,7 @@ class mod_grouptool {
     public function download_userlist_txt($groupid=0, $groupingid=0) {
         ob_start();
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
 
         $lines = [];
@@ -8071,13 +8075,14 @@ class mod_grouptool {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                         get_string('userlist', 'grouptool');
         }
+        $filename = clean_filename("$filename.txt");
         ob_clean();
         header('Content-Type: text/plain');
         header('Content-Length: ' . strlen($filecontent));
         header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1!
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in past!
-        header('Content-Disposition: attachment; filename="'.str_replace([' ', '"'], ['_', ''], $filename).'.txt";'.
-               ' filename*="'.rawurlencode($filename).'.txt"');
+        header('Content-Disposition: attachment; filename="'.str_replace([' ', '"'], ['_', ''], $filename).'";'.
+               ' filename*="'.rawurlencode($filename).'"');
         header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
         echo $filecontent;
@@ -8345,7 +8350,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/odslib.class.php");
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
 
         $workbook = new MoodleODSWorkbook("-");
@@ -8364,8 +8369,9 @@ class mod_grouptool {
             $filename = $coursename . '_' . $grouptoolname . '_' .
                     get_string('userlist', 'grouptool');
         }
+        $filename = clean_filename("$filename.ods");
 
-        $workbook->send($filename.'.ods');
+        $workbook->send($filename);
         $workbook->close();
     }
 
@@ -8384,7 +8390,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $coursename = $this->course->fullname;
+        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
 
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
@@ -8405,8 +8411,9 @@ class mod_grouptool {
             $filename = clean_filename($coursename . '_' . $grouptoolname . '_' .
                                        get_string('userlist', 'grouptool'));
         }
+        $filename = clean_filename("$filename.xlsx");
 
-        $workbook->send($filename.'.xlsx');
+        $workbook->send($filename);
         $workbook->close();
     }
 
