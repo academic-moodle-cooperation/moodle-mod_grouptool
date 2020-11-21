@@ -4295,7 +4295,7 @@ class mod_grouptool {
 
     /**
      * returns rank in queue for a particular user
-     * if $data is an array uses array (like queue/reg-info returned by {@link get_active_groups()})
+     * if $data is an array uses array (like queue/reg-info returned by {@see get_active_groups()})
      * to determin rank otherwise if $data is an integer uses DB-query to get queue rank in
      * active group with id == $data
      *
