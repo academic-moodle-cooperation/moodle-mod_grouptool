@@ -87,15 +87,15 @@ class restore_grouptool_activity_task extends restore_activity_task {
 
     /**
      * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
+     * by the {@see restore_logs_processor} when restoring
      * grouptool logs. It must return one array
-     * of {@link restore_log_rule} objects
+     * of {@see restore_log_rule} objects
      */
     static public function define_restore_log_rules() {
         $rules = [];
         /*
          * @todo change to using standard-action-pattern add/delete/update/view
-         * + additional info {@link ../../db/log.php}
+         * + additional info  ../../db/log.php
          */
         $rules[] = new restore_log_rule('grouptool', 'add', 'view.php?id={course_module}',
                                         '{grouptool}');
@@ -171,9 +171,9 @@ class restore_grouptool_activity_task extends restore_activity_task {
 
     /**
      * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
+     * by the {@see restore_logs_processor} when restoring
      * course logs. It must return one array
-     * of {@link restore_log_rule} objects
+     * of {@see restore_log_rule} objects
      *
      * Note this rules are applied when restoring course logs
      * by the restore final task, but are defined here at

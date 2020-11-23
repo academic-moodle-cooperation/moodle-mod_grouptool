@@ -46,7 +46,7 @@ class renderer extends \plugin_renderer_base {
      * @throws \moodle_exception
      */
     public function render_sortlist(sortlist $sortlist) {
-        global $PAGE, $OUTPUT, $DB;
+        global $DB;
 
         if (empty($sortlist->groups) || !is_array($sortlist->groups) || count($sortlist->groups) == 0) {
             return $this->get_no_groups_info($sortlist);
@@ -67,11 +67,11 @@ class renderer extends \plugin_renderer_base {
 
         $context = new stdClass();
         $context->usesize = $sortlist->usesize;
-        $context->pageurl = $PAGE->url->out();
+        $context->pageurl = $this->page->url->out();
         $url = new \moodle_url('/course/modedit.php', ['update' => $sortlist->cm->id, 'return' => 1]);
         $context->courseediturl = $url->out();
         $statushelpicon = new \help_icon('groupstatus', 'grouptool');
-        $context->statushelpicon = $statushelpicon->export_for_template($OUTPUT);
+        $context->statushelpicon = $statushelpicon->export_for_template($this->output);
         $context->groups = array_values($sortlist->groups);
 
         if ($DB->record_exists('grouptool', ['course' => $sortlist->cm->course, 'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP])) {
@@ -79,9 +79,9 @@ class renderer extends \plugin_renderer_base {
             $context->nodeletion = true;
         }
 
-        $html = $OUTPUT->render_from_template('mod_grouptool/sortlist', $context);
+        $html = $this->output->render_from_template('mod_grouptool/sortlist', $context);
 
-        $PAGE->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', [$sortlist->cm->id]);
+        $this->page->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', [$sortlist->cm->id]);
 
         return $html;
     }
@@ -95,28 +95,27 @@ class renderer extends \plugin_renderer_base {
      * @throws \moodle_exception
      */
     protected function get_no_groups_info(sortlist $sortlist) {
-        global $PAGE, $OUTPUT;
 
         switch ($sortlist->filter) {
             case \mod_grouptool::FILTER_ACTIVE:
-                $url = new \moodle_url($PAGE->url, ['filter' => \mod_grouptool::FILTER_ALL]);
+                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL]);
                 $message = get_string('nogroupsactive', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_INACTIVE:
-                $url = new \moodle_url($PAGE->url, ['filter' => \mod_grouptool::FILTER_ALL]);
+                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL]);
                 $message = get_string('nogroupsinactive', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_ALL:
-                $url = new \moodle_url($PAGE->url, ['tab' => 'group_creation']);
+                $url = new \moodle_url($this->page->url, ['tab' => 'group_creation']);
                 $message = get_string('nogroups', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
                 break;
             default:
                 $message = var_dump($sortlist->filter);
         }
-        return $OUTPUT->box($OUTPUT->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
+        return $this->output->box($this->output->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
     }
 
     /**
@@ -128,7 +127,6 @@ class renderer extends \plugin_renderer_base {
      * @throws \moodle_exception
      */
     protected function render_sortlist_controller(sortlist_controller $controller) {
-        global $OUTPUT;
 
         $sortlist = $controller->sortlist;
 
@@ -152,6 +150,6 @@ class renderer extends \plugin_renderer_base {
         }
         $context->options = $options;
 
-        return $OUTPUT->render_from_template("mod_grouptool/checkboxcontroller", $context);
+        return $this->output->render_from_template("mod_grouptool/checkboxcontroller", $context);
     }
 }
