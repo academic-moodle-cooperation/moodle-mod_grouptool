@@ -6194,8 +6194,13 @@ class mod_grouptool {
      */
     public static function get_useridentity_fields() {
         global $CFG;
-        // .
         $useridentityfields = explode(',', $CFG->showuseridentity);
+
+        // Set default values to idnumber and email in no showuseridentity setting is given.
+        if (empty($useridentityfields)) {
+            $useridentityfields = ['idnumber', 'email'];
+        }
+
         $useridentity = [];
         foreach ($useridentityfields as $identifier) {
             $useridentity[$identifier] = get_string($identifier);
@@ -6345,23 +6350,23 @@ class mod_grouptool {
                 if ($group->registered > 0) {
                     $lines[] = "\t".get_string('registrations', 'grouptool');
                     foreach ($group->reg_data as $reg) {
-                        $lines[] = "\t\t".$reg['status']."\t".$reg['name']."\t".$reg['idnumber'].
-                                   "\t".$reg['email'];
+                        $lines[] = "\t\t".$reg['status']."\t".$reg['name'].
+                                self::get_useridentity_values_for_txt($reg['useridentityvalues']);
                     }
                 } else if (count($group->mreg_data) == 0) {
                     $lines[] = "\t\t--".get_string('no_registrations', 'grouptool')."--";
                 }
                 if (count($group->mreg_data) >= 1) {
                     foreach ($group->mreg_data as $mreg) {
-                        $lines[] = "\t\t?\t".$mreg['name']."\t".$mreg['idnumber']."\t".
-                                   $mreg['email'];
+                        $lines[] = "\t\t?\t".$mreg['name']."\t".
+                                self::get_useridentity_values_for_txt($mreg['useridentityvalues']);
                     }
                 }
                 if ($group->queued > 0) {
                     $lines[] = "\t".get_string('queue', 'grouptool');
                     foreach ($group->queue_data as $queue) {
                         $lines[] = "\t\t".$queue['rank']."\t".$queue['name']."\t".
-                                   $queue['idnumber']."\t".$queue['email'];
+                                   self::get_useridentity_values_for_txt($queue['useridentityvalues']);
                     }
                 } else {
                     $lines[] = "\t\t--".get_string('nobody_queued', 'grouptool')."--";
@@ -6395,6 +6400,20 @@ class mod_grouptool {
         header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
         echo $filecontent;
+    }
+
+    /**
+     * Returns a ready to print string containing all given useridentity values separated by tabstops
+     *
+     * @param array $values array Values that should be separated
+     * @return string
+     */
+    private static function get_useridentity_values_for_txt($values) {
+        $outstring = '';
+        foreach ($values as $value) {
+            $outstring .= "\t".$value['value'];
+        }
+        return $outstring;
     }
 
     /**
