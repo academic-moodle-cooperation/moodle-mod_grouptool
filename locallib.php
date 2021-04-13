@@ -5963,7 +5963,7 @@ class mod_grouptool {
             $groupdata->formatpdf = GROUPTOOL_PDF;
             $groupdata->formatxlsx = GROUPTOOL_XLSX;
             $groupdata->formatods = GROUPTOOL_ODS;
-            $groupdata->useridentity = $this->get_useridentity_fields();
+            $groupdata->useridentity = self::convert_associative_array_into_nested_index_array(self::get_useridentity_fields());
 
             $statushelp = new help_icon('status', 'mod_grouptool');
             if (!$onlydata) {
@@ -5994,7 +5994,7 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
-                        $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                        $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
                                 $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         // We set those in any case, because PDF and TXT export needs them anyway!
@@ -6019,7 +6019,7 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
-                        $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                        $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
                                 $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         $row['email'] = $userinfo[$curuser]->email;
@@ -6043,7 +6043,7 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
-                        $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                        $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
                                 $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         // We set those in any case, because PDF and TXT export needs them anyway!
@@ -6072,7 +6072,7 @@ class mod_grouptool {
                     $row['userid'] = $curuser;
                     $row['rank'] = $rank;
                     $row['name'] = $fullname;
-                    $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                    $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
                             $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                     $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                     // We set those in any case, because PDF and TXT export needs them anyway!
@@ -6192,13 +6192,13 @@ class mod_grouptool {
      * @return array Identifiers in showuseridentity and their display names
      * @throws coding_exception
      */
-    private function get_useridentity_fields() {
+    public static function get_useridentity_fields() {
         global $CFG;
         // .
         $useridentityfields = explode(',', $CFG->showuseridentity);
         $useridentity = [];
         foreach ($useridentityfields as $identifier) {
-            $useridentity[] = ['identifier' => $identifier, 'text' => get_string($identifier)];
+            $useridentity[$identifier] = get_string($identifier);
         }
         return $useridentity;
     }
@@ -6209,7 +6209,7 @@ class mod_grouptool {
      * @param array $inarray Associative array that should be converted ($key => $value)
      * @return array Nested array in the format [['key' => $key, 'value' => $value]]
      */
-    private function convert_associative_array_into_nestd_index_array($inarray) {
+    public static function convert_associative_array_into_nested_index_array($inarray) {
         $outarray = [];
         foreach ($inarray as $key => $value) {
             $outarray[] = ['key' => $key, 'value' => $value];

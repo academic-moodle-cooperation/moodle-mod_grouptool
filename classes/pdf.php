@@ -25,6 +25,7 @@
 namespace mod_grouptool;
 
 use context_course;
+use mod_grouptool\local\tests\grouptool;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -364,7 +365,7 @@ class pdf extends \pdf {
         if (count($registration)) {
             $this->add_overview_table_header();
             foreach ($registration as $row) {
-                $this->add_overview_row($row['status'], $row['name'], $row['idnumber'], $row['email'], $fill);
+                $this->add_overview_row($row, $fill);
             }
         } else if (count($moodlemembers) == 0) {
             $this->SetFont('', 'I');
@@ -379,7 +380,8 @@ class pdf extends \pdf {
                 $this->add_overview_table_header();
             }
             foreach ($moodlemembers as $row) {
-                $this->add_overview_row('?', $row['name'], $row['idnumber'], $row['email'], $fill);
+                $row['status'] = '?';
+                $this->add_overview_row($row, $fill);
             }
         }
 
@@ -393,7 +395,7 @@ class pdf extends \pdf {
                 } else {
                     $this->SetFillColor(0xff, 0xcc, 0x99);
                 }
-                $this->add_overview_row($row['rank'], $row['name'], $row['idnumber'], $row['email'], $fill, 1);
+                $this->add_overview_row(row, $fill, 1);
             }
         } else {
             $this->SetFont('', 'I');
@@ -402,6 +404,20 @@ class pdf extends \pdf {
                              'M', true);
             $this->SetFont('', '');
         }
+    }
+
+    /**
+     * @return float|int
+     * @throws \coding_exception
+     */
+    private static function calculate_identitycolumn_width() {
+        $identityfields = grouptool::get_useridentity_fields();
+        $fieldwidth = 0.6;
+
+        if (empty($identityfields) || isset($identityfields['email'])) {
+            return $fieldwidth / (count($identityfields)+1);
+        }
+        return $fieldwidth / count($identityfields);
     }
 
     /**
@@ -414,6 +430,8 @@ class pdf extends \pdf {
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
         $normalheight = $this->normalheight;
+        $identityfields = grouptool::get_useridentity_fields();
+        $identitycolumnwidth = self::calculate_identitycolumn_width();
 
         $this->SetFont('', 'B');
         $this->MultiCell(0.1 * $writewidth, $normalheight, get_string('status', 'grouptool'),
@@ -421,10 +439,25 @@ class pdf extends \pdf {
                          'M', true);
         $this->MultiCell(0.3 * $writewidth, $normalheight, get_string('fullname'), 'LRB', 'C',
                          true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
-        $this->MultiCell(0.2 * $writewidth, $normalheight, get_string('idnumber'), 'LRB', 'C',
-                         true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
-        $this->MultiCell(0.4 * $writewidth, $normalheight, get_string('email'), 'LB', 'C', true,
-                         1, null, null, true, 1, true, false, $normalheight, 'M', true);
+
+        $col_count = 0;
+        $identityfieldscount = count($identityfields);
+        foreach ($identityfields as $key => $value) {
+            $border = 'LRB';
+            $ln = 0;
+            if (++$col_count == $identityfieldscount) {
+                $border = 'LB';
+                $ln = 1;
+            }
+            if ($key == 'email') {
+                $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight, get_string('email'), $border, 'C', true,
+                        $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
+            } else {
+                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, get_string($key), $border, 'C',
+                        true, $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
+            }
+        }
+
         $this->SetFillColor(0xe8, 0xe8, 0xe8);
         $this->SetFont('', '');
     }
@@ -439,7 +472,7 @@ class pdf extends \pdf {
      * @param bool $fill whether or not this row's cells will contain a background color (gets toggled afterwards)!
      * @param bool $forcefill force cell background color ($fill gets toggled anyways)!
      */
-    private function add_overview_row($status, $name, $idnumber, $email, &$fill, $forcefill = false) {
+    private function add_overview_row_old($status, $name, $idnumber, $email, &$fill, $forcefill = false) {
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
         $normalheight = $this->normalheight;
@@ -452,6 +485,43 @@ class pdf extends \pdf {
                          1, true, false, $normalheight, 'M', true);
         $this->MultiCell(0.4 * $writewidth, $normalheight, $email, 'TL', 'L', $fill || $forcefill, 1, null, null, true,
                          1, true, false, $normalheight, 'M', true);
+        $fill ^= 1;
+    }
+
+    private function add_overview_row($row, &$fill, $forcefill = false) {
+        $margins = $this->getMargins();
+        $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
+        $normalheight = $this->normalheight;
+        $identityfields = grouptool::get_useridentity_fields();
+        $identitycolumnwidth = self::calculate_identitycolumn_width();
+
+        $this->MultiCell(0.1 * $writewidth, $normalheight, $row['status'], 'TR', 'C', $fill || $forcefill, 0, null, null, true,
+                1, true, false, $normalheight, 'M', true);
+        $this->MultiCell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
+                1, true, false, $normalheight, 'M', true);
+
+        $col_count = 0;
+        $identityfieldscount = count($identityfields);
+        foreach ($identityfields as $key => $value) {
+            $border = 'TLR';
+            $ln = 0;
+            if (++$col_count == $identityfieldscount) {
+                $border = 'TL';
+                $ln = 1;
+            }
+            if ($key == 'email') {
+                $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight, $row['email'], $border, 'C',
+                        $fill || $forcefill, $ln, null, null, true, 1, true, false,
+                        $normalheight, 'M', true);
+            } else {
+                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, $row[$key], $border, 'C',
+                        $fill || $forcefill, $ln, null, null, true, 1, true, false,
+                        $normalheight, 'M', true);
+            }
+        }
+
+        $this->SetFillColor(0xe8, 0xe8, 0xe8);
+        $this->SetFont('', '');
         $fill ^= 1;
     }
 
