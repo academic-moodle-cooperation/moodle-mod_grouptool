@@ -5996,6 +5996,7 @@ class mod_grouptool {
                         $row['name'] = $fullname;
                         $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
                                 $this->get_namefields_useridentity($row, $userinfo[$curuser]));
+                        $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         // We set those in any case, because PDF and TXT export needs them anyway!
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6020,6 +6021,7 @@ class mod_grouptool {
                         $row['name'] = $fullname;
                         $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
                                 $this->get_namefields_useridentity($row, $userinfo[$curuser]));
+                        $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
                         $row['status'] = "+";
@@ -6043,6 +6045,7 @@ class mod_grouptool {
                         $row['name'] = $fullname;
                         $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
                                 $this->get_namefields_useridentity($row, $userinfo[$curuser]));
+                        $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         // We set those in any case, because PDF and TXT export needs them anyway!
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6071,6 +6074,7 @@ class mod_grouptool {
                     $row['name'] = $fullname;
                     $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
                             $this->get_namefields_useridentity($row, $userinfo[$curuser]));
+                    $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                     // We set those in any case, because PDF and TXT export needs them anyway!
                     $row['email'] = $userinfo[$curuser]->email;
                     $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6098,6 +6102,45 @@ class mod_grouptool {
             return $return;
         } else {
             return 0;
+        }
+    }
+
+    /**
+     * Add additional user fields and useridentity fields to the row (at least adds idnumber and email to be displayed).
+     *
+     * @param mixed[] $row Associative array with table data for this user
+     * @param stdClass $user the user's DB record
+     */
+    protected function add_namefields_useridentity(&$row, $user) {
+        global $CFG;
+        $namefields = get_all_user_name_fields();
+        foreach ($namefields as $namefield) {
+            if (!empty($user->$namefield)) {
+                $row[$namefield] = $user->$namefield;
+            } else {
+                $row[$namefield] = '';
+            }
+        }
+        if (empty($CFG->showuseridentity)) {
+            if (!empty($user->idnumber)) {
+                $row['idnumber'] = $user->idnumber;
+            } else {
+                $row['idnumber'] = '-';
+            }
+            if (!empty($user->email)) {
+                $row['email'] = $user->email;
+            } else {
+                $row['email'] = '-';
+            }
+        } else {
+            $fields = explode(',', $CFG->showuseridentity);
+            foreach ($fields as $field) {
+                if (!empty($user->$field)) {
+                    $row[$field] = $user->$field;
+                } else {
+                    $row[$field] = '';
+                }
+            }
         }
     }
 
