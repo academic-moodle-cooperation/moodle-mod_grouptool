@@ -5963,6 +5963,8 @@ class mod_grouptool {
             $groupdata->formatpdf = GROUPTOOL_PDF;
             $groupdata->formatxlsx = GROUPTOOL_XLSX;
             $groupdata->formatods = GROUPTOOL_ODS;
+            $groupdata->useridentity = $this->get_useridentity_fields();
+
             $statushelp = new help_icon('status', 'mod_grouptool');
             if (!$onlydata) {
                 $groupdata->statushelp = $statushelp->export_for_template($OUTPUT);
@@ -5992,7 +5994,8 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
-                        $this->add_namefields_useridentity($row, $userinfo[$curuser]);
+                        $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                                $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         // We set those in any case, because PDF and TXT export needs them anyway!
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6015,7 +6018,8 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
-                        $this->add_namefields_useridentity($row, $userinfo[$curuser]);
+                        $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                                $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
                         $row['status'] = "+";
@@ -6037,7 +6041,8 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
-                        $this->add_namefields_useridentity($row, $userinfo[$curuser]);
+                        $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                                $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         // We set those in any case, because PDF and TXT export needs them anyway!
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6064,7 +6069,8 @@ class mod_grouptool {
                     $row['userid'] = $curuser;
                     $row['rank'] = $rank;
                     $row['name'] = $fullname;
-                    $this->add_namefields_useridentity($row, $userinfo[$curuser]);
+                    $row['useridentityvalues'] = $this->convert_associative_array_into_nestd_index_array(
+                            $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                     // We set those in any case, because PDF and TXT export needs them anyway!
                     $row['email'] = $userinfo[$curuser]->email;
                     $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6096,12 +6102,13 @@ class mod_grouptool {
     }
 
     /**
-     * Add additional user fields and useridentity fields to the row (at least adds idnumber and email to be displayed).
+     * Get additional user fields and useridentity fields to the row (at least adds idnumber and email to be displayed).
      *
      * @param mixed[] $row Associative array with table data for this user
      * @param stdClass $user the user's DB record
+     * @return array
      */
-    protected function add_namefields_useridentity(&$row, $user) {
+    protected function get_namefields_useridentity($row, $user) {
         global $CFG;
         $namefields = get_all_user_name_fields();
         foreach ($namefields as $namefield) {
@@ -6111,27 +6118,60 @@ class mod_grouptool {
                 $row[$namefield] = '';
             }
         }
+        $useridentityvalues = [];
         if (empty($CFG->showuseridentity)) {
             if (!empty($user->idnumber)) {
-                $row['idnumber'] = $user->idnumber;
+                $useridentityvalues['idnumber'] = ['key' => 'idnumber', 'value' => $user->idnumber];
             } else {
-                $row['idnumber'] = '-';
+                $useridentityvalues['idnumber'] = ['key' => 'idnumber', 'value' => '-'];
             }
             if (!empty($user->email)) {
-                $row['email'] = $user->email;
+                $useridentityvalues['email'] = ['key' => 'email', 'value' => $user->email];
             } else {
-                $row['email'] = '-';
+                $useridentityvalues['email'] = ['key' => 'email', 'value' => '-'];
             }
         } else {
             $fields = explode(',', $CFG->showuseridentity);
             foreach ($fields as $field) {
                 if (!empty($user->$field)) {
-                    $row[$field] = $user->$field;
+                    $useridentityvalues[$field] = $user->$field;
                 } else {
-                    $row[$field] = '';
+                    $useridentityvalues[$field] = '';
                 }
             }
+            return $useridentityvalues;
         }
+    }
+
+    /**
+     * Get showuseridentity itentifiers and their display text on the current instance
+     *
+     * @return array Identifiers in showuseridentity and their display names
+     * @throws coding_exception
+     */
+    private function get_useridentity_fields() {
+        global $CFG;
+        // .
+        $useridentityfields = explode(',', $CFG->showuseridentity);
+        $useridentity = [];
+        foreach ($useridentityfields as $identifier) {
+            $useridentity[] = ['identifier' => $identifier, 'text' => get_string($identifier)];
+        }
+        return $useridentity;
+    }
+
+    /**
+     * Helper function to convert a given associative array into a nested index array so it can be iterated thorough by mustache.
+     *
+     * @param array $inarray Associative array that should be converted ($key => $value)
+     * @return array Nested array in the format [['key' => $key, 'value' => $value]]
+     */
+    private function convert_associative_array_into_nestd_index_array($inarray) {
+        $outarray = [];
+        foreach ($inarray as $key => $value) {
+            $outarray[] = ['key' => $key, 'value' => $value];
+        }
+        return $outarray;
     }
 
     /**
