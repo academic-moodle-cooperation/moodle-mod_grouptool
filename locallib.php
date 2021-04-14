@@ -7615,6 +7615,7 @@ class mod_grouptool {
      */
     public function userlist_table($groupingid = 0, $groupid = 0, $onlydata = false) {
         global $OUTPUT, $CFG, $DB, $PAGE, $SESSION;
+        $useridentityfields = self::get_useridentity_fields();
 
         if (!isset($SESSION->mod_grouptool->userlist)) {
             $SESSION->mod_grouptool->userlist = new stdClass();
@@ -7797,24 +7798,18 @@ class mod_grouptool {
             } else {
                 echo html_writer::tag('th', $this->collapselink($collapsed, 'fullname'), ['class' => '']);
             }
-            if (!in_array('idnumber', $collapsed)) {
-                $idnumberlink = html_writer::link(new moodle_url($PAGE->url,
-                                                                 ['tsort' => 'idnumber']),
-                                                  get_string('idnumber').
-                                                  $this->pic_if_sorted($orderby, 'idnumber'));
-                echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, 'idnumber'),
-                        ['class' => '']);
-            } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'idnumber'), ['class' => '']);
-            }
-            if (!in_array('email', $collapsed)) {
-                $emaillink = html_writer::link(new moodle_url($PAGE->url, ['tsort' => 'email']),
-                                               get_string('email').
-                                               $this->pic_if_sorted($orderby, 'email'));
-                echo html_writer::tag('th', $emaillink.$this->collapselink($collapsed, 'email'),
-                        ['class' => '']);
-            } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'email'), ['class' => '']);
+
+            foreach ($useridentityfields as $identifier => $text) {
+                if (!in_array($identifier, $collapsed)) {
+                    $idnumberlink = html_writer::link(new moodle_url($PAGE->url,
+                            ['tsort' => $identifier]),
+                            $text.
+                            $this->pic_if_sorted($orderby, $identifier));
+                    echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, $identifier),
+                            ['class' => '']);
+                } else {
+                    echo html_writer::tag('th', $this->collapselink($collapsed, $identifier), ['class' => '']);
+                }
             }
             if (!in_array('registrations', $collapsed)) {
                 $registrationslink = get_string('registrations', 'grouptool');
@@ -7874,13 +7869,12 @@ class mod_grouptool {
                         $fullname = html_writer::link($userlink, fullname($user));
                         echo html_writer::tag('td', $fullname, ['class' => '']);
                     }
-                    if (!in_array('idnumber', $collapsed)) {
-                        $idnumber = $user->idnumber;
-                        echo html_writer::tag('td', $idnumber, ['class' => '']);
-                    }
-                    if (!in_array('email', $collapsed)) {
-                        $email = $user->email;
-                        echo html_writer::tag('td', $email, ['class' => '']);
+                    // Print all activated useridentityvalue infos.
+                    foreach ($useridentityfields as $identifier => $value) {
+                        if (!in_array($identifier, $collapsed)) {
+                            $identityvalue = $user->$identifier;
+                            echo html_writer::tag('td', $identityvalue, ['class' => '']);
+                        }
                     }
                     if (!in_array('registrations', $collapsed)) {
                         if (!empty($user->regs)) {
