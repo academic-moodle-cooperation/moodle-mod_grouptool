@@ -7445,7 +7445,9 @@ class mod_grouptool {
         global $DB, $OUTPUT;
 
         // After which table-fields can we sort?
-        $sortable = ['firstname', 'lastname', 'idnumber', 'email'];
+        $sortable = ['firstname', 'lastname'];
+        // Add instance specific useridentity fields.
+        $sortable = array_merge($sortable, array_keys(self::get_useridentity_fields()));
 
         // Indexed by agrpid!
         $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
@@ -7625,7 +7627,7 @@ class mod_grouptool {
             $SESSION->mod_grouptool->userlist->orderby = [];
         }
         $orderby = $SESSION->mod_grouptool->userlist->orderby;
-        if ($tsort = optional_param('tsort', 0, PARAM_ALPHA)) {
+        if ($tsort = optional_param('tsort', 0, PARAM_ALPHANUM)) {
             $olddir = 'DESC';
             if (key_exists($tsort, $orderby)) {
                 $olddir = $orderby[$tsort];
