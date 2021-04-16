@@ -7647,13 +7647,13 @@ class mod_grouptool {
             $SESSION->mod_grouptool->userlist->collapsed = [];
         }
         $collapsed = $SESSION->mod_grouptool->userlist->collapsed;
-        if ($thide = optional_param('thide', 0, PARAM_ALPHA)) {
+        if ($thide = optional_param('thide', 0, PARAM_ALPHANUM)) {
             if (!in_array($thide, $collapsed)) {
                 array_push($collapsed, $thide);
             }
             $SESSION->mod_grouptool->userlist->collapsed = $collapsed;
         }
-        if ($tshow = optional_param('tshow', 0, PARAM_ALPHA)) {
+        if ($tshow = optional_param('tshow', 0, PARAM_ALPHANUM)) {
             foreach ($collapsed as $key => $value) {
                 if ($value == $tshow) {
                     unset($collapsed[$key]);
@@ -8125,8 +8125,8 @@ class mod_grouptool {
             foreach ($users as $key => $user) {
                 if ($key == 0) { // Headline!
                     $lines[] = get_string('fullname')."\t".
-                               get_string('idnumber')."\t".
-                               get_string('email')."\t".
+                               self::get_useridentity_values_for_txt
+                               (self::convert_associative_array_into_nested_index_array(self::get_useridentity_fields())) . "\t" .
                                get_string('registrations', 'grouptool')."\t".
                                get_string('queues', 'grouptool')." (".get_string('rank',
                                     'grouptool').")";

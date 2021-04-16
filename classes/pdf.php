@@ -593,7 +593,9 @@ class pdf extends \pdf {
         $totalwidth = array_sum($basicwidths);
         $colapsedwidth = $totalwidth;
         foreach ($collapsed as $column) {
-            $colapsedwidth -= $basicwidths[$column];
+            if (array_key_exists($column, $basicwidths)) {
+                $colapsedwidth -= $basicwidths[$column];
+            }
         }
         $widths = [];
         foreach ($basicwidths as $column => $width) {
