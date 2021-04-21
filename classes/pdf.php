@@ -506,12 +506,12 @@ class pdf extends \pdf {
         $this->MultiCell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
                 1, true, false, $normalheight, 'M', true);
 
-        $col_count = 0;
+        $colcount = 0;
         $identityfieldscount = count($identityfields);
         foreach ($identityfields as $key => $value) {
             $border = 'TLR';
             $ln = 0;
-            if (++$col_count == $identityfieldscount) {
+            if (++$colcount == $identityfieldscount) {
                 $border = 'TL';
                 $ln = 1;
             }
