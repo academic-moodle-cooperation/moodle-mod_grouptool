@@ -411,8 +411,11 @@ class pdf extends \pdf {
     }
 
     /**
-     * @return float|int
-     * @throws \coding_exception
+     * Helper function to calculate the width of identity columns for pdf exports
+     *
+     * @param float $fieldwidth Reserved width for all idenity columns
+     * @param int $emailscalefactor Scale of the email idenitycolumn relative to other columns (e.g. 2 means twice as wide)
+     * @return float|int Width of a normal identity column. Can be multiplied by emailscalefactor for the email column
      */
     private function calculate_identitycolumn_width($fieldwidth = 0.6, $emailscalefactor = 2) {
         $identityfields = $this->useridentityfields;
