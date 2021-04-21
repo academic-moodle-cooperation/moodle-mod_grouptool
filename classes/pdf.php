@@ -446,12 +446,12 @@ class pdf extends \pdf {
         $this->MultiCell(0.3 * $writewidth, $normalheight, get_string('fullname'), 'LRB', 'C',
                          true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
 
-        $col_count = 0;
+        $colcount = 0;
         $identityfieldscount = count($identityfields);
         foreach ($identityfields as $key => $value) {
             $border = 'LRB';
             $ln = 0;
-            if (++$col_count == $identityfieldscount) {
+            if (++$colcount == $identityfieldscount) {
                 $border = 'LB';
                 $ln = 1;
             }
@@ -582,11 +582,11 @@ class pdf extends \pdf {
         } else {
             $collapsed = [];
         }
-        // todo: Consider caching result of this calculation as it is the same for each row in one export.
+        // Todo: Consider caching result of this calculation as it is the same for each row in one export.
         $basicwidths = [
                 'fullname' => 0.225,
-                'identity' => $this->calculate_identitycolumn_width(0.375,1.5),
-                'email' => $this->calculate_identitycolumn_width(0.375,1.5) * 1.5,
+                'identity' => $this->calculate_identitycolumn_width(0.375, 1.5),
+                'email' => $this->calculate_identitycolumn_width(0.375, 1.5) * 1.5,
                 'registrations' => 0.225,
                 'queues' => 0.175
         ];
