@@ -8118,6 +8118,7 @@ class mod_grouptool {
 
         $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
+        $useridentityfields = self::get_useridentity_fields();
 
         $lines = [];
         $users = $this->userlist_table($groupingid, $groupid, true);
@@ -8136,7 +8137,13 @@ class mod_grouptool {
                     for ($i = 0; $i < $rows; $i++) {
                         $line = "";
                         if ($i == 0) {
-                            $line = $user['name']."\t".$user['idnumber']."\t".$user['email'];
+                            $line = $user['name'];
+                            // Print all activated useridentityvalue infos.
+                            foreach ($useridentityfields as $identifier => $value) {
+                                if (!empty($user[$identifier])) {
+                                    $line .= "\t" . $user[$identifier];
+                                }
+                            }
                         } else {
                             $line = "\t\t";
                         }
