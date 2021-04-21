@@ -494,6 +494,14 @@ class pdf extends \pdf {
         $fill ^= 1;
     }
 
+    /**
+     * Adds a single data row to a group column in overview
+     *
+     * @param array $row Array containing all data of a single row
+     * @param bool $fill Rather or not the current line is filled with a shade of lightgrey. Is toggled after every call.
+     * @param bool $forcefill Force the current row to be filled with a shade of lightgrey
+     * @throws \coding_exception
+     */
     private function add_overview_row($row, &$fill, $forcefill = false) {
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
