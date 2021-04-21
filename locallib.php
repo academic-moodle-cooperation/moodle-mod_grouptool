@@ -8056,7 +8056,7 @@ class mod_grouptool {
             $email = $user['email'];
             $regdata = $user['registrations'];
             $queuedata = $user['queues'];
-            $pdf->add_userdata($name, $idnumber, $email, $regdata, $queuedata, true);
+            $pdf->add_userdata($user, true);
             while (next($data)) {
                 $user = current($data);
                 $name = $user['name'];
@@ -8064,7 +8064,7 @@ class mod_grouptool {
                 $email = $user['email'];
                 $regdata = $user['registrations'];
                 $queuedata = $user['queues'];
-                $pdf->add_userdata($name, $idnumber, $email, $regdata, $queuedata);
+                $pdf->add_userdata($user);
             }
         } else {
             $pdf->MultiCell(0, $pdf->getLastH(), get_string('no_data_to_display', 'grouptool'),
