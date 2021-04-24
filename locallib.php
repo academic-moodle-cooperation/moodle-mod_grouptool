@@ -7880,7 +7880,7 @@ class mod_grouptool {
                         if (!in_array($identifier, $collapsed)) {
                             $identityvalue = $user->$identifier;
                             echo html_writer::tag('td', $identityvalue, ['class' => '']);
-                        }  else {
+                        } else {
                             $this->print_empty_cell();
                         }
                     }
@@ -7899,7 +7899,7 @@ class mod_grouptool {
                         }
                         $registrations = implode(html_writer::empty_tag('br'), $registrations);
                         echo html_writer::tag('td', $registrations, ['class' => '']);
-                    }  else {
+                    } else {
                         $this->print_empty_cell();
                     }
                     if (!in_array('queues', $collapsed)) {
