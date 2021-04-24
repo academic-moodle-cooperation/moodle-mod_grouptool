@@ -7866,16 +7866,22 @@ class mod_grouptool {
                     if (!in_array('picture', $collapsed)) {
                         $picture = html_writer::link($userlink, $OUTPUT->user_picture($user));
                         echo html_writer::tag('td', $picture, ['class' => '']);
+                    } else {
+                        $this->print_empty_cell();
                     }
                     if (!in_array('fullname', $collapsed)) {
                         $fullname = html_writer::link($userlink, fullname($user));
                         echo html_writer::tag('td', $fullname, ['class' => '']);
+                    } else {
+                        $this->print_empty_cell();
                     }
                     // Print all activated useridentityvalue infos.
                     foreach ($useridentityfields as $identifier => $value) {
                         if (!in_array($identifier, $collapsed)) {
                             $identityvalue = $user->$identifier;
                             echo html_writer::tag('td', $identityvalue, ['class' => '']);
+                        }  else {
+                            $this->print_empty_cell();
                         }
                     }
                     if (!in_array('registrations', $collapsed)) {
@@ -7893,6 +7899,8 @@ class mod_grouptool {
                         }
                         $registrations = implode(html_writer::empty_tag('br'), $registrations);
                         echo html_writer::tag('td', $registrations, ['class' => '']);
+                    }  else {
+                        $this->print_empty_cell();
                     }
                     if (!in_array('queues', $collapsed)) {
                         if (!empty($user->queued)) {
@@ -7918,7 +7926,7 @@ class mod_grouptool {
                         $queueentries = implode(html_writer::empty_tag('br'), $queueentries);
                         echo html_writer::tag('td', $queueentries, ['class' => '']);
                     } else {
-                        $queueentries = "";
+                        $this->print_empty_cell();
                     }
                     echo html_writer::end_tag('tr');
                     flush();
@@ -8005,6 +8013,13 @@ class mod_grouptool {
         }
 
         return true;
+    }
+
+    /**
+     * Helper function used to print empty cells for hidden columns
+     */
+    private function print_empty_cell() {
+        echo html_writer::tag('td', '', ['class' => '']);
     }
 
     /**
