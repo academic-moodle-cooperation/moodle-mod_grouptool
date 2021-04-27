@@ -5963,6 +5963,8 @@ class mod_grouptool {
             $groupdata->formatpdf = GROUPTOOL_PDF;
             $groupdata->formatxlsx = GROUPTOOL_XLSX;
             $groupdata->formatods = GROUPTOOL_ODS;
+            $groupdata->useridentity = self::convert_associative_array_into_nested_index_array(self::get_useridentity_fields());
+
             $statushelp = new help_icon('status', 'mod_grouptool');
             if (!$onlydata) {
                 $groupdata->statushelp = $statushelp->export_for_template($OUTPUT);
@@ -5992,6 +5994,8 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
+                        $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
+                                $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         // We set those in any case, because PDF and TXT export needs them anyway!
                         $row['email'] = $userinfo[$curuser]->email;
@@ -6015,6 +6019,8 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
+                        $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
+                                $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         $row['email'] = $userinfo[$curuser]->email;
                         $row['idnumber'] = $userinfo[$curuser]->idnumber;
@@ -6037,6 +6043,8 @@ class mod_grouptool {
                         $row = [];
                         $row['userid'] = $curuser;
                         $row['name'] = $fullname;
+                        $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
+                                $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                         $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                         // We set those in any case, because PDF and TXT export needs them anyway!
                         $row['email'] = $userinfo[$curuser]->email;
@@ -6064,6 +6072,8 @@ class mod_grouptool {
                     $row['userid'] = $curuser;
                     $row['rank'] = $rank;
                     $row['name'] = $fullname;
+                    $row['useridentityvalues'] = self::convert_associative_array_into_nested_index_array(
+                            $this->get_namefields_useridentity($row, $userinfo[$curuser]));
                     $this->add_namefields_useridentity($row, $userinfo[$curuser]);
                     // We set those in any case, because PDF and TXT export needs them anyway!
                     $row['email'] = $userinfo[$curuser]->email;
@@ -6132,6 +6142,84 @@ class mod_grouptool {
                 }
             }
         }
+    }
+
+    /**
+     * Get additional user fields and useridentity fields to the row (at least adds idnumber and email to be displayed).
+     *
+     * @param mixed[] $row Associative array with table data for this user
+     * @param stdClass $user the user's DB record
+     * @return array
+     */
+    protected function get_namefields_useridentity($row, $user) {
+        global $CFG;
+        $namefields = get_all_user_name_fields();
+        foreach ($namefields as $namefield) {
+            if (!empty($user->$namefield)) {
+                $row[$namefield] = $user->$namefield;
+            } else {
+                $row[$namefield] = '';
+            }
+        }
+        $useridentityvalues = [];
+        if (empty($CFG->showuseridentity)) {
+            if (!empty($user->idnumber)) {
+                $useridentityvalues['idnumber'] = ['key' => 'idnumber', 'value' => $user->idnumber];
+            } else {
+                $useridentityvalues['idnumber'] = ['key' => 'idnumber', 'value' => '-'];
+            }
+            if (!empty($user->email)) {
+                $useridentityvalues['email'] = ['key' => 'email', 'value' => $user->email];
+            } else {
+                $useridentityvalues['email'] = ['key' => 'email', 'value' => '-'];
+            }
+        } else {
+            $fields = explode(',', $CFG->showuseridentity);
+            foreach ($fields as $field) {
+                if (!empty($user->$field)) {
+                    $useridentityvalues[$field] = $user->$field;
+                } else {
+                    $useridentityvalues[$field] = '';
+                }
+            }
+            return $useridentityvalues;
+        }
+    }
+
+    /**
+     * Get showuseridentity itentifiers and their display text on the current instance
+     *
+     * @return array Identifiers in showuseridentity and their display names
+     * @throws coding_exception
+     */
+    public static function get_useridentity_fields() {
+        global $CFG;
+        $useridentityfields = explode(',', $CFG->showuseridentity);
+
+        // Set default values to idnumber and email in no showuseridentity setting is given.
+        if (empty($useridentityfields)) {
+            $useridentityfields = ['idnumber', 'email'];
+        }
+
+        $useridentity = [];
+        foreach ($useridentityfields as $identifier) {
+            $useridentity[$identifier] = get_string($identifier);
+        }
+        return $useridentity;
+    }
+
+    /**
+     * Helper function to convert a given associative array into a nested index array so it can be iterated thorough by mustache.
+     *
+     * @param array $inarray Associative array that should be converted ($key => $value)
+     * @return array Nested array in the format [['key' => $key, 'value' => $value]]
+     */
+    public static function convert_associative_array_into_nested_index_array($inarray) {
+        $outarray = [];
+        foreach ($inarray as $key => $value) {
+            $outarray[] = ['key' => $key, 'value' => $value];
+        }
+        return $outarray;
     }
 
     /**
@@ -6262,23 +6350,23 @@ class mod_grouptool {
                 if ($group->registered > 0) {
                     $lines[] = "\t".get_string('registrations', 'grouptool');
                     foreach ($group->reg_data as $reg) {
-                        $lines[] = "\t\t".$reg['status']."\t".$reg['name']."\t".$reg['idnumber'].
-                                   "\t".$reg['email'];
+                        $lines[] = "\t\t".$reg['status']."\t".$reg['name'].
+                                self::get_useridentity_values_for_txt($reg['useridentityvalues']);
                     }
                 } else if (count($group->mreg_data) == 0) {
                     $lines[] = "\t\t--".get_string('no_registrations', 'grouptool')."--";
                 }
                 if (count($group->mreg_data) >= 1) {
                     foreach ($group->mreg_data as $mreg) {
-                        $lines[] = "\t\t?\t".$mreg['name']."\t".$mreg['idnumber']."\t".
-                                   $mreg['email'];
+                        $lines[] = "\t\t?\t".$mreg['name']."\t".
+                                self::get_useridentity_values_for_txt($mreg['useridentityvalues']);
                     }
                 }
                 if ($group->queued > 0) {
                     $lines[] = "\t".get_string('queue', 'grouptool');
                     foreach ($group->queue_data as $queue) {
                         $lines[] = "\t\t".$queue['rank']."\t".$queue['name']."\t".
-                                   $queue['idnumber']."\t".$queue['email'];
+                                   self::get_useridentity_values_for_txt($queue['useridentityvalues']);
                     }
                 } else {
                     $lines[] = "\t\t--".get_string('nobody_queued', 'grouptool')."--";
@@ -6312,6 +6400,20 @@ class mod_grouptool {
         header('Content-Transfer-Encoding: binary');
         header('Content-Encoding: utf-8');
         echo $filecontent;
+    }
+
+    /**
+     * Returns a ready to print string containing all given useridentity values separated by tabstops
+     *
+     * @param array $values array Values that should be separated
+     * @return string
+     */
+    private static function get_useridentity_values_for_txt($values) {
+        $outstring = '';
+        foreach ($values as $value) {
+            $outstring .= "\t".$value['value'];
+        }
+        return $outstring;
     }
 
     /**
@@ -7343,7 +7445,9 @@ class mod_grouptool {
         global $DB, $OUTPUT;
 
         // After which table-fields can we sort?
-        $sortable = ['firstname', 'lastname', 'idnumber', 'email'];
+        $sortable = ['firstname', 'lastname'];
+        // Add instance specific useridentity fields.
+        $sortable = array_merge($sortable, array_keys(self::get_useridentity_fields()));
 
         // Indexed by agrpid!
         $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
@@ -7513,6 +7617,7 @@ class mod_grouptool {
      */
     public function userlist_table($groupingid = 0, $groupid = 0, $onlydata = false) {
         global $OUTPUT, $CFG, $DB, $PAGE, $SESSION;
+        $useridentityfields = self::get_useridentity_fields();
 
         if (!isset($SESSION->mod_grouptool->userlist)) {
             $SESSION->mod_grouptool->userlist = new stdClass();
@@ -7522,7 +7627,7 @@ class mod_grouptool {
             $SESSION->mod_grouptool->userlist->orderby = [];
         }
         $orderby = $SESSION->mod_grouptool->userlist->orderby;
-        if ($tsort = optional_param('tsort', 0, PARAM_ALPHA)) {
+        if ($tsort = optional_param('tsort', 0, PARAM_ALPHANUM)) {
             $olddir = 'DESC';
             if (key_exists($tsort, $orderby)) {
                 $olddir = $orderby[$tsort];
@@ -7542,13 +7647,13 @@ class mod_grouptool {
             $SESSION->mod_grouptool->userlist->collapsed = [];
         }
         $collapsed = $SESSION->mod_grouptool->userlist->collapsed;
-        if ($thide = optional_param('thide', 0, PARAM_ALPHA)) {
+        if ($thide = optional_param('thide', 0, PARAM_ALPHANUM)) {
             if (!in_array($thide, $collapsed)) {
                 array_push($collapsed, $thide);
             }
             $SESSION->mod_grouptool->userlist->collapsed = $collapsed;
         }
-        if ($tshow = optional_param('tshow', 0, PARAM_ALPHA)) {
+        if ($tshow = optional_param('tshow', 0, PARAM_ALPHANUM)) {
             foreach ($collapsed as $key => $value) {
                 if ($value == $tshow) {
                     unset($collapsed[$key]);
@@ -7695,24 +7800,18 @@ class mod_grouptool {
             } else {
                 echo html_writer::tag('th', $this->collapselink($collapsed, 'fullname'), ['class' => '']);
             }
-            if (!in_array('idnumber', $collapsed)) {
-                $idnumberlink = html_writer::link(new moodle_url($PAGE->url,
-                                                                 ['tsort' => 'idnumber']),
-                                                  get_string('idnumber').
-                                                  $this->pic_if_sorted($orderby, 'idnumber'));
-                echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, 'idnumber'),
-                        ['class' => '']);
-            } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'idnumber'), ['class' => '']);
-            }
-            if (!in_array('email', $collapsed)) {
-                $emaillink = html_writer::link(new moodle_url($PAGE->url, ['tsort' => 'email']),
-                                               get_string('email').
-                                               $this->pic_if_sorted($orderby, 'email'));
-                echo html_writer::tag('th', $emaillink.$this->collapselink($collapsed, 'email'),
-                        ['class' => '']);
-            } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'email'), ['class' => '']);
+
+            foreach ($useridentityfields as $identifier => $text) {
+                if (!in_array($identifier, $collapsed)) {
+                    $idnumberlink = html_writer::link(new moodle_url($PAGE->url,
+                            ['tsort' => $identifier]),
+                            $text.
+                            $this->pic_if_sorted($orderby, $identifier));
+                    echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, $identifier),
+                            ['class' => '']);
+                } else {
+                    echo html_writer::tag('th', $this->collapselink($collapsed, $identifier), ['class' => '']);
+                }
             }
             if (!in_array('registrations', $collapsed)) {
                 $registrationslink = get_string('registrations', 'grouptool');
@@ -7772,13 +7871,12 @@ class mod_grouptool {
                         $fullname = html_writer::link($userlink, fullname($user));
                         echo html_writer::tag('td', $fullname, ['class' => '']);
                     }
-                    if (!in_array('idnumber', $collapsed)) {
-                        $idnumber = $user->idnumber;
-                        echo html_writer::tag('td', $idnumber, ['class' => '']);
-                    }
-                    if (!in_array('email', $collapsed)) {
-                        $email = $user->email;
-                        echo html_writer::tag('td', $email, ['class' => '']);
+                    // Print all activated useridentityvalue infos.
+                    foreach ($useridentityfields as $identifier => $value) {
+                        if (!in_array($identifier, $collapsed)) {
+                            $identityvalue = $user->$identifier;
+                            echo html_writer::tag('td', $identityvalue, ['class' => '']);
+                        }
                     }
                     if (!in_array('registrations', $collapsed)) {
                         if (!empty($user->regs)) {
@@ -7958,7 +8056,7 @@ class mod_grouptool {
             $email = $user['email'];
             $regdata = $user['registrations'];
             $queuedata = $user['queues'];
-            $pdf->add_userdata($name, $idnumber, $email, $regdata, $queuedata, true);
+            $pdf->add_userdata($user, true);
             while (next($data)) {
                 $user = current($data);
                 $name = $user['name'];
@@ -7966,7 +8064,7 @@ class mod_grouptool {
                 $email = $user['email'];
                 $regdata = $user['registrations'];
                 $queuedata = $user['queues'];
-                $pdf->add_userdata($name, $idnumber, $email, $regdata, $queuedata);
+                $pdf->add_userdata($user);
             }
         } else {
             $pdf->MultiCell(0, $pdf->getLastH(), get_string('no_data_to_display', 'grouptool'),
@@ -8020,6 +8118,7 @@ class mod_grouptool {
 
         $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $grouptoolname = $this->grouptool->name;
+        $useridentityfields = self::get_useridentity_fields();
 
         $lines = [];
         $users = $this->userlist_table($groupingid, $groupid, true);
@@ -8027,8 +8126,8 @@ class mod_grouptool {
             foreach ($users as $key => $user) {
                 if ($key == 0) { // Headline!
                     $lines[] = get_string('fullname')."\t".
-                               get_string('idnumber')."\t".
-                               get_string('email')."\t".
+                               self::get_useridentity_values_for_txt
+                               (self::convert_associative_array_into_nested_index_array(self::get_useridentity_fields())) . "\t" .
                                get_string('registrations', 'grouptool')."\t".
                                get_string('queues', 'grouptool')." (".get_string('rank',
                                     'grouptool').")";
@@ -8038,7 +8137,13 @@ class mod_grouptool {
                     for ($i = 0; $i < $rows; $i++) {
                         $line = "";
                         if ($i == 0) {
-                            $line = $user['name']."\t".$user['idnumber']."\t".$user['email'];
+                            $line = $user['name'];
+                            // Print all activated useridentityvalue infos.
+                            foreach ($useridentityfields as $identifier => $value) {
+                                if (!empty($user[$identifier])) {
+                                    $line .= "\t" . $user[$identifier];
+                                }
+                            }
                         } else {
                             $line = "\t\t";
                         }

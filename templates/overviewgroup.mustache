@@ -108,8 +108,9 @@
             <tr>
                 <th class="text-center">{{#str}}status, mod_grouptool{{/str}}{{#statushelp}}{{>core/help_icon}}{{/statushelp}}</th>
                 <th class="">{{#str}} fullname, core {{/str}}</th>
-                <th class="">{{#str}} idnumber, core {{/str}}</th>
-                <th class="">{{#str}} email, core {{/str}}</th>
+                {{#useridentity}}
+                    <th class="">{{value}}</th>
+                {{/useridentity}}
             </tr>
         </thead>
         <tbody>
@@ -117,34 +118,37 @@
             <tr class="">
                 <td class="status">{{status}}</td>
                 <td class="userlink"><a href="{{userlink}}&id={{userid}}" title="{{name}}">{{name}}</a></td>
-                <td class="idnumber"><span class="idnumber">{{idnumber}}</span></td>
-                <td class="email"><span class="email">{{email}}</span></td>
+                {{#useridentityvalues}}
+                    <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
+                {{/useridentityvalues}}
             </tr>
         {{/reg_data}}
         {{#mreg_data}}
             <tr class="">
                 <td class="status">{{status}}</td>
                 <td class="userlink"><a href="{{userlink}}&id={{userid}}" title="{{name}}">{{name}}</a></td>
-                <td class="idnumber"><span class="idnumber">{{idnumber}}</span></td>
-                <td class="email"><span class="email">{{email}}</span></td>
+                {{#useridentityvalues}}
+                    <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
+                {{/useridentityvalues}}
             </tr>
         {{/mreg_data}}
         {{^reg_data}}{{^mreg_data}}
             <tr class="regentry reg">
-                <td class="no_registrations" colspan="4">{{#str}} no_registrations, mod_grouptool {{/str}}</td>
+                <td class="no_registrations" colspan="100">{{#str}} no_registrations, mod_grouptool {{/str}}</td>
             </tr>
         {{/mreg_data}}{{/reg_data}}
         {{#queue_data}}
             <tr class="">
                 <td class="status">{{rank}}</td>
                 <td class="userlink"><a href="{{userlink}}&id={{userid}}" title="{{name}}">{{name}}</a></td>
-                <td class="idnumber"><span class="idnumber">{{idnumber}}</span></td>
-                <td class="email"><span class="email">{{email}}</span></td>
+                {{#useridentityvalues}}
+                    <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
+                {{/useridentityvalues}}
             </tr>
         {{/queue_data}}
         {{^queue_data}}
             <tr class="queueentry queue">
-                <td class="no_queues" colspan="4">{{#str}} nobody_queued, mod_grouptool {{/str}}</td>
+                <td class="no_queues" colspan="100">{{#str}} nobody_queued, mod_grouptool {{/str}}</td>
             </tr>
         {{/queue_data}}
         </tbody>

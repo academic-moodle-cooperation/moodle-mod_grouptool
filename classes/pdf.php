@@ -25,6 +25,7 @@
 namespace mod_grouptool;
 
 use context_course;
+use mod_grouptool\local\tests\grouptool;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -75,6 +76,9 @@ class pdf extends \pdf {
     /** @var int|null used to calculate heights of text-blocks */
     protected $bigheight = null;
 
+    /** @var array Holds all instance specific useridentityfields*/
+    protected $useridentityfields = null;
+
     /**
      * Class constructor
      *
@@ -92,6 +96,7 @@ class pdf extends \pdf {
 
         parent::__construct($orientation, $unit, $format, $unicode, $encoding);
 
+        $this->useridentityfields = grouptool::get_useridentity_fields();
         $this->setFontSubsetting(false);
 
         // Set orientation (P/L)!
@@ -364,7 +369,7 @@ class pdf extends \pdf {
         if (count($registration)) {
             $this->add_overview_table_header();
             foreach ($registration as $row) {
-                $this->add_overview_row($row['status'], $row['name'], $row['idnumber'], $row['email'], $fill);
+                $this->add_overview_row($row, $fill);
             }
         } else if (count($moodlemembers) == 0) {
             $this->SetFont('', 'I');
@@ -379,7 +384,8 @@ class pdf extends \pdf {
                 $this->add_overview_table_header();
             }
             foreach ($moodlemembers as $row) {
-                $this->add_overview_row('?', $row['name'], $row['idnumber'], $row['email'], $fill);
+                $row['status'] = '?';
+                $this->add_overview_row($row, $fill);
             }
         }
 
@@ -393,7 +399,7 @@ class pdf extends \pdf {
                 } else {
                     $this->SetFillColor(0xff, 0xcc, 0x99);
                 }
-                $this->add_overview_row($row['rank'], $row['name'], $row['idnumber'], $row['email'], $fill, 1);
+                $this->add_overview_row(row, $fill, 1);
             }
         } else {
             $this->SetFont('', 'I');
@@ -402,6 +408,25 @@ class pdf extends \pdf {
                              'M', true);
             $this->SetFont('', '');
         }
+    }
+
+    /**
+     * Helper function to calculate the width of identity columns for pdf exports
+     *
+     * @param float $fieldwidth Reserved width for all idenity columns
+     * @param int $emailscalefactor Scale of the email idenitycolumn relative to other columns (e.g. 2 means twice as wide)
+     * @return float|int Width of a normal identity column. Can be multiplied by emailscalefactor for the email column
+     */
+    private function calculate_identitycolumn_width($fieldwidth = 0.6, $emailscalefactor = 2) {
+        $identityfields = $this->useridentityfields;
+
+        if (empty($identityfields) || isset($identityfields['email'])) {
+            $basewidth = $fieldwidth / count($identityfields);
+            $emailcolumn = $basewidth * $emailscalefactor;
+            // Return scaled basewidth.
+            return $basewidth * $fieldwidth / ($basewidth * (count($identityfields) - 1) + $emailcolumn);
+        }
+        return $fieldwidth / count($identityfields);
     }
 
     /**
@@ -414,6 +439,8 @@ class pdf extends \pdf {
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
         $normalheight = $this->normalheight;
+        $identityfields = $this->useridentityfields;
+        $identitycolumnwidth = self::calculate_identitycolumn_width();
 
         $this->SetFont('', 'B');
         $this->MultiCell(0.1 * $writewidth, $normalheight, get_string('status', 'grouptool'),
@@ -421,10 +448,25 @@ class pdf extends \pdf {
                          'M', true);
         $this->MultiCell(0.3 * $writewidth, $normalheight, get_string('fullname'), 'LRB', 'C',
                          true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
-        $this->MultiCell(0.2 * $writewidth, $normalheight, get_string('idnumber'), 'LRB', 'C',
-                         true, 0, null, null, true, 1, true, false, $normalheight, 'M', true);
-        $this->MultiCell(0.4 * $writewidth, $normalheight, get_string('email'), 'LB', 'C', true,
-                         1, null, null, true, 1, true, false, $normalheight, 'M', true);
+
+        $colcount = 0;
+        $identityfieldscount = count($identityfields);
+        foreach ($identityfields as $key => $value) {
+            $border = 'LRB';
+            $ln = 0;
+            if (++$colcount == $identityfieldscount) {
+                $border = 'LB';
+                $ln = 1;
+            }
+            if ($key == 'email') {
+                $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight, get_string('email'), $border, 'C', true,
+                        $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
+            } else {
+                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, get_string($key), $border, 'C',
+                        true, $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
+            }
+        }
+
         $this->SetFillColor(0xe8, 0xe8, 0xe8);
         $this->SetFont('', '');
     }
@@ -439,7 +481,7 @@ class pdf extends \pdf {
      * @param bool $fill whether or not this row's cells will contain a background color (gets toggled afterwards)!
      * @param bool $forcefill force cell background color ($fill gets toggled anyways)!
      */
-    private function add_overview_row($status, $name, $idnumber, $email, &$fill, $forcefill = false) {
+    private function add_overview_row_old($status, $name, $idnumber, $email, &$fill, $forcefill = false) {
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
         $normalheight = $this->normalheight;
@@ -456,32 +498,71 @@ class pdf extends \pdf {
     }
 
     /**
+     * Adds a single data row to a group column in overview
+     *
+     * @param array $row Array containing all data of a single row
+     * @param bool $fill Rather or not the current line is filled with a shade of lightgrey. Is toggled after every call.
+     * @param bool $forcefill Force the current row to be filled with a shade of lightgrey
+     * @throws \coding_exception
+     */
+    private function add_overview_row($row, &$fill, $forcefill = false) {
+        $margins = $this->getMargins();
+        $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
+        $normalheight = $this->normalheight;
+        $identityfields = $this->useridentityfields;
+        $identitycolumnwidth = self::calculate_identitycolumn_width();
+
+        $this->MultiCell(0.1 * $writewidth, $normalheight, $row['status'], 'TR', 'C', $fill || $forcefill, 0, null, null, true,
+                1, true, false, $normalheight, 'M', true);
+        $this->MultiCell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
+                1, true, false, $normalheight, 'M', true);
+
+        $colcount = 0;
+        $identityfieldscount = count($identityfields);
+        foreach ($identityfields as $key => $value) {
+            $border = 'TLR';
+            $ln = 0;
+            if (++$colcount == $identityfieldscount) {
+                $border = 'TL';
+                $ln = 1;
+            }
+            if ($key == 'email') {
+                $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight, $row['email'], $border, 'C',
+                        $fill || $forcefill, $ln, null, null, true, 1, true, false,
+                        $normalheight, 'M', true);
+            } else {
+                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, $row[$key], $border, 'C',
+                        $fill || $forcefill, $ln, null, null, true, 1, true, false,
+                        $normalheight, 'M', true);
+            }
+        }
+
+        $this->SetFillColor(0xe8, 0xe8, 0xe8);
+        $this->SetFont('', '');
+        $fill ^= 1;
+    }
+
+    /**
      * add_userdata helper method to write the data about 1 user in a row (also for table-header)
      *
-     * @param string $name of user
-     * @param string|integer $idnumber of user
-     * @param string $email user's email
-     * @param \stdClass[] $registrations
-     * @param \stdClass[] $queues
+     * @param array $row Array containing all data for a single row
      * @param bool $header if it's a header-row or not
      * @param bool $getheightonly return only the height of the row
      * @return int height of written row
      * @throws \coding_exception
-     *
      */
-    public function add_userdata($name, $idnumber, $email, $registrations, $queues, $header=false,
-                                 $getheightonly=false) {
+    public function add_userdata($row, $header=false, $getheightonly=false) {
         global $SESSION;
 
         $margins = $this->getMargins();
         $writewidth = $this->getPageWidth() - $margins['left'] - $margins['right'];
+        $identityfields = $this->useridentityfields;
 
         $this->SetFontSize(1.0 * self::NORMLINEHEIGHT);
 
         // Get row-height!
         if (!$getheightonly) {
-            $height = $this->add_userdata($name, $idnumber, $email, $registrations, $queues,
-                                          $header, true);
+            $height = $this->add_userdata($row, $header, true);
             // Move to next page if too high!
             $this->checkPageBreak($height);
 
@@ -512,18 +593,20 @@ class pdf extends \pdf {
         } else {
             $collapsed = [];
         }
-
+        // Todo: Consider caching result of this calculation as it is the same for each row in one export.
         $basicwidths = [
                 'fullname' => 0.225,
-                'idnumber' => 0.15,
-                'email' => 0.225,
+                'identity' => $this->calculate_identitycolumn_width(0.375, 1.5),
+                'email' => $this->calculate_identitycolumn_width(0.375, 1.5) * 1.5,
                 'registrations' => 0.225,
                 'queues' => 0.175
         ];
         $totalwidth = array_sum($basicwidths);
         $colapsedwidth = $totalwidth;
         foreach ($collapsed as $column) {
-            $colapsedwidth -= $basicwidths[$column];
+            if (array_key_exists($column, $basicwidths)) {
+                $colapsedwidth -= $basicwidths[$column];
+            }
         }
         $widths = [];
         foreach ($basicwidths as $column => $width) {
@@ -534,34 +617,34 @@ class pdf extends \pdf {
         $widths[key($widths)] = 0;
 
         if (!in_array('fullname', $collapsed)) {
-            $this->MultiCell($widths['fullname'], $height, $name, $borderf, 'L', $fill, 0, null,
+            $this->MultiCell($widths['fullname'], $height, $row['name'], $borderf, 'L', $fill, 0, null,
                              null, true, 1, false, false, $height, 'M', true);
             if ($getheightonly) {
                 $height = max([$height, $this->getLastH()]);
             }
         }
-        if (!in_array('idnumber', $collapsed)) {
-            $this->MultiCell($widths['idnumber'], $height, $idnumber, $border, 'L', $fill, 0, null,
-                             null, true, 1, false, false, $height, 'M', true);
-            if ($getheightonly) {
-                $height = max([$height, $this->getLastH()]);
+
+        foreach ($identityfields as $key => $value) {
+            $curwidth = $widths['identity'];
+            if ($key == 'email') {
+                $curwidth = $widths['email'];
+            }
+            if (!in_array($key, $collapsed)) {
+                $this->MultiCell($curwidth, $height, $row[$key], $border, 'L', $fill,
+                        0, null, null, true, 1, false, false, $height,
+                        'M', true);
             }
         }
-        if (!in_array('email', $collapsed)) {
-            $this->MultiCell($widths['email'], $height, $email, $border, 'L', $fill, 0, null, null,
-                             true, 1, false, false, $height, 'M', true);
-            if ($getheightonly) {
-                $height = max([$height, $this->getLastH()]);
-            }
-        }
+
         if (!in_array('registrations', $collapsed)) {
-            if (!empty($registrations) && is_array($registrations)) {
-                $registrationsstring = (count($registrations) > 1) ? implode("\n", $registrations) : $registrations[0];
+            if (!empty($row['registrations']) && is_array($row['registrations'])) {
+                $registrationsstring = (count($row['registrations']) > 1) ?
+                        implode("\n", $row['registrations']) : $row['registrations'][0];
                 if ($getheightonly) {
                     $this->MultiCell($widths['registrations'], $height, $registrationsstring,
                                      $border, 'L', $fill, 0, null, null, true, 1, false, false,
                                      $height, 'M', false);
-                    $height = count($registrations) * max([$height, $this->getLastH()]);
+                    $height = count($row['registrations']) * max([$height, $this->getLastH()]);
                 } else {
                     $this->MultiCell($widths['registrations'], $height, $registrationsstring,
                                      $border, 'L', $fill, 0, null, null, true, 1, false, false,
@@ -569,7 +652,7 @@ class pdf extends \pdf {
                 }
             } else if ($header) {
                 $this->SetFont('', 'B');
-                $this->MultiCell($widths['registrations'], $height, $registrations, $border, 'L',
+                $this->MultiCell($widths['registrations'], $height, $row['registrations'], $border, 'L',
                                 $fill, 0, null, null, true, 1, false, false, $height, 'M', true);
                 if ($getheightonly) {
                     $height = max([$height, $this->getLastH()]);
@@ -587,16 +670,16 @@ class pdf extends \pdf {
             }
         }
         if (!in_array('queues', $collapsed)) {
-            if (!empty($queues) && is_array($queues)) {
+            if (!empty($row['queues']) && is_array($row['queues'])) {
                 $queuesstrings = [];
-                foreach ($queues as $queue) {
+                foreach ($row['queues'] as $queue) {
                     $queuesstrings[] = $queue['name'].' (#'.$queue['rank'].')';
                 }
                 if ($getheightonly) {
                     $this->MultiCell(0, $height, implode("\n", $queuesstrings), $borderl,
                                      'L', $fill, 0, null, null, true, 1, false, false, $height,
                                      'M', false);
-                    $height = count($queues) * max([$height, $this->getLastH()]);
+                    $height = count($row['queues']) * max([$height, $this->getLastH()]);
                 } else {
                     $this->MultiCell(0, $height, implode("\n", $queuesstrings), $borderl,
                                      'L', $fill, 0, null, null, true, 1, false, false, $height,
@@ -604,7 +687,7 @@ class pdf extends \pdf {
                 }
             } else if ($header) {
                 $this->SetFont('', 'B');
-                $this->MultiCell(0, $height, $queues, $borderl, 'L', $fill, 0, null, null,
+                $this->MultiCell(0, $height, $row['queues'], $borderl, 'L', $fill, 0, null, null,
                                  true, 1, false, false, $height, 'M', true);
                 if ($getheightonly) {
                     $height = max([$height, $this->getLastH()]);
