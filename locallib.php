@@ -484,6 +484,9 @@ class mod_grouptool {
 
         $groups = [];
 
+        // Number of groups with userpergrp+1 for properly allocating the rest without messing up the sort order.
+        $plusonegroupcount = count($users) % $numgrps;
+
         // Allocate the users - all groups equal count first!
         for ($i = 0; $i < $numgrps; $i++) {
             $groups[$i] = [];
@@ -491,7 +494,9 @@ class mod_grouptool {
             if ($data->allocateby == 'no') {
                 continue; // Do not allocate users!
             }
-            for ($j = 0; $j < $userpergrp; $j++) {
+            // Adds one member more if group is in the pluse one range.
+            $plusonegroup = $i < $plusonegroupcount ? 1 : 0;
+            for ($j = 0; $j < ($userpergrp + $plusonegroup); $j++) {
                 if (empty($users)) {
                     break 2;
                 }
@@ -499,15 +504,9 @@ class mod_grouptool {
                 $groups[$i]['members'][$user->id] = $user;
             }
         }
-        // Now distribute the rest!
-        if ($data->allocateby != 'no') {
-            for ($i = 0; $i < $numgrps; $i++) {
-                if (empty($users)) {
-                    break 1;
-                }
-                $user = array_shift($users);
-                $groups[$i]['members'][$user->id] = $user;
-            }
+        // Throw an error if there are still users left who have not been allocated.
+        if ($data->allocateby != 'no' && !empty($users)) {
+            throw new coding_exception('User to group accocation did not work properly. There are still remaining users');
         }
         // Every member is there, so we can parse the name!
         $digits = ceil(log10($numgrps));
