@@ -5601,7 +5601,7 @@ class mod_grouptool {
                 foreach ($importfields as $curfield) {
                     $row->cells[] = new html_table_cell(empty($userinfo->$curfield) ? '' : $userinfo->$curfield);
                 }
-                if (!is_enrolled($this->context, $userinfo->id)) {
+                if (!is_enrolled($this->context, $userinfo->id) && !$previewonly) {
 
                     // We have to catch deleted users now, give a message and continue!
                     if (!empty($userinfo->deleted)) {
