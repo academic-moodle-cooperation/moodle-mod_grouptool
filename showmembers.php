@@ -95,11 +95,11 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     $context->name = $group->name;
 
     // Cache needed user records right now!
-    $userfields = get_all_user_name_fields(true);
+    $userfields = \core_user\fields::for_name()->get_sql();
     if ($showidnumber) {
-        $fields = "id,idnumber,".$userfields;
+        $fields = "id,idnumber".$userfields;
     } else {
-        $fields = "id,".$userfields;
+        $fields = "id".$userfields;
     }
     $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
 
