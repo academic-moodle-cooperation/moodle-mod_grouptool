@@ -1970,7 +1970,7 @@ class mod_grouptool {
                     get_string('target', 'grouptool'),
                     get_string('fullname'),
                     get_string('idnumber'),
-                    get_string('grade'),
+                    get_string('grade', 'grades'),
                     get_string('feedback'),
                     get_string('source', 'grouptool')
             ];
@@ -2130,7 +2130,7 @@ class mod_grouptool {
             $previewtable->head = [
                     get_string('groups')." (".count($selected).")",
                     get_string('fullname'),
-                    get_string('grade'),
+                    get_string('grade', 'grades'),
                     get_string('feedback')
             ];
             foreach ($selected as $group) {
@@ -2281,7 +2281,7 @@ class mod_grouptool {
                 $count = in_array($source, $selected) ? count($selected) - 1 : count($selected);
                 $previewtable->head = [
                         '', get_string('fullname')." (".$count.")",
-                        get_string('grade'), get_string('feedback')
+                        get_string('grade', 'grades'), get_string('feedback')
                 ];
                 $previewtable->attributes['class'] = 'table table-hover grading_previewtable';
             } else {
@@ -2384,7 +2384,7 @@ class mod_grouptool {
                                                     get_string('strftimedatetimeshort')),
                         'feedback' => $sourcegrade->feedback
                 ];
-                $info .= html_writer::tag('div', get_string('grade').": ".
+                $info .= html_writer::tag('div', get_string('grade', 'grades').": ".
                                         $formattedgrade.html_writer::empty_tag('br').
                                         format_text(get_string('copied_grade_feedback', 'grouptool',
                                                                $details),
@@ -5933,7 +5933,7 @@ class mod_grouptool {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = get_all_user_name_fields();
+            $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }
@@ -6071,7 +6071,7 @@ class mod_grouptool {
      */
     protected function add_namefields_useridentity(&$row, $user) {
         global $CFG;
-        $namefields = get_all_user_name_fields();
+        $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
         foreach ($namefields as $namefield) {
             if (!empty($user->$namefield)) {
                 $row[$namefield] = $user->$namefield;
@@ -6111,7 +6111,7 @@ class mod_grouptool {
      */
     protected function get_namefields_useridentity($row, $user) {
         global $CFG;
-        $namefields = get_all_user_name_fields();
+        $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
         foreach ($namefields as $namefield) {
             if (!empty($user->$namefield)) {
                 $row[$namefield] = $user->$namefield;
@@ -6471,7 +6471,7 @@ class mod_grouptool {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = get_all_user_name_fields();
+            $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }
@@ -7139,7 +7139,7 @@ class mod_grouptool {
 
         $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
                         || has_capability('mod/grouptool:view_regs_course_view', $this->context);
-        $userfields = get_all_user_name_fields(true);
+        $userfields = \core_user\fields::for_name()->get_required_fields();
         if ($showidnumber) {
             $fields = "id,idnumber,".$userfields;
         } else {
@@ -7429,8 +7429,8 @@ class mod_grouptool {
             $userparams = [];
         }
 
-        $extrauserfields = get_extra_user_fields_sql($this->context, 'u');
-        $mainuserfields = user_picture::fields('u', ['idnumber', 'email']);
+        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u', false, '', '', false)->selects;
+        $mainuserfields = \core_user\fields::for_userpic()->including(['idnumber', 'email'])->get_sql('u', false, '', '', false)->selects;
         $orderbystring = "";
         if (!empty($orderby)) {
             foreach ($orderby as $field => $direction) {
@@ -7645,7 +7645,8 @@ class mod_grouptool {
         $groups = groups_get_all_groups($this->course->id, 0, $groupingid);
         if (!empty($groupingid) && !empty($groups)) {
             // Get all groupings groups!
-            $ufields = user_picture::fields('u', ['idnumber']);
+            $ufields = $mainuserfields = \core_user\fields::for_userpic()->including(
+                    ['idnumber'])->get_sql('u', false, '', '', false)->selects;
             $groupingusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupingusers)) {
                 $groupingusers = [];
@@ -7674,7 +7675,8 @@ class mod_grouptool {
         if (!empty($groupid)) {
             // Same as with groupingid but just with 1 group!
             // Get all group members!
-            $ufields = user_picture::fields('u', ['idnumber']);
+            $ufields = $mainuserfields = \core_user\fields::for_userpic()->including(
+                    ['idnumber'])->get_sql('u', false, '', '', false)->selects;
             $groupusers = groups_get_members($groupid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupusers)) {
                 $groupusers = [];
@@ -7722,7 +7724,7 @@ class mod_grouptool {
 
         // We create a dummy user-object to get the fullname-format!
         $dummy = new stdClass();
-        $namefields = get_all_user_name_fields();
+        $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
         foreach ($namefields as $namefield) {
             $dummy->$namefield = $namefield;
         }
@@ -8236,7 +8238,7 @@ class mod_grouptool {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = get_all_user_name_fields();
+            $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }

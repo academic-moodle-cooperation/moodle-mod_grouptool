@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.11.0 (2021-05-19)
+------------------
+* [FEATURE] #6855 Add support for showuseridentiy information to group and course view and their respective exports
+* [FIXED] #6819 Fix wrong alphabetical allocation of group members occuring if groups cannot be filled up completely
+* [FIXED] #6817 Fix students being enrolled to a course when using the import function when the operation is aborted
+* [FIXED] #6858 Fix collapsing of columns in course view causing values to clip into the collapsed column
+
 3.10.0 (2020-11-18)
 ------------------
 * [FEATURE] #6774 Support for multilang format course names in export filenames [github pull #21 t-schroeder]
