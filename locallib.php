@@ -5933,7 +5933,7 @@ class mod_grouptool {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
+            $namefields = \core_user\fields::for_name()->get_required_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }
@@ -6071,7 +6071,7 @@ class mod_grouptool {
      */
     protected function add_namefields_useridentity(&$row, $user) {
         global $CFG;
-        $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
+        $namefields = \core_user\fields::for_name()->get_required_fields();
         foreach ($namefields as $namefield) {
             if (!empty($user->$namefield)) {
                 $row[$namefield] = $user->$namefield;
@@ -6111,7 +6111,7 @@ class mod_grouptool {
      */
     protected function get_namefields_useridentity($row, $user) {
         global $CFG;
-        $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
+        $namefields = \core_user\fields::for_name()->get_required_fields();
         foreach ($namefields as $namefield) {
             if (!empty($user->$namefield)) {
                 $row[$namefield] = $user->$namefield;
@@ -6471,7 +6471,7 @@ class mod_grouptool {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
+            $namefields = \core_user\fields::for_name()->get_required_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }
@@ -6567,7 +6567,7 @@ class mod_grouptool {
 
                 // First we output every namefield from used by fullname in exact the defined order!
                 foreach ($namefields as $namefield) {
-                    $groupworksheets[$key]->write_string(7, $k, get_user_field_name($namefield), $regheadformat);
+                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($namefield), $regheadformat);
                     $hidden = in_array($namefield, $collapsed) ? true : false;
                     $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
@@ -6579,9 +6579,9 @@ class mod_grouptool {
                     $curfieldcount = 1;
                     foreach ($fields as $field) {
                         if ($curfieldcount == count($fields)) {
-                            $groupworksheets[$key]->write_string(7, $k, get_user_field_name($field), $regheadlast);
+                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadlast);
                         } else {
-                            $groupworksheets[$key]->write_string(7, $k, get_user_field_name($field), $regheadformat);
+                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadformat);
                             $curfieldcount++;
                         }
                         $hidden = in_array($field, $collapsed) ? true : false;
@@ -6590,13 +6590,13 @@ class mod_grouptool {
                         $k++; // ...k = n+x!
                     }
                 } else {
-                    $groupworksheets[$key]->write_string(7, $k, get_user_field_name('idnumber'), $regheadformat);
+                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('idnumber'), $regheadformat);
                     $hidden = in_array('idnumber', $collapsed) ? true : false;
                     $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
                     $k++; // ...k = n+1!
 
-                    $groupworksheets[$key]->write_string(7, $k, get_user_field_name('email'), $regheadlast);
+                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('email'), $regheadlast);
                     $hidden = in_array('email', $collapsed) ? true : false;
                     $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['email'], null, $hidden);
@@ -6610,7 +6610,7 @@ class mod_grouptool {
                     $k++;
                     // First we output every namefield from used by fullname in exact the defined order!
                     foreach ($namefields as $namefield) {
-                        $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name($namefield), $regheadformat);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($namefield), $regheadformat);
                         $hidden = in_array($namefield, $collapsed) ? true : false;
                         $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
@@ -6622,9 +6622,9 @@ class mod_grouptool {
                         $curfieldcount = 1;
                         foreach ($fields as $field) {
                             if ($curfieldcount == count($fields)) {
-                                $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name($field), $regheadlast);
+                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field), $regheadlast);
                             } else {
-                                $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name($field), $regheadformat);
+                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field), $regheadformat);
                                 $curfieldcount++;
                             }
                             $hidden = in_array($field, $collapsed) ? true : false;
@@ -6633,13 +6633,13 @@ class mod_grouptool {
                             $k++; // ...k = n+x!
                         }
                     } else {
-                        $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name('idnumber'), $regheadformat);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('idnumber'), $regheadformat);
                         $hidden = in_array('idnumber', $collapsed) ? true : false;
                         $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
                         $k++; // ...k = n+1!
 
-                        $allgroupsworksheet->write_string($j + 7, $k, get_user_field_name('email'), $regheadlast);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('email'), $regheadlast);
                         $hidden = in_array('email', $collapsed) ? true : false;
                         $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
@@ -7429,8 +7429,8 @@ class mod_grouptool {
             $userparams = [];
         }
 
-        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u', false, '', '', false)->selects;
-        $mainuserfields = \core_user\fields::for_userpic()->including(['idnumber', 'email'])->get_sql('u', false, '', '', false)->selects;
+        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u')->selects;
+        $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u', false, '', '', false)->selects;
         $orderbystring = "";
         if (!empty($orderby)) {
             foreach ($orderby as $field => $direction) {
@@ -7724,7 +7724,7 @@ class mod_grouptool {
 
         // We create a dummy user-object to get the fullname-format!
         $dummy = new stdClass();
-        $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
+        $namefields = \core_user\fields::for_name()->get_required_fields();
         foreach ($namefields as $namefield) {
             $dummy->$namefield = $namefield;
         }
@@ -7793,18 +7793,18 @@ class mod_grouptool {
         } else {
             $head = ['name'          => get_string('fullname')];
             foreach ($namefields as $namefield) {
-                $head[$namefield] = get_user_field_name($namefield);
+                $head[$namefield] = \core_user\fields::get_display_name($namefield);
             }
             if (empty($CFG->showuseridentity)) {
-                $head['idnumber'] = get_user_field_name('idnumber');
+                $head['idnumber'] = \core_user\fields::get_display_name('idnumber');
             } else {
                 $fields = explode(',', $CFG->showuseridentity);
                 foreach ($fields as $field) {
-                    $head[$field] = get_user_field_name($field);
+                    $head[$field] = \core_user\fields::get_display_name($field);
                 }
             }
-            $head['idnumber'] = get_user_field_name('idnumber');
-            $head['email']         = get_user_field_name('email');
+            $head['idnumber'] = \core_user\fields::get_display_name('idnumber');
+            $head['email']         = \core_user\fields::get_display_name('email');
             $head['registrations'] = get_string('registrations', 'grouptool');
             $head['queues']        = get_string('queues', 'grouptool').' ('.get_string('rank',
                             'grouptool').')';
@@ -8238,7 +8238,7 @@ class mod_grouptool {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = \core_user\fields::for_name()->get_required_fields();_name_fields();
+            $namefields = \core_user\fields::for_name()->get_required_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }
@@ -8267,7 +8267,7 @@ class mod_grouptool {
                     $k = 0;
                     // First we output every namefield from used by fullname in exact the defined order!
                     foreach ($namefields as $namefield) {
-                        $worksheet->write_string($j, $k, get_user_field_name($namefield), $headlineformat);
+                        $worksheet->write_string($j, $k, \core_user\fields::get_display_name($namefield), $headlineformat);
                         $worksheet->write_blank($j + 1, $k, $headlineformat);
                         $worksheet->merge_cells($j, $k, $j + 1, $k);
                         $hidden = in_array($namefield, $collapsed) ? true : false;
@@ -8279,7 +8279,7 @@ class mod_grouptool {
                     if (!empty($CFG->showuseridentity)) {
                         $fields = explode(',', $CFG->showuseridentity);
                         foreach ($fields as $field) {
-                            $worksheet->write_string($j, $k, get_user_field_name($field), $headlineformat);
+                            $worksheet->write_string($j, $k, \core_user\fields::get_display_name($field), $headlineformat);
                             $worksheet->write_blank($j + 1, $k, $headlineformat);
                             $hidden = in_array($field, $collapsed) ? true : false;
                             $columnwidth[$field] = empty($columnwidth[$field]) ? $columnwidth[0] : $columnwidth[$field];
@@ -8288,7 +8288,7 @@ class mod_grouptool {
                             $k++; // ...k = n+x!
                         }
                     } else {
-                        $worksheet->write_string($j, $k, get_user_field_name('idnumber'), $headlineformat);
+                        $worksheet->write_string($j, $k, \core_user\fields::get_display_name('idnumber'), $headlineformat);
                         $worksheet->write_blank($j + 1, $k, $headlineformat);
                         $hidden = in_array('idnumber', $collapsed) ? true : false;
                         $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
@@ -8296,7 +8296,7 @@ class mod_grouptool {
                         $worksheet->merge_cells($j, $k, $j + 1, $k);
                         $k++; // ...k = n+1!
 
-                        $worksheet->write_string($j, $k, get_user_field_name('email'), $headlineformat);
+                        $worksheet->write_string($j, $k, \core_user\fields::get_display_name('email'), $headlineformat);
                         $worksheet->write_blank($j + 1, $k, $headlineformat);
                         $hidden = in_array('email', $collapsed) ? true : false;
                         $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
