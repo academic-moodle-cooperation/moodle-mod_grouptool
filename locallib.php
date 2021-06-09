@@ -7139,14 +7139,14 @@ class mod_grouptool {
 
         $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
                         || has_capability('mod/grouptool:view_regs_course_view', $this->context);
-        $userfields = \core_user\fields::for_name()->get_required_fields();
+        $userfields = \core_user\fields::for_name()->get_sql("", false, "", "", false)->selects;
         if ($showidnumber) {
             $fields = "id,idnumber,".$userfields;
         } else {
             $fields = "id,".$userfields;
         }
         // Cache needed user records right now!
-        $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
+        $users = $DB->get_records_list("user", 'id', array_combine($gtregs, $queued), null, $fields);
 
         $attributes['data-absregs'] = [];
         if (!empty($absregs)) {
