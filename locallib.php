@@ -7646,7 +7646,7 @@ class mod_grouptool {
         if (!empty($groupingid) && !empty($groups)) {
             // Get all groupings groups!
             $ufields = $mainuserfields = \core_user\fields::for_userpic()->including(
-                    ['idnumber'])->get_sql('u', false, '', '', false)->selects;
+                    'idnumber')->get_sql('u', false, '', '', false)->selects;
             $groupingusers = groups_get_grouping_members($groupingid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupingusers)) {
                 $groupingusers = [];
@@ -7676,7 +7676,7 @@ class mod_grouptool {
             // Same as with groupingid but just with 1 group!
             // Get all group members!
             $ufields = $mainuserfields = \core_user\fields::for_userpic()->including(
-                    ['idnumber'])->get_sql('u', false, '', '', false)->selects;
+                    'idnumber')->get_sql('u', false, '', '', false)->selects;
             $groupusers = groups_get_members($groupid, 'DISTINCT u.id, '.$ufields);
             if (empty($groupusers)) {
                 $groupusers = [];
