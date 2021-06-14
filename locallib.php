@@ -7146,7 +7146,7 @@ class mod_grouptool {
             $fields = "id,".$userfields;
         }
         // Cache needed user records right now!
-        $users = $DB->get_records_list("user", 'id', array_combine($gtregs, $queued), null, $fields);
+        $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
 
         $attributes['data-absregs'] = [];
         if (!empty($absregs)) {
