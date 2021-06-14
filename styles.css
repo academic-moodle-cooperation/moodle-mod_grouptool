@@ -412,3 +412,7 @@
     font-weight: bold;
     white-space: nowrap;
 }
+
+.path-mod-grouptool .status {
+    text-align: center;
+}
