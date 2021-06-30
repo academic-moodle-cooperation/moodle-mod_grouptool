@@ -4174,8 +4174,15 @@ class mod_grouptool {
                                 'agrpid' => $agrp[$group],
                                 'userid' => $data['id']
                             ])) {
-                            $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
-                            $row->attributes['class'] = 'success';
+                            if (groups_is_member($group, $data['id']) && $unregfrommgroups) {
+                                groups_remove_member($group, $data['id']);
+                                $row->cells[] = get_string('unregister_user_from_moodle_group', 'grouptool', $data);
+                                $row->attributes['class'] = 'success';
+                            } else {
+                                $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
+                                $row->attributes['class'] = 'success';
+                            }
+
                             continue;
                         }
                         if ($followchangessetting && $DB->record_exists('groups_members', [
@@ -4209,9 +4216,16 @@ class mod_grouptool {
                     } else if ($userinfo) {
                         if (!$DB->record_exists_select('grouptool_registered', "agrpid = :agrpid AND userid = :userid",
                             ['agrpid' => $agrp[$group], 'userid' => $userinfo->id])) {
-                            $cell = get_string('unregister_conflict_user_not_in_group', 'grouptool', $data);
-                            $row->cells[] = $cell;
-                            $row->attributes['class'] = 'prevconflict';
+                            if (groups_is_member($group, $userinfo->id)) {
+                                $cell = get_string('unregister_user_only_in_moodle_group',
+                                        'grouptool', $data);
+                                $row->cells[] = $cell;
+                                $row->attributes['class'] = 'prevsuccess';
+                            } else {
+                                $cell = get_string('unregister_conflict_user_not_in_group', 'grouptool', $data);
+                                $row->cells[] = $cell;
+                                $row->attributes['class'] = 'prevconflict';
+                            }
                         } else {
                             $row->cells[] = get_string('unregister_user_prev', 'grouptool', $data);
                             $row->attributes['class'] = 'prevsuccess';
