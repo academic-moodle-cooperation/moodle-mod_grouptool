@@ -2695,13 +2695,15 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
-                                       $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false) {
+                                       $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false, $ignoregtinstance = false) {
         global $DB;
 
         require_capability('mod/grouptool:view_groups', $this->context);
 
-        $params = ['grouptoolid' => $this->cm->instance];
-
+        if (!$ignoregtinstance) {
+            $params = ['grouptoolid' => $this->cm->instance];
+            $params['agrpgrptlid'] = $this->cm->instance;
+        }
         if (!empty($agrpid)) {
             $agrpidwhere = " AND agrp.id = :agroup";
             $params['agroup'] = $agrpid;
@@ -2741,7 +2743,6 @@ class mod_grouptool {
             $idstring = "agrp.id AS agrpid, grp.id AS id";
         }
 
-        $params['agrpgrptlid'] = $this->cm->instance;
 
         if (!$includeinactive) {
             $active = " AND agrp.active = 1 ";
@@ -2749,7 +2750,21 @@ class mod_grouptool {
             $active = "";
         }
 
-        $groupdata = $DB->get_records_sql("
+        $groupdata = null;
+        if ($ignoregtinstance) {
+            $groupdata = $DB->get_records_sql("
+                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                          agrp.active AS active
+                     FROM {groups} grp
+                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
+                LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
+                LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
+                    WHERE 1=1".$active.
+                    $agrpidwhere.$groupidwhere.$groupingidwhere."
+                 GROUP BY grp.id, agrp.id
+                 ORDER BY sort_order ASC, name ASC", $params);
+        } else {
+            $groupdata = $DB->get_records_sql("
                    SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
@@ -2757,9 +2772,10 @@ class mod_grouptool {
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
                     WHERE agrp.grouptoolid = :grouptoolid ".$active.
-                          $agrpidwhere.$groupidwhere.$groupingidwhere."
+                    $agrpidwhere.$groupidwhere.$groupingidwhere."
                  GROUP BY grp.id, agrp.id
                  ORDER BY sort_order ASC, name ASC", $params);
+        }
         if (!empty($groupdata)) {
             foreach ($groupdata as $key => $group) {
                 $groupingids = $DB->get_fieldset_select('groupings_groups',
@@ -2947,7 +2963,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false) {
+    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false, $ignoregtinstance=false) {
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -2974,7 +2990,7 @@ class mod_grouptool {
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid, 0,
-                0, true, true);
+                0, true, true, $ignoregtinstance);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
@@ -2982,8 +2998,13 @@ class mod_grouptool {
 
         $message->groupname = $groupdata->name;
         $message->userid = $userid;
+        $agrpids = null;
+        if ($ignoregtinstance) {
+            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', '');
+        } else {
+            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", [$this->grouptool->id]);
 
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", [$this->grouptool->id]);
+        }
         list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
         $userregs = $DB->count_records_select('grouptool_registered',
@@ -4067,7 +4088,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false) {
+    public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false, $unregfromallagrps = false) {
         global $DB, $OUTPUT;
 
         $message = "";
@@ -4089,21 +4110,29 @@ class mod_grouptool {
         $agrp = [];
         $groupname = [];
         foreach ($groups as $group) {
-            $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
-                'grouptoolid' => $this->grouptool->id,
-                'groupid'     => $group
-            ], IGNORE_MISSING);
-            $groupname[$group] = $DB->get_field('groups', 'name', [
-                'id'     => $group
-            ], IGNORE_MISSING);
+            if ($unregfromallagrps) {
+                $agrp[$group] = $DB->get_fieldset_select('grouptool_agrps', 'id','groupid = :groupid', [
+                        'groupid' => $group]);
+                $groupname[$group] = $DB->get_field('groups', 'name', [
+                        'id' => $group
+                ], IGNORE_MISSING);
+            } else {
+                $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
+                        'grouptoolid' => $this->grouptool->id,
+                        'groupid' => $group
+                ], IGNORE_MISSING);
+                $groupname[$group] = $DB->get_field('groups', 'name', [
+                        'id' => $group
+                ], IGNORE_MISSING);
 
-            if (!$DB->record_exists('grouptool_agrps', [
-                'grouptoolid' => $this->grouptool->id,
-                'groupid'     => $group,
-                'active'      => 1
-            ])) {
-                $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
-                    $groupname[$group]), \core\output\notification::NOTIFY_ERROR);
+                if (!$DB->record_exists('grouptool_agrps', [
+                        'grouptoolid' => $this->grouptool->id,
+                        'groupid' => $group,
+                        'active' => 1
+                ])) {
+                    $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
+                            $groupname[$group]), \core\output\notification::NOTIFY_ERROR);
+                }
             }
         }
         if (false !== ($gtimportfields = get_config('mod_grouptool', 'importfields'))) {
@@ -4166,14 +4195,12 @@ class mod_grouptool {
                         $pbar->update($processed, $count,
                             get_string('unregister_progress_unregister',
                                     'grouptool').' '.fullname($userinfo).'...');
-                        if (!$DB->record_exists('grouptool_registered', [
-                            'agrpid' => $agrp[$group],
-                            'userid' => $data['id']
-                        ]) &&
-                            !$DB->record_exists('grouptool_queued', [
-                                'agrpid' => $agrp[$group],
-                                'userid' => $data['id']
-                            ])) {
+                        list($insql, $inparams) = $DB->get_in_or_equal($agrp[$group], SQL_PARAMS_NAMED);
+                        $inparams['userid'] = $data['id'];
+                        $sqlreg = "SELECT * FROM {grouptool_registered} WHERE agrpid $insql AND userid=:userid";
+                        $sqlqueue = "SELECT * FROM {grouptool_queued} WHERE agrpid $insql AND userid=:userid";
+                        if (!$DB->record_exists_sql($sqlreg, $inparams) &&
+                            !$DB->record_exists_sql($sqlqueue, $inparams)) {
                             if (groups_is_member($group, $data['id']) && $unregfrommgroups) {
                                 groups_remove_member($group, $data['id']);
                                 $row->cells[] = get_string('unregister_user_from_moodle_group', 'grouptool', $data);
@@ -4208,7 +4235,22 @@ class mod_grouptool {
                         }
 
                         if ($unregfrommgroups) {
-                            $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
+                            if (is_array($agrp[$group])) {
+                                foreach ($agrp[$group] as $agrpinst) {
+                                    if ($DB->record_exists('grouptool_registered', [
+                                                    'agrpid' => $agrpinst,
+                                                    'userid' => $data['id']
+                                            ]) ||
+                                            $DB->record_exists('grouptool_queued', [
+                                                    'agrpid' => $agrpinst,
+                                                    'userid' => $data['id']
+                                            ])) {
+                                        $this->unregister_from_agrp($agrpinst, $userinfo->id, false, true, true);
+                                    }
+                                }
+                            } else {
+                                $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
+                            }
                         }
                         $unregistered[] = $userinfo->id;
                         $row->cells[] = get_string('unregister_user', 'grouptool', $data);
@@ -5802,7 +5844,7 @@ class mod_grouptool {
             foreach ($groups as $group) {
                 $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
             }
-            list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false);
+            list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false, $unregfrommgroups);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'),
