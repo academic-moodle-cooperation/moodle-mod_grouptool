@@ -2680,7 +2680,7 @@ class mod_grouptool {
     }
 
     /**
-     * gets data about active groups for this instance
+     * gets data about active groups for this instance or all instances if ignoregtinstance is set
      *
      * @param bool $includeregs optional include registered users in returned object
      * @param bool $includequeues optional include queued users in returned object
@@ -2690,6 +2690,7 @@ class mod_grouptool {
      * @param bool $indexbygroup optional index returned array by {groups}.id
      *                                    instead of {grouptool_agrps}.id
      * @param bool $includeinactive optional include also inactive groups - despite the method being called get_active_groups()!
+     * @param bool $ignoregtinstance If true gets active groups from all grouptool instances and not only from this instance
      * @return array of objects containing all necessary information about chosen active groups
      * @throws dml_exception
      * @throws required_capability_exception
@@ -2955,6 +2956,7 @@ class mod_grouptool {
      * @param int $userid user to unregister/unqueue
      * @param bool $previewonly (optional) don't act, just return a preview
      * @param bool $force (optional) ignore setting for allowing deregistration (needed for multi-deregistration)
+     * @param bool $ignoregtinstance If true unregister/unqueue a user from a given group regardless of this grouptool instance
      * @return string $message if everything went right
      * @throws \mod_grouptool\local\exception\notenoughregs If the user hasn't enough registrations!
      * @throws \mod_grouptool\local\exception\registration In any other case, where the user can't be unregistered!
@@ -4080,11 +4082,13 @@ class mod_grouptool {
      * @param string $data data that identifies the users
      * @param bool $unregfrommgroups also unreg. from moodle groups
      * @param bool $previewonly only preview
+     * @param bool $unregfromallagrps If true unregisters users from all occurrences of the given groups in any grouptool instance
      * @return array
      * @throws \mod_grouptool\local\exception\notenoughregs
      * @throws \mod_grouptool\local\exception\registration
      * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      * @throws required_capability_exception
      */
     public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false, $unregfromallagrps = false) {
