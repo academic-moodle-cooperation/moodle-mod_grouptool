@@ -2694,8 +2694,8 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
-                                       $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false, $ignoregtinstance = false) {
+    public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0, $groupid=0, $groupingid=0,
+            $indexbygroup=true, $includeinactive = false, $ignoregtinstance = false) {
         global $DB;
 
         require_capability('mod/grouptool:view_groups', $this->context);
@@ -2742,7 +2742,6 @@ class mod_grouptool {
         } else {
             $idstring = "agrp.id AS agrpid, grp.id AS id";
         }
-
 
         if (!$includeinactive) {
             $active = " AND agrp.active = 1 ";
@@ -4111,7 +4110,7 @@ class mod_grouptool {
         $groupname = [];
         foreach ($groups as $group) {
             if ($unregfromallagrps) {
-                $agrp[$group] = $DB->get_fieldset_select('grouptool_agrps', 'id','groupid = :groupid', [
+                $agrp[$group] = $DB->get_fieldset_select('grouptool_agrps', 'id', 'groupid = :groupid', [
                         'groupid' => $group]);
                 $groupname[$group] = $DB->get_field('groups', 'name', [
                         'id' => $group
@@ -6637,7 +6636,8 @@ class mod_grouptool {
                         if ($curfieldcount == count($fields)) {
                             $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadlast);
                         } else {
-                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadformat);
+                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field),
+                                    $regheadformat);
                             $curfieldcount++;
                         }
                         $hidden = in_array($field, $collapsed) ? true : false;
@@ -6646,7 +6646,8 @@ class mod_grouptool {
                         $k++; // ...k = n+x!
                     }
                 } else {
-                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('idnumber'), $regheadformat);
+                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('idnumber'),
+                            $regheadformat);
                     $hidden = in_array('idnumber', $collapsed) ? true : false;
                     $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
@@ -6666,7 +6667,8 @@ class mod_grouptool {
                     $k++;
                     // First we output every namefield from used by fullname in exact the defined order!
                     foreach ($namefields as $namefield) {
-                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($namefield), $regheadformat);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($namefield),
+                                $regheadformat);
                         $hidden = in_array($namefield, $collapsed) ? true : false;
                         $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
@@ -6678,9 +6680,11 @@ class mod_grouptool {
                         $curfieldcount = 1;
                         foreach ($fields as $field) {
                             if ($curfieldcount == count($fields)) {
-                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field), $regheadlast);
+                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field),
+                                        $regheadlast);
                             } else {
-                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field), $regheadformat);
+                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field),
+                                        $regheadformat);
                                 $curfieldcount++;
                             }
                             $hidden = in_array($field, $collapsed) ? true : false;
@@ -6689,7 +6693,8 @@ class mod_grouptool {
                             $k++; // ...k = n+x!
                         }
                     } else {
-                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('idnumber'), $regheadformat);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('idnumber'),
+                                $regheadformat);
                         $hidden = in_array('idnumber', $collapsed) ? true : false;
                         $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
@@ -7486,7 +7491,8 @@ class mod_grouptool {
         }
 
         $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u')->selects;
-        $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u', false, '', '', false)->selects;
+        $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u',
+                false, '', '', false)->selects;
         $orderbystring = "";
         if (!empty($orderby)) {
             foreach ($orderby as $field => $direction) {
