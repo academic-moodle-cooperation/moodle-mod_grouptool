@@ -103,4 +103,58 @@ $functions = [
         'type'        => 'write',
         'ajax'        => true,
         ],
+
+        'mod_grouptool_get_grouptools_by_courses' => [
+        'classname'     => 'mod_grouptool_external',
+        'methodname'    => 'get_grouptools_by_courses',
+        'classpath'     => 'mod/grouptool/externallib.php',
+        'description'   => 'Get all grouptools for the given courses',
+        'type'          => 'write',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
+
+        'mod_grouptool_get_grouptool' => [
+        'classname'     => 'mod_grouptool_external',
+        'methodname'    => 'get_grouptool',
+        'classpath'     => 'mod/grouptool/externallib.php',
+        'description'   => 'Get the grouptool with the given id',
+        'type'          => 'write',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
+
+        'mod_grouptool_register' => [
+        'classname'     => 'mod_grouptool_external',
+        'methodname'    => 'register',
+        'classpath'     => 'mod/grouptool/externallib.php',
+        'description'   => 'Register for group',
+        'type'          => 'write',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
+
+        'mod_grouptool_deregister' => [
+        'classname'     => 'mod_grouptool_external',
+        'methodname'    => 'deregister',
+        'classpath'     => 'mod/grouptool/externallib.php',
+        'description'   => 'deregister for group',
+        'type'          => 'write',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
+
+        'mod_grouptool_change_group' => [
+        'classname'     => 'mod_grouptool_external',
+        'methodname'    => 'change_group',
+        'classpath'     => 'mod/grouptool/externallib.php',
+        'description'   => 'Change from one group to another',
+        'type'          => 'write',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
+
+        'mod_grouptool_get_registration_status' => [
+        'classname'     => 'mod_grouptool_external',
+        'methodname'    => 'get_registration_status',
+        'classpath'     => 'mod/grouptool/externallib.php',
+        'description'   => 'Get the status of the current registration for this user in the given group tool',
+        'type'          => 'read',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        ],
 ];

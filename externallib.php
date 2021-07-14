@@ -22,6 +22,9 @@
  * @copyright     2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_grouptool\local\tests\grouptool;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/externallib.php");
@@ -608,5 +611,544 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
         ]);
+    }
+
+    /**
+     * Returns description of the get_grouptools_by_courses parameters
+     * @return external_function_parameters
+     */
+    public static function get_grouptools_by_courses_parameters() {
+        return new external_function_parameters([
+            'courseids' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Course id'), 'Array of course ids (all enrolled courses if empty array)', VALUE_DEFAULT, []
+            ),
+        ]);
+    }
+
+    /**
+     * Returns description of the get_grouptools_by_courses result value
+     * @return external_single_structure
+     */
+    public static function get_grouptools_by_courses_returns() {
+        return new external_single_structure([
+            'grouptools' => new external_multiple_structure(self::grouptool_structure(), 'All grouptools for the given courses'),
+            'warnings' => new external_warnings()
+        ]);
+    }
+
+    /**
+     * Get all grouptools for the courses with the given ids. If the ids are empty all grouptools from all
+     * user-enrolled courses are returned.
+     *
+     * @param $courseids array the ids of the courses to get grouptools for (all user enrolled courses if empty array)
+     * @return stdClass
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     */
+    public static function get_grouptools_by_courses($courseids) {
+
+        $params = self::validate_parameters(self::get_grouptools_by_courses_parameters(), [
+            'courseids' => $courseids
+        ]);
+
+        $rgrouptools = [];
+        $warnings = [];
+
+        $mycourses = new stdClass();
+        if (empty($params['courseids'])) {
+            $mycourses = enrol_get_my_courses();
+            $params['courseids'] = array_keys($mycourses);
+        }
+
+        // Ensure there are courseids to loop through.
+        if (!empty($params['courseids'])) {
+
+            list($courses, $warnings) = external_util::validate_courses($params['courseids'], $mycourses);
+
+            // Get the grouptools in this course, this function checks users visibility permissions.
+            // We can avoid then additional validate_context calls.
+            $grouptool_instances = get_all_instances_in_courses("grouptool", $courses);
+            foreach ($grouptool_instances as $grouptool_instance) {
+
+                $grouptool = new grouptool($grouptool_instance->coursemodule);
+                $rgrouptools[] = self::export_grouptool($grouptool);
+            }
+        }
+
+        $result = new stdClass();
+        $result->grouptools = $rgrouptools;
+        $result->warnings = $warnings;
+        return $result;
+    }
+
+    /**
+     * Returns description of the get_grouptool parameters
+     * @return external_function_parameters
+     */
+    public static function get_grouptool_parameters() {
+        return new external_function_parameters([
+            'grouptoolid' => new external_value(PARAM_INT, 'The id of the grouptool'),
+        ]);
+    }
+
+    /**
+     * Returns description of the get_grouptool result value
+     * @return external_single_structure
+     */
+    public static function get_grouptool_returns() {
+        return new external_single_structure([
+            'grouptool' => self::grouptool_structure(),
+        ]);
+    }
+
+    /**
+     * Returns the grouptool for the given id
+     *
+     * @param $grouptoolid
+     * @return stdClass
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     */
+    public static function get_grouptool($grouptoolid) {
+        $params = self::validate_parameters(self::get_grouptool_parameters(), ['grouptoolid' => $grouptoolid]);
+
+        $cm = get_coursemodule_from_instance('grouptool', $params['grouptoolid'], 0, false, MUST_EXIST);
+        $grouptool = new mod_grouptool($cm->id);
+
+        $context = context_module::instance($grouptool->get_course_module()->id);
+        require_capability('mod/grouptool:view_description', $context);
+        require_capability('mod/grouptool:view_own_registration', $context);
+        require_capability('mod/grouptool:view_groups', $context);
+        self::validate_context($context);
+
+        $result = new stdClass();
+        $result->grouptool = self::export_grouptool($grouptool);
+        return $result;
+    }
+
+    /**
+     * Returns description of the register parameters
+     * @return external_single_structure
+     */
+    public static function register_parameters() {
+        return new external_function_parameters([
+            'grouptoolid' => new external_value(PARAM_INT, 'grouptool id'),
+            'id' => new external_value(PARAM_INT, 'group id'),
+        ]);
+    }
+
+    /**
+     * Returns description of the register result values
+     * @return external_single_structure
+     */
+    public static function register_returns() {
+        return new external_single_structure([
+            'message' => new external_value(PARAM_RAW, "Message whether the registration was successful"),
+        ]);
+    }
+
+    /**
+     * Registers the current user in the given group of the given grouptool.
+     * 
+     * @param $grouptoolid
+     * @param $id
+     * @return object
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceedgroupsize
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     */
+    public static function register($grouptoolid, $id) {
+        $params = self::validate_parameters(self::register_parameters(), ['grouptoolid' => $grouptoolid,'id' => $id]);
+
+        $cm = get_coursemodule_from_instance('grouptool', $params['grouptoolid'], 0, false, MUST_EXIST);
+        $grouptool = new mod_grouptool($cm->id);
+
+        $context = context_module::instance($grouptool->get_course_module()->id);
+        require_capability('mod/grouptool:view_description', $context);
+        require_capability('mod/grouptool:view_own_registration', $context);
+        require_capability('mod/grouptool:view_groups', $context);
+        self::validate_context($context);
+
+        $result = new stdClass();
+        $result->message = $grouptool->register_in_agrp($params['id']);
+        return $result;
+    }
+
+    /**
+     * Returns description of the deregister parameters
+     * @return external_single_structure
+     */
+    public static function deregister_parameters() {
+        return new external_function_parameters([
+            'grouptoolid' => new external_value(PARAM_INT, 'grouptool id'),
+            'id' => new external_value(PARAM_INT, 'group id'),
+        ]);
+    }
+
+    /**
+     * Returns description of the deregister result values
+     * @return external_single_structure
+     */
+    public static function deregister_returns() {
+        return new external_single_structure([
+            'message' => new external_value(PARAM_RAW, "Message whether the un-registration was successful"),
+        ]);
+    }
+
+    /**
+     * Deregisters the current user from the given group of the given grouptool.
+     *
+     * @param $grouptoolid
+     * @param $id
+     * @return object
+     * @throws \mod_grouptool\local\exception\notenoughregs
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     */
+    public static function deregister($grouptoolid, $id) {
+        $params = self::validate_parameters(self::deregister_parameters(), ['grouptoolid' => $grouptoolid,'id' => $id]);
+
+        $cm = get_coursemodule_from_instance('grouptool', $params['grouptoolid'], 0, false, MUST_EXIST);
+        $grouptool = new mod_grouptool($cm->id);
+
+        $context = context_module::instance($grouptool->get_course_module()->id);
+        require_capability('mod/grouptool:view_description', $context);
+        require_capability('mod/grouptool:view_own_registration', $context);
+        require_capability('mod/grouptool:view_groups', $context);
+        self::validate_context($context);
+
+        $result = new stdClass();
+        $result->message = $grouptool->unregister_from_agrp($params['id']);
+        return $result;
+    }
+
+    /**
+     * Returns description of the change_group_parameters parameters
+     * @return external_single_structure
+     */
+    public static function change_group_parameters() {
+        return new external_function_parameters([
+            'grouptoolid' => new external_value(PARAM_INT, 'grouptool id'),
+            'id' => new external_value(PARAM_INT, 'the id of the group where you want to be'),
+        ]);
+    }
+
+    /**
+     * Returns description of the change_group_parameters result values
+     * @return external_single_structure
+     */
+    public static function change_group_returns() {
+        return new external_single_structure([
+            'message' => new external_value(PARAM_RAW, "Message whether the change of group was successful"),
+        ]);
+    }
+
+    /**
+     * Changes the group for the current user to the group with the given id
+     *
+     * @param $grouptoolid
+     * @param $id
+     * @return object
+     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\local\exception\exceeduserreglimit
+     * @throws \mod_grouptool\local\exception\registration
+     * @throws \mod_grouptool\local\exception\regpresent
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     */
+    public static function change_group($grouptoolid, $id) {
+        $params = self::validate_parameters(self::change_group_parameters(), ['grouptoolid' => $grouptoolid,'id' => $id]);
+
+        $cm = get_coursemodule_from_instance('grouptool', $params['grouptoolid'], 0, false, MUST_EXIST);
+        $grouptool = new mod_grouptool($cm->id);
+
+        $context = context_module::instance($grouptool->get_course_module()->id);
+        require_capability('mod/grouptool:view_description', $context);
+        require_capability('mod/grouptool:view_own_registration', $context);
+        require_capability('mod/grouptool:view_groups', $context);
+        self::validate_context($context);
+
+        $result = new stdClass();
+        $result->message = $grouptool->change_group($params['id']);
+        return $result;
+    }
+
+    /**
+     * Returns description of the get_registration_status_parameters parameters
+     * @return external_single_structure
+     */
+    public static function get_registration_status_parameters() {
+        return new external_function_parameters([
+            'grouptoolid' => new external_value(PARAM_INT, 'grouptool id'),
+        ]);
+    }
+
+    /**
+     * Returns description of the get_registration_status_returns result values
+     * @return external_single_structure
+     */
+    public static function get_registration_status_returns() {
+        return new external_single_structure([
+            'user_registrations' => self::user_registration_status_structure(),
+        ]);
+    }
+
+    /**
+     * Gets the registration status for the current user in the given grouptool.
+     * 
+     * @param $grouptoolid
+     * @return stdClass
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
+     */
+    public static function get_registration_status($grouptoolid) {
+        $params = self::validate_parameters(self::get_registration_status_parameters(), ['grouptoolid' => $grouptoolid,]);
+
+        $cm = get_coursemodule_from_instance('grouptool', $params['grouptoolid'], 0, false, MUST_EXIST);
+        $grouptool = new mod_grouptool($cm->id);
+
+        $context = context_module::instance($grouptool->get_course_module()->id);
+        require_capability('mod/grouptool:view_description', $context);
+        require_capability('mod/grouptool:view_own_registration', $context);
+        require_capability('mod/grouptool:view_groups', $context);
+        self::validate_context($context);
+
+        $result = new stdClass();
+        $result->user_registrations = self::export_user_registrations($grouptool->get_registration_stats(0));
+
+        return $result;
+    }
+
+    /**
+     * Description of the grouptool structure in result values
+     * @return external_single_structure
+     */
+    public static function grouptool_structure() {
+        return new external_single_structure(
+            [
+                'id' => new external_value(PARAM_INT, 'grouptool id'),
+                'instance' => new external_value(PARAM_INT, 'grouptool instance id'),
+                'course' => new external_value(PARAM_INT, 'course id the grouptool belongs to'),
+                'name' => new external_value(PARAM_TEXT, 'grouptool name'),
+                'intro' => new external_value(PARAM_RAW, 'intro/description of the grouptool'),
+                'introformat' => new external_value(PARAM_INT, 'intro format'),
+                'can_enter' => new external_value(PARAM_INT, 'Is the user allowed to enter a group in this grouptool'),
+                'can_leave' => new external_value(PARAM_INT, 'Is the user allowed to leave a group in this grouptool'),
+                'group_size' => new external_value(PARAM_INT, 'Size of the groups'),
+                'groups' => new external_multiple_structure(self::group_structure(), 'Groups of this grouptool'),
+                'user_registrations' => self::user_registration_status_structure(),
+            ], 'grouptool information'
+        );
+    }
+
+    /**
+     * Description of the user registration status structure in result values
+     * @return external_single_structure
+     */
+    public static function user_registration_status_structure() {
+        return new external_single_structure(
+            [
+                'registered' => new external_multiple_structure(self::status_group_structure(), 'Groups where the current user is registered'),
+                'queued' => new external_multiple_structure(self::status_group_structure(), 'Groups where the current user is queued'),
+            ], 'Groups where the current user is registered or queued in'
+        );
+    }
+
+    /**
+     * Description of the status group structure in result values
+     * @return external_single_structure
+     */
+    public static function status_group_structure() {
+        return new external_single_structure(
+            [
+                'id' => new external_value(PARAM_INT, 'group id'),
+                'name' => new external_value(PARAM_TEXT, 'group name'),
+                'rank' => new external_value(PARAM_TEXT, 'rank of registration or queue in this group', VALUE_OPTIONAL),
+            ], 'status group information'
+        );
+    }
+
+    /**
+     * Description of the group structure in result values
+     * @return external_single_structure
+     */
+    public static function group_structure() {
+        return new external_single_structure(
+            [
+                'id' => new external_value(PARAM_INT, 'group id'),
+                'name' => new external_value(PARAM_TEXT, 'group name'),
+                'group_size' => new external_value(PARAM_INT, 'Size of this group'),
+                'rank' => new external_value(PARAM_TEXT, 'rank of registration or queue in this group', VALUE_OPTIONAL),
+                'registered' => new external_value(PARAM_INT, 'number of users registered for this group'),
+                'queued' => new external_value(PARAM_INT, 'number of users queued for this group'),
+                'registered_members' => new external_multiple_structure(self::group_member_structure(), 'registered members of the group if visible for current user', VALUE_OPTIONAL),
+                'queued_members' => new external_multiple_structure(self::group_member_structure(), 'queued members of the group if visible for current user', VALUE_OPTIONAL),
+            ], 'group information'
+        );
+    }
+
+    /**
+     * Description of the group member structure in result values
+     * @return external_single_structure
+     */
+    public static function group_member_structure() {
+        return new external_single_structure(
+            [
+                'user' => new external_value(PARAM_INT, 'user id'),
+            ], 'group member information'
+        );
+    }
+
+    /**
+     * Converts the given grouptool to match the grouptool structure for result values
+     *
+     * @param $grouptool mod_grouptool  The grouptool to be exported
+     * @return stdClass                 The exported grouptool
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
+    public static function export_grouptool($grouptool) {
+        $result_grouptool = new stdClass();
+
+        $result_grouptool->id = $grouptool->get_course_module()->id;
+        $result_grouptool->instance = $grouptool->get_course_module()->instance;
+        $result_grouptool->course = $grouptool->get_course_module()->course;
+        $result_grouptool->name = $grouptool->get_grouptool()->name;
+        $result_grouptool->intro = $grouptool->get_grouptool()->intro;
+        $result_grouptool->introformat = $grouptool->get_grouptool()->introformat;
+        $result_grouptool->can_enter = $grouptool->get_grouptool()->allow_reg;
+        $result_grouptool->can_leave = $grouptool->get_grouptool()->allow_unreg;
+        $result_grouptool->group_size = $grouptool->get_grouptool()->grpsize;
+        $result_grouptool->groups = self::export_groups($grouptool, $grouptool->get_active_groups(true, true));
+        $result_grouptool->user_registrations = self::export_user_registrations($grouptool->get_registration_stats(0));
+
+        return $result_grouptool;
+    }
+
+    /**
+     * Exports the given groups to match the group structure for result values.
+     *
+     * @param $grouptool mod_grouptool  The grouptool of which the groups are part of
+     * @param $groups array             The groups to be exported
+     * @return array                    The exported groups
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function export_groups($grouptool, $groups) {
+        $result_groups = [];
+
+        foreach ($groups as $group_id => $group) {
+            $result_group = new stdClass();
+
+            $result_group->id = $group->agrpid;
+            $result_group->name = $group->name;
+            $result_group->group_size = $group->grpsize;
+            $result_group->registered = sizeof($group->registered);
+            $result_group->queued = sizeof($group->queued);
+
+            if (!empty($group->rank)) {
+                $result_group->rank = $group->rank;
+            }
+
+            if ($grouptool->canshowmembers($group->agrpid)) {
+                $result_registered_members = [];
+                foreach ($group->registered as $id => $registered_member) {
+                    $result_registered_member = new stdClass();
+
+                    $result_registered_member->user = $registered_member->userid;
+                    
+                    $result_registered_members[] = $result_registered_member;
+                }
+
+                $result_group->registered_members = $result_registered_members;
+
+                $result_queued_members = [];
+                foreach ($group->queued as $id => $queued_member) {
+                    $result_queued_member = new stdClass();
+
+                    $result_queued_member->user = $queued_member->userid;
+
+                    $result_queued_members[] = $result_queued_member;
+                }
+
+                $result_group->queued_members = $result_queued_members;
+            }
+
+            $result_groups[] = $result_group;
+        }
+
+        return $result_groups;
+    }
+
+    /**
+     * Exports the given user registration to match the user registration structure in result values
+     *
+     * @param $user_registrations object   The registrations of the current user to be exported
+     * @return object                      The exported user registrations
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
+    public static function export_user_registrations($user_registrations) {
+        $result_registrations = new stdClass();
+
+        $result_registrations->registered = self::export_status_groups($user_registrations->registered);
+        $result_registrations->queued = self::export_status_groups($user_registrations->queued);
+
+        return $result_registrations;
+    }
+
+    /**
+     * Exports the given groups to match the status group structure for result values.
+     *
+     * @param $groups array             The groups to be exported
+     * @return array                    The exported groups
+     * @throws coding_exception
+     * @throws dml_exception
+     */
+    public static function export_status_groups($groups) {
+        $result_groups = [];
+
+        foreach ($groups as $group_id => $group) {
+            $result_group = new stdClass();
+
+            $result_group->id = $group->agrpid;
+            $result_group->name = $group->grpname;
+
+            if (!empty($group->rank)) {
+                $result_group->rank = $group->rank;
+            }
+
+            $result_groups[] = $result_group;
+        }
+
+        return $result_groups;
     }
 }
