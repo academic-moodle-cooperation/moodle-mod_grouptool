@@ -2989,7 +2989,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false) {
+    public function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false) { // TODO protected -> public
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -3135,7 +3135,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function register_in_agrp($agrpid, $userid=0, $previewonly=false) {
+    public function register_in_agrp($agrpid, $userid=0, $previewonly=false) { // TODO changed from protected to public
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -3377,7 +3377,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
+    public function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
         global $DB, $USER;
 
         if ($userid === null) {
@@ -8465,5 +8465,32 @@ class mod_grouptool {
 
     }
 
+    /**
+     * @return object the course module
+     */
+    public function get_course_module() {
+        return $this->cm;
+    }
+
+    /**
+     * @return object the course
+     */
+    public function get_course() {
+        return $this->course;
+    }
+
+    /**
+     * @return object the grouptool
+     */
+    public function get_grouptool() {
+        return $this->grouptool;
+    }
+
+    /**
+     * @return object the context
+     */
+    public function get_context() {
+        return $this->context;
+    }
 }
 
