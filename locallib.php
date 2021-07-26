@@ -2763,6 +2763,7 @@ class mod_grouptool {
                  GROUP BY grp.id, agrp.id
                  ORDER BY sort_order ASC, name ASC", $params);
         } else {
+            $params['grouptoolid1'] = $params['grouptoolid'];
             $groupdata = $DB->get_records_sql("
                    SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
@@ -2770,7 +2771,7 @@ class mod_grouptool {
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :grouptoolid
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
-                    WHERE agrp.grouptoolid = :grouptoolid ".$active.
+                    WHERE agrp.grouptoolid = :grouptoolid1 ".$active.
                     $agrpidwhere.$groupidwhere.$groupingidwhere."
                  GROUP BY grp.id, agrp.id
                  ORDER BY sort_order ASC, name ASC", $params);
