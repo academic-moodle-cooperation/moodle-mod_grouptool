@@ -2703,7 +2703,6 @@ class mod_grouptool {
 
         if (!$ignoregtinstance) {
             $params = ['grouptoolid' => $this->cm->instance];
-            $params['agrpgrptlid'] = $this->cm->instance;
         }
         if (!empty($agrpid)) {
             $agrpidwhere = " AND agrp.id = :agroup";
@@ -2768,7 +2767,7 @@ class mod_grouptool {
                    SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
-                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :agrpgrptlid
+                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :grouptoolid
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
                     WHERE agrp.grouptoolid = :grouptoolid ".$active.
