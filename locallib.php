@@ -2680,7 +2680,7 @@ class mod_grouptool {
     }
 
     /**
-     * gets data about active groups for this instance
+     * gets data about active groups for this instance or all instances if ignoregtinstance is set
      *
      * @param bool $includeregs optional include registered users in returned object
      * @param bool $includequeues optional include queued users in returned object
@@ -2690,18 +2690,20 @@ class mod_grouptool {
      * @param bool $indexbygroup optional index returned array by {groups}.id
      *                                    instead of {grouptool_agrps}.id
      * @param bool $includeinactive optional include also inactive groups - despite the method being called get_active_groups()!
+     * @param bool $ignoregtinstance If true gets active groups from all grouptool instances and not only from this instance
      * @return array of objects containing all necessary information about chosen active groups
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0,
-                                       $groupid=0, $groupingid=0, $indexbygroup=true, $includeinactive = false) {
+    public function get_active_groups($includeregs=false, $includequeues=false, $agrpid=0, $groupid=0, $groupingid=0,
+            $indexbygroup=true, $includeinactive = false, $ignoregtinstance = false) {
         global $DB;
 
         require_capability('mod/grouptool:view_groups', $this->context);
 
-        $params = ['grouptoolid' => $this->cm->instance];
-
+        if (!$ignoregtinstance) {
+            $params = ['grouptoolid' => $this->cm->instance];
+        }
         if (!empty($agrpid)) {
             $agrpidwhere = " AND agrp.id = :agroup";
             $params['agroup'] = $agrpid;
@@ -2741,25 +2743,39 @@ class mod_grouptool {
             $idstring = "agrp.id AS agrpid, grp.id AS id";
         }
 
-        $params['agrpgrptlid'] = $this->cm->instance;
-
         if (!$includeinactive) {
             $active = " AND agrp.active = 1 ";
         } else {
             $active = "";
         }
 
-        $groupdata = $DB->get_records_sql("
+        $groupdata = null;
+        if ($ignoregtinstance) {
+            $groupdata = $DB->get_records_sql("
                    SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
-                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :agrpgrptlid
+                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
                 LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
                 LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
-                    WHERE agrp.grouptoolid = :grouptoolid ".$active.
-                          $agrpidwhere.$groupidwhere.$groupingidwhere."
+                    WHERE 1=1".$active.
+                    $agrpidwhere.$groupidwhere.$groupingidwhere."
                  GROUP BY grp.id, agrp.id
                  ORDER BY sort_order ASC, name ASC", $params);
+        } else {
+            $params['grouptoolid1'] = $params['grouptoolid'];
+            $groupdata = $DB->get_records_sql("
+                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                          agrp.active AS active
+                     FROM {groups} grp
+                LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :grouptoolid
+                LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id
+                LEFT JOIN {groupings} grpgs ON {groupings_groups}.groupingid = grpgs.id
+                    WHERE agrp.grouptoolid = :grouptoolid1 ".$active.
+                    $agrpidwhere.$groupidwhere.$groupingidwhere."
+                 GROUP BY grp.id, agrp.id
+                 ORDER BY sort_order ASC, name ASC", $params);
+        }
         if (!empty($groupdata)) {
             foreach ($groupdata as $key => $group) {
                 $groupingids = $DB->get_fieldset_select('groupings_groups',
@@ -2940,6 +2956,7 @@ class mod_grouptool {
      * @param int $userid user to unregister/unqueue
      * @param bool $previewonly (optional) don't act, just return a preview
      * @param bool $force (optional) ignore setting for allowing deregistration (needed for multi-deregistration)
+     * @param bool $ignoregtinstance If true unregister/unqueue a user from a given group regardless of this grouptool instance
      * @return string $message if everything went right
      * @throws \mod_grouptool\local\exception\notenoughregs If the user hasn't enough registrations!
      * @throws \mod_grouptool\local\exception\registration In any other case, where the user can't be unregistered!
@@ -2947,7 +2964,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false) {
+    protected function unregister_from_agrp($agrpid, $userid=0, $previewonly=false, $force=false, $ignoregtinstance=false) {
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -2974,7 +2991,7 @@ class mod_grouptool {
             $message->username = fullname($userdata);
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid, 0,
-                0, true, true);
+                0, true, true, $ignoregtinstance);
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
@@ -2982,8 +2999,13 @@ class mod_grouptool {
 
         $message->groupname = $groupdata->name;
         $message->userid = $userid;
+        $agrpids = null;
+        if ($ignoregtinstance) {
+            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', '');
+        } else {
+            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", [$this->grouptool->id]);
 
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", [$this->grouptool->id]);
+        }
         list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
         $userregs = $DB->count_records_select('grouptool_registered',
@@ -4060,14 +4082,16 @@ class mod_grouptool {
      * @param string $data data that identifies the users
      * @param bool $unregfrommgroups also unreg. from moodle groups
      * @param bool $previewonly only preview
+     * @param bool $unregfromallagrps If true unregisters users from all occurrences of the given groups in any grouptool instance
      * @return array
      * @throws \mod_grouptool\local\exception\notenoughregs
      * @throws \mod_grouptool\local\exception\registration
      * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false) {
+    public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false, $unregfromallagrps = false) {
         global $DB, $OUTPUT;
 
         $message = "";
@@ -4089,21 +4113,29 @@ class mod_grouptool {
         $agrp = [];
         $groupname = [];
         foreach ($groups as $group) {
-            $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
-                'grouptoolid' => $this->grouptool->id,
-                'groupid'     => $group
-            ], IGNORE_MISSING);
-            $groupname[$group] = $DB->get_field('groups', 'name', [
-                'id'     => $group
-            ], IGNORE_MISSING);
+            if ($unregfromallagrps) {
+                $agrp[$group] = $DB->get_fieldset_select('grouptool_agrps', 'id', 'groupid = :groupid', [
+                        'groupid' => $group]);
+                $groupname[$group] = $DB->get_field('groups', 'name', [
+                        'id' => $group
+                ], IGNORE_MISSING);
+            } else {
+                $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
+                        'grouptoolid' => $this->grouptool->id,
+                        'groupid' => $group
+                ], IGNORE_MISSING);
+                $groupname[$group] = $DB->get_field('groups', 'name', [
+                        'id' => $group
+                ], IGNORE_MISSING);
 
-            if (!$DB->record_exists('grouptool_agrps', [
-                'grouptoolid' => $this->grouptool->id,
-                'groupid'     => $group,
-                'active'      => 1
-            ])) {
-                $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
-                    $groupname[$group]), \core\output\notification::NOTIFY_ERROR);
+                if (!$DB->record_exists('grouptool_agrps', [
+                        'grouptoolid' => $this->grouptool->id,
+                        'groupid' => $group,
+                        'active' => 1
+                ])) {
+                    $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
+                            $groupname[$group]), \core\output\notification::NOTIFY_ERROR);
+                }
             }
         }
         if (false !== ($gtimportfields = get_config('mod_grouptool', 'importfields'))) {
@@ -4166,16 +4198,21 @@ class mod_grouptool {
                         $pbar->update($processed, $count,
                             get_string('unregister_progress_unregister',
                                     'grouptool').' '.fullname($userinfo).'...');
-                        if (!$DB->record_exists('grouptool_registered', [
-                            'agrpid' => $agrp[$group],
-                            'userid' => $data['id']
-                        ]) &&
-                            !$DB->record_exists('grouptool_queued', [
-                                'agrpid' => $agrp[$group],
-                                'userid' => $data['id']
-                            ])) {
-                            $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
-                            $row->attributes['class'] = 'success';
+                        list($insql, $inparams) = $DB->get_in_or_equal($agrp[$group], SQL_PARAMS_NAMED);
+                        $inparams['userid'] = $data['id'];
+                        $sqlreg = "SELECT * FROM {grouptool_registered} WHERE agrpid $insql AND userid=:userid";
+                        $sqlqueue = "SELECT * FROM {grouptool_queued} WHERE agrpid $insql AND userid=:userid";
+                        if (!$DB->record_exists_sql($sqlreg, $inparams) &&
+                            !$DB->record_exists_sql($sqlqueue, $inparams)) {
+                            if (groups_is_member($group, $data['id']) && $unregfrommgroups) {
+                                groups_remove_member($group, $data['id']);
+                                $row->cells[] = get_string('unregister_user_from_moodle_group', 'grouptool', $data);
+                                $row->attributes['class'] = 'success';
+                            } else {
+                                $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
+                                $row->attributes['class'] = 'success';
+                            }
+
                             continue;
                         }
                         if ($followchangessetting && $DB->record_exists('groups_members', [
@@ -4201,7 +4238,22 @@ class mod_grouptool {
                         }
 
                         if ($unregfrommgroups) {
-                            $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
+                            if (is_array($agrp[$group])) {
+                                foreach ($agrp[$group] as $agrpinst) {
+                                    if ($DB->record_exists('grouptool_registered', [
+                                                    'agrpid' => $agrpinst,
+                                                    'userid' => $data['id']
+                                            ]) ||
+                                            $DB->record_exists('grouptool_queued', [
+                                                    'agrpid' => $agrpinst,
+                                                    'userid' => $data['id']
+                                            ])) {
+                                        $this->unregister_from_agrp($agrpinst, $userinfo->id, false, true, true);
+                                    }
+                                }
+                            } else {
+                                $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
+                            }
                         }
                         $unregistered[] = $userinfo->id;
                         $row->cells[] = get_string('unregister_user', 'grouptool', $data);
@@ -4209,9 +4261,16 @@ class mod_grouptool {
                     } else if ($userinfo) {
                         if (!$DB->record_exists_select('grouptool_registered', "agrpid = :agrpid AND userid = :userid",
                             ['agrpid' => $agrp[$group], 'userid' => $userinfo->id])) {
-                            $cell = get_string('unregister_conflict_user_not_in_group', 'grouptool', $data);
-                            $row->cells[] = $cell;
-                            $row->attributes['class'] = 'prevconflict';
+                            if (groups_is_member($group, $userinfo->id)) {
+                                $cell = get_string('unregister_user_only_in_moodle_group',
+                                        'grouptool', $data);
+                                $row->cells[] = $cell;
+                                $row->attributes['class'] = 'prevsuccess';
+                            } else {
+                                $cell = get_string('unregister_conflict_user_not_in_group', 'grouptool', $data);
+                                $row->cells[] = $cell;
+                                $row->attributes['class'] = 'prevconflict';
+                            }
                         } else {
                             $row->cells[] = get_string('unregister_user_prev', 'grouptool', $data);
                             $row->attributes['class'] = 'prevsuccess';
@@ -5788,7 +5847,7 @@ class mod_grouptool {
             foreach ($groups as $group) {
                 $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
             }
-            list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false);
+            list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false, $unregfrommgroups);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'),
@@ -6581,7 +6640,8 @@ class mod_grouptool {
                         if ($curfieldcount == count($fields)) {
                             $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadlast);
                         } else {
-                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadformat);
+                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field),
+                                    $regheadformat);
                             $curfieldcount++;
                         }
                         $hidden = in_array($field, $collapsed) ? true : false;
@@ -6590,7 +6650,8 @@ class mod_grouptool {
                         $k++; // ...k = n+x!
                     }
                 } else {
-                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('idnumber'), $regheadformat);
+                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('idnumber'),
+                            $regheadformat);
                     $hidden = in_array('idnumber', $collapsed) ? true : false;
                     $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
@@ -6610,7 +6671,8 @@ class mod_grouptool {
                     $k++;
                     // First we output every namefield from used by fullname in exact the defined order!
                     foreach ($namefields as $namefield) {
-                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($namefield), $regheadformat);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($namefield),
+                                $regheadformat);
                         $hidden = in_array($namefield, $collapsed) ? true : false;
                         $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
@@ -6622,9 +6684,11 @@ class mod_grouptool {
                         $curfieldcount = 1;
                         foreach ($fields as $field) {
                             if ($curfieldcount == count($fields)) {
-                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field), $regheadlast);
+                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field),
+                                        $regheadlast);
                             } else {
-                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field), $regheadformat);
+                                $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name($field),
+                                        $regheadformat);
                                 $curfieldcount++;
                             }
                             $hidden = in_array($field, $collapsed) ? true : false;
@@ -6633,7 +6697,8 @@ class mod_grouptool {
                             $k++; // ...k = n+x!
                         }
                     } else {
-                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('idnumber'), $regheadformat);
+                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('idnumber'),
+                                $regheadformat);
                         $hidden = in_array('idnumber', $collapsed) ? true : false;
                         $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
@@ -7430,7 +7495,8 @@ class mod_grouptool {
         }
 
         $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u')->selects;
-        $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u', false, '', '', false)->selects;
+        $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u',
+                false, '', '', false)->selects;
         $orderbystring = "";
         if (!empty($orderby)) {
             foreach ($orderby as $field => $direction) {
