@@ -41,6 +41,7 @@ require_once(dirname(__FILE__).'/definitions.php');
 function grouptool_supports($feature) {
     switch ($feature) {
         case FEATURE_COMPLETION_TRACKS_VIEWS:
+        case FEATURE_COMPLETION_HAS_RULES:
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_BACKUP_MOODLE2:
         case FEATURE_MOD_INTRO:

@@ -93,6 +93,9 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         if (!isset($data->ifgroupdeleted)) {
             $data->ifgroupdeleted = get_config('mod_grouptool', 'ifgroupdeleted');
         }
+        if (!isset($data->completionregister)) {
+            $data->completionregister = 0;
+        }
 
         // Insert the checkmark record!
         $newitemid = $DB->insert_record('grouptool', $data);

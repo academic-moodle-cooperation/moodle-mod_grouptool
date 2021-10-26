@@ -540,6 +540,22 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2020061000, 'grouptool');
     }
+
+    if ($oldversion < 2021051901) {
+
+        // Define field completionregister to be added to grouptool.
+        $table = new xmldb_table('grouptool');
+        $field = new xmldb_field('completionregister', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'ifgroupdeleted');
+
+        // Conditionally launch add field completionregister.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2021051901, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
