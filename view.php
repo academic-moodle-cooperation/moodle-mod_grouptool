@@ -79,6 +79,10 @@ $PAGE->set_activity_record($grouptool);
 
 $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
+// Mark as viewed!
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
 // Output starts here!
 echo $OUTPUT->header();
 // Print tabs according to users capabilities!

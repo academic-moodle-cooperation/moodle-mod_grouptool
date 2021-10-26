@@ -40,11 +40,10 @@ require_once(dirname(__FILE__).'/definitions.php');
  */
 function grouptool_supports($feature) {
     switch ($feature) {
-        case FEATURE_MOD_INTRO:
-            return true;
-        case FEATURE_BACKUP_MOODLE2:
-            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
         case FEATURE_SHOW_DESCRIPTION:
+        case FEATURE_BACKUP_MOODLE2:
+        case FEATURE_MOD_INTRO:
             return true;
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_OTHER;
