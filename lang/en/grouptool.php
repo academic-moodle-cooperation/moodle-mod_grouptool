@@ -159,7 +159,7 @@ $string['createinsertgrouping'] = 'Add to grouping';
 $string['condition_prevent_access'] = 'The current conditions prevent you from accessing the grouptool instance!';
 $string['confirm_delete_title'] = 'Do you really want to delete this element?';
 $string['confirm_delete'] = 'You are about to completely delete the group. This will remove all members from this group irrecoverable. Are you SURE you want to continue?';
-$string['completiondetail:register'] = 'Make $a group registrations';
+$string['completiondetail:register'] = 'Register in groups';
 $string['completionregister'] = 'Student must be registered in groups:';
 $string['copied_grade_feedback'] = 'Group grading<br />
 +Submission from: <strong>{$a->student}</strong><br />

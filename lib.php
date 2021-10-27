@@ -58,34 +58,31 @@ function grouptool_supports($feature) {
 }
 
 /**
- * Obtains the automatic completion state for this grouptool instance based on any conditions
- * in grouptool settings.
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
  *
- * @param object $course Course
- * @param object $cm Course-module
- * @param int $userid User ID
- * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
- * @return bool True if completed, false if not, $type if conditions not set.
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
  */
-function grouptool_get_completion_state($course,$cm,$userid,$type) {
-    global $CFG,$DB;
-
-    // Get grouptool details
-    $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
-
-    // If completion option is enabled, evaluate it and return true/false
-    if($grouptool->completionregister) {
-        return $grouptool->completionregister <= $DB->get_field_sql("
-             SELECT COUNT(DISTINCT a.id) 
-             FROM {grouptool_registered} r 
-                 INNER JOIN {grouptool_agrps} a ON a.id=r.agrpid
-             WHERE
-                 r.userid=:userid AND a.grouptoolid=:grouptoolid",
-                        array('userid'=>$userid,'grouptoolid'=>$grouptool->id));
-    } else {
-        // Completion option is not enabled so just return $type
-        return $type;
+function mod_grouptool_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+            || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
     }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completionregister':
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completionregister', 'grouptool');
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
 }
 
 /**
