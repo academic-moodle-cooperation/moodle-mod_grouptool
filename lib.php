@@ -58,6 +58,37 @@ function grouptool_supports($feature) {
 }
 
 /**
+ * Obtains the automatic completion state for this grouptool instance based on any conditions
+ * in grouptool settings.
+ *
+ * @param object $course Course
+ * @param object $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions)
+ * @return bool True if completed, false if not, $type if conditions not set.
+ */
+function grouptool_get_completion_state($course,$cm,$userid,$type) {
+    global $CFG,$DB;
+
+    // Get grouptool details
+    $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
+
+    // If completion option is enabled, evaluate it and return true/false
+    if($grouptool->completionregister) {
+        return $grouptool->completionregister <= $DB->get_field_sql("
+             SELECT COUNT(DISTINCT a.id) 
+             FROM {grouptool_registered} r 
+                 INNER JOIN {grouptool_agrps} a ON a.id=r.agrpid
+             WHERE
+                 r.userid=:userid AND a.grouptoolid=:grouptoolid",
+                        array('userid'=>$userid,'grouptoolid'=>$grouptool->id));
+    } else {
+        // Completion option is not enabled so just return $type
+        return $type;
+    }
+}
+
+/**
  * Saves a new instance of the grouptool into the database
  *
  * Given an object containing all the necessary data,
