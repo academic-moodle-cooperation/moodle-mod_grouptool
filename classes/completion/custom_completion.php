@@ -88,8 +88,9 @@ class custom_completion extends activity_custom_completion {
      * @return array
      */
     public function get_custom_rule_descriptions(): array {
+    $completionregistrations = $this->cm->customdata['customcompletionrules']['completionregister'] ?? 0;
         return [
-            'completionregister' => get_string('completiondetail:register', 'grouptool')
+            'completionregister' => get_string('completiondetail:register', 'grouptool', $completionregistrations)
         ];
     }
 
