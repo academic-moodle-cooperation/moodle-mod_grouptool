@@ -392,10 +392,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         parent::data_preprocessing($defaultvalues);
 
-        $defaultvalues['completionregisterenabled']=
+        $defaultvalues['completionregisterenabled'] =
                 !empty($defaultvalues['completionregister']) ? 1 : 0;
         if (empty($defaultvalues['completionregister'])) {
-            $defaultvalues['completionregister']=1;
+            $defaultvalues['completionregister'] = 1;
         }
     }
 
@@ -552,7 +552,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform =& $this->_form;
 
-        $group=array();
+        $group = array();
         $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '',
                 get_string('completionregister', 'grouptool'));
         $group[] =& $mform->createElement('text', 'completionregister', '', array('size' => 3));
