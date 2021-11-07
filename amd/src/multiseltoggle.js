@@ -16,7 +16,7 @@
 /**
  * Javascript for toggling between multi-selects and single-selects
  *
- * @package   mod_grouptool
+ * @module   mod_grouptool/multiseltoggle
  * @author    Philipp Hager
  * @copyright 2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

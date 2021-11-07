@@ -16,7 +16,7 @@
 /**
  * Javascript for sortable groups-list
  *
- * @package   mod_grouptool
+ * @module   mod_grouptool/sortlist
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
