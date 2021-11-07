@@ -58,14 +58,14 @@ class custom_completion extends activity_custom_completion {
         $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
 
         // If completion option is enabled, evaluate it and return true/false
-        if($grouptool->completionregister) {
+        if ($grouptool->completionregister) {
             $status = $grouptool->completionregister <= $DB->get_field_sql("
              SELECT COUNT(DISTINCT a.id)
              FROM {grouptool_registered} r
                  INNER JOIN {grouptool_agrps} a ON a.id=r.agrpid
              WHERE
                  r.userid=:userid AND a.grouptoolid=:grouptoolid",
-                            array('userid'=>$userid,'grouptoolid'=>$grouptool->id));
+                            array('userid' => $userid, 'grouptoolid' => $grouptool->id));
             return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
         } else {
             // Completion option is not enabled so just return $type
@@ -88,7 +88,7 @@ class custom_completion extends activity_custom_completion {
      * @return array
      */
     public function get_custom_rule_descriptions(): array {
-    $completionregistrations = $this->cm->customdata['customcompletionrules']['completionregister'] ?? 0;
+        $completionregistrations = $this->cm->customdata['customcompletionrules']['completionregister'] ?? 0;
         return [
             'completionregister' => get_string('completiondetail:register', 'grouptool', $completionregistrations)
         ];

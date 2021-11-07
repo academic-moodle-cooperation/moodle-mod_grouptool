@@ -392,10 +392,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         parent::data_preprocessing($defaultvalues);
 
-        $default_values['completionregisterenabled']=
-                !empty($default_values['completionregister']) ? 1 : 0;
-        if (empty($default_values['completionregister'])) {
-            $default_values['completionregister']=1;
+        $defaultvalues['completionregisterenabled']=
+                !empty($defaultvalues['completionregister']) ? 1 : 0;
+        if (empty($defaultvalues['completionregister'])) {
+            $defaultvalues['completionregister']=1;
         }
     }
 
@@ -541,7 +541,6 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['completionregister'] = get_string('moreregsthanpossible', 'grouptool');
         }
 
-
         return array_merge($parenterrors, $errors);
     }
 
@@ -554,11 +553,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform =& $this->_form;
 
         $group=array();
-        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '', get_string('completionregister','grouptool'));
-        $group[] =& $mform->createElement('text', 'completionregister', '', array('size'=>3));
-        $mform->setType('completionregister',PARAM_INT);
-        $mform->addGroup($group, 'completionregistergroup', get_string('require_registration','grouptool'), array(' '), false);
-        $mform->disabledIf('completionregister','completionregisterenabled','notchecked');
+        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '',
+                get_string('completionregister', 'grouptool'));
+        $group[] =& $mform->createElement('text', 'completionregister', '', array('size' => 3));
+        $mform->setType('completionregister', PARAM_INT);
+        $mform->addGroup($group, 'completionregistergroup', get_string('require_registration', 'grouptool'), array(' '), false);
+        $mform->disabledIf('completionregister', 'completionregisterenabled', 'notchecked');
         return ['completionregistergroup'];
     }
     /**
@@ -568,7 +568,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
      * @return bool
      */
     public function completion_rule_enabled($data) {
-        return (!empty($data['completionregisterenabled']) && $data['completionregister']!=0);
+        return (!empty($data['completionregisterenabled']) && $data['completionregister'] != 0);
     }
 
     /**
@@ -581,7 +581,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
-        // Turn off completion settings if the checkboxes aren't ticked
+        // Turn off completion settings if the checkboxes aren't ticked.
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
             if (empty($data->completionregisterenabled) || !$autocompletion) {

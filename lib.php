@@ -490,8 +490,6 @@ function grouptool_get_coursemodule_info($coursemodule) {
         return false;
     }
 
-
-
     $result = new cached_cm_info();
     $result->name = $grouptool->name;
     if ($coursemodule->showdescription) {

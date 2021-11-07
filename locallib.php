@@ -3055,10 +3055,10 @@ class mod_grouptool {
             if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
                 $this->fill_from_queue($agrpid);
             }
-            // Update completion state
-            $completion=new completion_info($this->course);
-            if($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
-                $completion->update_state($this->cm,COMPLETION_INCOMPLETE, $userid);
+            // Update completion state.
+            $completion = new completion_info($this->course);
+            if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
+                $completion->update_state($this->cm, COMPLETION_INCOMPLETE, $userid);
             }
             if ($userid == $USER->id) {
                 return get_string('unreg_you_from_group_success', 'grouptool', $message);
@@ -3172,10 +3172,10 @@ class mod_grouptool {
                 $return = $this->add_registration($agrpid, $userid, $message);
                 // If we can register, we have to convert the other marks to registrations & queue entries!
                 $this->convert_marks_to_regs($userid);
-                // Update completion state if submission is changed
+                // Update completion state if submission is changed.
                 $completion = new completion_info($this->course);
-                if($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
-                    $completion->update_state($this->cm,COMPLETION_COMPLETE);
+                if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
+                    $completion->update_state($this->cm, COMPLETION_COMPLETE);
                 }
             }
 
@@ -5784,8 +5784,8 @@ class mod_grouptool {
         $message .= html_writer::table($prevtable);
         // Update completion state if submission is changed
         $completion = new completion_info($this->course);
-        if($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
-            $completion->update_state($this->cm,COMPLETION_COMPLETE);
+        if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
+            $completion->update_state($this->cm, COMPLETION_COMPLETE);
         }
         return [$error, $message];
     }
