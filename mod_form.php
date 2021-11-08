@@ -536,8 +536,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['choose_min'] = get_string('mustbegt0', 'grouptool');
         }
 
-        if ((empty($data['allow_multiple']) && ($data['completionregister'] > 1)) || ((!empty($data['allow_multiple']) &&
-                        $data['completionregister'] > $data['choose_max']))) {
+        if ((empty($data['allow_multiple']) && !empty($data['completionregister']) && $data['completionregister'] > 1) || (!empty($data['allow_multiple']) &&
+                        $data['completionregister'] > $data['choose_max'])) {
             $errors['completionregister'] = get_string('moreregsthanpossible', 'grouptool');
         }
 
