@@ -391,6 +391,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
 
         parent::data_preprocessing($defaultvalues);
+
+        $defaultvalues['completionregisterenabled'] =
+                !empty($defaultvalues['completionregister']) ? 1 : 0;
+        if (empty($defaultvalues['completionregister'])) {
+            $defaultvalues['completionregister'] = 1;
+        }
     }
 
     /**
@@ -529,6 +535,58 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['allow_multiple']) && preg_match('/[0-9]+/', $data['choose_min']) == 0) {
             $errors['choose_min'] = get_string('mustbegt0', 'grouptool');
         }
+
+        if ((empty($data['allow_multiple']) && !empty($data['completionregister']) && $data['completionregister'] > 1) || (!empty($data['allow_multiple']) &&
+                        !empty($data['completionregister']) && $data['completionregister'] > $data['choose_max'])) {
+            $errors['completionregister'] = get_string('moreregsthanpossible', 'grouptool');
+        }
+
         return array_merge($parenterrors, $errors);
+    }
+
+    /**
+     * Add any custom completion rules to the form.
+     *
+     * @return array Contains the names of the added form elements
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $group = array();
+        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '',
+                get_string('completionregister', 'grouptool'));
+        $group[] =& $mform->createElement('text', 'completionregister', '', array('size' => 3));
+        $mform->setType('completionregister', PARAM_INT);
+        $mform->addGroup($group, 'completionregistergroup', get_string('require_registration', 'grouptool'), array(' '), false);
+        $mform->disabledIf('completionregister', 'completionregisterenabled', 'notchecked');
+        return ['completionregistergroup'];
+    }
+    /**
+     * Determines if completion is enabled for this module.
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function completion_rule_enabled($data) {
+        return (!empty($data['completionregisterenabled']) && $data['completionregister'] != 0);
+    }
+
+    /**
+     * Allows module to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data the form data to be modified.
+     */
+    public function data_postprocessing($data) {
+        parent::data_postprocessing($data);
+        // Turn off completion settings if the checkboxes aren't ticked.
+        if (!empty($data->completionunlocked)) {
+            $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
+            if (empty($data->completionregisterenabled) || !$autocompletion) {
+                $data->completiondiscussions = 0;
+            }
+        }
     }
 }

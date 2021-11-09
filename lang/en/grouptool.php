@@ -159,6 +159,8 @@ $string['createinsertgrouping'] = 'Add to grouping';
 $string['condition_prevent_access'] = 'The current conditions prevent you from accessing the grouptool instance!';
 $string['confirm_delete_title'] = 'Do you really want to delete this element?';
 $string['confirm_delete'] = 'You are about to completely delete the group. This will remove all members from this group irrecoverable. Are you SURE you want to continue?';
+$string['completiondetail:register'] = 'Register in groups: {$a}';
+$string['completionregister'] = 'Student must be registered in groups:';
 $string['copied_grade_feedback'] = 'Group grading<br />
 +Submission from: <strong>{$a->student}</strong><br />
 +Graded by: <strong>{$a->teacher}</strong><br />
@@ -371,6 +373,7 @@ $string['modulenameplural'] = 'Grouptools';
 $string['modulename_help'] = 'The grouptool-module serves different kind of group-related tasks:<ul><li>It allows to create groups in different modes (amount of groups/group members, single-person-groups, interval of groups) as well as groupings for each group.</li><li>Furthermore it can be used to give students the possibility to register themselves to certain groups during a defined period.</li><li>The module also has the ability of group-grading - i.e. copying activity grades from 1 group member to other group members.</li><li>Import of users into groups via list of ID-numbers</li><li>overview over every course group including all registrations, members, queues, etc. And the ability to export this data into different files-formats (PDF/XLSX/ODS/TXT).</li><li>Exportable list of all course-users including their registrations, queues, etc.</li></ul><p>(!) Note that groups of the grouptool fundamentally differ from the moodle standard groups of the course. To ensure consistency among the group types set parameters of the section "Behaviour on changes in moodle" to "follow changes".</p>';
 $string['moodlesync'] = 'Behaviour on changes in moodle';
 $string['moodlesync_help'] = 'How grouptools should behave if moodle group members are added/deleted or single groups are deleted';
+$string['moreregsthanpossible'] = 'Required registrations for completion cannot be higher than maximum allowed registrations';
 $string['movedown'] = 'Move 1 down';
 $string['moveup'] = 'Move 1 up';
 $string['move_user'] = 'Move from queue to group';
@@ -512,6 +515,7 @@ $string['resized_group'] = 'Changed group size!';
 $string['resolve_queue_legend'] = 'Resolve queues';
 $string['resolve_queue_title'] = 'Resolve pending queues';
 $string['resolve_queue'] = 'Resolve queues';
+$string['require_registration'] = 'Requrie registrations';
 $string['search:activity'] = 'Grouptool - activity information';
 $string['selected'] = 'Selected';
 $string['select'] = 'Select';

@@ -3055,6 +3055,11 @@ class mod_grouptool {
             if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
                 $this->fill_from_queue($agrpid);
             }
+            // Update completion state.
+            $completion = new completion_info($this->course);
+            if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
+                $completion->update_state($this->cm, COMPLETION_INCOMPLETE, $userid);
+            }
             if ($userid == $USER->id) {
                 return get_string('unreg_you_from_group_success', 'grouptool', $message);
             } else {
@@ -3167,6 +3172,11 @@ class mod_grouptool {
                 $return = $this->add_registration($agrpid, $userid, $message);
                 // If we can register, we have to convert the other marks to registrations & queue entries!
                 $this->convert_marks_to_regs($userid);
+                // Update completion state if submission is changed.
+                $completion = new completion_info($this->course);
+                if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
+                    $completion->update_state($this->cm, COMPLETION_COMPLETE);
+                }
             }
 
             return $return;
@@ -5034,6 +5044,14 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
+            // Show the activity information output activity completion.
+            global $USER;
+            $modinfo = get_fast_modinfo($this->course);
+            $cmobj = $modinfo->get_cm($this->cm->id);
+            $cmcompletion = \core_completion\cm_completion_details::get_instance($cmobj, $USER->id);
+            // Pass empty array for the dates so only the completion marks are rendered.
+            $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, []));
+
             $regstat = $this->get_registration_stats($USER->id);
 
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
@@ -5764,6 +5782,11 @@ class mod_grouptool {
             $pbar->update($processed, $count, get_string('import_progress_preview_completed', 'grouptool'));
         }
         $message .= html_writer::table($prevtable);
+        // Update completion state if submission is changed
+        $completion = new completion_info($this->course);
+        if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
+            $completion->update_state($this->cm, COMPLETION_COMPLETE);
+        }
         return [$error, $message];
     }
 

@@ -31,6 +31,7 @@
         <FIELD NAME="ifmemberadded" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="add registration in grouptool if member is added to moodle-group"/>
         <FIELD NAME="ifmemberremoved" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="remove registration if member is removed from moodle-group"/>
         <FIELD NAME="ifgroupdeleted" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="delete active group (and all registrations and queue) if moodle-group get's deleted or recreate the moodle-group so it's further useable by grouptool (groupmembers in moodle won't get restored)"/>
+        <FIELD NAME="completionregister" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Registration threshold for automatic activity completion. If field is set to 0, automatic completion on registration is off. Otherwise the activity will be marked as completed once the user has registered in the given amount of groups"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

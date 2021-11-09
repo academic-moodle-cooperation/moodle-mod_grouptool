@@ -40,11 +40,11 @@ require_once(dirname(__FILE__).'/definitions.php');
  */
 function grouptool_supports($feature) {
     switch ($feature) {
-        case FEATURE_MOD_INTRO:
-            return true;
-        case FEATURE_BACKUP_MOODLE2:
-            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+        case FEATURE_COMPLETION_HAS_RULES:
         case FEATURE_SHOW_DESCRIPTION:
+        case FEATURE_BACKUP_MOODLE2:
+        case FEATURE_MOD_INTRO:
             return true;
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_OTHER;
@@ -55,6 +55,34 @@ function grouptool_supports($feature) {
         default:
             return false;
     }
+}
+
+/**
+ * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
+ *
+ * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @return array $descriptions the array of descriptions for the custom rules.
+ */
+function mod_grouptool_get_completion_active_rule_descriptions($cm) {
+    // Values will be present in cm_info, and we assume these are up to date.
+    if (empty($cm->customdata['customcompletionrules'])
+            || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+        return [];
+    }
+
+    $descriptions = [];
+    foreach ($cm->customdata['customcompletionrules'] as $key => $val) {
+        switch ($key) {
+            case 'completionregister':
+                if (!empty($val)) {
+                    $descriptions[] = get_string('completionregister', 'grouptool');
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return $descriptions;
 }
 
 /**
@@ -457,7 +485,7 @@ function grouptool_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat';
+    $fields = 'id, name, alwaysshowdescription, timeavailable, intro, introformat, completionregister';
     if (! $grouptool = $DB->get_record('grouptool', $dbparams, $fields)) {
         return false;
     }
@@ -471,6 +499,10 @@ function grouptool_get_coursemodule_info($coursemodule) {
         } else {
             unset($result->content);
         }
+    }
+    // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
+    if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completionregister'] = $grouptool->completionregister;
     }
     return $result;
 }
