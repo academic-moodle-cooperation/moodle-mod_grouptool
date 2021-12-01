@@ -468,7 +468,9 @@ class mod_grouptool {
             throw new coding_exception('User to group accocation did not work properly. There are still remaining users');
         }
         // Every member is there, so we can parse the name!
-        $digits = ceil(log10($numgrps));
+        $digits_log = log10($numgrps);
+        // Add another digit if result of log is an integer (it means that no of groups was 10,10,100,...)
+        $digits = $digits_log % 1 === 0 ? $digits_log + 1 : ceil($numgrps);
         for ($i = 0; $i < $numgrps; $i++) {
             $groups[$i]['name']    = $this->groups_parse_name(trim($data->namingscheme), $i,
                                                               $groups[$i]['members'], $digits);
