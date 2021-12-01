@@ -16,7 +16,7 @@
 /**
  * JS handling insertion of tags for group names and displaying advanced elements if changed group creation mode requires some
  *
- * @package   mod_grouptool
+ * @module   mod_grouptool/groupcreation
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

@@ -16,7 +16,7 @@
 /**
  * Javascript handling pop-over displaying group members
  *
- * @package   mod_grouptool
+ * @module   mod_grouptool/memberspopup
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
