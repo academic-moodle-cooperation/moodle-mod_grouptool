@@ -64,7 +64,7 @@ class backup_grouptool_activity_task extends backup_activity_task {
      * @param string $content URL to be modified
      * @return string modified URL
      */
-    static public function encode_content_links($content) {
+     public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot, "/");
