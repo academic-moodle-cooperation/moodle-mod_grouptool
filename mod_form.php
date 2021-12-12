@@ -585,7 +585,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
             if (empty($data->completionregisterenabled) || !$autocompletion) {
-                $data->completiondiscussions = 0;
+                $data->completionregister = 0;
             }
         }
     }
