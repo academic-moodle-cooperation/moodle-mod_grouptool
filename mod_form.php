@@ -538,7 +538,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         if ((empty($data['allow_multiple']) && !empty($data['completionregister']) && $data['completionregister'] > 1) || (!empty($data['allow_multiple']) &&
                         !empty($data['completionregister']) && $data['completionregister'] > $data['choose_max'])) {
-            $errors['completionregister'] = get_string('moreregsthanpossible', 'grouptool');
+            $errors['completionregistergroup'] = get_string('moreregsthanpossible', 'grouptool');
         }
 
         return array_merge($parenterrors, $errors);
@@ -558,6 +558,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $group[] =& $mform->createElement('text', 'completionregister', '', array('size' => 3));
         $mform->setType('completionregister', PARAM_INT);
         $mform->addGroup($group, 'completionregistergroup', get_string('require_registration', 'grouptool'), array(' '), false);
+        $mform->addHelpButton('completionregistergroup', 'require_registration', 'grouptool');
         $mform->disabledIf('completionregister', 'completionregisterenabled', 'notchecked');
         return ['completionregistergroup'];
     }
@@ -585,7 +586,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;
             if (empty($data->completionregisterenabled) || !$autocompletion) {
-                $data->completiondiscussions = 0;
+                $data->completionregister = 0;
             }
         }
     }
