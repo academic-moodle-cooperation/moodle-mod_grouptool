@@ -5047,9 +5047,13 @@ class mod_grouptool {
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
             // Create header
-            $headertext = '<div class="description"><h3>' . $this->grouptool->name .
-                    '</h3><div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
-                    $this->grouptool->intro . '</div></div></div>';
+            $headertext = '<div class="description"><h3>' . $this->grouptool->name . '</h3>';
+            if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
+                    && $this->grouptool->intro) {
+                $headertext .= '<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
+                        $this->grouptool->intro . '</div></div>';
+            }
+            $headertext .= '</div>';
             $mform->addElement('html', $headertext);
 
             // Show the activity information output activity completion.
