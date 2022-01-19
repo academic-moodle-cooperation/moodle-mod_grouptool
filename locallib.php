@@ -5046,13 +5046,24 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
+            // Create header
+            $headertext = '<div class="description"><h3>' . $this->grouptool->name . '</h3>';
+            if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
+                    && $this->grouptool->intro) {
+                $headertext .= '<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
+                        $this->grouptool->intro . '</div></div>';
+            }
+            $headertext .= '</div>';
+            $mform->addElement('html', $headertext);
+
             // Show the activity information output activity completion.
             global $USER;
             $modinfo = get_fast_modinfo($this->course);
             $cmobj = $modinfo->get_cm($this->cm->id);
             $cmcompletion = \core_completion\cm_completion_details::get_instance($cmobj, $USER->id);
+            $activitydates = \core\activity_dates::get_dates_for_module($cmobj, $USER->id);
             // Pass empty array for the dates so only the completion marks are rendered.
-            $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, []));
+            $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, $activitydates));
 
             $regstat = $this->get_registration_stats($USER->id);
 
@@ -5134,20 +5145,6 @@ class mod_grouptool {
                 }
 
                 if (!empty($this->grouptool->allow_reg)) {
-                    if (!empty($this->grouptool->timeavailable)) {
-                        $mform->addElement('static', 'availabledate', get_string('availabledate',
-                                'grouptool'),
-                            userdate($this->grouptool->timeavailable, get_string('strftimedatetime')));
-                    }
-
-                    if (!empty($this->grouptool->timedue)) {
-                        $textdue = userdate($this->grouptool->timedue, get_string('strftimedatetime'));
-                    } else {
-                        $textdue = get_string('noregistrationdue', 'grouptool');
-                    }
-                    $mform->addElement('static', 'registrationdue', get_string('registrationdue',
-                            'grouptool'), $textdue);
-
                     if (!empty($this->grouptool->allow_unreg)) {
                         $unregtext = get_string('allowed', 'grouptool');
                     } else {
@@ -5155,7 +5152,6 @@ class mod_grouptool {
                     }
                     $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'),
                             $unregtext);
-
                     if (!empty($this->grouptool->allow_multiple)) {
                         $minmaxtext = '';
                         if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
@@ -5179,14 +5175,6 @@ class mod_grouptool {
                         $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
                             get_string('active', 'grouptool'));
                     }
-                }
-
-                // Intro-text if set!
-                if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
-                        && $this->grouptool->intro) {
-                    $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
-                    $mform->addElement('header', 'intro', get_string('intro', 'grouptool'));
-                    $mform->addElement('html', $OUTPUT->box($intro, 'generalbox'));
                 }
             }
             $groups = $this->get_active_groups(true, true);
