@@ -5146,20 +5146,7 @@ class mod_grouptool {
                 }
 
                 if (!empty($this->grouptool->allow_reg)) {
-                    if (!empty($this->grouptool->timeavailable)) {
-                        $mform->addElement('static', 'availabledate', get_string('availabledate',
-                                'grouptool'),
-                            userdate($this->grouptool->timeavailable, get_string('strftimedatetime')));
-                    }
-
-                    if (!empty($this->grouptool->timedue)) {
-                        $textdue = userdate($this->grouptool->timedue, get_string('strftimedatetime'));
-                    } else {
-                        $textdue = get_string('noregistrationdue', 'grouptool');
-                    }
-                    $mform->addElement('static', 'registrationdue', get_string('registrationdue',
-                            'grouptool'), $textdue);
-
+                    
                     if (!empty($this->grouptool->allow_unreg)) {
                         $unregtext = get_string('allowed', 'grouptool');
                     } else {
@@ -5191,14 +5178,6 @@ class mod_grouptool {
                         $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
                             get_string('active', 'grouptool'));
                     }
-                }
-
-                // Intro-text if set!
-                if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
-                        && $this->grouptool->intro) {
-                    $intro = format_module_intro('grouptool', $this->grouptool, $this->cm->id);
-                    $mform->addElement('header', 'intro', get_string('intro', 'grouptool'));
-                    $mform->addElement('html', $OUTPUT->box($intro, 'generalbox'));
                 }
             }
             $groups = $this->get_active_groups(true, true);
