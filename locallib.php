@@ -5046,6 +5046,12 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
+            // Create header
+            $headertext = '<div class="description"><h3>' . $this->grouptool->name .
+                    '</h3><div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
+                    $this->grouptool->intro . '</div></div></div>';
+            $mform->addElement('html', $headertext);
+
             // Show the activity information output activity completion.
             global $USER;
             $modinfo = get_fast_modinfo($this->course);
@@ -5054,6 +5060,7 @@ class mod_grouptool {
             $activitydates = \core\activity_dates::get_dates_for_module($cmobj, $USER->id);
             // Pass empty array for the dates so only the completion marks are rendered.
             $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, $activitydates));
+
 
             $regstat = $this->get_registration_stats($USER->id);
 
