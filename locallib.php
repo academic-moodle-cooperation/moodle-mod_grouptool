@@ -5065,7 +5065,6 @@ class mod_grouptool {
             // Pass empty array for the dates so only the completion marks are rendered.
             $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, $activitydates));
 
-
             $regstat = $this->get_registration_stats($USER->id);
 
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
@@ -5146,7 +5145,6 @@ class mod_grouptool {
                 }
 
                 if (!empty($this->grouptool->allow_reg)) {
-                    
                     if (!empty($this->grouptool->allow_unreg)) {
                         $unregtext = get_string('allowed', 'grouptool');
                     } else {
@@ -5154,7 +5152,6 @@ class mod_grouptool {
                     }
                     $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'),
                             $unregtext);
-
                     if (!empty($this->grouptool->allow_multiple)) {
                         $minmaxtext = '';
                         if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
