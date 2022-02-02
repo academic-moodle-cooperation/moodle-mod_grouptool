@@ -1670,6 +1670,16 @@ class mod_grouptool {
             $data = $SESSION->grouptool->view_administration;
             $preview = "";
             $error = false;
+            $source = array();
+            if ($data->cohortid) {
+                $source['cohortid'] = $data->cohortid;
+            }
+            if ($data->selectfromgrouping) {
+                $source['groupingid'] = $data->selectfromgrouping;
+            }
+            if ($data->selectfromgroup) {
+                $source['groupid'] = $data->selectfromgroup;
+            }
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!
@@ -1689,7 +1699,7 @@ class mod_grouptool {
                             break;
                     }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                          $data->cohortid, $orderby);
+                                                          $source, $orderby);
                     $usercnt = count($users);
                     $numgrps    = clean_param($data->numberofgroups, PARAM_INT);
                     $userpergrp = floor($usercnt / $numgrps);
@@ -1714,7 +1724,7 @@ class mod_grouptool {
                             break;
                     }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                          $data->cohortid, $orderby);
+                                                          $source, $orderby);
                     $usercnt = count($users);
                     $numgrps    = ceil($usercnt / $data->numberofmembers);
                     $userpergrp = clean_param($data->numberofmembers, PARAM_INT);
