@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.11.1 (2022-02-09)
+------------------
+* [FEATURE] #7015 Allow creation of subgroups from groupings or other groups similar to core groups
+* [FEATURE] #7040 Display activity completion on top of the landing page for students. Also an automatic completion
+                  setting for registering to a given mount of groups was implemented
+* [FEATURE] #7015 Show activity dates on top of the landing page like in moodle core activities
+* [FEATURE] #7080 Add a link to the core group settings page in the administration overview
+* [FIXED] #7056 Use enough zeros for padding when 10,100,1000,... groups are created
+
 3.11.0 (2021-05-19)
 ------------------
 * [FEATURE] #6855 Add support for showuseridentiy information to group and course view and their respective exports
@@ -12,6 +21,7 @@ CHANGELOG
 * [FIXED] #6949 Fix a warning appearing when attempting to copy grands in the "without conflicts" view
 
 3.10.0 (2020-11-18)
+------------------
 * [FEATURE] #6774 Support for multilang format course names in export filenames [github pull #21 t-schroeder]
 
 3.9.0 (2020-06-15)
