@@ -70,7 +70,7 @@
         }}{{#pix}} i/dragdrop, core, {{#str}} drag, grouptool {{/str}}{{/pix}}</div></td>
     <td class="grpname"><div>
         <input type="hidden" name="name[{{id}}]" value="{{name}}" class="form-control" />
-        <span class="text"><a href="{{{editurl}}}" target="_blank">{{name}}</a></span>
+        <span class="text">{{name}}</span>
         <a href="{{pageurl}}&rename={{id}}" data-rename title="{{#str}}rename, core{{/str}}">
             {{#pix}}t/editstring, core, {{#str}}rename, core{{/str}}{{/pix}}</a>
         <input type="hidden" name="order[{{id}}]" value="{{order}}" class="sort_order" />
@@ -100,6 +100,12 @@
         <a href="{{pageurl}}&movedown={{id}}" data-movedown class="movedownbutton" {{!
            }}title="{{#str}}movedown, mod_grouptool{{/str}}">{{!
             }}{{#pix}} i/down, core, {{#str}}movedown, mod_grouptool{{/str}}{{/pix}}{{!
+        }}</a>
+    </div></td>
+    <td class="buttons"><div>
+        <a href="{{{editurl}}}" target="_blank"  {{!
+           }}title="{{#str}}settingspage, mod_grouptool{{/str}}">{{!
+            }}{{#pix}} i/settings, core, {{#str}}settingspage, mod_grouptool{{/str}}{{/pix}}{{!
         }}</a>
     </div></td>
     <td class="buttons"><div>
