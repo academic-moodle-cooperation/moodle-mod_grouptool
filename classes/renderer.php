@@ -63,6 +63,10 @@ class renderer extends \plugin_renderer_base {
             }
             $sortlist->groups[$id]->id = $id;
             $sortlist->groups[$id]->order = !empty($group->order) ? $group->order : 999999;
+            $sortlist->groups[$id]->editurl = new \moodle_url('/group/group.php', [
+                    'courseid' => $this->page->course->id,
+                    'id' => $id,
+            ]);
         }
 
         $context = new stdClass();
