@@ -245,7 +245,7 @@ class group_creation_form extends \moodleform {
                 $mform->addHelpButton('selectfromgrouping', 'selectfromgroup', 'grouptool');
             } else {
                 $mform->addElement('hidden', 'selectfromgrouping');
-                $mform->setType('groupingid', PARAM_INT);
+                $mform->setType('selectfromgrouping', PARAM_INT);
                 $mform->setConstant('selectfromgrouping', 0);
             }
 

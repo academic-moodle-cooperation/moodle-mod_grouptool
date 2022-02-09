@@ -470,7 +470,7 @@ class mod_grouptool {
         // Every member is there, so we can parse the name!
         $digitslog = log10($numgrps);
         // Add another digit if result of log is an integer (it means that no of groups was 10,10,100,...)
-        $digits = $digitslog % 1 === 0 ? $digitslog + 1 : ceil($numgrps);
+        $digits = fmod($digitslog, 1.) === 0 ? $digitslog + 1 : ceil($digitslog);
         for ($i = 0; $i < $numgrps; $i++) {
             $groups[$i]['name']    = $this->groups_parse_name(trim($data->namingscheme), $i,
                                                               $groups[$i]['members'], $digits);
@@ -1745,7 +1745,7 @@ class mod_grouptool {
                     break;
                 case GROUPTOOL_1_PERSON_GROUPS:
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                          $data->cohortid);
+                            $source);
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;
                     }
