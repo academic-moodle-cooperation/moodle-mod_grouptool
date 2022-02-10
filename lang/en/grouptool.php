@@ -531,7 +531,7 @@ $string['selfregistration'] = 'Registration';
 $string['selfregistration_alt'] = 'Register to one or more groups (depending on settings)';
 $string['setactive'] = 'Activate';
 $string['setinactive'] = 'Deactivate';
-$string['settingspage'] = 'Open group settings';
+$string['settingspage'] = 'Edit group settings';
 $string['show_members'] = 'Show group members';
 $string['show_members_help'] = 'Enables students (under certain circumstances) to see who\'s already registered in a group.<br />
 <ul>
