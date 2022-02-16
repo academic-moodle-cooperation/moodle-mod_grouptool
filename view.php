@@ -85,6 +85,9 @@ $completion->set_module_viewed($cm);
 
 // Output starts here!
 echo $OUTPUT->header();
+
+// Print header showing title, description, deadlines and completion marks.
+echo $instance->get_header();
 // Print tabs according to users capabilities!
 
 $inactive = [];

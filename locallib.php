@@ -5056,25 +5056,6 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
-            // Create header
-            $headertext = '<div class="description"><h3>' . $this->grouptool->name . '</h3>';
-            if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
-                    && $this->grouptool->intro) {
-                $headertext .= '<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
-                        $this->grouptool->intro . '</div></div>';
-            }
-            $headertext .= '</div>';
-            $mform->addElement('html', $headertext);
-
-            // Show the activity information output activity completion.
-            global $USER;
-            $modinfo = get_fast_modinfo($this->course);
-            $cmobj = $modinfo->get_cm($this->cm->id);
-            $cmcompletion = \core_completion\cm_completion_details::get_instance($cmobj, $USER->id);
-            $activitydates = \core\activity_dates::get_dates_for_module($cmobj, $USER->id);
-            // Pass empty array for the dates so only the completion marks are rendered.
-            $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, $activitydates));
-
             $regstat = $this->get_registration_stats($USER->id);
 
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
@@ -8633,6 +8614,32 @@ class mod_grouptool {
         flush();
         $this->userlist_table($groupingid, $groupid);
 
+    }
+
+    /**
+     * Returns the header to display on the main page of a grouptool activity.
+     * @return string HTML containing title, description, deadlines and completion marks.
+     * @throws moodle_exception
+     */
+    public function get_header() {
+        // Create header
+        $headertext = '<div class="description"><h3>' . $this->grouptool->name . '</h3>';
+        if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
+                && $this->grouptool->intro) {
+            $headertext .= '<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
+                    $this->grouptool->intro . '</div></div>';
+        }
+        $headertext .= '</div>';
+
+        // Show the activity information output activity completion.
+        global $USER, $OUTPUT;
+        $modinfo = get_fast_modinfo($this->course);
+        $cmobj = $modinfo->get_cm($this->cm->id);
+        $cmcompletion = \core_completion\cm_completion_details::get_instance($cmobj, $USER->id);
+        $activitydates = \core\activity_dates::get_dates_for_module($cmobj, $USER->id);
+        // Pass empty array for the dates so only the completion marks are rendered.
+        $headertext .= $OUTPUT->activity_information($cmobj, $cmcompletion, $activitydates);
+        return $headertext;
     }
 
 }
