@@ -1533,7 +1533,6 @@ class mod_grouptool {
         if ($data->selectfromgroup) {
             $source['groupid'] = $data->selectfromgroup;
         }
-
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
         // Get applicable roles!
