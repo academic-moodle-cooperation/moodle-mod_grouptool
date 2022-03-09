@@ -48,7 +48,7 @@ variables:
     - moodle-plugin-ci savepoints
     # Mustache check disabled as sortlist_entry.mustache fails with stray tags due to being nested inside a table defined in another template
     #- moodle-plugin-ci mustache
-    - moodle-plugin-ci grunt
+    #- moodle-plugin-ci grunt
     - moodle-plugin-ci phpdoc
     - moodle-plugin-ci phpunit
     - moodle-plugin-ci behat
