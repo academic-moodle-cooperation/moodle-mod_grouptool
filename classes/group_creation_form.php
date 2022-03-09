@@ -245,6 +245,8 @@ class group_creation_form extends \moodleform {
                 $mform->addHelpButton('selectfromgrouping', 'selectfromgrouping', 'grouptool');
                 $mform->hideIf ('selectfromgrouping', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
                 $mform->hideIf ('selectfromgrouping', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+                $mform->hideIf ('selectfromgrouping', 'allocateby', 'eq', 'no');
+                $mform->disabledIf ('selectfromgrouping', 'selectfromgroup', 'neq', '0');
             } else {
                 $mform->addElement('hidden', 'selectfromgrouping');
                 $mform->setType('selectfromgrouping', PARAM_INT);
@@ -262,6 +264,8 @@ class group_creation_form extends \moodleform {
                 $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
                 $mform->hideIf ('selectfromgroup', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
                 $mform->hideIf ('selectfromgroup', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+                $mform->hideIf ('selectfromgroup', 'allocateby', 'eq', 'no');
+                $mform->disabledIf ('selectfromgroup', 'selectfromgrouping', 'neq', '0');
             } else {
                 $mform->addElement('hidden', 'selectfromgroup');
                 $mform->setType('selectfromgroup', PARAM_INT);
