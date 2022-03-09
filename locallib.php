@@ -1523,16 +1523,7 @@ class mod_grouptool {
     public function view_creation() {
         global $SESSION, $OUTPUT;
 
-        $source = array();
-        if ($data->cohortid) {
-            $source['cohortid'] = $data->cohortid;
-        }
-        if ($data->selectfromgrouping) {
-            $source['groupingid'] = $data->selectfromgrouping;
-        }
-        if ($data->selectfromgroup) {
-            $source['groupid'] = $data->selectfromgroup;
-        }
+
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
         // Get applicable roles!
@@ -1551,6 +1542,16 @@ class mod_grouptool {
                 $data = $SESSION->grouptool->view_administration;
                 $error = false;
                 $preview = '';
+                $source = array();
+                if ($data->cohortid) {
+                    $source['cohortid'] = $data->cohortid;
+                }
+                if ($data->selectfromgrouping) {
+                    $source['groupingid'] = $data->selectfromgrouping;
+                }
+                if ($data->selectfromgroup) {
+                    $source['groupid'] = $data->selectfromgroup;
+                }
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
