@@ -1541,6 +1541,16 @@ class mod_grouptool {
                 $data = $SESSION->grouptool->view_administration;
                 $error = false;
                 $preview = '';
+                $source = array();
+                if ($data->cohortid) {
+                    $source['cohortid'] = $data->cohortid;
+                }
+                if ($data->selectfromgrouping) {
+                    $source['groupingid'] = $data->selectfromgrouping;
+                }
+                if ($data->selectfromgroup) {
+                    $source['groupid'] = $data->selectfromgroup;
+                }
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1560,7 +1570,7 @@ class mod_grouptool {
                                 break;
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid, $orderby);
+                                $source, $orderby);
                         $usercnt = count($users);
                         $numgrps    = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
@@ -1584,7 +1594,7 @@ class mod_grouptool {
                                 break;
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid, $orderby);
+                                $source, $orderby);
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt / $data->numberofmembers);
                         $userpergrp = $data->numberofmembers;
@@ -1604,7 +1614,7 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid);
+                                $source);
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
                         }
