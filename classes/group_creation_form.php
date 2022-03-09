@@ -217,23 +217,6 @@ class group_creation_form extends \moodleform {
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
-            $tags = [];
-            foreach (\mod_grouptool::NAME_TAGS as $tag) {
-                $tags[] = html_writer::tag('span', $tag, ['class' => 'nametag', 'data-nametag' => $tag]);
-            }
-
-            $naminggrp = [];
-            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', ['size' => '64']);
-            $naminggrp[] =& $mform->createElement('static', 'tags', '', implode("", $tags));
-            $namingstd = get_config('mod_grouptool', 'name_scheme');
-            $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
-            $mform->setDefault('namingscheme', $namingstd);
-            $mform->setType('namingscheme', PARAM_RAW);
-            $mform->addGroup($naminggrp, 'naminggrp', get_string('namingscheme', 'grouptool'), ' ', false);
-            $mform->addHelpButton('naminggrp', 'namingscheme', 'grouptool');
-            // Init JS!
-            $PAGE->requires->js_call_amd('mod_grouptool/groupcreation', 'initializer');
-
             if ($groupings = groups_get_all_groupings($course->id)) {
                 $options = array();
                 $options[0] = get_string('none');
@@ -271,6 +254,23 @@ class group_creation_form extends \moodleform {
                 $mform->setType('selectfromgroup', PARAM_INT);
                 $mform->setConstant('selectfromgroup', 0);
             }
+
+            $tags = [];
+            foreach (\mod_grouptool::NAME_TAGS as $tag) {
+                $tags[] = html_writer::tag('span', $tag, ['class' => 'nametag', 'data-nametag' => $tag]);
+            }
+
+            $naminggrp = [];
+            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', ['size' => '64']);
+            $naminggrp[] =& $mform->createElement('static', 'tags', '', implode("", $tags));
+            $namingstd = get_config('mod_grouptool', 'name_scheme');
+            $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
+            $mform->setDefault('namingscheme', $namingstd);
+            $mform->setType('namingscheme', PARAM_RAW);
+            $mform->addGroup($naminggrp, 'naminggrp', get_string('namingscheme', 'grouptool'), ' ', false);
+            $mform->addHelpButton('naminggrp', 'namingscheme', 'grouptool');
+            // Init JS!
+            $PAGE->requires->js_call_amd('mod_grouptool/groupcreation', 'initializer');
 
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 
