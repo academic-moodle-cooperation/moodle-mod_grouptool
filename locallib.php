@@ -1542,7 +1542,6 @@ class mod_grouptool {
      */
     public function view_creation() {
         global $SESSION, $OUTPUT;
-        
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
         // Get applicable roles!
