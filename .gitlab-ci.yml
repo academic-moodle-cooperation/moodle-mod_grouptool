@@ -14,7 +14,7 @@ variables:
     # Wait until database is ready
     - timeout 3m bash -c 'echo -e "DB...\c"; until </dev/tcp/127.0.0.1/5432; do echo -e ".\c"; sleep 1; done; echo "ok";' 2> /dev/null
     - cd ../..
-    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=moodleci --db-pass=moodleing --db-host=127.0.0.1
+    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1 --branch="MOODLE_311_STABLE"
   services:
     - postgres:11
     - docker:dind
@@ -29,7 +29,7 @@ variables:
     # Wait until database is ready
     - timeout 3m bash -c 'echo -e "DB...\c"; until </dev/tcp/127.0.0.1/3306; do echo -e ".\c"; sleep 1; done; echo "ok";' 2> /dev/null
     - cd ../..
-    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1
+    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1 --branch="MOODLE_311_STABLE"
   services:
     - mariadb:10.4-bionic
     - docker:dind
