@@ -1513,6 +1513,26 @@ class mod_grouptool {
     }
 
     /**
+     * Assemble source array of members when creating a group from an existing source
+     *
+     * @param StdClass $data Data values submitted to the group creation form
+     * @return array Source array ready to use in groups_get_potential_members
+     */
+    private function assemble_group_member_source($data) {
+        $source = array();
+        if ($data->cohortid) {
+            $source['cohortid'] = $data->cohortid;
+        }
+        if ($data->selectfromgrouping) {
+            $source['groupingid'] = $data->selectfromgrouping;
+        }
+        if ($data->selectfromgroup) {
+            $source['groupid'] = $data->selectfromgroup;
+        }
+        return $source;
+    }
+
+    /**
      * Outputs the content of the creation tab and manages actions taken in this tab
      *
      * @throws coding_exception
@@ -1522,7 +1542,6 @@ class mod_grouptool {
      */
     public function view_creation() {
         global $SESSION, $OUTPUT;
-
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
         // Get applicable roles!
@@ -1541,6 +1560,7 @@ class mod_grouptool {
                 $data = $SESSION->grouptool->view_administration;
                 $error = false;
                 $preview = '';
+                $source = $this->assemble_group_member_source($data);
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1560,7 +1580,7 @@ class mod_grouptool {
                                 break;
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid, $orderby);
+                                $source, $orderby);
                         $usercnt = count($users);
                         $numgrps    = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
@@ -1584,7 +1604,7 @@ class mod_grouptool {
                                 break;
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid, $orderby);
+                                $source, $orderby);
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt / $data->numberofmembers);
                         $userpergrp = $data->numberofmembers;
@@ -1604,7 +1624,7 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid);
+                                $source);
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
                         }
@@ -1670,16 +1690,7 @@ class mod_grouptool {
             $data = $SESSION->grouptool->view_administration;
             $preview = "";
             $error = false;
-            $source = array();
-            if ($data->cohortid) {
-                $source['cohortid'] = $data->cohortid;
-            }
-            if ($data->selectfromgrouping) {
-                $source['groupingid'] = $data->selectfromgrouping;
-            }
-            if ($data->selectfromgroup) {
-                $source['groupid'] = $data->selectfromgroup;
-            }
+            $source = $this->assemble_group_member_source($data);
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!

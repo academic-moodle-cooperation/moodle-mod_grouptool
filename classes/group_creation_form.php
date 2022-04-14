@@ -217,6 +217,44 @@ class group_creation_form extends \moodleform {
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
+            if ($groupings = groups_get_all_groupings($course->id)) {
+                $options = array();
+                $options[0] = get_string('none');
+                foreach ($groupings as $grouping) {
+                    $options[$grouping->id] = format_string($grouping->name);
+                }
+                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'group'), $options);
+                $mform->setDefault('selectfromgrouping', 0);
+                $mform->addHelpButton('selectfromgrouping', 'selectfromgrouping', 'grouptool');
+                $mform->hideIf ('selectfromgrouping', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
+                $mform->hideIf ('selectfromgrouping', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+                $mform->hideIf ('selectfromgrouping', 'allocateby', 'eq', 'no');
+                $mform->disabledIf ('selectfromgrouping', 'selectfromgroup', 'neq', '0');
+            } else {
+                $mform->addElement('hidden', 'selectfromgrouping');
+                $mform->setType('selectfromgrouping', PARAM_INT);
+                $mform->setConstant('selectfromgrouping', 0);
+            }
+
+            if ($groups = groups_get_all_groups($course->id)) {
+                $options = array();
+                $options[0] = get_string('none');
+                foreach ($groups as $group) {
+                    $options[$group->id] = format_string($group->name);
+                }
+                $mform->addElement('select', 'selectfromgroup', get_string('selectfromgroup', 'grouptool'), $options);
+                $mform->setDefault('selectfromgroup', 0);
+                $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
+                $mform->hideIf ('selectfromgroup', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
+                $mform->hideIf ('selectfromgroup', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
+                $mform->hideIf ('selectfromgroup', 'allocateby', 'eq', 'no');
+                $mform->disabledIf ('selectfromgroup', 'selectfromgrouping', 'neq', '0');
+            } else {
+                $mform->addElement('hidden', 'selectfromgroup');
+                $mform->setType('selectfromgroup', PARAM_INT);
+                $mform->setConstant('selectfromgroup', 0);
+            }
+
             $tags = [];
             foreach (\mod_grouptool::NAME_TAGS as $tag) {
                 $tags[] = html_writer::tag('span', $tag, ['class' => 'nametag', 'data-nametag' => $tag]);
@@ -233,36 +271,6 @@ class group_creation_form extends \moodleform {
             $mform->addHelpButton('naminggrp', 'namingscheme', 'grouptool');
             // Init JS!
             $PAGE->requires->js_call_amd('mod_grouptool/groupcreation', 'initializer');
-
-            if ($groupings = groups_get_all_groupings($course->id)) {
-                $options = array();
-                $options[0] = get_string('none');
-                foreach ($groupings as $grouping) {
-                    $options[$grouping->id] = format_string($grouping->name);
-                }
-                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'group'), $options);
-                $mform->setDefault('selectfromgrouping', 0);
-                $mform->addHelpButton('selectfromgrouping', 'selectfromgroup', 'grouptool');
-            } else {
-                $mform->addElement('hidden', 'selectfromgrouping');
-                $mform->setType('selectfromgrouping', PARAM_INT);
-                $mform->setConstant('selectfromgrouping', 0);
-            }
-
-            if ($groups = groups_get_all_groups($course->id)) {
-                $options = array();
-                $options[0] = get_string('none');
-                foreach ($groups as $group) {
-                    $options[$group->id] = format_string($group->name);
-                }
-                $mform->addElement('select', 'selectfromgroup', get_string('selectfromgroup', 'grouptool'), $options);
-                $mform->setDefault('selectfromgroup', 0);
-                $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
-            } else {
-                $mform->addElement('hidden', 'selectfromgroup');
-                $mform->setType('selectfromgroup', PARAM_INT);
-                $mform->setConstant('selectfromgroup', 0);
-            }
 
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 
