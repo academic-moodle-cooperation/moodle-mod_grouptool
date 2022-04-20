@@ -127,6 +127,38 @@ class group_creation_form extends \moodleform {
                 $mform->setConstant('cohortid', '0');
             }
 
+            if ($groupings = groups_get_all_groupings($course->id)) {
+                $options = array();
+                $options[0] = get_string('none');
+                foreach ($groupings as $grouping) {
+                    $options[$grouping->id] = format_string($grouping->name);
+                }
+                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'group'), $options);
+                $mform->setDefault('selectfromgrouping', 0);
+                $mform->addHelpButton('selectfromgrouping', 'selectfromgrouping', 'grouptool');
+                $mform->disabledIf ('selectfromgrouping', 'selectfromgroup', 'neq', '0');
+            } else {
+                $mform->addElement('hidden', 'selectfromgrouping');
+                $mform->setType('selectfromgrouping', PARAM_INT);
+                $mform->setConstant('selectfromgrouping', 0);
+            }
+
+            if ($groups = groups_get_all_groups($course->id)) {
+                $options = array();
+                $options[0] = get_string('none');
+                foreach ($groups as $group) {
+                    $options[$group->id] = format_string($group->name);
+                }
+                $mform->addElement('select', 'selectfromgroup', get_string('selectfromgroup', 'grouptool'), $options);
+                $mform->setDefault('selectfromgroup', 0);
+                $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
+                $mform->disabledIf ('selectfromgroup', 'selectfromgrouping', 'neq', '0');
+            } else {
+                $mform->addElement('hidden', 'selectfromgroup');
+                $mform->setType('selectfromgroup', PARAM_INT);
+                $mform->setConstant('selectfromgroup', 0);
+            }
+
             $mform->addElement('hidden', 'seed');
             $mform->setType('seed', PARAM_INT);
             global $OUTPUT;
@@ -216,44 +248,6 @@ class group_creation_form extends \moodleform {
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_1_PERSON_GROUPS);
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
             $mform->hideIf ('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
-
-            if ($groupings = groups_get_all_groupings($course->id)) {
-                $options = array();
-                $options[0] = get_string('none');
-                foreach ($groupings as $grouping) {
-                    $options[$grouping->id] = format_string($grouping->name);
-                }
-                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'group'), $options);
-                $mform->setDefault('selectfromgrouping', 0);
-                $mform->addHelpButton('selectfromgrouping', 'selectfromgrouping', 'grouptool');
-                $mform->hideIf ('selectfromgrouping', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
-                $mform->hideIf ('selectfromgrouping', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-                $mform->hideIf ('selectfromgrouping', 'allocateby', 'eq', 'no');
-                $mform->disabledIf ('selectfromgrouping', 'selectfromgroup', 'neq', '0');
-            } else {
-                $mform->addElement('hidden', 'selectfromgrouping');
-                $mform->setType('selectfromgrouping', PARAM_INT);
-                $mform->setConstant('selectfromgrouping', 0);
-            }
-
-            if ($groups = groups_get_all_groups($course->id)) {
-                $options = array();
-                $options[0] = get_string('none');
-                foreach ($groups as $group) {
-                    $options[$group->id] = format_string($group->name);
-                }
-                $mform->addElement('select', 'selectfromgroup', get_string('selectfromgroup', 'grouptool'), $options);
-                $mform->setDefault('selectfromgroup', 0);
-                $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
-                $mform->hideIf ('selectfromgroup', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
-                $mform->hideIf ('selectfromgroup', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
-                $mform->hideIf ('selectfromgroup', 'allocateby', 'eq', 'no');
-                $mform->disabledIf ('selectfromgroup', 'selectfromgrouping', 'neq', '0');
-            } else {
-                $mform->addElement('hidden', 'selectfromgroup');
-                $mform->setType('selectfromgroup', PARAM_INT);
-                $mform->setConstant('selectfromgroup', 0);
-            }
 
             $tags = [];
             foreach (\mod_grouptool::NAME_TAGS as $tag) {
