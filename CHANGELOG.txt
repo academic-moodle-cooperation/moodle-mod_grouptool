@@ -4,6 +4,7 @@ CHANGELOG
 3.11.2 (in progress)
 ------------------
 * [FIXED] #7189 Fix binding of selectfromgrouping langstring
+* [FIXED] #7136 Add a default option to only include active users when auto generating groups
 
 3.11.1 (2022-02-09)
 ------------------
