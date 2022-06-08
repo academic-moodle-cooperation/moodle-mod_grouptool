@@ -1561,6 +1561,9 @@ class mod_grouptool {
                 $error = false;
                 $preview = '';
                 $source = $this->assemble_group_member_source($data);
+                // Display only active users if the option was selected or they do not have the capability to view suspended users.
+                $onlyactive = !empty($data->includeonlyactiveenrol)
+                    || !has_capability('moodle/course:viewsuspendedusers', $context);
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1580,7 +1583,7 @@ class mod_grouptool {
                                 break;
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                $source, $orderby);
+                                $source, $orderby, null, $onlyactive);
                         $usercnt = count($users);
                         $numgrps    = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
@@ -1604,7 +1607,7 @@ class mod_grouptool {
                                 break;
                         }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                $source, $orderby);
+                                $source, $orderby, null, $onlyactive);
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt / $data->numberofmembers);
                         $userpergrp = $data->numberofmembers;
@@ -1624,7 +1627,7 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                $source);
+                                $source, 'lastname ASC, firstname ASC', null, $onlyactive);
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
                         }
@@ -1691,6 +1694,9 @@ class mod_grouptool {
             $preview = "";
             $error = false;
             $source = $this->assemble_group_member_source($data);
+            // Display only active users if the option was selected or they do not have the capability to view suspended users.
+            $onlyactive = !empty($data->includeonlyactiveenrol)
+                || !has_capability('moodle/course:viewsuspendedusers', $context);
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!
@@ -1710,7 +1716,7 @@ class mod_grouptool {
                             break;
                     }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                          $source, $orderby);
+                                                          $source, $orderby, null, $onlyactive);
                     $usercnt = count($users);
                     $numgrps    = clean_param($data->numberofgroups, PARAM_INT);
                     $userpergrp = floor($usercnt / $numgrps);
@@ -1735,7 +1741,7 @@ class mod_grouptool {
                             break;
                     }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                          $source, $orderby);
+                                                          $source, $orderby, null, $onlyactive);
                     $usercnt = count($users);
                     $numgrps    = ceil($usercnt / $data->numberofmembers);
                     $userpergrp = clean_param($data->numberofmembers, PARAM_INT);
@@ -1756,7 +1762,7 @@ class mod_grouptool {
                     break;
                 case GROUPTOOL_1_PERSON_GROUPS:
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
-                            $source);
+                            $source, 'lastname ASC, firstname ASC', null, $onlyactive);
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;
                     }
