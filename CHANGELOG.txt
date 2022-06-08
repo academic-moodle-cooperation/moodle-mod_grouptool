@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.11.2 (in progress)
+------------------
+* [FIXED] #7189 Fix binding of selectfromgrouping langstring
+
 3.11.1 (2022-02-09)
 ------------------
 * [FEATURE] #7015 Allow creation of subgroups from groupings or other groups similar to core groups

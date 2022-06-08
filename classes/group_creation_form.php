@@ -133,7 +133,7 @@ class group_creation_form extends \moodleform {
                 foreach ($groupings as $grouping) {
                     $options[$grouping->id] = format_string($grouping->name);
                 }
-                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'group'), $options);
+                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'grouptool'), $options);
                 $mform->setDefault('selectfromgrouping', 0);
                 $mform->addHelpButton('selectfromgrouping', 'selectfromgrouping', 'grouptool');
                 $mform->disabledIf ('selectfromgrouping', 'selectfromgroup', 'neq', '0');
