@@ -48,6 +48,8 @@ function grouptool_supports($feature) {
             return true;
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_OTHER;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_ADMINISTRATION;
 
         case FEATURE_GROUPS:
         case FEATURE_GROUPINGS:
