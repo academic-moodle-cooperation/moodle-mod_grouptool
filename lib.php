@@ -45,13 +45,14 @@ function grouptool_supports($feature) {
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_BACKUP_MOODLE2:
         case FEATURE_MOD_INTRO:
+        case FEATURE_IDNUMBER:
             return true;
         case FEATURE_MOD_ARCHETYPE:
             return MOD_ARCHETYPE_OTHER;
-
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_ADMINISTRATION;
         case FEATURE_GROUPS:
         case FEATURE_GROUPINGS:
-        case FEATURE_IDNUMBER:
         default:
             return false;
     }

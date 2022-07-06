@@ -1,4 +1,4 @@
-@mod @mod_grouptool @adminsetting @amc
+@mod @mod_grouptool @adminsetting @amc @currentdev
 Feature: Within a moodle instance, an administrator should be able to set the value for "Show group members" for the entire Moodle installation.
   In order to define the adminsettings of an grouptool.
   As an admin
@@ -27,9 +27,10 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I turn editing mode on
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - No |
+      | ID number | Test grouptool name - No |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - No"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "Test grouptool name - No" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "No"
 
@@ -47,9 +48,10 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I turn editing mode on
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - All - after due date |
+      | ID number | Test grouptool name - All - after due date |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - All - after due date"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "Test grouptool name - All - after due date" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "All - after due date"
 
@@ -68,8 +70,9 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - Own - after due date |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - Own - after due date"
-    And I navigate to "Edit settings" in current page administration
+      | ID number | Test grouptool name - Own - after due date |
+    When I am on the "Test grouptool name - Own - after due date" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "Own - after due date"
 
@@ -87,9 +90,10 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I turn editing mode on
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - Own - after registration |
+      | ID number | Test grouptool name - Own - after registration |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - Own - after registration"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "Test grouptool name - Own - after registration" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "Own - after registration"
 
@@ -107,9 +111,10 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I turn editing mode on
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - Yes |
+      | ID number | Test grouptool name - Yes |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - Yes"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "Test grouptool name - Yes" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "Yes"
     Then I log out
