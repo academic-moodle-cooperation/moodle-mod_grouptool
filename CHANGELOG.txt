@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+4.0 (in progress)
+------------------
+* [FIXED] #7244 Use correct required and optional parameter order for PHP 8.0
+
 3.11.1 (2022-02-09)
 ------------------
 * [FEATURE] #7015 Allow creation of subgroups from groupings or other groups similar to core groups
