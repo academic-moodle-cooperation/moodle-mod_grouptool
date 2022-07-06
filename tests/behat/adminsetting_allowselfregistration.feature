@@ -27,9 +27,10 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I turn editing mode on
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - Yes |
+      | ID number | Test grouptool name - Yes |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - Yes"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "Test grouptool name - Yes" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Enable self registration" matches value "Yes"
 
@@ -47,8 +48,9 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I turn editing mode on
     And I add a "Grouptool" to section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - No |
+      | ID number | Test grouptool name - No |
       | Description | Add a grouptool to the current course |
-    And I follow "Test grouptool name - No"
-    And I navigate to "Edit settings" in current page administration
+    When I am on the "Test grouptool name - No" Activity page logged in as admin
+    And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Enable self registration" matches value "No"
