@@ -444,7 +444,7 @@ class mod_grouptool {
         $groups = [];
 
         // Number of groups with userpergrp+1 for properly allocating the rest without messing up the sort order.
-        $plusonegroupcount = $usercnt % $numgrps;
+        $plusonegroupcount = $numgrps > ($usercnt / $userpergrp) ? 0 : $usercnt % $userpergrp;
 
         // Allocate the users - all groups equal count first!
         for ($i = 0; $i < $numgrps; $i++) {
