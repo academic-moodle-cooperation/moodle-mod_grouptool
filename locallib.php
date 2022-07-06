@@ -7600,13 +7600,13 @@ class mod_grouptool {
     /**
      * returns collapselink (= symbol to show column or column-name and symbol to hide column)
      *
-     * @param string[] $collapsed array with collapsed columns
      * @param string $search column-name to print link for
+     * @param string[] $collapsed array with collapsed columns
      * @return string html-fragment with icon to show column or column header text with icon to hide
      *                              column
      * @throws moodle_exception
      */
-    private function collapselink($collapsed = [], $search) {
+    private function collapselink($search, $collapsed = []) {
         global $PAGE, $OUTPUT;
         if (in_array($search, $collapsed)) {
             $url = new moodle_url($PAGE->url, ['tshow' => $search]);
@@ -7834,7 +7834,7 @@ class mod_grouptool {
 
             echo html_writer::start_tag('thead');
             echo html_writer::start_tag('tr');
-            echo html_writer::tag('th', $this->collapselink($collapsed, 'picture'), ['class' => '']);
+            echo html_writer::tag('th', $this->collapselink('picture', $collapsed), ['class' => '']);
             flush();
             if (!in_array('fullname', $collapsed)) {
                 $firstnamelink = html_writer::link(new moodle_url($PAGE->url,
@@ -7848,10 +7848,10 @@ class mod_grouptool {
                 $fullname = html_writer::tag('div', get_string('fullname').
                                                     html_writer::empty_tag('br').
                                                     $firstnamelink.'&nbsp;/&nbsp;'.$surnamelink);
-                echo html_writer::tag('th', $fullname.$this->collapselink($collapsed, 'fullname'),
+                echo html_writer::tag('th', $fullname.$this->collapselink('fullname', $collapsed),
                         ['class' => '']);
             } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'fullname'), ['class' => '']);
+                echo html_writer::tag('th', $this->collapselink('fullname', $collapsed), ['class' => '']);
             }
 
             foreach ($useridentityfields as $identifier => $text) {
@@ -7860,26 +7860,26 @@ class mod_grouptool {
                             ['tsort' => $identifier]),
                             $text.
                             $this->pic_if_sorted($orderby, $identifier));
-                    echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, $identifier),
+                    echo html_writer::tag('th', $idnumberlink.$this->collapselink($identifier, $collapsed),
                             ['class' => '']);
                 } else {
-                    echo html_writer::tag('th', $this->collapselink($collapsed, $identifier), ['class' => '']);
+                    echo html_writer::tag('th', $this->collapselink($identifier, $collapsed), ['class' => '']);
                 }
             }
             if (!in_array('registrations', $collapsed)) {
                 $registrationslink = get_string('registrations', 'grouptool');
                 echo html_writer::tag('th', $registrationslink.
-                                            $this->collapselink($collapsed, 'registrations'), ['class' => '']);
+                                            $this->collapselink('registrations', $collapsed), ['class' => '']);
             } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'registrations'), ['class' => '']);
+                echo html_writer::tag('th', $this->collapselink('registrations', $collapsed), ['class' => '']);
             }
             if (!in_array('queues', $collapsed)) {
                 $queueslink = get_string('queues', 'grouptool').' ('.get_string('rank',
                                 'grouptool').')';
                 echo html_writer::tag('th', $queueslink.
-                                            $this->collapselink($collapsed, 'queues'), ['class' => '']);
+                                            $this->collapselink('queues', $collapsed), ['class' => '']);
             } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'queues'), ['class' => '']);
+                echo html_writer::tag('th', $this->collapselink('queues', $collapsed), ['class' => '']);
             }
             echo html_writer::end_tag('tr');
             echo html_writer::end_tag('thead');

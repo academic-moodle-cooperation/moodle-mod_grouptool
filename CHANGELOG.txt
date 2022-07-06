@@ -11,7 +11,7 @@ CHANGELOG
 * [FEATURE] #7015 Allow creation of subgroups from groupings or other groups similar to core groups
 * [FEATURE] #7040 Display activity completion on top of the landing page for students. Also an automatic completion
                   setting for registering to a given mount of groups was implemented
-* [FEATURE] #7017 Show activity dates on top of the landing page like in moodle core activities
+* [FEATURE] #7015 Show activity dates on top of the landing page like in moodle core activities
 * [FEATURE] #7080 Add a link to the core group settings page in the administration overview
 * [FIXED] #7056 Use enough zeros for padding when 10,100,1000,... groups are created
 
