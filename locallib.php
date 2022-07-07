@@ -6242,7 +6242,7 @@ class mod_grouptool {
 
         $useridentity = [];
         foreach ($useridentityfields as $identifier) {
-            $useridentity[$identifier] = get_string($identifier);
+            $useridentity[$identifier] = \core_user\fields::get_display_name($identifier);
         }
         return $useridentity;
     }
@@ -7516,7 +7516,7 @@ class mod_grouptool {
             $userparams = [];
         }
 
-        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u')->selects;
+        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u');
         $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u',
                 false, '', '', false)->selects;
         $orderbystring = "";
@@ -7535,12 +7535,14 @@ class mod_grouptool {
                 }
             }
         }
-
-        $sql = "SELECT $mainuserfields $extrauserfields ".
-               "FROM {user} u ".
+        $extrauserfields_selects = $extrauserfields->selects;
+        $extrauserfields_from = $extrauserfields->joins;
+        $sql = "SELECT $mainuserfields $extrauserfields_selects ".
+               "FROM {user} u $extrauserfields_from".
                "WHERE u.id ".$usersql.
                $orderbystring;
-        $params = array_merge($userparams);
+        $params = array_merge($extrauserfields->params, $userparams);
+        //$params = array_merge($params, $extrauserfields->params);
 
         $data = $DB->get_records_sql($sql, $params);
 
