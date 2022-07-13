@@ -6244,7 +6244,7 @@ class mod_grouptool {
 
         $useridentity = [];
         foreach ($useridentityfields as $identifier) {
-            $useridentity[$identifier] = get_string($identifier);
+            $useridentity[$identifier] = \core_user\fields::get_display_name($identifier);
         }
         return $useridentity;
     }
@@ -7518,7 +7518,7 @@ class mod_grouptool {
             $userparams = [];
         }
 
-        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u')->selects;
+        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u');
         $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u',
                 false, '', '', false)->selects;
         $orderbystring = "";
@@ -7537,12 +7537,14 @@ class mod_grouptool {
                 }
             }
         }
-
-        $sql = "SELECT $mainuserfields $extrauserfields ".
-               "FROM {user} u ".
+        $extrauserfieldsselects = $extrauserfields->selects;
+        $extrauserfieldsfrom = $extrauserfields->joins;
+        $sql = "SELECT $mainuserfields $extrauserfieldsselects ".
+               "FROM {user} u $extrauserfieldsfrom".
                "WHERE u.id ".$usersql.
                $orderbystring;
-        $params = array_merge($userparams);
+        $params = array_merge($extrauserfields->params, $userparams);
+        // $params = array_merge($params, $extrauserfields->params);
 
         $data = $DB->get_records_sql($sql, $params);
 
@@ -7928,6 +7930,7 @@ class mod_grouptool {
                     // Print all activated useridentityvalue infos.
                     foreach ($useridentityfields as $identifier => $value) {
                         if (!in_array($identifier, $collapsed)) {
+                            $identifier = strtolower($identifier);
                             $identityvalue = $user->$identifier;
                             echo html_writer::tag('td', $identityvalue, ['class' => '']);
                         } else {
