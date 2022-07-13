@@ -7483,13 +7483,13 @@ class mod_grouptool {
      * @param int $groupid optional get only this group
      * @param int|array $userids optional get only this user(s)
      * @param stdClass[] $orderby array how data should be sorted (column as key and ASC/DESC as value)
-     * @param bool $is_downloading Indicates if the function is called from a download, muting all output
+     * @param bool $isdownloading Indicates if the function is called from a download, muting all output
      * @return stdClass[] array of objects records from DB with all necessary data
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = [], $is_downloading = false) {
+    public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = [], $isdownloading = false) {
         global $DB, $OUTPUT;
 
         // After which table-fields can we sort?
@@ -7503,12 +7503,12 @@ class mod_grouptool {
         if (!empty($agrpids)) {
             list($agrpsql, $agrpparams) = $DB->get_in_or_equal($agrpids);
         } else {
-             $agrpsql = '';
-             $agrpparams = [];
-             if (!$is_downloading) {
-                 echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
-                     \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
-             }
+            $agrpsql = '';
+            $agrpparams = [];
+            if (!$isdownloading) {
+             echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
+                 \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
+            }
         }
 
         if (!empty($userids)) {
