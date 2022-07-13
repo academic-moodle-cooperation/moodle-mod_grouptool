@@ -7535,14 +7535,14 @@ class mod_grouptool {
                 }
             }
         }
-        $extrauserfields_selects = $extrauserfields->selects;
-        $extrauserfields_from = $extrauserfields->joins;
-        $sql = "SELECT $mainuserfields $extrauserfields_selects ".
-               "FROM {user} u $extrauserfields_from".
+        $extrauserfieldsselects = $extrauserfields->selects;
+        $extrauserfieldsfrom = $extrauserfields->joins;
+        $sql = "SELECT $mainuserfields $extrauserfieldsselects ".
+               "FROM {user} u $extrauserfieldsfrom".
                "WHERE u.id ".$usersql.
                $orderbystring;
         $params = array_merge($extrauserfields->params, $userparams);
-        //$params = array_merge($params, $extrauserfields->params);
+        // $params = array_merge($params, $extrauserfields->params);
 
         $data = $DB->get_records_sql($sql, $params);
 
