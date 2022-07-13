@@ -7928,6 +7928,7 @@ class mod_grouptool {
                     // Print all activated useridentityvalue infos.
                     foreach ($useridentityfields as $identifier => $value) {
                         if (!in_array($identifier, $collapsed)) {
+                            $identifier = strtolower($identifier);
                             $identityvalue = $user->$identifier;
                             echo html_writer::tag('td', $identityvalue, ['class' => '']);
                         } else {
