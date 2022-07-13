@@ -7483,12 +7483,13 @@ class mod_grouptool {
      * @param int $groupid optional get only this group
      * @param int|array $userids optional get only this user(s)
      * @param stdClass[] $orderby array how data should be sorted (column as key and ASC/DESC as value)
+     * @param bool $is_downloading Indicates if the function is called from a download, muting all output
      * @return stdClass[] array of objects records from DB with all necessary data
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = []) {
+    public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = [], $is_downloading = false) {
         global $DB, $OUTPUT;
 
         // After which table-fields can we sort?
@@ -7504,8 +7505,10 @@ class mod_grouptool {
         } else {
              $agrpsql = '';
              $agrpparams = [];
-             echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
+             if (!$is_downloading) {
+                 echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
                      \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
+             }
         }
 
         if (!empty($userids)) {
@@ -7802,7 +7805,7 @@ class mod_grouptool {
 
         if (!empty($users)) {
             $users = array_keys($users);
-            $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
+            $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby, $onlydata);
         } else {
             if (!$onlydata) {
                 echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display', 'grouptool'),
@@ -8016,6 +8019,7 @@ class mod_grouptool {
                     } else {
                         $fields = explode(',', $CFG->showuseridentity);
                         foreach ($fields as $field) {
+                            $field = strtolower($field);
                             $row[$field] = $user->$field;
                             $user->$field = null;
                             unset($user->$field);
