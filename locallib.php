@@ -7504,7 +7504,7 @@ class mod_grouptool {
             $agrpsql = '';
             $agrpparams = [];
             if (!$isdownloading) {
-             echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
+                echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
                  \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
             }
         }
