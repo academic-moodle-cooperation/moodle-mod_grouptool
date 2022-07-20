@@ -1,9 +1,17 @@
 CHANGELOG
 =========
 
-4.0 (in progress)
+4.0 (2022-07-20)
 ------------------
+* [UPDATE] #7201 Use icon in new style
 * [FIXED] #7244 Use correct required and optional parameter order for PHP 8.0
+* [FIXED] #7243 Fixed an error preventing download of .pdf or .txt exports
+* [FIXED] #7241 Fixed an error showing when using participants list with custom fields
+
+3.11.2 (2022-06-08)
+------------------
+* [FIXED] #7189 Fix binding of selectfromgrouping langstring
+* [FIXED] #7136 Add a default option to only include active users when auto generating groups
 
 3.11.1 (2022-02-09)
 ------------------
