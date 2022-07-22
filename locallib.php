@@ -6388,16 +6388,21 @@ class mod_grouptool {
                                 get_string('registered', 'grouptool').' '.$group->registered." / ".
                                 get_string('queued', 'grouptool').' '.$group->queued." / ".
                                 get_string('free', 'grouptool').' '.$group->free;
+                if (isset($group->mreg_data)) {
+                    $mregs = count($group->mreg_data);
+                } else {
+                    $mregs = 0;
+                }
                 if ($group->registered > 0) {
                     $lines[] = "\t".get_string('registrations', 'grouptool');
                     foreach ($group->reg_data as $reg) {
                         $lines[] = "\t\t".$reg['status']."\t".$reg['name'].
                                 self::get_useridentity_values_for_txt($reg['useridentityvalues']);
                     }
-                } else if (count($group->mreg_data) == 0) {
+                } else if ($mregs == 0) {
                     $lines[] = "\t\t--".get_string('no_registrations', 'grouptool')."--";
                 }
-                if (count($group->mreg_data) >= 1) {
+                if ($mregs >= 1) {
                     foreach ($group->mreg_data as $mreg) {
                         $lines[] = "\t\t?\t".$mreg['name']."\t".
                                 self::get_useridentity_values_for_txt($mreg['useridentityvalues']);
