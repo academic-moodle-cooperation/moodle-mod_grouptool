@@ -84,6 +84,12 @@ class pdf extends \pdf {
      *
      * Enhances moodle's pdf class by adding calculated values for text-height. {@inheritDoc}
      *
+     * @param string $type type of this list (overview or userlist)
+     * @param string $coursename the name of the course
+     * @param string $grouptoolname name of grouptool instance
+     * @param int $timeavailable time since the checkmark is available
+     * @param int $timedue time due to which students can submit
+     * @param string $viewname the checkmark-modulename to view
      * @param string $orientation page orientation
      * @param string $unit User measure unit
      * @param string $format The format used for pages
