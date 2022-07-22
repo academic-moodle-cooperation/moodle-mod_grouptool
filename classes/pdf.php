@@ -521,7 +521,12 @@ class pdf extends \pdf {
         $identityfields = $this->useridentityfields;
         $identitycolumnwidth = self::calculate_identitycolumn_width();
 
-        $this->MultiCell(0.1 * $writewidth, $normalheight, $row['status'], 'TR', 'C', $fill || $forcefill, 0, null, null, true,
+        if (isset($row['status'])) {
+            $rowstatus = $row['status'];
+        } else {
+            $rowstatus = "?";
+        }
+        $this->MultiCell(0.1 * $writewidth, $normalheight, $rowstatus, 'TR', 'C', $fill || $forcefill, 0, null, null, true,
                 1, true, false, $normalheight, 'M', true);
         $this->MultiCell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
                 1, true, false, $normalheight, 'M', true);
