@@ -6277,8 +6277,6 @@ class mod_grouptool {
     public function download_overview_pdf($groupid=0, $groupingid=0, $includeinactive=false) {
         $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
-        $pdf = new \mod_grouptool\pdf();
-
         $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
@@ -6294,8 +6292,8 @@ class mod_grouptool {
             }
         }
 
-        $pdf->set_overview_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
-                                       $viewname);
+        $pdf = new \mod_grouptool\pdf('overview', $coursename, $grouptoolname, $timeavailable, $timedue,
+            $viewname);
 
         if (count($data) > 0) {
 
@@ -8097,8 +8095,6 @@ class mod_grouptool {
     public function download_userlist_pdf($groupid=0, $groupingid=0) {
         $data = $this->userlist_table($groupingid, $groupid, true);
 
-        $pdf = new \mod_grouptool\pdf();
-
         $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
         $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
@@ -8123,8 +8119,8 @@ class mod_grouptool {
             $viewname = get_string('all').' '.get_string('groups');
         }
 
-        $pdf->set_userlist_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
-                                    $viewname);
+        $pdf = new \mod_grouptool\pdf('userlist', $coursename, $grouptoolname, $timeavailable, $timedue,
+            $viewname);
 
         if (count($data) > 1) {
             $user = reset($data);

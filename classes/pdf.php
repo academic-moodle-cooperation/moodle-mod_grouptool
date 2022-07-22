@@ -91,10 +91,19 @@ class pdf extends \pdf {
      * @param string $encoding Charset encoding (used only when converting back html entities); default is UTF-8.
      * @throws \coding_exception
      */
-    public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8') {
+    public function __construct($type, $coursename, $grouptoolname, $timeavailable, $timedue,
+                            $viewname, $orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8') {
         global $SITE, $USER;
 
         parent::__construct($orientation, $unit, $format, $unicode, $encoding);
+
+        if ($type == 'overview') {
+            $this->set_overview_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
+                $viewname);
+        } else {
+            $this->set_userlist_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
+                $viewname);
+        }
 
         $this->useridentityfields = grouptool::get_useridentity_fields();
         $this->setFontSubsetting(false);
@@ -399,7 +408,7 @@ class pdf extends \pdf {
                 } else {
                     $this->SetFillColor(0xff, 0xcc, 0x99);
                 }
-                $this->add_overview_row(row, $fill, 1);
+                $this->add_overview_row($row, $fill, 1);
             }
         } else {
             $this->SetFont('', 'I');
