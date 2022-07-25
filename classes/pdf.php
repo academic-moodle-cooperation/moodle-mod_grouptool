@@ -84,6 +84,12 @@ class pdf extends \pdf {
      *
      * Enhances moodle's pdf class by adding calculated values for text-height. {@inheritDoc}
      *
+     * @param string $type type of this list (overview or userlist)
+     * @param string $coursename the name of the course
+     * @param string $grouptoolname name of grouptool instance
+     * @param int $timeavailable time since the checkmark is available
+     * @param int $timedue time due to which students can submit
+     * @param string $viewname the checkmark-modulename to view
      * @param string $orientation page orientation
      * @param string $unit User measure unit
      * @param string $format The format used for pages
@@ -91,10 +97,19 @@ class pdf extends \pdf {
      * @param string $encoding Charset encoding (used only when converting back html entities); default is UTF-8.
      * @throws \coding_exception
      */
-    public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8') {
+    public function __construct($type, $coursename, $grouptoolname, $timeavailable, $timedue,
+                            $viewname, $orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8') {
         global $SITE, $USER;
 
         parent::__construct($orientation, $unit, $format, $unicode, $encoding);
+
+        if ($type == 'overview') {
+            $this->set_overview_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
+                $viewname);
+        } else {
+            $this->set_userlist_header_data($coursename, $grouptoolname, $timeavailable, $timedue,
+                $viewname);
+        }
 
         $this->useridentityfields = grouptool::get_useridentity_fields();
         $this->setFontSubsetting(false);
@@ -399,7 +414,7 @@ class pdf extends \pdf {
                 } else {
                     $this->SetFillColor(0xff, 0xcc, 0x99);
                 }
-                $this->add_overview_row(row, $fill, 1);
+                $this->add_overview_row($row, $fill, 1);
             }
         } else {
             $this->SetFont('', 'I');
@@ -512,7 +527,12 @@ class pdf extends \pdf {
         $identityfields = $this->useridentityfields;
         $identitycolumnwidth = self::calculate_identitycolumn_width();
 
-        $this->MultiCell(0.1 * $writewidth, $normalheight, $row['status'], 'TR', 'C', $fill || $forcefill, 0, null, null, true,
+        if (isset($row['status'])) {
+            $rowstatus = $row['status'];
+        } else {
+            $rowstatus = "?";
+        }
+        $this->MultiCell(0.1 * $writewidth, $normalheight, $rowstatus, 'TR', 'C', $fill || $forcefill, 0, null, null, true,
                 1, true, false, $normalheight, 'M', true);
         $this->MultiCell(0.3 * $writewidth, $normalheight, $row['name'], 'TLR', 'L', $fill || $forcefill, 0, null, null, true,
                 1, true, false, $normalheight, 'M', true);
