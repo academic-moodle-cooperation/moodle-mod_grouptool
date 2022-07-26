@@ -5066,15 +5066,6 @@ class mod_grouptool {
             $headertext .= '</div>';
             $mform->addElement('html', $headertext);
 
-            // Show the activity information output activity completion.
-            global $USER;
-            $modinfo = get_fast_modinfo($this->course);
-            $cmobj = $modinfo->get_cm($this->cm->id);
-            $cmcompletion = \core_completion\cm_completion_details::get_instance($cmobj, $USER->id);
-            $activitydates = \core\activity_dates::get_dates_for_module($cmobj, $USER->id);
-            // Pass empty array for the dates so only the completion marks are rendered.
-            $mform->addElement('html', $OUTPUT->activity_information($cmobj, $cmcompletion, $activitydates));
-
             $regstat = $this->get_registration_stats($USER->id);
 
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
