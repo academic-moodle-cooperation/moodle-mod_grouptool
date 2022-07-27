@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+3.11.3 (2022-09-07)
+------------------
+* [FIXED] #7220 fix create group from group bugs
+* [FIXED] #7269 Use only active users for group creation
+* [FIXED] #7243 Fixed an error preventing download of .pdf or .txt exports
+* [FIXED] #7241 Fixed an error showing when using participants list with custom fields
+* [FIXED] #7244 Use correct required and optional parameter order for PHP 8.0
+
 3.11.2 (2022-06-08)
 ------------------
 * [FIXED] #7189 Fix binding of selectfromgrouping langstring
