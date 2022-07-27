@@ -264,6 +264,12 @@ class group_creation_form extends \moodleform {
                 $mform->setConstant('selectfromgroup', 0);
             }
 
+            if (has_capability('moodle/course:viewsuspendedusers', $coursecontext)) {
+                $mform->addElement('checkbox', 'includeonlyactiveenrol', get_string('includeonlyactiveenrol', 'grouptool'), '');
+                $mform->addHelpButton('includeonlyactiveenrol', 'includeonlyactiveenrol', 'grouptool');
+                $mform->setDefault('includeonlyactiveenrol', true);
+            }
+
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 
             $options = ['0' => get_string('no')];
