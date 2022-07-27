@@ -272,6 +272,42 @@ class group_creation_form extends \moodleform {
             // Init JS!
             $PAGE->requires->js_call_amd('mod_grouptool/groupcreation', 'initializer');
 
+            if ($groupings = groups_get_all_groupings($course->id)) {
+                $options = array();
+                $options[0] = get_string('none');
+                foreach ($groupings as $grouping) {
+                    $options[$grouping->id] = format_string($grouping->name);
+                }
+                $mform->addElement('select', 'selectfromgrouping', get_string('selectfromgrouping', 'group'), $options);
+                $mform->setDefault('selectfromgrouping', 0);
+                $mform->addHelpButton('selectfromgrouping', 'selectfromgroup', 'grouptool');
+            } else {
+                $mform->addElement('hidden', 'selectfromgrouping');
+                $mform->setType('selectfromgrouping', PARAM_INT);
+                $mform->setConstant('selectfromgrouping', 0);
+            }
+
+            if ($groups = groups_get_all_groups($course->id)) {
+                $options = array();
+                $options[0] = get_string('none');
+                foreach ($groups as $group) {
+                    $options[$group->id] = format_string($group->name);
+                }
+                $mform->addElement('select', 'selectfromgroup', get_string('selectfromgroup', 'grouptool'), $options);
+                $mform->setDefault('selectfromgroup', 0);
+                $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
+            } else {
+                $mform->addElement('hidden', 'selectfromgroup');
+                $mform->setType('selectfromgroup', PARAM_INT);
+                $mform->setConstant('selectfromgroup', 0);
+            }
+
+            if (has_capability('moodle/course:viewsuspendedusers', $coursecontext)) {
+                $mform->addElement('checkbox', 'includeonlyactiveenrol', get_string('includeonlyactiveenrol', 'grouptool'), '');
+                $mform->addHelpButton('includeonlyactiveenrol', 'includeonlyactiveenrol', 'grouptool');
+                $mform->setDefault('includeonlyactiveenrol', true);
+            }
+
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 
             $options = ['0' => get_string('no')];
