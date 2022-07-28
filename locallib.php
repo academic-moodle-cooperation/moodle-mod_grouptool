@@ -444,7 +444,7 @@ class mod_grouptool {
         $groups = [];
 
         // Number of groups with userpergrp+1 for properly allocating the rest without messing up the sort order.
-        $plusonegroupcount = $numgrps > ($usercnt / $userpergrp) ? 0 : $usercnt % $userpergrp;
+        $plusonegroupcount = ($usercnt / $numgrps) > $userpergrp ? $usercnt % $numgrps : 0;
 
         // Allocate the users - all groups equal count first!
         for ($i = 0; $i < $numgrps; $i++) {
@@ -1564,26 +1564,12 @@ class mod_grouptool {
                 // Display only active users if the option was selected or they do not have the capability to view suspended users.
                 $onlyactive = !empty($data->includeonlyactiveenrol)
                     || !has_capability('moodle/course:viewsuspendedusers', $context);
+                list($source, $orderby) = $this->view_creation_get_source_orderby($data);
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
-                        switch ($data->allocateby) {
-                            default:
-                                print_error('unknoworder');
-                            case 'no':
-                            case 'random':
-                            case 'lastname':
-                                $orderby = 'lastname, firstname, idnumber';
-                                break;
-                            case 'firstname':
-                                $orderby = 'firstname, lastname, idnumber';
-                                break;
-                            case 'idnumber':
-                                $orderby = 'idnumber, lastname, firstname';
-                                break;
-                        }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid, $orderby, null, $onlyactive);
+                                                              $source, $orderby, null, $onlyactive);
                         $usercnt = count($users);
                         $numgrps    = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
@@ -1591,23 +1577,8 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_MEMBERS_AMOUNT:
                         // Allocate members from the selected role to groups!
-                        switch ($data->allocateby) {
-                            default:
-                                print_error('unknoworder');
-                            case 'no':
-                            case 'random':
-                            case 'lastname':
-                                $orderby = 'lastname, firstname, idnumber';
-                                break;
-                            case 'firstname':
-                                $orderby = 'firstname, lastname, idnumber';
-                                break;
-                            case 'idnumber':
-                                $orderby = 'idnumber, lastname, firstname';
-                                break;
-                        }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                                              $data->cohortid, $orderby, null, $onlyactive);
+                                                              $source, $orderby, null, $onlyactive);
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt / $data->numberofmembers);
                         $userpergrp = $data->numberofmembers;
@@ -1704,26 +1675,12 @@ class mod_grouptool {
             if ($data->selectfromgroup) {
                 $source['groupid'] = $data->selectfromgroup;
             }
+            list($source, $orderby) = $this->view_creation_get_source_orderby($data);
             $onlyactive = !empty($data->includeonlyactiveenrol)
                 || !has_capability('moodle/course:viewsuspendedusers', $context);
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!
-                    switch ($data->allocateby) {
-                        default:
-                            print_error('unknoworder');
-                        case 'no':
-                        case 'random':
-                        case 'lastname':
-                            $orderby = 'lastname, firstname, idnumber';
-                            break;
-                        case 'firstname':
-                            $orderby = 'firstname, lastname, idnumber';
-                            break;
-                        case 'idnumber':
-                            $orderby = 'idnumber, lastname, firstname';
-                            break;
-                    }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $source, $orderby, null, $onlyactive);
                     $usercnt = count($users);
@@ -1734,21 +1691,6 @@ class mod_grouptool {
                     break;
                 case GROUPTOOL_MEMBERS_AMOUNT:
                     // Allocate members from the selected role to groups!
-                    switch ($data->allocateby) {
-                        default:
-                            print_error('unknoworder');
-                        case 'no':
-                        case 'random':
-                        case 'lastname':
-                            $orderby = 'lastname, firstname, idnumber';
-                            break;
-                        case 'firstname':
-                            $orderby = 'firstname, lastname, idnumber';
-                            break;
-                        case 'idnumber':
-                            $orderby = 'idnumber, lastname, firstname';
-                            break;
-                    }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $source, $orderby, null, $onlyactive);
                     $usercnt = count($users);
@@ -1815,6 +1757,46 @@ class mod_grouptool {
         } else {
             $mform->display();
         }
+    }
+
+    /**
+     * returns the source of potential users and order mode
+     *
+     * @param object $data data of creation view
+     * @return array $source array of possible sources for potential users
+     * @return string $orderby sql clause for ordering the list of potential users
+     * @throws moodle_exception
+     */
+    private function view_creation_get_source_orderby($data) {
+
+        $source = array();
+        if ($data->cohortid) {
+            $source['cohortid'] = $data->cohortid;
+        }
+        if ($data->selectfromgrouping) {
+            $source['groupingid'] = $data->selectfromgrouping;
+        }
+        if ($data->selectfromgroup) {
+            $source['groupid'] = $data->selectfromgroup;
+        }
+        $orderby = "";
+        switch ($data->allocateby) {
+            default:
+                print_error('unknoworder');
+            case 'no':
+            case 'random':
+            case 'lastname':
+                $orderby = 'lastname, firstname, idnumber';
+                break;
+            case 'firstname':
+                $orderby = 'firstname, lastname, idnumber';
+                break;
+            case 'idnumber':
+                $orderby = 'idnumber, lastname, firstname';
+                break;
+        }
+
+        return array($source, $orderby);
     }
 
     /**
