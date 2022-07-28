@@ -3,6 +3,9 @@ CHANGELOG
 
 4.0 (2022-07-20)
 ------------------
+* [FIXED] #7220 fix create group from group bugs
+* [FIXED] #7269 Use only active users for group creation
+* [FIXED] #7267 Prevent double completion display
 * [UPDATE] #7201 Use icon in new style
 * [FIXED] #7244 Use correct required and optional parameter order for PHP 8.0
 * [FIXED] #7243 Fixed an error preventing download of .pdf or .txt exports
