@@ -31,4 +31,4 @@ $plugin->version   = 2022072000;
 $plugin->requires  = 2022041900;
 $plugin->component = 'mod_grouptool';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v4.0";
+$plugin->release   = "v4.0.0";
