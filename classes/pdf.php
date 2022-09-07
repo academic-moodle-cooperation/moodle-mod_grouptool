@@ -462,7 +462,7 @@ class pdf extends \pdf {
                 $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight, get_string('email'), $border, 'C', true,
                         $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
             } else {
-                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, get_string($key), $border, 'C',
+                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, \core_user\fields::get_display_name($key), $border, 'C',
                         true, $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
             }
         }
@@ -628,6 +628,9 @@ class pdf extends \pdf {
             $curwidth = $widths['identity'];
             if ($key == 'email') {
                 $curwidth = $widths['email'];
+            }
+            if (property_exists((object) $row, strtolower($key))) {
+                $key = strtolower($key);
             }
             if (!in_array($key, $collapsed)) {
                 $this->MultiCell($curwidth, $height, $row[$key], $border, 'L', $fill,

@@ -444,7 +444,7 @@ class mod_grouptool {
         $groups = [];
 
         // Number of groups with userpergrp+1 for properly allocating the rest without messing up the sort order.
-        $plusonegroupcount = $usercnt % $numgrps;
+        $plusonegroupcount = ($usercnt / $numgrps) > $userpergrp ? $usercnt % $numgrps : 0;
 
         // Allocate the users - all groups equal count first!
         for ($i = 0; $i < $numgrps; $i++) {
@@ -1564,26 +1564,12 @@ class mod_grouptool {
                 // Display only active users if the option was selected or they do not have the capability to view suspended users.
                 $onlyactive = !empty($data->includeonlyactiveenrol)
                     || !has_capability('moodle/course:viewsuspendedusers', $context);
+                list($source, $orderby) = $this->view_creation_get_source_orderby($data);
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
-                        switch ($data->allocateby) {
-                            default:
-                                print_error('unknoworder');
-                            case 'no':
-                            case 'random':
-                            case 'lastname':
-                                $orderby = 'lastname, firstname, idnumber';
-                                break;
-                            case 'firstname':
-                                $orderby = 'firstname, lastname, idnumber';
-                                break;
-                            case 'idnumber':
-                                $orderby = 'idnumber, lastname, firstname';
-                                break;
-                        }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                $source, $orderby, null, $onlyactive);
+                                                              $source, $orderby, null, $onlyactive);
                         $usercnt = count($users);
                         $numgrps    = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
@@ -1591,23 +1577,8 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_MEMBERS_AMOUNT:
                         // Allocate members from the selected role to groups!
-                        switch ($data->allocateby) {
-                            default:
-                                print_error('unknoworder');
-                            case 'no':
-                            case 'random':
-                            case 'lastname':
-                                $orderby = 'lastname, firstname, idnumber';
-                                break;
-                            case 'firstname':
-                                $orderby = 'firstname, lastname, idnumber';
-                                break;
-                            case 'idnumber':
-                                $orderby = 'idnumber, lastname, firstname';
-                                break;
-                        }
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                $source, $orderby, null, $onlyactive);
+                                                              $source, $orderby, null, $onlyactive);
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt / $data->numberofmembers);
                         $userpergrp = $data->numberofmembers;
@@ -1627,7 +1598,8 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
-                                $source, 'lastname ASC, firstname ASC', null, $onlyactive);
+                                                              $data->cohortid, 'lastname ASC, firstname ASC',
+                                                              null, $onlyactive);
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
                         }
@@ -1694,27 +1666,21 @@ class mod_grouptool {
             $preview = "";
             $error = false;
             $source = $this->assemble_group_member_source($data);
-            // Display only active users if the option was selected or they do not have the capability to view suspended users.
+            if ($data->cohortid) {
+                $source['cohortid'] = $data->cohortid;
+            }
+            if ($data->selectfromgrouping) {
+                $source['groupingid'] = $data->selectfromgrouping;
+            }
+            if ($data->selectfromgroup) {
+                $source['groupid'] = $data->selectfromgroup;
+            }
+            list($source, $orderby) = $this->view_creation_get_source_orderby($data);
             $onlyactive = !empty($data->includeonlyactiveenrol)
                 || !has_capability('moodle/course:viewsuspendedusers', $context);
             switch ($data->mode) {
                 case GROUPTOOL_GROUPS_AMOUNT:
                     // Allocate members from the selected role to groups!
-                    switch ($data->allocateby) {
-                        default:
-                            print_error('unknoworder');
-                        case 'no':
-                        case 'random':
-                        case 'lastname':
-                            $orderby = 'lastname, firstname, idnumber';
-                            break;
-                        case 'firstname':
-                            $orderby = 'firstname, lastname, idnumber';
-                            break;
-                        case 'idnumber':
-                            $orderby = 'idnumber, lastname, firstname';
-                            break;
-                    }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $source, $orderby, null, $onlyactive);
                     $usercnt = count($users);
@@ -1725,21 +1691,6 @@ class mod_grouptool {
                     break;
                 case GROUPTOOL_MEMBERS_AMOUNT:
                     // Allocate members from the selected role to groups!
-                    switch ($data->allocateby) {
-                        default:
-                            print_error('unknoworder');
-                        case 'no':
-                        case 'random':
-                        case 'lastname':
-                            $orderby = 'lastname, firstname, idnumber';
-                            break;
-                        case 'firstname':
-                            $orderby = 'firstname, lastname, idnumber';
-                            break;
-                        case 'idnumber':
-                            $orderby = 'idnumber, lastname, firstname';
-                            break;
-                    }
                     $users = groups_get_potential_members($this->course->id, $data->roleid,
                                                           $source, $orderby, null, $onlyactive);
                     $usercnt = count($users);
@@ -1806,6 +1757,46 @@ class mod_grouptool {
         } else {
             $mform->display();
         }
+    }
+
+    /**
+     * returns the source of potential users and order mode
+     *
+     * @param object $data data of creation view
+     * @return array $source array of possible sources for potential users
+     * @return string $orderby sql clause for ordering the list of potential users
+     * @throws moodle_exception
+     */
+    private function view_creation_get_source_orderby($data) {
+
+        $source = array();
+        if ($data->cohortid) {
+            $source['cohortid'] = $data->cohortid;
+        }
+        if ($data->selectfromgrouping) {
+            $source['groupingid'] = $data->selectfromgrouping;
+        }
+        if ($data->selectfromgroup) {
+            $source['groupid'] = $data->selectfromgroup;
+        }
+        $orderby = "";
+        switch ($data->allocateby) {
+            default:
+                print_error('unknoworder');
+            case 'no':
+            case 'random':
+            case 'lastname':
+                $orderby = 'lastname, firstname, idnumber';
+                break;
+            case 'firstname':
+                $orderby = 'firstname, lastname, idnumber';
+                break;
+            case 'idnumber':
+                $orderby = 'idnumber, lastname, firstname';
+                break;
+        }
+
+        return array($source, $orderby);
     }
 
     /**
@@ -6242,7 +6233,7 @@ class mod_grouptool {
 
         $useridentity = [];
         foreach ($useridentityfields as $identifier) {
-            $useridentity[$identifier] = get_string($identifier);
+            $useridentity[$identifier] = \core_user\fields::get_display_name($identifier);
         }
         return $useridentity;
     }
@@ -7481,12 +7472,13 @@ class mod_grouptool {
      * @param int $groupid optional get only this group
      * @param int|array $userids optional get only this user(s)
      * @param stdClass[] $orderby array how data should be sorted (column as key and ASC/DESC as value)
+     * @param bool $isdownloading Indicates if the function is called from a download, muting all output
      * @return stdClass[] array of objects records from DB with all necessary data
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = []) {
+    public function get_user_data($groupingid = 0, $groupid = 0, $userids = 0, $orderby = [], $isdownloading = false) {
         global $DB, $OUTPUT;
 
         // After which table-fields can we sort?
@@ -7500,10 +7492,12 @@ class mod_grouptool {
         if (!empty($agrpids)) {
             list($agrpsql, $agrpparams) = $DB->get_in_or_equal($agrpids);
         } else {
-             $agrpsql = '';
-             $agrpparams = [];
-             echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
-                     \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
+            $agrpsql = '';
+            $agrpparams = [];
+            if (!$isdownloading) {
+                echo $OUTPUT->box($OUTPUT->notification(get_string('no_groups_to_display', 'grouptool'),
+                 \core\output\notification::NOTIFY_ERROR), 'generalbox centered');
+            }
         }
 
         if (!empty($userids)) {
@@ -7516,7 +7510,7 @@ class mod_grouptool {
             $userparams = [];
         }
 
-        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u')->selects;
+        $extrauserfields = \core_user\fields::for_identity($this->context)->get_sql('u');
         $mainuserfields = \core_user\fields::for_userpic()->including('idnumber', 'email')->get_sql('u',
                 false, '', '', false)->selects;
         $orderbystring = "";
@@ -7535,12 +7529,14 @@ class mod_grouptool {
                 }
             }
         }
-
-        $sql = "SELECT $mainuserfields $extrauserfields ".
-               "FROM {user} u ".
+        $extrauserfieldsselects = $extrauserfields->selects;
+        $extrauserfieldsfrom = $extrauserfields->joins;
+        $sql = "SELECT $mainuserfields $extrauserfieldsselects ".
+               "FROM {user} u $extrauserfieldsfrom".
                "WHERE u.id ".$usersql.
                $orderbystring;
-        $params = array_merge($userparams);
+        $params = array_merge($extrauserfields->params, $userparams);
+        // $params = array_merge($params, $extrauserfields->params);
 
         $data = $DB->get_records_sql($sql, $params);
 
@@ -7595,13 +7591,13 @@ class mod_grouptool {
     /**
      * returns collapselink (= symbol to show column or column-name and symbol to hide column)
      *
-     * @param string[] $collapsed array with collapsed columns
      * @param string $search column-name to print link for
+     * @param string[] $collapsed array with collapsed columns
      * @return string html-fragment with icon to show column or column header text with icon to hide
      *                              column
      * @throws moodle_exception
      */
-    private function collapselink($collapsed = [], $search) {
+    private function collapselink($search, $collapsed = []) {
         global $PAGE, $OUTPUT;
         if (in_array($search, $collapsed)) {
             $url = new moodle_url($PAGE->url, ['tshow' => $search]);
@@ -7798,7 +7794,7 @@ class mod_grouptool {
 
         if (!empty($users)) {
             $users = array_keys($users);
-            $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby);
+            $userdata = $this->get_user_data($groupingid, $groupid, $users, $orderby, $onlydata);
         } else {
             if (!$onlydata) {
                 echo $OUTPUT->box($OUTPUT->notification(get_string('no_users_to_display', 'grouptool'),
@@ -7829,7 +7825,7 @@ class mod_grouptool {
 
             echo html_writer::start_tag('thead');
             echo html_writer::start_tag('tr');
-            echo html_writer::tag('th', $this->collapselink($collapsed, 'picture'), ['class' => '']);
+            echo html_writer::tag('th', $this->collapselink('picture', $collapsed), ['class' => '']);
             flush();
             if (!in_array('fullname', $collapsed)) {
                 $firstnamelink = html_writer::link(new moodle_url($PAGE->url,
@@ -7843,10 +7839,10 @@ class mod_grouptool {
                 $fullname = html_writer::tag('div', get_string('fullname').
                                                     html_writer::empty_tag('br').
                                                     $firstnamelink.'&nbsp;/&nbsp;'.$surnamelink);
-                echo html_writer::tag('th', $fullname.$this->collapselink($collapsed, 'fullname'),
+                echo html_writer::tag('th', $fullname.$this->collapselink('fullname', $collapsed),
                         ['class' => '']);
             } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'fullname'), ['class' => '']);
+                echo html_writer::tag('th', $this->collapselink('fullname', $collapsed), ['class' => '']);
             }
 
             foreach ($useridentityfields as $identifier => $text) {
@@ -7855,26 +7851,26 @@ class mod_grouptool {
                             ['tsort' => $identifier]),
                             $text.
                             $this->pic_if_sorted($orderby, $identifier));
-                    echo html_writer::tag('th', $idnumberlink.$this->collapselink($collapsed, $identifier),
+                    echo html_writer::tag('th', $idnumberlink.$this->collapselink($identifier, $collapsed),
                             ['class' => '']);
                 } else {
-                    echo html_writer::tag('th', $this->collapselink($collapsed, $identifier), ['class' => '']);
+                    echo html_writer::tag('th', $this->collapselink($identifier, $collapsed), ['class' => '']);
                 }
             }
             if (!in_array('registrations', $collapsed)) {
                 $registrationslink = get_string('registrations', 'grouptool');
                 echo html_writer::tag('th', $registrationslink.
-                                            $this->collapselink($collapsed, 'registrations'), ['class' => '']);
+                                            $this->collapselink('registrations', $collapsed), ['class' => '']);
             } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'registrations'), ['class' => '']);
+                echo html_writer::tag('th', $this->collapselink('registrations', $collapsed), ['class' => '']);
             }
             if (!in_array('queues', $collapsed)) {
                 $queueslink = get_string('queues', 'grouptool').' ('.get_string('rank',
                                 'grouptool').')';
                 echo html_writer::tag('th', $queueslink.
-                                            $this->collapselink($collapsed, 'queues'), ['class' => '']);
+                                            $this->collapselink('queues', $collapsed), ['class' => '']);
             } else {
-                echo html_writer::tag('th', $this->collapselink($collapsed, 'queues'), ['class' => '']);
+                echo html_writer::tag('th', $this->collapselink('queues', $collapsed), ['class' => '']);
             }
             echo html_writer::end_tag('tr');
             echo html_writer::end_tag('thead');
@@ -7926,6 +7922,7 @@ class mod_grouptool {
                     // Print all activated useridentityvalue infos.
                     foreach ($useridentityfields as $identifier => $value) {
                         if (!in_array($identifier, $collapsed)) {
+                            $identifier = strtolower($identifier);
                             $identityvalue = $user->$identifier;
                             echo html_writer::tag('td', $identityvalue, ['class' => '']);
                         } else {
@@ -8011,6 +8008,7 @@ class mod_grouptool {
                     } else {
                         $fields = explode(',', $CFG->showuseridentity);
                         foreach ($fields as $field) {
+                            $field = strtolower($field);
                             $row[$field] = $user->$field;
                             $user->$field = null;
                             unset($user->$field);
