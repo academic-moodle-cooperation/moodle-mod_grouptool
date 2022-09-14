@@ -8,6 +8,7 @@ CHANGELOG
 * [FIXED] #7243 Fixed an error preventing download of .pdf or .txt exports
 * [FIXED] #7241 Fixed an error showing when using participants list with custom fields
 * [FIXED] #7244 Use correct required and optional parameter order for PHP 8.0
+* [FIXED] #7311 Prevent header form being printed if no information is available
 
 3.11.2 (2022-06-08)
 ------------------
