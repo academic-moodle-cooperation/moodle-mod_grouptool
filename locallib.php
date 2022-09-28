@@ -2244,6 +2244,7 @@ class mod_grouptool {
                             $noerror = $currentgrade->insert();
                         }
                         $currentgrade->set_overridden(true, false);
+                        $currentgrade->grade_item->force_regrading();
                         $fullname = fullname($groupmembers[$currentgrade->userid]);
                         if ($noerror) {
                             $groupinfo .= html_writer::tag('span',
@@ -2378,6 +2379,7 @@ class mod_grouptool {
                         $noerror = $currentgrade->insert();
                     }
                     $currentgrade->set_overridden(true, false);
+                    $currentgrade->grade_item->force_regrading();
                     $fullname = fullname($targetusers[$currentgrade->userid]);
                     if (function_exists ('grouptool_copy_'.$cmtouse->modname.'_grades')) {
                         $copyfunction = 'grouptool_copy_'.$cmtouse->modname.'_grades';
