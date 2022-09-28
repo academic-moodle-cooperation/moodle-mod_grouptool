@@ -1,9 +1,14 @@
 CHANGELOG
 =========
 
-4.0 (2022-07-20)
+4.0.1 (2022-09-28)
 ------------------
-* [FIXED] #7220 fix create group from group bugs
+* [FIXED] #7301 Update activity completion status correctly after self registration
+* [FIXED] #7269 Fix recalculation of grades after copying grades among groups
+
+4.0.0 (2022-07-20)
+------------------
+* [FIXED] #7220 Fix create group from group bugs
 * [FIXED] #7269 Use only active users for group creation
 * [FIXED] #7267 Prevent double completion display
 * [UPDATE] #7201 Use icon in new style
