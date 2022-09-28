@@ -4898,6 +4898,7 @@ class mod_grouptool {
     /**
      * view selfregistration-tab
      *
+     * @param string $outputcache Output already generated that can be added after the header to be generated
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
