@@ -6383,10 +6383,10 @@ class mod_grouptool {
                         $lines[] = "\t\t".$reg['status']."\t".$reg['name'].
                                 self::get_useridentity_values_for_txt($reg['useridentityvalues']);
                     }
-                } else if (count($group->mreg_data) == 0) {
+                } else if (isset($group->mreg_data) && count($group->mreg_data) == 0) {
                     $lines[] = "\t\t--".get_string('no_registrations', 'grouptool')."--";
                 }
-                if (count($group->mreg_data) >= 1) {
+                if (isset($group->mreg_data) && count($group->mreg_data) >= 1) {
                     foreach ($group->mreg_data as $mreg) {
                         $lines[] = "\t\t?\t".$mreg['name']."\t".
                                 self::get_useridentity_values_for_txt($mreg['useridentityvalues']);

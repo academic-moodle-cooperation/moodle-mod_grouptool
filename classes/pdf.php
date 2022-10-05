@@ -240,6 +240,10 @@ class pdf extends \pdf {
      * Header() helper method to actually print the page header in the PDF
      */
     public function header() {
+
+        if (empty($this->header1)) {
+            return;
+        }
         // Set font.
         $this->SetFont('', '');
 
@@ -251,6 +255,7 @@ class pdf extends \pdf {
         // First row.
         $border = 0;
         $height = 7;
+
         $this->SetFont('', 'B');
         $this->MultiCell(15 * $scale, $height, $this->header1[0],
                          $border, 'L', 0, 0, null, null, true, 1, false, false, $height, 'M', true);
