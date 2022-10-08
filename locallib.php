@@ -5368,26 +5368,21 @@ class mod_grouptool {
                         }
                     }
 
+                    $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
+                                 html_writer::tag('div', 'Test Test Test', ['class' => 'panel-desc']).
+                                 html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
                     if ($regrank !== false) {
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-success');
+                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
                     } else if ($queuerank !== false) {
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-warning');
+                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-warning');
                     } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-error group-full');
+                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-error group-full');
                     } else {
                         $classes = 'generalbox group empty';
                         if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
                             $classes .= ' group-full';
                         }
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  $classes);
+                        $grouphtml = $OUTPUT->box($grouphtml, $classes);
                     }
                     $mform->addElement('html', $grouphtml);
                 }
