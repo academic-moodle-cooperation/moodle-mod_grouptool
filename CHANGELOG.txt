@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.11.4 (2022-10-12)
+------------------
+* [FIXED] #7315 Correctly display images specified in the activity description
+
 3.11.3 (2022-09-07)
 ------------------
 * [FIXED] #7220 fix create group from group bugs
