@@ -2745,7 +2745,7 @@ class mod_grouptool {
         $groupdata = null;
         if ($ignoregtinstance) {
             $groupdata = $DB->get_records_sql("
-                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                   SELECT ".$idstring.", MAX(grp.name) AS name, MAX(grp.description) AS description,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
@@ -2758,7 +2758,7 @@ class mod_grouptool {
         } else {
             $params['grouptoolid1'] = $params['grouptoolid'];
             $groupdata = $DB->get_records_sql("
-                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                   SELECT ".$idstring.", MAX(grp.name) AS name, MAX(grp.description) AS description,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :grouptoolid
@@ -5368,9 +5368,16 @@ class mod_grouptool {
                         }
                     }
 
-                    $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                 html_writer::tag('div', 'Test Test Test', ['class' => 'panel-desc']).
-                                 html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    if (isset($group->description) && get_config('mod_grouptool', 'show_add_info')) {
+                        $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
+                            html_writer::tag('div', $group->description, ['class' => 'panel-desc']).
+                            html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    } else {
+                        $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
+                            html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    }
+
+
                     if ($regrank !== false) {
                         $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
                     } else if ($queuerank !== false) {
