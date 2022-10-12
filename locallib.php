@@ -5377,7 +5377,6 @@ class mod_grouptool {
                             html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
                     }
 
-
                     if ($regrank !== false) {
                         $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
                     } else if ($queuerank !== false) {
