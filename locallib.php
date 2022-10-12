@@ -140,6 +140,8 @@ class mod_grouptool {
          * visibility handled by require_login() with $cm parameter
          * get current group only when really needed
          */
+
+        $this->grouptool->intro = file_rewrite_pluginfile_urls($this->grouptool->intro, 'pluginfile.php', $this->context->id, 'mod_grouptool', 'intro', null);
     }
 
     /**
@@ -8639,6 +8641,7 @@ class mod_grouptool {
     public function get_header() {
         // Create header
         $headertext = '<div class="description"><h3>' . $this->grouptool->name . '</h3>';
+
         if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
                 && $this->grouptool->intro) {
             $headertext .= '<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
