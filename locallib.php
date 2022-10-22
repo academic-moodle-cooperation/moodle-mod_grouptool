@@ -2212,6 +2212,7 @@ class mod_grouptool {
                             $noerror = $currentgrade->insert();
                         }
                         $currentgrade->set_overridden(true, false);
+                        $currentgrade->grade_item->force_regrading();
                         $fullname = fullname($groupmembers[$currentgrade->userid]);
                         if ($noerror) {
                             $groupinfo .= html_writer::tag('span',
@@ -2346,6 +2347,7 @@ class mod_grouptool {
                         $noerror = $currentgrade->insert();
                     }
                     $currentgrade->set_overridden(true, false);
+                    $currentgrade->grade_item->force_regrading();
                     $fullname = fullname($targetusers[$currentgrade->userid]);
                     if (function_exists ('grouptool_copy_'.$cmtouse->modname.'_grades')) {
                         $copyfunction = 'grouptool_copy_'.$cmtouse->modname.'_grades';
@@ -2743,7 +2745,7 @@ class mod_grouptool {
         $groupdata = null;
         if ($ignoregtinstance) {
             $groupdata = $DB->get_records_sql("
-                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                   SELECT ".$idstring.", MAX(grp.name) AS name, MAX(grp.description) AS description,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
@@ -2756,7 +2758,7 @@ class mod_grouptool {
         } else {
             $params['grouptoolid1'] = $params['grouptoolid'];
             $groupdata = $DB->get_records_sql("
-                   SELECT ".$idstring.", MAX(grp.name) AS name,".$sizesql." MAX(agrp.sort_order) AS sort_order,
+                   SELECT ".$idstring.", MAX(grp.name) AS name, MAX(grp.description) AS description,".$sizesql." MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :grouptoolid
@@ -4898,12 +4900,13 @@ class mod_grouptool {
     /**
      * view selfregistration-tab
      *
+     * @param string $outputcache Output already generated that can be added after the header to be generated
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function view_selfregistration() {
+    public function view_selfregistration($outputcache) {
         global $OUTPUT, $DB, $USER, $PAGE;
 
         // Include js for filters.
@@ -4955,9 +4958,9 @@ class mod_grouptool {
                 }
             }
             if ($error === true) {
-                echo $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
+                echo $OUTPUT->header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
             } else {
-                echo $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
+                echo $OUTPUT->header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
             }
         } else if (data_submitted() && confirm_sesskey()) {
 
@@ -5020,9 +5023,11 @@ class mod_grouptool {
                 $continue = new single_button($continue, get_string('continue'), 'get');
                 $cancel = null;
             }
+            echo $OUTPUT->header() . $outputcache;
             echo $this->confirm($confirmmessage, $continue, $cancel);
         } else {
             $hideform = 0;
+            echo $OUTPUT->header() . $outputcache;
         }
 
         if (empty($hideform)) {
@@ -5363,26 +5368,27 @@ class mod_grouptool {
                         }
                     }
 
+                    if (isset($group->description) && get_config('mod_grouptool', 'show_add_info')) {
+                        $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
+                            html_writer::tag('div', $group->description, ['class' => 'panel-desc']).
+                            html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    } else {
+                        $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
+                            html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    }
+
                     if ($regrank !== false) {
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-success');
+                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
                     } else if ($queuerank !== false) {
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-warning');
+                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-warning');
                     } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  'generalbox group alert-error group-full');
+                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-error group-full');
                     } else {
                         $classes = 'generalbox group empty';
                         if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
                             $classes .= ' group-full';
                         }
-                        $grouphtml = $OUTPUT->box(html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                                                  html_writer::tag('div', $grouphtml, ['class' => 'panel-body']),
-                                                  $classes);
+                        $grouphtml = $OUTPUT->box($grouphtml, $classes);
                     }
                     $mform->addElement('html', $grouphtml);
                 }

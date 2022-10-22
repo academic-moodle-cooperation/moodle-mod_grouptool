@@ -134,4 +134,6 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/force_dereg', get_string('cfg_force_dereg', 'grouptool'),
         get_string('cfg_force_dereg_desc', 'grouptool'), 0));
+    $settings->add(new admin_setting_configcheckbox('mod_grouptool/show_add_info', get_string('cfg_show_add_info', 'grouptool'),
+        get_string('cfg_show_add_info_desc', 'grouptool'), 0));
 }
