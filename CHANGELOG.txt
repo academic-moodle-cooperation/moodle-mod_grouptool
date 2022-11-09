@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+3.11.5 (2022-11-09)
+------------------
+* [FIXED] #7301 Update activity completion status correctly after self registration
+* [FIXED] #7306 Fix recalculation of grades after copying grades among groups [github#26]
+* [FIXED] #7363 Exchange hardcoded strings in groupmembers dialogue with dynamic ones [github#27]
+
 3.11.4 (2022-10-12)
 ------------------
 * [FIXED] #7315 Correctly display images specified in the activity description

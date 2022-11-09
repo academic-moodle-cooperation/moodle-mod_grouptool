@@ -79,15 +79,14 @@ $PAGE->set_activity_record($grouptool);
 
 $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
+// Cache output so header can be generated after new completion infos are avaliable.
+// Print header showing title, description, deadlines and completion marks.
+$outputcache = '';
+
 // Mark as viewed!
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-// Output starts here!
-echo $OUTPUT->header();
-
-// Print header showing title, description, deadlines and completion marks.
-echo $instance->get_header();
 // Print tabs according to users capabilities!
 
 $inactive = [];
@@ -268,7 +267,7 @@ if (empty($cm->uservisible)) {
 
     mod_grouptool::translate_top_level_tabs($row, $tab);
 
-    echo $OUTPUT->tabtree($row, $SESSION->mod_grouptool->currenttab, $inactive);
+    $outputcache = $OUTPUT->tabtree($row, $SESSION->mod_grouptool->currenttab, $inactive);
 } else if (count($row) == 1) {
     $SESSION->mod_grouptool->currenttab = current($availabletabs);
     $tab = current($availabletabs);
@@ -285,12 +284,11 @@ if (has_capability('moodle/course:managegroups', $context)) {
     $url = new moodle_url('/group/index.php', ['id' => $course->id]);
     $grpslnk = html_writer::link($url,
                                  get_string('viewmoodlegroups', 'grouptool'));
-    echo html_writer::tag('div', $grpslnk, ['class' => 'moodlegrpslnk']);
-    echo html_writer::tag('div', '', ['class' => 'clearer']);
+    $outputcache .= html_writer::tag('div', $grpslnk, ['class' => 'moodlegrpslnk']);
+    $outputcache .= html_writer::tag('div', '', ['class' => 'clearer']);
 }
 
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
-
 $tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
 
 /* TRIGGER THE VIEW EVENT */
@@ -308,6 +306,13 @@ $event->add_record_snapshot($PAGE->cm->modname, $grouptool);
 $event->trigger();
 /* END OF VIEW EVENT */
 
+if ($tab != 'selfregistration') {
+    // Output starts here!
+    echo $OUTPUT->header();
+    echo $instance->get_header();
+    echo $outputcache;
+}
+
 switch ($tab) {
     case 'group_admin':
         $instance->view_administration();
@@ -319,7 +324,8 @@ switch ($tab) {
         $instance->view_grading();
         break;
     case 'selfregistration':
-        $instance->view_selfregistration();
+        // Send cached tab output so selfregistration can add the header once updated.
+        $instance->view_selfregistration($outputcache);
         break;
     case 'import':
         $instance->view_import();

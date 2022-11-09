@@ -2244,6 +2244,7 @@ class mod_grouptool {
                             $noerror = $currentgrade->insert();
                         }
                         $currentgrade->set_overridden(true, false);
+                        $currentgrade->grade_item->force_regrading();
                         $fullname = fullname($groupmembers[$currentgrade->userid]);
                         if ($noerror) {
                             $groupinfo .= html_writer::tag('span',
@@ -2378,6 +2379,7 @@ class mod_grouptool {
                         $noerror = $currentgrade->insert();
                     }
                     $currentgrade->set_overridden(true, false);
+                    $currentgrade->grade_item->force_regrading();
                     $fullname = fullname($targetusers[$currentgrade->userid]);
                     if (function_exists ('grouptool_copy_'.$cmtouse->modname.'_grades')) {
                         $copyfunction = 'grouptool_copy_'.$cmtouse->modname.'_grades';
@@ -4930,12 +4932,13 @@ class mod_grouptool {
     /**
      * view selfregistration-tab
      *
+     * @param string $outputcache Output already generated that can be added after the header to be generated
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function view_selfregistration() {
+    public function view_selfregistration($outputcache) {
         global $OUTPUT, $DB, $USER, $PAGE;
 
         // Include js for filters.
@@ -4987,9 +4990,9 @@ class mod_grouptool {
                 }
             }
             if ($error === true) {
-                echo $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
+                echo $OUTPUT->header() . $this->get_header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
             } else {
-                echo $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
+                echo $OUTPUT->header() . $this->get_header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
             }
         } else if (data_submitted() && confirm_sesskey()) {
 
@@ -5052,9 +5055,11 @@ class mod_grouptool {
                 $continue = new single_button($continue, get_string('continue'), 'get');
                 $cancel = null;
             }
+            echo $OUTPUT->header() . $this->get_header() . $outputcache;
             echo $this->confirm($confirmmessage, $continue, $cancel);
         } else {
             $hideform = 0;
+            echo $OUTPUT->header() . $this->get_header() . $outputcache;
         }
 
         if (empty($hideform)) {
