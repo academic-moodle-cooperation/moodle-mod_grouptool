@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+4.0.2 (2022-10-09)
+------------------
+* [FIXED] #7363 Exchange hardcoded strings in groupmembers dialogue with dynamic ones [github#27]
+
 4.0.1 (2022-09-28)
 ------------------
 * [FIXED] #7301 Update activity completion status correctly after self registration
