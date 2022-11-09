@@ -4990,9 +4990,9 @@ class mod_grouptool {
                 }
             }
             if ($error === true) {
-                echo $OUTPUT->header() . $instance->get_header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
+                echo $OUTPUT->header() . $this->get_header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
             } else {
-                echo $OUTPUT->header() . $instance->get_header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
+                echo $OUTPUT->header() . $this->get_header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
             }
         } else if (data_submitted() && confirm_sesskey()) {
 
@@ -5055,11 +5055,11 @@ class mod_grouptool {
                 $continue = new single_button($continue, get_string('continue'), 'get');
                 $cancel = null;
             }
-            echo $OUTPUT->header() . $instance->get_header() . $outputcache;
+            echo $OUTPUT->header() . $this->get_header() . $outputcache;
             echo $this->confirm($confirmmessage, $continue, $cancel);
         } else {
             $hideform = 0;
-            echo $OUTPUT->header() . $instance->get_header() . $outputcache;
+            echo $OUTPUT->header() . $this->get_header() . $outputcache;
         }
 
         if (empty($hideform)) {
