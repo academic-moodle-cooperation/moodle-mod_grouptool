@@ -8,7 +8,7 @@ CHANGELOG
 4.0.1 (2022-09-28)
 ------------------
 * [FIXED] #7301 Update activity completion status correctly after self registration
-* [FIXED] #7269 Fix recalculation of grades after copying grades among groups
+* [FIXED] #7306 Fix recalculation of grades after copying grades among groups [github#26]
 
 4.0.0 (2022-07-20)
 ------------------
