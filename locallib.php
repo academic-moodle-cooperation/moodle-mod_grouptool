@@ -5378,6 +5378,13 @@ class mod_grouptool {
 
                         $groupobj = groups_get_group($group->agrpid);
                         $pictureout = print_group_picture($groupobj, $this->course->id, true, true);
+                        if (empty($pictureout)) {
+                            $pictureurl = new moodle_url('/user/index.php',
+                                ['id' => $this->course->id, 'group' => $group->id]);
+                            $pictureobj = html_writer::img($OUTPUT->image_url('g/g1')->out(false),
+                                $group->name, ['title' => $group->name]); // default image.
+                            $pictureout = html_writer::link($pictureurl, $pictureobj);
+                        }
                         if (isset($pictureout)) {
                             $grouppicture = html_writer::tag('div', $pictureout, ['class' => 'panel-picture']);
                         }

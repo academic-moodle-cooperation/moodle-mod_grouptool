@@ -243,6 +243,8 @@
 
 .path-mod-grouptool #registration_form .group .panel-picture img {
     border-radius: 50%;
+    width: 100px;
+    height: 100px;
 }
 
 .path-mod-grouptool #registration_form .group .panel-text {
