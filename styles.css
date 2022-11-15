@@ -116,6 +116,18 @@
     font-weight: bold;
 }
 
+.path-mod-grouptool .draggable_item .grpname .grouppix {
+    padding-right: 5px;
+    max-height: 35px;
+    max-width: 35px;
+}
+
+.path-mod-grouptool .draggable_item .grpname .grouppix img {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+}
+
 .path-mod-grouptool .draggable_item .grpsize {
     font-weight: normal;
     margin-left: 20px;
