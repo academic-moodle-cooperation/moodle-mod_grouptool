@@ -63,9 +63,9 @@
     <table>
         <thead>
             <tr>
-                <td>Status{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td>
-                <td>User</td>
-                {{#showidnumber}}<td>IDNumber</td>{{/showidnumber}}
+                <td>{{# str }} status, mod_grouptool {{/ str }}{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td>
+                <td>{{# str }} user, mod_grouptool {{/ str }}</td>
+                {{#showidnumber}}<td>{{# str }} idnumber {{/ str }}</td>{{/showidnumber}}
             </tr>
         </thead>
         <tbody>
