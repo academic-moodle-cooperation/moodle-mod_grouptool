@@ -5368,14 +5368,30 @@ class mod_grouptool {
                         }
                     }
 
-                    if (isset($group->description) && get_config('mod_grouptool', 'show_add_info')) {
-                        $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                            html_writer::tag('div', $group->description, ['class' => 'panel-desc']).
-                            html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
-                    } else {
-                        $grouphtml = html_writer::tag('h2', $group->name, ['class' => 'panel-title']).
-                            html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    $grouptext = html_writer::tag('h2', $group->name, ['class' => 'panel-title']);
+                    $grouppicture = '';
+                    if (get_config('mod_grouptool', 'show_add_info')) {
+                        if (isset($group->description)) {
+                            $grouptext .=
+                                html_writer::tag('div', $group->description, ['class' => 'panel-desc']);
+                        }
+
+                        $groupobj = groups_get_group($group->agrpid);
+                        $pictureout = print_group_picture($groupobj, $this->course->id, true, true);
+                        if (empty($pictureout)) {
+                            $pictureurl = new moodle_url('/user/index.php',
+                                ['id' => $this->course->id, 'group' => $group->id]);
+                            $pictureobj = html_writer::img($OUTPUT->image_url('g/g1')->out(false),
+                                $group->name, ['title' => $group->name]); // default image.
+                            $pictureout = html_writer::link($pictureurl, $pictureobj);
+                        }
+                        if (isset($pictureout)) {
+                            $grouppicture = html_writer::tag('div', $pictureout, ['class' => 'panel-picture']);
+                        }
                     }
+                    $grouptext = $grouptext . html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                    $grouptext = html_writer::tag('div', $grouptext, ['class' => 'panel-text']);
+                    $grouphtml = $grouppicture . $grouptext;
 
                     if ($regrank !== false) {
                         $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
