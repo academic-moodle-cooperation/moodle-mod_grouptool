@@ -5234,8 +5234,6 @@ class mod_grouptool {
                                                        get_string('registered_on_rank',
                                                                   'grouptool', $regrank),
                                                        ['class' => 'rank']);
-
-                        $grouphtml .= html_writer::tag('div', 'TestTest', ['class' => 'rank']);
                     } else if (!empty($group->queued) && $this->is_registration_open()
                         && $this->get_rank_in_queue($group->queued, $userid) != false) {
                         // We're sorry, but user's already queued in this group!
