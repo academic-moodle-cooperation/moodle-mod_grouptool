@@ -8661,8 +8661,6 @@ class mod_grouptool {
             return;
         }
         $PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send',  array('#group-message-button'));
-
-        //$PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send', array('#message-group-button'));
         $done = true;
     }
 
