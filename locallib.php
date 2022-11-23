@@ -5234,6 +5234,8 @@ class mod_grouptool {
                                                        get_string('registered_on_rank',
                                                                   'grouptool', $regrank),
                                                        ['class' => 'rank']);
+
+                        $grouphtml .= html_writer::tag('div', 'TestTest', ['class' => 'rank']);
                     } else if (!empty($group->queued) && $this->is_registration_open()
                         && $this->get_rank_in_queue($group->queued, $userid) != false) {
                         // We're sorry, but user's already queued in this group!
@@ -5365,6 +5367,19 @@ class mod_grouptool {
                         } catch (\mod_grouptool\local\exception\registration $e) {
                             // No registration possible!
                             $grouphtml .= html_writer::tag('div', '', ['class' => 'rank']);
+                        }
+                    }
+
+                    if (!empty($group->registered && $this->get_rank_in_queue($group->registered, $userid) != false)) {
+                        // Find group conversation in order to display group message icon.
+                        $coursecontext = context_course::instance($this->course->id);
+                        $conversation = \core_message\api::get_conversation_by_area('core_group',
+                            'groups', $group->id, $coursecontext->id);
+                        if (!empty($conversation)) {
+                            $grouphtml .= html_writer::link('#', $OUTPUT->pix_icon('t/message',
+                                get_string('open_group_message', 'grouptool')),
+                                ['id' => 'group-message-button', 'data-conversationid' => $conversation->id]);
+                            self::messagegroup_requirejs();
                         }
                     }
 
@@ -8632,6 +8647,23 @@ class mod_grouptool {
         flush();
         $this->userlist_table($groupingid, $groupid);
 
+    }
+    /**
+     * Requires the JS libraries for the message group button.
+     *
+     * @return void
+     */
+    public static function messagegroup_requirejs() {
+        global $PAGE;
+
+        static $done = false;
+        if ($done) {
+            return;
+        }
+        $PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send',  array('#group-message-button'));
+
+        //$PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send', array('#message-group-button'));
+        $done = true;
     }
 
 }
