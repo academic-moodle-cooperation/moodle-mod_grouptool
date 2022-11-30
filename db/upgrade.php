@@ -558,6 +558,29 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     if ($oldversion < 2022113000) {
 
+        // Define index agrpid-userid (unique) to be dropped form grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, ['agrpid', 'userid']);
+
+        // Conditionally launch drop index agrpid-userid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define key agrpid (foreign) to be dropped form grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, ['agrpid'], 'grouptool_agrps', ['id']);
+
+        // Launch drop key agrpid.
+        $dbman->drop_key($table, $key);
+
+        // Define key userid (foreign) to be dropped form grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch drop key userid.
+        $dbman->drop_key($table, $key);
+
         // Changing the default of field agrpid on table grouptool_registered to 0.
         $table = new xmldb_table('grouptool_registered');
         $field = new xmldb_field('agrpid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
@@ -572,6 +595,52 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Launch change of default for field userid.
         $dbman->change_field_default($table, $field);
 
+        // Define key agrpid (foreign) to be added to grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, ['agrpid'], 'grouptool_agrps', ['id']);
+
+        // Launch add key agrpid.
+        $dbman->add_key($table, $key);
+
+        // Define key userid (foreign) to be added to grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch add key userid.
+        $dbman->add_key($table, $key);
+
+        // Define index agrpid-userid (unique) to be added to grouptool_registered.
+        $table = new xmldb_table('grouptool_registered');
+        $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, ['agrpid', 'userid']);
+
+        // Conditionally launch add index agrpid-userid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Define index agrpid-userid (unique) to be dropped form grouptool_queued.
+        $table = new xmldb_table('grouptool_queued');
+        $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, ['agrpid', 'userid']);
+
+        // Conditionally launch drop index agrpid-userid.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Define key agrpid (foreign) to be dropped form grouptool_queued.
+        $table = new xmldb_table('grouptool_queued');
+        $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, ['agrpid'], 'grouptool_agrps', ['id']);
+
+        // Launch drop key agrpid.
+        $dbman->drop_key($table, $key);
+
+        // Define key userid (foreign) to be dropped form grouptool_queued.
+        $table = new xmldb_table('grouptool_queued');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch drop key userid.
+        $dbman->drop_key($table, $key);
+
         // Changing the default of field agrpid on table grouptool_queued to 0.
         $table = new xmldb_table('grouptool_queued');
         $field = new xmldb_field('agrpid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
@@ -585,6 +654,29 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Launch change of default for field userid.
         $dbman->change_field_default($table, $field);
+
+        // Define key agrpid (foreign) to be added to grouptool_queued.
+        $table = new xmldb_table('grouptool_queued');
+        $key = new xmldb_key('agrpid', XMLDB_KEY_FOREIGN, ['agrpid'], 'grouptool_agrps', ['id']);
+
+        // Launch add key agrpid.
+        $dbman->add_key($table, $key);
+
+        // Define key userid (foreign) to be added to grouptool_queued.
+        $table = new xmldb_table('grouptool_queued');
+        $key = new xmldb_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+
+        // Launch add key userid.
+        $dbman->add_key($table, $key);
+
+        // Define index agrpid-userid (unique) to be added to grouptool_queued.
+        $table = new xmldb_table('grouptool_queued');
+        $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, ['agrpid', 'userid']);
+
+        // Conditionally launch add index agrpid-userid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
 
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2022113000, 'grouptool');
