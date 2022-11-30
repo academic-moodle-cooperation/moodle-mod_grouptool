@@ -556,6 +556,40 @@ function xmldb_grouptool_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021051901, 'grouptool');
     }
 
+    if ($oldversion < 2022113000) {
+
+        // Changing the default of field agrpid on table grouptool_registered to 0.
+        $table = new xmldb_table('grouptool_registered');
+        $field = new xmldb_field('agrpid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+
+        // Launch change of default for field agrpid.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field userid on table grouptool_registered to 0.
+        $table = new xmldb_table('grouptool_registered');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'agrpid');
+
+        // Launch change of default for field userid.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field agrpid on table grouptool_queued to 0.
+        $table = new xmldb_table('grouptool_queued');
+        $field = new xmldb_field('agrpid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
+
+        // Launch change of default for field agrpid.
+        $dbman->change_field_default($table, $field);
+
+        // Changing the default of field userid on table grouptool_queued to 0.
+        $table = new xmldb_table('grouptool_queued');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'agrpid');
+
+        // Launch change of default for field userid.
+        $dbman->change_field_default($table, $field);
+
+        // Grouptool savepoint reached.
+        upgrade_mod_savepoint(true, 2022113000, 'grouptool');
+    }
+
     // Final return of upgrade result (true, all went good) to Moodle.
     return true;
 }
