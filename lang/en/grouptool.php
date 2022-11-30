@@ -436,6 +436,7 @@ $string['number_of_students'] = 'Number of students';
 $string['occupied'] = 'Occupied';
 $string['onenewgrouping'] = 'In ONE new grouping';
 $string['onenewgroupingpergroup'] = 'One grouping PER group';
+$string['open_group_message'] = 'Open group messages';
 $string['orientation'] = 'PDF-orientation';
 $string['outdated'] = 'deviating';
 $string['overflowwarning'] = 'If you continue importing the group size in instance <strong>{$a->instancename}</strong> will be exceeded!';
