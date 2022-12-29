@@ -605,6 +605,7 @@ $string['unregfrommgroups_help'] = 'Deregister users not only from grouptool, bu
 $string['updatemdlgrps'] = 'Register in moodle-groups';
 $string['update_grouplist_success'] = 'Successfully updated active groups!';
 $string['uptodate'] = 'up to date';
+$string['user'] = 'User';
 $string['userlist'] = 'User list';
 $string['userlist_tab'] = 'Course view';
 $string['userlist_tab_alt'] = 'Open course view';
