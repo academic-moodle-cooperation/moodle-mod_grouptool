@@ -1,4 +1,4 @@
-@mod @mod_grouptool @adminsetting @amc @currentdev
+@mod @mod_grouptool @adminsetting @amc
 Feature: Within a moodle instance, an administrator should be able to set the value for "Show group members" for the entire Moodle installation.
   In order to define the adminsettings of an grouptool.
   As an admin

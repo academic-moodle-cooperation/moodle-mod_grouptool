@@ -5039,16 +5039,6 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
-            // Create header
-            $headertext = '<div class="description"><h3>' . $this->grouptool->name . '</h3>';
-            if (($this->grouptool->alwaysshowdescription || (time() > $this->grouptool->timeavailable))
-                    && $this->grouptool->intro) {
-                $headertext .= '<div id="intro" class="box py-3 generalbox boxaligncenter"><div class="no-overflow">' .
-                        $this->grouptool->intro . '</div></div>';
-            }
-            $headertext .= '</div>';
-            $mform->addElement('html', $headertext);
-
             $regstat = $this->get_registration_stats($USER->id);
 
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
