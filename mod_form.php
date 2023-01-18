@@ -480,11 +480,13 @@ class mod_grouptool_mod_form extends moodleform_mod {
             }
         }
 
-        if (!empty($data['use_queue']) && !empty($data['limit_groups_queues']) && ($data['groups_queues_limit'] <= 0 || (!filter_var($data['groups_queues_limit'], FILTER_VALIDATE_INT)))) {
+        if (!empty($data['use_queue']) && !empty($data['limit_groups_queues']) &&
+            ($data['groups_queues_limit'] <= 0 || (!filter_var($data['groups_queues_limit'], FILTER_VALIDATE_INT)))) {
             $errors['groups_queues_grp'] = get_string('queuesizeerror', 'grouptool');
         }
 
-        if (!empty($data['use_queue']) && !empty($data['limit_users_queues']) && ($data['users_queues_limit'] <= 0 || (!filter_var($data['users_queues_limit'], FILTER_VALIDATE_INT)))) {
+        if (!empty($data['use_queue']) && !empty($data['limit_users_queues']) &&
+            ($data['users_queues_limit'] <= 0 || (!filter_var($data['users_queues_limit'], FILTER_VALIDATE_INT)))) {
             $errors['users_queues_grp'] = get_string('queuesizeerror', 'grouptool');
         }
 
