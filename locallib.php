@@ -5582,12 +5582,12 @@ class mod_grouptool {
             $usercnt = count($users);
             foreach ($agrps as $cur) {
                 if (!empty($cur->size)) {
-                    if (($cur->regs + $usercnt) > $cur->size) {
+                    if (($cur->regs + $usercnt) > $cur->size && $previewonly) {
                         $message .= html_writer::tag('div', $OUTPUT->notification(get_string('overflowwarning',
                                 'grouptool', $cur), \core\output\notification::NOTIFY_ERROR));
                     }
                 } else {
-                    if (($cur->regs + $usercnt) > $cur->globalsize) {
+                    if (($cur->regs + $usercnt) > $cur->globalsize && $previewonly) {
                         $message .= html_writer::tag('div', $OUTPUT->notification(get_string('overflowwarning',
                                 'grouptool', $cur), \core\output\notification::NOTIFY_ERROR));
                     }
