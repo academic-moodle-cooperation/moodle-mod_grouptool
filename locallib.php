@@ -5379,7 +5379,7 @@ class mod_grouptool {
                                 html_writer::tag('div', $group->description, ['class' => 'panel-desc']);
                         }
 
-                        $groupobj = groups_get_group($group->agrpid);
+                        $groupobj = groups_get_group($group->id);
                         $pictureout = print_group_picture($groupobj, $this->course->id, true, true);
                         if (empty($pictureout)) {
                             $pictureurl = new moodle_url('/user/index.php',
