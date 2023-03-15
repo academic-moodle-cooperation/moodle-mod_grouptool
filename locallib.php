@@ -4198,6 +4198,11 @@ class mod_grouptool {
                         'groupname' => $groupname[$group]
                     ];
                     if (!$previewonly && $userinfo) {
+
+                        $wasunregfrommgroup = false;
+                        $wasunregfrommgtgroup = false;
+                        $notinmgroup = false;
+
                         $pbar->update($processed, $count,
                             get_string('unregister_progress_unregister',
                                     'grouptool').' '.fullname($userinfo).'...');
@@ -4205,18 +4210,14 @@ class mod_grouptool {
                         $inparams['userid'] = $data['id'];
                         $sqlreg = "SELECT * FROM {grouptool_registered} WHERE agrpid $insql AND userid=:userid";
                         $sqlqueue = "SELECT * FROM {grouptool_queued} WHERE agrpid $insql AND userid=:userid";
-                        if (!$DB->record_exists_sql($sqlreg, $inparams) &&
-                            !$DB->record_exists_sql($sqlqueue, $inparams)) {
+                        if ((!$DB->record_exists_sql($sqlreg, $inparams) &&
+                            !$DB->record_exists_sql($sqlqueue, $inparams)) || $unregfrommgroups) {
                             if (groups_is_member($group, $data['id']) && $unregfrommgroups) {
                                 groups_remove_member($group, $data['id']);
-                                $row->cells[] = get_string('unregister_user_from_moodle_group', 'grouptool', $data);
-                                $row->attributes['class'] = 'success';
+                                $wasunregfrommgroup = true;
                             } else {
-                                $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
-                                $row->attributes['class'] = 'success';
+                                $notinmgroup = true;
                             }
-
-                            continue;
                         }
                         if ($followchangessetting && $DB->record_exists('groups_members', [
                                 'groupid' => $group,
@@ -4240,7 +4241,7 @@ class mod_grouptool {
                             }
                         }
 
-                        if ($unregfrommgroups) {
+                        if ($unregfromallagrps) {
                             if (is_array($agrp[$group])) {
                                 foreach ($agrp[$group] as $agrpinst) {
                                     if ($DB->record_exists('grouptool_registered', [
@@ -4257,10 +4258,20 @@ class mod_grouptool {
                             } else {
                                 $this->unregister_from_agrp($agrp[$group], $userinfo->id, false, true);
                             }
+                            $wasunregfrommgtgroup = true;
                         }
                         $unregistered[] = $userinfo->id;
-                        $row->cells[] = get_string('unregister_user', 'grouptool', $data);
-                        $row->attributes['class'] = 'success';
+                        if ($wasunregfrommgroup && !$wasunregfrommgtgroup) {
+                            $row->cells[] = get_string('unregister_user_from_moodle_group', 'grouptool', $data);
+                            $row->attributes['class'] = 'success';
+                        } else if ($notinmgroup && !$wasunregfrommgtgroup) {
+                            $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
+                            $row->attributes['class'] = 'success';
+                        } else {
+                            $row->cells[] = get_string('unregister_user', 'grouptool', $data);
+                            $row->attributes['class'] = 'success';
+                        }
+
                     } else if ($userinfo) {
                         if (!$DB->record_exists_select('grouptool_registered', "agrpid = :agrpid AND userid = :userid",
                             ['agrpid' => $agrp[$group], 'userid' => $userinfo->id])) {
@@ -5865,7 +5876,7 @@ class mod_grouptool {
             foreach ($groups as $group) {
                 $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
             }
-            list($error, $message) = $this->unregister($groups, $data, $unregfrommgroups, false, $unregfrommgroups);
+            list($error, $message) = $this->unregister($groups, $data, true, false, $unregfrommgroups);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'),
@@ -5877,7 +5888,8 @@ class mod_grouptool {
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
             list($error, $confirmmessage) =
-                $this->unregister($fromform->groups, $fromform->data, $fromform->unregfrommgroups, true);
+                $this->unregister($fromform->groups, $fromform->data, true,
+                    true);
             $formdata = [
                 'id'                => $id,
                 'groups'            => $fromform->groups,
