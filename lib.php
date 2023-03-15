@@ -312,7 +312,6 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
             }
 
             if ($grouptool->timeavailable) {
-                //$event->type = CALENDAR_EVENT_TYPE_STANDARD;
                 $event->eventtype = GROUPTOOL_EVENT_TYPE_AVAILABLEFROM;
                 $event->name = get_string('calendaravailable', 'grouptool', $grouptool->name);
 
