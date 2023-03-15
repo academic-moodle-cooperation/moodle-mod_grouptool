@@ -311,9 +311,37 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                 }
             }
 
+            if ($grouptool->timeavailable) {
+                $event->eventtype = GROUPTOOL_EVENT_TYPE_AVAILABLEFROM;
+                $event->name = get_string('calendaravailable', 'grouptool', $grouptool->name);
+
+                $event->timestart = $grouptool->timeavailable;
+                $event->timesort = $grouptool->timeavailable;
+                $select = "modulename = :modulename
+                           AND instance = :instance
+                           AND eventtype = :eventtype
+                           AND groupid = 0
+                           AND courseid <> 0";
+                $params = ['modulename' => 'grouptool', 'instance' => $grouptool->id, 'eventtype' => $event->eventtype];
+                $event->id = $DB->get_field_select('event', 'id', $select, $params);
+
+                // Now process the event.
+                if ($event->id) {
+                    $calendarevent = calendar_event::load($event->id);
+                    $calendarevent->update($event, false);
+                } else {
+                    calendar_event::create($event, false);
+                }
+            } else {
+                $DB->delete_records('event', [
+                    'modulename' => 'grouptool', 'instance' => $grouptool->id,
+                    'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM
+                ]);
+            }
+
             if ($grouptool->timedue) {
                 $event->eventtype = GROUPTOOL_EVENT_TYPE_DUE;
-                $event->name = $grouptool->name;
+                $event->name = get_string('calendardue', 'grouptool', $grouptool->name);
 
                 $event->timestart = $grouptool->timedue;
                 $event->timesort = $grouptool->timedue;
@@ -341,6 +369,29 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
         }
     }
     return true;
+
+}
+
+/**
+ * Callback to fetch the activity event type lang string.
+ *
+ * @param string $eventtype The event type.
+ * @return lang_string The event type lang string.
+ */
+function mod_grouptool_core_calendar_get_event_action_string(string $eventtype): string {
+    $modulename = get_string('modulename', 'grouptool');
+
+    switch ($eventtype) {
+        case GROUPTOOL_EVENT_TYPE_DUE:
+            $identifier = 'calendardue';
+            break;
+        case GROUPTOOL_EVENT_TYPE_AVAILABLEFROM:
+            $identifier = 'calendaravailable';
+            break;
+        default:
+            return get_string('requiresaction', 'calendar', $modulename);
+    }
+    return get_string($identifier, 'grouptool', $modulename);
 }
 
 /**
@@ -1091,8 +1142,13 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
                                                                                                  $context);
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
-        return ((has_capability('mod/grouptool:register', $context) && $grouptool->is_registration_open())
+        return ((has_capability('mod/grouptool:register', $context))
                 || ($managesregs && ($grouptool->get_missing_registrations() >= 1 || $grouptool->is_registration_open())));
+    }
+
+    if ($event->eventtype == GROUPTOOL_EVENT_TYPE_AVAILABLEFROM) {
+        return time() <= $grouptool->get_settings()->timeavailable && ((has_capability('mod/grouptool:register', $context))
+            || ($managesregs && ($grouptool->get_missing_registrations() >= 1 || $grouptool->is_registration_open())));
     }
 
     return false;
