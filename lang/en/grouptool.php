@@ -597,7 +597,7 @@ $string['unregister_desc'] = 'Deregister mutiple users';
 $string['unregister_from_inactive_group_warning'] = 'Note: Group <strong>{$a}</strong> is currently inactive in the grouptool context and will therefore not be displayed.';$string['unregister_skipped'] = 'Skipped user <strong>{$a->fullname}</strong> for group <strong>{$a->groupname}</strong>!';
 $string['unregister_user'] = 'Deregistration of <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) from group <strong>{$a->groupname}</strong> succeeded.';
 $string['unregister_user_from_moodle_group']  = 'Deregistration of <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) from moodle group <strong>{$a->groupname}</strong> succeeded.';
-$string['unregister_user_not_in_group'] = 'User <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) not in group <strong>{$a->groupname}</strong>!';
+$string['unregister_user_not_in_group'] = 'User <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) not in moodle group <strong>{$a->groupname}</strong>!';
 $string['unregister_user_only_in_moodle_group'] = 'User <strong>{$a->fullname}</strong> is only in moodle group <strong>{$a->groupname}</strong> but not in grouptool group!';
 $string['unregister_user_prev'] = 'Deregistrating <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) from group <strong>{$a->groupname}</strong>.';
 $string['unregister_progress_completed'] = 'Deregistration completed';
