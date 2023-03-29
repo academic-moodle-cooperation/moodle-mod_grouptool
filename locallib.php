@@ -5376,7 +5376,7 @@ class mod_grouptool {
                         $coursecontext = context_course::instance($this->course->id);
                         $conversation = \core_message\api::get_conversation_by_area('core_group',
                             'groups', $group->id, $coursecontext->id);
-                       // Check if converastion exists and if user is allowed to access it.
+                        // Check if converastion exists and if user is allowed to access it.
                         if (!empty($conversation) &&
                             \core_message\api::can_send_message_to_conversation($userid, $conversation->id)) {
                             $grouptext .= html_writer::link('#', $OUTPUT->pix_icon('t/message',
