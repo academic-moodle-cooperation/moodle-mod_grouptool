@@ -5369,20 +5369,24 @@ class mod_grouptool {
                         }
                     }
 
+                    $grouptext = $group->name;
+                    // Add conversation button if conditions are met.
                     if (!empty($group->registered && $this->get_rank_in_queue($group->registered, $userid) != false)) {
                         // Find group conversation in order to display group message icon.
                         $coursecontext = context_course::instance($this->course->id);
                         $conversation = \core_message\api::get_conversation_by_area('core_group',
                             'groups', $group->id, $coursecontext->id);
-                        if (!empty($conversation)) {
-                            $grouphtml .= html_writer::link('#', $OUTPUT->pix_icon('t/message',
+                        // Check if converastion exists and if user is allowed to access it.
+                        if (!empty($conversation) &&
+                            \core_message\api::can_send_message_to_conversation($userid, $conversation->id)) {
+                            $grouptext .= html_writer::link('#', $OUTPUT->pix_icon('t/message',
                                 get_string('open_group_message', 'grouptool')),
                                 ['id' => 'group-message-button', 'data-conversationid' => $conversation->id]);
                             self::messagegroup_requirejs();
                         }
                     }
+                    $grouptext = html_writer::tag('h2', $grouptext, ['class' => 'panel-title']);
 
-                    $grouptext = html_writer::tag('h2', $group->name, ['class' => 'panel-title']);
                     $grouppicture = '';
                     if (get_config('mod_grouptool', 'show_add_info')) {
                         if (isset($group->description)) {
@@ -5403,6 +5407,7 @@ class mod_grouptool {
                             $grouppicture = html_writer::tag('div', $pictureout, ['class' => 'panel-picture']);
                         }
                     }
+
                     $grouptext = $grouptext . html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
                     $grouptext = html_writer::tag('div', $grouptext, ['class' => 'panel-text']);
                     $grouphtml = $grouppicture . $grouptext;

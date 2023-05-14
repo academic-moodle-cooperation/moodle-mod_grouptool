@@ -451,3 +451,7 @@
 .path-mod-grouptool .col-form-label {
     padding-top: 0 !important;
 }
+
+.path-mod-grouptool #group-message-button {
+    padding-left: 5px;
+}
