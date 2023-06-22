@@ -70,6 +70,10 @@ if ($id) {
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
+// Hide intro if module not available yet and alwaysshowdescription is false.
+if ($grouptool->alwaysshowdescription == 0 && time() < $grouptool->timeavailable) {
+    $grouptool->intro = '';
+}
 // Configure the page header!
 $PAGE->set_url('/mod/grouptool/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
@@ -306,12 +310,6 @@ $event->add_record_snapshot($PAGE->cm->modname, $grouptool);
 $event->trigger();
 /* END OF VIEW EVENT */
 
-// Hide intro if module not available and alwaysshowdescription is false.
-if (!($grouptool->alwaysshowdescription && time() > $grouptool->timeavailable)) {
-    $intro = $grouptool->intro;
-    $DB->set_field('grouptool', 'intro', '', array('id' => $grouptool->id));
-}
-
 if ($tab != 'selfregistration') {
     // Output starts here!
     echo $OUTPUT->header();
@@ -365,10 +363,6 @@ switch ($tab) {
         $notification = $OUTPUT->notification(get_string('incorrect_tab', 'grouptool'), 'error');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
-}
-
-if (isset($intro)) {
-    $DB->set_field('grouptool', 'intro', $intro, array('id' => $grouptool->id));
 }
 
 // Finish the page!
