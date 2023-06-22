@@ -1,14 +1,15 @@
 CHANGELOG
-=========
+========
 
-4.0.2 (2022-10-09)
+4.0.1 (2023-06-22)
 ------------------
-* [FIXED] #7363 Exchange hardcoded strings in groupmembers dialogue with dynamic ones [github#27]
-
-4.0.1 (2022-09-28)
-------------------
+* [FEATURE] #7081 Show group messages to group members in moodle messaging tool
 * [FIXED] #7301 Update activity completion status correctly after self registration
 * [FIXED] #7306 Fix recalculation of grades after copying grades among groups [github#26]
+* [FIXED] #7427 Show module description only if instance is available or alwaysshowdescription is true
+* [FIXED] #7437 Fix vertical alignment in registration view
+* [FIXED] #7363 Exchange hardcoded strings in groupmembers dialogue with dynamic ones [github#27]
+* Moodle 4.1.0 compatible version
 
 4.0.0 (2022-07-20)
 ------------------
