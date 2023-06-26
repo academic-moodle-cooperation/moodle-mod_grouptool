@@ -70,7 +70,11 @@ if ($id) {
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
-// Print the page header!
+// Hide intro if module not available yet and alwaysshowdescription is false.
+if ($grouptool->alwaysshowdescription == 0 && time() < $grouptool->timeavailable) {
+    $grouptool->intro = '';
+}
+// Configure the page header!
 $PAGE->set_url('/mod/grouptool/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 $PAGE->set_title(format_string($grouptool->name));
@@ -86,9 +90,7 @@ $outputcache = '';
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-
 // Print tabs according to users capabilities!
-
 $inactive = [];
 $tabs = [];
 $row = [];

@@ -48,3 +48,4 @@ class registration extends \moodle_exception {
         parent::__construct($description, $module, '', $a);
     }
 }
+

@@ -43,3 +43,4 @@ class exceedgroupsize extends registration {
         parent::__construct('exceedgroupsize', 'grouptool');
     }
 }
+

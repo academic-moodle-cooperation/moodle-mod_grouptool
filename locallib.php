@@ -8670,4 +8670,3 @@ class mod_grouptool {
     }
 
 }
-

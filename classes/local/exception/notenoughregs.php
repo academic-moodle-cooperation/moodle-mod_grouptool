@@ -50,3 +50,4 @@ class notenoughregs extends registration {
         parent::__construct($text, 'grouptool', $a);
     }
 }
+

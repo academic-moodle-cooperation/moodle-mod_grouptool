@@ -43,3 +43,4 @@ class exceedgroupqueuelimit extends registration {
         parent::__construct('exceedgroupqueuelimit', 'grouptool');
     }
 }
+
