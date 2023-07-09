@@ -1,6 +1,10 @@
 CHANGELOG
 ========
 
+4.0.2 (2023-07-08)
+------------------
+* Moodle 4.2.0 compatible version
+
 4.0.1 (2023-06-22)
 ------------------
 * [FEATURE] #7081 Show group messages to group members in moodle messaging tool
