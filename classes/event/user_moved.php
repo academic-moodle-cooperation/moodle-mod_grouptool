@@ -143,23 +143,6 @@ class user_moved extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            $this->objecttable,
-            'move user',
-            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['to']['groupid'],
-            'move user='.$this->data['other']['from']['userid'].' from agrp='.$this->data['other']['from']['agrpid'].
-                    ' to agrp='.$this->data['other']['to']['agrpid'],
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

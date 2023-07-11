@@ -98,24 +98,6 @@ abstract class export extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     * @throws \moodle_exception
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            $this->objecttable,
-            'export',
-            "download.php?id=".$this->contextinstanceid."&groupingid=".$this->data['other']['groupingid'].
-                "&groupid=".$this->data['other']['groupid']."&tab=".$this->exportsubject."&format=".$this->data['other']['format'],
-            get_string($this->exportsubject, 'grouptool').' '.$this->data['other']['format_readable'],
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

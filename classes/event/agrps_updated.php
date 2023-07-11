@@ -94,32 +94,6 @@ class agrps_updated extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        if (!empty($this->data['other']['pattern'])) {
-            return [
-                $this->courseid,
-                $this->objecttable,
-                'create groups',
-                'view.php?id=' . $this->contextinstanceid.'&tab=overview',
-                'create groups namescheme:'.$this->data['other']['pattern'].' numgroups:'.$this->data['other']['numgrps'],
-                $this->contextinstanceid
-            ];
-        }
-        return [
-            $this->courseid,
-            $this->objecttable,
-            'update agrps',
-            'view.php?id='.$this->contextinstanceid.'&tab=overview',
-            $this->objectid,
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Returns description of what happened.
      *
      * @return string

@@ -105,22 +105,6 @@ class queue_entry_created extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            'grouptool',
-            'queue',
-            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-            'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception
