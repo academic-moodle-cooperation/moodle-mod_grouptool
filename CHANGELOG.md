@@ -1,11 +1,11 @@
 CHANGELOG
 ========
 
-4.0.2 (2023-07-08)
+4.2.0 (2023-07-08)
 ------------------
 * Moodle 4.2.0 compatible version
 
-4.0.1 (2023-06-22)
+4.1.0 (2023-06-22)
 ------------------
 * [FEATURE] #7081 Show group messages to group members in moodle messaging tool
 * [FIXED] #7301 Update activity completion status correctly after self registration
