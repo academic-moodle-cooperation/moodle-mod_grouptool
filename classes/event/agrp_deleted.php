@@ -72,22 +72,6 @@ class agrp_deleted extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            $this->objecttable,
-            'agrp deleted id \''.$this->data['other']->agrpid.'\'',
-            'view.php?id=' . $this->contextinstanceid.'&tab=overview',
-            $this->objectid,
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Returns description of what happened.
      *
      * @return string

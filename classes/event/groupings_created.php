@@ -73,22 +73,6 @@ class groupings_created extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            $this->objecttable,
-            'create groupings',
-            'view.php?id='.$this->contextinstanceid.'&tab=overview',
-            'create groupings for groups:'.implode("|", $this->data['other']),
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Returns description of what happened.
      *
      * @return string

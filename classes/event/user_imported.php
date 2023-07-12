@@ -133,34 +133,6 @@ class user_imported extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        if ($this->data['other']['type'] == 'force') {
-            return [
-                $this->courseid,
-                'grouptool',
-                'import',
-                "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
-                'group='.$this->data['other']['group'].' agrp='.$this->data['other']['agrp'].' user='.
-                        $this->data['other']['user'],
-                $this->contextinstanceid
-            ];
-        } else {
-            return [
-                $this->courseid,
-                'grouptool',
-                'import',
-                "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['group'],
-                'group='.$this->data['other']['group'].' user='.$this->data['other']['user'],
-                $this->contextinstanceid
-            ];
-        }
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception

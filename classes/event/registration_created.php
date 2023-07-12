@@ -55,20 +55,5 @@ class registration_created extends registration {
     public static function get_name() {
         return get_string('eventregistrationcreated', 'grouptool');
     }
-
-    /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            'grouptool',
-            'register',
-            "view.php?id=".$this->contextinstanceid."&tab=overview&groupid=".$this->data['other']['groupid'],
-            'via event agrp='.$this->data['other']['agrpid'].' user='.$this->data['other']['userid'],
-            $this->contextinstanceid
-        ];
-    }
 }
+

@@ -56,19 +56,5 @@ class course_module_viewed extends \core\event\course_module_viewed {
             'tab' => $this->data['other']['tab']
         ]);
     }
-
-    /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return [
-            $this->courseid,
-            $this->objecttable, 'view',
-            'view.php?id=' . $this->contextinstanceid,
-            $this->objectid.' || '.$this->data['other']['name'],
-            $this->contextinstanceid
-        ];
-    }
 }
+
