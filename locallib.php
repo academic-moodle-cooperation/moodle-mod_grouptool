@@ -212,9 +212,9 @@ class mod_grouptool {
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
                 $url = new moodle_url($continue);
-                $continue = new single_button($url, get_string('continue'), 'post', true);
+                $continue = new single_button($url, get_string('continue'), 'post', 'primary');
             } else if ($continue instanceof moodle_url) {
-                $continue = new single_button($continue, get_string('continue'), 'post', true);
+                $continue = new single_button($continue, get_string('continue'), 'post', 'primary');
             } else {
                 throw new coding_exception('The continue param to grouptool::confirm() must be either a'.
                                            ' URL (string/moodle_url) or a single_button instance.');
@@ -7395,7 +7395,7 @@ class mod_grouptool {
                  */
                 $url = new moodle_url($PAGE->url, ['pushtomdl' => 1, 'sesskey' => sesskey()]);
                 $button = new single_button($url, get_string('updatemdlgrps', 'grouptool'), 'post',
-                        true);
+                    'primary');
                 echo $OUTPUT->box(html_writer::empty_tag('br').
                                   $OUTPUT->render($button).
                                   html_writer::empty_tag('br'), 'generalbox centered');
