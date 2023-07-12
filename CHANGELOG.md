@@ -3,14 +3,22 @@ CHANGELOG
 
 4.1.0 (2023-06-22)
 ------------------
+* Moodle 4.1.0 compatible version
+* [FEATURE] #7078 Show group pictures in the module
+* [FEATURE] #7079 Show group descriptions in the module
 * [FEATURE] #7081 Show group messages to group members in moodle messaging tool
-* [FIXED] #7301 Update activity completion status correctly after self registration
-* [FIXED] #7306 Fix recalculation of grades after copying grades among groups [github#26]
-* [FIXED] #7363 Exchange hardcoded strings in groupmembers dialogue with dynamic ones [github#27]
 * [FIXED] #7427 Show module description only if instance is available or alwaysshowdescription is true
 * [FIXED] #7437 Fix vertical alignment in registration view
 * [FIXED] #7634 Remove Zone.Identifier files from pix directory
-* Moodle 4.1.0 compatible version
+
+4.0.2 (2022-10-09)
+------------------
+* [FIXED] #7363 Exchange hardcoded strings in groupmembers dialogue with dynamic ones [github#27]
+
+4.0.1 (2022-09-28)
+------------------
+* [FIXED] #7301 Update activity completion status correctly after self registration
+* [FIXED] #7306 Fix recalculation of grades after copying grades among groups [github#26]
 
 4.0.0 (2022-07-20)
 ------------------
