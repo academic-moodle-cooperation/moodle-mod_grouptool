@@ -1,6 +1,13 @@
 CHANGELOG
 ========
 
+4.2.0 (2023-07-08)
+------------------
+* Moodle 4.2.0 compatible version
+* [FIXED] #7620 Remove deprecated get_legacy_logdata function
+* [FIXED] #7638 Change single_button function's type parameter
+* [FIXED] #7643 Fix empty status help page in xlsx download in english
+
 4.1.0 (2023-06-22)
 ------------------
 * Moodle 4.1.0 compatible version

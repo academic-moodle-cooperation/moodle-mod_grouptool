@@ -139,35 +139,6 @@ class group_graded extends \core\event\base {
     }
 
     /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        if ($this->data['other']['type'] == 'users') {
-            return [
-                $this->courseid,
-                'grouptool',
-                'grade group',
-                "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
-                        "&refresh_table=1",
-                "group-grade users ".implode(", ",
-                $this->data['other']['selected']),
-                $this->contextinstanceid
-            ];
-        }
-        return [
-            $this->courseid,
-            'grouptool',
-            'grade group',
-            "view.php?id=".$this->contextinstanceid."&tab=grading&activity=".$this->data['other']['cmtouse'].
-                   "&groupid=".$this->data['other']['groupid']."&refresh_table=1",
-            'group-grade group '.$this->data['other']['groupid'],
-            $this->contextinstanceid
-        ];
-    }
-
-    /**
      * Custom validation.
      *
      * @throws \coding_exception
@@ -197,3 +168,4 @@ class group_graded extends \core\event\base {
         }
     }
 }
+
