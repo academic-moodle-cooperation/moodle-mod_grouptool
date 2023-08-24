@@ -62,9 +62,9 @@ class unregister_confirm_form extends \moodleform {
         $mform->setType('tab', PARAM_TEXT);
 
         foreach ($this->_customdata['groups'] as $group) {
-            $mform->addElement('hidden', "group[$group]");
-            $mform->setDefault("group[$group]", $group);
-            $mform->setType("group[$group]", PARAM_INT);
+            $mform->addElement('hidden', "groups[$group]");
+            $mform->setDefault("groups[$group]", $group);
+            $mform->setType("groups[$group]", PARAM_INT);
         }
 
         $mform->addElement('hidden', 'data');
