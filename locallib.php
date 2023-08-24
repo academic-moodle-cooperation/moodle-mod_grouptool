@@ -5815,7 +5815,7 @@ class mod_grouptool {
         $form = new \mod_grouptool\import_form(null, ['id' => $id]);
 
         if (optional_param('confirm', 0, PARAM_BOOL)) {
-            $groups = required_param_array('group', PARAM_INT);
+            $groups = required_param_array('groups', PARAM_INT);
             $data = required_param('data', PARAM_NOTAGS);
             $forceregistration = optional_param('forceregistration', 0, PARAM_BOOL);
             $ignored = [];
@@ -5874,7 +5874,7 @@ class mod_grouptool {
         $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);
 
         if (optional_param('confirm', 0, PARAM_BOOL)) {
-            $groups = required_param_array('group', PARAM_INT);
+            $groups = required_param_array('groups', PARAM_INT);
             $data = required_param('data', PARAM_NOTAGS);
             $unregfrommgroups = optional_param('unregfrommgroups', 1, PARAM_BOOL);
             $ignored = [];
