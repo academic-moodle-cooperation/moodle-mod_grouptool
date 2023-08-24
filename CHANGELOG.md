@@ -1,6 +1,10 @@
 CHANGELOG
 ========
 
+4.2.1 (2023-08-24)
+------------------
+* [FIXED] #7674 Fix participants' import/unregister error
+
 4.2.0 (2023-07-08)
 ------------------
 * Moodle 4.2.0 compatible version
