@@ -21,14 +21,15 @@
  * @author    Philipp Hager
  * @author    Hannes Laimer
  * @author    Daniel Binder
- * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Anne Kreppenhofer
+ * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023070801;
+$plugin->version   = 2024011600;
 $plugin->requires  = 2023042400;
 $plugin->component = 'mod_grouptool';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v4.2.1";
+$plugin->release   = "v4.3.0";
