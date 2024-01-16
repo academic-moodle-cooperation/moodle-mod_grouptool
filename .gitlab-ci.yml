@@ -27,15 +27,15 @@ variables:
     - moodle-plugin-ci codechecker
     - moodle-plugin-ci validate
     - moodle-plugin-ci savepoints
-    #- moodle-plugin-ci mustache
-    #- moodle-plugin-ci grunt
+    - moodle-plugin-ci mustache
+    - moodle-plugin-ci grunt
     - moodle-plugin-ci phpdoc
     - moodle-plugin-ci phpunit
     - moodle-plugin-ci behat --profile chrome
   parallel:
     matrix:
-      - MOODLE_BRANCH: [ "MOODLE_402_STABLE" ]
-        PHP_VERSION: [ "8.0", "8.1" ]
+      - MOODLE_BRANCH: [ "MOODLE_403_STABLE" ]
+        PHP_VERSION: [ "8.0", "8.1", "8.2" ]
 
 test:postgres:
   <<: *job_configuration
