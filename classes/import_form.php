@@ -106,7 +106,7 @@ class import_form extends \moodleform {
             $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
                 'wrap' => 'virtual',
                 'rows' => '20',
-                'cols' => '50'
+                'cols' => '50',
             ]);
             $mform->addHelpButton('data', 'userlist', 'grouptool');
             $mform->addRule('data', null, 'required', null, 'client');

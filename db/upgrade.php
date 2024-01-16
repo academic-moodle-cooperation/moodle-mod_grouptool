@@ -318,7 +318,7 @@ function xmldb_grouptool_upgrade($oldversion) {
     // The following code has code of 2 upgrade steps compressed to a foreach!
     $tables = [
             2013112701 => new xmldb_table('grouptool_registered'),
-            2013112702 => new xmldb_table('grouptool_queued')
+            2013112702 => new xmldb_table('grouptool_queued'),
     ];
     foreach ($tables as $vers => $table) {
         if ($oldversion < $vers) {
@@ -393,7 +393,7 @@ function xmldb_grouptool_upgrade($oldversion) {
                 'grpsize', 'use_size', 'use_individual', 'use_queue',
                 'max_queues', 'allow_multiple', 'choose_min', 'choose_max',
                 'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted',
-                'force_importreg', 'importfields'
+                'force_importreg', 'importfields',
         ];
         // Check if everything is all right!
         foreach ($settingsnames as $key => $cur) {
@@ -476,11 +476,11 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
         $count = $DB->count_records('event', [
                 'modulename' => 'grouptool',
-                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE
+                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE,
         ]);
         $rs = $DB->get_recordset('event', [
                 'modulename' => 'grouptool',
-                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE
+                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE,
         ]);
         $i = 0;
         $cmnames = [];

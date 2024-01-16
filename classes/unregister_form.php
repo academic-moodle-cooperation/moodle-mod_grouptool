@@ -106,7 +106,7 @@ class unregister_form extends \moodleform {
             $mdlform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
                 'wrap' => 'virtual',
                 'rows' => '20',
-                'cols' => '50'
+                'cols' => '50',
             ]);
             $mdlform->addHelpButton('data', 'userlist', 'grouptool');
             $mdlform->addRule('data', null, 'required', null, 'client');

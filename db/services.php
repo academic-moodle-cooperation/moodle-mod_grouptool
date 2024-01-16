@@ -33,7 +33,7 @@ $services = [
                 'mod_grouptool_activate_group',
                 'mod_grouptool_deactivate_group',
                 'mod_grouptool_reorder_groups',
-                'mod_grouptool_swap_groups'
+                'mod_grouptool_swap_groups',
             ],
             /* If set, the web service user need this capability to access
             * any function of this service. For example: 'some/capability:specified'. */
@@ -43,7 +43,7 @@ $services = [
             'restrictedusers' => 0,
             // If enabled, the service can be reachable on a default installation.
             'enabled' => 1,
-    ]
+    ],
 ];
 
 $functions = [

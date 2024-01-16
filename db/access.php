@@ -33,7 +33,7 @@ $capabilities = [
                 'editingteacher' => CAP_ALLOW,
                 'teacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW,
-            ]
+            ],
         ],
 
         'mod/grouptool:view_description' => [
@@ -45,7 +45,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:view_own_registration' => [
@@ -53,7 +53,7 @@ $capabilities = [
             'contextlevel' => CONTEXT_MODULE,
             'legacy' => [
                 'student' => CAP_ALLOW,
-            ]
+            ],
         ],
 
         'mod/grouptool:export' => [
@@ -63,7 +63,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:view_groups' => [
@@ -74,7 +74,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:view_regs_group_view' => [
@@ -84,7 +84,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:view_regs_course_view' => [
@@ -94,7 +94,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:register' => [
@@ -102,7 +102,7 @@ $capabilities = [
             'contextlevel' => CONTEXT_MODULE,
             'legacy' => [
                 'student' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:grade' => [
@@ -112,7 +112,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:grade_own_group' => [
@@ -122,7 +122,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:administrate_groups' => [
@@ -132,7 +132,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:create_groups' => [
@@ -142,7 +142,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:create_groupings' => [
@@ -152,7 +152,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:move_students' => [
@@ -162,7 +162,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:register_students' => [
@@ -172,7 +172,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 
         'mod/grouptool:unregister_students' => [
@@ -182,7 +182,7 @@ $capabilities = [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW
-            ]
+            ],
         ],
 ];
 

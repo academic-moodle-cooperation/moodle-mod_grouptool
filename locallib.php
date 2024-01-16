@@ -395,7 +395,7 @@ class mod_grouptool {
         }
         $attr = [
                 'grouptoolid' => $this->grouptool->id,
-                'groupid'     => $groupid
+                'groupid'     => $groupid,
         ];
         if (!$DB->record_exists('grouptool_agrps', $attr)) {
             $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
@@ -486,7 +486,7 @@ class mod_grouptool {
                 $table->head  = [
                         get_string('groupscount', 'group', $numgrps),
                         get_string('groupmembers', 'group'),
-                        get_string('usercounttotal', 'group', $usercnt)
+                        get_string('usercounttotal', 'group', $usercnt),
                 ];
                 $table->size  = ['20%', '70%', '10%'];
                 $table->align = ['left', 'left', 'center'];
@@ -576,7 +576,7 @@ class mod_grouptool {
                     $usrreg->modified_by = $USER->id;
                     $attr = [
                             'userid' => $user->id,
-                            'agrpid' => $newagrp->id
+                            'agrpid' => $newagrp->id,
                     ];
                     if (!$DB->record_exists('grouptool_registered', $attr)) {
                         $DB->insert_record('grouptool_registered', $usrreg);
@@ -645,7 +645,7 @@ class mod_grouptool {
             $table = new html_table();
             $table->head  = [
                     get_string('groupscount', 'group',
-                                  (clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT) + 1))
+                                  (clean_param($data->to, PARAM_INT) - clean_param($data->from, PARAM_INT) + 1)),
             ];
             $table->size  = ['100%'];
             $table->align = ['left'];
@@ -740,7 +740,7 @@ class mod_grouptool {
                 }
                 return [
                         0 => $failed,
-                        1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error
+                        1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error,
                 ];
             } else {
                 // Activate group size if we already used it when creating groups!
@@ -802,7 +802,7 @@ class mod_grouptool {
             $table = new html_table();
             $table->head  = [
                     get_string('groupscount', 'group', $usercnt),
-                    get_string('groupmembers', 'group')
+                    get_string('groupmembers', 'group'),
             ];
             $table->size  = ['30%', '70%'];
             $table->align = ['left', 'left'];
@@ -878,7 +878,7 @@ class mod_grouptool {
                 }
                 if (!$DB->record_exists('grouptool_agrps', [
                         'grouptoolid' => $this->grouptool->id,
-                        'groupid'     => $groupid
+                        'groupid'     => $groupid,
                 ])) {
                     $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
                 } else {
@@ -887,7 +887,7 @@ class mod_grouptool {
                      */
                     $newagrp->id = $DB->get_field('grouptool_agrps', 'id', [
                             'grouptoolid' => $this->grouptool->id,
-                            'groupid'     => $groupid
+                            'groupid'     => $groupid,
                     ]);
                     if ($this->grouptool->allow_reg == true) {
                         $DB->set_field('grouptool_agrps', 'active', 1, ['id' => $newagrp->id]);
@@ -902,7 +902,7 @@ class mod_grouptool {
                 $usrreg->modified_by = $USER->id;
                 $attr = [
                         'userid' => $group['member']->id,
-                        'agrpid' => $newagrp->id
+                        'agrpid' => $newagrp->id,
                 ];
                 if (!$DB->record_exists('grouptool_registered', $attr)) {
                     $DB->insert_record('grouptool_registered', $usrreg);
@@ -924,7 +924,7 @@ class mod_grouptool {
                 }
                 return [
                         0 => $failed,
-                        1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error
+                        1 => get_string('group_creation_failed', 'grouptool').html_writer::empty_tag('br').$error,
                 ];
             } else {
                 // Trigger agrps updated via groupcreation event.
@@ -966,7 +966,7 @@ class mod_grouptool {
         $table->head = [
                 new html_table_cell(get_string('grouping', 'group')),
                 new html_table_cell(get_string('info').'/'.
-                                                       get_string('groups'))
+                                                       get_string('groups')),
         ];
 
         // Get all course-groups!
@@ -1267,7 +1267,7 @@ class mod_grouptool {
                     $selected = optional_param_array('selected', [], PARAM_INT);
                     $mform = new \mod_grouptool\groupings_creation_form(null, [
                             'id'       => $id,
-                            'selected' => $selected
+                            'selected' => $selected,
                     ]);
                     $groups = $DB->get_records_list('groups', 'id', $selected);
                     if ($mform->is_cancelled()) {
@@ -1312,7 +1312,7 @@ class mod_grouptool {
                         $url = new moodle_url('/mod/grouptool/view.php', [
                                 'id' => $this->cm->id,
                                 'tab' => 'group_admin',
-                                'filter' => $filter
+                                'filter' => $filter,
                         ]);
                         echo $OUTPUT->notification(get_string('groupings_created_and_groups_added',
                                 'grouptool'),  \core\output\notification::NOTIFY_SUCCESS);
@@ -1359,7 +1359,7 @@ class mod_grouptool {
             $gform = new \mod_grouptool\group_rename_form(null, [
                     'id'       => $this->cm->id,
                     'instance' => $this->cm->instance,
-                    'rename'   => $rename
+                    'rename'   => $rename,
             ]);
             if (!$gform->is_cancelled() && $fromform = $gform->get_data()) {
                 $group = new stdClass();
@@ -1382,19 +1382,19 @@ class mod_grouptool {
             $gform = new \mod_grouptool\group_resize_form(null, [
                     'id'       => $this->cm->id,
                     'instance' => $this->cm->instance,
-                    'resize'   => $resize
+                    'resize'   => $resize,
             ]);
             if (!$gform->is_cancelled() && $fromform = $gform->get_data()) {
                 if (empty($fromform->size)) {
                     $DB->set_field('grouptool_agrps', 'grpsize', null, [
                             'groupid'     => $fromform->resize,
-                            'grouptoolid' => $this->cm->instance
+                            'grouptoolid' => $this->cm->instance,
                     ]);
                 } else {
                     $group = new stdClass();
                     $group->id = $DB->get_field('grouptool_agrps', 'id', [
                             'groupid' => $fromform->resize,
-                            'grouptoolid' => $this->cm->instance
+                            'grouptoolid' => $this->cm->instance,
                     ]);
                     $group->grpsize = $fromform->size;
                     $DB->update_record('grouptool_agrps', $group);
@@ -1403,7 +1403,7 @@ class mod_grouptool {
                 $data = new stdClass();
                 $data->size = $DB->get_field('grouptool_agrps', 'grpsize', [
                         'groupid'     => $resize,
-                        'grouptoolid' => $this->cm->instance
+                        'grouptoolid' => $this->cm->instance,
                 ]);
                 $gform->set_data($data);
                 $gform->display();
@@ -1418,7 +1418,7 @@ class mod_grouptool {
                 $cancel = new moodle_url($PAGE->url);
                 $continue = new moodle_url($cancel, [
                         'confirm' => 1,
-                        'delete'  => $delete
+                        'delete'  => $delete,
                 ]);
                 $cancel = new single_button($cancel, get_string('no'), 'post');
                 $continue = new single_button($continue,
@@ -1455,7 +1455,7 @@ class mod_grouptool {
             $formaction = new moodle_url('/mod/grouptool/view.php', [
                     'id' => $this->cm->id,
                     'tab' => 'group_admin',
-                    'filter' => $filter
+                    'filter' => $filter,
             ]);
             $mform = new MoodleQuickForm('bulk', 'post', $formaction, '');
 
@@ -1470,11 +1470,11 @@ class mod_grouptool {
             $actions = [
                 '' => get_string('choose', 'grouptool'),
                 'activate' => get_string('setactive', 'grouptool'),
-                'deactivate' => get_string('setinactive', 'grouptool')
+                'deactivate' => get_string('setinactive', 'grouptool'),
             ];
             if (!($this->grouptool->ifgroupdeleted === GROUPTOOL_RECREATE_GROUP)
                     && !$DB->record_exists('grouptool', ['course' => $this->cm->course,
-                                                         'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP])) {
+                                                         'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP,])) {
                 $actions['delete'] = get_string('delete');
             }
             $actions['grouping'] = get_string('createinsertgrouping', 'grouptool');
@@ -1507,7 +1507,7 @@ class mod_grouptool {
                        'filter'     => $curfilter,
                        'filterall'  => GROUPTOOL_FILTER_ALL,
                        'globalsize' => $this->grouptool->grpsize,
-                       'usesize'    => (bool)$this->grouptool->use_size];
+                       'usesize'    => (bool)$this->grouptool->use_size,];
             $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', $params);
         }
     }
@@ -1609,10 +1609,10 @@ class mod_grouptool {
                             get_string('group_administration', 'grouptool');
                     $urlparams = [
                             'id' => $this->cm->id,
-                            'tab' => 'group_admin'
+                            'tab' => 'group_admin',
                     ];
                     $preview .= html_writer::link(new moodle_url('/mod/grouptool/view.php', $urlparams), $linktext, [
-                            'class' => 'ml-1'
+                            'class' => 'ml-1',
                     ]);
                 }
                 $preview = $OUTPUT->notification($preview, $error ? \core\output\notification::NOTIFY_ERROR :
@@ -1628,7 +1628,7 @@ class mod_grouptool {
         $mform = new \mod_grouptool\group_creation_form(null, [
                 'id'           => $id,
                 'roles'        => $rolenames,
-                'show_grpsize' => $showgrpsize
+                'show_grpsize' => $showgrpsize,
         ]);
         unset($showgrpsize);
 
@@ -1666,7 +1666,7 @@ class mod_grouptool {
                     $usercnt = count($users);
                     $numgrps    = ceil($usercnt / $data->numberofmembers);
                     $userpergrp = clean_param($data->numberofmembers, PARAM_INT);
-                    if (!empty($data->nosmallgroups) and $usercnt % clean_param($data->numberofmembers, PARAM_INT) != 0) {
+                    if (!empty($data->nosmallgroups) && $usercnt % clean_param($data->numberofmembers, PARAM_INT) != 0) {
                         /*
                          *  If there would be one group with a small number of member
                          *  reduce the number of groups
@@ -1739,7 +1739,7 @@ class mod_grouptool {
      */
     private function view_creation_get_source_orderby($data) {
 
-        $source = array();
+        $source = [];
         if ($data->cohortid) {
             $source['cohortid'] = $data->cohortid;
         }
@@ -1766,7 +1766,7 @@ class mod_grouptool {
                 break;
         }
 
-        return array($source, $orderby);
+        return [$source, $orderby];
     }
 
     /**
@@ -1822,19 +1822,19 @@ class mod_grouptool {
             $tablecolumns = [
                     'select',
                     'name',
-                    'gradeinfo'
+                    'gradeinfo',
             ];
             $button = html_writer::tag('button', get_string('copy', 'grouptool'), [
                     'name'  => 'copygrades',
                     'type'  => 'submit',
                     'value' => 'true',
-                    'class' => 'btn btn-primary'
+                    'class' => 'btn btn-primary',
             ]);
             $buttontext = get_string('copy_refgrades_feedback', 'grouptool');
             $tableheaders = [
                     '',
                     get_string('name'),
-                    get_string('reference_grade_feedback', 'grouptool')
+                    get_string('reference_grade_feedback', 'grouptool'),
             ];
 
             $groups = groups_get_all_groups($this->course->id, 0, $grouping);
@@ -1883,7 +1883,7 @@ class mod_grouptool {
                                 'name'  => 'source['.$group->id.']',
                                 'value' => $groupmembers[$key]->id,
                                 'type'  => 'radio',
-                                'class' => 'form-check-input'
+                                'class' => 'form-check-input',
                         ];
 
                         if (count($userwithgrades) == 1) {
@@ -1905,7 +1905,7 @@ class mod_grouptool {
                         $gradeinfocont .= ")";
                         $label = html_writer::tag('label', $gradeinfocont, [
                                 'class' => 'form-check-label gradinginfo'.
-                                                                                            $groupmembers[$key]->id
+                                                                                            $groupmembers[$key]->id,
                         ]);
                         $gradeinfo[] = html_writer::tag('div', $label, ['class' => 'form-check']);
                     }
@@ -1914,7 +1914,7 @@ class mod_grouptool {
                         'type' => 'checkbox',
                         'name' => 'selected[]',
                         'value' => $group->id,
-                        'class' => 'form-check-input'
+                        'class' => 'form-check-input',
                 ];
                 $checkboxcontroller = optional_param('select', '', PARAM_ALPHA);
                 if ((count($groupmembers) <= 1) || count($userwithgrades) == 0) {
@@ -1954,7 +1954,7 @@ class mod_grouptool {
                     'idnumber',
                     'grade',
                     'feedback',
-                    'copybutton'
+                    'copybutton',
             ];
             $tableheaders = [
                     get_string('target', 'grouptool'),
@@ -1962,7 +1962,7 @@ class mod_grouptool {
                     get_string('idnumber'),
                     get_string('grade', 'grades'),
                     get_string('feedback'),
-                    get_string('source', 'grouptool')
+                    get_string('source', 'grouptool'),
             ];
 
             $groupmembers = groups_get_members($filter);
@@ -2004,7 +2004,7 @@ class mod_grouptool {
                                                           'type'  => 'submit',
                                                           'name'  => 'source',
                                                           'value' => $groupmember->id,
-                                                          'class' => 'btn btn-primary'
+                                                          'class' => 'btn btn-primary',
                                                   ]);
                     }
                     $data[] = $row;
@@ -2047,7 +2047,7 @@ class mod_grouptool {
                 'incomplete_only' => $incompleteonly,
                 'filter' => $filter,
                 'overwrite' => $overwrite,
-                'grouping' => $grouping
+                'grouping' => $grouping,
         ]);
         $selectallurl = new \moodle_url($baseurl, ['select' => 'all']);
         $selectnoneurl = new \moodle_url($baseurl, ['select' => 'none']);
@@ -2104,7 +2104,7 @@ class mod_grouptool {
         $gradeitems = grade_item::fetch_all([
                 'itemtype'     => 'mod',
                 'itemmodule'   => $cmtouse->modname,
-                'iteminstance' => $cmtouse->instance
+                'iteminstance' => $cmtouse->instance,
         ]);
         // TODO #3310 should we support multiple grade items per activity module soon?
 
@@ -2121,7 +2121,7 @@ class mod_grouptool {
                     get_string('groups')." (".count($selected).")",
                     get_string('fullname'),
                     get_string('grade', 'grades'),
-                    get_string('feedback')
+                    get_string('feedback'),
             ];
             foreach ($selected as $group) {
                 $groupinfo = "";
@@ -2177,7 +2177,7 @@ class mod_grouptool {
                             'teacher'  => fullname($origteacher),
                             'date'     => userdate($sourcegrade->get_dategraded(),
                                                             get_string('strftimedatetimeshort')),
-                            'feedback' => $sourcegrade->feedback
+                            'feedback' => $sourcegrade->feedback,
                     ];
                     $currentgrade->feedback = format_text(get_string('copied_grade_feedback',
                                                                       'grouptool',
@@ -2243,7 +2243,7 @@ class mod_grouptool {
                             'teacher' => fullname($origteacher),
                             'date'    => userdate($sourcegrade->get_dategraded(),
                                                         get_string('strftimedatetimeshort')),
-                            'feedback' => $sourcegrade->feedback
+                            'feedback' => $sourcegrade->feedback,
                     ];
                     $temp = get_string('copied_grade_feedback', 'grouptool', $data);
                     $grpinfo .= html_writer::tag('div', $formattedgrade.html_writer::empty_tag('br').
@@ -2273,7 +2273,7 @@ class mod_grouptool {
                 $count = in_array($source, $selected) ? count($selected) - 1 : count($selected);
                 $previewtable->head = [
                         '', get_string('fullname')." (".$count.")",
-                        get_string('grade', 'grades'), get_string('feedback')
+                        get_string('grade', 'grades'), get_string('feedback'),
                 ];
                 $previewtable->attributes['class'] = 'table table-hover grading_previewtable';
             } else {
@@ -2314,7 +2314,7 @@ class mod_grouptool {
                         'teacher' => fullname($origteacher),
                         'date' => userdate($sourcegrade->get_dategraded(),
                                                        get_string('strftimedatetimeshort')),
-                        'feedback' => $sourcegrade->feedback
+                        'feedback' => $sourcegrade->feedback,
                 ];
                 $currentgrade->feedback = format_text(get_string('copied_grade_feedback',
                                                                   'grouptool',
@@ -2375,7 +2375,7 @@ class mod_grouptool {
                         'teacher' => fullname($origteacher),
                         'date' => userdate($sourcegrade->get_dategraded(),
                                                     get_string('strftimedatetimeshort')),
-                        'feedback' => $sourcegrade->feedback
+                        'feedback' => $sourcegrade->feedback,
                 ];
                 $info .= html_writer::tag('div', get_string('grade', 'grades').": ".
                                         $formattedgrade.html_writer::empty_tag('br').
@@ -2396,7 +2396,7 @@ class mod_grouptool {
         if ($previewonly) {
             return [
                     $error, html_writer::tag('div', html_writer::table($previewtable),
-                                                  ['class' => 'centeredblock'])
+                                                  ['class' => 'centeredblock']),
             ];
         } else {
             return [$error, html_writer::tag('div', $info, ['class' => 'centeredblock'])];
@@ -2528,7 +2528,7 @@ class mod_grouptool {
                             'mygroups_only' => $mygroupsonly,
                             'overwrite'     => $overwrite,
                             'selected'      => serialize($selected),
-                            'source'        => serialize($source)
+                            'source'        => serialize($source),
                     ]);
                     $cancel = new moodle_url("view.php?id=".$this->cm->id, [
                             'tab'           => 'grading',
@@ -2539,7 +2539,7 @@ class mod_grouptool {
                             'mygroups_only' => $mygroupsonly,
                             'overwrite'     => $overwrite,
                             'selected'      => serialize($selected),
-                            'source'        => serialize($source)
+                            'source'        => serialize($source),
                     ]);
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
@@ -2580,7 +2580,7 @@ class mod_grouptool {
                             'overwrite'     => $overwrite,
                             'step'          => '2',
                             'selected'      => serialize($selected),
-                            'source'        => serialize($source)
+                            'source'        => serialize($source),
                     ]);
                     $cancel = new moodle_url("view.php?id=".$this->cm->id, [
                             'tab' => 'grading',
@@ -2591,7 +2591,7 @@ class mod_grouptool {
                             'overwrite'     => $overwrite,
                             'step'          => '2',
                             'selected'      => serialize($selected),
-                            'source'        => serialize($source)
+                            'source'        => serialize($source),
                     ]);
                     $preview = $OUTPUT->heading(get_string('preview'), 2, 'centered').$preview;
                     if ($overwrite) {
@@ -2657,10 +2657,10 @@ class mod_grouptool {
                          'overwrite'      => $overwrite,
                          'grouping'       => $grouping,
                          'filter'         => $filter,
-                         'table'          => $table];
+                         'table'          => $table,];
             $mform = new \mod_grouptool\grading_form($PAGE->url, $formdata, 'post', '', ['class' => 'mform',
                                                                                          'id'    => 'grading_form',
-                                                                                         'name'  => 'grading_form']);
+                                                                                         'name'  => 'grading_form',]);
 
             $params = new stdClass();
             $params->lang = current_language();
@@ -2906,7 +2906,7 @@ class mod_grouptool {
                     'grouptoolname' => format_string($this->grouptool->name, true),
                     'groupname' => $groupdata->name,
                     'message' => get_string('register_you_in_group_success', 'grouptool', (object)[
-                        'groupname' => $groupdata->name
+                        'groupname' => $groupdata->name,
                     ]),
             ];
 
@@ -3029,11 +3029,11 @@ class mod_grouptool {
 
             $records = $DB->get_records('grouptool_registered', [
                     'agrpid' => $agrpid,
-                    'userid' => $userid
+                    'userid' => $userid,
             ]);
             $DB->delete_records('grouptool_registered', [
                     'agrpid' => $agrpid,
-                    'userid' => $userid
+                    'userid' => $userid,
             ]);
             if (!$force && !empty($this->grouptool->immediate_reg)) {
                 groups_remove_member($groupdata->id, $userid);
@@ -3072,7 +3072,7 @@ class mod_grouptool {
             $records = $DB->get_records('grouptool_queued', ['agrpid' => $agrpid, 'userid' => $userid]);
             $DB->delete_records('grouptool_queued', [
                     'agrpid' => $agrpid,
-                    'userid' => $userid
+                    'userid' => $userid,
             ]);
             foreach ($records as $cur) {
                 // Trigger the Event!
@@ -3402,7 +3402,7 @@ class mod_grouptool {
                      WHERE userid = ? AND agrpid = ?";
             if ($queue = $DB->get_record_sql($sql, [
                     'userid' => $userid,
-                    'agrpid' => $oldagrpid
+                    'agrpid' => $oldagrpid,
             ], IGNORE_MISSING)) {
 
                 $DB->delete_records('grouptool_queued', ['id' => $queue->id]);
@@ -3417,7 +3417,7 @@ class mod_grouptool {
                      WHERE userid = ? AND agrpid = ?";
             if ($reg = $DB->get_record_sql($sql, [
                     'userid' => $userid,
-                    'agrpid' => $oldagrpid
+                    'agrpid' => $oldagrpid,
             ], IGNORE_MISSING)) {
 
                 $DB->delete_records('grouptool_registered', ['id' => $reg->id]);

@@ -287,7 +287,7 @@ abstract class base extends advanced_testcase {
         return [
                 0 => $agrps,
                 1 => $agrpids,
-                2 => $message
+                2 => $message,
         ];
     }
 }

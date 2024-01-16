@@ -56,7 +56,7 @@ class group_recreated extends \core\event\base {
         $event = self::create([
             'objectid' => $data->newid,
             'context' => \context_module::instance($data->cmid),
-            'other' => (array)$data
+            'other' => (array)$data,
         ]);
         return $event;
     }

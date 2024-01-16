@@ -52,16 +52,16 @@ class backup_grouptool_activity_structure_step extends backup_activity_structure
                 'name', 'intro', 'introformat', 'alwaysshowdescription', 'timecreated', 'timemodified', 'timedue', 'timeavailable',
                 'show_members', 'allow_reg', 'immediate_reg', 'allow_unreg', 'grpsize', 'use_size', 'use_queue',
                 'users_queues_limit', 'groups_queues_limit', 'allow_multiple', 'choose_min', 'choose_max',
-                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted', 'completionregister']);
+                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted', 'completionregister',]);
         $agrps = new backup_nested_element('agrps');
         $agrp = new backup_nested_element('agrp', ['id'], [
-                'grouptoolid', 'groupid', 'sort_order', 'grpsize', 'active']);
+                'grouptoolid', 'groupid', 'sort_order', 'grpsize', 'active',]);
         $registrations = new backup_nested_element('registrations');
         $registration = new backup_nested_element('registration', ['id'], [
-                'agrpid', 'userid', 'timestamp', 'modified_by']);
+                'agrpid', 'userid', 'timestamp', 'modified_by',]);
         $queues = new backup_nested_element('queues');
         $queue = new backup_nested_element('queue', ['id'], [
-                'agrpid', 'userid', 'timestamp']);
+                'agrpid', 'userid', 'timestamp',]);
 
         // We begin building the tree.
         $grouptool->add_child($agrps);

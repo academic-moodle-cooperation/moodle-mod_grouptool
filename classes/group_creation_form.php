@@ -189,7 +189,7 @@ class group_creation_form extends \moodleform {
             $mform->setType('digits', PARAM_RAW);
             $fromtoglue = [
                 ' '.\html_writer::tag('label', '-', ['for' => 'id_from']).' ',
-                ' '.\html_writer::tag('label', get_string('digits', 'grouptool'), ['for' => 'id_digits']).' '
+                ' '.\html_writer::tag('label', get_string('digits', 'grouptool'), ['for' => 'id_digits']).' ',
             ];
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'), $fromtoglue, false);
             $mform->hideIf ('fromto', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
@@ -205,7 +205,7 @@ class group_creation_form extends \moodleform {
                 'random'    => get_string('random', 'group'),
                 'firstname' => get_string('byfirstname', 'group'),
                 'lastname'  => get_string('bylastname', 'group'),
-                'idnumber'  => get_string('byidnumber', 'group')
+                'idnumber'  => get_string('byidnumber', 'group'),
             ];
             $mform->addElement('select', 'allocateby', get_string('allocateby', 'group'), $options);
             if ($grouptool->allow_reg) {
@@ -235,7 +235,7 @@ class group_creation_form extends \moodleform {
             $PAGE->requires->js_call_amd('mod_grouptool/groupcreation', 'initializer');
 
             if ($groupings = groups_get_all_groupings($course->id)) {
-                $options = array();
+                $options = [];
                 $options[0] = get_string('none');
                 foreach ($groupings as $grouping) {
                     $options[$grouping->id] = format_string($grouping->name);
@@ -253,7 +253,7 @@ class group_creation_form extends \moodleform {
             }
 
             if ($groups = groups_get_all_groups($course->id)) {
-                $options = array();
+                $options = [];
                 $options[0] = get_string('none');
                 foreach ($groups as $group) {
                     $options[$group->id] = format_string($group->name);
@@ -302,7 +302,7 @@ class group_creation_form extends \moodleform {
             }
 
             $mform->addElement('select', 'enablegroupmessaging', get_string('enablemessaging', 'group'),
-                array(0 => get_string('no'), 1 => get_string('yes')));
+                [0 => get_string('no'), 1 => get_string('yes')]);
             $mform->addHelpButton('enablegroupmessaging', 'enablemessaging', 'group');
 
             $mform->addElement('submit', 'createGroups', get_string('createGroups', 'grouptool'));
