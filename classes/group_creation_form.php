@@ -101,7 +101,7 @@ class group_creation_form extends \moodleform {
             $student = get_archetype_roles('student');
             $student = reset($student);
 
-            if ($student and array_key_exists($student->id, $options)) {
+            if ($student && array_key_exists($student->id, $options)) {
                 $mform->setDefault('roleid', $student->id);
             }
 

@@ -1562,7 +1562,7 @@ class mod_grouptool {
                         $usercnt = count($users);
                         $numgrps    = ceil($usercnt / $data->numberofmembers);
                         $userpergrp = $data->numberofmembers;
-                        if (!empty($data->nosmallgroups) and $usercnt % $data->numberofmembers != 0) {
+                        if (!empty($data->nosmallgroups) && $usercnt % $data->numberofmembers != 0) {
                             /*
                              *  If there would be one group with a small number of member
                              *  reduce the number of groups
@@ -4119,7 +4119,8 @@ class mod_grouptool {
         foreach ($groups as $group) {
             if ($unregfromallagrps) {
                 $agrp[$group] = $DB->get_fieldset_select('grouptool_agrps', 'id', 'groupid = :groupid', [
-                        'groupid' => $group]);
+                        'groupid' => $group,
+                    ]);
                 $groupname[$group] = $DB->get_field('groups', 'name', [
                         'id' => $group,
                 ], IGNORE_MISSING);
@@ -4129,7 +4130,7 @@ class mod_grouptool {
                         'groupid' => $group,
                 ], IGNORE_MISSING);
                 $groupname[$group] = $DB->get_field('groups', 'name', [
-                        'id' => $group
+                        'id' => $group,
                 ], IGNORE_MISSING);
 
                 if (!$DB->record_exists('grouptool_agrps', [
@@ -5768,7 +5769,7 @@ class mod_grouptool {
                                                       ['agrpid' => $agrp[$group], 'userid' => $userinfo->id])) {
                             $options = [
                                     -1 => get_string('move_user', 'grouptool'),
-                                    $userinfo->id => get_string('skip_user_import', 'grouptool')
+                                    $userinfo->id => get_string('skip_user_import', 'grouptool'),
                             ];
                             $cell = get_string('import_conflict_user_queued', 'grouptool', $data).
                                     html_writer::tag('div',
@@ -7979,7 +7980,7 @@ class mod_grouptool {
                             foreach ($user->queued as $queue) {
                                 $grouplink = new moodle_url($PAGE->url, [
                                         'tab'     => 'overview',
-                                        'groupid' => $groupinfo[$queue]->id
+                                        'groupid' => $groupinfo[$queue]->id,
                                 ]);
                                 $groupdata = $this->get_active_groups(false, true, $queue);
                                 $groupdata = current($groupdata);

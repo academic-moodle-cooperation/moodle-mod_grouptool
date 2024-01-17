@@ -128,7 +128,7 @@ class user_imported extends \core\event\base {
         return new \moodle_url("/mod/$this->objecttable/view.php", [
             'id'      => $this->contextinstanceid,
             'tab'     => 'overview',
-            'groupid' => $this->data['other']['group']
+            'groupid' => $this->data['other']['group'],
         ]);
     }
 

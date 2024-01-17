@@ -88,7 +88,7 @@ class user_moved extends \core\event\base {
             'other'    => [
                 'from' => (array)$from,
                 'to' => (array)$to,
-                'type' => 'move'
+                'type' => 'move',
             ],
         ]);
         return $event;
