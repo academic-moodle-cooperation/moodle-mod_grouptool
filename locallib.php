@@ -1474,7 +1474,7 @@ class mod_grouptool {
             ];
             if (!($this->grouptool->ifgroupdeleted === GROUPTOOL_RECREATE_GROUP)
                     && !$DB->record_exists('grouptool', ['course' => $this->cm->course,
-                                                         'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP,])) {
+                                                         'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP, ])) {
                 $actions['delete'] = get_string('delete');
             }
             $actions['grouping'] = get_string('createinsertgrouping', 'grouptool');
@@ -1507,7 +1507,7 @@ class mod_grouptool {
                        'filter'     => $curfilter,
                        'filterall'  => GROUPTOOL_FILTER_ALL,
                        'globalsize' => $this->grouptool->grpsize,
-                       'usesize'    => (bool)$this->grouptool->use_size,];
+                       'usesize'    => (bool)$this->grouptool->use_size, ];
             $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', $params);
         }
     }
@@ -2657,10 +2657,11 @@ class mod_grouptool {
                          'overwrite'      => $overwrite,
                          'grouping'       => $grouping,
                          'filter'         => $filter,
-                         'table'          => $table,];
+                         'table'          => $table,
+                ];
             $mform = new \mod_grouptool\grading_form($PAGE->url, $formdata, 'post', '', ['class' => 'mform',
                                                                                          'id'    => 'grading_form',
-                                                                                         'name'  => 'grading_form',]);
+                                                                                         'name'  => 'grading_form', ]);
 
             $params = new stdClass();
             $params->lang = current_language();

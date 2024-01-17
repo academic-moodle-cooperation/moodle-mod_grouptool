@@ -110,7 +110,7 @@ abstract class registration extends \core\event\base {
     public function get_url() {
         return new \moodle_url("/mod/grouptool/view.php", ['id'      => $this->contextinstanceid,
                                                            'tab'     => 'overview',
-                                                           'groupid' => $this->data['other']['groupid'],]);
+                                                           'groupid' => $this->data['other']['groupid'], ]);
     }
 
     /**
