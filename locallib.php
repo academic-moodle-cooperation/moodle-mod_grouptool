@@ -4121,12 +4121,12 @@ class mod_grouptool {
                 $agrp[$group] = $DB->get_fieldset_select('grouptool_agrps', 'id', 'groupid = :groupid', [
                         'groupid' => $group]);
                 $groupname[$group] = $DB->get_field('groups', 'name', [
-                        'id' => $group
+                        'id' => $group,
                 ], IGNORE_MISSING);
             } else {
                 $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
                         'grouptoolid' => $this->grouptool->id,
-                        'groupid' => $group
+                        'groupid' => $group,
                 ], IGNORE_MISSING);
                 $groupname[$group] = $DB->get_field('groups', 'name', [
                         'id' => $group
@@ -4135,7 +4135,7 @@ class mod_grouptool {
                 if (!$DB->record_exists('grouptool_agrps', [
                         'grouptoolid' => $this->grouptool->id,
                         'groupid' => $group,
-                        'active' => 1
+                        'active' => 1,
                 ])) {
                     $message .= $OUTPUT->notification(get_string('unregister_in_inactive_group_warning', 'grouptool',
                             $groupname[$group]), \core\output\notification::NOTIFY_ERROR);
@@ -4162,7 +4162,7 @@ class mod_grouptool {
         $pbar->update($processed, $count, get_string('unregister_progress_start', 'grouptool'));
         core_php_time_limit::raise(count($users) * 5);
         raise_memory_limit(MEMORY_HUGE);
-        $followchangessetting = $DB->get_field('grouptool', 'ifmemberremoved', array('id' => $this->grouptool->id));
+        $followchangessetting = $DB->get_field('grouptool', 'ifmemberremoved', ['id' => $this->grouptool->id]);
         foreach ($users as $user) {
             $userinfo = $this->find_userinfo($importfields, $user);
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool').' '.$user);
@@ -4196,7 +4196,7 @@ class mod_grouptool {
                         'id' => $userinfo->id,
                         'idnumber' => $userinfo->idnumber,
                         'fullname' => fullname($userinfo),
-                        'groupname' => $groupname[$group]
+                        'groupname' => $groupname[$group],
                     ];
                     if (!$previewonly && $userinfo) {
 
@@ -4222,18 +4222,18 @@ class mod_grouptool {
                         }
                         if ($followchangessetting && $DB->record_exists('groups_members', [
                                 'groupid' => $group,
-                                'userid' => $data['id']
+                                'userid' => $data['id'],
                             ])) {
                             $DB->delete_records('groups_members', [
                                 'groupid' => $group,
-                                'userid' => $data['id']
+                                'userid' => $data['id'],
                             ]);
 
                             $time = time();
-                            $DB->set_field('groups', 'timemodified', $time, array('id' => $group));
+                            $DB->set_field('groups', 'timemodified', $time, ['id' => $group]);
 
-                            cache_helper::invalidate_by_definition('core', 'user_group_groupings', array(),
-                                    array($data['id']));
+                            cache_helper::invalidate_by_definition('core', 'user_group_groupings', [],
+                                    [$data['id']]);
 
                             $context = context_course::instance($this->grouptool->course);
                             if ($conversation = \core_message\api::get_conversation_by_area('core_group',
@@ -4247,11 +4247,11 @@ class mod_grouptool {
                                 foreach ($agrp[$group] as $agrpinst) {
                                     if ($DB->record_exists('grouptool_registered', [
                                                     'agrpid' => $agrpinst,
-                                                    'userid' => $data['id']
+                                                    'userid' => $data['id'],
                                             ]) ||
                                             $DB->record_exists('grouptool_queued', [
                                                     'agrpid' => $agrpinst,
-                                                    'userid' => $data['id']
+                                                    'userid' => $data['id'],
                                             ])) {
                                         $this->unregister_from_agrp($agrpinst, $userinfo->id, false, true, true);
                                     }
@@ -4353,7 +4353,7 @@ class mod_grouptool {
         } else if (!empty($data)) { // It's an active-group-id, so we gotta get the queue data!
             $params = [
                     'agrpid' => $data,
-                    'userid' => !empty($userid) ? $userid : $USER->id
+                    'userid' => !empty($userid) ? $userid : $USER->id,
             ];
             $sql = "SELECT count(b.id) AS rank
                       FROM {grouptool_queued} a
@@ -4597,7 +4597,7 @@ class mod_grouptool {
 
                 while ($DB->record_exists('grouptool_registered', [
                                 'agrpid' => $curgroup->id,
-                                'userid' => $queue->userid
+                                'userid' => $queue->userid,
                         ])
                        || in_array($curgroup->id, $planned->{$queue->userid})
                        || $curgroup->registered >= $curgroup->grpsize) {
@@ -4670,7 +4670,7 @@ class mod_grouptool {
                         $attr = [
                                 'id'     => $queue->id,
                                 'userid' => $queue->userid,
-                                'agrpid' => $queue->agrpid
+                                'agrpid' => $queue->agrpid,
                         ];
                         // Delete queue entry if successfull or print message!
                         $DB->delete_records('grouptool_queued', $attr);
@@ -4685,7 +4685,7 @@ class mod_grouptool {
                                 MUST_EXIST);
                         $to->id = $DB->get_field('grouptool_registered', 'id', [
                                 'agrpid' => $to->agrpid,
-                                'userid' => $to->userid
+                                'userid' => $to->userid,
                         ], MUST_EXIST);
                         \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
 
@@ -4831,7 +4831,7 @@ class mod_grouptool {
                                   [
                                           'agrpid' => $agrpid,
                                           'userid' => $userid,
-                                          'modified_by' => -1
+                                          'modified_by' => -1,
                                   ]);
     }
 
@@ -5143,7 +5143,7 @@ class mod_grouptool {
                         if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
                             $data = [
                                     'min' => $this->grouptool->choose_min,
-                                    'max' => $this->grouptool->choose_max
+                                    'max' => $this->grouptool->choose_max,
                             ];
                             $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
                         } else if ($this->grouptool->choose_min) {
@@ -5226,7 +5226,7 @@ class mod_grouptool {
                                     'type'  => 'submit',
                                     'name'  => 'unreg['.$group->agrpid.']',
                                     'value' => $group->agrpid,
-                                    'class' => 'unregbutton btn btn-secondary'
+                                    'class' => 'unregbutton btn btn-secondary',
                             ];
                             if ($regopen && ($userregs + $userqueues > $min)) {
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
@@ -5245,7 +5245,7 @@ class mod_grouptool {
                                     'type'  => 'submit',
                                     'name'  => 'unreg['.$group->agrpid.']',
                                     'value' => $group->agrpid,
-                                    'class' => 'unregbutton btn btn-secondary'
+                                    'class' => 'unregbutton btn btn-secondary',
                             ];
                             if ($regopen && ($userregs + $userqueues > $min)) {
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
@@ -5274,7 +5274,7 @@ class mod_grouptool {
                                 'type'   => 'submit',
                                 'name'  => 'reg['.$group->agrpid.']',
                                 'value' => $group->agrpid,
-                                'class' => 'regbutton btn '.$class
+                                'class' => 'regbutton btn '.$class,
                         ];
                         $grouphtml .= html_writer::tag('button', $label, $buttonattr);
 
@@ -5296,7 +5296,7 @@ class mod_grouptool {
                                             'type' => 'submit',
                                             'name' => 'reg[' . $group->agrpid . ']',
                                             'value' => $group->agrpid,
-                                            'class' => 'regbutton btn btn-primary'
+                                            'class' => 'regbutton btn btn-primary',
                                     ];
                                     $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                                 }
@@ -5314,7 +5314,7 @@ class mod_grouptool {
                                                 'type' => 'submit',
                                                 'name' => 'reg[' . $group->agrpid . ']',
                                                 'value' => $group->agrpid,
-                                                'class' => 'queuebutton btn btn-secondary'
+                                                'class' => 'queuebutton btn btn-secondary',
                                         ];
                                         $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                                     }
@@ -5330,7 +5330,7 @@ class mod_grouptool {
                                             'type'  => 'submit',
                                             'name'  => 'reg['.$group->agrpid.']',
                                             'value' => $group->agrpid,
-                                            'class' => 'regbutton btn btn-primary'
+                                            'class' => 'regbutton btn btn-primary',
                                     ];
                                     $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                                 } else if (has_capability('mod/grouptool:register', $this->context)) {
@@ -5340,7 +5340,7 @@ class mod_grouptool {
                                             'type'  => 'submit',
                                             'name'  => 'reg['.$group->agrpid.']',
                                             'value' => $group->agrpid,
-                                            'class' => 'queuebutton btn btn-secondary'
+                                            'class' => 'queuebutton btn btn-secondary',
                                     ];
                                     $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                                 }
@@ -5520,12 +5520,12 @@ class mod_grouptool {
         }
         if (!$instance = $DB->get_record('enrol', [
                 'courseid' => $this->course->id,
-                'enrol'    => 'manual'
+                'enrol'    => 'manual',
         ], '*', IGNORE_MISSING)) {
             if ($enrolmanual->add_default_instance($this->course)) {
                 $instance = $DB->get_record('enrol', [
                         'courseid' => $this->course->id,
-                        'enrol'    => 'manual'
+                        'enrol'    => 'manual',
                 ], '*', MUST_EXIST);
             }
         }
@@ -5573,12 +5573,12 @@ class mod_grouptool {
         foreach ($groups as $group) {
             $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
                     'grouptoolid' => $this->grouptool->id,
-                    'groupid'     => $group
+                    'groupid'     => $group,
             ], IGNORE_MISSING);
             if (!$DB->record_exists('grouptool_agrps', [
                     'grouptoolid' => $this->grouptool->id,
                     'groupid'     => $group,
-                    'active'      => 1
+                    'active'      => 1,
             ])) {
                 $message .= $OUTPUT->notification(get_string('import_in_inactive_group_warning', 'grouptool',
                                                              $groupinfo[$group]->name), \core\output\notification::NOTIFY_ERROR);
@@ -5677,7 +5677,7 @@ class mod_grouptool {
                             'id' => $userinfo->id,
                             'idnumber' => $userinfo->idnumber,
                             'fullname' => fullname($userinfo),
-                            'groupname' => $groupinfo[$group]->name
+                            'groupname' => $groupinfo[$group]->name,
                     ];
                     if (!$previewonly && $userinfo) {
                         $pbar->update($processed, $count, get_string('import_progress_import',
@@ -5733,7 +5733,7 @@ class mod_grouptool {
                             if ($reg = $DB->get_record('grouptool_registered', [
                                     'agrpid' => $agrp[$group],
                                     'userid' => $userinfo->id,
-                                    'modified_by' => -1
+                                    'modified_by' => -1,
                             ], IGNORE_MISSING)) {
                                 // If user is marked, we register him right now!
                                 $reg->modified_by = $USER->id;
@@ -5841,7 +5841,7 @@ class mod_grouptool {
                     'groups'            => $fromform->groups,
                     'data'              => $fromform->data,
                     'forceregistration' => $fromform->forceregistration,
-                    'confirmmessage'    => $confirmmessage
+                    'confirmmessage'    => $confirmmessage,
             ];
             // The form data will be fetched through required_param()! TODO gotta refactor this in the future!
             $confirmform = new \mod_grouptool\import_confirm_form($PAGE->url, $formdata);
@@ -5901,7 +5901,7 @@ class mod_grouptool {
                 'groups'            => $fromform->groups,
                 'data'              => $fromform->data,
                 'unregfrommgroups'  => $fromform->unregfrommgroups,
-                'confirmmessage'    => $confirmmessage
+                'confirmmessage'    => $confirmmessage,
             ];
             // The form data will be fetched through required_param()! TODO gotta refactor this in the future!
             $confirmform = new \mod_grouptool\unregister_confirm_form($PAGE->url, $formdata);
@@ -5944,7 +5944,7 @@ class mod_grouptool {
             'orientation' => $orientation,
             'sesskey'     => sesskey(),
             'tab'         => 'overview',
-            'inactive'    => $includeinactive
+            'inactive'    => $includeinactive,
         ]);
         $return = [];
 
@@ -6289,7 +6289,7 @@ class mod_grouptool {
     public function download_overview_pdf($groupid=0, $groupingid=0, $includeinactive=false) {
         $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
         $timedue = $this->grouptool->timedue;
@@ -6434,7 +6434,7 @@ class mod_grouptool {
         }
         $filecontent = implode(GROUPTOOL_NL, $lines);
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -6518,13 +6518,13 @@ class mod_grouptool {
             $headlineprop = [
                     'size' => 14,
                     'bold' => 1,
-                    'align' => 'center'
+                    'align' => 'center',
             ];
             $headlineformat = $workbook->add_format($headlineprop);
             $groupinfoprop1 = [
                     'size' => 10,
                     'bold' => 1,
-                    'align' => 'left'
+                    'align' => 'left',
             ];
             $groupinfoprop2 = $groupinfoprop1;
             unset($groupinfoprop2['bold']);
@@ -6536,11 +6536,11 @@ class mod_grouptool {
                     'size' => 10,
                     'align' => 'center',
                     'bold' => 1,
-                    'bottom' => 2
+                    'bottom' => 2,
             ];
             $regentryprop = [
                     'size' => 10,
-                    'align' => 'left'
+                    'align' => 'left',
             ];
             $queueentryprop = $regentryprop;
             $queueentryprop['italic'] = true;
@@ -6585,7 +6585,7 @@ class mod_grouptool {
                     'email'         => 35,
                     'registrations' => 47,
                     'queues_rank'   => 7.5,
-                    'queues_grp'    => 47
+                    'queues_grp'    => 47,
             ]; // Unit: mm!
 
             // Start row for groups general sheet!
@@ -7016,7 +7016,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/odslib.class.php");
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -7056,7 +7056,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -7210,7 +7210,7 @@ class mod_grouptool {
         // Now create the link around it - we need https on loginhttps pages!
         $url = new moodle_url($CFG->httpswwwroot.'/mod/grouptool/showmembers.php', [
                 'agrpid'    => $group->agrpid,
-                'contextid' => $this->context->id
+                'contextid' => $this->context->id,
         ]);
 
         $attributes = ['href' => $url, 'title' => get_string('show_members', 'grouptool')];
@@ -7259,7 +7259,7 @@ class mod_grouptool {
                 $attributes['data-absregs'][] = [
                         'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
                         'fullname' => fullname($group->moodle_members[$cur]),
-                        'id'       => $cur
+                        'id'       => $cur,
                 ];
             }
         }
@@ -7271,7 +7271,7 @@ class mod_grouptool {
                 $attributes['data-gtregs'][] = [
                         'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
                         'fullname' => fullname($users[$cur]),
-                        'id'       => $cur
+                        'id'       => $cur,
                 ];
             }
         }
@@ -7283,7 +7283,7 @@ class mod_grouptool {
                 $attributes['data-mregs'][] = [
                         'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
                         'fullname' => fullname($group->moodle_members[$cur]),
-                        'id'       => $cur
+                        'id'       => $cur,
                 ];
             }
         }
@@ -7297,7 +7297,7 @@ class mod_grouptool {
                         'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
                         'fullname' => fullname($users[$cur]),
                         'id'       => $cur,
-                        'rank'     => $this->get_rank_in_queue($queuedlist, $cur)
+                        'rank'     => $this->get_rank_in_queue($queuedlist, $cur),
                 ];
             }
         }
@@ -7329,7 +7329,7 @@ class mod_grouptool {
                 'groupid'     => $groupid,
                 'groupingid'  => $groupingid,
                 'orientation' => $orientation,
-                'inactive'    => $includeinactive
+                'inactive'    => $includeinactive,
         ]);
 
         // Process submitted form!
@@ -7484,7 +7484,7 @@ class mod_grouptool {
         if (!$options) {
             $options = [
                     0 => get_string('portrait', 'grouptool'),
-                    1 => get_string('landscape', 'grouptool')
+                    1 => get_string('landscape', 'grouptool'),
             ];
         }
 
@@ -7741,7 +7741,7 @@ class mod_grouptool {
                                                   'groupid'     => $groupid,
                                                   'orientation' => $orientation,
                                                   'sesskey'     => sesskey(),
-                                                  'tab'         => 'userlist'
+                                                  'tab'         => 'userlist',
                                           ]);
         }
 
@@ -7931,7 +7931,7 @@ class mod_grouptool {
 
                     $userlink = new moodle_url($CFG->wwwroot.'/user/view.php', [
                             'id'     => $user->id,
-                            'course' => $this->course->id
+                            'course' => $this->course->id,
                     ]);
                     if (!in_array('picture', $collapsed)) {
                         $picture = html_writer::link($userlink, $OUTPUT->user_picture($user));
@@ -7961,7 +7961,7 @@ class mod_grouptool {
                             foreach ($user->regs as $reg) {
                                 $grouplink = new moodle_url($PAGE->url, [
                                         'tab'     => 'overview',
-                                        'groupid' => $groupinfo[$reg]->id
+                                        'groupid' => $groupinfo[$reg]->id,
                                 ]);
                                 $registrations[] = html_writer::link($grouplink, $groupinfo[$reg]->name);
                             }
@@ -8062,7 +8062,7 @@ class mod_grouptool {
                             }
                             $queueentries[] = [
                                     'rank' => $rank,
-                                    'name' => $groupinfo[$queue]->name
+                                    'name' => $groupinfo[$queue]->name,
                             ];
                         }
                         $row['queues'] = $queueentries;
@@ -8107,7 +8107,7 @@ class mod_grouptool {
     public function download_userlist_pdf($groupid=0, $groupingid=0) {
         $data = $this->userlist_table($groupingid, $groupid, true);
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $timeavailable = $this->grouptool->timeavailable;
         $grouptoolname = $this->grouptool->name;
         $timedue = $this->grouptool->timedue;
@@ -8201,7 +8201,7 @@ class mod_grouptool {
     public function download_userlist_txt($groupid=0, $groupingid=0) {
         ob_start();
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
         $useridentityfields = self::get_useridentity_fields();
 
@@ -8299,7 +8299,7 @@ class mod_grouptool {
                     'bold' => 1,
                     'HAlign' => 'center',
                     'bottom' => 2,
-                    'VAlign' => 'vcenter'
+                    'VAlign' => 'vcenter',
             ];
             $headlineformat = $workbook->add_format($headlineprop);
             $headlineformat->set_right(1);
@@ -8319,7 +8319,7 @@ class mod_grouptool {
 
             $regentryprop = [
                     'size' => 10,
-                    'align' => 'left'
+                    'align' => 'left',
             ];
             $queueentryprop = $regentryprop;
             $queueentryprop['italic'] = true;
@@ -8364,7 +8364,7 @@ class mod_grouptool {
                     'email'         => 35,
                     'registrations' => 47,
                     'queues_grp'    => 47,
-                    'queues_rank'   => 7.5
+                    'queues_rank'   => 7.5,
             ]; // Unit: mm!
 
             foreach ($data as $key => $user) {
@@ -8540,7 +8540,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/odslib.class.php");
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
 
         $workbook = new MoodleODSWorkbook("-");
@@ -8580,7 +8580,7 @@ class mod_grouptool {
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $coursename = format_string($this->course->fullname, true, array('context' => context_module::instance($this->cm->id)));
+        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
 
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
@@ -8626,7 +8626,7 @@ class mod_grouptool {
                 'sesskey'     => sesskey(),
                 'groupid'     => $groupid,
                 'groupingid'  => $groupingid,
-                'orientation' => $orientation
+                'orientation' => $orientation,
         ]);
 
         $groupings = groups_get_all_groupings($this->course->id);
@@ -8666,7 +8666,7 @@ class mod_grouptool {
         if ($done) {
             return;
         }
-        $PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send',  array('#group-message-button'));
+        $PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send',  ['#group-message-button']);
         $done = true;
     }
 
