@@ -563,10 +563,10 @@ $string['sortlist_no_data'] = 'There are no groups present at the moment!';
 $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul>
-<li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li>
-<li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li>
-<li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li>
-<li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li>
+<li><strong>✔</strong> registered in Moodle-group and grouptool</li>
+<li><strong>?</strong> registered in Moodle-group but not in grouptool</li>
+<li><strong>+</strong> registered in grouptool but not in Moodle-group</li>
+<li><strong>1, 2, 3...</strong> queued in grouptool</li>
 </ul>';
 $string['successfully_deleted_groups'] = 'Successfully deleted groups!';
 $string['swapped_groups'] = 'Swapped groups <strong>{$a->a}</strong> (order <strong>{$a->aorder}</strong>) and <strong>{$a->b}</strong> (order <strong>{$a->border}</strong>)!';
