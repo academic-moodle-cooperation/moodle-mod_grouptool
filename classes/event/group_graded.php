@@ -126,7 +126,7 @@ class group_graded extends \core\event\base {
                 'id'            => $this->contextinstanceid,
                 'tab'           => 'grading',
                 'activity'      => $this->data['other']['cmtouse'],
-                'refresh_table' => 1
+                'refresh_table' => 1,
             ]);
         }
         return new \moodle_url("/mod/$this->objecttable/view.php", [
@@ -134,7 +134,7 @@ class group_graded extends \core\event\base {
             'tab'           => 'grading',
             'activity'      => $this->data['other']['cmtouse'],
             'groupid'       => $this->data['other']['groupid'],
-            'refresh_table' => 1
+            'refresh_table' => 1,
         ]);
     }
 

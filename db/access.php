@@ -33,7 +33,7 @@ $capabilities = [
                 'editingteacher' => CAP_ALLOW,
                 'teacher' => CAP_ALLOW,
                 'manager' => CAP_ALLOW,
-            ]
+            ],
         ],
 
         'mod/grouptool:view_description' => [
@@ -44,8 +44,8 @@ $capabilities = [
                 'student' => CAP_ALLOW,
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:view_own_registration' => [
@@ -53,7 +53,7 @@ $capabilities = [
             'contextlevel' => CONTEXT_MODULE,
             'legacy' => [
                 'student' => CAP_ALLOW,
-            ]
+            ],
         ],
 
         'mod/grouptool:export' => [
@@ -62,8 +62,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:view_groups' => [
@@ -73,8 +73,8 @@ $capabilities = [
                 'student' => CAP_ALLOW,
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:view_regs_group_view' => [
@@ -83,8 +83,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:view_regs_course_view' => [
@@ -93,16 +93,16 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:register' => [
             'captype' => 'write',
             'contextlevel' => CONTEXT_MODULE,
             'legacy' => [
-                'student' => CAP_ALLOW
-            ]
+                'student' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:grade' => [
@@ -111,8 +111,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:grade_own_group' => [
@@ -121,8 +121,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:administrate_groups' => [
@@ -131,8 +131,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:create_groups' => [
@@ -141,8 +141,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:create_groupings' => [
@@ -151,8 +151,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:move_students' => [
@@ -161,8 +161,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:register_students' => [
@@ -171,8 +171,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 
         'mod/grouptool:unregister_students' => [
@@ -181,8 +181,8 @@ $capabilities = [
             'legacy' => [
                 'teacher' => CAP_ALLOW,
                 'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW
-            ]
+                'manager' => CAP_ALLOW,
+            ],
         ],
 ];
 

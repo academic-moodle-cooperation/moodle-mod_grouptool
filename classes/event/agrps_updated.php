@@ -77,7 +77,7 @@ class agrps_updated extends \core\event\base {
             'other' => [
                 'pattern' => $pattern,
                 'numgrps' => $numgrps,
-                'grouping' => $groupingid
+                'grouping' => $groupingid,
             ],
         ]);
         return $event;

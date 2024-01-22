@@ -25,7 +25,7 @@
 
 namespace mod_grouptool\local\tests;
 
-use \mod_grouptool\privacy\provider;
+use mod_grouptool\privacy\provider;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -80,7 +80,7 @@ class mod_grouptool_privacy_testcase extends base {
                 'use_size' => 0,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
         // Grouptool with queues.
         $gt2 = $this->create_instance([
@@ -90,14 +90,14 @@ class mod_grouptool_privacy_testcase extends base {
                 'grpsize' => 1,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
         // Grouptool instance two in a different course that the user is not enrolled in.
         $gt3 = $this->create_instance([
                 'course' => $course2,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
 
         // The user will be in these contexts.
@@ -165,7 +165,7 @@ class mod_grouptool_privacy_testcase extends base {
                 'use_size' => 0,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
         $gt2 = $this->create_instance([
                 'course' => $course,
@@ -173,7 +173,7 @@ class mod_grouptool_privacy_testcase extends base {
                 'use_size' => 0,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
 
         $context = $gt1->get_context();
@@ -300,7 +300,7 @@ class mod_grouptool_privacy_testcase extends base {
                 'use_size' => 0,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
         // Grouptool with queues.
         $gt2 = $this->create_instance([
@@ -310,14 +310,14 @@ class mod_grouptool_privacy_testcase extends base {
                 'grpsize' => 1,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
         // Grouptool instance three in a different course that the user is not enrolled in.
         $gt3 = $this->create_instance([
                 'course' => $course2,
                 'ifmemberadded' => 0,
                 'ifmemberremoved' => 0,
-                'ifgroupdeleted' => 0
+                'ifgroupdeleted' => 0,
         ]);
 
         // Get all active groups indexed by active group ID!
@@ -354,7 +354,7 @@ class mod_grouptool_privacy_testcase extends base {
         $usercounts = [
             $user1->id => 0,
             $user2->id => 0,
-            $user3->id => 0
+            $user3->id => 0,
         ];
         foreach ($data as $datum) {
             $usercounts[$datum->userid]++;
@@ -368,7 +368,7 @@ class mod_grouptool_privacy_testcase extends base {
         self::assertCount(2, $data);
         $usercounts = [
                 $user2->id => 0,
-                $user3->id => 0
+                $user3->id => 0,
         ];
         foreach ($data as $datum) {
             $usercounts[$datum->userid]++;

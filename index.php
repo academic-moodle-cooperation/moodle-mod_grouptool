@@ -34,7 +34,7 @@ require_course_login($course);
 
 /* TRIGGER THE VIEW ALL EVENT */
 $event = \mod_grouptool\event\course_module_instance_list_viewed::create([
-    'context' => context_course::instance($course->id)
+    'context' => context_course::instance($course->id),
 ]);
 $event->trigger();
 /* END OF VIEW ALL EVENT */
@@ -58,13 +58,13 @@ $table = new html_table();
 if ($course->format == 'weeks') {
     $table->head  = [
             get_string('week'), get_string('name'), get_string('info'),
-            get_string('moduleintro')
+            get_string('moduleintro'),
     ];
     $table->align = ['center', 'left', 'left', 'left'];
 } else if ($course->format == 'topics') {
     $table->head  = [
             get_string('topic'), get_string('name'), get_string('info'),
-            get_string('moduleintro')
+            get_string('moduleintro'),
     ];
     $table->align = ['center', 'left', 'left', 'left', 'left'];
 } else {
@@ -87,7 +87,7 @@ foreach ($grouptools as $grouptool) {
         || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         $attrib = [
                 'title' => $strgrouptool,
-                'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule
+                'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule,
         ];
         if ($grouptool->visible) {
             $attrib['class'] = 'dimmed';
@@ -138,7 +138,7 @@ foreach ($grouptools as $grouptool) {
         $intro = '';
     }
 
-    if ($course->format == 'weeks' or $course->format == 'topics') {
+    if ($course->format == 'weeks' || $course->format == 'topics') {
         $table->data[] = [$grouptool->section, $link, $info, $intro];
     } else {
         $table->data[] = [$link, $info, $intro];

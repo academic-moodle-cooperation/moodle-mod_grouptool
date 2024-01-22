@@ -131,7 +131,7 @@ class grading_form extends \moodleform {
 
         $options = [
             "-1" => get_string('nonconflicting', 'grouptool'),
-            "0"  => get_string('all')
+            "0"  => get_string('all'),
         ];
         $groups = groups_get_all_groups($this->_customdata['course']->id, null, $this->_customdata['grouping'], 'g.id, g.name');
         foreach ($groups as $key => $group) {

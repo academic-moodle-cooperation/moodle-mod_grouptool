@@ -66,7 +66,7 @@ class user_moved extends \core\event\base {
             'other'    => [
                 'from' => (array)$from,
                 'to' => (array)$to,
-                'type' => 'promotion'
+                'type' => 'promotion',
             ],
         ]);
         return $event;
@@ -88,7 +88,7 @@ class user_moved extends \core\event\base {
             'other'    => [
                 'from' => (array)$from,
                 'to' => (array)$to,
-                'type' => 'move'
+                'type' => 'move',
             ],
         ]);
         return $event;
@@ -138,7 +138,7 @@ class user_moved extends \core\event\base {
         return new \moodle_url("/mod/$this->objecttable/view.php", [
             'id' => $this->contextinstanceid,
             'tab' => 'overview',
-            'groupid' => $this->data['other']['to']['groupid']
+            'groupid' => $this->data['other']['to']['groupid'],
         ]);
     }
 

@@ -143,7 +143,7 @@ class queue_entry_deleted extends \core\event\base {
         return new \moodle_url("/mod/$this->objecttable/view.php", [
             'id'      => $this->contextinstanceid,
             'tab'     => 'overview',
-            'groupid' => $this->data['other']['groupid']
+            'groupid' => $this->data['other']['groupid'],
         ]);
     }
 

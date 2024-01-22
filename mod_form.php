@@ -135,7 +135,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
                 GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
                 GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
                 GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
-                GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes')
+                GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes'),
         ];
         $mform->addElement('select', 'show_members', get_string('show_members', 'grouptool'), $options);
         $showmembers = get_config('mod_grouptool', 'show_members');
@@ -321,7 +321,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $options = [
                 GROUPTOOL_IGNORE => get_string('ignorechanges', 'grouptool'),
-                GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool')
+                GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool'),
         ];
 
         $mform->addElement('select', 'ifmemberadded', get_string('ifmemberadded', 'grouptool'),
@@ -346,7 +346,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $options = [
                 GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
-                GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool')
+                GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'),
         ];
         $mform->addElement('select', 'ifgroupdeleted', get_string('ifgroupdeleted', 'grouptool'),
                            $options);
@@ -554,12 +554,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform =& $this->_form;
 
-        $group = array();
+        $group = [];
         $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '',
                 get_string('completionregister', 'grouptool'));
-        $group[] =& $mform->createElement('text', 'completionregister', '', array('size' => 3));
+        $group[] =& $mform->createElement('text', 'completionregister', '', ['size' => 3]);
         $mform->setType('completionregister', PARAM_INT);
-        $mform->addGroup($group, 'completionregistergroup', get_string('require_registration', 'grouptool'), array(' '), false);
+        $mform->addGroup($group, 'completionregistergroup', get_string('require_registration', 'grouptool'), [' '], false);
         $mform->addHelpButton('completionregistergroup', 'require_registration', 'grouptool');
         $mform->disabledIf('completionregister', 'completionregisterenabled', 'notchecked');
         return ['completionregistergroup'];

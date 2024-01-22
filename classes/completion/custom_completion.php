@@ -55,7 +55,7 @@ class custom_completion extends activity_custom_completion {
 
         require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
                 // Get grouptool details
-        $grouptool = $DB->get_record('grouptool', array('id' => $cm->instance), '*', MUST_EXIST);
+        $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
         // If completion option is enabled, evaluate it and return true/false
         if ($grouptool->completionregister) {
@@ -65,7 +65,7 @@ class custom_completion extends activity_custom_completion {
                  INNER JOIN {grouptool_agrps} a ON a.id=r.agrpid
              WHERE
                  r.userid=:userid AND a.grouptoolid=:grouptoolid",
-                            array('userid' => $userid, 'grouptoolid' => $grouptool->id));
+                           ['userid' => $userid, 'grouptoolid' => $grouptool->id]);
             return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
         } else {
             // Completion option is not enabled so just return $type
@@ -90,7 +90,7 @@ class custom_completion extends activity_custom_completion {
     public function get_custom_rule_descriptions(): array {
         $completionregistrations = $this->cm->customdata['customcompletionrules']['completionregister'] ?? 0;
         return [
-            'completionregister' => get_string('completiondetail:register', 'grouptool', $completionregistrations)
+            'completionregister' => get_string('completiondetail:register', 'grouptool', $completionregistrations),
         ];
     }
 

@@ -110,7 +110,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
             $context->absregs[] = [
                     'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
                     'fullname' => fullname($group->moodle_members[$cur]),
-                    'id'       => $cur
+                    'id'       => $cur,
             ];
         }
     }
@@ -121,7 +121,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
             $context->gtregs[] = [
                     'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
                     'fullname' => fullname($users[$cur]),
-                    'id'       => $cur
+                    'id'       => $cur,
             ];
         }
     }
@@ -132,7 +132,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
             $context->mregs[] = [
                     'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
                     'fullname' => fullname($group->moodle_members[$cur]),
-                    'id'       => $cur
+                    'id'       => $cur,
             ];
         }
     }
@@ -145,7 +145,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
                     'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
                     'fullname' => fullname($users[$cur]),
                     'id'       => $cur,
-                    'rank'     => $this->get_rank_in_queue($queuedlist, $cur)
+                    'rank'     => $this->get_rank_in_queue($queuedlist, $cur),
             ];
         }
     }

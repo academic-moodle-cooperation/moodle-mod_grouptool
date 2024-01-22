@@ -1,6 +1,10 @@
 CHANGELOG
 ========
 
+4.3.0 (2024-01-22)
+------------------
+* [FIXED] #7814 Fix description showing 
+
 4.2.1 (2023-08-24)
 ------------------
 * [FIXED] #7674 Fix participants' import/unregister error
