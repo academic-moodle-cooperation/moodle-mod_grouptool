@@ -3,6 +3,8 @@ CHANGELOG
 
 4.3.0 (2024-01-22)
 ------------------
+* Moodle 4.3.0 compatible version
+* [CHANGED] #7795 Replaced <span style="font-weight:bold"> with <strong> 
 * [FIXED] #7814 Fix description showing 
 
 4.2.1 (2023-08-24)
