@@ -1,11 +1,11 @@
-Grouptool Module
+Grouptool 
 ================
 
 This file is part of the mod_grouptool plugin for Moodle - <http://moodle.org/>
 
-*Author:*    Philipp Hager, Hannes Laimer, Daniel Binder
+*Author:*    Philipp Hager, Hannes Laimer, Daniel Binder, Anne Kreppenhofer
 
-*Copyright:* 2014 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+*Copyright:* [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
@@ -13,48 +13,19 @@ This file is part of the mod_grouptool plugin for Moodle - <http://moodle.org/>
 Description
 -----------
 
-The Grouptool module enhances the functionality of Moodle default groups. Two of the additional
-features are the possibility for students to enrol in groups with waiting lists on their own, and
-the transfer of grades within groups.
-
-The grouptool module features the following functionalities:
-
-* automatic creation of groups with simultaneous enrolment of participants (optional)
-  - 1-person groups
-  - groups with pre-defined numbers of persons or groups
-  - groups with certain pre-defined group names, consisting of [lastname], [firstname], [idnumber],
-    [usernumber], numbers, alphabetical indexes, and pure text
-
-* simultaneous creation of groupings for each group created
-
-* self-enrolment of participants in exisiting groups:
-  - activate the groups and specify their order for each grouptool instance
-  - use a waiting list system with optional limitation of the number of participants
-  - define the maximum number allowed per group or for all available groups
-  - allow each participant to enrol in several groups (min./max.)
-
-* group grades - transfer awarded grades to other group participants
-  - automatically for all groups or just for some
-  - select the participant from whom the grade is to be transferred
+With the Grouptool activity, teachers can create groups and give students the opportunity to register and deregister for these groups independently or, if necessary, to register for waiting lists. 
 
 
-Example
+Usage
 -------
 
-Create groups and allow students to form groups of no more than five members each to work on a
-joint project during the semester.
-
-
-Requirements
-------------
-
-The plugin is available for Moodle 2.5+.
+In a course, the participants are to give group presentations. The teacher therefore creates a group for each presentation topic in the grouptool and specifies the maximum number of participants for each topic. They also allow waiting lists. Students can now register for the group of their choice within the specified period. If the desired group is already full, they can sign up for the waiting list and move up if someone in the group de-registers. After the registration deadline, the teacher starts an allocation process that assigns the participants on the waiting list to other groups with open places.
 
 
 Installation
 ------------
 
-* Copy the module code directly to the mod/grouptool directory.
+* Copy the  code directly to the mod/grouptool directory.
 
 * Log into Moodle as administrator.
 
@@ -62,41 +33,16 @@ Installation
   automatically.
 
 
-Admin Settings
+Privacy API 
 --------------
 
-As an administrator you can set the default values instance-wide on the settings page for
-administrators in the grouptool module:
-
-* default naming scheme (text field)
-* allow self-enrolment (checkbox)
-* show group members (drop down)
-* immediate enrolment (checkbox)
-* allow unenrolment (checkbox)
-* general default group size (text field)
-* limited group size (checkbox)
-* define different group sizes (checkbox)
-* use waiting lists (checkbox)
-* maximum number of waiting lists a participant can be on at the same time (text field)
-* maximum number of waiting list entrys a group can have at the same time (text field)
-* multiple enrolments (checkbox)
-* minimum number of groups to be selected (text field)
-* maximum number of groups to be selected (text field)
-* sync behaviour:
-  - when adding a group member (drop down)
-  - when deleting a group member (drop down)
-  - when deleting a group (drop down)
-* import settings
-  - force registration
-  - fields to identify user
+The plugin fully implements the Moodle Privacy API.
 
 
 Documentation
 -------------
 
-You can find a cheat sheet for the plugin on the [AMC
-website](http://www.academic-moodle-cooperation.org/en/modules/grouptool/) and a video tutorial in
-german only in the [AMC YouTube Channel](https://www.youtube.com/c/AMCAcademicMoodleCooperation).
+You can find a documentation for the plugin on the [AMC website](https://academic-moodle-cooperation.org/mod_grouptool/).
 
 
 Bug Reports / Support
