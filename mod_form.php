@@ -20,7 +20,8 @@
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @author    Hannes Laimer
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Anne Kreppenhofer
+ * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +35,7 @@ require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_grouptool_mod_form extends moodleform_mod {
@@ -554,15 +555,16 @@ class mod_grouptool_mod_form extends moodleform_mod {
     public function add_completion_rules() {
         $mform =& $this->_form;
 
+        $suffix = $this->get_suffix();
+
         $group = [];
-        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '',
-                get_string('completionregister', 'grouptool'));
+        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '', get_string('completionregister', 'grouptool'));
         $group[] =& $mform->createElement('text', 'completionregister', '', ['size' => 3]);
         $mform->setType('completionregister', PARAM_INT);
-        $mform->addGroup($group, 'completionregistergroup', get_string('require_registration', 'grouptool'), [' '], false);
-        $mform->addHelpButton('completionregistergroup', 'require_registration', 'grouptool');
+        $mform->addGroup($group, 'completionregistergroup'.$suffix, get_string('require_registration', 'grouptool'), [' '], false);
+        $mform->addHelpButton('completionregistergroup'.$suffix, 'require_registration', 'grouptool');
         $mform->disabledIf('completionregister', 'completionregisterenabled', 'notchecked');
-        return ['completionregistergroup'];
+        return ['completionregistergroup'.$suffix];
     }
     /**
      * Determines if completion is enabled for this module.
@@ -571,6 +573,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
      * @return bool
      */
     public function completion_rule_enabled($data) {
+        $suffix = $this->get_suffix();
         return (!empty($data['completionregisterenabled']) && $data['completionregister'] != 0);
     }
 
@@ -584,6 +587,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
+        $suffix = $this->get_suffix();
         // Turn off completion settings if the checkboxes aren't ticked.
         if (!empty($data->completionunlocked)) {
             $autocompletion = !empty($data->completion) && $data->completion == COMPLETION_TRACKING_AUTOMATIC;

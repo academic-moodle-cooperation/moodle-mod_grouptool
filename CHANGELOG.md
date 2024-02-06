@@ -5,6 +5,7 @@ CHANGELOG
 ------------------
 * Moodle 4.3.0 compatible version
 * [FIXED] #7839 Deprecated parameter in round function
+* [FIXED] #7828 Fix error message default task completion
 * [CHANGED] #7795 Replaced <span style="font-weight:bold"> with <strong> 
 * [FIXED] #7814 Fix description showing 
 
