@@ -4,6 +4,7 @@ CHANGELOG
 4.3.0 (2024-01-22)
 ------------------
 * Moodle 4.3.0 compatible version
+* [FIXED] #7839 Deprecated parameter in round function
 * [CHANGED] #7795 Replaced <span style="font-weight:bold"> with <strong> 
 * [FIXED] #7814 Fix description showing 
 
