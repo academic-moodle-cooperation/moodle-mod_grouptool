@@ -1975,8 +1975,8 @@ class mod_grouptool {
                     $row = [];
                     $finalgrade = $gradinginfo->items[0]->grades[$groupmember->id];
                     $grademax = $gradinginfo->items[0]->grademax;
-                    $finalgrade->formatted_grade = round($finalgrade->grade, 2) .' / ' .
-                                                    round($grademax, 2);
+                    $finalgrade->formatted_grade = round((float)$finalgrade->grade, 2) .' / ' .
+                                                    round((float)$grademax, 2);
                     $checkboxcontroller = optional_param('select', '', PARAM_ALPHA);
                     if ($checkboxcontroller == 'all') {
                         $checked = true;
