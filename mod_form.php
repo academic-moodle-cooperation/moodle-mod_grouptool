@@ -558,12 +558,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $suffix = $this->get_suffix();
 
         $group = [];
-        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled', '', get_string('completionregister', 'grouptool'));
-        $group[] =& $mform->createElement('text', 'completionregister', '', ['size' => 3]);
-        $mform->setType('completionregister', PARAM_INT);
+        $group[] =& $mform->createElement('checkbox', 'completionregisterenabled'.$suffix, '', get_string('completionregister', 'grouptool'));
+        $group[] =& $mform->createElement('text', 'completionregister'.$suffix, '', ['size' => 3]);
+        $mform->setType('completionregister'.$suffix, PARAM_INT);
         $mform->addGroup($group, 'completionregistergroup'.$suffix, get_string('require_registration', 'grouptool'), [' '], false);
         $mform->addHelpButton('completionregistergroup'.$suffix, 'require_registration', 'grouptool');
-        $mform->disabledIf('completionregister', 'completionregisterenabled', 'notchecked');
+        $mform->disabledIf('completionregister'.$suffix, 'completionregisterenabled'.$suffix, 'notchecked');
         return ['completionregistergroup'.$suffix];
     }
     /**
@@ -574,7 +574,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function completion_rule_enabled($data) {
         $suffix = $this->get_suffix();
-        return (!empty($data['completionregisterenabled']) && $data['completionregister'] != 0);
+        return (!empty($data['completionregisterenabled'.$suffix]) && $data['completionregister'.$suffix] != 0);
     }
 
     /**
