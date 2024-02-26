@@ -338,7 +338,7 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM,
                 ]);
             }
-
+            //
             if ($grouptool->timedue) {
                 $event->eventtype = GROUPTOOL_EVENT_TYPE_DUE;
                 $event->name = get_string('calendardue', 'grouptool', $grouptool->name);
