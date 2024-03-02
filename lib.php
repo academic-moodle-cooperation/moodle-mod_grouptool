@@ -339,7 +339,6 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM,
                 ]);
             }
-            //
             if ($grouptool->timedue) {
                 $event->eventtype = GROUPTOOL_EVENT_TYPE_DUE;
                 $event->name = get_string('calendardue', 'grouptool', $grouptool->name);
@@ -1205,7 +1204,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
             $label = get_string('view_registrations', 'grouptool');
             $itemcount = -1;
         }
-        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) || (!empty($userstats->registered) ? 0 : 1 ) == 0){
+        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) || (!empty($userstats->registered) ? 0 : 1 ) == 0) {
             // If enough registration were made we want to remove the event from the dashboard for the student
             return null;
         }

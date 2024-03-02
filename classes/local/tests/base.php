@@ -111,7 +111,7 @@ abstract class base extends advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    protected function setUp():void {
+    protected function setUp(): void {
         global $DB;
 
         $this->resetAfterTest(true);
