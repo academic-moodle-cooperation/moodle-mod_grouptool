@@ -3,7 +3,8 @@ CHANGELOG
 
 4.3.1 (2024-03-02)
 ------------------
-* [FIXED] 7766 Fix overdue marking in dashboard was different from core
+* [FIXED] #7533 Fix extra highlight of today in calendar
+* [FIXED] #7766 Fix overdue marking in dashboard was different from core
 
 4.3.0 (2024-01-22)
 ------------------
