@@ -19,7 +19,8 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Anne Kreppenhofer
+ * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -338,7 +339,6 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM,
                 ]);
             }
-
             if ($grouptool->timedue) {
                 $event->eventtype = GROUPTOOL_EVENT_TYPE_DUE;
                 $event->name = get_string('calendardue', 'grouptool', $grouptool->name);
@@ -1200,9 +1200,13 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
             $itemcount = !empty($userstats->registered) ? 0 : 1;
             $label = get_string('register', 'grouptool');
         }
-        if ($itemcount <= 0) {
+        if ($itemcount >= 0) {
             $label = get_string('view_registrations', 'grouptool');
             $itemcount = -1;
+        }
+        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) || (!empty($userstats->registered) ? 0 : 1 ) == 0) {
+            // If enough registration were made we want to remove the event from the dashboard for the student
+            return null;
         }
         // Clickable if registration is open and registrations are missing or enough registrations are made!
         $actionable = ($isopen && ($itemcount > 0)) || ($itemcount <= 0);

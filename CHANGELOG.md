@@ -1,6 +1,10 @@
 CHANGELOG
 ========
 
+4.3.1 (2024-03-02)
+------------------
+* [FIXED] 7766 Fix overdue marking in dashboard was different from core
+
 4.3.0 (2024-01-22)
 ------------------
 * Moodle 4.3.0 compatible version

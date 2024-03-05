@@ -103,7 +103,7 @@ class mod_grouptool_privacy_testcase extends base {
         // The user will be in these contexts.
         $usercontextids = [
             $gt1->get_context()->id,
-            $gt2->get_context()->id
+            $gt2->get_context()->id,
         ];
 
         // Get all active groups indexed by active group ID!
