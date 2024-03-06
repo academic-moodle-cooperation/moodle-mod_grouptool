@@ -1200,7 +1200,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
             $itemcount = !empty($userstats->registered) ? 0 : 1;
             $label = get_string('register', 'grouptool');
         }
-        if ($itemcount >= 0) {
+        if ($itemcount <= 0) {
             $label = get_string('view_registrations', 'grouptool');
             $itemcount = -1;
         }
