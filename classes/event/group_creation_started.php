@@ -63,7 +63,7 @@ class group_creation_started extends \core\event\base {
                 'mode'     => 'groups_amount',
                 'pattern'  => $pattern,
                 'amount'   => $amount,
-                'grouping' => $grouping
+                'grouping' => $grouping,
             ],
         ]);
         return $event;
@@ -87,7 +87,7 @@ class group_creation_started extends \core\event\base {
                 'mode'     => 'members_amount',
                 'pattern'  => $pattern,
                 'amount'   => $amount,
-                'grouping' => $grouping
+                'grouping' => $grouping,
             ],
         ]);
         return $event;
@@ -113,7 +113,7 @@ class group_creation_started extends \core\event\base {
                 'pattern'  => $pattern,
                 'from'     => $from,
                 'to'         => $to,
-                'grouping' => $grouping
+                'grouping' => $grouping,
             ],
         ]);
         return $event;
@@ -135,7 +135,7 @@ class group_creation_started extends \core\event\base {
             'other' => [
                 'mode'     => '1-person-groups',
                 'pattern'  => $pattern,
-                'grouping' => $grouping
+                'grouping' => $grouping,
             ],
         ]);
         return $event;

@@ -64,7 +64,7 @@ class user_imported extends \core\event\base {
                 'agrp' => $agrp,
                 'group' => $group,
                 'user' => $user,
-                'type' => 'force'
+                'type' => 'force',
             ],
         ]);
         return $event;
@@ -86,7 +86,7 @@ class user_imported extends \core\event\base {
             'other'    => [
                 'group' => $group,
                 'user' => $user,
-                'type' => ''
+                'type' => '',
             ],
         ]);
         return $event;
@@ -128,7 +128,7 @@ class user_imported extends \core\event\base {
         return new \moodle_url("/mod/$this->objecttable/view.php", [
             'id'      => $this->contextinstanceid,
             'tab'     => 'overview',
-            'groupid' => $this->data['other']['group']
+            'groupid' => $this->data['other']['group'],
         ]);
     }
 

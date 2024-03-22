@@ -47,7 +47,7 @@ class mod_grouptool_external extends external_api {
         return new external_function_parameters(
             [
                     'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id')
+                    'groupid' => new external_value(PARAM_INT, 'group id'),
             ]
         );
     }
@@ -94,7 +94,7 @@ class mod_grouptool_external extends external_api {
     public static function delete_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -109,7 +109,7 @@ class mod_grouptool_external extends external_api {
             [
                     'cmid'    => new external_value(PARAM_INT, 'course module id'),
                     'groupid' => new external_value(PARAM_INT, 'group id'),
-                    'name'    => new external_value(PARAM_TEXT, 'new name')
+                    'name'    => new external_value(PARAM_TEXT, 'new name'),
             ]
         );
     }
@@ -138,7 +138,7 @@ class mod_grouptool_external extends external_api {
         // Parameters validation!
         $params = self::validate_parameters(self::rename_group_parameters(), [
                 'cmid' => $cmid, 'groupid' => $groupid,
-                'name' => $name
+                'name' => $name,
         ]);
 
         $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
@@ -178,7 +178,7 @@ class mod_grouptool_external extends external_api {
     public static function rename_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -191,7 +191,7 @@ class mod_grouptool_external extends external_api {
             [
                     'cmid'    => new external_value(PARAM_INT, 'course module id'),
                     'groupid' => new external_value(PARAM_INT, 'group id'),
-                    'size'    => new external_value(PARAM_TEXT, 'size or 0')
+                    'size'    => new external_value(PARAM_TEXT, 'size or 0'),
             ]
         );
     }
@@ -220,7 +220,7 @@ class mod_grouptool_external extends external_api {
         // Parameters validation!
         $params = self::validate_parameters(self::resize_group_parameters(), [
                 'cmid' => $cmid, 'groupid' => $groupid,
-                'size' => $size
+                'size' => $size,
         ]);
 
         $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
@@ -240,11 +240,11 @@ class mod_grouptool_external extends external_api {
             // Disable individual size for this group!
             $DB->set_field('grouptool_agrps', 'grpsize', null, [
                     'groupid' => $params['groupid'],
-                    'grouptoolid' => $cm->instance
+                    'grouptoolid' => $cm->instance,
             ]);
             $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', [
                     'groupid'    => $params['groupid'],
-                    'grouptoolid' => $cm->instance
+                    'grouptoolid' => $cm->instance,
             ]);
             if (!empty($dbsize)) {
                 // Error happened...
@@ -262,7 +262,7 @@ class mod_grouptool_external extends external_api {
             $DB->set_field('grouptool', 'use_size', 1, ['id' => $cm->instance]);
             if ($params['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
                             'groupid'     => $params['groupid'],
-                            'grouptoolid' => $cm->instance
+                            'grouptoolid' => $cm->instance,
                     ])) {
                 // Error happened...
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
@@ -287,7 +287,7 @@ class mod_grouptool_external extends external_api {
     public static function resize_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -299,7 +299,7 @@ class mod_grouptool_external extends external_api {
         return new external_function_parameters(
             [
                     'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id')
+                    'groupid' => new external_value(PARAM_INT, 'group id'),
             ]
         );
     }
@@ -357,7 +357,7 @@ class mod_grouptool_external extends external_api {
     public static function activate_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -369,7 +369,7 @@ class mod_grouptool_external extends external_api {
         return new external_function_parameters(
             [
                     'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id')
+                    'groupid' => new external_value(PARAM_INT, 'group id'),
             ]
         );
     }
@@ -425,7 +425,7 @@ class mod_grouptool_external extends external_api {
     public static function deactivate_group_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -440,9 +440,9 @@ class mod_grouptool_external extends external_api {
                     'order' => new external_multiple_structure(
                       new external_single_structure([
                           'groupid' => new external_value(PARAM_INT, 'group id'),
-                          'order'   => new external_value(PARAM_INT, 'order')
+                          'order'   => new external_value(PARAM_INT, 'order'),
                       ])
-                  )
+                  ),
             ]
         );
     }
@@ -493,12 +493,12 @@ class mod_grouptool_external extends external_api {
             } else {
                 $DB->set_field('grouptool_agrps', 'sort_order', $cur['order'], [
                         'groupid'     => $cur['groupid'],
-                        'grouptoolid' => $cm->instance
+                        'grouptoolid' => $cm->instance,
                 ]);
                 if (!$DB->record_exists('grouptool_agrps', [
                         'groupid' => $cur['groupid'],
                         'grouptoolid' => $cm->instance,
-                        'sort_order'  => $cur['order']
+                        'sort_order'  => $cur['order'],
                 ])) {
                     $failed[] = "groupid ".$cur['groupid'];
                 }
@@ -523,7 +523,7 @@ class mod_grouptool_external extends external_api {
     public static function reorder_groups_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -536,7 +536,7 @@ class mod_grouptool_external extends external_api {
             [
                     'cmid' => new external_value(PARAM_INT, 'course module id'),
                     'a'    => new external_value(PARAM_INT, 'group A id'),
-                    'b'    => new external_value(PARAM_INT, 'group B id')
+                    'b'    => new external_value(PARAM_INT, 'group B id'),
             ]
         );
     }
@@ -574,19 +574,19 @@ class mod_grouptool_external extends external_api {
 
         $aorder = $DB->get_field('grouptool_agrps', 'sort_order', [
                 'groupid'     => $a,
-                'grouptoolid' => $cm->instance
+                'grouptoolid' => $cm->instance,
         ]);
         $border = $DB->get_field('grouptool_agrps', 'sort_order', [
                 'groupid'     => $b,
-                'grouptoolid' => $cm->instance
+                'grouptoolid' => $cm->instance,
         ]);
         $DB->set_field('grouptool_agrps', 'sort_order', $border, [
                 'groupid'     => $a,
-                'grouptoolid' => $cm->instance
+                'grouptoolid' => $cm->instance,
         ]);
         $DB->set_field('grouptool_agrps', 'sort_order', $aorder, [
                 'groupid'     => $b,
-                'grouptoolid' => $cm->instance
+                'grouptoolid' => $cm->instance,
         ]);
         // This will only be displayed in the developer console, so we can hardcode the string here!
         $data = new stdClass();
@@ -606,7 +606,7 @@ class mod_grouptool_external extends external_api {
     public static function swap_groups_returns() {
         return new external_single_structure([
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
-            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, '')
+            'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
     }
 }

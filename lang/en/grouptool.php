@@ -50,7 +50,7 @@ $string['already_occupied'] = 'The place in group <strong>{$a->grpname}</strong>
 $string['already_queued'] = '<strong>{$a->username}</strong> is already queued in group <strong>{$a->groupname}</strong>!';
 $string['already_registered'] = '<strong>{$a->username}</strong> is already registered in group <strong>{$a->groupname}</strong>!';
 $string['alwaysshowdescription'] = 'Always show description';
-$string['alwaysshowdescription_help'] = 'If disabled, the grouptool description above will only become visible to students on the "Registration start" date.';
+$string['alwaysshowdescription_help'] = 'If disabled, the assignment description above will only become visible to students on the "Registration start" date.';
 $string['you_are_already_queued'] = 'You are already queued in group <strong>{$a->groupname}</strong>!';
 $string['you_are_already_registered'] = 'You are already registered in group <strong>{$a->groupname}</strong>!';
 $string['asterisk_marks_moodle_registrations'] = 'Users with leading asterisk (*) are already registered in the respective Moodle-Group';
@@ -563,10 +563,10 @@ $string['sortlist_no_data'] = 'There are no groups present at the moment!';
 $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul>
-<li><span style="font-weight:bold">✔</span> registered in Moodle-group and grouptool</li>
-<li><span style="font-weight:bold">?</span> registered in Moodle-group but not in grouptool</li>
-<li><span style="font-weight:bold">+</span> registered in grouptool but not in Moodle-group</li>
-<li><span style="font-weight:bold">1, 2, 3...</span> queued in grouptool</li>
+<li><strong>✔</strong> registered in Moodle-group and grouptool</li>
+<li><strong>?</strong> registered in Moodle-group but not in grouptool</li>
+<li><strong>+</strong> registered in grouptool but not in Moodle-group</li>
+<li><strong>1, 2, 3...</strong> queued in grouptool</li>
 </ul>';
 $string['successfully_deleted_groups'] = 'Successfully deleted groups!';
 $string['swapped_groups'] = 'Swapped groups <strong>{$a->a}</strong> (order <strong>{$a->aorder}</strong>) and <strong>{$a->b}</strong> (order <strong>{$a->border}</strong>)!';

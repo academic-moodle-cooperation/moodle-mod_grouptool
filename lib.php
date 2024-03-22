@@ -19,7 +19,8 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Anne Kreppenhofer
+ * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -135,7 +136,7 @@ function grouptool_add_instance(stdClass $grouptool) {
     foreach ($coursegroups as $groupid) {
         if (!$DB->record_exists('grouptool_agrps', [
                 'grouptoolid' => $return,
-                'groupid'     => $groupid
+                'groupid'     => $groupid,
         ])) {
             $record = new stdClass();
             $record->grouptoolid = $return;
@@ -212,7 +213,7 @@ function grouptool_update_instance(stdClass $grouptool) {
     foreach ($coursegroups as $groupid) {
         if (!$DB->record_exists('grouptool_agrps', [
                 'grouptoolid' => $grouptool->instance,
-                'groupid'     => $groupid
+                'groupid'     => $groupid,
         ])) {
             $record = new stdClass();
             $record->grouptoolid = $grouptool->instance;
@@ -304,7 +305,7 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     $intro = strip_pluginfile_content($intro);
                     $event->description = [
                             'text' => $intro,
-                            'format' => $grouptool->introformat
+                            'format' => $grouptool->introformat,
                     ];
                 } else {
                     $event->description = format_module_intro('grouptool', $grouptool, $cm->id);
@@ -335,10 +336,9 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
             } else {
                 $DB->delete_records('event', [
                     'modulename' => 'grouptool', 'instance' => $grouptool->id,
-                    'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM
+                    'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM,
                 ]);
             }
-
             if ($grouptool->timedue) {
                 $event->eventtype = GROUPTOOL_EVENT_TYPE_DUE;
                 $event->name = get_string('calendardue', 'grouptool', $grouptool->name);
@@ -363,7 +363,7 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
             } else {
                 $DB->delete_records('event', [
                         'modulename' => 'grouptool', 'instance' => $grouptool->id,
-                        'eventtype' => GROUPTOOL_EVENT_TYPE_DUE
+                        'eventtype' => GROUPTOOL_EVENT_TYPE_DUE,
                 ]);
             }
         }
@@ -448,7 +448,7 @@ function grouptool_update_queues($grouptool = 0) {
                     unset($record->id);
                     if (!$DB->record_exists('grouptool_registered', [
                             'agrpid' => $agrpid,
-                            'userid' => $record->userid
+                            'userid' => $record->userid,
                     ])) {
                         unset($record->priority);
                         unset($record->regs);
@@ -460,7 +460,7 @@ function grouptool_update_queues($grouptool = 0) {
                     } else if ($mark = $DB->get_record('grouptool_registered', [
                             'agrpid' => $agrpid,
                             'userid' => $record->userid,
-                            'modified_by' => -1
+                            'modified_by' => -1,
                     ])) {
                         $mark->modified_by = 0;
                         $DB->update_record('grouptool_registered', $mark);
@@ -470,7 +470,7 @@ function grouptool_update_queues($grouptool = 0) {
                     }
                     $DB->delete_records('grouptool_queued', [
                             'agrpid' => $agrpid,
-                            'userid' => $record->userid
+                            'userid' => $record->userid,
                     ]);
                     $groupregs[$agrpid]++;
                 }
@@ -730,7 +730,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
             $attrib = [
                     'title' => $strgrouptool, 'href' => $CFG->wwwroot.
                                                                 '/mod/grouptool/view.php?id='.
-                                                                $grouptool->coursemodule
+                                                                $grouptool->coursemodule,
             ];
             if (!$grouptool->visible
                 || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
@@ -903,7 +903,7 @@ function grouptool_reset_userdata($data) {
         $status[] = [
                 'component'    => $componentstr,
                 'item'         => get_string('reset_transparent_unreg', 'grouptool'),
-                'error'        => false
+                'error'        => false,
         ];
     }
 
@@ -912,7 +912,7 @@ function grouptool_reset_userdata($data) {
         $status[] = [
                 'component'    => $componentstr,
                 'item'         => get_string('reset_queues', 'grouptool'),
-                'error'        => false
+                'error'        => false,
         ];
     }
 
@@ -921,7 +921,7 @@ function grouptool_reset_userdata($data) {
         $status[] = [
                 'component' => $componentstr,
                 'item'      => get_string('reset_registrations', 'grouptool'),
-                'error'     => false
+                'error'     => false,
         ];
     }
 
@@ -930,7 +930,7 @@ function grouptool_reset_userdata($data) {
         $status[] = [
                 'component'    => $componentstr,
                 'item'         => get_string('reset_agrps', 'grouptool'),
-                'error'        => false
+                'error'        => false,
         ];
     }
 
@@ -970,7 +970,7 @@ function grouptool_reset_course_form_defaults() {
             'reset_grouptool_registrations'     => 1,
             'reset_grouptool_queues'            => 1,
             'reset_grouptool_agrps'             => 0,
-            'reset_grouptool_transparent_unreg' => 0
+            'reset_grouptool_transparent_unreg' => 0,
     ];
 }
 
@@ -996,11 +996,11 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
     // Get corresponding feedback!
     $feedbackcomment = $DB->get_record('assignfeedback_comments', [
             'assignment' => $id,
-            'grade'      => $source->id
+            'grade'      => $source->id,
     ]);
     $feedbackfile = $DB->get_record('assignfeedback_file', [
             'assignment' => $id,
-            'grade'      => $source->id
+            'grade'      => $source->id,
     ]);
     foreach ($toid as $curid) {
         $record = clone $source;
@@ -1009,7 +1009,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
         if ($record->id = $DB->get_field('assign_grades', 'id', [
                 'assignment'    => $id,
                 'userid'        => $curid,
-                'attemptnumber' => $source->attemptnumber
+                'attemptnumber' => $source->attemptnumber,
         ])) {
             $DB->update_record('assign_grades', $record);
             if ($feedbackcomment) {
@@ -1022,7 +1022,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                         'teacher'  => fullname($grader),
                         'date'     => userdate($source->timemodified,
                                                         get_string('strftimedatetimeshort')),
-                        'feedback' => $newfeedbackcomment->commenttext
+                        'feedback' => $newfeedbackcomment->commenttext,
                 ];
                 $newfeedbackcomment->commenttext = format_text(get_string('copied_grade_feedback',
                                                                           'grouptool',
@@ -1030,7 +1030,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                                                                $newfeedbackcomment->commentformat);
                 if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', [
                         'assignment' => $id,
-                        'grade'      => $record->id
+                        'grade'      => $record->id,
                 ])) {
                     $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
                 } else {
@@ -1044,7 +1044,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                 $newfeedbackfile->assignment = $id;
                 if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', [
                         'assignment' => $id,
-                        'grade'      => $record->id
+                        'grade'      => $record->id,
                 ])) {
                     $DB->update_record('assignfeedback_file', $newfeedbackfile);
                 } else {
@@ -1063,7 +1063,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                         'teacher'  => fullname($grader),
                         'date'     => userdate($source->timemodified,
                                                         get_string('strftimedatetimeshort')),
-                        'feedback' => $newfeedbackcomment->commenttext
+                        'feedback' => $newfeedbackcomment->commenttext,
                 ];
                 $newfeedbackcomment->commenttext = format_text(get_string('copied_grade_feedback',
                                                                           'grouptool',
@@ -1071,7 +1071,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                                                                $newfeedbackcomment->commentformat);
                 if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', [
                         'assignment' => $id,
-                        'grade'      => $gradeid
+                        'grade'      => $gradeid,
                 ])) {
                     $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
                 } else {
@@ -1085,7 +1085,7 @@ function grouptool_copy_assign_grades($id, $fromid, $toid) {
                 $newfeedbackfile->assignment = $id;
                 if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', [
                         'assignment' => $id,
-                        'grade'      => $gradeid
+                        'grade'      => $gradeid,
                 ])) {
                     $DB->update_record('assignfeedback_file', $newfeedbackfile);
                 } else {
@@ -1182,7 +1182,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $isopen = $grouptool->is_registration_open();
 
     $url = new \moodle_url('/mod/grouptool/view.php', [
-        'id' => $cm->id
+        'id' => $cm->id,
     ]);
 
     $actionable = false;
@@ -1203,6 +1203,10 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
         if ($itemcount <= 0) {
             $label = get_string('view_registrations', 'grouptool');
             $itemcount = -1;
+        }
+        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) || (!empty($userstats->registered) ? 0 : 1 ) == 0) {
+            // If enough registration were made we want to remove the event from the dashboard for the student
+            return null;
         }
         // Clickable if registration is open and registrations are missing or enough registrations are made!
         $actionable = ($isopen && ($itemcount > 0)) || ($itemcount <= 0);
@@ -1235,7 +1239,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 function mod_grouptool_core_calendar_event_action_shows_item_count(calendar_event $event, $itemcount = 0) {
     // List of event types where the action event's item count should be shown.
     $showitemcountfor = [
-        GROUPTOOL_EVENT_TYPE_DUE
+        GROUPTOOL_EVENT_TYPE_DUE,
     ];
     // For mod_grouptool, item count should be shown if the event type is 'due' and there is one or more items.
     return in_array($event->eventtype, $showitemcountfor) && $itemcount > 0;
@@ -1249,6 +1253,6 @@ function mod_grouptool_core_calendar_event_action_shows_item_count(calendar_even
 function mod_grouptool_get_fontawesome_icon_map() {
     return [
         'mod_grouptool:active' => 'fa-circle text-success',
-        'mod_grouptool:inactive' => 'fa-circle'
+        'mod_grouptool:inactive' => 'fa-circle',
     ];
 }

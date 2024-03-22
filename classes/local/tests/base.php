@@ -111,7 +111,7 @@ abstract class base extends advanced_testcase {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    protected function setUp():void {
+    protected function setUp(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -287,7 +287,7 @@ abstract class base extends advanced_testcase {
         return [
                 0 => $agrps,
                 1 => $agrpids,
-                2 => $message
+                2 => $message,
         ];
     }
 }

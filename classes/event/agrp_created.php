@@ -57,7 +57,7 @@ class agrp_created extends \core\event\base {
         $event = self::create([
             'objectid' => $agrp->id,
             'context' => \context_module::instance($cm->id),
-            'other' => (array)$agrp
+            'other' => (array)$agrp,
         ]);
         return $event;
     }

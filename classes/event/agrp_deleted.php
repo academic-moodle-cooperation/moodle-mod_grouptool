@@ -56,7 +56,7 @@ class agrp_deleted extends \core\event\base {
         $event = self::create([
             'objectid' => $data->id,
             'context' => \context_module::instance($data->cmid),
-            'other' => $data
+            'other' => $data,
         ]);
         return $event;
     }

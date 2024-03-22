@@ -1,6 +1,20 @@
 CHANGELOG
 ========
 
+4.3.1 (2024-03-02)
+------------------
+* [FIXED] #7873 Fix wrong register button label
+* [FIXED] #7533 Fix extra highlight of today in calendar
+* [FIXED] #7766 Fix overdue marking in dashboard was different from core
+
+4.3.0 (2024-01-22)
+------------------
+* Moodle 4.3.0 compatible version
+* [FIXED] #7839 Fix deprecated parameter in round function
+* [FIXED] #7828 Fix error message default task completion
+* [CHANGED] #7795 Replaced <span style="font-weight:bold"> with <strong> 
+* [FIXED] #7814 Updated Langstring equivalent to Assignment when description is shown
+
 4.2.1 (2023-08-24)
 ------------------
 * [FIXED] #7674 Fix participants' import/unregister error

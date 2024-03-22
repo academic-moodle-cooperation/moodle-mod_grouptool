@@ -74,11 +74,11 @@ class sortlist implements \renderable {
             // Move up!
             $a = $DB->get_record('grouptool_agrps', [
                 'groupid' => $moveup,
-                'grouptoolid' => $cm->instance
+                'grouptoolid' => $cm->instance,
             ]);
             $b = $DB->get_record('grouptool_agrps', [
                 'grouptoolid' => $a->grouptoolid,
-                'sort_order' => ($a->sort_order - 1)
+                'sort_order' => ($a->sort_order - 1),
             ]);
             if (empty($a) || empty($b)) {
                 echo $OUTPUT->notification(get_string('couldnt_move_up', 'grouptool'), 'error');
@@ -92,11 +92,11 @@ class sortlist implements \renderable {
             // Move up!
             $a = $DB->get_record('grouptool_agrps', [
                 'groupid' => $movedown,
-                'grouptoolid' => $cm->instance
+                'grouptoolid' => $cm->instance,
             ]);
             $b = $DB->get_record('grouptool_agrps', [
                 'grouptoolid' => $a->grouptoolid,
-                'sort_order' => ($a->sort_order + 1)
+                'sort_order' => ($a->sort_order + 1),
             ]);
             if (empty($a) || empty($b)) {
                 echo $OUTPUT->notification(get_string('couldnt_move_down', 'grouptool'), 'error');

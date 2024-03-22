@@ -63,14 +63,14 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
         $queued = [
                 'agrpid' => 'privacy:metadata:agrpid',
                 'userid' => 'privacy:metadata:userid',
-                'timestamp' => 'privacy:metadata:timestamp'
+                'timestamp' => 'privacy:metadata:timestamp',
         ];
 
         $registered = [
                 'agrpid' => 'privacy:metadata:agrpid',
                 'userid' => 'privacy:metadata:userid',
                 'timestamp' => 'privacy:metadata:timestamp',
-                'modified_by' => 'privacy:metadata:modified_by'
+                'modified_by' => 'privacy:metadata:modified_by',
         ];
 
         $collection->add_database_table('grouptool_queued', $queued, 'privacy:metadata:queued');
@@ -100,7 +100,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
                 'contextlevel' => CONTEXT_MODULE,
                 'queueuserid' => $userid,
                 'reguserid' => $userid,
-                'regmodifierid' => $userid
+                'regmodifierid' => $userid,
         ];
 
         $sql = "SELECT ctx.id
@@ -134,12 +134,12 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
         $params = [
                 'modulename' => 'grouptool',
                 'contextid' => $context->id,
-                'contextlevel' => CONTEXT_MODULE
+                'contextlevel' => CONTEXT_MODULE,
         ];
 
         // Get all who are queued or registered or marked or have modified, but only real users, no empty values!
         foreach (['grouptool_queued' => ['userid'],
-                  'grouptool_registered' => ['userid', 'modified_by']] as $table => $fields) {
+                  'grouptool_registered' => ['userid', 'modified_by'], ] as $table => $fields) {
             foreach ($fields as $field) {
                 $sql = "SELECT r." . $field . "
                           FROM {context} ctx
@@ -277,7 +277,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
 
         $preferences = [
             'mod_grouptool_group_filter',
-            'mod_grouptool_mygroups_only'
+            'mod_grouptool_mygroups_only',
         ];
 
         foreach ($preferences as $cur) {
@@ -323,7 +323,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
                 $tmp = [
                         'group' => $agrps[$cur->agrpid]->name,
                         'status' => ($cur->modified_by === -1) ? $strmarked : $strregistered,
-                        'timestamp' => transform::datetime($cur->timestamp)
+                        'timestamp' => transform::datetime($cur->timestamp),
                 ];
                 if ($cur->userid != $user->id) {
                     if (!isset($export->modified)) {
@@ -351,7 +351,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
                 $export->queues[] = [
                         'group' => $agrps[$cur->agrpid]->name,
                         'status' => $strqueued,
-                        'timestamp' => transform::datetime($cur->timestamp)
+                        'timestamp' => transform::datetime($cur->timestamp),
                 ];
             }
         }

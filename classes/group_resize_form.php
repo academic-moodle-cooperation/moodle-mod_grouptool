@@ -127,7 +127,7 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
                            ['groupid' => $data['resize'], 'grouptoolid' => $data['instance']]);
             if ($data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
                         'groupid'     => $data['resize'],
-                        'grouptoolid' => $data['instance']
+                        'grouptoolid' => $data['instance'],
                     ])) {
                 // Error happened...
                 $errors['size'] = get_string('couldnt_resize_group', 'grouptool', $data['size']);

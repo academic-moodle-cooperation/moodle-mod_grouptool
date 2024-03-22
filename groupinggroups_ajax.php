@@ -46,7 +46,7 @@ $contextid = null; // Now we have a context object throw away the id from the us
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/grouptool/groupinggroups_ajax.php', [
         'contextid' => $context->id,
-        'groupingid'    => $groupingid
+        'groupingid'    => $groupingid,
 ]);
 
 // Get groupings groups.

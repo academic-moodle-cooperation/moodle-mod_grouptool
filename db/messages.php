@@ -32,7 +32,7 @@ $messageproviders = [
  * unregisters from that group
  */
     'grouptool_moveupreg' => [
-            'capability'  => 'mod/grouptool:register'
-    ]
+            'capability'  => 'mod/grouptool:register',
+    ],
 
 ];

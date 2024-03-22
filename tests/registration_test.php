@@ -82,7 +82,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'use_size' => 1,
                 'grpsize' => 2,
                 'use_queue' => 0,
-                'allow_unreg' => 0
+                'allow_unreg' => 0,
         ]);
 
         // Get all active groups indexed by active group ID!
@@ -154,7 +154,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'use_size' => 1,
                 'grpsize' => 2,
                 'use_queue' => 1,
-                'allow_unreg' => 0
+                'allow_unreg' => 0,
         ]);
 
         list(, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
@@ -219,7 +219,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'grpsize' => 2,
                 'use_queue' => 1,
                 'groups_queues_limit' => 1,
-                'users_queues_limit' => 1
+                'users_queues_limit' => 1,
         ]);
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
@@ -302,7 +302,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'grpsize' => 1,
                 'use_queue' => 1,
                 'groups_queues_limit' => 1,
-                'users_queues_limit' => 1
+                'users_queues_limit' => 1,
         ]);
         // Get all active groups indexed by active group ID!
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
@@ -385,7 +385,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'grpsize' => 1,
                 'use_queue' => 1,
                 'groups_queues_limit' => 1,
-                'users_queues_limit' => 1
+                'users_queues_limit' => 1,
         ]);
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 
@@ -569,7 +569,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'grpsize' => 1,
                 'use_queue' => 1,
                 'groups_queues_limit' => 2,
-                'users_queues_limit' => 1
+                'users_queues_limit' => 1,
         ]);
         list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
 

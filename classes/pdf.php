@@ -619,7 +619,7 @@ class pdf extends \pdf {
                 'identity' => $this->calculate_identitycolumn_width(0.375, 1.5),
                 'email' => $this->calculate_identitycolumn_width(0.375, 1.5) * 1.5,
                 'registrations' => 0.225,
-                'queues' => 0.175
+                'queues' => 0.175,
         ];
         $totalwidth = array_sum($basicwidths);
         $colapsedwidth = $totalwidth;
