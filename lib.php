@@ -610,11 +610,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
             $navref->add(get_string('group_administration', 'grouptool'), $url);
         }
     }
-    if (has_capability('mod/grouptool:grade', $context)
-            || has_capability('mod/grouptool:grade_own_group', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'grading']);
-        $navref->add(get_string('grading', 'grouptool'), $url);
-    }
 
     $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
@@ -630,19 +625,8 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'import']);
         $navref->add(get_string('import', 'grouptool'), $url);
     }
-    if (has_capability('mod/grouptool:view_regs_course_view', $context)
-            && has_capability('mod/grouptool:view_regs_group_view', $context)) {
+    if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $userstab = $navref->add(get_string('users_tab', 'grouptool'), $url);
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $userstab->add(get_string('overview_tab', 'grouptool'), $url);
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'userlist']);
-        $userstab->add(get_string('userlist_tab', 'grouptool'), $url);
-    } else if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $navref->add(get_string('users_tab', 'grouptool'), $url);
-    } else if (has_capability('mod/grouptool:view_regs_course_view', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'userlist']);
         $navref->add(get_string('users_tab', 'grouptool'), $url);
     }
 
