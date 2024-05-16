@@ -290,9 +290,6 @@ switch ($tab) {
     case 'group_creation':
         $instance->view_creation();
         break;
-    case 'grading':
-        $instance->view_grading();
-        break;
     case 'selfregistration':
         // Send cached tab output so selfregistration can add the header once updated.
         $instance->view_selfregistration($outputcache);
