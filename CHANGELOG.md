@@ -1,6 +1,11 @@
 CHANGELOG
 ========
 
+4.4.0 (2024-05-22)
+------------------
+* [CHANGED] #7932 New activity logo
+* [FEATURE] #7622 New MVP Navstructure
+
 4.3.1 (2024-03-02)
 ------------------
 * [FIXED] #7873 Fix wrong register button label
