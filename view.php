@@ -147,14 +147,6 @@ if ($creategrps || $creategrpgs || $admingrps) {
                                                                        false);
     }
 }
-if (has_capability('mod/grouptool:grade', $context)
-    || has_capability('mod/grouptool:grade_own_group', $context)) {
-    $row['grading'] = new tabobject('grading',
-                                    $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=grading',
-                                    get_string('grading', 'grouptool'),
-                                    get_string('grading_alt', 'grouptool'),
-                                    false);
-}
 if (has_capability('mod/grouptool:register_students', $context)
         || has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_own_registration', $context)
@@ -193,34 +185,9 @@ if (has_capability('mod/grouptool:register_students', $context)
         $row['unregister'] = $unregtab;
     }
 }
-if (has_capability('mod/grouptool:view_regs_group_view', $context)
-    && has_capability('mod/grouptool:view_regs_course_view', $context)) {
-    $row['users'] = new tabobject('users',
+if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
+    $row['overview'] = new tabobject('overview',
                                   $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
-                                  get_string('users_tab', 'grouptool'),
-                                  get_string('users_tab_alt', 'grouptool'),
-                                  false);
-    $row['users']->subtree['overview'] = new tabobject('overview',
-                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
-                                                       get_string('overview_tab', 'grouptool'),
-                                                       get_string('overview_tab_alt', 'grouptool'),
-                                                       false);
-    $row['users']->subtree['overview']->level = 2;
-    $row['users']->subtree['userlist'] = new tabobject('userlist',
-                                                       $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=userlist',
-                                                       get_string('userlist_tab', 'grouptool'),
-                                                       get_string('userlist_tab_alt', 'grouptool'),
-                                                       false);
-    $row['users']->subtree['userlist']->level = 2;
-} else if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
-    $row['users'] = new tabobject('users',
-                                  $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=overview',
-                                  get_string('users_tab', 'grouptool'),
-                                  get_string('users_tab_alt', 'grouptool'),
-                                  false);
-} else if (has_capability('mod/grouptool:view_regs_course_view', $context)) {
-    $row['users'] = new tabobject('users',
-                                  $CFG->wwwroot.'/mod/grouptool/view.php?id='.$id.'&amp;tab=userlist',
                                   get_string('users_tab', 'grouptool'),
                                   get_string('users_tab_alt', 'grouptool'),
                                   false);
@@ -323,9 +290,6 @@ switch ($tab) {
     case 'group_creation':
         $instance->view_creation();
         break;
-    case 'grading':
-        $instance->view_grading();
-        break;
     case 'selfregistration':
         // Send cached tab output so selfregistration can add the header once updated.
         $instance->view_selfregistration($outputcache);
@@ -338,9 +302,6 @@ switch ($tab) {
         break;
     case 'overview':
         $instance->view_overview();
-        break;
-    case 'userlist':
-        $instance->view_userlist();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');

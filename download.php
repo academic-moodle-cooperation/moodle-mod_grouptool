@@ -102,22 +102,6 @@ switch ($tab) {
         ]);
         $event->trigger();
     break;
-    case 'userlist':
-        require_capability('mod/grouptool:view_regs_course_view', $context);
-        // Trigger userlist event.
-        $event = \mod_grouptool\event\userlist_exported::create([
-                'objectid' => $cm->instance,
-                'context'  => context_module::instance($cm->id),
-                'other'    => [
-                'tab' => $tab,
-                'format_readable' => $readableformat,
-                'format' => $format,
-                'groupid' => $groupid,
-                'groupingid' => $groupingid,
-                ],
-        ]);
-        $event->trigger();
-    break;
 }
 
 
@@ -141,29 +125,6 @@ switch ($tab) {
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
                 $instance->download_overview_ods($groupid, $groupingid, $includeinactive);
-                break;
-            default:
-                break;
-        }
-        break;
-    case 'userlist':
-        $PAGE->url->param('tab', 'userlist');
-        switch ($format) {
-            case GROUPTOOL_PDF:
-                $PAGE->url->param('format', GROUPTOOL_PDF);
-                $instance->download_userlist_pdf($groupid, $groupingid);
-                break;
-            case GROUPTOOL_TXT:
-                $PAGE->url->param('format', GROUPTOOL_TXT);
-                $instance->download_userlist_txt($groupid, $groupingid);
-                break;
-            case GROUPTOOL_XLSX:
-                $PAGE->url->param('format', GROUPTOOL_XLSX);
-                $instance->download_userlist_xlsx($groupid, $groupingid);
-                break;
-            case GROUPTOOL_ODS:
-                $PAGE->url->param('format', GROUPTOOL_ODS);
-                $instance->download_userlist_ods($groupid, $groupingid);
                 break;
             default:
                 break;

@@ -610,11 +610,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
             $navref->add(get_string('group_administration', 'grouptool'), $url);
         }
     }
-    if (has_capability('mod/grouptool:grade', $context)
-            || has_capability('mod/grouptool:grade_own_group', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'grading']);
-        $navref->add(get_string('grading', 'grouptool'), $url);
-    }
 
     $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
@@ -630,19 +625,8 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'import']);
         $navref->add(get_string('import', 'grouptool'), $url);
     }
-    if (has_capability('mod/grouptool:view_regs_course_view', $context)
-            && has_capability('mod/grouptool:view_regs_group_view', $context)) {
+    if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $userstab = $navref->add(get_string('users_tab', 'grouptool'), $url);
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $userstab->add(get_string('overview_tab', 'grouptool'), $url);
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'userlist']);
-        $userstab->add(get_string('userlist_tab', 'grouptool'), $url);
-    } else if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $navref->add(get_string('users_tab', 'grouptool'), $url);
-    } else if (has_capability('mod/grouptool:view_regs_course_view', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'userlist']);
         $navref->add(get_string('users_tab', 'grouptool'), $url);
     }
 
@@ -974,142 +958,6 @@ function grouptool_reset_course_form_defaults() {
     ];
 }
 
-/**
- * Copy Assign Grades from one user to another user (in assign_grade table)
- *
- * @param int $id Assignment ID
- * @param int $fromid User ID from whom will be copied
- * @param int $toid User ID to whom will be copied
- * @throws coding_exception
- * @throws dml_exception
- */
-function grouptool_copy_assign_grades($id, $fromid, $toid) {
-    global $DB, $CFG;
-
-    $source = $DB->get_records('assign_grades', ['assignment' => $id, 'userid' => $fromid], 'id DESC', '*', 0, 1);
-    if (!is_array($toid)) {
-        $toid = [$toid];
-    }
-    $source = reset($source);
-    $user = $DB->get_record('user', ['id' => $source->userid]);
-    $grader = $DB->get_record('user', ['id' => $source->grader]);
-    // Get corresponding feedback!
-    $feedbackcomment = $DB->get_record('assignfeedback_comments', [
-            'assignment' => $id,
-            'grade'      => $source->id,
-    ]);
-    $feedbackfile = $DB->get_record('assignfeedback_file', [
-            'assignment' => $id,
-            'grade'      => $source->id,
-    ]);
-    foreach ($toid as $curid) {
-        $record = clone $source;
-        $record->userid = $curid;
-        unset($record->id);
-        if ($record->id = $DB->get_field('assign_grades', 'id', [
-                'assignment'    => $id,
-                'userid'        => $curid,
-                'attemptnumber' => $source->attemptnumber,
-        ])) {
-            $DB->update_record('assign_grades', $record);
-            if ($feedbackcomment) {
-                $newfeedbackcomment = clone $feedbackcomment;
-                unset($newfeedbackcomment->id);
-                $newfeedbackcomment->grade = $record->id;
-                $newfeedbackcomment->assignment = $id;
-                $details = [
-                        'student'  => fullname($user),
-                        'teacher'  => fullname($grader),
-                        'date'     => userdate($source->timemodified,
-                                                        get_string('strftimedatetimeshort')),
-                        'feedback' => $newfeedbackcomment->commenttext,
-                ];
-                $newfeedbackcomment->commenttext = format_text(get_string('copied_grade_feedback',
-                                                                          'grouptool',
-                                                                          $details),
-                                                               $newfeedbackcomment->commentformat);
-                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', [
-                        'assignment' => $id,
-                        'grade'      => $record->id,
-                ])) {
-                    $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
-                } else {
-                    $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
-                }
-            }
-            if ($feedbackfile) {
-                $newfeedbackfile = clone $feedbackfile;
-                unset($newfeedbackfile->id);
-                $newfeedbackfile->grade = $record->id;
-                $newfeedbackfile->assignment = $id;
-                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', [
-                        'assignment' => $id,
-                        'grade'      => $record->id,
-                ])) {
-                    $DB->update_record('assignfeedback_file', $newfeedbackfile);
-                } else {
-                    $DB->insert_record('assignfeedback_file', $newfeedbackfile);
-                }
-            }
-        } else {
-            $gradeid = $DB->insert_record('assign_grades', $record);
-            if ($feedbackcomment) {
-                $newfeedbackcomment = clone $feedbackcomment;
-                unset($newfeedbackcomment->id);
-                $newfeedbackcomment->grade = $gradeid;
-                $newfeedbackcomment->assignment = $id;
-                $details = [
-                        'student'  => fullname($user),
-                        'teacher'  => fullname($grader),
-                        'date'     => userdate($source->timemodified,
-                                                        get_string('strftimedatetimeshort')),
-                        'feedback' => $newfeedbackcomment->commenttext,
-                ];
-                $newfeedbackcomment->commenttext = format_text(get_string('copied_grade_feedback',
-                                                                          'grouptool',
-                                                                          $details),
-                                                               $newfeedbackcomment->commentformat);
-                if ($newfeedbackcomment->id = $DB->get_field('assignfeedback_comments', 'id', [
-                        'assignment' => $id,
-                        'grade'      => $gradeid,
-                ])) {
-                    $DB->update_record('assignfeedback_comments', $newfeedbackcomment);
-                } else {
-                    $DB->insert_record('assignfeedback_comments', $newfeedbackcomment);
-                }
-            }
-            if ($feedbackfile) {
-                $newfeedbackfile = clone $feedbackfile;
-                unset($newfeedbackfile->id);
-                $newfeedbackfile->grade = $gradeid;
-                $newfeedbackfile->assignment = $id;
-                if ($newfeedbackfile->id = $DB->get_field('assignfeedback_file', 'id', [
-                        'assignment' => $id,
-                        'grade'      => $gradeid,
-                ])) {
-                    $DB->update_record('assignfeedback_file', $newfeedbackfile);
-                } else {
-                    $DB->insert_record('assignfeedback_file', $newfeedbackfile);
-                }
-            }
-        }
-
-        // User must have an assign_submission record, or the grade wont be displayed properly!
-        if (!$DB->record_exists('assign_submission', ['assignment' => $id, 'userid' => $curid])) {
-            require_once($CFG->dirroot.'/mod/assign/locallib.php');
-            $rec = new stdClass();
-            $rec->assignment = $id;
-            $rec->userid = $curid;
-            $rec->timecreated = time();
-            $rec->timemodified = $rec->timecreated;
-            $rec->groupid = 0;
-            $rec->attemptnumber = 0;
-            $rec->latest = 1;
-            $rec->status = ASSIGN_SUBMISSION_STATUS_NEW;
-            $DB->insert_record('assign_submission', $rec);
-        }
-    }
-}
 
 /*
  ******************** CALENDAR API AND SIMILAR FUNCTIONS FOR GROUPTOOLS ***********************

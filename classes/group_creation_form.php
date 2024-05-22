@@ -166,14 +166,14 @@ class group_creation_form extends \moodleform {
             $mform->setDefault('numberofmembers', $grouptool->grpsize);
 
             $fromto = [];
-            $fromto[] = $mform->createElement('text', 'from', get_string('from'));
+            $fromto[] = $mform->createElement('text', 'from', get_string('fromsender'));
             $mform->setDefault('from', 0);
             /*
              * We have to clean this params by ourselves afterwards otherwise we get problems
              * with texts getting mapped to 0
              */
             $mform->setType('from', PARAM_RAW);
-            $fromto[] = $mform->createElement('text', 'to', get_string('to'));
+            $fromto[] = $mform->createElement('text', 'to', get_string('torecipient'));
             $mform->setDefault('to', 0);
             /*
              * We have to clean this params by ourselves afterwards otherwise we get problems
