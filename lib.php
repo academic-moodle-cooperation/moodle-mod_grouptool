@@ -651,6 +651,71 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
 }
 
 /**
+ * extend an grouptool navigation settings
+ *
+ * @param settings_navigation $settings
+ * @param navigation_node $navref
+ * @return void
+ */
+function grouptool_extend_settings_navigation(settings_navigation $settings, navigation_node $navref) {
+    global $DB;
+
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $navref->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('backup', $keys);
+    if ($i === false and array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
+    $cm = $settings->get_page()->cm;
+    if (!$cm) {
+        return;
+    }
+
+    $context = $cm->context;
+    $course = $settings->get_page()->course;
+
+    if (!$course) {
+        return;
+    }
+
+    if (has_capability('mod/grouptool:view_groups', $settings->get_page()->cm->context)) {
+        $url = new moodle_url('/group/index.php', ['id' => $course->id]);
+
+        $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_viewmoodlegroups');
+        $node->forceintomoremenu = true;
+        $navref->add_node($node, $beforekey);
+    }
+    if (has_capability('mod/grouptool:view_groups', $settings->get_page()->cm->context)) {
+        $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
+        $node = navigation_node::create(get_string('report', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_report');
+        $node->forceintomoremenu = true;
+        $navref->add_node($node, $beforekey);
+    }
+
+/*    if (has_capability('mod/assign:revealidentities', $context)) {
+        $dbparams = array('id'=>$cm->instance);
+        $assignment = $DB->get_record('assign', $dbparams, 'blindmarking, revealidentities');
+
+        if ($assignment && $assignment->blindmarking && !$assignment->revealidentities) {
+            $urlparams = array('id' => $cm->id, 'action'=>'revealidentities');
+            $url = new moodle_url('/mod/assign/view.php', $urlparams);
+            $linkname = get_string('revealidentities', 'assign');
+            $node = $navref->add($linkname, $url, navigation_node::TYPE_SETTING);
+        }
+    }
+*/
+}
+
+/**
  * displays if submission was early enough or late...
  *
  * @param int $timesubmitted

@@ -509,6 +509,7 @@ $string['registration_period_end'] = 'End of registration for';
 $string['registration_period_start'] = 'Begin of registration for';
 $string['rename_failed'] = 'Rename failed!';
 $string['renamed_group'] = 'Renamed group!';
+$string['report'] = 'Grouptool report';
 $string['reset_agrps'] = 'Reset active groups';
 $string['reset_agrps_help'] = 'Resets all course groups to be inactive for grouptools. This will also delete every registration and queue in grouptools of this course!';
 $string['reset_registrations'] = 'Reset registrations';
