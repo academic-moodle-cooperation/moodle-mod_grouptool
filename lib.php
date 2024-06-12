@@ -593,12 +593,21 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
+    $more_node = $navref->find('moremenu', global_navigation::TYPE_CUSTOM);
     if (has_capability('mod/grouptool:view_groups', $context)) {
         $url = new moodle_url('/group/index.php', ['id' => $course->id]);
 
         $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_grouptool_viewmoodlegroups');
+        $navref->add_node($node);
+    }
+    if (has_capability('mod/grouptool:view_groups', $context)) {
+        $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
+
+        $node = navigation_node::create(get_string('report', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_report');
         $navref->add_node($node);
     }
 

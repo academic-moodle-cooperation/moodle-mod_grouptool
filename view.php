@@ -248,15 +248,6 @@ if (empty($cm->uservisible)) {
 }
 
 $context = context_course::instance($course->id);
-if (has_capability('moodle/course:managegroups', $context)) {
-    // Print link to moodle groups!
-    $url = new moodle_url('/group/index.php', ['id' => $course->id]);
-    $grpslnk = html_writer::link($url,
-                                 get_string('viewmoodlegroups', 'grouptool'));
-    $outputcache .= html_writer::tag('div', $grpslnk, ['class' => 'moodlegrpslnk']);
-    $outputcache .= html_writer::tag('div', '', ['class' => 'clearer']);
-}
-
 $PAGE->url->param('tab', $SESSION->mod_grouptool->currenttab);
 $tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
 
