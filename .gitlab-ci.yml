@@ -37,7 +37,7 @@ variables:
     - failed report
   parallel:
     matrix:
-      - MOODLE_BRANCH: [ "MOODLE_403_STABLE" ]
+      - MOODLE_BRANCH: [ "MOODLE_404_STABLE" ]
         PHP_VERSION: [ "8.0", "8.1", "8.2"]
 
 test:postgres:
