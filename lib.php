@@ -593,7 +593,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
-    $more_node = $navref->find('moremenu', global_navigation::TYPE_CUSTOM);
     if (has_capability('mod/grouptool:view_groups', $context)) {
         $url = new moodle_url('/group/index.php', ['id' => $course->id]);
 
@@ -683,7 +682,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         return;
     }
 
-    if (has_capability('mod/grouptool:view_groups', $settings->get_page()->cm->context)) {
+    if (has_capability('moodle/course:managegroups', $context)) {
         $url = new moodle_url('/group/index.php', ['id' => $course->id]);
 
         $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
@@ -692,7 +691,8 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $node->forceintomoremenu = true;
         $navref->add_node($node, $beforekey);
     }
-    if (has_capability('mod/grouptool:view_groups', $settings->get_page()->cm->context)) {
+    $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
+    if (!is_null($reportplugins['grouptool']) && has_capability('mod/grouptool:view_regs_course_view', $context)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('report', 'grouptool'),
             $url,
@@ -700,19 +700,6 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $node->forceintomoremenu = true;
         $navref->add_node($node, $beforekey);
     }
-
-/*    if (has_capability('mod/assign:revealidentities', $context)) {
-        $dbparams = array('id'=>$cm->instance);
-        $assignment = $DB->get_record('assign', $dbparams, 'blindmarking, revealidentities');
-
-        if ($assignment && $assignment->blindmarking && !$assignment->revealidentities) {
-            $urlparams = array('id' => $cm->id, 'action'=>'revealidentities');
-            $url = new moodle_url('/mod/assign/view.php', $urlparams);
-            $linkname = get_string('revealidentities', 'assign');
-            $node = $navref->add($linkname, $url, navigation_node::TYPE_SETTING);
-        }
-    }
-*/
 }
 
 /**
