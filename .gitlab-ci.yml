@@ -31,7 +31,7 @@ variables:
     - moodle-plugin-ci grunt || true
     - moodle-plugin-ci phpdoc
     - moodle-plugin-ci phpunit
-    - moodle-plugin-ci behat --profile chrome || true
+    - moodle-plugin-ci behat --profile chrome
     - failed result
   after_script:
     - failed report
