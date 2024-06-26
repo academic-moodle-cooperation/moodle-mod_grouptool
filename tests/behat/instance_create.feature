@@ -20,7 +20,8 @@ Feature: In a course, a teacher should be able to add a new grouptool
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I turn editing mode on
-    When I add a "Grouptool" to section "2" and I complete the form with:
+    When I add a "Grouptool" to the course
+    And I set the following fields to these values:
       | Grouptool name | Add a grouptool to the current course |
       | Description | Add a grouptool to the current course (Description) |
     And I log out
