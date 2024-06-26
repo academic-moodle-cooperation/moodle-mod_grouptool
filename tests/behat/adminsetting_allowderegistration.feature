@@ -24,9 +24,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I turn editing mode on
-    And I add a "Grouptool" activity to section "1" and I fill the form with:
+    And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - Yes |
       | ID number | Test grouptool name - Yes |
       | Description | Add a grouptool to the current course |
@@ -47,9 +45,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I turn editing mode on
-    And I add a "Grouptool" activity to section "1" and I fill the form with:
+    And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - No |
       | ID number | Test grouptool name - No |
       | Description | Add a grouptool to the current course |
