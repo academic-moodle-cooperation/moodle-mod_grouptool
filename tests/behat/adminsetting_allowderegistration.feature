@@ -28,7 +28,6 @@ Feature: Within a moodle instance, an administrator should be able to set the va
       | Grouptool name | Test grouptool name - Yes |
       | ID number | Test grouptool name - Yes |
       | Description | Add a grouptool to the current course |
-    And I turn editing mode off
     When I am on the "Test grouptool name - Yes" Activity page logged in as admin
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
@@ -49,6 +48,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
       | Grouptool name | Test grouptool name - No |
       | ID number | Test grouptool name - No |
       | Description | Add a grouptool to the current course |
+    And I press "Save changes"
     When I am on the "Test grouptool name - No" Activity page logged in as admin
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
