@@ -48,7 +48,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
       | Grouptool name | Test grouptool name - No |
       | ID number | Test grouptool name - No |
       | Description | Add a grouptool to the current course |
-    And I press "Save changes"
+    And I press "Save and return to course"
     When I am on the "Test grouptool name - No" Activity page logged in as admin
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
