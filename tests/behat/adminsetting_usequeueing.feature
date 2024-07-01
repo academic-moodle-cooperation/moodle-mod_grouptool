@@ -23,13 +23,15 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I set the field "Use queueing" to "1"
     And I press "Save changes"
     And I log out
-    When I log in as "teacher1"
+    And I log in as "teacher1"
     And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - Yes |
       | ID number | Test grouptool name - Yes |
       | Description | Add a grouptool to the current course |
     And I press "Save and display"
-    And I am on the "Test grouptool name - Yes" Activity page logged in as admin
+    And I log out
+    When I log in as "admin"
+    And I am on the "Test grouptool name - Yes" Activity page
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Use queues" matches value "1"
