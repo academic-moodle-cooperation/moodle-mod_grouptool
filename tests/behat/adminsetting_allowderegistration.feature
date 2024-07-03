@@ -50,7 +50,6 @@ Feature: Within a moodle instance, an administrator should be able to set the va
       | Description | Add a grouptool to the current course |
     And I log out
     And I am on the "Test grouptool name - No" "grouptool activity" page logged in as admin
-    And I log out
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Allow deregistration" matches value "No"
