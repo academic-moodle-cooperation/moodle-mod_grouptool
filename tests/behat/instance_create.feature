@@ -27,3 +27,4 @@ Feature: In a course, a teacher should be able to add a new grouptool
     And I follow "Add a grouptool to the current course"
     And I expand all fieldsets
     Then I should see "Add a grouptool to the current course (Description)"
+    Then I log out

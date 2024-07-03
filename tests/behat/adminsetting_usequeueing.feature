@@ -29,7 +29,7 @@ Feature: Within a moodle instance, an administrator should be able to set the va
       | ID number | Test grouptool name - Yes |
       | Description | Add a grouptool to the current course |
     And I log out
-    When I am on the "Test grouptool name - No" "grouptool activity" page logged in as admin
+    When I am on the "Test grouptool name - Yes" "grouptool activity" page logged in as admin
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Use queues" matches value "1"
@@ -53,4 +53,4 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Use queues" matches value ""
-    Then I log iut
+    Then I log out

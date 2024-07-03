@@ -23,17 +23,15 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I turn editing mode on
-    And I add a "Grouptool" to section "1" and I fill the form with:
+    And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - No |
       | ID number | Test grouptool name - No |
       | Description | Add a grouptool to the current course |
-    When I am on the "Test grouptool name - No" Activity page logged in as admin
+    And I log out
+    When I am on the "Test grouptool name - No" "grouptool activity" page logged in as admin
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "No"
-
     Then I log out
 
   @javascript
@@ -44,17 +42,15 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I turn editing mode on
-    And I add a "Grouptool" to section "1" and I fill the form with:
+    And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
       | Grouptool name | Test grouptool name - All - after due date |
       | ID number | Test grouptool name - All - after due date |
       | Description | Add a grouptool to the current course |
-    When I am on the "Test grouptool name - All - after due date" Activity page logged in as admin
+    And I log out
+    When I am on the "Test grouptool name - All - after due date" "grouptool activity" page logged in as admin
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     Then the field "Show group members" matches value "All - after due date"
-
     Then I log out
 
   @javascript
