@@ -657,7 +657,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
  * @return void
  */
 function grouptool_extend_settings_navigation(settings_navigation $settings, navigation_node $navref) {
-    global $DB;
+    global $DB, $CFG;
 
     // We want to add these new nodes after the Edit settings node, and before the
     // Locally assigned roles node. Of course, both of those are controlled by capabilities.
@@ -693,7 +693,13 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     }
 
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
-    if (!is_null($reportplugins['grouptool']) && has_capability('mod/grouptool:view_regs_course_view', $context)) {
+    try{
+        $reportgrouptoolversion = $reportplugins['grouptool'];
+    }catch (Exception $ex){
+        $reportgrouptoolversion = null;
+    }
+
+    if (is_null($reportgrouptoolversion)&&has_capability('mod/grouptool:view_regs_course_view', $context)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('report', 'grouptool'),
             $url,
