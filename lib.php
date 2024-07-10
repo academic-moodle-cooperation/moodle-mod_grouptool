@@ -691,7 +691,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $node->forceintomoremenu = true;
         $navref->add_node($node, $beforekey);
     }
-    /*
+
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
     if (!is_null($reportplugins['grouptool']) && has_capability('mod/grouptool:view_regs_course_view', $context)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
@@ -701,7 +701,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $node->forceintomoremenu = true;
         $navref->add_node($node, $beforekey);
     }
-    */
+    
 }
 
 /**
