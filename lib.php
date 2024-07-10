@@ -593,6 +593,22 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
+    if (has_capability('mod/grouptool:view_groups', $context)) {
+        $url = new moodle_url('/group/index.php', ['id' => $course->id]);
+
+        $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_viewmoodlegroups');
+        $navref->add_node($node);
+    }
+    if (has_capability('mod/grouptool:view_groups', $context)) {
+        $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
+
+        $node = navigation_node::create(get_string('report', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_report');
+        $navref->add_node($node);
+    }
 
     if ($creategrps || $creategrpgs || $admingrps) {
         if ($creategrps && ($admingrps || $creategrpgs)) {
@@ -631,6 +647,66 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     }
 
     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
+}
+
+/**
+ * extend an grouptool navigation settings
+ *
+ * @param settings_navigation $settings
+ * @param navigation_node $navref
+ * @return void
+ */
+function grouptool_extend_settings_navigation(settings_navigation $settings, navigation_node $navref) {
+    global $DB, $CFG;
+
+    // We want to add these new nodes after the Edit settings node, and before the
+    // Locally assigned roles node. Of course, both of those are controlled by capabilities.
+    $keys = $navref->get_children_key_list();
+    $beforekey = null;
+    $i = array_search('backup', $keys);
+    if ($i === false && array_key_exists(0, $keys)) {
+        $beforekey = $keys[0];
+    } else if (array_key_exists($i + 1, $keys)) {
+        $beforekey = $keys[$i + 1];
+    }
+
+    $cm = $settings->get_page()->cm;
+    if (!$cm) {
+        return;
+    }
+
+    $context = $cm->context;
+    $course = $settings->get_page()->course;
+
+    if (!$course) {
+        return;
+    }
+
+    if (has_capability('moodle/course:managegroups', $context)) {
+        $url = new moodle_url('/group/index.php', ['id' => $course->id]);
+
+        $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_viewmoodlegroups');
+        $node->forceintomoremenu = true;
+        $navref->add_node($node, $beforekey);
+    }
+
+    $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
+    try {
+        $reportgrouptoolversion = $reportplugins['grouptool'];
+    } catch (Exception $ex) {
+        $reportgrouptoolversion = null;
+    }
+
+    if (is_null($reportgrouptoolversion) && has_capability('mod/grouptool:view_regs_course_view', $context)) {
+        $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
+        $node = navigation_node::create(get_string('report', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_report');
+        $node->forceintomoremenu = true;
+        $navref->add_node($node, $beforekey);
+    }
 }
 
 /**

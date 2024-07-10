@@ -1,8 +1,10 @@
 CHANGELOG
 ========
 
-4.4.0 (2024-05-22)
+4.4.0 (2024-07-10)
 ------------------
+* [FEATURE] #7624 Link to "moodle groups" in more menu
+* [FEATURE] #7623 Link to new plugin "grouptool report" in more menu
 * [CHANGED] #7932 New activity logo
 * [FEATURE] #7622 New MVP Navstructure
 
