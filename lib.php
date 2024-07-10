@@ -701,7 +701,6 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $node->forceintomoremenu = true;
         $navref->add_node($node, $beforekey);
     }
-    
 }
 
 /**
