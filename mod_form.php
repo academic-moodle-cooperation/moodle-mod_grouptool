@@ -380,15 +380,11 @@ class mod_grouptool_mod_form extends moodleform_mod {
      * @param array $defaultvalues passed by reference
      */
     public function data_preprocessing(&$defaultvalues) {
-        if (array_key_exists('users_queues_limit', $defaultvalues) && ($defaultvalues['users_queues_limit'] > 0)) {
-            $defaultvalues['limit_users_queues'] = 1;
-        } else {
-            $defaultvalues['limit_users_queues'] = 0;
+        if (array_key_exists('users_queues_limit', $defaultvalues)) {
+            $defaultvalues['limit_users_queues'] = $defaultvalues['users_queues_limit'] > 0 ? 1 : 0;
         }
-        if (array_key_exists('groups_queues_limit', $defaultvalues) && ($defaultvalues['groups_queues_limit'] > 0)) {
-            $defaultvalues['limit_groups_queues'] = 1;
-        } else {
-            $defaultvalues['limit_groups_queues'] = 0;
+        if (array_key_exists('groups_queues_limit', $defaultvalues)) {
+            $defaultvalues['limit_groups_queues'] = $defaultvalues['groups_queues_limit'] > 0 ? 1 : 0;
         }
 
         parent::data_preprocessing($defaultvalues);
