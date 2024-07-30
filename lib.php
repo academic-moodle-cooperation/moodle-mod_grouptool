@@ -693,13 +693,14 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     }
 
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
+
     try {
         $reportgrouptoolversion = $reportplugins['grouptool'];
     } catch (Exception $ex) {
         $reportgrouptoolversion = null;
     }
 
-    if (is_null($reportgrouptoolversion) && has_capability('mod/grouptool:view_regs_course_view', $context)) {
+    if (!is_null($reportgrouptoolversion) && has_capability('mod/grouptool:view_regs_course_view', $context)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('report', 'grouptool'),
             $url,
