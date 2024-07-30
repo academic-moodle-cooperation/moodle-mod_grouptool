@@ -444,7 +444,7 @@
 }
 
 .path-mod-grouptool .col-form-label {
-    padding-top: 0 !important;
+    padding-top: 0;
 }
 
 .path-mod-grouptool #group-message-button {
