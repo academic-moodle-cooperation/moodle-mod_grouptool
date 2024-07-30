@@ -1,7 +1,7 @@
 CHANGELOG
 ========
 
-4.4.0 (2024-07-10)
+4.4.0 (2024-07-30)
 ------------------
 * [FEATURE] #7624 Link to "moodle groups" in more menu
 * [FEATURE] #7623 Link to new plugin "grouptool report" in more menu
