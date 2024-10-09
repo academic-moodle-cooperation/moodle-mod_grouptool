@@ -33,7 +33,8 @@
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @author    Hannes Laimer
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Anne Kreppenhofer
+ * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -147,6 +148,7 @@ if ($creategrps || $creategrpgs || $admingrps) {
                                                                        false);
     }
 }
+
 if (has_capability('mod/grouptool:register_students', $context)
         || has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_own_registration', $context)
@@ -192,6 +194,8 @@ if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
                                   get_string('users_tab_alt', 'grouptool'),
                                   false);
 }
+
+
 
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
@@ -293,6 +297,10 @@ switch ($tab) {
         break;
     case 'overview':
         $instance->view_overview();
+        $node = $PAGE->navigation->find('mod_grouptool_registration',navigation_node::TYPE_SETTING);
+        echo '<pre>';print_r($node);echo "</pre>\n\n";
+        die(__LINE__.' '.__FILE__);
+        $node->make_active();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');

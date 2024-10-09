@@ -584,6 +584,7 @@ function grouptool_get_extra_capabilities() {
  * @throws moodle_exception
  */
 function grouptool_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
+
     if ($course->id != $module->course) {
         // Just so PHPMD won't complain about $course being here ;) These have to be equal all the time!
         return;
@@ -646,7 +647,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         $navref->add(get_string('users_tab', 'grouptool'), $url);
     }
 
-    $navref->nodetype = navigation_node::NODETYPE_BRANCH;
+     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
 }
 
 /**
@@ -663,7 +664,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     // Locally assigned roles node. Of course, both of those are controlled by capabilities.
     $keys = $navref->get_children_key_list();
     $beforekey = null;
-    $i = array_search('backup', $keys);
+    $i = array_search('Settings', $keys);
     if ($i === false && array_key_exists(0, $keys)) {
         $beforekey = $keys[0];
     } else if (array_key_exists($i + 1, $keys)) {
@@ -674,14 +675,29 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     if (!$cm) {
         return;
     }
-
     $context = $cm->context;
     $course = $settings->get_page()->course;
 
     if (!$course) {
         return;
     }
+    if (has_capability('moodle/course:managegroups', $context)) {
+       $url = new moodle_url('/mod/grouptool/view.php', ['id' => $course->id, 'tab' => 'group_admin']);
+       $node = navigation_node::create(get_string('administration', 'grouptool'),
+                $url,
+           navigation_node::TYPE_SETTING, null, 'mod_grouptool_administration');
+       $navref->add_node($node);
+    }
+    if (has_capability('moodle/course:managegroups', $context)) {
+        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $course->id, 'tab' => 'overview']);
+        $node = navigation_node::create(get_string('registrations', 'grouptool'),
+            $url,
+            navigation_node::TYPE_SETTING, null, 'mod_grouptool_registration');
+        $navref->add_node($node);
 
+    }
+
+    // Add "viewmoodlegroups" to more menu
     if (has_capability('moodle/course:managegroups', $context)) {
         $url = new moodle_url('/group/index.php', ['id' => $course->id]);
 
@@ -689,9 +705,10 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_grouptool_viewmoodlegroups');
         $node->forceintomoremenu = true;
-        $navref->add_node($node, $beforekey);
+        $navref->add_node($node);
     }
 
+    // Add "report grouptool" to more menu
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
 
     try {
@@ -706,7 +723,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_grouptool_report');
         $node->forceintomoremenu = true;
-        $navref->add_node($node, $beforekey);
+        $navref->add_node($node);
     }
 }
 
