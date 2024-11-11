@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+global $SESSION, $OUTPUT;
 
 /**
  * Displays a particular instance of mod_grouptool
@@ -20,15 +21,11 @@
  * Shows different tabs according to users capabilities
  * |-- administration: tools for creating groups, groupings
  * |                   and to choose for this instance active groups
- * |-- grading: tool to copy grades from one groupmember to either
- * |                   *) all others (for 1 or more groups) or
- * |                   *) selected others (only available for 1 group at a time)
  * |-- registration: tool to either import students into groups as teacher or register
  * |                 to a group by oneself as student if this is activated for the particular
  * |                 instance
  * |-- overview:     overview over the active coursegroups
  * |                 as well as the registered and queued students
- * |-- userlist:     view/export lists of students including their registrations
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
@@ -92,6 +89,7 @@ $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 // Print tabs according to users capabilities!
+
 $inactive = [];
 $tabs = [];
 $row = [];
@@ -202,12 +200,15 @@ if (!isset($SESSION->mod_grouptool)) {
 }
 
 // We won't iterate recursively over it right now, if we'll get more levels, we'll have to!
+
 $availabletabs = array_keys($row);
 foreach ($availabletabs as $cur) {
     if (!empty($row[$cur]->subtree)) {
         $availabletabs = array_merge($availabletabs, array_keys($row[$cur]->subtree));
     }
 }
+
+
 
 $modinfo = get_fast_modinfo($course);
 $cm = $modinfo->get_cm($cm->id);
@@ -274,13 +275,29 @@ $event->trigger();
 
 if ($tab != 'selfregistration') {
     // Output starts here!
-    echo $OUTPUT->header();
-    echo $outputcache;
+
 }
 
 switch ($tab) {
     case 'group_admin':
+        // Update nav fitting to right menu point
+        $node = $PAGE->secondarynav->find_active_node();
+        $node->make_inactive();
+        $node2 = $PAGE->secondarynav->find("mod_grouptool_administration",navigation_node::TYPE_SETTING);
+        $node2->make_active();
+        echo $OUTPUT->header();
+        echo $outputcache;
         $instance->view_administration();
+        break;
+    case 'overview':
+        // Update nav fitting to right menu point
+        $node = $PAGE->secondarynav->find_active_node();
+        $node->make_inactive();
+        $node2 = $PAGE->secondarynav->find("mod_grouptool_registration",navigation_node::TYPE_SETTING);
+        $node2->make_active();
+        echo $OUTPUT->header();
+        echo $outputcache;
+        $instance->view_overview();
         break;
     case 'group_creation':
         $instance->view_creation();
@@ -294,13 +311,6 @@ switch ($tab) {
         break;
     case 'unregister':
         $instance->view_unregister();
-        break;
-    case 'overview':
-        $instance->view_overview();
-        $node = $PAGE->navigation->find('mod_grouptool_registration',navigation_node::TYPE_SETTING);
-        echo '<pre>';print_r($node);echo "</pre>\n\n";
-        die(__LINE__.' '.__FILE__);
-        $node->make_active();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
