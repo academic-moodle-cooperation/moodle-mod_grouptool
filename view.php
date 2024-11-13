@@ -176,7 +176,7 @@ if ($node) {
             $node2 = $PAGE->secondarynav->find("mod_grouptool_registration", navigation_node::TYPE_SETTING);
             break;
         default:
-           $node2 = false;
+            $node2 = false;
     }
     if($node2){
         $node2->make_active();
