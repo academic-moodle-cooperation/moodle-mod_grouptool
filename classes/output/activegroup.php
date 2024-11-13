@@ -56,6 +56,18 @@ class activegroup {
     /** @var bool $selected active groups selection status (selected or not) */
     public $selected;
 
+    /** @var bool  */
+    public $checked = false;
+
+    /** @var \moodle_url url to edit this group*/
+    public $editurl = null;
+
+    /** @var array  */
+    public $groupingid = [];
+
+    /** @var bool  true if the status of the group is missing*/
+    public $missing = false;
+
     /**
      * Constructor for activegroup
      *
