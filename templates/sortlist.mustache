@@ -87,7 +87,7 @@
                     </th>
                     <th>{{#str}} move, core{{/str}}{{#movehelpicon}}{{>core/help_icon}}{{/movehelpicon}}</th>
                     <th>{{#str}} name, core {{/str}}</th>
-                    <th>{{#str}} size, core {{/str}}{{#sizehelpicon}}{{>core/help_icon}}{{/sizehelpicon}}</th>
+                    {{#usesize}}<th>{{#str}} size, core {{/str}}{{#sizehelpicon}}{{>core/help_icon}}{{/sizehelpicon}}</th>{{/usesize}}
                     <th>{{#str}} groupstatus, mod_grouptool {{/str}}{{#statushelpicon}}{{>core/help_icon}}{{/statushelpicon}}</th>
                     <th>{{#str}} settings, core {{/str}}</th>
                     <th>{{#str}} delete, core {{/str}}</th>

@@ -1181,13 +1181,15 @@ class mod_grouptool {
                 self::FILTER_ALL => get_string('all'),
             ];
         }
+
         $param = optional_param('filter', self::FILTER_ALL, PARAM_INT);
         $filerselect = new single_select($url, 'filter', $options, $param, false);
 
 
         $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_creation');
         $button = $OUTPUT->single_button($url, get_string('group_creation', 'grouptool'));
-
+        echo $OUTPUT->heading(get_string('administration', 'mod_grouptool'));
+        echo "<br>";
         echo html_writer::start_tag("div", ["class" => "container"]);
         echo html_writer::start_tag("div", ["class" =>"row align-items-start"]);
         echo html_writer::start_tag("div", ["class" =>"col-md-4"]);
@@ -1199,8 +1201,7 @@ class mod_grouptool {
         echo html_writer::end_tag("div" );
         echo html_writer::end_tag("div" );
         echo html_writer::end_tag("div" );
-
-
+        echo "<br>";
         $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
         $selected = optional_param_array('selected', [], PARAM_INT);
         $dialog = false;
@@ -1464,13 +1465,14 @@ class mod_grouptool {
                 $actions['delete'] = get_string('delete');
             }
             $actions['grouping'] = get_string('createinsertgrouping', 'grouptool');
-
+            // Add the bulk action form on the left side of the page.
             $grp = [];
             $grp[] =& $mform->createElement('static', 'with_selection', '', get_string('with_selection',
                 'grouptool'));
             $grp[] =& $mform->createElement('select', 'bulkaction', '', $actions);
             $grp[] =& $mform->createElement('submit', 'start_bulkaction', get_string('start',
                 'grouptool'));
+            $mform->addElement('html', '<br>');
             $mform->addGroup($grp, 'actiongrp', '', ' ', false);
             $mform->disable_form_change_checker();
 

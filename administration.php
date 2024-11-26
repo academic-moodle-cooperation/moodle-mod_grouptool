@@ -134,8 +134,8 @@ if ($node2) {
     $node2->make_active();
 }
 $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course,$context);
-
-echo $OUTPUT->header();
+$header = $OUTPUT->header();
+echo $header;
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
 switch ($tab) {
