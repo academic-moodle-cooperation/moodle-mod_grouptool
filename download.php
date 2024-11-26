@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+global $CFG, $DB, $PAGE, $OUTPUT;
 
 /**
  * Handles download of userview and course overview in various formats
@@ -29,11 +30,12 @@ require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
 $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
+$grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 $context = context_module::instance($cmid);
 $PAGE->set_context($context);
 $url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', ['id' => $cmid]);
 $PAGE->set_url($url);
-$instance = new mod_grouptool($cmid);
+$instance = new mod_grouptool($cmid, $grouptool, $cm, $context );
 
 require_login($cm->course, true, $cm);
 require_capability('mod/grouptool:export', $context);

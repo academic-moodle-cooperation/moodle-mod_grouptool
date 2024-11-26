@@ -24,6 +24,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use JetBrains\PhpStorm\NoReturn;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
@@ -101,11 +103,13 @@ class mod_grouptool {
      * @param stdClass $grouptool usually null, but if we have it we pass it to save db access
      * @param stdClass $cm usually null, but if we have it we pass it to save db access
      * @param stdClass $course usually null, but if we have it we pass it to save db access
+     * @param context_module $context
      * @throws \coding_exception
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function __construct($cmid, $grouptool = null, $cm = null, $course = null) {
+    public function __construct($cmid, $grouptool , $cm , $course, $context = null ) {
+        global $DB;
         global $DB;
 
         if ($cmid == 'staticonly') {
@@ -115,26 +119,30 @@ class mod_grouptool {
 
         if (!empty($cm)) {
             $this->cm = $cm;
-        } else if (!$this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
+        } else if (! $this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
             print_error('invalidcoursemodule');
         }
-        $this->context = context_module::instance($this->cm->id);
+        if($context){
+            $this->context = $context;
+        } else{
+            $context = context_module::instance($cmid);
+        }
 
         if ($course) {
             $this->course = $course;
-        } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
+        } else if (! $this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
             print_error('invalidid', 'grouptool');
         }
 
         if ($grouptool) {
             $this->grouptool = $grouptool;
-        } else if (!$this->grouptool = $DB->get_record('grouptool',
+        } else if (! $this->grouptool = $DB->get_record('grouptool',
             ['id' => $this->cm->instance])) {
             print_error('invalidid', 'grouptool');
         }
 
         $this->grouptool->cmidnumber = $this->cm->idnumber;
-        $this->grouptool->course = $this->course->id;
+        $this->grouptool->course   = $this->course->id;
 
         /*
          * visibility handled by require_login() with $cm parameter
@@ -167,26 +175,6 @@ class mod_grouptool {
      */
     public function get_reg_settings() {
         return [$this->grouptool->allow_multiple, $this->grouptool->choose_min, $this->grouptool->choose_max];
-    }
-
-    /**
-     * Translates top level tabs.
-     *
-     * @param tabobject[] $tabs
-     * @param string|null $tab
-     */
-    public static function translate_top_level_tabs(array $tabs, string $tab = null) {
-        global $SESSION;
-
-        // Now translate, if there's a top level tab chosen, which has just child-tabs!
-        switch ($tab) {
-            case 'administration':
-                if (!empty($tabs[$tab]->subtree)) {
-                    $tab = key($tabs[$tab]->subtree);
-                    $SESSION->mod_grouptool->currenttab = $tab;
-                }
-                break;
-        }
     }
 
     /**
@@ -344,7 +332,6 @@ class mod_grouptool {
 
     /**
      *  Adds all missin agrp-entries for this instance!
-     * TODO ANNE agrp? active groups?
      *
      * @throws coding_exception
      * @throws dml_exception
@@ -355,6 +342,7 @@ class mod_grouptool {
         // Get all course's group-IDs!
         $groupids = groups_get_all_groups($this->course->id, 0, 0, 'g.id');
         $groupids = array_keys($groupids);
+
         // Get all group-IDs which have active group entries!
         $ok = $DB->get_fieldset_select('grouptool_agrps', "DISTINCT groupid", "grouptoolid = ?", [$this->grouptool->id]);
         $missing = array_diff($groupids, $ok);
@@ -401,7 +389,7 @@ class mod_grouptool {
             $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp, true);
         } else {
             /* This is also the case if eventhandlers work properly
-             * because group gets allready created in eventhandler
+             * because group gets already created in eventhandler
              */
             $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
             if ($this->grouptool->allow_reg == true) {
@@ -767,7 +755,7 @@ class mod_grouptool {
      * @param int $grouping -1 => create new grouping,
      *                       0 => no grouping,
      *                      >0 => assign groups to grouping with that id
-     * @param string $groupingname optional name for created grouping
+     * @param string|null $groupingname optional name for created grouping
      * @param bool $previewonly optional only show preview of created groups
      * @param int $enablegroupmessaging optional enable messaging within group (default: no)
      * @return array ( 0 => error, 1 => message )
@@ -776,8 +764,8 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    private function create_one_person_groups($users, $namescheme = "[idnumber]", $grouping = 0, $groupingname = null,
-                                              $previewonly = false, $enablegroupmessaging = 0) {
+    private function create_one_person_groups(array $users, string $namescheme = "[idnumber]", int $grouping = 0, string $groupingname = null,
+                                              bool  $previewonly = false, int $enablegroupmessaging = 0): array {
         global $DB, $USER;
 
         require_capability('mod/grouptool:create_groups', $this->context);
@@ -1172,14 +1160,8 @@ class mod_grouptool {
 
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
-        // Get applicable roles!
-        $rolenames = [];
-        if ($roles = get_profile_roles($context)) {
-            foreach ($roles as $role) {
-                $rolenames[$role->id] = strip_tags(role_get_name($role, $context));
-            }
-        }
 
+        // Get applicable roles!
         $filter = optional_param('filter', null, PARAM_INT);
         if ($filter !== null) {
             set_user_preference('mod_grouptool_group_filter', $filter, $USER->id);
@@ -1187,26 +1169,37 @@ class mod_grouptool {
             $filter = get_user_preferences('mod_grouptool_group_filter', self::FILTER_ACTIVE, $USER->id);
         }
 
-        $inactivetabs = [];
+        // Adds Filter Selector
+        static $options = null;
 
-        $filtertabs['active'] = new tabobject(self::FILTER_ACTIVE,
-            $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id .
-            '&amp;tab=group_admin&filter=' . self::FILTER_ACTIVE,
-            get_string('active', 'grouptool'),
-            '',
-            false);
-        $filtertabs['inactive'] = new tabobject(self::FILTER_INACTIVE,
-            $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id .
-            '&amp;tab=group_admin&filter=' . self::FILTER_INACTIVE,
-            get_string('inactive'),
-            '',
-            false);
-        $filtertabs['all'] = new tabobject(self::FILTER_ALL,
-            $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id .
-            '&amp;tab=group_admin&filter=' . self::FILTER_ALL,
-            get_string('all'),
-            '',
-            false);
+
+        $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&amp;tab=group_admin');
+        if (!$options) {
+            $options = [
+                self::FILTER_ACTIVE => get_string('active', 'grouptool'),
+                self::FILTER_INACTIVE => get_string('inactive'),
+                self::FILTER_ALL => get_string('all'),
+            ];
+        }
+        $param = optional_param('filter', self::FILTER_ALL, PARAM_INT);
+        $filerselect = new single_select($url, 'filter', $options, $param, false);
+
+
+        $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_creation');
+        $button = $OUTPUT->single_button($url, get_string('group_creation', 'grouptool'));
+
+        echo html_writer::start_tag("div", ["class" => "container"]);
+        echo html_writer::start_tag("div", ["class" =>"row align-items-start"]);
+        echo html_writer::start_tag("div", ["class" =>"col-md-4"]);
+        echo $OUTPUT->render($filerselect);
+        echo html_writer::end_tag("div" );
+        echo html_writer::start_tag("div", ["class" => "col-md-4 offset-md-4"]);
+        echo html_writer::start_tag("div", ["class" =>"float-right"]);
+        echo $button;
+        echo html_writer::end_tag("div" );
+        echo html_writer::end_tag("div" );
+        echo html_writer::end_tag("div" );
+
 
         $bulkaction = optional_param('bulkaction', null, PARAM_ALPHA);
         $selected = optional_param_array('selected', [], PARAM_INT);
@@ -1309,7 +1302,7 @@ class mod_grouptool {
                             }
                         }
                         // ...redirect to show sortlist again!
-                        $url = new moodle_url('/mod/grouptool/view.php', [
+                        $url = new moodle_url('/mod/grouptool/administration.php', [
                             'id' => $this->cm->id,
                             'tab' => 'group_admin',
                             'filter' => $filter,
@@ -1322,11 +1315,6 @@ class mod_grouptool {
                     }
                     break;
             }
-        }
-
-        if (!$dialog) {
-            echo html_writer::tag('div', $OUTPUT->tabtree($filtertabs, $filter, $inactivetabs),
-                ['id' => 'filtertabs']);
         }
 
         // Check if everything has been confirmed, so we can finally start working!
@@ -1452,7 +1440,7 @@ class mod_grouptool {
 
         if (!$dialog || !optional_param('start_bulkaction', 0, PARAM_BOOL)) {
             // Show form!
-            $formaction = new moodle_url('/mod/grouptool/view.php', [
+            $formaction = new moodle_url('/mod/grouptool/administration.php', [
                 'id' => $this->cm->id,
                 'tab' => 'group_admin',
                 'filter' => $filter,
@@ -1463,8 +1451,6 @@ class mod_grouptool {
             $mform->setDefault('sesskey', sesskey());
 
             $sortlist = new \mod_grouptool\output\sortlist($this->course->id, $this->cm, $filter);
-            $sortlistcontroller = new \mod_grouptool\output\sortlist_controller($sortlist);
-            $mform->addElement('html', $output->render($sortlistcontroller));
             $mform->addElement('html', $output->render($sortlist));
 
             $actions = [
@@ -1521,11 +1507,11 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function view_creation() {
-        global $SESSION, $OUTPUT;
+        global $SESSION, $OUTPUT, $DB;
 
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
-        // Get applicable roles!
+
         $rolenames = [];
         if ($roles = get_profile_roles($context)) {
             foreach ($roles as $role) {
@@ -1873,9 +1859,9 @@ class mod_grouptool {
                     'groupid = ?',
                     [$group->id]);
                 if (!empty($groupingids)) {
-                    $groupdata[$key]->classes = implode(',', $groupingids);
+                    $group->classes = implode(',', $groupingids);
                 } else {
-                    $groupdata[$key]->classes = '';
+                    $group->classes = '';
                 }
             }
 
@@ -3203,10 +3189,6 @@ class mod_grouptool {
                 unset($users[$key]);
             }
         }
-        $groupinfo = [];
-        foreach ($groups as $group) {
-            $groupinfo[$group] = groups_get_group($group);
-        }
 
         $unregistered = [];
 
@@ -3850,9 +3832,9 @@ class mod_grouptool {
                 $notfull = empty($this->grouptool->groups_queues_limit)
                     || (count($groupdata->queued) < $this->grouptool->groups_queues_limit);
                 if (count($groupdata->registered) < $groupdata->grpsize) {
-                    $marks[$id]->type = 'reg';
+                    $cur->type = 'reg';
                 } else if ($this->grouptool->use_queue && $notfull) {
-                    $marks[$id]->type = 'queue';
+                    $cur->type = 'queue';
                 } else {
                     // Place occupied in the meanwhile, must look for another group!
                     $info = new stdClass();
@@ -5381,7 +5363,7 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_overview_pdf($groupid = 0, $groupingid = 0, $includeinactive = false) {
+    #[NoReturn] public function download_overview_pdf($groupid = 0, $groupingid = 0, $includeinactive = false) {
         $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);

@@ -88,6 +88,10 @@ class renderer extends \plugin_renderer_base {
         $url = new \moodle_url('/course/modedit.php', ['update' => $sortlist->cm->id, 'return' => 1]);
         $context->courseediturl = $url->out();
         $statushelpicon = new \help_icon('groupstatus', 'grouptool');
+        $movehelpicon = new \help_icon('move', 'grouptool');
+        $sizehelpicon = new \help_icon('size','grouptool');
+        $context->sizehelpicon = $sizehelpicon->export_for_template($this->output);
+        $context->movehelpicon = $movehelpicon->export_for_template($this->output);
         $context->statushelpicon = $statushelpicon->export_for_template($this->output);
         $context->groups = array_values($sortlist->groups);
 

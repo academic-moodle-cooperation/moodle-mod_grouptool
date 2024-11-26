@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+global $OUTPUT, $DB;
 
 /**
  * Non-AJAX-Version of showing group's members. Fallback for JS using showmembers_ajax.php
@@ -39,13 +40,15 @@ $coursecontext = context_course::instance($grouptool->course);
 $PAGE->set_context($coursecontext);
 
 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course);
+$course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
+
 $context = context_module::instance($cm->id);
 
 require_login($cm->course, true, $cm);
 
 echo $OUTPUT->header();
 
-$grouptool = new mod_grouptool($cm->id, $grouptool, $cm);
+$grouptool = new mod_grouptool($cm->id, $grouptool, $cm,$course,$context);
 
 if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     && !has_capability('mod/grouptool:view_regs_course_view', $context)

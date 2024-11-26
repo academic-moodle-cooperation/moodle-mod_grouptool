@@ -203,7 +203,10 @@ function grouptool_update_instance(stdClass $grouptool) {
     // Register students if immediate registration has been turned on!
     if ($grouptool->immediate_reg) {
         require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-        $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
+        $cmid = $grouptool->coursemodule;
+        $cm = get_coursemodule_from_id('grouptool', $cmid);
+        $course = $DB->get_record('course', ['id' => $cm->course]);
+        $instance = new mod_grouptool($cmid, $grouptool, $cm, $course);
         $instance->push_registrations();
     }
 
@@ -846,14 +849,17 @@ function grouptool_print_overview($courses, &$htmlarray) {
  * @throws moodle_exception
  */
 function grouptool_get_user_reg_details($grouptool, $context) {
-    global $USER;
+    global $USER, $DB;
 
     $details = '';
     if (has_capability('mod/grouptool:register', $context)
         || has_capability('mod/grouptool:view_regs_course_view', $context)
         || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         // It's similar to the student mymoodle output!
-        $instance = new mod_grouptool($grouptool->coursemodule, $grouptool);
+        $cmid = $grouptool->coursemodule;
+        $cm = get_coursemodule_from_id('grouptool', $cmid);
+        $course = $DB->get_record('course', ['id' => $cm->course]);
+        $instance = new mod_grouptool($grouptool->coursemodule, $grouptool, $cm, $course, $context);
         $userstats = $instance->get_registration_stats($USER->id);
     } else {
         return '';
@@ -1059,14 +1065,16 @@ function grouptool_reset_course_form_defaults() {
  * @throws moodle_exception
  */
 function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
-    global $CFG;
+    global $CFG, $DB;
 
     require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
     $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
     $context = context_module::instance($cm->id);
+    $course = $DB->get_record('course', ['id' => $cm->course]);
+    $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $grouptool = new mod_grouptool($cm->id, null, $cm, null);
+    $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
     $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
             $context);
@@ -1098,14 +1106,16 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
  * @throws moodle_exception
  */
 function mod_grouptool_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
-    global $CFG, $USER;
+    global $CFG, $USER, $DB;
 
     require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
     $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
     $context = context_module::instance($cm->id);
+    $course = $DB->get_record('course', ['id' => $cm->course]);
+    $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $grouptool = new mod_grouptool($cm->id, null, $cm, null);
+    $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course,$context);
 
     $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
             $context);

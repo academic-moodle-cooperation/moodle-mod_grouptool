@@ -79,7 +79,7 @@ $PAGE->set_activity_record($grouptool);
 $PAGE->add_body_class('mediumwidth');
 
 
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course);
+$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
 // Cache output so header can be generated after new completion infos are avaliable
 $outputcache = '';
