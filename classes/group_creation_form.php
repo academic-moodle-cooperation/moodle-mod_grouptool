@@ -219,11 +219,11 @@ class group_creation_form extends \moodleform {
 
             $tags = [];
             foreach (\mod_grouptool::NAME_TAGS as $tag) {
-                $tags[] = html_writer::tag('span', $tag, ['class' => 'nametag', 'data-nametag' => $tag]);
+                $tags[] = html_writer::tag('button', $tag, ['type' => 'button','class' => 'btm btn-secondary nametag', 'data-nametag' => $tag]);
             }
 
             $naminggrp = [];
-            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', ['size' => '64']);
+            $naminggrp[] =& $mform->createElement('text', 'namingscheme', '', ['size' => '32']);
             $naminggrp[] =& $mform->createElement('static', 'tags', '', implode("", $tags));
             $namingstd = get_config('mod_grouptool', 'name_scheme');
             $namingstd = (!empty($namingstd) ? $namingstd : get_string('group', 'group').' #');
@@ -305,7 +305,10 @@ class group_creation_form extends \moodleform {
                 [0 => get_string('no'), 1 => get_string('yes')]);
             $mform->addHelpButton('enablegroupmessaging', 'enablemessaging', 'group');
 
-            $mform->addElement('submit', 'createGroups', get_string('createGroups', 'grouptool'));
+            $buttonarray=[];
+            $buttonarray[] = $mform->createElement('submit', 'createGroups', get_string('preview', 'grouptool'));
+            $buttonarray[] = $mform->createElement('cancel');
+            $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
         }
     }
 

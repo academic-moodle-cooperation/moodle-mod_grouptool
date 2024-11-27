@@ -191,6 +191,7 @@ if ($tab != 'selfregistration') {
 
 switch ($tab) {
     case 'default':
+        $instance->view_starting_page();
         break;
     case 'group_admin':
         $instance->view_administration();

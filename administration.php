@@ -138,6 +138,11 @@ $header = $OUTPUT->header();
 echo $header;
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
+if(!$tab) {
+    if(!$SESSION->mod_grouptool->view_administration){
+        $tab = 'administration';
+    }
+}
 switch ($tab) {
     case 'group_creation':
         $instance->view_creation();
