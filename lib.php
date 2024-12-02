@@ -671,7 +671,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
 
     // Add "Administation" to menu
     if ($admingrps) {
-        $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $course->id, 'tab' => 'group_admin']);
+        $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
         $node = navigation_node::create(get_string('administration', 'grouptool'),
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_grouptool_administration');
@@ -680,7 +680,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
 
     // Add "Registrations" to menu
     if ($viewreggv) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $course->id, 'tab' => 'overview']);
+        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
         $node = navigation_node::create(get_string('registrations', 'grouptool'),
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_grouptool_registration');
