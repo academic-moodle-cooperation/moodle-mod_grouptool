@@ -148,12 +148,20 @@ class sortlist implements \renderable {
                 $groups[] = $group->id;
             }
             list($grpssql, $params) = $DB->get_in_or_equal($groups);
-
+            $grouping = '';
+            $groupingwhere = '';
             if ($this->filter == \mod_grouptool::FILTER_ACTIVE) {
                 $activefilter = ' AND active = 1 ';
             } else if ($this->filter == \mod_grouptool::FILTER_INACTIVE) {
                 $activefilter = ' AND active = 0 ';
-            } else {
+            } else if ($this->filter == \mod_grouptool::FILTER_ALL) {
+                $activefilter = '';
+            }else if ($this->filter > 10){
+                $activefilter = '';
+                $grouping = 'LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id';
+                $groupingwhere = ' AND {groupings_groups}.groupingid = '.$this->filter-10;
+            }else{
+                $grouping = '';
                 $activefilter = '';
             }
             if (!is_object($cm)) {
@@ -167,8 +175,8 @@ class sortlist implements \renderable {
                            MAX(agrp.active) AS status
                       FROM {groups} grp
                  LEFT JOIN {grouptool_agrps} agrp
-                           ON agrp.groupid = grp.id AND agrp.grouptoolid = ?
-                     WHERE grp.id ".$grpssql.$activefilter."
+                           ON agrp.groupid = grp.id AND agrp.grouptoolid = ?".$grouping."
+                     WHERE grp.id ".$grpssql.$activefilter.$groupingwhere."
                   GROUP BY grp.id
                   ORDER BY status DESC, sort_order ASC, name ASC", $params);
 
