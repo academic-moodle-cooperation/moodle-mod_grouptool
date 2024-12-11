@@ -133,13 +133,13 @@ $node2 = $PAGE->secondarynav->find("mod_grouptool_administration", navigation_no
 if ($node2) {
     $node2->make_active();
 }
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course,$context);
+$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 $header = $OUTPUT->header();
 echo $header;
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
-if(!$tab) {
-    if(!$SESSION->mod_grouptool->view_administration){
+if (!$tab) {
+    if (!$SESSION->mod_grouptool->view_administration) {
         $tab = 'administration';
     }
 }

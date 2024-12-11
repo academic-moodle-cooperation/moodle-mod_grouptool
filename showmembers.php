@@ -25,8 +25,8 @@ global $OUTPUT, $DB;
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->libdir .'/grouplib.php');
-require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+require_once($CFG->libdir . '/grouplib.php');
+require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
 
@@ -48,17 +48,17 @@ require_login($cm->course, true, $cm);
 
 echo $OUTPUT->header();
 
-$grouptool = new mod_grouptool($cm->id, $grouptool, $cm,$course,$context);
+$grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
 if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     && !has_capability('mod/grouptool:view_regs_course_view', $context)
     && !$grouptool->canshowmembers($agrpid)) {
     echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
-                          ['class' => 'reg']);
+        ['class' => 'reg']);
 } else {
 
     $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context)
-                    || has_capability('mod/grouptool:view_regs_course_view', $context);
+        || has_capability('mod/grouptool:view_regs_course_view', $context);
 
     $group = $grouptool->get_active_groups(true, true, $agrpid);
     $group = current($group);
@@ -92,7 +92,7 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     $context = new stdClass();
     $context->courseid = $cm->course;
     $context->showidnumber = $showidnumber;
-    $context->profileurl = $CFG->wwwroot . '/user/view.php?course='.$cm->course.'&id=';
+    $context->profileurl = $CFG->wwwroot . '/user/view.php?course=' . $cm->course . '&id=';
     $helpicon = new help_icon('status', 'mod_grouptool');
     $context->statushelp = $helpicon->export_for_template($OUTPUT);
     $context->name = $group->name;
@@ -100,9 +100,9 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     // Cache needed user records right now!
     $userfields = \core_user\fields::for_name()->get_sql();
     if ($showidnumber) {
-        $fields = "id,idnumber".$userfields;
+        $fields = "id,idnumber" . $userfields;
     } else {
-        $fields = "id".$userfields;
+        $fields = "id" . $userfields;
     }
     $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
 
@@ -111,9 +111,9 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
         foreach ($absregs as $cur) {
             // These user records are fully fetched in $group->moodle_members!
             $context->absregs[] = [
-                    'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
-                    'fullname' => fullname($group->moodle_members[$cur]),
-                    'id'       => $cur,
+                'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                'fullname' => fullname($group->moodle_members[$cur]),
+                'id' => $cur,
             ];
         }
     }
@@ -122,9 +122,9 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     if (!empty($gtregs)) {
         foreach ($gtregs as $cur) {
             $context->gtregs[] = [
-                    'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
-                    'fullname' => fullname($users[$cur]),
-                    'id'       => $cur,
+                'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                'fullname' => fullname($users[$cur]),
+                'id' => $cur,
             ];
         }
     }
@@ -133,9 +133,9 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
     if (!empty($mdlregs)) {
         foreach ($mdlregs as $cur) {
             $context->mregs[] = [
-                    'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
-                    'fullname' => fullname($group->moodle_members[$cur]),
-                    'id'       => $cur,
+                'idnumber' => $showidnumber ? $group->moodle_members[$cur]->idnumber : '',
+                'fullname' => fullname($group->moodle_members[$cur]),
+                'id' => $cur,
             ];
         }
     }
@@ -145,10 +145,10 @@ if (!has_capability('mod/grouptool:view_regs_group_view', $context)
         $queuedlist = $DB->get_records('grouptool_queued', ['agrpid' => $group->agrpid], 'timestamp ASC');
         foreach ($queued as $cur) {
             $context->queued[] = [
-                    'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
-                    'fullname' => fullname($users[$cur]),
-                    'id'       => $cur,
-                    'rank'     => $this->get_rank_in_queue($queuedlist, $cur),
+                'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
+                'fullname' => fullname($users[$cur]),
+                'id' => $cur,
+                'rank' => $this->get_rank_in_queue($queuedlist, $cur),
             ];
         }
     }

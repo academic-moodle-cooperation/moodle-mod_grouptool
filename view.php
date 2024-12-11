@@ -112,7 +112,7 @@ if (empty($cm->uservisible)) {
     $tab = optional_param('tab', null, PARAM_ALPHAEXT);
     if ($tab) {
         $SESSION->mod_grouptool->currenttab = $tab;
-    }else{
+    } else {
         $SESSION->mod_grouptool->currenttab = 'default';
     }
 
@@ -130,7 +130,7 @@ if (empty($cm->uservisible)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
-}else if (has_capability('mod/grouptool:register_students', $context)
+} else if (has_capability('mod/grouptool:register_students', $context)
     || has_capability('mod/grouptool:register', $context)) {
     $SESSION->mod_grouptool->currenttab = 'selfregistration';
 } else {
@@ -162,7 +162,7 @@ $node = $PAGE->secondarynav->find_active_node();
 if ($node) {
     $node->make_inactive();
 
-    switch ($tab){
+    switch ($tab) {
         case 'default':
         case 'selfregistration':
         case 'noaccess':
@@ -181,7 +181,7 @@ if ($node) {
         default:
             $node2 = false;
     }
-    if($node2){
+    if ($node2) {
         $node2->make_active();
     }
 }

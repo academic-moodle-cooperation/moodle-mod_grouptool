@@ -1115,7 +1115,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $course = $DB->get_record('course', ['id' => $cm->course]);
     $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course,$context);
+    $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
     $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
             $context);

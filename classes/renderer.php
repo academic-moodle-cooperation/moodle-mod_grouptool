@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\output;
 
 use html_writer;
@@ -77,8 +78,8 @@ class renderer extends \plugin_renderer_base {
                 $sortlist->groups[$id]->grouppix = $pictureout;
             }
             $sortlist->groups[$id]->editurl = new \moodle_url('/group/group.php', [
-                    'courseid' => $this->page->course->id,
-                    'id' => $id,
+                'courseid' => $this->page->course->id,
+                'id' => $id,
             ]);
         }
 
@@ -89,7 +90,7 @@ class renderer extends \plugin_renderer_base {
         $context->courseediturl = $url->out();
         $statushelpicon = new \help_icon('groupstatus', 'grouptool');
         $movehelpicon = new \help_icon('move', 'grouptool');
-        $sizehelpicon = new \help_icon('size','grouptool');
+        $sizehelpicon = new \help_icon('size', 'grouptool');
         $context->sizehelpicon = $sizehelpicon->export_for_template($this->output);
         $context->movehelpicon = $movehelpicon->export_for_template($this->output);
         $context->statushelpicon = $statushelpicon->export_for_template($this->output);
@@ -120,22 +121,22 @@ class renderer extends \plugin_renderer_base {
         switch ($sortlist->filter) {
             case \mod_grouptool::FILTER_ACTIVE:
                 $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
-                $message = get_string('nogroupsactive', 'grouptool').' '.
-                           \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                $message = get_string('nogroupsactive', 'grouptool') . ' ' .
+                    \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_INACTIVE:
                 $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
-                $message = get_string('nogroupsinactive', 'grouptool').' '.
-                           \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
+                $message = get_string('nogroupsinactive', 'grouptool') . ' ' .
+                    \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_ALL:
                 $url = new \moodle_url($this->page->url, ['tab' => 'group_creation']);
-                $message = get_string('nogroups', 'grouptool').' '.
-                           \html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
+                $message = get_string('nogroups', 'grouptool') . ' ' .
+                    \html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
                 break;
             default:
                 $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
-                $message = get_string('nogroupsgrouping', 'grouptool').' '.
+                $message = get_string('nogroupsgrouping', 'grouptool') . ' ' .
                     \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
         }
         return $this->output->box($this->output->notification($message, 'info'), 'generalbox', 'nogroupsinfo');

@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\output;
 
 defined('MOODLE_INTERNAL') || die();
@@ -65,7 +66,7 @@ class sortlist implements \renderable {
      * @throws \coding_exception
      * @throws \dml_exception
      */
-    public function __construct($courseid, $cm, $filter=null) {
+    public function __construct($courseid, $cm, $filter = null) {
         global $SESSION, $DB, $OUTPUT;
 
         $this->filter = $filter;
@@ -156,11 +157,11 @@ class sortlist implements \renderable {
                 $activefilter = ' AND active = 0 ';
             } else if ($this->filter == \mod_grouptool::FILTER_ALL) {
                 $activefilter = '';
-            }else if ($this->filter > 10){
+            } else if ($this->filter > 10) {
                 $activefilter = '';
                 $grouping = 'LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id';
-                $groupingwhere = ' AND {groupings_groups}.groupingid = '.$this->filter-10;
-            }else{
+                $groupingwhere = ' AND {groupings_groups}.groupingid = ' . $this->filter - 10;
+            } else {
                 $grouping = '';
                 $activefilter = '';
             }
@@ -175,8 +176,8 @@ class sortlist implements \renderable {
                            MAX(agrp.active) AS status
                       FROM {groups} grp
                  LEFT JOIN {grouptool_agrps} agrp
-                           ON agrp.groupid = grp.id AND agrp.grouptoolid = ?".$grouping."
-                     WHERE grp.id ".$grpssql.$activefilter.$groupingwhere."
+                           ON agrp.groupid = grp.id AND agrp.grouptoolid = ?" . $grouping . "
+                     WHERE grp.id " . $grpssql . $activefilter . $groupingwhere . "
                   GROUP BY grp.id
                   ORDER BY status DESC, sort_order ASC, name ASC", $params);
 
@@ -195,7 +196,7 @@ class sortlist implements \renderable {
                                                       FROM {groupings_groups}
                                                  LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
                                                      WHERE {groupings}.courseid = ? AND {groupings_groups}.groupid = ?",
-                                                                        [$courseid, $group->groupid]);
+                    [$courseid, $group->groupid]);
             }
         }
 
@@ -204,7 +205,7 @@ class sortlist implements \renderable {
 
             foreach ($groupdata as $key => $group) {
                 if ($grouptool->use_size && (($groupdata[$key]->size == null))) {
-                    $groupdata[$key]->size = $this->globalgrpsize.'*';
+                    $groupdata[$key]->size = $this->globalgrpsize . '*';
                 }
 
                 // Convert to activegroup object!
@@ -253,7 +254,7 @@ class sortlist implements \renderable {
             return;
         }
 
-        if ($this->groupings == null || count($this->groupings) == 0 ) {
+        if ($this->groupings == null || count($this->groupings) == 0) {
             return;
         }
 
