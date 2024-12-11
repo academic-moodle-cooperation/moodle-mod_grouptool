@@ -130,6 +130,9 @@ if (empty($cm->uservisible)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
+}else if (has_capability('mod/grouptool:register_students', $context)
+    || has_capability('mod/grouptool:register', $context)) {
+    $SESSION->mod_grouptool->currenttab = 'selfregistration';
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
     $tab = 'noaccess';
