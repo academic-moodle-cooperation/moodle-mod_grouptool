@@ -119,12 +119,12 @@ class renderer extends \plugin_renderer_base {
 
         switch ($sortlist->filter) {
             case \mod_grouptool::FILTER_ACTIVE:
-                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL]);
+                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
                 $message = get_string('nogroupsactive', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
             case \mod_grouptool::FILTER_INACTIVE:
-                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL]);
+                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
                 $message = get_string('nogroupsinactive', 'grouptool').' '.
                            \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
@@ -134,7 +134,9 @@ class renderer extends \plugin_renderer_base {
                            \html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
                 break;
             default:
-                $message = var_dump($sortlist->filter);
+                $url = new \moodle_url($this->page->url, ['filter' => \mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
+                $message = get_string('nogroupsgrouping', 'grouptool').' '.
+                    \html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
         }
         return $this->output->box($this->output->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
     }
