@@ -1,0 +1,89 @@
+{{!
+    This file is part of mod_grouptool for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    TODO - Add description
+    @template mod_grouptool/sortlist
+
+    Grouptool's sortlist template.
+
+    The purpose of this template is to display the sortlist.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * usesize - whether or not size is used
+    * pageurl - URL to grouptool's view.php
+    * courseediturl - URL to course edit page
+    * statushelpicon statushelpicon displayed besides title
+    * options Array with groupingids & grouping names
+
+    Example context (json):
+    {
+        "usesize": true,
+        "pageurl": "https://example.com/mod/grouptool/view.php?id=1",
+        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1",
+        "statushelpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
+    }
+}}
+<div class="mod_grouptool_starting_page conatiner">
+    <div class="buttons row align-items-start">
+        <div class="px-3">
+            <a href="{{buttonadministratelink}}" class="btn btn-secondary" type="button">{{#str}}group_administration, mod_grouptool{{/str}}</a>
+        </div>
+        <div class="px-3">
+            <a href="{{buttonpreviewlink}}" class="btn btn-secondary" type ="button">{{#str}}selfregistration, mod_grouptool{{/str}}</a>
+        </div>
+    </div>
+    <br>
+    <div class="genaral_information row align-items-start">
+        <div class="px-3">
+            <h2>{{#str}}general_information, mod_grouptool{{/str}}</h2>
+        </div>
+    </div>
+    <div class="row align-items-start">
+            <table class="table table-bordered ">
+                <tr>
+                    <td>{{#str}}registration_details, mod_grouptool{{/str}}</td>
+                    <td>{{&registrationdetails}}</td>
+                </tr>
+                <tr>
+                    <td>{{#str}}group_places, mod_grouptool{{/str}}</td>
+                    <td>{{groupplacedetails}}</td>
+                </tr>
+                {{#queueing}}
+                <tr>
+                    <td>{{#str}}queue_places, mod_grouptool{{/str}}</td>
+                    <td>{{queueplacedetails}}</td>
+                </tr>
+                {{/queueing}}
+                <tr>
+                    <td>{{#str}}number_of_students, mod_grouptool{{/str}}</td>
+                    <td>{{numberofusers}}</td>
+                </tr>
+                {{#registrations}}
+                <tr>
+                    <td>{{#str}}registrations, mod_grouptool{{/str}}</td>
+                    <td>{{&detailsregistration}}</td>
+                </tr>
+                {{/registrations}}
+            </table>
+</div>
+
