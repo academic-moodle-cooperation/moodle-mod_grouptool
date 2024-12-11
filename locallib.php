@@ -1173,7 +1173,6 @@ class mod_grouptool {
         // Adds Filter Selector
         static $options = null;
 
-
         $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&amp;tab=group_admin');
         if (!$options) {
             $options = [
@@ -1189,7 +1188,6 @@ class mod_grouptool {
 
         $param = optional_param('filter', null, PARAM_INT);
         $filerselect = new single_select($url, 'filter', $options, $param);
-
 
         $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_creation');
         $button = $OUTPUT->single_button($url, get_string('group_creation', 'grouptool'));
@@ -1466,7 +1464,7 @@ class mod_grouptool {
             ];
             if (!($this->grouptool->ifgroupdeleted === GROUPTOOL_RECREATE_GROUP)
                 && !$DB->record_exists('grouptool', ['course' => $this->cm->course,
-                    'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP,])) {
+                    'ifgroupdeleted' => GROUPTOOL_RECREATE_GROUP, ])) {
                 $actions['delete'] = get_string('delete');
             }
             $actions['grouping'] = get_string('createinsertgrouping', 'grouptool');
@@ -1500,7 +1498,7 @@ class mod_grouptool {
                 'filter' => $curfilter,
                 'filterall' => GROUPTOOL_FILTER_ALL,
                 'globalsize' => $this->grouptool->grpsize,
-                'usesize' => (bool)$this->grouptool->use_size,];
+                'usesize' => (bool)$this->grouptool->use_size, ];
             $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', $params);
         }
     }
@@ -2078,7 +2076,6 @@ class mod_grouptool {
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid, 0,
             0, true, true, $ignoregtinstance);
-
 
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
@@ -2681,7 +2678,6 @@ class mod_grouptool {
         }
     }
 
-
     /**
      * Allocates a place in the group. Used in case there are not enough registrations by now.
      *
@@ -3077,7 +3073,6 @@ class mod_grouptool {
                                        WHERE modified_by >= 0 AND userid = ? AND agrpid ' . $sql, $params);
     }
 
-
     /**
      * checks the found userdata, and return error rows if no user was found or multiple were fund
      * @param array $userinfo data that was found
@@ -3469,7 +3464,6 @@ class mod_grouptool {
             $registrations = false;
         }
 
-
         $templatename = 'mod_grouptool/startingpage';
         $data = [
             'buttonadministratelink' => $CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_admin',
@@ -3484,10 +3478,7 @@ class mod_grouptool {
         ];
 
         echo $OUTPUT->render_from_template($templatename, $data);
-
-
     }
-
 
     /**
      * helperfunction compares to objects using a particular timestamp-property
@@ -4503,7 +4494,7 @@ class mod_grouptool {
                             } catch (\mod_grouptool\local\exception\notenoughregs $e) {
                                 /* The user has not enough registrations, queue entries or marks,
                                  * so we try to mark the user! (Exceptions get handled above!) */
-                                list($queued,) = $this->can_be_marked($group->agrpid, $USER->id, $message);
+                                list($queued, ) = $this->can_be_marked($group->agrpid, $USER->id, $message);
                                 if (!$queued && has_capability('mod/grouptool:register', $this->context)) {
                                     // Register button!
                                     $label = get_string('register', 'grouptool');

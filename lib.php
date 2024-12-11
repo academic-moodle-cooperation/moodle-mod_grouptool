@@ -805,7 +805,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
                 $attrib['class'] = 'dimmed';
             }
-            list($cc,) = grouptool_display_lateness(time(), $grouptool->timedue);
+            list($cc, ) = grouptool_display_lateness(time(), $grouptool->timedue);
             $str .= html_writer::tag('div', $strgrouptool . ': ' .
                 html_writer::tag('a', $grouptool->name, $attrib),
                 ['class' => 'name']);
@@ -865,7 +865,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         return '';
     }
 
-    list($colorclass,) = grouptool_display_lateness(time(), $grouptool->timedue);
+    list($colorclass, ) = grouptool_display_lateness(time(), $grouptool->timedue);
 
     if (has_capability('mod/grouptool:register', $context)) {
         if ($grouptool->allow_reg) {
@@ -917,7 +917,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
             if (count($userstats->queued)) {
                 $tempstr = "";
                 foreach ($userstats->queued as $queue) {
-                    list($colorclass,) = grouptool_display_lateness($queue->timestamp,
+                    list($colorclass, ) = grouptool_display_lateness($queue->timestamp,
                         $grouptool->timedue);
                     if ($tempstr != "") {
                         $tempstr .= ", ";
@@ -1132,7 +1132,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 
     if (!$managesregs && has_capability('mod/grouptool:register', $context)) {
         $userstats = $grouptool->get_registration_stats($USER->id);
-        list($allowmultiple, $choosemin,) = $grouptool->get_reg_settings();
+        list($allowmultiple, $choosemin, ) = $grouptool->get_reg_settings();
         if ($allowmultiple) {
             $itemcount = ($choosemin - count($userstats->registered));
             $label = get_string(($itemcount > 1) ? 'register' : 'register', 'grouptool');

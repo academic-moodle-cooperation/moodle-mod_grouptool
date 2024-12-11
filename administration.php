@@ -71,11 +71,6 @@ const SHOW_OWN_GROUPMEMBERS_AFTER_REG = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_RE
  */
 const SHOW_GROUPMEMBERS = GROUPTOOL_SHOW_GROUPMEMBERS;
 
-// TODO fix all TODOs in this file
-// TODO Delete all this, from methods or find a better way to use the old class
-// TODO file clean up
-// TODO WIP
-
 // Do we get course_module ID?
 $id = optional_param('id', 0, PARAM_INT);
 // Or do we get grouptool instance ID?
@@ -117,6 +112,8 @@ $creategrps = has_capability('mod/grouptool:create_groups', $context);
 $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
+
+
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
 }
@@ -138,14 +135,17 @@ $header = $OUTPUT->header();
 echo $header;
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
-if (!$tab) {
-    if (!$SESSION->mod_grouptool->view_administration) {
-        $tab = 'administration';
-    }
+if(!($creategrps || $creategrpgs || $admingrps)) {
+    $SESSION->mod_grouptool->currenttab = 'noaccess';
+    $tab = 'noaccess';
 }
 switch ($tab) {
     case 'group_creation':
         $instance->view_creation();
+        break;
+    case 'noaccess':
+        $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
+        echo $OUTPUT->box($notification, 'generalbox centered');
         break;
     default:
         $instance->view_administration();
