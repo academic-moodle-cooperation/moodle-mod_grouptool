@@ -1197,6 +1197,10 @@ class mod_grouptool
                 self::FILTER_ALL => get_string('all'),
             ];
         }
+        $groupings = groups_get_all_groupings($this->course->id);
+        foreach ($groupings as $grouping) {
+            $options[$grouping->id + 10] = $grouping->name;
+        }
 
         $param = optional_param('filter', null, PARAM_INT);
         $filerselect = new single_select($url, 'filter', $options, $param);
@@ -1526,7 +1530,7 @@ class mod_grouptool
      */
     public function view_creation()
     {
-        global $SESSION, $OUTPUT, $DB,$PAGE;
+        global $SESSION, $OUTPUT, $DB, $PAGE;
 
         $id = $this->cm->id;
         $context = context_course::instance($this->course->id);
@@ -1639,6 +1643,7 @@ class mod_grouptool
         if ($mform->is_cancelled()) {
             // Go back to the administration tab!
             unset($SESSION->grouptool->view_administration);
+            $this->view_administration();
         } else if ($fromform = $mform->get_data()) {
             require_capability('mod/grouptool:create_groups', $this->context);
             // Save submitted data in session and show confirmation dialog!
@@ -2093,6 +2098,8 @@ class mod_grouptool
         }
         $groupdata = $this->get_active_groups(true, true, $agrpid, 0,
             0, true, true, $ignoregtinstance);
+
+
         if (count($groupdata) != 1) {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
@@ -3433,9 +3440,92 @@ class mod_grouptool
 
     public function view_starting_page()
     {
-        global $OUTPUT, $DB, $USER;
+        global $OUTPUT, $DB, $USER, $CFG;
+        // TODO add caoabilities
+        $id = $this->cm->id;
+        $registrationdetail = "";
+        if (property_exists($this->grouptool, "allow_reg") && $this->grouptool->allow_reg == 1) {
+            if ($registrationdetail != "") {
+                $registrationdetail .= " <br> ";
+            }
+            $registrationdetail .= get_string('cfg_allow_reg', 'grouptool');
+        }
+        if (property_exists($this->grouptool, "allow_unreg") && $this->grouptool->allow_unreg == 1) {
+            if ($registrationdetail != "") {
+                $registrationdetail .= " <br> ";
+            }
+            $registrationdetail .= get_string('cfg_allow_unreg', 'grouptool');
+        }
+        if (property_exists($this->grouptool, "allow_mutltiple") && $this->grouptool->allow_mutltiple == 1) {
+            if ($registrationdetail != "") {
+                $registrationdetail .= " <br> ";
+            }
+            $registrationdetail .= get_string('cfg_allow_multiple', 'grouptool');
+        }
+        $regstats = $this->get_registration_stats($USER->id);
+        $countactivegroups = count($this->get_active_groups());
+        $groupplacedetails = $countactivegroups . " " . get_string('groups') . " / " . $regstats->group_places . " " . get_string('places', 'grouptool');
+        if ($countactivegroups < 1) {
+            $groupplacedetails = get_string('no_active_groups', 'grouptool');
+        }
+        if (property_exists($this->grouptool, "use_queue") && $this->grouptool->use_queue == 1) {
+            $queuing = true;
+        } else {
+            $queuing = false;
+        }
+        $queueplacedetails = '';
+        if ($queuing) {
+            $queueplacedetails = get_string("active") . " / " . $regstats->queued_users . " " . get_string('places', 'grouptool');
+        }
+        $numberofusers = $regstats->users . " " . get_string('users');
+        $detailsregistration = '';
 
-        echo "TEST";
+        // TODO if regstration is open
+        $registrations = false;
+
+        if (!empty($this->grouptool->timeavailable) && (time() >= $this->grouptool->timeavailable)) {
+            $registrations = true;
+            // Show how many are registered
+            if ($regstats->reg_users > 0) {
+                $detailsregistration = $regstats->reg_users . " " . get_string('registered', 'grouptool');
+            }
+            // if queuses are enabled show how many are in a queue
+            if ($queuing) {
+                if ($regstats->queued_users > 0) {
+                    if ($detailsregistration != "") {
+                        $detailsregistration .= " <br> ";
+                    }
+                    $detailsregistration .= $regstats->queued_users . " " . get_string('queued', 'grouptool');
+                }
+            }
+            // show how many are not registered yet
+            if ($regstats->users > 0) {
+                if ($detailsregistration != "") {
+                    $detailsregistration .= " <br> ";
+                }
+                $detailsregistration .= get_string('registrations_missing', 'grouptool', $this->get_missing_registrations());
+            }
+        }
+        if ($detailsregistration == '') {
+            $registrations = false;
+        }
+
+
+        $templatename = 'mod_grouptool/startingpage';
+        $data = [
+            'buttonadministratelink' => $CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_admin',
+            'buttonpreviewlink' => $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&tab=selfregistration',
+            'queueing' => $queuing,
+            'registrations' => $registrations,
+            'registrationdetails' => $registrationdetail,
+            'groupplacedetails' => $groupplacedetails,
+            'queueplacedetails' => $queueplacedetails,
+            'numberofusers' => $numberofusers,
+            'detailsregistration' => $detailsregistration,
+        ];
+
+        echo $OUTPUT->render_from_template($templatename, $data);
+
 
     }
 
@@ -4078,6 +4168,7 @@ class mod_grouptool
 
         // Process submitted form!
         $error = false;
+
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed!
             $hideform = 0;
@@ -4115,6 +4206,7 @@ class mod_grouptool
             } else {
                 echo $OUTPUT->header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
             }
+
         } else if (data_submitted() && confirm_sesskey()) {
 
             // Display confirm-dialog!
