@@ -35,9 +35,13 @@ $context = context_module::instance($cmid);
 $PAGE->set_context($context);
 $url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', ['id' => $cmid]);
 $PAGE->set_url($url);
-$instance = new mod_grouptool($cmid, $grouptool, $cm, $context );
+$course = $DB->get_record('course', ['id' => $cm->course]);
+
+$instance = new mod_grouptool($cmid, $grouptool, $cm, $course, $context );
+
 
 require_login($cm->course, true, $cm);
+
 require_capability('mod/grouptool:export', $context);
 
 $groupingid = optional_param('groupingid', 0, PARAM_INT);
