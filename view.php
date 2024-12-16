@@ -45,6 +45,9 @@ if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab'])
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
+
+defined('MOODLE_INTERNAL') || die();
+
 // Do we get course_module ID?
 $id = optional_param('id', 0, PARAM_INT);
 // Or do we get grouptool instance ID?

@@ -35,6 +35,7 @@ require_once($CFG->libdir . '/gradelib.php');
 require_once($CFG->libdir . '/grade/grade_grade.php');
 require_once($CFG->libdir . '/pdflib.php');
 
+defined('MOODLE_INTERNAL') || die();
 const FILTER_ALL = 0;
 /**
  * filter active groups
@@ -113,7 +114,6 @@ $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
 
-
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
 }
@@ -135,7 +135,7 @@ $header = $OUTPUT->header();
 echo $header;
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
-if(!($creategrps || $creategrpgs || $admingrps)) {
+if (!($creategrps || $creategrpgs || $admingrps)) {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
     $tab = 'noaccess';
 }
