@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
 /**
  * Displays a particular instance of mod_grouptool
@@ -34,6 +33,7 @@ global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
  * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 // TODO split tabs in different PHP files and define it only when really needed (=import-tab , needed for progress bar)!
 // @codingStandardsIgnoreLine
 if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
@@ -45,8 +45,10 @@ if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab'])
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
-
 defined('MOODLE_INTERNAL') || die();
+
+global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
+
 
 // Do we get course_module ID?
 $id = optional_param('id', 0, PARAM_INT);
