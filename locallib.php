@@ -4224,7 +4224,7 @@ class mod_grouptool {
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
             $regstat = $this->get_registration_stats($USER->id);
-            if(has_capability('mod/grouptool:register_students', $this->context)){
+            if (has_capability('mod/grouptool:register_students', $this->context)) {
                 $mform->addElement('cancel', 'cancel', get_string('back'));
             }
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
@@ -6570,7 +6570,7 @@ class mod_grouptool {
                  * Out of sync? --> show button to get registrations from grouptool to moodle
                  * (just register not already registered persons and let the others be)
                  */
-                $url = new moodle_url($PAGE->url, ['tab' => 'overview','pushtomdl' => 1, 'sesskey' => sesskey()]);
+                $url = new moodle_url($PAGE->url, ['tab' => 'overview', 'pushtomdl' => 1, 'sesskey' => sesskey()]);
                 $button = new single_button($url, get_string('updatemdlgrps', 'grouptool'), 'post',
                     'primary');
                 echo $OUTPUT->box(html_writer::empty_tag('br') .
@@ -6603,7 +6603,7 @@ class mod_grouptool {
                     ['class' => 'centered grouptool_overview_filter']);
             $data = [
                 'containername' => 'grouptool_overview_filter',
-                'heading' => get_string('options' ),
+                'heading' => get_string('options'),
                 'content' => $select,
             ];
             $templatename = "grouptool/downloadoptions";
