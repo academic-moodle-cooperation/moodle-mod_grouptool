@@ -48,7 +48,7 @@ class groupings_created extends \core\event\base {
     /**
      * Convenience method to create the event object from course module object and the created groups ids
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param int[] $ids array of ids (integers)
      * @return \core\event\base event object
      * @throws \coding_exception

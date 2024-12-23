@@ -48,7 +48,7 @@ class user_imported extends \core\event\base {
     /**
      * Convenience method for user imports where registration in grouptool is forced
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param int $id grouptool id
      * @param int $agrp active group id
      * @param int $group group id
@@ -73,7 +73,7 @@ class user_imported extends \core\event\base {
     /**
      * Convenience method for user imports
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param int $group group id
      * @param int $user user id
      * @return \core\event\base event object

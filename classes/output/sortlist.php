@@ -61,7 +61,7 @@ class sortlist implements \renderable {
      * Constructor
      *
      * @param int $courseid ID of related course
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param int $filter optional current filter (active/inactive/all)
      * @throws \coding_exception
      * @throws \dml_exception

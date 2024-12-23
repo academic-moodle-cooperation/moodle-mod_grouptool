@@ -48,7 +48,7 @@ class agrps_updated extends \core\event\base {
     /**
      * Convenience method to create from course-module object
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @return \core\event\base event object
      * @throws \coding_exception
      */
@@ -63,7 +63,7 @@ class agrps_updated extends \core\event\base {
     /**
      * Convenience method to create from course-module object and form data
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param string $pattern pattern for group names
      * @param int $numgrps number of created groups
      * @param int|0 $groupingid optional id of grouping used for these groups (0 if not in grouping)

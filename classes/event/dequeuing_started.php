@@ -48,7 +48,7 @@ class dequeuing_started extends \core\event\base {
     /**
      * Convenience method to create the event object from the course module object
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @return \core\event\base event object
      * @throws \coding_exception
      */

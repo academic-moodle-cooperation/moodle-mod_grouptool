@@ -53,7 +53,7 @@ class user_moved extends \core\event\base {
     /**
      * Convenience method usable if user has been promoted/moved from the queue to regular registrations
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $from data from which queue entry the user has been moved
      * @param \stdClass $to data to which registration entry the user has been moved
      * @return \core\event\base event object
@@ -75,7 +75,7 @@ class user_moved extends \core\event\base {
     /**
      * Convenience method usable if user has been moved from one group to another
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $from data from which queue entry the user has been moved
      * @param \stdClass $to data to which registration entry the user has been moved
      * @return \core\event\base event object

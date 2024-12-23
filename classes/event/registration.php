@@ -49,7 +49,7 @@ abstract class registration extends \core\event\base {
     /**
      * Convenience method for events created via observer/eventhandler
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $regdata registration entries data
      * @return \core\event\base event object
      * @throws \coding_exception
@@ -67,7 +67,7 @@ abstract class registration extends \core\event\base {
     /**
      * Convenience method for events created via direct user action
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $regdata registration entries data
      * @return \core\event\base event object
      * @throws \coding_exception

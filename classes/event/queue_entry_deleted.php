@@ -48,7 +48,7 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted by observer/eventhandler
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
@@ -66,7 +66,7 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted i.e. because user has enough registrations
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
@@ -84,7 +84,7 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted by direct user action
      *
-     * @param \stdClass | \cm_info $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
