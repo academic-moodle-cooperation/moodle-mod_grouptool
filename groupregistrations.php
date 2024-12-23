@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
 /**
  * Displays a particular page of mod_grouptool
@@ -23,6 +22,7 @@ global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
  * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 // @codingStandardsIgnoreLine
 if (((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
     || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))) {
@@ -42,6 +42,8 @@ require_once($CFG->libdir . '/grade/grade_grade.php');
 require_once($CFG->libdir . '/pdflib.php');
 
 defined('MOODLE_INTERNAL') || die();
+
+global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
 
 // Do we get course_module ID?

@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-global $OUTPUT, $DB;
 
 /**
  * Non-AJAX-Version of showing group's members. Fallback for JS using showmembers_ajax.php
@@ -27,6 +26,8 @@ global $OUTPUT, $DB;
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/grouplib.php');
 require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+
+global $OUTPUT, $DB;
 
 $agrpid = required_param('agrpid', PARAM_INT);
 

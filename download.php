@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-global $CFG, $DB, $PAGE, $OUTPUT;
 
 /**
  * Handles download of userview and course overview in various formats
@@ -25,6 +24,8 @@ global $CFG, $DB, $PAGE, $OUTPUT;
  */
 
 require_once('../../config.php');
+
+global $CFG, $DB, $PAGE, $OUTPUT;
 
 require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 

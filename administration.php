@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
 /**
  * Displays a particular page of mod_grouptool
@@ -36,6 +35,9 @@ require_once($CFG->libdir . '/grade/grade_grade.php');
 require_once($CFG->libdir . '/pdflib.php');
 
 defined('MOODLE_INTERNAL') || die();
+
+global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
+
 const FILTER_ALL = 0;
 /**
  * filter active groups

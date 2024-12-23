@@ -356,7 +356,7 @@ class mod_grouptool {
             }
             if (!empty($added)) {
                 // Set them inactive!
-                list($addedsql, $addedparams) = $DB->get_in_or_equal($added);
+                [$addedsql, $addedparams] = $DB->get_in_or_equal($added);
                 $DB->set_field_select('grouptool_agrps', 'active', 0, "id " . $addedsql, $addedparams);
             }
         }
@@ -1214,7 +1214,7 @@ class mod_grouptool {
                     // Activate now!
                     $groups = optional_param_array('selected', null, PARAM_INT);
                     if (!empty($groups)) {
-                        list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
+                        [$grpsql, $grpparams] = $DB->get_in_or_equal($groups);
                         $DB->set_field_select("grouptool_agrps", "active", 1,
                             " grouptoolid = ? AND groupid " . $grpsql, array_merge([$this->cm->instance], $grpparams));
                     }
@@ -1225,7 +1225,7 @@ class mod_grouptool {
                     // Deactivate now!
                     $groups = optional_param_array('selected', null, PARAM_INT);
                     if (!empty($groups)) {
-                        list($grpsql, $grpparams) = $DB->get_in_or_equal($groups);
+                        [$grpsql, $grpparams] = $DB->get_in_or_equal($groups);
                         $DB->set_field_select("grouptool_agrps", "active", 0,
                             " grouptoolid = ? AND groupid " . $grpsql, array_merge([$this->cm->instance], $grpparams));
                     }
@@ -1331,13 +1331,13 @@ class mod_grouptool {
                         $preview = '';
                         break;
                     case -2: // One grouping per group!
-                        list(, $preview) = $this->create_group_groupings();
+                        [, $preview] = $this->create_group_groupings();
                         break;
                     case -1: // One new grouping for all!
-                        list(, $preview) = $this->update_grouping($target, required_param('name', PARAM_ALPHANUMEXT));
+                        [, $preview] = $this->update_grouping($target, required_param('name', PARAM_ALPHANUMEXT));
                         break;
                     default:
-                        list(, $preview) = $this->update_grouping($target);
+                        [, $preview] = $this->update_grouping($target);
                         break;
                 }
                 $preview = html_writer::tag('div', $preview, ['class' => 'centered']);
@@ -1535,7 +1535,7 @@ class mod_grouptool {
                 // Display only active users if the option was selected or they do not have the capability to view suspended users.
                 $onlyactive = !empty($data->includeonlyactiveenrol)
                     || !has_capability('moodle/course:viewsuspendedusers', $context);
-                list($source, $orderby) = $this->view_creation_get_source_orderby($data);
+                [$source, $orderby] = $this->view_creation_get_source_orderby($data);
                 switch ($data->mode) {
                     case GROUPTOOL_GROUPS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1544,7 +1544,7 @@ class mod_grouptool {
                         $usercnt = count($users);
                         $numgrps = $data->numberofgroups;
                         $userpergrp = floor($usercnt / $numgrps);
-                        list($error, $preview) = $this->create_groups($data, $users, $userpergrp, $numgrps);
+                        [$error, $preview] = $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
                     case GROUPTOOL_MEMBERS_AMOUNT:
                         // Allocate members from the selected role to groups!
@@ -1565,7 +1565,7 @@ class mod_grouptool {
                                 $userpergrp = floor($usercnt / $numgrps);
                             }
                         }
-                        list($error, $preview) = $this->create_groups($data, $users, $userpergrp, $numgrps);
+                        [$error, $preview] = $this->create_groups($data, $users, $userpergrp, $numgrps);
                         break;
                     case GROUPTOOL_1_PERSON_GROUPS:
                         $users = groups_get_potential_members($this->course->id, $data->roleid,
@@ -1574,7 +1574,7 @@ class mod_grouptool {
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
                         }
-                        list($error, $prev) = $this->create_one_person_groups($users,
+                        [$error, $prev] = $this->create_one_person_groups($users,
                             $data->namingscheme,
                             $data->grouping,
                             $data->groupingname,
@@ -1592,7 +1592,7 @@ class mod_grouptool {
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
                         }
-                        list($error, $preview) = $this->create_fromto_groups($data);
+                        [$error, $preview] = $this->create_fromto_groups($data);
                         break;
                 }
                 if (!$error && has_capability('mod/grouptool:administrate_groups', $this->context)) {
@@ -1639,7 +1639,7 @@ class mod_grouptool {
             $data = $SESSION->grouptool->view_administration;
             $preview = "";
             $error = false;
-            list($source, $orderby) = $this->view_creation_get_source_orderby($data);
+            [$source, $orderby] = $this->view_creation_get_source_orderby($data);
             $onlyactive = !empty($data->includeonlyactiveenrol)
                 || !has_capability('moodle/course:viewsuspendedusers', $context);
             switch ($data->mode) {
@@ -1650,7 +1650,7 @@ class mod_grouptool {
                     $usercnt = count($users);
                     $numgrps = clean_param($data->numberofgroups, PARAM_INT);
                     $userpergrp = floor($usercnt / $numgrps);
-                    list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
+                    [$error, $preview] = $this->create_groups($data, $users, $userpergrp,
                         $numgrps, true);
                     break;
                 case GROUPTOOL_MEMBERS_AMOUNT:
@@ -1672,7 +1672,7 @@ class mod_grouptool {
                             $userpergrp = floor($usercnt / $numgrps);
                         }
                     }
-                    list($error, $preview) = $this->create_groups($data, $users, $userpergrp,
+                    [$error, $preview] = $this->create_groups($data, $users, $userpergrp,
                         $numgrps, true);
                     break;
                 case GROUPTOOL_1_PERSON_GROUPS:
@@ -1681,7 +1681,7 @@ class mod_grouptool {
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;
                     }
-                    list($error, $prev) = $this->create_one_person_groups($users,
+                    [$error, $prev] = $this->create_one_person_groups($users,
                         $data->namingscheme,
                         $data->grouping,
                         $data->groupingname,
@@ -1699,7 +1699,7 @@ class mod_grouptool {
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;
                     }
-                    list($error, $preview) = $this->create_fromto_groups($data, true);
+                    [$error, $preview] = $this->create_fromto_groups($data, true);
                     break;
             }
             $preview = html_writer::tag('div', $preview, ['class' => 'centered']);
@@ -1933,7 +1933,7 @@ class mod_grouptool {
         $agrpids = $DB->get_fieldset_sql('SELECT id
                                             FROM {grouptool_agrps}
                                            WHERE grouptoolid = ?', [$this->grouptool->id]);
-        list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
+        [$agrpssql, $agrpsparam] = $DB->get_in_or_equal($agrpids);
         $sql = "SELECT queued.id, MAX(agrp.groupid) AS groupid, MAX(queued.agrpid) AS agrpid,
                        MAX(queued.userid) AS userid, MAX(queued.timestamp) AS timestamp,
                        (COUNT(DISTINCT reg.id) < ?) AS priority
@@ -1973,7 +1973,7 @@ class mod_grouptool {
                 $agrps = $this->get_active_groups(false, false, 0, 0, 0,
                     false);
                 $agrpids = array_keys($agrps);
-                list($sql, $params) = $DB->get_in_or_equal($agrpids);
+                [$sql, $params] = $DB->get_in_or_equal($agrpids);
                 $records = $DB->get_records_sql("SELECT queued.*, agrp.groupid
                                                    FROM {grouptool_queued} queued
                                                    JOIN {grouptool_agrps} agrp ON queued.agrpid = agrp.id
@@ -2091,7 +2091,7 @@ class mod_grouptool {
             $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", [$this->grouptool->id]);
 
         }
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        [$agrpsql, $params] = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
         $userregs = $DB->count_records_select('grouptool_registered',
             "modified_by >= 0 AND userid = ? AND agrpid " . $agrpsql, $params);
@@ -2285,7 +2285,7 @@ class mod_grouptool {
                 /* The user has not enough registrations, queue entries or marks,
                  * so we try to mark the user! (Exceptions get handled above!) */
                 if ($previewonly) {
-                    list(, $return) = $this->can_be_marked($agrpid, $userid, $message);
+                    [, $return] = $this->can_be_marked($agrpid, $userid, $message);
                 } else {
                     $return = $this->mark_for_reg($agrpid, $userid, $message);
                 }
@@ -2296,7 +2296,7 @@ class mod_grouptool {
             /* The user has not enough registrations, queue entries or marks,
              * so we try to mark the user! (Exceptions get handled above!) */
             if ($previewonly) {
-                list(, $return) = $this->can_be_marked($agrpid, $userid, $message);
+                [, $return] = $this->can_be_marked($agrpid, $userid, $message);
             } else {
                 $return = $this->mark_for_reg($agrpid, $userid, $message);
             }
@@ -2407,7 +2407,7 @@ class mod_grouptool {
 
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
-        list($userregs, $userqueues, , , $max) = $this->check_users_regs_limits($userid, true);
+        [$userregs, $userqueues, , , $max] = $this->check_users_regs_limits($userid, true);
 
         if (($oldagrpid === null)
             && !(($userqueues == 1 && $userregs == $max - 1) || ($userqueues + $userregs == 1 && $max == 1))) {
@@ -2482,7 +2482,7 @@ class mod_grouptool {
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1",
             [$this->grouptool->id]);
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        [$agrpsql, $params] = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
         $userregs = $DB->get_records_select('grouptool_registered',
             "modified_by >= 0 AND userid = ? AND agrpid " . $agrpsql, $params);
@@ -2600,7 +2600,7 @@ class mod_grouptool {
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ? AND active = 1",
             [$this->grouptool->id]);
-        list($agrpsql, $params) = $DB->get_in_or_equal($agrpids);
+        [$agrpsql, $params] = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
         $userregs = $DB->count_records_select('grouptool_registered',
             "modified_by >= 0 AND userid = ? AND agrpid " . $agrpsql, $params);
@@ -3036,7 +3036,7 @@ class mod_grouptool {
         if (count($keys) == 0) {
             return 0;
         }
-        list($sql, $params) = $DB->get_in_or_equal($keys);
+        [$sql, $params] = $DB->get_in_or_equal($keys);
         $params = array_merge([$userid], $params);
         return $DB->count_records_sql('SELECT count(id)
                                        FROM {grouptool_queued}
@@ -3066,7 +3066,7 @@ class mod_grouptool {
         if (count($keys) == 0) {
             return 0;
         }
-        list($sql, $params) = $DB->get_in_or_equal($keys);
+        [$sql, $params] = $DB->get_in_or_equal($keys);
         $params = array_merge([$userid], $params);
         return $DB->count_records_sql('SELECT count(id)
                                        FROM {grouptool_registered}
@@ -3293,7 +3293,7 @@ class mod_grouptool {
                         $pbar->update($processed, $count,
                             get_string('unregister_progress_unregister',
                                 'grouptool') . ' ' . fullname($userinfo) . '...');
-                        list($insql, $inparams) = $DB->get_in_or_equal($agrp[$group], SQL_PARAMS_NAMED);
+                        [$insql, $inparams] = $DB->get_in_or_equal($agrp[$group], SQL_PARAMS_NAMED);
                         $inparams['userid'] = $data['id'];
                         $sqlreg = "SELECT * FROM {grouptool_registered} WHERE agrpid $insql AND userid=:userid";
                         $sqlqueue = "SELECT * FROM {grouptool_queued} WHERE agrpid $insql AND userid=:userid";
@@ -3620,7 +3620,7 @@ class mod_grouptool {
         $agrps = $DB->get_records('grouptool_agrps', ['grouptoolid' => $this->cm->instance, 'active' => 1]);
         if (is_array($agrps) && count($agrps) >= 1) {
             $agrpids = array_keys($agrps);
-            list($inorequal, $params) = $DB->get_in_or_equal($agrpids);
+            [$inorequal, $params] = $DB->get_in_or_equal($agrpids);
             $sql = "SELECT count(DISTINCT userid)
                       FROM {grouptool_registered}
                      WHERE modified_by >= 0 AND agrpid " . $inorequal;
@@ -3667,12 +3667,12 @@ class mod_grouptool {
 
         $agrps = $this->get_active_groups(false, false, 0, 0, 0,
             false);
-        list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'reg');
-        list($agrpsql2, $params2) = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'queue');
+        [$agrpsql, $params] = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'reg');
+        [$agrpsql2, $params2] = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'queue');
 
         if (!empty($agrps)) {
             $agrpids = array_keys($agrps);
-            list($agrpssql, $agrpsparam) = $DB->get_in_or_equal($agrpids);
+            [$agrpssql, $agrpsparam] = $DB->get_in_or_equal($agrpids);
             $agrpsfiltersql = " AND agrp.id " . $agrpssql;
             $agrpsfilterparams = array_merge([$grouptool->id], $agrpsparam);
             // Get queue-entries (sorted by timestamp)!
@@ -3905,7 +3905,7 @@ class mod_grouptool {
         if (empty($agrps)) {
             return null;
         }
-        list($agrpssql, $params) = $DB->get_in_or_equal($agrps);
+        [$agrpssql, $params] = $DB->get_in_or_equal($agrps);
         $params[] = $userid;
 
         $sql = 'SELECT reg.id, reg.agrpid, reg.userid, reg.timestamp,
@@ -3959,7 +3959,7 @@ class mod_grouptool {
 
         $marks = $this->get_user_marks($userid);
         if (is_array($marks) && count($marks) > 0) {
-            list($select, $params) = $DB->get_in_or_equal(array_keys($marks));
+            [$select, $params] = $DB->get_in_or_equal(array_keys($marks));
             $select = 'id ' . $select;
             $DB->delete_records_select('grouptool_registered', $select, $params);
         }
@@ -4027,7 +4027,7 @@ class mod_grouptool {
     public function get_missing_registrations() {
         global $DB;
 
-        list($esql, $params) = get_enrolled_sql($this->context, 'mod/grouptool:register');
+        [$esql, $params] = get_enrolled_sql($this->context, 'mod/grouptool:register');
 
         $sql = "SELECT u.id
                   FROM {user} u
@@ -4039,7 +4039,7 @@ class mod_grouptool {
             return 0;
         }
 
-        list($usql, $uparams) = $DB->get_in_or_equal(array_keys($users), SQL_PARAMS_NAMED, 'usr');
+        [$usql, $uparams] = $DB->get_in_or_equal(array_keys($users), SQL_PARAMS_NAMED, 'usr');
 
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 1;
 
@@ -4054,7 +4054,7 @@ class mod_grouptool {
         if (empty($keys)) {
             $keys = [-1];
         }
-        list($agrpsql, $params) = $DB->get_in_or_equal($keys, SQL_PARAMS_NAMED, 'agrp');
+        [$agrpsql, $params] = $DB->get_in_or_equal($keys, SQL_PARAMS_NAMED, 'agrp');
         $params = array_merge($uparams, $params);
         $regs = $DB->get_records_sql_menu("SELECT u.id, count(r.id)
                                              FROM {user} u
@@ -4135,7 +4135,7 @@ class mod_grouptool {
                 }
             } else if ($action == 'resolvequeues') {
                 require_capability('mod/grouptool:register_students', $this->context);
-                list($error, $confirmmessage) = $this->resolve_queues();
+                [$error, $confirmmessage] = $this->resolve_queues();
                 if ($error == -1) {
                     $error = true;
                 }
@@ -4172,7 +4172,7 @@ class mod_grouptool {
             $attr = [];
             if ($action == 'resolvequeues') {
                 require_capability('mod/grouptool:register_students', $this->context);
-                list($error, $confirmmessage) = $this->resolve_queues(true); // Try only!
+                [$error, $confirmmessage] = $this->resolve_queues(true); // Try only!
             } else if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
                 $attr['group'] = $agrpid;
@@ -4496,7 +4496,7 @@ class mod_grouptool {
                             } catch (\mod_grouptool\local\exception\notenoughregs $e) {
                                 /* The user has not enough registrations, queue entries or marks,
                                  * so we try to mark the user! (Exceptions get handled above!) */
-                                list($queued, ) = $this->can_be_marked($group->agrpid, $USER->id, $message);
+                                [$queued, ] = $this->can_be_marked($group->agrpid, $USER->id, $message);
                                 if (!$queued && has_capability('mod/grouptool:register', $this->context)) {
                                     // Register button!
                                     $label = get_string('register', 'grouptool');
@@ -4997,7 +4997,7 @@ class mod_grouptool {
             foreach ($groups as $group) {
                 $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
             }
-            list($error, $message) = $this->import($groups, $data, $ignored, $forceregistration);
+            [$error, $message] = $this->import($groups, $data, $ignored, $forceregistration);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users', 'grouptool'),
@@ -5008,7 +5008,7 @@ class mod_grouptool {
 
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
-            list($error, $confirmmessage) = $this->import($fromform->groups, $fromform->data, [],
+            [$error, $confirmmessage] = $this->import($fromform->groups, $fromform->data, [],
                 $fromform->forceregistration, true);
             $formdata = [
                 'id' => $id,
@@ -5056,7 +5056,7 @@ class mod_grouptool {
             foreach ($groups as $group) {
                 $ignored[$group] = optional_param_array("ignored_$group", [-1 => -1], PARAM_INT);
             }
-            list($error, $message) = $this->unregister($groups, $data, true, false, $unregfrommgroups);
+            [$error, $message] = $this->unregister($groups, $data, true, false, $unregfrommgroups);
 
             if (!empty($error)) {
                 $message = $OUTPUT->notification(get_string('ignored_not_found_users_unregister', 'grouptool'),
@@ -5067,7 +5067,7 @@ class mod_grouptool {
 
         if ($fromform = $form->get_data()) {
             // Display confirm message - so we "try" only!
-            list($error, $confirmmessage) =
+            [$error, $confirmmessage] =
                 $this->unregister($fromform->groups, $fromform->data, true,
                     true);
             $formdata = [
@@ -6302,7 +6302,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function push_registrations($groupid = 0, $groupingid = 0, $previewonly = false) {
+    public function push_registrations(int $groupid = 0, int $groupingid = 0, bool $previewonly = false) {
         global $DB, $OUTPUT;
 
         // Trigger the event!
@@ -6513,7 +6513,7 @@ class mod_grouptool {
             $hideform = 0;
             $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
             if ($pushtomdl) {
-                list($error, $message) = $this->push_registrations($groupid, $groupingid);
+                [$error, $message] = $this->push_registrations($groupid, $groupingid);
                 if ($error) {
                     echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_ERROR);
                 } else {
@@ -6527,7 +6527,7 @@ class mod_grouptool {
             $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
             if ($pushtomdl) {
                 // Try only!
-                list($error, $message) = $this->push_registrations($groupid, $groupingid, true);
+                [$error, $message] = $this->push_registrations($groupid, $groupingid, true);
                 $attr = [];
                 $attr['confirm'] = 1;
                 $attr['pushtomdl'] = 1;
@@ -6580,10 +6580,6 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['tab' => 'import']);
             $button = new single_button($url, get_string('manage_members', 'grouptool'));
             $queues = "";
-            if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
-                has_capability('mod/grouptool:register_students', $this->context)) {
-
-            }
             echo $OUTPUT->box(html_writer::empty_tag('br') .
                 $OUTPUT->render($button) . $queues .
                 html_writer::empty_tag('br'), 'generalbox');
@@ -6709,7 +6705,7 @@ class mod_grouptool {
         $agrps = $this->get_active_groups(false, false, 0, $groupid, $groupingid, false);
         $agrpids = array_keys($agrps);
         if (!empty($agrpids)) {
-            list($agrpsql, $agrpparams) = $DB->get_in_or_equal($agrpids);
+            [$agrpsql, $agrpparams] = $DB->get_in_or_equal($agrpids);
         } else {
             $agrpsql = '';
             $agrpparams = [];
@@ -6723,7 +6719,7 @@ class mod_grouptool {
             if (!is_array($userids)) {
                 $userids = [$userids];
             }
-            list($usersql, $userparams) = $DB->get_in_or_equal($userids);
+            [$usersql, $userparams] = $DB->get_in_or_equal($userids);
         } else {
             $usersql = ' LIKE *';
             $userparams = [];
