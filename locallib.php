@@ -109,7 +109,7 @@ class mod_grouptool {
      * @throws \dml_exception
      * @throws \moodle_exception
      */
-    public function __construct($cmid, $grouptool, $cm, $course, $context = null) {
+    public function __construct($cmid, $grouptool, $cm, $course = null, $context = null) {
         global $DB;
         global $DB;
 
