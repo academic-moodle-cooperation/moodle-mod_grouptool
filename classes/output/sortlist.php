@@ -160,7 +160,7 @@ class sortlist implements \renderable {
             } else if ($this->filter > 10) {
                 $activefilter = '';
                 $grouping = 'LEFT JOIN {groupings_groups} ON {groupings_groups}.groupid = grp.id';
-                $groupingwhere = ' AND {groupings_groups}.groupingid = ' . $this->filter - 10;
+                $groupingwhere = ' AND {groupings_groups}.groupingid = ' . ($this->filter - 10);
             } else {
                 $grouping = '';
                 $activefilter = '';
