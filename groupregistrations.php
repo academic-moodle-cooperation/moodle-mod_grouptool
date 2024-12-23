@@ -25,7 +25,7 @@ global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
  */
 // @codingStandardsIgnoreLine
 if (((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
-    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister') )) {
+    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))) {
     // @codingStandardsIgnoreLine
     define('NO_OUTPUT_BUFFERING', true);
 // @codingStandardsIgnoreLine
@@ -42,7 +42,6 @@ require_once($CFG->libdir . '/grade/grade_grade.php');
 require_once($CFG->libdir . '/pdflib.php');
 
 defined('MOODLE_INTERNAL') || die();
-
 
 
 // Do we get course_module ID?
@@ -116,16 +115,16 @@ $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id]
 $options = [
     'import' => get_string('import'),
     'unregister' => get_string('unregister', 'grouptool'),
-    ];
+];
 switch ($tab) {
     case 'import':
         $select = new single_select($url, 'tab', $options, 'import', false);
-        echo html_writer::tag('div', $OUTPUT->render($select),['class' => 'grouptool_manage_user_select']).'<br>';
+        echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         $instance->view_import();
         break;
     case 'unregister':
         $select = new single_select($url, 'tab', $options, 'unregister', false);
-        echo html_writer::tag('div', $OUTPUT->render($select),['class' => 'grouptool_manage_user_select']).'<br>';
+        echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         $instance->view_unregister();
         break;
     case 'noaccess':
