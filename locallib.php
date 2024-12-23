@@ -123,10 +123,10 @@ class mod_grouptool {
         } else if (!$this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
             print_error('invalidcoursemodule');
         }
-        if ($context) {
+        if ($context != null) {
             $this->context = $context;
         } else {
-            $context = context_module::instance($cmid);
+            $context = context_module::instance($cm->id);
         }
 
         if ($course) {
