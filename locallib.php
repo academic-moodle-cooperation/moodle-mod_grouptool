@@ -1783,7 +1783,7 @@ class mod_grouptool {
                                       $indexbygroup = true, $includeinactive = false, $ignoregtinstance = false) {
         global $DB;
 
-        if($this->context == null) {
+        if ($this->context == null) {
             $this->context = context_module::instance($this->cm->id);
         }
 
