@@ -369,6 +369,7 @@ $string['landscape'] = 'Landscape';
 $string['late'] = '{$a} late';
 $string['limit'] = 'limit';
 $string['loading'] = 'loading...';
+$string['manage_members'] = 'Manage members';
 $string['maxmembers'] = 'Global group size';
 $string['max_queues_reached'] = 'Maximum queues reached!';
 $string['max_regs_reached'] = 'Maximum registrations reached!';
@@ -402,6 +403,7 @@ $string['namingscheme_help'] = '<p>The Name scheme defines how groups will be na
 <p>Each of this tags will be replaced in the final group names. The tags in [] are related to the users data and the # and @ symbols will be replaced through the groups serial number. If JavaScript is enabled you can simply click on the tags to append them to the name-scheme. Please consider that the group names have to be unique in each course and therefore you may have to alter the name scheme until it\'s conflict-free.</p>';
 $string['number_of_groups'] = 'Number of groups N';
 $string['number_of_members'] = 'Number of group members M';
+$string['no_active_groups'] = 'No active groups';
 $string['no_conflictfree_to_display'] = 'No conflict-free groups to display. So we try to display all instead!';
 $string['no_data_to_display'] = 'No group(s) data to display!';
 $string['no_grades_present'] = 'No grades to show';
