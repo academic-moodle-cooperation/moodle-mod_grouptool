@@ -265,7 +265,7 @@ abstract class base extends advanced_testcase {
 
         $DB->set_field('grouptool_agrps', 'active', 1, ['grouptoolid' => $instance->id]);
 
-        return new grouptool($cm->id, $instance, $cm, $this->course);
+        return new grouptool($cm->id, $instance, $cm, $this->course, context_module::instance($cm->id));
     }
 
     /**
