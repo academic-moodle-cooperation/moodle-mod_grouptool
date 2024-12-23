@@ -1515,7 +1515,7 @@ class mod_grouptool {
         global $SESSION, $OUTPUT, $DB, $PAGE;
 
         $id = $this->cm->id;
-        $context = context_course::instance($this->course->id);
+        $context = $this->context;
 
         $rolenames = [];
         if ($roles = get_profile_roles($context)) {
@@ -6499,6 +6499,7 @@ class mod_grouptool {
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         $includeinactive = optional_param('inactive', 0, PARAM_BOOL);
         $url = new moodle_url($PAGE->url, [
+            'tab' => 'overview',
             'sesskey' => sesskey(),
             'groupid' => $groupid,
             'groupingid' => $groupingid,
@@ -6549,6 +6550,7 @@ class mod_grouptool {
         }
 
         if (!$hideform) {
+
             $groupingselect = $this->get_grouping_select($url, $groupingid);
             $groupselect = $this->get_groups_select($url, $groupingid, $groupid);
             $orientationselect = $this->get_orientation_select($url, $orientation);
@@ -6568,15 +6570,27 @@ class mod_grouptool {
                  * Out of sync? --> show button to get registrations from grouptool to moodle
                  * (just register not already registered persons and let the others be)
                  */
-                $url = new moodle_url($PAGE->url, ['pushtomdl' => 1, 'sesskey' => sesskey()]);
+                $url = new moodle_url($PAGE->url, ['tab' => 'overview','pushtomdl' => 1, 'sesskey' => sesskey()]);
                 $button = new single_button($url, get_string('updatemdlgrps', 'grouptool'), 'post',
                     'primary');
                 echo $OUTPUT->box(html_writer::empty_tag('br') .
                     $OUTPUT->render($button) .
                     html_writer::empty_tag('br'), 'generalbox centered');
             }
+            $url = new moodle_url($PAGE->url, ['tab' => 'import']);
+            $button = new single_button($url, get_string('manage_members', 'grouptool'));
+            $queues = "";
+            if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
+                has_capability('mod/grouptool:register_students', $this->context)) {
 
-            echo html_writer::tag('div', get_string('grouping', 'group') . '&nbsp;' .
+            }
+            echo $OUTPUT->box(html_writer::empty_tag('br') .
+                $OUTPUT->render($button) . $queues .
+                html_writer::empty_tag('br'), 'generalbox');
+            echo "<br />";
+            // If we don't only get the data, the output happens directly per group!
+            $this->group_overview_table($groupingid, $groupid, false, $includeinactive);
+            $select = html_writer::tag('div', get_string('grouping', 'group') . '&nbsp;' .
                     $OUTPUT->render($groupingselect),
                     ['class' => 'centered grouptool_overview_filter']) .
                 html_writer::tag('div', get_string('group', 'group') . '&nbsp;' .
@@ -6587,9 +6601,14 @@ class mod_grouptool {
                     ['class' => 'centered grouptool_overview_filter']) .
                 html_writer::tag('div', html_writer::link($inactiveurl, $inactivetext),
                     ['class' => 'centered grouptool_overview_filter']);
+            $data = [
+                'containername' => 'grouptool_overview_filter',
+                'heading' => get_string('options' ),
+                'content' => $select,
+            ];
+            $templatename = "grouptool/downloadoptions";
+            echo $OUTPUT->render_from_template($templatename, $data);
 
-            // If we don't only get the data, the output happens directly per group!
-            $this->group_overview_table($groupingid, $groupid, false, $includeinactive);
         }
     }
 
