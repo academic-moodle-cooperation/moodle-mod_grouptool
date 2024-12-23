@@ -5467,7 +5467,7 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    #[NoReturn] public function download_overview_pdf($groupid = 0, $groupingid = 0, $includeinactive = false) {
+    public function download_overview_pdf($groupid = 0, $groupingid = 0, $includeinactive = false) {
         $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
