@@ -680,7 +680,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
 
     // Add "Registrations" to menu
     if ($viewreggv) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
+        $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'overview']);
         $node = navigation_node::create(get_string('registrations', 'grouptool'),
             $url,
             navigation_node::TYPE_SETTING, null, 'mod_grouptool_registration');
