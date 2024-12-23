@@ -48,12 +48,12 @@ class agrp_created extends \core\event\base {
     /**
      * Create the event object and set properties.
      *
-     * @param \stdClass $cm Course-Module object
+     * @param \stdClass | \cm_info $cm Course-Module object
      * @param \stdClass $agrp active-group object which has been created
      * @return \core\event\base
      * @throws \coding_exception
      */
-    public static function create_from_object(\stdClass $cm, \stdClass $agrp) {
+    public static function create_from_object(\stdClass | \cm_info $cm, \stdClass $agrp) {
         $event = self::create([
             'objectid' => $agrp->id,
             'context' => \context_module::instance($cm->id),

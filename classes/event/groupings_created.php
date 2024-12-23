@@ -48,12 +48,12 @@ class groupings_created extends \core\event\base {
     /**
      * Convenience method to create the event object from course module object and the created groups ids
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass | \cm_info $cm course module object
      * @param int[] $ids array of ids (integers)
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_from_object(\stdClass $cm, array $ids) {
+    public static function create_from_object(\stdClass | \cm_info $cm, array $ids) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context'  => \context_module::instance($cm->id),

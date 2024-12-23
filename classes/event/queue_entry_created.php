@@ -48,12 +48,12 @@ class queue_entry_created extends \core\event\base {
     /**
      * Convenience method to create event object from data
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass | \cm_info $cm course module object
      * @param \stdClass $regdata data of the created queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_direct(\stdClass $cm, \stdClass $regdata) {
+    public static function create_direct(\stdClass | \cm_info $cm, \stdClass $regdata) {
         $regdata->source = null;
         $event = self::create([
             'objectid' => $regdata->id,

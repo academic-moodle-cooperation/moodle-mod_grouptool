@@ -48,12 +48,12 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted by observer/eventhandler
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass | \cm_info $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_via_eventhandler(\stdClass $cm, \stdClass $entrydata) {
+    public static function create_via_eventhandler(\stdClass | \cm_info $cm, \stdClass $entrydata) {
         $entrydata->source = 'event';
         $event = self::create([
             'objectid' => $entrydata->id,
@@ -66,12 +66,12 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted i.e. because user has enough registrations
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass | \cm_info $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_limit_violation(\stdClass $cm, \stdClass $entrydata) {
+    public static function create_limit_violation(\stdClass | \cm_info $cm, \stdClass $entrydata) {
         $entrydata->reason = 'registration limit violation';
         $event = self::create([
             'objectid' => $entrydata->id,
@@ -84,12 +84,12 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted by direct user action
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass | \cm_info $cm course module object
      * @param \stdClass $entrydata data of deleted queue entry
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_direct(\stdClass $cm, \stdClass $entrydata) {
+    public static function create_direct(\stdClass | \cm_info $cm, \stdClass $entrydata) {
         $entrydata->source = null;
         $entrydata->reason = null;
         $event = self::create([
