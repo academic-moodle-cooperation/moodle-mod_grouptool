@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_grouptool\event;
+use core\event\base;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -48,9 +50,9 @@ class agrp_created extends \core\event\base {
     /**
      * Create the event object and set properties.
      *
-     * @param \stdClass | \cm_info $cm Course-Module object
+     * @param \stdClass|\cm_info $cm Course-Module object
      * @param \stdClass $agrp active-group object which has been created
-     * @return \core\event\base
+     * @return base
      * @throws \coding_exception
      */
     public static function create_from_object(\stdClass | \cm_info $cm, \stdClass $agrp) {

@@ -38,6 +38,9 @@ defined('MOODLE_INTERNAL') || die();
 
 global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
+/**
+ * filter all groups
+ */
 const FILTER_ALL = 0;
 /**
  * filter active groups
