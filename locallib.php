@@ -1914,7 +1914,7 @@ class mod_grouptool {
      * @return bool true if everything went fine!
      * @throws coding_exception
      * @throws dml_exception
-     * @throws required_capability_exception
+     * @throws required_capability_exception|\core\exception\moodle_exception
      */
     public function fill_from_queue($agrpid) {
         global $DB, $CFG, $OUTPUT;
@@ -2337,7 +2337,6 @@ class mod_grouptool {
      * @param stdClass $groupdata Object with group info
      * @param stdClass $message (optional) cached data for the language strings
      * @throws \mod_grouptool\local\exception\regpresent
-     * @throws coding_exception
      * @throws dml_exception
      */
     protected function check_reg_present($agrpid, $userid, $groupdata, $message) {
@@ -3393,6 +3392,14 @@ class mod_grouptool {
         return [$error, $message];
     }
 
+    /**
+     * Shows the starting page of the grouptool
+     * @return void
+     * @throws \core\exception\moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
     public function view_starting_page() {
         global $OUTPUT, $DB, $USER, $CFG;
         // TODO add caoabilities
