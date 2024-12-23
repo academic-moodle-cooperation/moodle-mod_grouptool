@@ -4224,7 +4224,9 @@ class mod_grouptool {
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
             $regstat = $this->get_registration_stats($USER->id);
-
+            if(has_capability('mod/grouptool:register_students', $this->context)){
+                $mform->addElement('cancel', 'cancel', get_string('back'));
+            }
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
                 has_capability('mod/grouptool:register_students', $this->context)) {
                 if ($regstat->queued_users > 0) {
