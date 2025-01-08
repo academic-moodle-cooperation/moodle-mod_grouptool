@@ -1,8 +1,15 @@
 CHANGELOG
 ========
 
+4.5.0 (2024-11-30)
+------------------
+* Moodle 4.5.0 compatible version
+* [FEATURE] #7537 New starting page
+
+
 4.4.0 (2024-07-30)
 ------------------
+* Moodle 4.4.0 compatible version
 * [FEATURE] #7624 Link to "moodle groups" in more menu
 * [FEATURE] #7623 Link to new plugin "grouptool report" in more menu
 * [CHANGED] #7932 New activity logo

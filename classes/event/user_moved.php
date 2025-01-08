@@ -53,13 +53,13 @@ class user_moved extends \core\event\base {
     /**
      * Convenience method usable if user has been promoted/moved from the queue to regular registrations
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $from data from which queue entry the user has been moved
      * @param \stdClass $to data to which registration entry the user has been moved
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function promotion_from_queue(\stdClass $cm, \stdClass $from, \stdClass $to) {
+    public static function promotion_from_queue(\stdClass | \cm_info $cm, \stdClass $from, \stdClass $to) {
         $event = self::create([
             'objectid' => $to->id,
             'context'  => \context_module::instance($cm->id),
@@ -75,13 +75,13 @@ class user_moved extends \core\event\base {
     /**
      * Convenience method usable if user has been moved from one group to another
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param \stdClass $from data from which queue entry the user has been moved
      * @param \stdClass $to data to which registration entry the user has been moved
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function move(\stdClass $cm, \stdClass $from, \stdClass $to) {
+    public static function move(\stdClass | \cm_info $cm, \stdClass $from, \stdClass $to) {
         $event = self::create([
             'objectid' => $to->id,
             'context'  => \context_module::instance($cm->id),

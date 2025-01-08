@@ -48,14 +48,14 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating groups by amount
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int $amount number of created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_groupamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
+    public static function create_groupamount(\stdClass | \cm_info $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
@@ -72,14 +72,14 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating groups by amount of groupmembers
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int $amount number of created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_memberamount(\stdClass $cm, $pattern, $amount, $grouping = 0) {
+    public static function create_memberamount(\stdClass | \cm_info $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
@@ -96,7 +96,7 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating groups from X to Y
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int $from lowest index for created groups
      * @param int $to highest index for created groups
@@ -104,7 +104,7 @@ class group_creation_started extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_fromto(\stdClass $cm, $pattern, $from, $to, $grouping = 0) {
+    public static function create_fromto(\stdClass | \cm_info $cm, $pattern, $from, $to, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
@@ -122,13 +122,13 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating 1-person-groups
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_person(\stdClass $cm, $pattern, $grouping = 0) {
+    public static function create_person(\stdClass | \cm_info $cm, $pattern, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),

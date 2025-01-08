@@ -25,17 +25,24 @@
 
 require_once('../../config.php');
 
+global $CFG, $DB, $PAGE, $OUTPUT;
+
 require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
 
 $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
+$grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 $context = context_module::instance($cmid);
 $PAGE->set_context($context);
 $url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', ['id' => $cmid]);
 $PAGE->set_url($url);
-$instance = new mod_grouptool($cmid);
+$course = $DB->get_record('course', ['id' => $cm->course]);
+
+$instance = new mod_grouptool($cmid, $grouptool, $cm, $course, $context );
+
 
 require_login($cm->course, true, $cm);
+
 require_capability('mod/grouptool:export', $context);
 
 $groupingid = optional_param('groupingid', 0, PARAM_INT);

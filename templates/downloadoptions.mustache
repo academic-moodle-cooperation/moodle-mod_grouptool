@@ -1,0 +1,67 @@
+{{!
+    This file is part of mod_publication for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_grouptool/groupmembers
+
+    Grouptool's groupmembers template.
+
+    The purpose of this template is to display the members and queued users of an active group in mod_grouptool.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id ID of related element
+    * showidnumber wether to display idnumbers or not
+    * absregs Array with fullname & idnumber pairs.
+    * gtregs Array with fullname & idnumber paris.
+    * mregs Array with fullname & idnumber pairs.
+    * queued Array with fullname, idnumber & rank values.
+
+    Example context (json):
+    {
+
+    }
+
+}}
+<br>
+<div class="d-flex align-items-center mb-2">
+    <div class="position-relative d-flex ftoggler align-items-center position-relative me-1">
+        <a data-toggle="collapse" href="#id_{{containername}}" role="button" aria-expanded="true"
+           aria-controls="id_{{containername}}"
+           class="btn btn-icon me-1 icons-collapse-expand stretched-link fheader " id="collapseElement-0">
+                <span class="expanded-icon icon-no-margin p-2" title="Collapse">
+                    <i class="icon fa fa-chevron-down fa-fw " aria-hidden="true"></i>
+                </span>
+            <span class="collapsed-icon icon-no-margin p-2" title="Expand">
+                    <span class="dir-rtl-hide"><i class="icon fa fa-chevron-right fa-fw " aria-hidden="true"></i></span>
+                    <span class="dir-ltr-hide"><i class="icon fa fa-chevron-left fa-fw " aria-hidden="true"></i></span>
+                </span>
+            <span class="sr-only">{{heading}}</span>
+        </a>
+
+        <h3 class="d-flex align-self-stretch align-items-center mb-0" aria-hidden="true">
+            {{heading}}
+        </h3>
+    </div>
+</div>
+<div id="id_{{containername}}" class="fcontainer collapseable collapse  show">
+    {{&content}}
+</div>

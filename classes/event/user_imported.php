@@ -48,7 +48,7 @@ class user_imported extends \core\event\base {
     /**
      * Convenience method for user imports where registration in grouptool is forced
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param int $id grouptool id
      * @param int $agrp active group id
      * @param int $group group id
@@ -56,7 +56,7 @@ class user_imported extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function import_forced(\stdClass $cm, $id, $agrp, $group, $user) {
+    public static function import_forced(\stdClass | \cm_info $cm, $id, $agrp, $group, $user) {
         $event = self::create([
             'objectid' => $id,
             'context'  => \context_module::instance($cm->id),
@@ -73,13 +73,13 @@ class user_imported extends \core\event\base {
     /**
      * Convenience method for user imports
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @param int $group group id
      * @param int $user user id
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function import(\stdClass $cm, $group, $user) {
+    public static function import(\stdClass | \cm_info $cm, $group, $user) {
         $event = self::create([
             'objectid' => 0,
             'context'  => \context_module::instance($cm->id),

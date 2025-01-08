@@ -48,11 +48,11 @@ class dequeuing_started extends \core\event\base {
     /**
      * Convenience method to create the event object from the course module object
      *
-     * @param \stdClass $cm course module object
+     * @param \stdClass|\cm_info $cm course module object
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_from_object(\stdClass $cm) {
+    public static function create_from_object(\stdClass | \cm_info $cm) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
