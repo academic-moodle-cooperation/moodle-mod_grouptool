@@ -68,6 +68,12 @@ class activegroup {
     /** @var bool  true if the status of the group is missing*/
     public $missing = false;
 
+    /** @var null not empty if there is a grouppicture used*/
+    public $grouppix = null;
+
+    /** @var array array of grouping ids */
+    public $gorupingids = [];
+
     /**
      * Constructor for activegroup
      *
