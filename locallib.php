@@ -117,19 +117,18 @@ class mod_grouptool {
             // Use static functions only!
             return;
         }
-
-        if (!empty($cm)) {
+        if (!empty($cm) && $cm != null) {
             $this->cm = $cm;
         } else if (!$this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
             print_error('invalidcoursemodule');
         }
-        if ($context != null) {
+        if (!empty($context) && $context != null) {
             $this->context = $context;
         } else {
-            $context = context_module::instance($cm->id);
+            $this->context = context_module::instance($this->cm->id);
         }
 
-        if ($course) {
+        if (!empty($course) && $course != null) {
             $this->course = $course;
         } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
             print_error('invalidid', 'grouptool');
