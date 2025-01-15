@@ -72,7 +72,7 @@ class activegroup {
     public $grouppix = null;
 
     /** @var array array of grouping ids */
-    public $gorupingids = [];
+    public $groupingids = [];
 
     /**
      * Constructor for activegroup
