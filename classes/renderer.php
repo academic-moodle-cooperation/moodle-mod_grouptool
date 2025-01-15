@@ -102,9 +102,7 @@ class renderer extends \plugin_renderer_base {
         }
 
         $html = $this->output->render_from_template('mod_grouptool/sortlist', $context);
-
-        $this->page->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', [$sortlist->cm->id]);
-
+        
         return $html;
     }
 
@@ -142,38 +140,4 @@ class renderer extends \plugin_renderer_base {
         return $this->output->box($this->output->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
     }
 
-    /**
-     * Render a controller for the sortable list of groups
-     *
-     * @param sortlist_controller $controller Sortlist controller to render
-     * @return    string
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     */
-    protected function render_sortlist_controller(sortlist_controller $controller) {
-
-        $sortlist = $controller->sortlist;
-
-        // Generate groupings-controls to select/deselect groupings!
-        $context = new stdClass();
-
-        $helpicon = new stdClass();
-        $helpicon->title = get_string('checkbox_control_header', 'grouptool');
-        $helpicon->text = get_string('checkbox_control_header_help', 'grouptool');
-        $context->helpicon = $helpicon;
-
-        $options = [];
-        if (!empty($sortlist->groupings) && is_array($sortlist->groupings)) {
-            foreach ($sortlist->groupings as $groupingid => $grouping) {
-                /*
-                 * We have only non-empty groupings here, it should also work with empty ones but would make no sense.
-                 * Maybe we use disabled options for all the empty groupings.
-                 */
-                $options[] = ['id' => $groupingid, 'name' => $grouping];
-            }
-        }
-        $context->options = $options;
-
-        return $this->output->render_from_template("mod_grouptool/checkboxcontroller", $context);
-    }
 }

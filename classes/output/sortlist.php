@@ -71,42 +71,6 @@ class sortlist implements \renderable {
 
         $this->filter = $filter;
 
-        if ($moveup = optional_param('moveup', 0, PARAM_INT)) {
-            // Move up!
-            $a = $DB->get_record('grouptool_agrps', [
-                'groupid' => $moveup,
-                'grouptoolid' => $cm->instance,
-            ]);
-            $b = $DB->get_record('grouptool_agrps', [
-                'grouptoolid' => $a->grouptoolid,
-                'sort_order' => ($a->sort_order - 1),
-            ]);
-            if (empty($a) || empty($b)) {
-                echo $OUTPUT->notification(get_string('couldnt_move_up', 'grouptool'), 'error');
-            } else {
-                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, ['id' => $b->id]);
-                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, ['id' => $a->id]);
-            }
-        }
-
-        if ($movedown = optional_param('movedown', 0, PARAM_INT)) {
-            // Move up!
-            $a = $DB->get_record('grouptool_agrps', [
-                'groupid' => $movedown,
-                'grouptoolid' => $cm->instance,
-            ]);
-            $b = $DB->get_record('grouptool_agrps', [
-                'grouptoolid' => $a->grouptoolid,
-                'sort_order' => ($a->sort_order + 1),
-            ]);
-            if (empty($a) || empty($b)) {
-                echo $OUTPUT->notification(get_string('couldnt_move_down', 'grouptool'), 'error');
-            } else {
-                $DB->set_field('grouptool_agrps', 'sort_order', $a->sort_order, ['id' => $b->id]);
-                $DB->set_field('grouptool_agrps', 'sort_order', $b->sort_order, ['id' => $a->id]);
-            }
-        }
-
         if ($courseid != null) {
             $this->loadgroups($courseid, $cm);
             $this->cm = $cm;

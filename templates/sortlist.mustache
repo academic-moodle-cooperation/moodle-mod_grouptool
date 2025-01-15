@@ -76,16 +76,14 @@
     }
 }}
 <div class="mod_grouptool_sortlist">
-    <div class="drag_area">
-        <table class="table table-hover drag_list">
+        <table class="table table-hover">
             <thead>
                 <tr>
-                    <th class="checkbox_container">
+                    <th class="mod_grouptool_checkbox_container">
                         <div>
-                            <input type="checkbox" id="select_all" title="{{#str}}select, grouptool{{/str}}" />
+                            <input type="checkbox" id="mod_grouptool_select_all" title="{{#str}}select, grouptool{{/str}}" />
                         </div>
                     </th>
-                    <th>{{#str}} move, core{{/str}}{{#movehelpicon}}{{>core/help_icon}}{{/movehelpicon}}</th>
                     <th>{{#str}} name, core {{/str}}</th>
                     {{#usesize}}<th>{{#str}} size, core {{/str}}{{#sizehelpicon}}{{>core/help_icon}}{{/sizehelpicon}}</th>{{/usesize}}
                     <th>{{#str}} groupstatus, mod_grouptool {{/str}}{{#statushelpicon}}{{>core/help_icon}}{{/statushelpicon}}</th>
@@ -97,11 +95,10 @@
                 {{#groups}}{{>mod_grouptool/sortlist_entry}}{{/groups}}
             </tbody>
         </table>
-    </div>
 </div>
 
 <script>
-    document.getElementById('select_all').addEventListener('change', function() {
+    document.getElementById('mod_grouptool_select_all').addEventListener('change', function() {
         var checkboxes = document.querySelectorAll('.mod_grouptool_sortlist_body input[type="checkbox"]');
         for (var checkbox of checkboxes) {
             checkbox.checked = this.checked;
