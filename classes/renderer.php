@@ -102,7 +102,6 @@ class renderer extends \plugin_renderer_base {
         }
 
         $html = $this->output->render_from_template('mod_grouptool/sortlist', $context);
-        
         return $html;
     }
 
