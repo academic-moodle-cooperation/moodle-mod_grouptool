@@ -58,52 +58,131 @@
     }
 
 }}
-<tr class="mod_grouptool_sortlist_entry {{^status}} dimmed_text{{/status}}{{#missing}} missing_agrp{{/missing}}{{!
-           }}{{#slidup}} slidup{{/slidup}}" {{!
-    }}data-groupings='[0{{#groupingids}}, {{.}}{{/groupingids}}]' data-order="{{order}}" data-id="{{id}}" data-status="{{status}}"
-    {{!
-    }}data-name="{{name}}" {{#usesize}}data-size="{{size}}"{{/usesize}}>
-    <td class="cell c0 checkbox_container"><div><input type="checkbox" name="selected[]" title="{{#str}}select, grouptool{{/str}}" {{!
-                                        }}class="checkbox_status class0 {{#groupingids}} class{{.}}{{/groupingids}}" {{!
-                                        }}value="{{id}}" {{#checked}}checked{{/checked}} /></div></td>
-    <td class="cell c1 grpname" style="text-align:left;width:20%;"><div>
-        <input type="hidden" name="name[{{id}}]" value="{{name}}" class="form-control" />
-        <span class="grouppix img-fluid">{{{grouppix}}}</span>
-        <span class="text">{{name}}</span>
-        <a href="{{pageurl}}&rename={{id}}" data-rename title="{{#str}}rename, core{{/str}}">
-            {{#pix}}t/editstring, core, {{#str}}rename, core{{/str}}{{/pix}}</a>
-        <input type="hidden" name="order[{{id}}]" value="{{order}}" class="sort_order" />
-    </div></td>
+<tr class="mod_grouptool_sortlist_entry
+    {{^status}} dimmed_text{{/status}}
+    {{#missing}} missing_agrp{{/missing}}
+    {{#slidup}} slidup{{/slidup}}"
+    data-groupings='[0{{#groupingids}}, {{.}}{{/groupingids}}]'
+    data-order="{{order}}"
+    data-id="{{id}}"
+    data-status="{{status}}"
+    data-name="{{name}}"
     {{#usesize}}
-        <td class="cell c3 size addfield"><div>
-            <input type="hidden" name="size[{{id}}]" value="{{size}}" class="form-control" />
-            <span class="text">{{size}}</span>{{!
-            }}<a href="{{pageurl}}&resize={{id}}" data-resize title="{{#str}}resize, mod_grouptool{{/str}}" {{!
-               }}class="resizebutton">{{#pix}} t/editstring, core, {{#str}}resize, mod_grouptool{{/str}}{{/pix}}</a>
-        </div></td>
+    data-size="{{size}}"
+    {{/usesize}}>
+    <td class="cell c0 checkbox_container">
+        <div>
+            <input type="checkbox" name="selected[]"
+                   title="{{#str}}select, grouptool{{/str}}"
+                   class="checkbox_status class0 {{#groupingids}} class{{.}}{{/groupingids}}"
+                   value="{{id}}" {{#checked}} checked {{/checked}}/>
+        </div>
+    </td>
+    <td class="cell c1 grpname" style="text-align:left;width:20%;">
+        <div>
+        <input type="hidden" name="name[{{id}}]" value="{{name}}" class="form-control" />
+            <span class="grouppix img-fluid">
+                {{{grouppix}}}
+            </span>
+            <span class="text">
+                {{name}}
+            </span>
+        <a href="{{pageurl}}&rename={{id}}" data-rename title="{{#str}}rename, core{{/str}}">
+            {{#pix}}
+                t/editstring, core,
+                {{#str}}
+                    rename, core
+                {{/str}}
+            {{/pix}}
+            </a>
+        <input type="hidden" name="order[{{id}}]" value="{{order}}" class="sort_order" />
+        </div>
+    </td>
+    {{#usesize}}
+        <td class="cell c3 size addfield">
+            <div>
+                <input type="hidden" name="size[{{id}}]" value="{{size}}" class="form-control"/>
+                <span class="text">
+                    {{size}}
+                </span>
+                <a href="{{pageurl}}&resize={{id}}" data-resize title="{{#str}}
+                    resize, mod_grouptool{{/str}}" class="resizebutton">
+                    {{#pix}}
+                        t/editstring, core,
+                        {{#str}}
+                            resize, mod_grouptool
+                        {{/str}}
+                    {{/pix}}
+                </a>
+            </div>
+        </td>
     {{/usesize}}
-    <td class="cell c4 buttons"><div>
-        <a href="{{pageurl}}&toggle={{id}}" data-toggle data-status="{{status}}" {{!
-           }}title="{{#status}}{{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}" {{!
-           }}class="{{#status}} {{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}">{{!
-            }}
-        {{#status}}<span class="badge bg-success text-light">Active </span>{{/status}}
-        {{^status}}<span class="badge bg-secondary text-dark"> Inactive</span> {{/status}}
-        </a>
-    </div></td>
-    <td class="cell c5 buttons"><div>
-        <a href="{{{editurl}}}" target="_blank"  {{!
-           }}title="{{#str}}settingspage, mod_grouptool{{/str}}">{{!
-            }}{{#pix}} i/settings, core, {{#str}}settingspage, mod_grouptool{{/str}}{{/pix}}{{!
-        }}</a>
-    </div></td>
-    <td class="cell c6 buttons"><div>
-        <a href="{{^nodeletion}}{{pageurl}}&delete={{id}}{{/nodeletion}}" data-delete{{!
-           }} class="deletebutton {{#nodeletion}} disabled{{/nodeletion}}"{{!
-           }}{{^nodeletion}} title="{{#str}}delete, core{{/str}}"{{/nodeletion}}{{!
-           }}{{#nodeletion}} disabled aria-disabled="true" title="{{#str}}nodeletion, grouptool{{/str}}"{{/nodeletion}}>{{!
-            }}{{^nodeletion}}{{#pix}} i/delete, core, {{#str}}delete, core{{/str}}{{/pix}}{{/nodeletion}}{{!
-            }}{{#nodeletion}}{{#pix}} i/delete, core, {{#str}}nodeletion, grouptool{{/str}}{{/pix}}{{/nodeletion}}{{!
-        }}</a>
-    </div></td>
+    <td class="cell c4 buttons">
+        <div>
+            <a href="{{pageurl}}&toggle={{id}}"
+            data-toggle data-status="{{status}}"
+            title="{{#status}}{{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}"
+            class="{{#status}} {{#str}}active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}">
+                {{#status}}<span class="badge bg-success text-light">Active </span>{{/status}}
+                {{^status}}<span class="badge bg-secondary text-dark"> Inactive</span> {{/status}}
+            </a>
+        </div>
+    </td>
+    <td class="cell c5 buttons">
+        <div>
+            <a href="{{{editurl}}}"
+               target="_blank"
+               title="{{#str}}settingspage, mod_grouptool{{/str}}">
+                {{#pix}}
+                    i/settings, core,
+                    {{#str}}
+                        settingspage, mod_grouptool
+                    {{/str}}
+                {{/pix}}
+            </a>
+        </div>
+    </td>
+    <td class="cell c6 buttons">
+        <div>
+            <a href="
+                {{^nodeletion}}
+                    {{pageurl}}&delete={{id}}
+                {{/nodeletion}}"
+                data-delete
+                class="deletebutton
+                {{#nodeletion}}
+                    disabled
+                {{/nodeletion}}"
+                {{^nodeletion}}
+                    title="
+                    {{#str}}
+                        delete, core
+                    {{/str}}"
+                {{/nodeletion}}
+                {{#nodeletion}}
+                    disabled aria-disabled="true"
+                    title="
+                    {{#str}}
+                        nodeletion, grouptool
+                    {{/str}}"
+                {{/nodeletion}}>
+                    {{^nodeletion}}
+                        {{#pix}}
+                            i/delete, core,
+                            {{#str}}
+                                delete, core
+                            {{/str}}
+                        {{/pix}}
+                    {{/nodeletion}}
+                    {{#nodeletion}}
+                        {{#pix}}
+                            i/delete, core,
+                            {{#str}}
+                                nodeletion, grouptool
+                            {{/str}}
+                        {{/pix}}
+                    {{/nodeletion}}
+            </a>
+        </div>
+    </td>
 </tr>
