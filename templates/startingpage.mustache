@@ -16,11 +16,11 @@
 }}
 {{!
     TODO - Add description
-    @template mod_grouptool/sortlist
+    @template mod_grouptool/startingpage
 
-    Grouptool's sortlist template.
+    Grouptool's startingpage template.
 
-    The purpose of this template is to display the sortlist.
+    The purpose of this template is to display the startingpage.
 
     Classes required for JS:
     * none
@@ -37,10 +37,17 @@
 
     Example context (json):
     {
-        "usesize": true,
-        "pageurl": "https://example.com/mod/grouptool/view.php?id=1",
-        "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1",
-        "statushelpicon": { "title": "Help Text Title", "linktext": "Help Text Content" },
+    "usesize": true,
+    "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1",
+    "buttonadministratelink": "https://example.com/mod/grouptool/admin.php",
+    "buttonpreviewlink": "https://example.com/mod/grouptool/preview.php",
+    "registrationdetails": " 	Allow self registration",
+    "groupplacedetails": " 	4 Groups / 12 Places",
+    "queueing": true,
+    "queueplacedetails": "Active / 0 Places",
+    "numberofusers": 21 Users,
+    "registrations": true,
+    "detailsregistration": "21 registrations missing"
     }
 }}
 <div class="mod_grouptool_starting_page conatiner">
