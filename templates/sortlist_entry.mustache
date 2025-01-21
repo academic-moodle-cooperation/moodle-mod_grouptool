@@ -59,10 +59,7 @@
 
 }}
 <div>
-    <tr class="mod_grouptool_sortlist_entry
-        {{^status}} dimmed_text{{/status}}
-        {{#missing}} missing_agrp{{/missing}}
-        {{#slidup}} slidup{{/slidup}}"
+    <tr class="mod_grouptool_sortlist_entry {{^status}} dimmed_text{{/status}} {{#missing}} missing_agrp{{/missing}} {{#slidup}} slidup{{/slidup}}"
         data-groupings="[0{{#groupingids}}, {{.}}{{/groupingids}}]"
         data-order="{{order}}"
         data-id="{{id}}"
