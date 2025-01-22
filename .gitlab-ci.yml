@@ -18,6 +18,8 @@ variables:
   MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
   MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
 
+  MUSTACHE_IGNORE_NAMES: 'sortlist_entry.mustache'
+
 .job_template: &job_configuration
   image: quay.io/amc/moodle-plugin-ci:${PHP_VERSION}-node.20
   before_script:
@@ -31,7 +33,7 @@ variables:
     - moodle-plugin-ci phpcs
     - moodle-plugin-ci validate
     - moodle-plugin-ci savepoints
-    - moodle-plugin-ci mustache || true
+    - moodle-plugin-ci mustache
     - moodle-plugin-ci grunt
     - moodle-plugin-ci phpdoc
     - moodle-plugin-ci phpunit
