@@ -552,7 +552,7 @@ $string['unregfrommgroups_help'] = 'Deregister users not only from grouptool, bu
 $string['unregister'] = 'Deregistration';
 $string['unregister_conflict_user_not_in_group'] = 'User <strong>{$a->fullname}</strong> is not in group <strong>{$a->groupname}</strong>!';
 $string['unregister_desc'] = 'Deregister mutiple users';
-$string['unregister_from_inactive_group_warning'] = 'Note: Group <strong>{$a}</strong> is currently inactive in the grouptool context and will therefore not be displayed.';$string['unregister_skipped'] = 'Skipped user <strong>{$a->fullname}</strong> for group <strong>{$a->groupname}</strong>!';
+$string['unregister_from_inactive_group_warning'] = 'Note: Group <strong>{$a}</strong> is currently inactive in the grouptool context and will therefore not be displayed.';
 $string['unregister_in_inactive_group_warning'] = 'Note: Group <strong>{$a}</strong> is currently inactive in the grouptool context and will therefore not be displayed.';
 $string['unregister_progress_completed'] = 'Deregistration completed';
 $string['unregister_progress_preview_completed'] = 'Deregistrationpreview completed';
@@ -563,6 +563,7 @@ $string['unregister_user_from_moodle_group']  = 'Deregistration of <strong>{$a->
 $string['unregister_user_not_in_group'] = 'User <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) not in moodle group <strong>{$a->groupname}</strong>!';
 $string['unregister_user_only_in_moodle_group'] = 'User <strong>{$a->fullname}</strong> is only in moodle group <strong>{$a->groupname}</strong> but not in grouptool group!';
 $string['unregister_user_prev'] = 'Deregistrating <strong>{$a->fullname}</strong> (<strong>{$a->idnumber}</strong>) from group <strong>{$a->groupname}</strong>.';
+$string['unregister_skipped'] = 'Skipped user <strong>{$a->fullname}</strong> for group <strong>{$a->groupname}</strong>!';
 $string['unregisterbutton'] = 'Deregister users';
 $string['update_grouplist_success'] = 'Successfully updated active groups!';
 $string['updatemdlgrps'] = 'Register in moodle-groups';
@@ -604,8 +605,8 @@ $string['your_place_allocated_in_group_success'] = 'You successfully marked grou
 // Deprecated since version 2.8!
 $string['grouptool:view_registrations'] = 'View who\'s registered/queued in which active group using grouptool';
 // Deprecated since version 2.9!
-$string['grouptool:view_regs_group_overview'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
 $string['grouptool:view_regs_course_overview'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
+$string['grouptool:view_regs_group_overview'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
 $string['includedeleted'] = 'Include deleted users';
 $string['includedeleted_help'] = 'If checked, deleted users won\'t get filtered out of the list. Deleted user-accounts can\'t be enroled in the course during import process.';
 // Deprecated since version 3.1.2!
