@@ -11,6 +11,7 @@ CHANGELOG
 * [FEATURE] #7544 New more menu
 * [FIXED] #8040 Deprecated messages for active groups
 * [FIXED] #8117 Fixed Courseindex not working
+* [FIXED] #8208 Fixed extra empty first sheet in excel download
 
 4.4.0 (2024-07-30)
 ------------------

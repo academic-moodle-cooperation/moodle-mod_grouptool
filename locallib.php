@@ -5681,20 +5681,6 @@ class mod_grouptool {
                 $allgroupsworksheet->set_column(3, 3, $columnwidth[3]);
             }
 
-            $legendworksheet = $workbook->add_worksheet(get_string('status', 'grouptool') . ' ' .
-                get_string('help'));
-            $legendworksheet->write_string(0, 0, get_string('status', 'grouptool') . ' ' .
-                get_string('help'));
-            $line = 1;
-            foreach (explode("</li>", get_string('status_help', 'grouptool')) as $legendline) {
-                if (strstr($legendline, "</span>")) {
-                    $lineelements = explode("</span>", $legendline);
-                    $legendworksheet->write_string($line, 0, strip_tags($lineelements[0]));
-                    $legendworksheet->write_string($line, 1, strip_tags($lineelements[1]));
-                    $line++;
-                }
-            }
-
             // Add content for all groups!
             $groupworksheets = [];
 
