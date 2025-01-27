@@ -21,7 +21,7 @@ variables:
   MUSTACHE_IGNORE_NAMES: 'sortlist_entry.mustache'
 
 .job_template: &job_configuration
-  image: quay.io/amc/moodle-plugin-ci:${PHP_VERSION}-node.20
+  image: quay.io/amc/moodle-plugin-ci:${PHP_VERSION}-node.22
   before_script:
     - cd ../..
     - moodle-db-isready
