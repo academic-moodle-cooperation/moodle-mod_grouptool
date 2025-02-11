@@ -5,7 +5,6 @@ CHANGELOG
 ------------------
 * Moodle 4.5.0 compatible version
 * [FEATURE] #7537 New starting page
-* [FEATURE] #7538 New group registration preview subpage
 * [FEATURE] #7539 New group administration page
 * [FEATURE] #7540 New group creation subpage
 * [FEATURE] #7544 New more menu
