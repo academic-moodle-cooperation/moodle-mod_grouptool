@@ -4,6 +4,7 @@ CHANGELOG
 4.5.1 (2025-02-26)
 ------------------
 [FIXED] #8230 Fix resolving group queue
+[FIXED] #8245 Fix error message when deleting groups
 
 4.5.0 (2024-11-30)
 ------------------
