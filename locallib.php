@@ -4208,6 +4208,7 @@ class mod_grouptool {
             $attr['confirm'] = '1';
             $attr['action'] = $action;
             $attr['sesskey'] = sesskey();
+            $attr['tab'] = 'selfregistration';
 
             $continue = new moodle_url($PAGE->url, $attr);
             $cancel = new moodle_url($PAGE->url);
@@ -4230,12 +4231,18 @@ class mod_grouptool {
              * $PAGE->url->param('sesskey', sesskey());
              * won't set sesskey param in $PAGE->url?!?
              */
-            $url = new moodle_url($PAGE->url, ['sesskey' => sesskey()]);
+            $url = new moodle_url($PAGE->url, ['sesskey' => sesskey(), 'tab' => 'selfregistration']);
+            // The back url is for the back button to return to the grouptool overview.
+            $backurl = new moodle_url($PAGE->url);
             $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
 
             $regstat = $this->get_registration_stats($USER->id);
             if (has_capability('mod/grouptool:register_students', $this->context)) {
-                $mform->addElement('cancel', 'cancel', get_string('back'));
+                // Add HTML button instead of a normal button to use a different URL than the form.
+                $buttonarray = [];
+                $buttonarray[] = $mform->createElement('html',
+                    $OUTPUT->render_from_template('mod_grouptool/helpers/back_button', ['back_url' => $backurl->out(false)]));
+                $mform->addGroup($buttonarray, 'buttonar', '', [''], false);
             }
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
                 has_capability('mod/grouptool:register_students', $this->context)) {
