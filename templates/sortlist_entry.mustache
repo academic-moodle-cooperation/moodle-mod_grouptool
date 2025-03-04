@@ -86,10 +86,11 @@
                 {{name}}
             </span>
             <a href="{{pageurl}}&rename={{id}}" data-rename title="{{#str}}rename, core{{/str}}">
-            </a>
+            {{#pix}}t/editstring, core, {{#str}}rename, core{{/str}}{{/pix}}</a>
             <input type="hidden" name="order[{{id}}]" value="{{order}}" class="sort_order"/>
         </div>
     </td>
+
     {{#usesize}}
         <td class="cell c3 size addfield">
             <div>
