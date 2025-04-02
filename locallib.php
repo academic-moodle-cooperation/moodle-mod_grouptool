@@ -765,7 +765,7 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     private function create_one_person_groups(array $users, string $namescheme = "[idnumber]", int $grouping = 0,
-                                              string $groupingname = null,
+                                              string|null $groupingname = null,
                                               bool  $previewonly = false, int $enablegroupmessaging = 0): array {
         global $DB, $USER;
 
@@ -3473,7 +3473,7 @@ class mod_grouptool {
                 $detailsregistration = $regstats->reg_users . " " .
                     get_string('registered', 'grouptool');
             }
-            // if queuses are enabled show how many are in a queue.
+            // If queuses are enabled show how many are in a queue.
             if ($queuing) {
                 if ($regstats->queued_users > 0) {
                     if ($detailsregistration != "") {
@@ -3483,7 +3483,7 @@ class mod_grouptool {
                         get_string('queued', 'grouptool');
                 }
             }
-            // show how many are not registered yet.
+            // Show how many are not registered yet.
             if ($regstats->users > 0) {
                 if ($detailsregistration != "") {
                     $detailsregistration .= " <br> ";
@@ -4206,11 +4206,11 @@ class mod_grouptool {
             $attr = [];
             if ($action == 'resolvequeues') {
                 require_capability('mod/grouptool:register_students', $this->context);
-                [$error, $confirmmessage] = $this->resolve_queues(true); // Try only!
+                [$error, $confirmmessage] = $this->resolve_queues(true); // This is try only!
             } else if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
                 $attr['group'] = $agrpid;
-                // Try only!
+                // This is try only!
                 try {
                     $confirmmessage = $this->unregister_from_agrp($agrpid, $USER->id, true);
                 } catch (\mod_grouptool\local\exception\registration $e) {
@@ -4221,7 +4221,7 @@ class mod_grouptool {
                 require_capability('mod/grouptool:register', $this->context);
                 $action = 'reg';
                 $attr['group'] = $agrpid;
-                // Try only!
+                // This is try only!
                 try {
                     $confirmmessage = $this->register_in_agrp($agrpid, $USER->id, true);
                 } catch (\mod_grouptool\local\exception\registration $e) {
@@ -5172,7 +5172,7 @@ class mod_grouptool {
         $userinfo = [];
         $syncstatus = $this->get_sync_status();
         if (!$onlydata && count($agrps)) {
-            // Global-downloadlinks!
+            // Echo the Global-downloadlinks!
             echo $this->get_download_links($downloadurl);
         }
 
@@ -6556,7 +6556,7 @@ class mod_grouptool {
 
             $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
             if ($pushtomdl) {
-                // Try only!
+                // This is try only!
                 [$error, $message] = $this->push_registrations($groupid, $groupingid, true);
                 $attr = [];
                 $attr['confirm'] = 1;

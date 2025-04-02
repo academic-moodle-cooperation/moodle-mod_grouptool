@@ -66,16 +66,6 @@ class renderer extends \plugin_renderer_base {
             if (get_config('mod_grouptool', 'show_add_info')) {
                 $groupobj = groups_get_group($id);
                 $pictureout = print_group_picture($groupobj, $sortlist->cm->course, false, true, false);
-                /*
-                 * TODO - This is a hack to get the group picture to display.
-                if (empty($pictureout)) {
-                    $pictureurl = new \moodle_url('/user/index.php',
-                        ['id' => $sortlist->cm->course, 'group' => $group->id]);
-                    $pictureobj = html_writer::img($this->image_url('g/g1')->out(false),
-                        $group->name, ['title' => $group->name]); // default image.
-                    $pictureout = html_writer::link($pictureurl, $pictureobj);
-                }
-                */
                 $sortlist->groups[$id]->grouppix = $pictureout;
             }
             $sortlist->groups[$id]->editurl = new \moodle_url('/group/group.php', [
