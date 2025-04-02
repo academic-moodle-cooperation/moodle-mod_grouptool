@@ -150,9 +150,12 @@ class mod_grouptool_external extends external_api {
 
         $group = groups_get_group_by_name($course->id, $params['name']);
         $group = $DB->get_record('groups', ['id' => $group]);
-
+        // If the group already exists
         if (!empty($group) && ($group->id != $params['groupid'])) {
             $result->error = get_string('groupnameexists', 'group', $params['name']);
+        // If the group name is too long
+        } elseif (!empty($params) && strlen($params['name']) >= 255) {
+            $result->error = get_string('groupnametoolong', 'grouptool', $params['name']);
         } else {
             $group = new stdClass();
             $group->id = $params['groupid'];

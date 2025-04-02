@@ -238,6 +238,7 @@ $string['groupcreation'] = 'Group creation';
 $string['groupcreationmode'] = 'Mode';
 $string['groupfromtodigits'] = 'From, to &amp; digits in group names:';
 $string['groupinfo'] = 'Group information';
+$string['groupnamelength'] = 'Group name length is too long!';
 $string['grouping_assign_error'] = 'Couldn\'t be successfully assigned to the grouping:';
 $string['grouping_assign_error_prev'] = 'Can\'t be successfully assigned to the grouping:';
 $string['grouping_assign_success'] = 'Were successfully assigned:';

@@ -119,6 +119,9 @@ class group_rename_form extends \moodleform {
             if (!empty($group) && ($group->id != $data['rename'])) {
                 $errors['name'] = get_string('groupnameexists', 'group', $data['name']);
             }
+            if(strlen($data['name']) >= 255){
+                $errors['name'] = get_string('groupinfo', 'grouptool');
+            }
         }
 
         return $errors;
