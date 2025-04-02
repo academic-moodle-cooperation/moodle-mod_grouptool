@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_grouptool;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -38,11 +40,10 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code
  * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_grouptool_locallib_test extends \mod_grouptool\local\tests\base {
+class locallib_test extends \mod_grouptool\local\tests\base {
     /*
      * The base test class already contains a setUp-method setting up a course including users and groups.
      */
-
 
     /**
      * Tests get_name method in locallib
@@ -53,11 +54,10 @@ class mod_grouptool_locallib_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_get_name() {
+    public function test_get_name(): void  {
         $grouptool = $this->create_instance(['name' => 'GT01']);
         $this->assertEquals($grouptool->get_name(), 'GT01');
     }
-
 
     /**
      * Tests get_active_groups method in locallib
@@ -68,7 +68,7 @@ class mod_grouptool_locallib_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_get_active_groups() {
+    public function test_get_active_groups(): void  {
         global $DB;
         $grouptool = $this->create_instance();
 
@@ -86,7 +86,7 @@ class mod_grouptool_locallib_test extends \mod_grouptool\local\tests\base {
         // TODO: test with set agrpid, groupid and groupingid as parameter in order to check if correct data is returned.
     }
 
-    public function test_groups_get_all_groups() {
+    public function test_groups_get_all_groups(): void  {
         // TODO: wirite test for groups_get_all_groups().
     }
 }

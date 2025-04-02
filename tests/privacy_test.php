@@ -59,7 +59,7 @@ class mod_grouptool_privacy_testcase extends base {
      * @throws \moodle_exception
      * @throws \required_capability_exception
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void  {
         $this->resetAfterTest();
 
         $course1 = $this->course;
@@ -141,7 +141,7 @@ class mod_grouptool_privacy_testcase extends base {
      * @throws \moodle_exception
      * @throws \required_capability_exception
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void  {
         $this->resetAfterTest();
 
         $course = $this->course;
@@ -224,7 +224,7 @@ class mod_grouptool_privacy_testcase extends base {
     /**
      * Test that a student with multiple submissions and grades is returned with the correct data.
      */
-    public function test_export_user_data_student() {
+    public function test_export_user_data_student(): void  {
         // Stop here and mark this test as incomplete.
         self::markTestIncomplete(
                 'This test has not been implemented yet.'
@@ -234,7 +234,7 @@ class mod_grouptool_privacy_testcase extends base {
     /**
      * Tests the data returned for a teacher.
      */
-    public function test_export_user_data_teacher() {
+    public function test_export_user_data_teacher(): void  {
         // Stop here and mark this test as incomplete.
         self::markTestIncomplete(
                 'This test has not been implemented yet.'
@@ -244,7 +244,7 @@ class mod_grouptool_privacy_testcase extends base {
     /**
      * A test for deleting all user data for a given context.
      */
-    public function test_delete_data_for_all_users_in_context() {
+    public function test_delete_data_for_all_users_in_context(): void  {
         // Stop here and mark this test as incomplete.
         self::markTestIncomplete(
                 'This test has not been implemented yet.'
@@ -254,7 +254,7 @@ class mod_grouptool_privacy_testcase extends base {
     /**
      * A test for deleting all user data for one user.
      */
-    public function test_delete_data_for_user() {
+    public function test_delete_data_for_user(): void  {
         // Stop here and mark this test as incomplete.
         self::markTestIncomplete(
                 'This test has not been implemented yet.'
@@ -276,7 +276,7 @@ class mod_grouptool_privacy_testcase extends base {
      * @throws \moodle_exception
      * @throws \required_capability_exception
      */
-    public function test_delete_data_for_users() {
+    public function test_delete_data_for_users(): void  {
         global $DB;
 
         $course1 = $this->course;

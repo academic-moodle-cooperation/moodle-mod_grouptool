@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -48,12 +49,12 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * Tests basic creation of grouptool instance
      *
      * 2 Assertions
-     *
+     * @covers \mod_grouptool::create_instance
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_create_instance() {
+    public function test_create_instance(): void  {
         global $DB;
 
         $grouptool = $this->create_instance();
@@ -66,13 +67,13 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * Tests basic registration to a single group
      *
      * 9 Assertions
-     *
+     * @covers \mod_grouptool::register_in_agrp
      * @throws Throwable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_single() {
+    public function test_single(): void  {
         // Just a single registration per user, with groupsize = 2 and no queue!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -84,7 +85,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
         ]);
 
         // Get all active groups indexed by active group ID!
-        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
 
@@ -139,12 +140,13 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      *
      * 6 Assertions
      *
+     * @covers \mod_grouptool::register_in_agrp
      * @throws Throwable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_single_queue() {
+    public function test_single_queue(): void  {
         // Just a single registration per user, with groupsize = 2 and queue!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -155,7 +157,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'allow_unreg' => 0,
         ]);
 
-        list(, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        [, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
         $message->username = fullname($this->students[3]);
 
         // Prepare by registering users 0 and 1 in group 0 and queue user 2 in group 0!
@@ -201,12 +203,13 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      *
      * 11 Assertions
      *
+     * @covers \mod_grouptool::register_in_agrp
      * @throws Throwable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_multiple_queue() {
+    public function test_multiple_queue(): void  {
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -219,7 +222,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'groups_queues_limit' => 1,
                 'users_queues_limit' => 1,
         ]);
-        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
         // Allocate a place first and continue with registering user 0 in groups 0, 1 and 2!
@@ -285,12 +288,13 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      *
      * 13 Assertions
      *
+     * @covers \mod_grouptool::register_in_agrp
      * @throws Throwable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_groupchange_single() {
+    public function test_groupchange_single(): void  {
         // Single registration per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -303,7 +307,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'users_queues_limit' => 1,
         ]);
         // Get all active groups indexed by active group ID!
-        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
         // Prepare by registering users 0 and 1 in group 0!
         $text = $grouptool->testable_register_in_agrp($agrpids[0], $this->students[0]->id, false);
@@ -366,12 +370,13 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      *
      * 10 Assertions
      *
+     * @covers \mod_grouptool::register_in_agrp
      * @throws Throwable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_groupchange_multiple() {
+    public function test_groupchange_multiple(): void  {
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
                 'allow_reg' => 1,
@@ -385,7 +390,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'groups_queues_limit' => 1,
                 'users_queues_limit' => 1,
         ]);
-        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
         // Prepare by registering user 0 in groups 0 and 1 and user 2 in groups 2 and 3!
         $text = $grouptool->testable_register_in_agrp($agrpids[0], $this->students[0]->id, false);
@@ -548,13 +553,14 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      *
      * 11 Assertions
      *
+     * @covers \mod_grouptool::register_in_agrp
      * @throws Throwable
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function test_queue_resolving() {
+    public function test_queue_resolving(): void  {
         global $DB;
 
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
@@ -569,7 +575,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
                 'groups_queues_limit' => 2,
                 'users_queues_limit' => 1,
         ]);
-        list($agrps, $agrpids, $message) = $this->get_agrps_and_prepare_message($grouptool);
+        [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
         // Exercise SUT & Validate outcome!
 
@@ -600,14 +606,14 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
         self::assertEquals(get_string('queue_in_group_success', 'grouptool', $message), $text);
 
         // Now resolve queues - preview first!
-        list($error, $message) = $grouptool->resolve_queues(true);
+        [$error, $message] = $grouptool->resolve_queues(true);
         if ($error) {
             echo $message;
         }
         self::assertFalse($error);
 
         // Now do the work!
-        list($error, $message) = $grouptool->resolve_queues();
+        [$error, $message] = $grouptool->resolve_queues();
         if ($error) {
             echo $message;
         }
