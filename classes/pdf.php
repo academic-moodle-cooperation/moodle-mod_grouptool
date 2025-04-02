@@ -474,11 +474,15 @@ class pdf extends \pdf {
                 $ln = 1;
             }
             if ($key == 'email') {
-                $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight, get_string('email'), $border, 'C', true,
-                        $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
+                $this->MultiCell($identitycolumnwidth * 2 * $writewidth, $normalheight,
+                    get_string('email'), $border, 'C', true,
+                        $ln, null, null, true, 1, true,
+                    false, $normalheight, 'M', true);
             } else {
-                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight, \core_user\fields::get_display_name($key), $border, 'C',
-                        true, $ln, null, null, true, 1, true, false, $normalheight, 'M', true);
+                $this->MultiCell($identitycolumnwidth * $writewidth, $normalheight,
+                    \core_user\fields::get_display_name($key), $border, 'C',
+                        true, $ln, null, null, true, 1,
+                    true, false, $normalheight, 'M', true);
             }
         }
 

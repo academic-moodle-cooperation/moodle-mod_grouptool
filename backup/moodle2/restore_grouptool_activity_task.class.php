@@ -25,6 +25,8 @@
 
 // Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_stepslib.php');
+defined('MOODLE_INTERNAL') || die();
+
 
 /**
  * grouptool restore task that provides everything to perform one complete restore of the activity

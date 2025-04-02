@@ -25,6 +25,9 @@
 
 namespace mod_grouptool\local\tests;
 
+defined('MOODLE_INTERNAL') || die();
+
+
 use advanced_testcase;
 use stdClass;
 use mod_grouptool_generator;

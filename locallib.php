@@ -120,7 +120,7 @@ class mod_grouptool {
         if (!empty($cm) && $cm != null) {
             $this->cm = $cm;
         } else if (!$this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
-            print_error('invalidcoursemodule');
+            throw new moodle_exception('invalidcoursemodule');
         }
         if (!empty($context) && $context != null) {
             $this->context = $context;
@@ -131,14 +131,14 @@ class mod_grouptool {
         if (!empty($course) && $course != null) {
             $this->course = $course;
         } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
-            print_error('invalidid', 'grouptool');
+            throw new moodle_exception('invalidid', 'grouptool');
         }
 
         if ($grouptool) {
             $this->grouptool = $grouptool;
         } else if (!$this->grouptool = $DB->get_record('grouptool',
             ['id' => $this->cm->instance])) {
-            print_error('invalidid', 'grouptool');
+            throw new moodle_exception('invalidid', 'grouptool');
         }
 
         $this->grouptool->cmidnumber = $this->cm->idnumber;
@@ -764,7 +764,8 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    private function create_one_person_groups(array $users, string $namescheme = "[idnumber]", int $grouping = 0, string $groupingname = null,
+    private function create_one_person_groups(array $users, string $namescheme = "[idnumber]", int $grouping = 0,
+                                              string $groupingname = null,
                                               bool  $previewonly = false, int $enablegroupmessaging = 0): array {
         global $DB, $USER;
 
@@ -962,7 +963,7 @@ class mod_grouptool {
             if (isset($this->course->id)) {
                 $courseid = $this->course->id;
             } else {
-                print_error('coursemisconf');
+                throw new moodle_exception('coursemisconf');
             }
         }
         $groups = groups_get_all_groups($courseid);
@@ -1065,7 +1066,7 @@ class mod_grouptool {
             $courseid = $this->course->id;
         } else {
             $courseid = 0;
-            print_error('coursemisconf');
+            throw new moodle_exception('coursemisconf');
         }
 
         if ($target == -1) {
@@ -1254,7 +1255,6 @@ class mod_grouptool {
                         $continue = new moodle_url($cancel, $params);
 
                         echo $this->confirm($text, $continue, $cancel);
-                        // echo $OUTPUT->footer();.
                         $dialog = true;
                     }
                     break;
@@ -1745,7 +1745,7 @@ class mod_grouptool {
         $orderby = "";
         switch ($data->allocateby) {
             default:
-                print_error('unknoworder');
+                throw new moodle_exception('unknoworder');
             case 'no':
             case 'random':
             case 'lastname':
@@ -1839,7 +1839,8 @@ class mod_grouptool {
         $groupdata = null;
         if ($ignoregtinstance) {
             $groupdata = $DB->get_records_sql("
-                   SELECT " . $idstring . ", MAX(grp.name) AS name, MAX(grp.description) AS description," . $sizesql . " MAX(agrp.sort_order) AS sort_order,
+                   SELECT " . $idstring . ", MAX(grp.name) AS name, MAX(grp.description) AS description," .
+                $sizesql . " MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id
@@ -1852,7 +1853,8 @@ class mod_grouptool {
         } else {
             $params['grouptoolid1'] = $params['grouptoolid'];
             $groupdata = $DB->get_records_sql("
-                   SELECT " . $idstring . ", MAX(grp.name) AS name, MAX(grp.description) AS description," . $sizesql . " MAX(agrp.sort_order) AS sort_order,
+                   SELECT " . $idstring . ", MAX(grp.name) AS name, MAX(grp.description) AS description," .
+                $sizesql . " MAX(agrp.sort_order) AS sort_order,
                           agrp.active AS active
                      FROM {groups} grp
                 LEFT JOIN {grouptool_agrps} agrp ON agrp.groupid = grp.id AND agrp.grouptoolid = :grouptoolid
@@ -2004,7 +2006,8 @@ class mod_grouptool {
                 ]),
             ];
 
-            $postsubject = $this->course->shortname . ': ' . get_string('modulenameplural', 'grouptool') . ': ' .
+            $postsubject = $this->course->shortname . ': ' .
+                get_string('modulenameplural', 'grouptool') . ': ' .
                 format_string($this->grouptool->name, true);
 
             $messageuser = $DB->get_record('user', ['id' => $newrecord->userid]);
@@ -2019,7 +2022,8 @@ class mod_grouptool {
             $moodlemessage->fullmessage = get_string('registrationnotification', 'mod_grouptool',
                 $context);
             $moodlemessage->fullmessageformat = FORMAT_HTML;
-            $moodlemessage->fullmessagehtml = $OUTPUT->render_from_template('mod_grouptool/registrationnotification', $context);
+            $moodlemessage->fullmessagehtml =
+                $OUTPUT->render_from_template('mod_grouptool/registrationnotification', $context);
             $moodlemessage->smallmessage = $context->message;
             $moodlemessage->notification = 1;
             $moodlemessage->contexturl = $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $this->cm->id;
@@ -2051,7 +2055,8 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function unregister_from_agrp($agrpid, $userid = 0, $previewonly = false, $force = false, $ignoregtinstance = false) {
+    protected function unregister_from_agrp($agrpid, $userid = 0,
+                                            $previewonly = false, $force = false, $ignoregtinstance = false) {
         global $USER, $DB;
 
         if (empty($userid)) {
@@ -2091,14 +2096,16 @@ class mod_grouptool {
         if ($ignoregtinstance) {
             $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', '');
         } else {
-            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', "grouptoolid = ?", [$this->grouptool->id]);
+            $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id',
+                "grouptoolid = ?", [$this->grouptool->id]);
 
         }
         [$agrpsql, $params] = $DB->get_in_or_equal($agrpids);
         array_unshift($params, $userid);
         $userregs = $DB->count_records_select('grouptool_registered',
             "modified_by >= 0 AND userid = ? AND agrpid " . $agrpsql, $params);
-        $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid " . $agrpsql, $params);
+        $userqueues = $DB->count_records_select('grouptool_queued',
+            "userid = ? AND agrpid " . $agrpsql, $params);
         $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
         if ($userregs + $userqueues <= $min) {
             if ($userid == $USER->id) {
@@ -3271,10 +3278,12 @@ class mod_grouptool {
                     $userinfo->fullname = fullname($userinfo);
                     if (empty($userinfo->deleted)) {
                         $text = get_string('user_is_not_enrolled', 'grouptool', $userinfo);
-                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
+                        $row->cells[] = new html_table_cell(
+                            $OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                     } else {
                         $text = get_string('user_is_deleted', 'grouptool', $userinfo);
-                        $row->cells[] = new html_table_cell($OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
+                        $row->cells[] = new html_table_cell(
+                            $OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR));
                     }
                     $error = true;
                     continue;
@@ -3341,7 +3350,8 @@ class mod_grouptool {
                                             'agrpid' => $agrpinst,
                                             'userid' => $data['id'],
                                         ])) {
-                                        $this->unregister_from_agrp($agrpinst, $userinfo->id, false, true, true);
+                                        $this->unregister_from_agrp($agrpinst,
+                                            $userinfo->id, false, true, true);
                                     }
                                 }
                             } else {
@@ -3351,10 +3361,12 @@ class mod_grouptool {
                         }
                         $unregistered[] = $userinfo->id;
                         if ($wasunregfrommgroup && !$wasunregfrommgtgroup) {
-                            $row->cells[] = get_string('unregister_user_from_moodle_group', 'grouptool', $data);
+                            $row->cells[] = get_string('unregister_user_from_moodle_group',
+                                'grouptool', $data);
                             $row->attributes['class'] = 'success';
                         } else if ($notinmgroup && !$wasunregfrommgtgroup) {
-                            $row->cells[] = get_string('unregister_user_not_in_group', 'grouptool', $data);
+                            $row->cells[] = get_string('unregister_user_not_in_group',
+                                'grouptool', $data);
                             $row->attributes['class'] = 'success';
                         } else {
                             $row->cells[] = get_string('unregister_user', 'grouptool', $data);
@@ -3362,7 +3374,8 @@ class mod_grouptool {
                         }
 
                     } else if ($userinfo) {
-                        if (!$DB->record_exists_select('grouptool_registered', "agrpid = :agrpid AND userid = :userid",
+                        if (!$DB->record_exists_select('grouptool_registered',
+                            "agrpid = :agrpid AND userid = :userid",
                             ['agrpid' => $agrp[$group], 'userid' => $userinfo->id])) {
                             if (groups_is_member($group, $userinfo->id)) {
                                 $cell = get_string('unregister_user_only_in_moodle_group',
@@ -3370,12 +3383,14 @@ class mod_grouptool {
                                 $row->cells[] = $cell;
                                 $row->attributes['class'] = 'prevsuccess';
                             } else {
-                                $cell = get_string('unregister_conflict_user_not_in_group', 'grouptool', $data);
+                                $cell = get_string('unregister_conflict_user_not_in_group',
+                                    'grouptool', $data);
                                 $row->cells[] = $cell;
                                 $row->attributes['class'] = 'prevconflict';
                             }
                         } else {
-                            $row->cells[] = get_string('unregister_user_prev', 'grouptool', $data);
+                            $row->cells[] = get_string('unregister_user_prev',
+                                'grouptool', $data);
                             $row->attributes['class'] = 'prevsuccess';
                         }
                     }
@@ -3387,9 +3402,11 @@ class mod_grouptool {
         }
         $processed++;
         if (!$previewonly) {
-            $pbar->update($processed, $count, get_string('unregister_progress_completed', 'grouptool'));
+            $pbar->update($processed, $count, get_string('unregister_progress_completed',
+                'grouptool'));
         } else {
-            $pbar->update($processed, $count, get_string('unregister_progress_preview_completed', 'grouptool'));
+            $pbar->update($processed, $count, get_string('unregister_progress_preview_completed',
+                'grouptool'));
         }
         $message .= html_writer::table($prevtable);
         return [$error, $message];
@@ -3428,7 +3445,8 @@ class mod_grouptool {
         }
         $regstats = $this->get_registration_stats($USER->id);
         $countactivegroups = count($this->get_active_groups());
-        $groupplacedetails = $countactivegroups . " " . get_string('groups') . " / " . $regstats->group_places . " " . get_string('places', 'grouptool');
+        $groupplacedetails = $countactivegroups . " " . get_string('groups') . " / " .
+            $regstats->group_places . " " . get_string('places', 'grouptool');
         if ($countactivegroups < 1) {
             $groupplacedetails = get_string('no_active_groups', 'grouptool');
         }
@@ -3439,7 +3457,8 @@ class mod_grouptool {
         }
         $queueplacedetails = '';
         if ($queuing) {
-            $queueplacedetails = get_string("active") . " / " . $regstats->queued_users . " " . get_string('places', 'grouptool');
+            $queueplacedetails = get_string("active") . " / " .
+                $regstats->queued_users . " " . get_string('places', 'grouptool');
         }
         $numberofusers = $regstats->users . " " . get_string('users');
         $detailsregistration = '';
@@ -3451,7 +3470,8 @@ class mod_grouptool {
             $registrations = true;
             // Show how many are registered.
             if ($regstats->reg_users > 0) {
-                $detailsregistration = $regstats->reg_users . " " . get_string('registered', 'grouptool');
+                $detailsregistration = $regstats->reg_users . " " .
+                    get_string('registered', 'grouptool');
             }
             // if queuses are enabled show how many are in a queue.
             if ($queuing) {
@@ -3459,7 +3479,8 @@ class mod_grouptool {
                     if ($detailsregistration != "") {
                         $detailsregistration .= " <br> ";
                     }
-                    $detailsregistration .= $regstats->queued_users . " " . get_string('queued', 'grouptool');
+                    $detailsregistration .= $regstats->queued_users . " " .
+                        get_string('queued', 'grouptool');
                 }
             }
             // show how many are not registered yet.
@@ -3467,7 +3488,8 @@ class mod_grouptool {
                 if ($detailsregistration != "") {
                     $detailsregistration .= " <br> ";
                 }
-                $detailsregistration .= get_string('registrations_missing', 'grouptool', $this->get_missing_registrations());
+                $detailsregistration .= get_string('registrations_missing',
+                    'grouptool', $this->get_missing_registrations());
             }
         }
         if ($detailsregistration == '') {
@@ -4151,9 +4173,11 @@ class mod_grouptool {
                 }
             }
             if ($error === true) {
-                echo $OUTPUT->header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
+                echo $OUTPUT->header() . $outputcache .
+                    $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_ERROR);
             } else {
-                echo $OUTPUT->header() . $outputcache . $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
+                echo $OUTPUT->header() . $outputcache .
+                    $OUTPUT->notification($confirmmessage, \core\output\notification::NOTIFY_SUCCESS);
             }
 
         } else if (data_submitted() && confirm_sesskey()) {
@@ -4234,14 +4258,16 @@ class mod_grouptool {
             $url = new moodle_url($PAGE->url, ['sesskey' => sesskey(), 'tab' => 'selfregistration']);
             // The back url is for the back button to return to the grouptool overview.
             $backurl = new moodle_url($PAGE->url);
-            $mform = new MoodleQuickForm('registration_form', 'post', $url, '', ['id' => 'registration_form']);
+            $mform = new MoodleQuickForm('registration_form', 'post', $url, '',
+                ['id' => 'registration_form']);
 
             $regstat = $this->get_registration_stats($USER->id);
             if (has_capability('mod/grouptool:register_students', $this->context)) {
                 // Add HTML button instead of a normal button to use a different URL than the form.
                 $buttonarray = [];
                 $buttonarray[] = $mform->createElement('html',
-                    $OUTPUT->render_from_template('mod_grouptool/helpers/back_button', ['back_url' => $backurl->out(false)]));
+                    $OUTPUT->render_from_template('mod_grouptool/helpers/back_button',
+                        ['back_url' => $backurl->out(false)]));
                 $mform->addGroup($buttonarray, 'buttonar', '', [''], false);
             }
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
@@ -5453,7 +5479,8 @@ class mod_grouptool {
     }
 
     /**
-     * Helper function to convert a given associative array into a nested index array so it can be iterated thorough by mustache.
+     * Helper function to convert a given associative array into
+     * a nested index array so it can be iterated thorough by mustache.
      *
      * @param array $inarray Associative array that should be converted ($key => $value)
      * @return array Nested array in the format [['key' => $key, 'value' => $value]]
@@ -6754,7 +6781,6 @@ class mod_grouptool {
             "WHERE u.id " . $usersql .
             $orderbystring;
         $params = array_merge($extrauserfields->params, $userparams);
-        // $params = array_merge($params, $extrauserfields->params);.
 
         $data = $DB->get_records_sql($sql, $params);
 

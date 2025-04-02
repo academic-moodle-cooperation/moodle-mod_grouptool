@@ -207,7 +207,7 @@ class sortlist implements \renderable {
      *
      * @throws \coding_exception
      */
-    public function _refresh_select_state() {
+    public function refresh_select_state() {
         global $COURSE;
         $action = optional_param('class_action', 0, \PARAM_ALPHA);
         $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);

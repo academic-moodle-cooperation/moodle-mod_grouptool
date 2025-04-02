@@ -28,8 +28,6 @@ namespace mod_grouptool\output;
 use html_writer;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Grouptools renderer class
  *
@@ -69,6 +67,7 @@ class renderer extends \plugin_renderer_base {
                 $groupobj = groups_get_group($id);
                 $pictureout = print_group_picture($groupobj, $sortlist->cm->course, false, true, false);
                 /*
+                 * TODO - This is a hack to get the group picture to display.
                 if (empty($pictureout)) {
                     $pictureurl = new \moodle_url('/user/index.php',
                         ['id' => $sortlist->cm->course, 'group' => $group->id]);
