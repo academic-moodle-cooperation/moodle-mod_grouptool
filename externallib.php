@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/externallib.php");
-require_once($CFG->libdir .'/grouplib.php');
-require_once($CFG->dirroot.'/group/lib.php');
+require_once($CFG->libdir . '/grouplib.php');
+require_once($CFG->dirroot . '/group/lib.php');
 require_once($CFG->dirroot . "/mod/grouptool/locallib.php");
 
 /**
@@ -46,8 +46,8 @@ class mod_grouptool_external extends external_api {
     public static function delete_group_parameters() {
         return new external_function_parameters(
             [
-                    'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id'),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
             ]
         );
     }
@@ -107,9 +107,9 @@ class mod_grouptool_external extends external_api {
         // The external_function_parameters constructor expects an array of external_description.
         return new external_function_parameters(
             [
-                    'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id'),
-                    'name'    => new external_value(PARAM_TEXT, 'new name'),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+                'name' => new external_value(PARAM_TEXT, 'new name'),
             ]
         );
     }
@@ -137,8 +137,8 @@ class mod_grouptool_external extends external_api {
 
         // Parameters validation!
         $params = self::validate_parameters(self::rename_group_parameters(), [
-                'cmid' => $cmid, 'groupid' => $groupid,
-                'name' => $name,
+            'cmid' => $cmid, 'groupid' => $groupid,
+            'name' => $name,
         ]);
 
         $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
@@ -153,7 +153,7 @@ class mod_grouptool_external extends external_api {
         // If the group already exists
         if (!empty($group) && ($group->id != $params['groupid'])) {
             $result->error = get_string('groupnameexists', 'group', $params['name']);
-        // If the group name is too long
+            // If the group name is too long
         } elseif (!empty($params) && strlen($params['name']) >= 255) {
             $result->error = get_string('groupnametoolong', 'grouptool', $params['name']);
         } else {
@@ -192,9 +192,9 @@ class mod_grouptool_external extends external_api {
     public static function resize_group_parameters() {
         return new external_function_parameters(
             [
-                    'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id'),
-                    'size'    => new external_value(PARAM_TEXT, 'size or 0'),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+                'size' => new external_value(PARAM_TEXT, 'size or 0'),
             ]
         );
     }
@@ -222,8 +222,8 @@ class mod_grouptool_external extends external_api {
 
         // Parameters validation!
         $params = self::validate_parameters(self::resize_group_parameters(), [
-                'cmid' => $cmid, 'groupid' => $groupid,
-                'size' => $size,
+            'cmid' => $cmid, 'groupid' => $groupid,
+            'size' => $size,
         ]);
 
         $cm = get_coursemodule_from_id('grouptool', $params['cmid'], 0, false, MUST_EXIST);
@@ -242,12 +242,12 @@ class mod_grouptool_external extends external_api {
         if (empty($params['size']) && $params['size'] != '0') {
             // Disable individual size for this group!
             $DB->set_field('grouptool_agrps', 'grpsize', null, [
-                    'groupid' => $params['groupid'],
-                    'grouptoolid' => $cm->instance,
+                'groupid' => $params['groupid'],
+                'grouptoolid' => $cm->instance,
             ]);
             $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', [
-                    'groupid'    => $params['groupid'],
-                    'grouptoolid' => $cm->instance,
+                'groupid' => $params['groupid'],
+                'grouptoolid' => $cm->instance,
             ]);
             if (!empty($dbsize)) {
                 // Error happened...
@@ -264,9 +264,9 @@ class mod_grouptool_external extends external_api {
                 ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
             $DB->set_field('grouptool', 'use_size', 1, ['id' => $cm->instance]);
             if ($params['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
-                            'groupid'     => $params['groupid'],
-                            'grouptoolid' => $cm->instance,
-                    ])) {
+                    'groupid' => $params['groupid'],
+                    'grouptoolid' => $cm->instance,
+                ])) {
                 // Error happened...
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
             } else {
@@ -301,8 +301,8 @@ class mod_grouptool_external extends external_api {
     public static function activate_group_parameters() {
         return new external_function_parameters(
             [
-                    'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id'),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
             ]
         );
     }
@@ -339,7 +339,7 @@ class mod_grouptool_external extends external_api {
 
         $DB->set_field('grouptool_agrps', 'active', 1, ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
         if ($DB->get_field('grouptool_agrps', 'active',
-                           ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 0) {
+                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 0) {
             $a = new stdClass();
             $a->groupid = $params['groupid'];
             $a->grouptoolid = $cm->instance;
@@ -371,8 +371,8 @@ class mod_grouptool_external extends external_api {
     public static function deactivate_group_parameters() {
         return new external_function_parameters(
             [
-                    'cmid'    => new external_value(PARAM_INT, 'course module id'),
-                    'groupid' => new external_value(PARAM_INT, 'group id'),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
             ]
         );
     }
@@ -409,7 +409,7 @@ class mod_grouptool_external extends external_api {
 
         $DB->set_field('grouptool_agrps', 'active', 0, ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
         if ($DB->get_field('grouptool_agrps', 'active',
-                           ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 1) {
+                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 1) {
             $a = new stdClass();
             $a->groupid = $params['groupid'];
             $a->grouptoolid = $cm->instance;
@@ -439,13 +439,13 @@ class mod_grouptool_external extends external_api {
     public static function reorder_groups_parameters() {
         return new external_function_parameters(
             [
-                    'cmid'  => new external_value(PARAM_INT, 'course module id'),
-                    'order' => new external_multiple_structure(
-                      new external_single_structure([
-                          'groupid' => new external_value(PARAM_INT, 'group id'),
-                          'order'   => new external_value(PARAM_INT, 'order'),
-                      ])
-                  ),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'order' => new external_multiple_structure(
+                    new external_single_structure([
+                        'groupid' => new external_value(PARAM_INT, 'group id'),
+                        'order' => new external_value(PARAM_INT, 'order'),
+                    ])
+                ),
             ]
         );
     }
@@ -492,18 +492,18 @@ class mod_grouptool_external extends external_api {
                 $newrecord->active = 0;
                 $newrecord->sort_order = $cur['order'];
                 $DB->insert_record('grouptool_agrps', $newrecord);
-                $missing[] = "groupid ".$cur['groupid'];
+                $missing[] = "groupid " . $cur['groupid'];
             } else {
                 $DB->set_field('grouptool_agrps', 'sort_order', $cur['order'], [
-                        'groupid'     => $cur['groupid'],
-                        'grouptoolid' => $cm->instance,
+                    'groupid' => $cur['groupid'],
+                    'grouptoolid' => $cm->instance,
                 ]);
                 if (!$DB->record_exists('grouptool_agrps', [
-                        'groupid' => $cur['groupid'],
-                        'grouptoolid' => $cm->instance,
-                        'sort_order'  => $cur['order'],
+                    'groupid' => $cur['groupid'],
+                    'grouptoolid' => $cm->instance,
+                    'sort_order' => $cur['order'],
                 ])) {
-                    $failed[] = "groupid ".$cur['groupid'];
+                    $failed[] = "groupid " . $cur['groupid'];
                 }
             }
         }
@@ -537,9 +537,9 @@ class mod_grouptool_external extends external_api {
     public static function swap_groups_parameters() {
         return new external_function_parameters(
             [
-                    'cmid' => new external_value(PARAM_INT, 'course module id'),
-                    'a'    => new external_value(PARAM_INT, 'group A id'),
-                    'b'    => new external_value(PARAM_INT, 'group B id'),
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'a' => new external_value(PARAM_INT, 'group A id'),
+                'b' => new external_value(PARAM_INT, 'group B id'),
             ]
         );
     }
@@ -576,20 +576,20 @@ class mod_grouptool_external extends external_api {
         require_login($course, true, $cm);
 
         $aorder = $DB->get_field('grouptool_agrps', 'sort_order', [
-                'groupid'     => $a,
-                'grouptoolid' => $cm->instance,
+            'groupid' => $a,
+            'grouptoolid' => $cm->instance,
         ]);
         $border = $DB->get_field('grouptool_agrps', 'sort_order', [
-                'groupid'     => $b,
-                'grouptoolid' => $cm->instance,
+            'groupid' => $b,
+            'grouptoolid' => $cm->instance,
         ]);
         $DB->set_field('grouptool_agrps', 'sort_order', $border, [
-                'groupid'     => $a,
-                'grouptoolid' => $cm->instance,
+            'groupid' => $a,
+            'grouptoolid' => $cm->instance,
         ]);
         $DB->set_field('grouptool_agrps', 'sort_order', $aorder, [
-                'groupid'     => $b,
-                'grouptoolid' => $cm->instance,
+            'groupid' => $b,
+            'grouptoolid' => $cm->instance,
         ]);
         // This will only be displayed in the developer console, so we can hardcode the string here!
         $data = new stdClass();
