@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
  * @author Philipp Hager <philipp.hager@tuwien.ac.at> strongly based on mod_assign's privacy unit tests!
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class privacy_testcase extends base {
+abstract class privacy_test extends base {
     /*
      * The base test class already contains a setUp-method setting up a course including users and groups.
      */
@@ -107,9 +107,9 @@ class privacy_testcase extends base {
         ];
 
         // Get all active groups indexed by active group ID!
-        [, $agrpids,] = $this->get_agrps_and_prepare_message($gt1);
-        [, $agrpids2,] = $this->get_agrps_and_prepare_message($gt2);
-        [, $agrpids3,] = $this->get_agrps_and_prepare_message($gt3);
+        [, $agrpids, ] = $this->get_agrps_and_prepare_message($gt1);
+        [, $agrpids2, ] = $this->get_agrps_and_prepare_message($gt2);
+        [, $agrpids3, ] = $this->get_agrps_and_prepare_message($gt3);
 
         self::setUser($user1);
         $gt1->testable_register_in_agrp($agrpids[0]);
@@ -181,7 +181,7 @@ class privacy_testcase extends base {
 
         // Get all active groups indexed by active group ID!
         [, $agrpids, $message] = $this->get_agrps_and_prepare_message($gt1);
-        [, $agrpids2,] = $this->get_agrps_and_prepare_message($gt2);
+        [, $agrpids2, ] = $this->get_agrps_and_prepare_message($gt2);
 
         self::setUser($user1);
         $gt1->testable_register_in_agrp($agrpids[0]);
@@ -322,7 +322,7 @@ class privacy_testcase extends base {
 
         // Get all active groups indexed by active group ID!
         [, $agrpids, $message] = $this->get_agrps_and_prepare_message($gt1);
-        [, $agrpids2,] = $this->get_agrps_and_prepare_message($gt2);
+        [, $agrpids2, ] = $this->get_agrps_and_prepare_message($gt2);
         [, $agrpids3, $message3] = $this->get_agrps_and_prepare_message($gt3);
 
         self::setUser($user1);
