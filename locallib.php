@@ -457,7 +457,7 @@ class mod_grouptool {
         }
         // Every member is there, so we can parse the name!
         $digitslog = log10($numgrps);
-        // Add another digit if result of log is an integer (it means that no of groups was 10,10,100,...)
+        // Add another digit if result of log is an integer (it means that no of groups was 10,10,100,...).
         $digits = fmod($digitslog, 1.) === 0 ? $digitslog + 1 : ceil($digitslog);
         for ($i = 0; $i < $numgrps; $i++) {
             $groups[$i]['name'] = $this->groups_parse_name(trim($data->namingscheme), $i,
@@ -1169,7 +1169,7 @@ class mod_grouptool {
             $filter = get_user_preferences('mod_grouptool_group_filter', self::FILTER_ACTIVE, $USER->id);
         }
 
-        // Adds Filter Selector
+        // Adds Filter Selector.
         static $options = null;
 
         $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&amp;tab=group_admin');
@@ -1254,7 +1254,7 @@ class mod_grouptool {
                         $continue = new moodle_url($cancel, $params);
 
                         echo $this->confirm($text, $continue, $cancel);
-                        // echo $OUTPUT->footer();
+                        // echo $OUTPUT->footer();.
                         $dialog = true;
                     }
                     break;
@@ -3405,7 +3405,7 @@ class mod_grouptool {
      */
     public function view_starting_page() {
         global $OUTPUT, $DB, $USER, $CFG;
-        // TODO add caoabilities
+        // TODO add caoabilities.
         $id = $this->cm->id;
         $registrationdetail = "";
         if (property_exists($this->grouptool, "allow_reg") && $this->grouptool->allow_reg == 1) {
@@ -3444,16 +3444,16 @@ class mod_grouptool {
         $numberofusers = $regstats->users . " " . get_string('users');
         $detailsregistration = '';
 
-        // TODO if regstration is open
+        // TODO if regstration is open.
         $registrations = false;
 
         if (!empty($this->grouptool->timeavailable) && (time() >= $this->grouptool->timeavailable)) {
             $registrations = true;
-            // Show how many are registered
+            // Show how many are registered.
             if ($regstats->reg_users > 0) {
                 $detailsregistration = $regstats->reg_users . " " . get_string('registered', 'grouptool');
             }
-            // if queuses are enabled show how many are in a queue
+            // if queuses are enabled show how many are in a queue.
             if ($queuing) {
                 if ($regstats->queued_users > 0) {
                     if ($detailsregistration != "") {
@@ -3462,7 +3462,7 @@ class mod_grouptool {
                     $detailsregistration .= $regstats->queued_users . " " . get_string('queued', 'grouptool');
                 }
             }
-            // show how many are not registered yet
+            // show how many are not registered yet.
             if ($regstats->users > 0) {
                 if ($detailsregistration != "") {
                     $detailsregistration .= " <br> ";
@@ -4984,7 +4984,7 @@ class mod_grouptool {
             $pbar->update($processed, $count, get_string('import_progress_preview_completed', 'grouptool'));
         }
         $message .= html_writer::table($prevtable);
-        // Update completion state if submission is changed
+        // Update completion state if submission is changed.
         $completion = new completion_info($this->course);
         if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
             $completion->update_state($this->cm, COMPLETION_COMPLETE);
@@ -6754,7 +6754,7 @@ class mod_grouptool {
             "WHERE u.id " . $usersql .
             $orderbystring;
         $params = array_merge($extrauserfields->params, $userparams);
-        // $params = array_merge($params, $extrauserfields->params);
+        // $params = array_merge($params, $extrauserfields->params);.
 
         $data = $DB->get_records_sql($sql, $params);
 

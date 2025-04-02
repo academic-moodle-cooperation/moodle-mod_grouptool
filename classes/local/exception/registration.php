@@ -24,8 +24,6 @@
  */
 namespace mod_grouptool\local\exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * General exception during the registration/queue/marking process!
  *

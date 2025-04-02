@@ -23,8 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 // Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_stepslib.php');
 

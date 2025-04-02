@@ -24,8 +24,6 @@
  */
 namespace mod_grouptool\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The \mod_grouptool\registration class serves as common base for registration events
  *

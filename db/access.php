@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// TODO redefine capabilities
+// TODO redefine capabilities.
 
 $capabilities = [
         'mod/grouptool:addinstance' => [

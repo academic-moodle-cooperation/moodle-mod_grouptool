@@ -23,8 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- defined('MOODLE_INTERNAL') || die();
-
 /**
  * GROUPTOOL_N_M_GROUPS - group creation mode where N groups with a groupsize of M members are created
  */

@@ -2,6 +2,9 @@ default:
   tags:
     - moodle
 
+variables:
+  MUSTACHE_IGNORE_NAMES: 'sortlist_entry.mustache'
+
 stages:
   - preflight
   - test

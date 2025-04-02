@@ -23,7 +23,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_grouptool\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The \mod_grouptool\group_recreated class holds the logic for the event

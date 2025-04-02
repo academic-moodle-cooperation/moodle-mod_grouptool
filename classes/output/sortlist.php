@@ -25,8 +25,6 @@
 
 namespace mod_grouptool\output;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Representation a sortable collection of active groups with advanced fields!
  *

@@ -146,7 +146,7 @@ class pdf extends \pdf {
         // Set auto page breaks!
         $this->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
 
-        // Set image scale factor
+        // Set image scale factor.
         $this->setImageScale(/*PDF_IMAGE_SCALE_RATIO*/1);
 
         /*

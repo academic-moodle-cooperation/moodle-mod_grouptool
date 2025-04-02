@@ -54,10 +54,10 @@ class custom_completion extends activity_custom_completion {
         $cm = $this->cm;
 
         require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-                // Get grouptool details
+                // Get grouptool details.
         $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-        // If completion option is enabled, evaluate it and return true/false
+        // If completion option is enabled, evaluate it and return true/false.
         if ($grouptool->completionregister) {
             $status = $grouptool->completionregister <= $DB->get_field_sql("
              SELECT COUNT(DISTINCT a.id)
@@ -68,7 +68,7 @@ class custom_completion extends activity_custom_completion {
                            ['userid' => $userid, 'grouptoolid' => $grouptool->id]);
             return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
         } else {
-            // Completion option is not enabled so just return $type
+            // Completion option is not enabled so just return $type.
             return COMPLETION_INCOMPLETE;
         }
     }

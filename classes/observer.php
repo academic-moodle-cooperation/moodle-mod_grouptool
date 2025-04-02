@@ -24,6 +24,7 @@
  */
 namespace mod_grouptool;
 
+use core\exception\moodle_exception;
 use mod_grouptool\event\agrp_created;
 use mod_grouptool\event\agrp_deleted;
 use mod_grouptool\event\registration_created;
@@ -251,7 +252,7 @@ class observer {
                             notification::add(get_string('notification:group_recreated', 'grouptool', $infodata),
                                     notification::INFO);
                         } else {
-                            print_error('error', 'moodle');
+                            throw new moodle_exception('error','moodle');
                             return false;
                         }
                     } else {
@@ -306,7 +307,7 @@ class observer {
              * references while group has been recreated by another instance! */
             if ($grouprecreated && !empty($agrpids)) {
                 // Group has already ben recreated due to another instance, just deactivate it!
-                list($sqlids, $sqlparams) = $DB->get_in_or_equal($agrpids);
+                [$sqlids, $sqlparams] = $DB->get_in_or_equal($agrpids);
                 $DB->set_field_select('grouptool_agrps', 'active', 0, "id ".$sqlids, $sqlparams);
             } else if (!empty($agrpids)) {
                 $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);

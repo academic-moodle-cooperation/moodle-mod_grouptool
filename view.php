@@ -86,7 +86,7 @@ $PAGE->add_body_class('mediumwidth');
 
 $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
-// Cache output so header can be generated after new completion infos are avaliable
+// Cache output so header can be generated after new completion infos are avaliable.
 $outputcache = '';
 
 // Mark as viewed!
@@ -112,7 +112,7 @@ $cm = $modinfo->get_cm($cm->id);
 if (empty($cm->uservisible)) {
     $SESSION->mod_grouptool->currenttab = 'conditions_prevent_access';
     $tab = 'conditions_prevent_access';
-    // TODO USE RIGHT CAPABILITIES HERE
+    // TODO USE RIGHT CAPABILITIES HERE.
 } else if ($creategrps || $creategrpgs || $admingrps) {
     $tab = optional_param('tab', null, PARAM_ALPHAEXT);
     if ($tab) {
@@ -226,8 +226,8 @@ switch ($tab) {
         break;
     case 'conditions_prevent_access':
         if ($cm->availableinfo) {
-            // User cannot access the activity, but on the course page they will
-            // see a link to it, greyed-out, with information (HTML format) from
+            // User cannot access the activity, but on the course page they will.
+            // see a link to it, greyed-out, with information (HTML format) from.
             // $cm->availableinfo about why they can't access it.
             $text = "<br />" . format_text($cm->availableinfo, FORMAT_HTML);
         } else {
