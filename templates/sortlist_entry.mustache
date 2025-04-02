@@ -59,7 +59,7 @@
 
 }}
 
-<tr class="mod_grouptool_sortlist_entry {{^status}} dimmed_text{{/status}} {{#missing}} missing_agrp{{/missing}} {{#slidup}} slidup{{/slidup}}"
+<tr class="mod_grouptool_sortlist_entry draggable_item{{^status}} dimmed_text{{/status}} {{#missing}} missing_agrp{{/missing}} {{#slidup}} slidup{{/slidup}}"
     data-groupings="[0{{#groupingids}}, {{.}}{{/groupingids}}]"
     data-order="{{order}}"
     data-id="{{id}}"
@@ -76,6 +76,7 @@
                    value="{{id}}" {{#checked}} checked {{/checked}}/>
         </div>
     </td>
+    <td class="cell c1 buttons js_invisible" data-drag><div>{{#pix}} i/dragdrop, core, {{#str}} drag, grouptool {{/str}}{{/pix}}</div></td>
     <td class="cell c1 grpname" style="text-align:left;width:20%;">
         <div>
             <input type="hidden" name="name[{{id}}]" value="{{name}}" class="form-control"/>
@@ -110,7 +111,7 @@
             </div>
         </td>
     {{/usesize}}
-    <td class="cell c4 buttons">
+    <td class="cell c4 mod_grouptool_sortlist_active_buttons">
         <div>
             <a href="{{pageurl}}&toggle={{id}}"
             data-toggle data-status="{{status}}"

@@ -104,8 +104,12 @@ class renderer extends \plugin_renderer_base {
         }
 
         $html = $this->output->render_from_template('mod_grouptool/sortlist', $context);
+
+        $this->page->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', [$sortlist->cm->id]);
+
         return $html;
     }
+
 
     /**
      * Get message stating no groups are to be displayed
