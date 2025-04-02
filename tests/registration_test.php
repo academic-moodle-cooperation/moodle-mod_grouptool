@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
@@ -54,7 +55,7 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_create_instance(): void  {
+    public function test_create_instance(): void {
         global $DB;
 
         $grouptool = $this->create_instance();
@@ -73,15 +74,15 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_single(): void  {
+    public function test_single(): void {
         // Just a single registration per user, with groupsize = 2 and no queue!
         $grouptool = $this->create_instance([
-                'allow_reg' => 1,
-                'allow_multiple' => 0,
-                'use_size' => 1,
-                'grpsize' => 2,
-                'use_queue' => 0,
-                'allow_unreg' => 0,
+            'allow_reg' => 1,
+            'allow_multiple' => 0,
+            'use_size' => 1,
+            'grpsize' => 2,
+            'use_queue' => 0,
+            'allow_unreg' => 0,
         ]);
 
         // Get all active groups indexed by active group ID!
@@ -146,15 +147,15 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_single_queue(): void  {
+    public function test_single_queue(): void {
         // Just a single registration per user, with groupsize = 2 and queue!
         $grouptool = $this->create_instance([
-                'allow_reg' => 1,
-                'allow_multiple' => 0,
-                'use_size' => 1,
-                'grpsize' => 2,
-                'use_queue' => 1,
-                'allow_unreg' => 0,
+            'allow_reg' => 1,
+            'allow_multiple' => 0,
+            'use_size' => 1,
+            'grpsize' => 2,
+            'use_queue' => 1,
+            'allow_unreg' => 0,
         ]);
 
         [, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
@@ -209,18 +210,18 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_multiple_queue(): void  {
+    public function test_multiple_queue(): void {
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
-                'allow_reg' => 1,
-                'allow_multiple' => 1,
-                'choose_min' => 2,
-                'choose_max' => 3,
-                'use_size' => 1,
-                'grpsize' => 2,
-                'use_queue' => 1,
-                'groups_queues_limit' => 1,
-                'users_queues_limit' => 1,
+            'allow_reg' => 1,
+            'allow_multiple' => 1,
+            'choose_min' => 2,
+            'choose_max' => 3,
+            'use_size' => 1,
+            'grpsize' => 2,
+            'use_queue' => 1,
+            'groups_queues_limit' => 1,
+            'users_queues_limit' => 1,
         ]);
         [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
@@ -294,17 +295,17 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_groupchange_single(): void  {
+    public function test_groupchange_single(): void {
         // Single registration per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
-                'allow_reg' => 1,
-                'allow_unreg' => 1,
-                'allow_multiple' => 0,
-                'use_size' => 1,
-                'grpsize' => 1,
-                'use_queue' => 1,
-                'groups_queues_limit' => 1,
-                'users_queues_limit' => 1,
+            'allow_reg' => 1,
+            'allow_unreg' => 1,
+            'allow_multiple' => 0,
+            'use_size' => 1,
+            'grpsize' => 1,
+            'use_queue' => 1,
+            'groups_queues_limit' => 1,
+            'users_queues_limit' => 1,
         ]);
         // Get all active groups indexed by active group ID!
         [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
@@ -376,19 +377,19 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_groupchange_multiple(): void  {
+    public function test_groupchange_multiple(): void {
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
-                'allow_reg' => 1,
-                'allow_unreg' => 1,
-                'allow_multiple' => 1,
-                'choose_max' => 3,
-                'choose_min' => 2,
-                'use_size' => 1,
-                'grpsize' => 1,
-                'use_queue' => 1,
-                'groups_queues_limit' => 1,
-                'users_queues_limit' => 1,
+            'allow_reg' => 1,
+            'allow_unreg' => 1,
+            'allow_multiple' => 1,
+            'choose_max' => 3,
+            'choose_min' => 2,
+            'use_size' => 1,
+            'grpsize' => 1,
+            'use_queue' => 1,
+            'groups_queues_limit' => 1,
+            'users_queues_limit' => 1,
         ]);
         [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 
@@ -560,20 +561,20 @@ class grouptool_registration_test extends \mod_grouptool\local\tests\base {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function test_queue_resolving(): void  {
+    public function test_queue_resolving(): void {
         global $DB;
 
         // Multiple registrations per user, with groupsize = 2 and queue (limited to 1 place per user and 1 place per group)!
         $grouptool = $this->create_instance([
-                'allow_reg' => 1,
-                'allow_multiple' => 1,
-                'choose_min' => 1,
-                'choose_max' => 3,
-                'use_size' => 1,
-                'grpsize' => 1,
-                'use_queue' => 1,
-                'groups_queues_limit' => 2,
-                'users_queues_limit' => 1,
+            'allow_reg' => 1,
+            'allow_multiple' => 1,
+            'choose_min' => 1,
+            'choose_max' => 3,
+            'use_size' => 1,
+            'grpsize' => 1,
+            'use_queue' => 1,
+            'groups_queues_limit' => 2,
+            'users_queues_limit' => 1,
         ]);
         [$agrps, $agrpids, $message] = $this->get_agrps_and_prepare_message($grouptool);
 

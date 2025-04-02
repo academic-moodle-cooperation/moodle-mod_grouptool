@@ -54,7 +54,7 @@ class locallib_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_get_name(): void  {
+    public function test_get_name(): void {
         $grouptool = $this->create_instance(['name' => 'GT01']);
         $this->assertEquals($grouptool->get_name(), 'GT01');
     }
@@ -68,7 +68,7 @@ class locallib_test extends \mod_grouptool\local\tests\base {
      * @throws dml_exception
      * @throws moodle_exception
      */
-    public function test_get_active_groups(): void  {
+    public function test_get_active_groups(): void {
         global $DB;
         $grouptool = $this->create_instance();
 
@@ -86,7 +86,7 @@ class locallib_test extends \mod_grouptool\local\tests\base {
         // TODO: test with set agrpid, groupid and groupingid as parameter in order to check if correct data is returned.
     }
 
-    public function test_groups_get_all_groups(): void  {
+    public function test_groups_get_all_groups(): void {
         // TODO: wirite test for groups_get_all_groups().
     }
 }
