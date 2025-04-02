@@ -4618,7 +4618,7 @@ class mod_grouptool {
                             $pictureurl = new moodle_url('/user/index.php',
                                 ['id' => $this->course->id, 'group' => $group->id]);
                             $pictureobj = html_writer::img($OUTPUT->image_url('g/g1')->out(false),
-                                $group->name, ['title' => $group->name]); // default image.
+                                $group->name, ['title' => $group->name]); // Default image.
                             $pictureout = html_writer::link($pictureurl, $pictureobj);
                         }
                         if (isset($pictureout)) {
@@ -5865,7 +5865,7 @@ class mod_grouptool {
                 $k = 0;
                 $groupworksheets[$key]->write_string(7, $k, get_string('status', 'grouptool'),
                     $regheadformat);
-                $k++; // ...k = 1!
+                $k++; // ...k is equal to 1!
 
                 // First we output every namefield from used by fullname in exact the defined order!
                 foreach ($namefields as $namefield) {
@@ -5875,7 +5875,7 @@ class mod_grouptool {
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
                     $k++;
                 }
-                // ...k = n!
+                // ...k is equal to n!
                 if (!empty($CFG->showuseridentity)) {
                     $fields = explode(',', $CFG->showuseridentity);
                     $curfieldcount = 1;
@@ -5890,7 +5890,7 @@ class mod_grouptool {
                         $hidden = in_array($field, $collapsed) ? true : false;
                         $columnwidth[$field] = empty($columnwidth[$field]) ? $columnwidth[0] : $columnwidth[$field];
                         $groupworksheets[$key]->set_column($k, $k, $columnwidth[$field], null, $hidden);
-                        $k++; // ...k = n+x!
+                        $k++; // ...k is equal to n+x!
                     }
                 } else {
                     $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('idnumber'),
@@ -5898,13 +5898,13 @@ class mod_grouptool {
                     $hidden = in_array('idnumber', $collapsed) ? true : false;
                     $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
-                    $k++; // ...k = n+1!
+                    $k++; // ...k is equal to n+1!
 
                     $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('email'), $regheadlast);
                     $hidden = in_array('email', $collapsed) ? true : false;
                     $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['email'], null, $hidden);
-                    $k++; // ...k = n+2!
+                    $k++; // ...k is equal to n+2!
                 }
 
                 if ($allgroupsworksheet !== false) {
@@ -5921,7 +5921,7 @@ class mod_grouptool {
                         $allgroupsworksheet->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
                         $k++;
                     }
-                    // ...k = n!
+                    // ...k is equal to n!
                     if (!empty($CFG->showuseridentity)) {
                         $fields = explode(',', $CFG->showuseridentity);
                         $curfieldcount = 1;
@@ -5937,7 +5937,7 @@ class mod_grouptool {
                             $hidden = in_array($field, $collapsed) ? true : false;
                             $columnwidth[$field] = empty($columnwidth[$field]) ? $columnwidth[0] : $columnwidth[$field];
                             $allgroupsworksheet->set_column($k, $k, $columnwidth[$field], null, $hidden);
-                            $k++; // ...k = n+x!
+                            $k++; // ...k is equal to n+x!
                         }
                     } else {
                         $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('idnumber'),
@@ -5945,13 +5945,13 @@ class mod_grouptool {
                         $hidden = in_array('idnumber', $collapsed) ? true : false;
                         $columnwidth['idnumber'] = empty($columnwidth['idnumber']) ? $columnwidth[0] : $columnwidth['idnumber'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
-                        $k++; // ...k = n+1!
+                        $k++; // ...k is equal to n+1!
 
                         $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('email'), $regheadlast);
                         $hidden = in_array('email', $collapsed) ? true : false;
                         $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
-                        $k++; // ...k = n+2!
+                        $k++; // ...k is equal to n+2!
                     }
                 }
                 // Now the registrations!
@@ -5972,7 +5972,7 @@ class mod_grouptool {
                             $groupworksheets[$key]->write_string(8 + $i, $k, $reg[$namefield], $regentryformat);
                             $k++;
                         }
-                        // ...k = n!
+                        // ...k is equal to n!
                         if (!empty($CFG->showuseridentity)) {
                             $fields = explode(',', $CFG->showuseridentity);
                             $curfieldcount = 1;
@@ -5983,14 +5983,14 @@ class mod_grouptool {
                                     $groupworksheets[$key]->write_string(8 + $i, $k, $reg[$field], $regentryformat);
                                     $curfieldcount++;
                                 }
-                                $k++; // ...k = n+x!
+                                $k++; // ...k is equal to n+x!
                             }
                         } else {
                             $groupworksheets[$key]->write_string(8 + $i, $k, $reg['idnumber'], $regentryformat);
-                            $k++; // ...k = n+1!
+                            $k++; // ...k is equal to n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $reg['email'], $regentrylast);
-                            $k++; // ...k = n+2!
+                            $k++; // ...k is equal to n+2!
                         }
 
                         if ($allgroupsworksheet !== false) {
@@ -6003,7 +6003,7 @@ class mod_grouptool {
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg[$namefield], $regentryformat);
                                 $k++;
                             }
-                            // ...k = n!
+                            // ...k is equal to n!
                             if (!empty($CFG->showuseridentity)) {
                                 $fields = explode(',', $CFG->showuseridentity);
                                 $curfieldcount = 1;
@@ -6014,14 +6014,14 @@ class mod_grouptool {
                                         $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg[$field], $regentryformat);
                                         $curfieldcount++;
                                     }
-                                    $k++; // ...k = n+x!
+                                    $k++; // ...k is equal to n+x!
                                 }
                             } else {
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['idnumber'], $regentryformat);
-                                $k++; // ...k = n+1!
+                                $k++; // ...k is equal to n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $reg['email'], $regentrylast);
-                                $k++; // ...k = n+2!
+                                $k++; // ...k is equal to n+2!
                             }
                         }
                         $i++;
@@ -6058,7 +6058,7 @@ class mod_grouptool {
                             $groupworksheets[$key]->write_string(8 + $i, $k, $mreg[$namefield], $regentryformat);
                             $k++;
                         }
-                        // ...k = n!
+                        // ...k is equal to n!
                         if (!empty($CFG->showuseridentity)) {
                             $fields = explode(',', $CFG->showuseridentity);
                             $curfieldcount = 1;
@@ -6069,14 +6069,14 @@ class mod_grouptool {
                                     $groupworksheets[$key]->write_string(8 + $i, $k, $mreg[$field], $regentryformat);
                                     $curfieldcount++;
                                 }
-                                $k++; // ...k = n+x!
+                                $k++; // ...k is equal to n+x!
                             }
                         } else {
                             $groupworksheets[$key]->write_string(8 + $i, $k, $mreg['idnumber'], $regentryformat);
-                            $k++; // ...k = n+1!
+                            $k++; // ...k is equal to n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $mreg['email'], $regentrylast);
-                            $k++; // ...k = n+2!
+                            $k++; // ...k is equal to n+2!
                         }
 
                         if ($allgroupsworksheet !== false) {
@@ -6089,7 +6089,7 @@ class mod_grouptool {
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg[$namefield], $regentryformat);
                                 $k++;
                             }
-                            // ...k = n!
+                            // ...k is equal to n!
                             if (!empty($CFG->showuseridentity)) {
                                 $fields = explode(',', $CFG->showuseridentity);
                                 $curfieldcount = 1;
@@ -6100,14 +6100,14 @@ class mod_grouptool {
                                         $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg[$field], $regentryformat);
                                         $curfieldcount++;
                                     }
-                                    $k++; // ...k = n+x!
+                                    $k++; // ...k is equal to n+x!
                                 }
                             } else {
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['idnumber'], $regentryformat);
-                                $k++; // ...k = n+1!
+                                $k++; // ...k is equal to n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $mreg['email'], $regentrylast);
-                                $k++; // ...k = n+2!
+                                $k++; // ...k is equal to n+2!
                             }
                         }
                         $i++;
@@ -6130,7 +6130,7 @@ class mod_grouptool {
                             $groupworksheets[$key]->write_string(8 + $i, $k, $queue[$namefield], $regentryformat);
                             $k++;
                         }
-                        // ...k = n!
+                        // ...k is equal to n!
                         if (!empty($CFG->showuseridentity)) {
                             $fields = explode(',', $CFG->showuseridentity);
                             $curfieldcount = 1;
@@ -6141,14 +6141,14 @@ class mod_grouptool {
                                     $groupworksheets[$key]->write_string(8 + $i, $k, $queue[$field], $regentryformat);
                                     $curfieldcount++;
                                 }
-                                $k++; // ...k = n+x!
+                                $k++; // ...k is equal to n+x!
                             }
                         } else {
                             $groupworksheets[$key]->write_string(8 + $i, $k, $queue['idnumber'], $regentryformat);
-                            $k++; // ...k = n+1!
+                            $k++; // ...k is equal to n+1!
 
                             $groupworksheets[$key]->write_string(8 + $i, $k, $queue['email'], $regentrylast);
-                            $k++; // ...k = n+2!
+                            $k++; // ...k is equal to n+2!
                         }
 
                         if ($allgroupsworksheet !== false) {
@@ -6161,7 +6161,7 @@ class mod_grouptool {
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue[$namefield], $regentryformat);
                                 $k++;
                             }
-                            // ...k = n!
+                            // ...k is equal to n!
                             if (!empty($CFG->showuseridentity)) {
                                 $fields = explode(',', $CFG->showuseridentity);
                                 $curfieldcount = 1;
@@ -6172,14 +6172,14 @@ class mod_grouptool {
                                         $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue[$field], $regentryformat);
                                         $curfieldcount++;
                                     }
-                                    $k++; // ...k = n+x!
+                                    $k++; // ...k is equal to n+x!
                                 }
                             } else {
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['idnumber'], $regentryformat);
-                                $k++; // ...k = n+1!
+                                $k++; // ...k is equal to n+1!
 
                                 $allgroupsworksheet->write_string($j + 8 + $i, $k, $queue['email'], $regentrylast);
-                                $k++; // ...k = n+2!
+                                $k++; // ...k is equal to n+2!
                             }
                         }
                         $i++;

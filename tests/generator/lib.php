@@ -24,8 +24,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * grouptool module data generator class
  *
@@ -41,11 +39,12 @@ class mod_grouptool_generator extends testing_module_generator {
      * Generator method creating a mod_grouptool instance.
      *
      *
-     * @param array|stdClass $record (optional) Named array containing instance settings
-     * @param array $options (optional) general options for course module. Can be merged into $record
+     * @param array|stdClass|null $record (optional) Named array containing instance settings
+     * @param array|null $options (optional) general options for course module. Can be merged into $record
      * @return stdClass record from module-defined table with additional field cmid (corresponding id in course_modules table)
+     * @throws coding_exception
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance(array|stdClass|null  $record = null, array|null $options = null) {
         $record = (object)(array)$record;
 
         $timecreated = time();
