@@ -65,7 +65,7 @@ if ($id) {
     $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $course->id, false, MUST_EXIST);
     $id = $cm->id;
 } else {
-    print_error('invalidcoursemodule');
+    throw new moodle_exception('invalidcoursemodule');
 }
 
 
