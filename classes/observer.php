@@ -251,7 +251,7 @@ class observer {
                             notification::add(get_string('notification:group_recreated', 'grouptool', $infodata),
                                     notification::INFO);
                         } else {
-                            print_error('error', 'moodle');
+                            throw new moodle_exception('error', 'moodle');
                             return false;
                         }
                     } else {
