@@ -24,8 +24,6 @@
  */
 namespace mod_grouptool\local\exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Exception when the user is already registered/queued/marked for this group!
  *

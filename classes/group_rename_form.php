@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
@@ -118,6 +119,9 @@ class group_rename_form extends \moodleform {
             $group = $DB->get_record('groups', ['id' => $group]);
             if (!empty($group) && ($group->id != $data['rename'])) {
                 $errors['name'] = get_string('groupnameexists', 'group', $data['name']);
+            }
+            if (strlen($data['name']) >= 255) {
+                $errors['name'] = get_string('groupinfo', 'grouptool');
             }
         }
 

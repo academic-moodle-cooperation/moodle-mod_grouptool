@@ -69,11 +69,11 @@ if ($ADMIN->fulltree) {
             get_string('cfg_grpsize_desc', 'grouptool'), '3', PARAM_INT);
     $settings->add($groupsize);
 
-    // Use groupsize?
+    // Maybe use groupsize?
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/use_size', get_string('cfg_use_size', 'grouptool'),
             get_string('cfg_use_size_desc', 'grouptool'), 0));
 
-    // Use queues?
+    // Maybe use queues?
     $settings->add(new admin_setting_configcheckbox('mod_grouptool/use_queue', get_string('cfg_use_queue', 'grouptool'),
             get_string('cfg_use_queue_desc', 'grouptool'), 0));
 

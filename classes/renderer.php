@@ -28,8 +28,6 @@ namespace mod_grouptool\output;
 use html_writer;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Grouptools renderer class
  *
@@ -68,15 +66,6 @@ class renderer extends \plugin_renderer_base {
             if (get_config('mod_grouptool', 'show_add_info')) {
                 $groupobj = groups_get_group($id);
                 $pictureout = print_group_picture($groupobj, $sortlist->cm->course, false, true, false);
-                /*
-                if (empty($pictureout)) {
-                    $pictureurl = new \moodle_url('/user/index.php',
-                        ['id' => $sortlist->cm->course, 'group' => $group->id]);
-                    $pictureobj = html_writer::img($this->image_url('g/g1')->out(false),
-                        $group->name, ['title' => $group->name]); // default image.
-                    $pictureout = html_writer::link($pictureurl, $pictureobj);
-                }
-                */
                 $sortlist->groups[$id]->grouppix = $pictureout;
             }
             $sortlist->groups[$id]->editurl = new \moodle_url('/group/group.php', [
@@ -104,8 +93,12 @@ class renderer extends \plugin_renderer_base {
         }
 
         $html = $this->output->render_from_template('mod_grouptool/sortlist', $context);
+
+        $this->page->requires->js_call_amd('mod_grouptool/sortlist', 'initializer', [$sortlist->cm->id]);
+
         return $html;
     }
+
 
     /**
      * Get message stating no groups are to be displayed

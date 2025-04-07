@@ -75,30 +75,35 @@
         ]
     }
 }}
-<div class="mod_grouptool_sortlist">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th class="mod_grouptool_checkbox_container">
-                        <div>
-                            <input type="checkbox" id="mod_grouptool_select_all" title="{{#str}}select, grouptool{{/str}}" />
-                        </div>
-                    </th>
-                    <th>{{#str}} name, core {{/str}}</th>
-                    {{#usesize}}<th>{{#str}} size, core {{/str}}{{#sizehelpicon}}{{>core/help_icon}}{{/sizehelpicon}}</th>{{/usesize}}
-                    <th>{{#str}} groupstatus, mod_grouptool {{/str}}{{#statushelpicon}}{{>core/help_icon}}{{/statushelpicon}}</th>
-                    <th>{{#str}} settings, core {{/str}}</th>
-                    <th>{{#str}} delete, core {{/str}}</th>
-                </tr>
-            </thead>
-            <tbody class="mod_grouptool_sortlist_body">
-                {{#groups}}{{>mod_grouptool/sortlist_entry}}{{/groups}}
-            </tbody>
-        </table>
+<div class="mod_grouptool_sortlist drag_area">
+    <table class="table table-hover drag_list">
+        <thead>
+        <tr>
+            <th class="mod_grouptool_checkbox_container">
+                <div>
+                    <input type="checkbox" id="mod_grouptool_select_all" title="{{#str}}select, grouptool{{/str}}" />
+                </div>
+            </th>
+            <th>{{#str}} move, core{{/str}}{{#movehelpicon}}{{>core/help_icon}}{{/movehelpicon}}</th>
+            <th data-sort="name">{{#str}} name, core {{/str}}</th>
+            {{#usesize}}
+                <th data-sort="size" data-type="number">{{#str}} size, core {{/str}}</th>
+            {{/usesize}}
+            <th data-sort="status">{{#str}} groupstatus, mod_grouptool {{/str}}</th>
+            <th>{{#str}} settings, core {{/str}}</th>
+            <th>{{#str}} delete, core {{/str}}</th>
+        </tr>
+        </thead>
+        <tbody class="mod_grouptool_sortlist_body">
+        {{#groups}}
+                {{>mod_grouptool/sortlist_entry}}
+        {{/groups}}
+        </tbody>
+    </table>
 </div>
 
 <script>
-    document.getElementById('mod_grouptool_select_all').addEventListener('change', function() {
+    document.getElementById('mod_grouptool_select_all').addEventListener('change', function () {
         var checkboxes = document.querySelectorAll('.mod_grouptool_sortlist_body input[type="checkbox"]');
         for (var checkbox of checkboxes) {
             checkbox.checked = this.checked;

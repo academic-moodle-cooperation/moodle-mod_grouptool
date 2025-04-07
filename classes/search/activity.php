@@ -26,8 +26,6 @@ namespace mod_grouptool\search;
 
 use core_search\document;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Search area for mod_grouptool activities.
  *

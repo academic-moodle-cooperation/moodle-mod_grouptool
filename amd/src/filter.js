@@ -31,20 +31,21 @@ define(['jquery', 'core/config', 'core/log'], function($, config, log) {
         this.baseurl = config.wwwroot + '/lib/ajax/setuserpref.php';
     };
 
-    Filter.prototype.toogleUnoccupiedFilter = function (updatePrefs = true) {
+    Filter.prototype.toogleUnoccupiedFilter = function(updatePrefs = true) {
         $('.group-full').toggle();
         if (updatePrefs) {
             this.setUserPreference();
         }
     };
 
-    Filter.prototype.setUserPreference = function () {
+    Filter.prototype.setUserPreference = function() {
+        var cfg;
         var name = 'mod_grouptool_hideoccupied';
         var value = false;
         if ($('#filterunoccupied').prop('checked') === true) {
             value = true;
         }
-        var cfg = {
+        cfg = {
             method: 'get',
             url: this.baseurl,
             data: {
@@ -78,7 +79,7 @@ define(['jquery', 'core/config', 'core/log'], function($, config, log) {
             });
             log.info(params);
             log.info(params.filterunoccupied);
-            if(params.filterunoccupied) {
+            if (params.filterunoccupied) {
                 $('#filterunoccupied').prop('checked', true);
                 instance.toogleUnoccupiedFilter(false);
             }

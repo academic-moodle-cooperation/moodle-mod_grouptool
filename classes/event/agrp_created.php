@@ -25,8 +25,6 @@
 namespace mod_grouptool\event;
 use core\event\base;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The \mod_grouptool\agrp_created class holds the logic for the event
  *

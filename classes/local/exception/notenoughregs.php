@@ -24,8 +24,6 @@
  */
 namespace mod_grouptool\local\exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Exception when the user has not enough marked groups to be registered completely
  *

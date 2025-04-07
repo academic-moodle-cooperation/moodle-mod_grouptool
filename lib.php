@@ -296,14 +296,14 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
 
             if (!empty($grouptool->intro)) {
                 if (!$cm) {
-                    // Convert the links to pluginfile. It is a bit hacky but at this stage the files
-                    // might not have been saved in the module area yet.
+                    // Convert the links to pluginfile. It is a bit hacky but at this stage the files.
+                    // might not have been saved in the module area yet..
                     $intro = $grouptool->intro;
                     if ($draftid = file_get_submitted_draft_itemid('introeditor')) {
                         $intro = file_rewrite_urls_to_pluginfile($intro, $draftid);
                     }
 
-                    // We need to remove the links to files as the calendar is not ready
+                    // We need to remove the links to files as the calendar is not ready.
                     // to support module events with file areas.
                     $intro = strip_pluginfile_content($intro);
                     $event->description = [
@@ -593,7 +593,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         return;
     }
 
-    // TODO Delete old nodes
+    // TODO Delete old nodes.
 
     $context = context_module::instance($cm->id);
 
@@ -660,7 +660,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         return;
     }
 
-    // TODO check right capabilities -> aks Tester or PO
+    // TODO check right capabilities -> aks Tester or PO.
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
@@ -669,7 +669,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     $managegrps = has_capability('moodle/course:managegroups', $context);
     $viewregcw = has_capability('mod/grouptool:view_regs_course_view', $context);
 
-    // Add "Administation" to menu
+    // Add "Administation" to menu.
     if ($admingrps) {
         $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
         $node = navigation_node::create(get_string('administration', 'grouptool'),
@@ -678,7 +678,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $navref->add_node($node);
     }
 
-    // Add "Registrations" to menu
+    // Add "Registrations" to menu.
     if ($viewreggv) {
         $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'overview']);
         $node = navigation_node::create(get_string('registrations', 'grouptool'),
@@ -688,7 +688,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
 
     }
 
-    // Add "viewmoodlegroups" to more menu
+    // Add "viewmoodlegroups" to more menu.
     if ($managegrps) {
         $url = new moodle_url('/group/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
@@ -698,12 +698,12 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $navref->add_node($node);
     }
 
-    // Add "report grouptool" to more menu
+    // Add "report grouptool" to more menu.
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
 
     try {
         $reportgrouptoolversion = $reportplugins['grouptool'];
-        // TODO without try catch
+        // TODO without try catch.
     } catch (Exception $ex) {
         $reportgrouptoolversion = null;
     }
@@ -1144,8 +1144,9 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
             $label = get_string('view_registrations', 'grouptool');
             $itemcount = -1;
         }
-        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) || (!empty($userstats->registered) ? 0 : 1) == 0) {
-            // If enough registration were made we want to remove the event from the dashboard for the student
+        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) ||
+            (!empty($userstats->registered) ? 0 : 1) == 0) {
+            // If enough registration were made we want to remove the event from the dashboard for the student.
             return null;
         }
         // Clickable if registration is open and registrations are missing or enough registrations are made!

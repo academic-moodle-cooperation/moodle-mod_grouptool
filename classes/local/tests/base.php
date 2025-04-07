@@ -25,6 +25,9 @@
 
 namespace mod_grouptool\local\tests;
 
+defined('MOODLE_INTERNAL') || die();
+
+
 use advanced_testcase;
 use stdClass;
 use mod_grouptool_generator;
@@ -32,10 +35,6 @@ use coding_exception;
 use dml_exception;
 use moodle_exception;
 use required_capability_exception;
-
-if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.'); // It must be included from a Moodle page!
-}
 
 // Make sure the code being tested is accessible.
 global $CFG;

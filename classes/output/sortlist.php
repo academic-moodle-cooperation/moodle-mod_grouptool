@@ -25,8 +25,6 @@
 
 namespace mod_grouptool\output;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Representation a sortable collection of active groups with advanced fields!
  *
@@ -209,7 +207,7 @@ class sortlist implements \renderable {
      *
      * @throws \coding_exception
      */
-    public function _refresh_select_state() {
+    public function refresh_select_state() {
         global $COURSE;
         $action = optional_param('class_action', 0, \PARAM_ALPHA);
         $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);

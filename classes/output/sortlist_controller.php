@@ -24,8 +24,6 @@
  */
 namespace mod_grouptool\output;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Representation of a controller for use with sortlist!
  *

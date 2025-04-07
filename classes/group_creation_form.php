@@ -220,7 +220,8 @@ class group_creation_form extends \moodleform {
 
             $tags = [];
             foreach (\mod_grouptool::NAME_TAGS as $tag) {
-                $tags[] = html_writer::tag('button', $tag, ['type' => 'button', 'class' => 'btm btn-secondary nametag', 'data-nametag' => $tag]);
+                $tags[] = html_writer::tag('button', $tag,
+                    ['type' => 'button', 'class' => 'btm btn-secondary nametag', 'data-nametag' => $tag]);
             }
 
             $naminggrp = [];
