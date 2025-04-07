@@ -19,7 +19,7 @@ define(['jquery', 'core/custom_interaction_events', 'core_message/message_drawer
          * @param {object} element jQuery object for the button
          * @return {int}
          */
-        var getConversationId = function (element) {
+        var getConversationId = function(element) {
             return parseInt(element.attr('data-conversationid'));
         };
 
@@ -42,17 +42,17 @@ define(['jquery', 'core/custom_interaction_events', 'core_message/message_drawer
             window.console.log(args);
 
             Templates.render(TEMPLATES.CONTENT, {})
-                .then(function (html) {
+                .then(function(html) {
                     element.after(html);
                 })
-                .then(function () {
-                    $(SELECTORS.MESSAGE_USER_BUTTON).next().focus(function () {
+                .then(function() {
+                    $(SELECTORS.MESSAGE_USER_BUTTON).next().focus(function() {
                         $(SELECTORS.MESSAGE_TEXTAREA).focus();
                     });
                 });
 
             CustomEvents.define(element, [CustomEvents.events.activate]);
-            element.on(CustomEvents.events.activate, function (e, data) {
+            element.on(CustomEvents.events.activate, function(e, data) {
                 if ($(e.target).hasClass('active')) {
                     MessageDrawerHelper.hide();
                     $(SELECTORS.MESSAGE_USER_BUTTON).next().attr('tabindex', -1);

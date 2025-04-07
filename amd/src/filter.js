@@ -25,9 +25,9 @@
 /**
  * @module mod_grouptool/filter
  */
-define(['jquery', 'core/config', 'core/log'], function($, config, log) {
+define(['jquery', 'core/config', 'core/log'], function ($, config, log) {
 
-    var Filter = function() {
+    var Filter = function () {
         this.baseurl = config.wwwroot + '/lib/ajax/setuserpref.php';
     };
 
@@ -52,13 +52,13 @@ define(['jquery', 'core/config', 'core/log'], function($, config, log) {
                 'pref': encodeURI(name),
                 'value': encodeURI(value)
             },
-            beforeSend: function() {
+            beforeSend: function () {
                 log.info('set user preference ' + name + ': ' + value, 'grouptool');
             },
-            success: function() {
+            success: function () {
                 log.info('set user preference OK', 'grouptool');
             },
-            error: function() {
+            error: function () {
                 log.error('set user preference FAILED', 'grouptool');
             }
         };
@@ -71,14 +71,14 @@ define(['jquery', 'core/config', 'core/log'], function($, config, log) {
          *
          * @param {object} params
          */
-        init: function(params) {
+        init: function (params) {
             var instance = new Filter();
-            $('#filterunoccupied').change(function() {
+            $('#filterunoccupied').change(function () {
                 instance.toogleUnoccupiedFilter();
             });
             log.info(params);
             log.info(params.filterunoccupied);
-            if(params.filterunoccupied) {
+            if (params.filterunoccupied) {
                 $('#filterunoccupied').prop('checked', true);
                 instance.toogleUnoccupiedFilter(false);
             }
