@@ -44,7 +44,7 @@ class mod_grouptool_generator extends testing_module_generator {
      * @return stdClass record from module-defined table with additional field cmid (corresponding id in course_modules table)
      * @throws coding_exception
      */
-    public function create_instance(array|stdClass|null  $record = null, array|null $options = null) {
+    public function create_instance($record = null, array|null $options = null) {
         $record = (object)(array)$record;
 
         $timecreated = time();
