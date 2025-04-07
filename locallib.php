@@ -120,7 +120,7 @@ class mod_grouptool {
         if (!empty($cm) && $cm != null) {
             $this->cm = $cm;
         } else if (!$this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
-            print_error('invalidcoursemodule');
+            throw new moodle_exception('invalidcoursemodule');
         }
         if (!empty($context) && $context != null) {
             $this->context = $context;
@@ -131,14 +131,14 @@ class mod_grouptool {
         if (!empty($course) && $course != null) {
             $this->course = $course;
         } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
-            print_error('invalidid', 'grouptool');
+            throw new moodle_exception('invalidid', 'grouptool');
         }
 
         if ($grouptool) {
             $this->grouptool = $grouptool;
         } else if (!$this->grouptool = $DB->get_record('grouptool',
             ['id' => $this->cm->instance])) {
-            print_error('invalidid', 'grouptool');
+            throw new moodle_exception('invalidid', 'grouptool');
         }
 
         $this->grouptool->cmidnumber = $this->cm->idnumber;
