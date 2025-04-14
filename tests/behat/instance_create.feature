@@ -22,8 +22,7 @@ Feature: In a course, a teacher should be able to add a new grouptool
     And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
       | Grouptool name | Add a grouptool to the current course |
       | Description | Add a grouptool to the current course (Description) |
-    And I press "Save and display"
-    Then I should see "Add a grouptool to the current course (Description)"
+    And I press "id_submitbutton2"
     Then I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
