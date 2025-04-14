@@ -125,18 +125,16 @@ if (empty($cm->uservisible)) {
         || ($SESSION->mod_grouptool->currenttab == 'noaccess')
         || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
-        if (has_capability('mod/grouptool:administrate_groups', $context)
-            || has_capability('mod/grouptool:administrate_groups', $context)) {
+        if (has_capability('mod/grouptool:administrate_groups', $context)) {
             $SESSION->mod_grouptool->currenttab = 'group_admin';
-        } else if (has_capability('mod/grouptool:administrate_groups', $context)) {
-            $SESSION->mod_grouptool->currenttab = 'group_creation';
-        } else if (has_capability('mod/grouptool:register_students', $context)
+        }  else if (has_capability('mod/grouptool:administrate_registration', $context)
             || has_capability('mod/grouptool:register', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
-} else if (has_capability('mod/grouptool:register_students', $context)
-    || has_capability('mod/grouptool:register', $context)) {
+} else if (has_capability('mod/grouptool:administrate_registration', $context)
+    || has_capability('mod/grouptool:register', $context)
+    || has_capability('mod/grouptool:preview', $context)) {
     $SESSION->mod_grouptool->currenttab = 'selfregistration';
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';

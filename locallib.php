@@ -2067,7 +2067,7 @@ class mod_grouptool {
                 || (time() < $this->grouptool->timedue))
             && ($this->grouptool->timeavailable < time()));
 
-        if (!$force && !$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$force && !$regopen && !has_capability('mod/grouptool:administrate_registration', $this->context)) {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
@@ -2226,7 +2226,7 @@ class mod_grouptool {
                 || (time() < $this->grouptool->timedue))
             && ($this->grouptool->timeavailable <= time()));
 
-        if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$regopen && !has_capability('mod/grouptool:administrate_registration', $this->context)) {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
@@ -3693,7 +3693,7 @@ class mod_grouptool {
         $grouptool = $this->grouptool;
         $context = $this->context;
 
-        require_capability('mod/grouptool:register_students', $context);
+        require_capability('mod/grouptool:administrate_registration', $context);
 
         $agrps = $this->get_active_groups(false, false, 0, 0, 0,
             false);
@@ -4164,7 +4164,7 @@ class mod_grouptool {
                     $confirmmessage = $e->getMessage();
                 }
             } else if ($action == 'resolvequeues') {
-                require_capability('mod/grouptool:register_students', $this->context);
+                require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $this->resolve_queues();
                 if ($error == -1) {
                     $error = true;
@@ -4203,7 +4203,7 @@ class mod_grouptool {
 
             $attr = [];
             if ($action == 'resolvequeues') {
-                require_capability('mod/grouptool:register_students', $this->context);
+                require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $this->resolve_queues(true); // This is try only!
             } else if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
@@ -4260,7 +4260,7 @@ class mod_grouptool {
                 ['id' => 'registration_form']);
 
             $regstat = $this->get_registration_stats($USER->id);
-            if (has_capability('mod/grouptool:register_students', $this->context)) {
+            if (has_capability('mod/grouptool:administrate_registration', $this->context)) {
                 // Add HTML button instead of a normal button to use a different URL than the form.
                 $buttonarray = [];
                 $buttonarray[] = $mform->createElement('html',
@@ -4269,7 +4269,7 @@ class mod_grouptool {
                 $mform->addGroup($buttonarray, 'buttonar', '', [''], false);
             }
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
-                has_capability('mod/grouptool:register_students', $this->context)) {
+                has_capability('mod/grouptool:administrate_registration', $this->context)) {
                 if ($regstat->queued_users > 0) {
                     // Insert queue-resolving button!
                     $mform->addElement('header', 'resolveheader', get_string('resolve_queue_legend',
@@ -5021,7 +5021,7 @@ class mod_grouptool {
      */
     public function view_import() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:register_students', $this->context);
+        require_capability('mod/grouptool:administrate_registration', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\import_form(null, ['id' => $id]);
@@ -5080,7 +5080,7 @@ class mod_grouptool {
      */
     public function view_unregister() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:unregister_students', $this->context);
+        require_capability('mod/grouptool:adminstrate_deregistration', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);

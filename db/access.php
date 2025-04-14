@@ -115,7 +115,7 @@ $capabilities = [
         ],
     ],
 
-    'mod/grouptool:move_students' => [
+    'mod/grouptool:administrate_registration' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => [
@@ -125,17 +125,7 @@ $capabilities = [
         ],
     ],
 
-    'mod/grouptool:register_students' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
-    'mod/grouptool:unregister_students' => [
+    'mod/grouptool:administrate_deregistration' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => [
@@ -164,6 +154,18 @@ $deprecatedcapabilities = [
     ],
     'mod/grouptool:create_groupings' => [
         'replacement' => 'mod/grouptool:administrate_groups',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:move_students' => [
+        'replacement' => 'mod/grouptool:administrate_registration',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:register_students' => [
+        'replacement' => 'mod/grouptool:administrate_registration',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:unregister_students' => [
+        'replacement' => 'mod/grouptool:administrate_unregistration',
         'message' => 'This was replaced with another capability in Moodle 5.0!',
     ],
 ];

@@ -622,12 +622,12 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
         && ($gt->timeavailable < time()));
 
-    if (has_capability('mod/grouptool:register_students', $context)
+    if (has_capability('mod/grouptool:administrate_registration', $context)
         || ($regopen && has_capability('mod/grouptool:register', $context))) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'selfregistration']);
         $navref->add(get_string('selfregistration', 'grouptool'), $url);
     }
-    if (has_capability('mod/grouptool:register_students', $context)) {
+    if (has_capability('mod/grouptool:administrate_registration', $context)) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'import']);
         $navref->add(get_string('import', 'grouptool'), $url);
     }
@@ -1068,7 +1068,7 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
 
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
-    $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
+    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability('mod/grouptool:administrate_registration',
             $context);
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
@@ -1109,7 +1109,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
-    $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
+    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability('mod/grouptool:administrate_registration',
             $context);
     $isopen = $grouptool->is_registration_open();
 
