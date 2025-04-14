@@ -98,7 +98,7 @@ $completion->set_module_viewed($cm);
 $inactive = [];
 $tabs = [];
 $row = [];
-$creategrps = has_capability('mod/grouptool:administrate_gr', $context);
+$creategrps = has_capability('mod/grouptool:administrate_groups', $context);
 $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
@@ -128,7 +128,7 @@ if (empty($cm->uservisible)) {
         if (has_capability('mod/grouptool:administrate_groups', $context)
             || has_capability('mod/grouptool:administrate_groups', $context)) {
             $SESSION->mod_grouptool->currenttab = 'group_admin';
-        } else if (has_capability('mod/grouptool:administrate_gr', $context)) {
+        } else if (has_capability('mod/grouptool:administrate_groups', $context)) {
             $SESSION->mod_grouptool->currenttab = 'group_creation';
         } else if (has_capability('mod/grouptool:register_students', $context)
             || has_capability('mod/grouptool:register', $context)) {

@@ -37,6 +37,26 @@ $capabilities = [
         ],
     ],
 
+    'mod/grouptool:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
+    'mod/grouptool:preview' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
     'mod/grouptool:view_description' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,

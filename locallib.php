@@ -418,7 +418,7 @@ class mod_grouptool {
     private function create_groups($data, $users, $userpergrp, $numgrps, $previewonly = false) {
         global $DB, $USER;
 
-        require_capability('mod/grouptool:administrate_gr', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         $namestouse = [];
 
@@ -619,7 +619,7 @@ class mod_grouptool {
     private function create_fromto_groups($data, $previewonly = false) {
         global $DB, $OUTPUT;
 
-        require_capability('mod/grouptool:administrate_gr', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         $groups = [];
 
@@ -769,7 +769,7 @@ class mod_grouptool {
                                               bool  $previewonly = false, int $enablegroupmessaging = 0): array {
         global $DB, $USER;
 
-        require_capability('mod/grouptool:administrate_gr', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         // Allocate members from the selected role to groups!
         $usercnt = count($users);
@@ -1526,7 +1526,7 @@ class mod_grouptool {
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             if (isset($SESSION->grouptool->view_administration->createGroups)) {
-                require_capability('mod/grouptool:administrate_gr', $this->context);
+                require_capability('mod/grouptool:administrate_groups', $this->context);
                 // Create groups!
                 $data = $SESSION->grouptool->view_administration;
                 $error = false;
@@ -1626,7 +1626,7 @@ class mod_grouptool {
             unset($SESSION->grouptool->view_administration);
             $this->view_administration();
         } else if ($fromform = $mform->get_data()) {
-            require_capability('mod/grouptool:administrate_gr', $this->context);
+            require_capability('mod/grouptool:administrate_groups', $this->context);
             // Save submitted data in session and show confirmation dialog!
             if (!isset($SESSION->grouptool)) {
                 $SESSION->grouptool = new stdClass();
