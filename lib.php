@@ -664,7 +664,6 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
     $viewreggv = has_capability('mod/grouptool:view_regs_group_view', $context);
     $managegrps = has_capability('moodle/course:managegroups', $context);
-    $viewregcw = has_capability('mod/grouptool:view_regs_course_view', $context);
 
     // Add "Administation" to menu.
     if ($admingrps) {
@@ -705,7 +704,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $reportgrouptoolversion = null;
     }
 
-    if (!is_null($reportgrouptoolversion) && $viewregcw) {
+    if (!is_null($reportgrouptoolversion)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('report', 'grouptool'),
             $url,
@@ -791,8 +790,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
 
         $str = "";
         if (has_capability('mod/grouptool:register', $context)
-            || has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)) {
+            || has_capability('mod/grouptool:view_regs_group_view', $context)) {
             $attrib = [
                 'title' => $strgrouptool, 'href' => $CFG->wwwroot .
                     '/mod/grouptool/view.php?id=' .
@@ -823,7 +821,6 @@ function grouptool_print_overview($courses, &$htmlarray) {
         $details = grouptool_get_user_reg_details($grouptool, $context);
 
         if (has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)
             || has_capability('mod/grouptool:register', $context)) {
             $str = html_writer::tag('div', $str . $details, ['class' => 'grouptool overview']);
             if (empty($htmlarray[$grouptool->course]['grouptool'])) {
@@ -850,7 +847,6 @@ function grouptool_get_user_reg_details($grouptool, $context) {
 
     $details = '';
     if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_regs_course_view', $context)
         || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         // It's similar to the student mymoodle output!
         $cmid = $grouptool->coursemodule;
@@ -928,8 +924,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         }
     }
 
-    if ((has_capability('mod/grouptool:view_regs_group_view', $context) || has_capability('mod/grouptool:view_regs_course_view',
-                $context))
+    if ((has_capability('mod/grouptool:view_regs_group_view', $context))
         && $grouptool->allow_reg) {
         $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool', $userstats), ['class' => 'userstats']);
 

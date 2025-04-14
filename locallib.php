@@ -4405,7 +4405,7 @@ class mod_grouptool {
                 if ($this->grouptool->use_queue) {
                     $queued = count($group->queued);
                     $grouphtml .= html_writer::tag('span', get_string('queued', 'grouptool') .
-                        " " . $queued,
+                        ' ' . $queued,
                         ['class' => 'queued']);
                 }
 
@@ -4647,8 +4647,7 @@ class mod_grouptool {
             if ($this->grouptool->show_members) {
                 $params = new stdClass();
                 $params->courseid = $this->grouptool->course;
-                $params->showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
-                    || has_capability('mod/grouptool:view_regs_course_view', $this->context);
+                $params->showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context);
                 $helpicon = new help_icon('status', 'mod_grouptool');
                 // Add the help-icon-data to the form element as data-attribute so we use less params for the JS-call!
                 $mform->updateAttributes(['data-statushelp' => json_encode($helpicon->export_for_template($OUTPUT))]);
@@ -6442,16 +6441,16 @@ class mod_grouptool {
         $mdlregs = array_diff($members, $registered);
         $mdlregs = array_combine($mdlregs, $mdlregs);
 
-        $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
-            || has_capability('mod/grouptool:view_regs_course_view', $this->context);
-        $userfields = \core_user\fields::for_name()->get_sql("", false, "", "", false)->selects;
+        $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context);
+        $userfields = \core_user\fields::for_name()->get_sql("", false,
+            '', '', false)->selects;
         if ($showidnumber) {
             $fields = "id,idnumber," . $userfields;
         } else {
             $fields = "id," . $userfields;
         }
         // Cache needed user records right now!
-        $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
+        $users = $DB->get_records_list('user', 'id', $gtregs + $queued, null, $fields);
 
         $attributes['data-absregs'] = [];
         if (!empty($absregs)) {
