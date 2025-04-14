@@ -127,7 +127,7 @@ if (empty($cm->uservisible)) {
         // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:administrate_groups', $context)) {
             $SESSION->mod_grouptool->currenttab = 'group_admin';
-        }  else if (has_capability('mod/grouptool:administrate_registration', $context)
+        } else if (has_capability('mod/grouptool:administrate_registration', $context)
             || has_capability('mod/grouptool:register', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
