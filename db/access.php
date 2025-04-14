@@ -85,37 +85,7 @@ $capabilities = [
         ],
     ],
 
-    'mod/grouptool:grade' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
-    'mod/grouptool:grade_own_group' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
     'mod/grouptool:administrate_groups' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
-    'mod/grouptool:create_groups' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => [
@@ -172,8 +142,14 @@ $deprecatedcapabilities = [
     'mod/grouptool:view_regs_course_view' => [
         'message' => 'This was deprecated in Moodle 5.0! ',
     ],
-    'mod/folder:managefiles' => [
-        'replacement' => 'mod/folder:newmanagefiles',
-        'message' => 'This was replaced with another capability'
-    ]
+    'mod/grouptool:grade' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:grade_own_group' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:create_groups' => [
+        'replacement' => 'mod/grouptool:administrate_groups',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
 ];

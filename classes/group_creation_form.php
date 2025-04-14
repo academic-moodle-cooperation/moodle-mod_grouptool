@@ -89,7 +89,7 @@ class group_creation_form extends \moodleform {
         $mform->setDefault('tab', 'group_creation');
         $mform->setType('tab', PARAM_TEXT);
 
-        if (has_capability('mod/grouptool:create_groups', $this->context)) {
+        if (has_capability('mod/grouptool:administrate_groups', $this->context)) {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed!
              */

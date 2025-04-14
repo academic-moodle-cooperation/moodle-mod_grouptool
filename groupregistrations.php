@@ -83,7 +83,7 @@ $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 // Build site according to user capability.
-$creategrps = has_capability('mod/grouptool:create_groups', $context);
+$creategrps = has_capability('mod/grouptool:administrate_groups', $context);
 $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
