@@ -943,7 +943,7 @@ class mod_grouptool {
     private function create_group_groupings($courseid = null, $previewonly = false) {
         global $SESSION, $OUTPUT;
 
-        require_capability('mod/grouptool:create_groupings', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         // Create groupings!
         $created = [];
@@ -1060,7 +1060,7 @@ class mod_grouptool {
         $error = false;
         $return = "";
 
-        require_capability('mod/grouptool:create_groupings', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         if (isset($this->course->id)) {
             $courseid = $this->course->id;
@@ -1323,7 +1323,7 @@ class mod_grouptool {
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             if (isset($SESSION->grouptool->view_administration->createGroupings)) {
-                require_capability('mod/grouptool:create_groupings', $this->context);
+                require_capability('mod/grouptool:administrate_groups', $this->context);
                 $target = required_param('target', PARAM_INT);
                 switch ($target) { // ...grpg_target | grpg_groupingname | use_all (0 sel | 1 all).
                     case 0: // Invalid - no action! TODO Add message!

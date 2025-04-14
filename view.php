@@ -99,7 +99,7 @@ $inactive = [];
 $tabs = [];
 $row = [];
 $creategrps = has_capability('mod/grouptool:administrate_gr', $context);
-$creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+$creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
 if (!isset($SESSION->mod_grouptool)) {
@@ -125,7 +125,7 @@ if (empty($cm->uservisible)) {
         || ($SESSION->mod_grouptool->currenttab == 'noaccess')
         || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
-        if (has_capability('mod/grouptool:create_groupings', $context)
+        if (has_capability('mod/grouptool:administrate_groups', $context)
             || has_capability('mod/grouptool:administrate_groups', $context)) {
             $SESSION->mod_grouptool->currenttab = 'group_admin';
         } else if (has_capability('mod/grouptool:administrate_gr', $context)) {

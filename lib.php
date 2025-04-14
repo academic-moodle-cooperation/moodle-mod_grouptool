@@ -598,7 +598,7 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $context = context_module::instance($cm->id);
 
     $creategrps = has_capability('mod/grouptool:administrate_groups', $context);
-    $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+    $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
 
     if ($creategrps || $creategrpgs || $admingrps) {
@@ -660,7 +660,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     }
 
     $creategrps = has_capability('mod/grouptool:administrate_gr', $context);
-    $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+    $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
     $viewreggv = has_capability('mod/grouptool:view_regs_group_view', $context);
     $managegrps = has_capability('moodle/course:managegroups', $context);

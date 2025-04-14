@@ -66,7 +66,7 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
-
+    // TODO This capability should be renamed!
     'mod/grouptool:view_regs_group_view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -86,16 +86,6 @@ $capabilities = [
     ],
 
     'mod/grouptool:administrate_groups' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
-    'mod/grouptool:create_groupings' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'legacy' => [
@@ -149,6 +139,10 @@ $deprecatedcapabilities = [
         'message' => 'This was deprecated in Moodle 5.0! ',
     ],
     'mod/grouptool:create_groups' => [
+        'replacement' => 'mod/grouptool:administrate_groups',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:create_groupings' => [
         'replacement' => 'mod/grouptool:administrate_groups',
         'message' => 'This was replaced with another capability in Moodle 5.0!',
     ],
