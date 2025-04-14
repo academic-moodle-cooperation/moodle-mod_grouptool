@@ -600,7 +600,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
-    $viewgrps = has_capability('mod/grouptool:view_groups', $context);
 
     if ($creategrps || $creategrpgs || $admingrps) {
         if ($creategrps && ($admingrps || $creategrpgs)) {
@@ -660,12 +659,10 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         return;
     }
 
-    // TODO check right capabilities -> aks Tester or PO.
     $creategrps = has_capability('mod/grouptool:create_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
     $viewreggv = has_capability('mod/grouptool:view_regs_group_view', $context);
-    $viewgrps = has_capability('mod/grouptool:view_groups', $context);
     $managegrps = has_capability('moodle/course:managegroups', $context);
     $viewregcw = has_capability('mod/grouptool:view_regs_course_view', $context);
 
