@@ -40,11 +40,13 @@ $capabilities = [
     'mod/grouptool:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
+        'archetypes' => [
+            'guest' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
+            'manager' => CAP_ALLOW
+        ]
     ],
 
     'mod/grouptool:preview' => [
