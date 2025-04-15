@@ -1,6 +1,6 @@
 CHANGELOG
 ========
-4.5.2 (2025-03-30)
+4.5.2 (2025-04-15)
 ------------------
 * [FIXED] #8231 Add Editing groupname
 * [FIXED] #8232 Add Drag and drop of groups
