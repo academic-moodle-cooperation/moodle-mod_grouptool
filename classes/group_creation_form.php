@@ -89,7 +89,7 @@ class group_creation_form extends \moodleform {
         $mform->setDefault('tab', 'group_creation');
         $mform->setType('tab', PARAM_TEXT);
 
-        if (has_capability('mod/grouptool:create_groups', $this->context)) {
+        if (has_capability('mod/grouptool:administrate_groups', $this->context)) {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed!
              */
@@ -281,7 +281,7 @@ class group_creation_form extends \moodleform {
             $selectgroups = $mform->createElement('selectgroups', 'grouping', get_string('createingrouping', 'group'));
 
             $options = ['0' => get_string('no')];
-            if (has_capability('mod/grouptool:create_groupings', $this->context)) {
+            if (has_capability('mod/grouptool:administrate_groups', $this->context)) {
                 $options['-1'] = get_string('onenewgrouping', 'grouptool');
             }
             $selectgroups->addOptGroup("", $options);
@@ -297,7 +297,7 @@ class group_creation_form extends \moodleform {
             if ($groupings) {
                 $mform->setDefault('grouping', '0');
             }
-            if (has_capability('mod/grouptool:create_groupings', $this->context)) {
+            if (has_capability('mod/grouptool:administrate_groups', $this->context)) {
                 $mform->addElement('text', 'groupingname', get_string('groupingname', 'group'));
                 $mform->setType('groupingname', PARAM_TEXT);
                 $mform->hideIf('groupingname', 'grouping', 'noteq', '-1');

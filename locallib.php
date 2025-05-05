@@ -418,7 +418,7 @@ class mod_grouptool {
     private function create_groups($data, $users, $userpergrp, $numgrps, $previewonly = false) {
         global $DB, $USER;
 
-        require_capability('mod/grouptool:create_groups', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         $namestouse = [];
 
@@ -619,7 +619,7 @@ class mod_grouptool {
     private function create_fromto_groups($data, $previewonly = false) {
         global $DB, $OUTPUT;
 
-        require_capability('mod/grouptool:create_groups', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         $groups = [];
 
@@ -769,7 +769,7 @@ class mod_grouptool {
                                               bool  $previewonly = false, int $enablegroupmessaging = 0): array {
         global $DB, $USER;
 
-        require_capability('mod/grouptool:create_groups', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         // Allocate members from the selected role to groups!
         $usercnt = count($users);
@@ -943,7 +943,7 @@ class mod_grouptool {
     private function create_group_groupings($courseid = null, $previewonly = false) {
         global $SESSION, $OUTPUT;
 
-        require_capability('mod/grouptool:create_groupings', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         // Create groupings!
         $created = [];
@@ -1060,7 +1060,7 @@ class mod_grouptool {
         $error = false;
         $return = "";
 
-        require_capability('mod/grouptool:create_groupings', $this->context);
+        require_capability('mod/grouptool:administrate_groups', $this->context);
 
         if (isset($this->course->id)) {
             $courseid = $this->course->id;
@@ -1323,7 +1323,7 @@ class mod_grouptool {
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             if (isset($SESSION->grouptool->view_administration->createGroupings)) {
-                require_capability('mod/grouptool:create_groupings', $this->context);
+                require_capability('mod/grouptool:administrate_groups', $this->context);
                 $target = required_param('target', PARAM_INT);
                 switch ($target) { // ...grpg_target | grpg_groupingname | use_all (0 sel | 1 all).
                     case 0: // Invalid - no action! TODO Add message!
@@ -1526,7 +1526,7 @@ class mod_grouptool {
         // Check if everything has been confirmed, so we can finally start working!
         if (optional_param('confirm', 0, PARAM_BOOL)) {
             if (isset($SESSION->grouptool->view_administration->createGroups)) {
-                require_capability('mod/grouptool:create_groups', $this->context);
+                require_capability('mod/grouptool:administrate_groups', $this->context);
                 // Create groups!
                 $data = $SESSION->grouptool->view_administration;
                 $error = false;
@@ -1626,7 +1626,7 @@ class mod_grouptool {
             unset($SESSION->grouptool->view_administration);
             $this->view_administration();
         } else if ($fromform = $mform->get_data()) {
-            require_capability('mod/grouptool:create_groups', $this->context);
+            require_capability('mod/grouptool:administrate_groups', $this->context);
             // Save submitted data in session and show confirmation dialog!
             if (!isset($SESSION->grouptool)) {
                 $SESSION->grouptool = new stdClass();
@@ -1785,8 +1785,6 @@ class mod_grouptool {
         if ($this->context == null) {
             $this->context = context_module::instance($this->cm->id);
         }
-
-        require_capability('mod/grouptool:view_groups', $this->context);
 
         if (!$ignoregtinstance) {
             $params = ['grouptoolid' => $this->cm->instance];
@@ -2069,7 +2067,7 @@ class mod_grouptool {
                 || (time() < $this->grouptool->timedue))
             && ($this->grouptool->timeavailable < time()));
 
-        if (!$force && !$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$force && !$regopen && !has_capability('mod/grouptool:administrate_registration', $this->context)) {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
@@ -2228,7 +2226,7 @@ class mod_grouptool {
                 || (time() < $this->grouptool->timedue))
             && ($this->grouptool->timeavailable <= time()));
 
-        if (!$regopen && !has_capability('mod/grouptool:register_students', $this->context)) {
+        if (!$regopen && !has_capability('mod/grouptool:administrate_registration', $this->context)) {
             throw new \mod_grouptool\local\exception\registration('reg_not_open');
         }
 
@@ -3695,7 +3693,7 @@ class mod_grouptool {
         $grouptool = $this->grouptool;
         $context = $this->context;
 
-        require_capability('mod/grouptool:register_students', $context);
+        require_capability('mod/grouptool:administrate_registration', $context);
 
         $agrps = $this->get_active_groups(false, false, 0, 0, 0,
             false);
@@ -4166,7 +4164,7 @@ class mod_grouptool {
                     $confirmmessage = $e->getMessage();
                 }
             } else if ($action == 'resolvequeues') {
-                require_capability('mod/grouptool:register_students', $this->context);
+                require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $this->resolve_queues();
                 if ($error == -1) {
                     $error = true;
@@ -4205,7 +4203,7 @@ class mod_grouptool {
 
             $attr = [];
             if ($action == 'resolvequeues') {
-                require_capability('mod/grouptool:register_students', $this->context);
+                require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $this->resolve_queues(true); // This is try only!
             } else if ($action == 'unreg') {
                 require_capability('mod/grouptool:register', $this->context);
@@ -4262,7 +4260,7 @@ class mod_grouptool {
                 ['id' => 'registration_form']);
 
             $regstat = $this->get_registration_stats($USER->id);
-            if (has_capability('mod/grouptool:register_students', $this->context)) {
+            if (has_capability('mod/grouptool:administrate_registration', $this->context)) {
                 // Add HTML button instead of a normal button to use a different URL than the form.
                 $buttonarray = [];
                 $buttonarray[] = $mform->createElement('html',
@@ -4271,7 +4269,7 @@ class mod_grouptool {
                 $mform->addGroup($buttonarray, 'buttonar', '', [''], false);
             }
             if (!empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
-                has_capability('mod/grouptool:register_students', $this->context)) {
+                has_capability('mod/grouptool:administrate_registration', $this->context)) {
                 if ($regstat->queued_users > 0) {
                     // Insert queue-resolving button!
                     $mform->addElement('header', 'resolveheader', get_string('resolve_queue_legend',
@@ -4396,161 +4394,134 @@ class mod_grouptool {
                 get_string('filterunoccupied', 'grouptool') . '</label></div>');
 
             // Student view!
-            if (has_capability("mod/grouptool:view_groups", $this->context)) {
-                // Prepare formular-content for registration-action!
-                foreach ($groups as $key => &$group) {
-                    $registered = count($group->registered);
-                    $grpsize = ($this->grouptool->use_size) ? $group->grpsize : "∞";
+            // Prepare formular-content for registration-action!
+            foreach ($groups as $key => &$group) {
+                $registered = count($group->registered);
+                $grpsize = ($this->grouptool->use_size) ? $group->grpsize : '∞';
 
-                    $grouphtml = html_writer::tag('span', get_string('registered', 'grouptool') .
-                        ": " . $registered . "/" . $grpsize,
-                        ['class' => 'fillratio']);
-                    if ($this->grouptool->use_queue) {
-                        $queued = count($group->queued);
-                        $grouphtml .= html_writer::tag('span', get_string('queued', 'grouptool') .
-                            " " . $queued,
-                            ['class' => 'queued']);
-                    }
+                $grouphtml = html_writer::tag('span', get_string('registered', 'grouptool') .
+                    ": " . $registered . "/" . $grpsize,
+                    ['class' => 'fillratio']);
+                if ($this->grouptool->use_queue) {
+                    $queued = count($group->queued);
+                    $grouphtml .= html_writer::tag('span', get_string('queued', 'grouptool') .
+                        ' ' . $queued,
+                        ['class' => 'queued']);
+                }
 
-                    // Could become a performance problem when groups fill up!
-                    if (!empty($group->registered)) {
-                        $regrank = $this->get_rank_in_queue($group->registered, $USER->id);
-                    } else {
-                        $regrank = false;
-                    }
-                    if (!empty($group->queued)) {
-                        $queuerank = $this->get_rank_in_queue($group->queued, $USER->id);
-                    } else {
-                        $queuerank = false;
-                    }
+                // Could become a performance problem when groups fill up!
+                if (!empty($group->registered)) {
+                    $regrank = $this->get_rank_in_queue($group->registered, $USER->id);
+                } else {
+                    $regrank = false;
+                }
+                if (!empty($group->queued)) {
+                    $queuerank = $this->get_rank_in_queue($group->queued, $USER->id);
+                } else {
+                    $queuerank = false;
+                }
 
-                    // We have to determine if we can show the members link!
-                    $showmembers = $this->canshowmembers($group->agrpid, $regrank, $queuerank);
-                    if ($showmembers) {
-                        $grouphtml .= $this->render_members_link($group);
-                    }
+                // We have to determine if we can show the members link!
+                $showmembers = $this->canshowmembers($group->agrpid, $regrank, $queuerank);
+                if ($showmembers) {
+                    $grouphtml .= $this->render_members_link($group);
+                }
 
-                    /* If we include inactive groups and there's someone registered in one of these,
-                     * the label gets displayed incorrectly.
-                     */
+                /* If we include inactive groups and there's someone registered in one of these,
+                 * the label gets displayed incorrectly.
+                 */
 
-                    if (!empty($group->registered) && $this->is_registration_open()
-                        && $this->get_rank_in_queue($group->registered, $userid) != false) {
-                        // User is already registered --> unreg button!
-                        if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
-                            $label = get_string('unreg', 'grouptool');
-                            $buttonattr = [
-                                'type' => 'submit',
-                                'name' => 'unreg[' . $group->agrpid . ']',
-                                'value' => $group->agrpid,
-                                'class' => 'unregbutton btn btn-secondary',
-                            ];
-                            if ($regopen && ($userregs + $userqueues > $min)) {
-                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                            }
-                        }
-                        $grouphtml .= html_writer::tag('span',
-                            get_string('registered_on_rank',
-                                'grouptool', $regrank),
-                            ['class' => 'rank']);
-                    } else if (!empty($group->queued) && $this->is_registration_open()
-                        && $this->get_rank_in_queue($group->queued, $userid) != false) {
-                        // We're sorry, but user's already queued in this group!
-                        if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
-                            $label = get_string('unqueue', 'grouptool');
-                            $buttonattr = [
-                                'type' => 'submit',
-                                'name' => 'unreg[' . $group->agrpid . ']',
-                                'value' => $group->agrpid,
-                                'class' => 'unregbutton btn btn-secondary',
-                            ];
-                            if ($regopen && ($userregs + $userqueues > $min)) {
-                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                            }
-                        }
-                        $grouphtml .= html_writer::tag('span',
-                            get_string('queued_on_rank',
-                                'grouptool', $queuerank),
-                            ['class' => 'rank']);
-                    } else if ($this->grpmarked($group->agrpid)) {
-                        $grouphtml .= html_writer::tag('span',
-                            get_string('grp_marked', 'grouptool'),
-                            ['class' => 'rank']);
-                    } else if ($this->is_registration_open() && $this->qualifies_for_groupchange($group->agrpid, $USER->id)
-                        && has_capability('mod/grouptool:register', $this->context)) {
-                        // Groupchange!
-                        $label = get_string('change_group', 'grouptool');
-                        if ($this->grouptool->use_size
-                            && count($group->registered) >= $group->grpsize) {
-                            $label .= ' (' . get_string('queue', 'grouptool') . ')';
-                            $class = "btn-secondary";
-                        } else {
-                            $class = "btn-primary";
-                        }
+                if (!empty($group->registered) && $this->is_registration_open()
+                    && $this->get_rank_in_queue($group->registered, $userid) != false) {
+                    // User is already registered --> unreg button!
+                    if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
+                        $label = get_string('unreg', 'grouptool');
                         $buttonattr = [
                             'type' => 'submit',
-                            'name' => 'reg[' . $group->agrpid . ']',
+                            'name' => 'unreg[' . $group->agrpid . ']',
                             'value' => $group->agrpid,
-                            'class' => 'regbutton btn ' . $class,
+                            'class' => 'unregbutton btn btn-secondary',
                         ];
-                        $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                        if ($regopen && ($userregs + $userqueues > $min)) {
+                            $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                        }
+                    }
+                    $grouphtml .= html_writer::tag('span',
+                        get_string('registered_on_rank',
+                            'grouptool', $regrank),
+                        ['class' => 'rank']);
+                } else if (!empty($group->queued) && $this->is_registration_open()
+                    && $this->get_rank_in_queue($group->queued, $userid) != false) {
+                    // We're sorry, but user's already queued in this group!
+                    if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
+                        $label = get_string('unqueue', 'grouptool');
+                        $buttonattr = [
+                            'type' => 'submit',
+                            'name' => 'unreg[' . $group->agrpid . ']',
+                            'value' => $group->agrpid,
+                            'class' => 'unregbutton btn btn-secondary',
+                        ];
+                        if ($regopen && ($userregs + $userqueues > $min)) {
+                            $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                        }
+                    }
+                    $grouphtml .= html_writer::tag('span',
+                        get_string('queued_on_rank',
+                            'grouptool', $queuerank),
+                        ['class' => 'rank']);
+                } else if ($this->grpmarked($group->agrpid)) {
+                    $grouphtml .= html_writer::tag('span',
+                        get_string('grp_marked', 'grouptool'),
+                        ['class' => 'rank']);
+                } else if ($this->is_registration_open() && $this->qualifies_for_groupchange($group->agrpid, $USER->id)
+                    && has_capability('mod/grouptool:register', $this->context)) {
+                    // Groupchange!
+                    $label = get_string('change_group', 'grouptool');
+                    if ($this->grouptool->use_size
+                        && count($group->registered) >= $group->grpsize) {
+                        $label .= ' (' . get_string('queue', 'grouptool') . ')';
+                        $class = "btn-secondary";
+                    } else {
+                        $class = "btn-primary";
+                    }
+                    $buttonattr = [
+                        'type' => 'submit',
+                        'name' => 'reg[' . $group->agrpid . ']',
+                        'value' => $group->agrpid,
+                        'class' => 'regbutton btn ' . $class,
+                    ];
+                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
 
-                    } else if ($this->is_registration_open()) {
-                        $message = new stdClass();
-                        $message->username = fullname($USER);
-                        $message->groupname = $group->name;
-                        $message->userid = $USER->id;
+                } else if ($this->is_registration_open()) {
+                    $message = new stdClass();
+                    $message->username = fullname($USER);
+                    $message->groupname = $group->name;
+                    $message->userid = $USER->id;
 
+                    try {
                         try {
-                            try {
-                                // Can be registered?
-                                $this->check_can_be_registered($group, $userregs, $userqueues, $usermarks);
+                            // Can be registered?
+                            $this->check_can_be_registered($group, $userregs, $userqueues, $usermarks);
 
+                            if (has_capability('mod/grouptool:register', $this->context)) {
+                                // Register button!
+                                $label = get_string('register', 'grouptool');
+                                $buttonattr = [
+                                    'type' => 'submit',
+                                    'name' => 'reg[' . $group->agrpid . ']',
+                                    'value' => $group->agrpid,
+                                    'class' => 'regbutton btn btn-primary',
+                                ];
+                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                            }
+                        } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
+                            if (!$this->grouptool->use_queue) {
+                                throw new \mod_grouptool\local\exception\exceedgroupsize();
+                            } else {
                                 if (has_capability('mod/grouptool:register', $this->context)) {
-                                    // Register button!
-                                    $label = get_string('register', 'grouptool');
-                                    $buttonattr = [
-                                        'type' => 'submit',
-                                        'name' => 'reg[' . $group->agrpid . ']',
-                                        'value' => $group->agrpid,
-                                        'class' => 'regbutton btn btn-primary',
-                                    ];
-                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                                }
-                            } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
-                                if (!$this->grouptool->use_queue) {
-                                    throw new \mod_grouptool\local\exception\exceedgroupsize();
-                                } else {
-                                    if (has_capability('mod/grouptool:register', $this->context)) {
-                                        // There's no place left in the group, so we try to queue the user!
-                                        $this->can_be_queued($group->agrpid, $USER->id, $message);
+                                    // There's no place left in the group, so we try to queue the user!
+                                    $this->can_be_queued($group->agrpid, $USER->id, $message);
 
-                                        // Queue button!
-                                        $label = get_string('queue', 'grouptool');
-                                        $buttonattr = [
-                                            'type' => 'submit',
-                                            'name' => 'reg[' . $group->agrpid . ']',
-                                            'value' => $group->agrpid,
-                                            'class' => 'queuebutton btn btn-secondary',
-                                        ];
-                                        $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                                    }
-                                }
-                            } catch (\mod_grouptool\local\exception\notenoughregs $e) {
-                                /* The user has not enough registrations, queue entries or marks,
-                                 * so we try to mark the user! (Exceptions get handled above!) */
-                                [$queued, ] = $this->can_be_marked($group->agrpid, $USER->id, $message);
-                                if (!$queued && has_capability('mod/grouptool:register', $this->context)) {
-                                    // Register button!
-                                    $label = get_string('register', 'grouptool');
-                                    $buttonattr = [
-                                        'type' => 'submit',
-                                        'name' => 'reg[' . $group->agrpid . ']',
-                                        'value' => $group->agrpid,
-                                        'class' => 'regbutton btn btn-primary',
-                                    ];
-                                    $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                                } else if (has_capability('mod/grouptool:register', $this->context)) {
                                     // Queue button!
                                     $label = get_string('queue', 'grouptool');
                                     $buttonattr = [
@@ -4562,96 +4533,119 @@ class mod_grouptool {
                                     $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                                 }
                             }
-                        } catch (\mod_grouptool\local\exception\exceedgroupqueuelimit $e) {
-                            // Group is full!
-                            $grouphtml .= html_writer::tag('div', get_string('fullgroup', 'grouptool'),
-                                ['class' => 'rank']);
-                        } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
-                            // Group is full!
-                            $grouphtml .= html_writer::tag('div', get_string('fullgroup', 'grouptool'),
-                                ['class' => 'rank']);
-                        } catch (\mod_grouptool\local\exception\exceeduserqueuelimit $e) {
-                            // Too many queues!
-                            $grouphtml .= html_writer::tag('div', get_string('max_queues_reached',
-                                'grouptool'),
-                                ['class' => 'rank']);
-
-                        } catch (\mod_grouptool\local\exception\exceeduserreglimit $e) {
-                            $grouphtml .= html_writer::tag('div', get_string('max_regs_reached',
-                                'grouptool'),
-                                ['class' => 'rank']);
-
-                        } catch (\mod_grouptool\local\exception\registration $e) {
-                            // No registration possible!
-                            $grouphtml .= html_writer::tag('div', '', ['class' => 'rank']);
+                        } catch (\mod_grouptool\local\exception\notenoughregs $e) {
+                            /* The user has not enough registrations, queue entries or marks,
+                             * so we try to mark the user! (Exceptions get handled above!) */
+                            [$queued, ] = $this->can_be_marked($group->agrpid, $USER->id, $message);
+                            if (!$queued && has_capability('mod/grouptool:register', $this->context)) {
+                                // Register button!
+                                $label = get_string('register', 'grouptool');
+                                $buttonattr = [
+                                    'type' => 'submit',
+                                    'name' => 'reg[' . $group->agrpid . ']',
+                                    'value' => $group->agrpid,
+                                    'class' => 'regbutton btn btn-primary',
+                                ];
+                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                            } else if (has_capability('mod/grouptool:register', $this->context)) {
+                                // Queue button!
+                                $label = get_string('queue', 'grouptool');
+                                $buttonattr = [
+                                    'type' => 'submit',
+                                    'name' => 'reg[' . $group->agrpid . ']',
+                                    'value' => $group->agrpid,
+                                    'class' => 'queuebutton btn btn-secondary',
+                                ];
+                                $grouphtml .= html_writer::tag('button', $label, $buttonattr);
+                            }
                         }
+                    } catch (\mod_grouptool\local\exception\exceedgroupqueuelimit $e) {
+                        // Group is full!
+                        $grouphtml .= html_writer::tag('div', get_string('fullgroup', 'grouptool'),
+                            ['class' => 'rank']);
+                    } catch (\mod_grouptool\local\exception\exceedgroupsize $e) {
+                        // Group is full!
+                        $grouphtml .= html_writer::tag('div', get_string('fullgroup', 'grouptool'),
+                            ['class' => 'rank']);
+                    } catch (\mod_grouptool\local\exception\exceeduserqueuelimit $e) {
+                        // Too many queues!
+                        $grouphtml .= html_writer::tag('div', get_string('max_queues_reached',
+                            'grouptool'),
+                            ['class' => 'rank']);
+
+                    } catch (\mod_grouptool\local\exception\exceeduserreglimit $e) {
+                        $grouphtml .= html_writer::tag('div', get_string('max_regs_reached',
+                            'grouptool'),
+                            ['class' => 'rank']);
+
+                    } catch (\mod_grouptool\local\exception\registration $e) {
+                        // No registration possible!
+                        $grouphtml .= html_writer::tag('div', '', ['class' => 'rank']);
                     }
-
-                    $grouptext = $group->name;
-                    // Add conversation button if conditions are met.
-                    if (!empty($group->registered && $this->get_rank_in_queue($group->registered, $userid) != false)) {
-                        // Find group conversation in order to display group message icon.
-                        $coursecontext = context_course::instance($this->course->id);
-                        $conversation = \core_message\api::get_conversation_by_area('core_group',
-                            'groups', $group->id, $coursecontext->id);
-                        // Check if converastion exists and if user is allowed to access it.
-                        if (!empty($conversation) &&
-                            \core_message\api::can_send_message_to_conversation($userid, $conversation->id)) {
-                            $grouptext .= html_writer::link('#', $OUTPUT->pix_icon('t/message',
-                                get_string('open_group_message', 'grouptool')),
-                                ['id' => 'group-message-button', 'data-conversationid' => $conversation->id]);
-                            self::messagegroup_requirejs();
-                        }
-                    }
-                    $grouptext = html_writer::tag('h2', $grouptext, ['class' => 'panel-title']);
-
-                    $grouppicture = '';
-                    if (get_config('mod_grouptool', 'show_add_info')) {
-                        if (isset($group->description)) {
-                            $grouptext .=
-                                html_writer::tag('div', $group->description, ['class' => 'panel-desc']);
-                        }
-
-                        $groupobj = groups_get_group($group->id);
-                        $pictureout = print_group_picture($groupobj, $this->course->id, true, true);
-                        if (empty($pictureout)) {
-                            $pictureurl = new moodle_url('/user/index.php',
-                                ['id' => $this->course->id, 'group' => $group->id]);
-                            $pictureobj = html_writer::img($OUTPUT->image_url('g/g1')->out(false),
-                                $group->name, ['title' => $group->name]); // Default image.
-                            $pictureout = html_writer::link($pictureurl, $pictureobj);
-                        }
-                        if (isset($pictureout)) {
-                            $grouppicture = html_writer::tag('div', $pictureout, ['class' => 'panel-picture']);
-                        }
-                    }
-
-                    $grouptext = $grouptext . html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
-                    $grouptext = html_writer::tag('div', $grouptext, ['class' => 'panel-text']);
-                    $grouphtml = $grouppicture . $grouptext;
-
-                    if ($regrank !== false) {
-                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
-                    } else if ($queuerank !== false) {
-                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-warning');
-                    } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
-                        $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-error group-full');
-                    } else {
-                        $classes = 'generalbox group empty';
-                        if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
-                            $classes .= ' group-full';
-                        }
-                        $grouphtml = $OUTPUT->box($grouphtml, $classes);
-                    }
-                    $mform->addElement('html', $grouphtml);
                 }
-            }
 
+                $grouptext = $group->name;
+                // Add conversation button if conditions are met.
+                if (!empty($group->registered && $this->get_rank_in_queue($group->registered, $userid) != false)) {
+                    // Find group conversation in order to display group message icon.
+                    $coursecontext = context_course::instance($this->course->id);
+                    $conversation = \core_message\api::get_conversation_by_area('core_group',
+                        'groups', $group->id, $coursecontext->id);
+                    // Check if converastion exists and if user is allowed to access it.
+                    if (!empty($conversation) &&
+                        \core_message\api::can_send_message_to_conversation($userid, $conversation->id)) {
+                        $grouptext .= html_writer::link('#', $OUTPUT->pix_icon('t/message',
+                            get_string('open_group_message', 'grouptool')),
+                            ['id' => 'group-message-button', 'data-conversationid' => $conversation->id]);
+                        self::messagegroup_requirejs();
+                    }
+                }
+                $grouptext = html_writer::tag('h2', $grouptext, ['class' => 'panel-title']);
+
+                $grouppicture = '';
+                if (get_config('mod_grouptool', 'show_add_info')) {
+                    if (isset($group->description)) {
+                        $grouptext .=
+                            html_writer::tag('div', $group->description, ['class' => 'panel-desc']);
+                    }
+
+                    $groupobj = groups_get_group($group->id);
+                    $pictureout = print_group_picture($groupobj, $this->course->id, true, true);
+                    if (empty($pictureout)) {
+                        $pictureurl = new moodle_url('/user/index.php',
+                            ['id' => $this->course->id, 'group' => $group->id]);
+                        $pictureobj = html_writer::img($OUTPUT->image_url('g/g1')->out(false),
+                            $group->name, ['title' => $group->name]); // Default image.
+                        $pictureout = html_writer::link($pictureurl, $pictureobj);
+                    }
+                    if (isset($pictureout)) {
+                        $grouppicture = html_writer::tag('div', $pictureout, ['class' => 'panel-picture']);
+                    }
+                }
+
+                $grouptext = $grouptext . html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
+                $grouptext = html_writer::tag('div', $grouptext, ['class' => 'panel-text']);
+                $grouphtml = $grouppicture . $grouptext;
+
+                if ($regrank !== false) {
+                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
+                } else if ($queuerank !== false) {
+                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-warning');
+                } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
+                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-error group-full');
+                } else {
+                    $classes = 'generalbox group empty';
+                    if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
+                        $classes .= ' group-full';
+                    }
+                    $grouphtml = $OUTPUT->box($grouphtml, $classes);
+                }
+                $mform->addElement('html', $grouphtml);
+            }
             if ($this->grouptool->show_members) {
                 $params = new stdClass();
                 $params->courseid = $this->grouptool->course;
-                $params->showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
-                    || has_capability('mod/grouptool:view_regs_course_view', $this->context);
+                $params->showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context);
                 $helpicon = new help_icon('status', 'mod_grouptool');
                 // Add the help-icon-data to the form element as data-attribute so we use less params for the JS-call!
                 $mform->updateAttributes(['data-statushelp' => json_encode($helpicon->export_for_template($OUTPUT))]);
@@ -5027,7 +5021,7 @@ class mod_grouptool {
      */
     public function view_import() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:register_students', $this->context);
+        require_capability('mod/grouptool:administrate_registration', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\import_form(null, ['id' => $id]);
@@ -5086,7 +5080,7 @@ class mod_grouptool {
      */
     public function view_unregister() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:unregister_students', $this->context);
+        require_capability('mod/grouptool:adminstrate_deregistration', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);
@@ -6445,16 +6439,16 @@ class mod_grouptool {
         $mdlregs = array_diff($members, $registered);
         $mdlregs = array_combine($mdlregs, $mdlregs);
 
-        $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context)
-            || has_capability('mod/grouptool:view_regs_course_view', $this->context);
-        $userfields = \core_user\fields::for_name()->get_sql("", false, "", "", false)->selects;
+        $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context);
+        $userfields = \core_user\fields::for_name()->get_sql("", false,
+            '', '', false)->selects;
         if ($showidnumber) {
             $fields = "id,idnumber," . $userfields;
         } else {
             $fields = "id," . $userfields;
         }
         // Cache needed user records right now!
-        $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
+        $users = $DB->get_records_list('user', 'id', $gtregs + $queued, null, $fields);
 
         $attributes['data-absregs'] = [];
         if (!empty($absregs)) {
