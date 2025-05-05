@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
  * @author Philipp Hager <philipp.hager@tuwien.ac.at> strongly based on mod_assign's privacy unit tests!
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class privacy_test extends base {
+class privacy_test extends base {
     /*
      * The base test class already contains a setUp-method setting up a course including users and groups.
      */
