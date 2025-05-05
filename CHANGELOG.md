@@ -1,5 +1,9 @@
 CHANGELOG
 ========
+5.0.0 (2025-05-05)
+------------------
+* [FIXED] #8339 Fix grouptool not showing in activity chooser
+
 4.5.2 (2025-03-30)
 ------------------
 * [FIXED] #8231 Add Editing groupname
