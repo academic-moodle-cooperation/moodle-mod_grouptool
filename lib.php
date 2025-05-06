@@ -40,23 +40,12 @@ require_once(dirname(__FILE__) . '/definitions.php');
  * @see plugin_supports() in lib/moodlelib.php
  */
 function grouptool_supports($feature) {
-    switch ($feature) {
-        case FEATURE_COMPLETION_TRACKS_VIEWS:
-        case FEATURE_COMPLETION_HAS_RULES:
-        case FEATURE_SHOW_DESCRIPTION:
-        case FEATURE_BACKUP_MOODLE2:
-        case FEATURE_MOD_INTRO:
-        case FEATURE_IDNUMBER:
-            return true;
-        case FEATURE_MOD_ARCHETYPE:
-            return MOD_ARCHETYPE_OTHER;
-        case FEATURE_MOD_PURPOSE:
-            return MOD_PURPOSE_ADMINISTRATION;
-        case FEATURE_GROUPS:
-        case FEATURE_GROUPINGS:
-        default:
-            return false;
-    }
+    return match ($feature) {
+        FEATURE_COMPLETION_TRACKS_VIEWS, FEATURE_COMPLETION_HAS_RULES, FEATURE_SHOW_DESCRIPTION, FEATURE_BACKUP_MOODLE2, FEATURE_MOD_INTRO, FEATURE_IDNUMBER => true,
+        FEATURE_MOD_ARCHETYPE => MOD_ARCHETYPE_OTHER,
+        FEATURE_MOD_PURPOSE => MOD_PURPOSE_ADMINISTRATION,
+        default => null,
+    };
 }
 
 /**
