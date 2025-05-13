@@ -18,173 +18,156 @@
  * Capability definitions for mod_grouptool
  *
  * @package   mod_grouptool
- * @author    Philipp Hager
+ * @author    Philipp Hager, Anne Kreppenhofer
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-// TODO redefine capabilities.
 
 $capabilities = [
-        'mod/grouptool:addinstance' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_COURSE,
-            'legacy' => [
-                'editingteacher' => CAP_ALLOW,
-                'teacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:addinstance' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'legacy' => [
+            'editingteacher' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:view_description' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'guest' => CAP_ALLOW,
-                'student' => CAP_ALLOW,
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'guest' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:view_own_registration' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'student' => CAP_ALLOW,
-            ],
+    'mod/grouptool:preview' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:export' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:view_description' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'guest' => CAP_ALLOW,
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:view_groups' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'student' => CAP_ALLOW,
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:view_own_registration' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'student' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:view_regs_group_view' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:export' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
+    // TODO This capability should be renamed!
+    'mod/grouptool:view_regs_group_view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
 
-        'mod/grouptool:view_regs_course_view' => [
-            'captype' => 'read',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:register' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'student' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:register' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'student' => CAP_ALLOW,
-            ],
+    'mod/grouptool:administrate_groups' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:grade' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:administrate_registration' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
+    ],
 
-        'mod/grouptool:grade_own_group' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
+    'mod/grouptool:administrate_deregistration' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'legacy' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
-
-        'mod/grouptool:administrate_groups' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
-        ],
-
-        'mod/grouptool:create_groups' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
-        ],
-
-        'mod/grouptool:create_groupings' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
-        ],
-
-        'mod/grouptool:move_students' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
-        ],
-
-        'mod/grouptool:register_students' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
-        ],
-
-        'mod/grouptool:unregister_students' => [
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_MODULE,
-            'legacy' => [
-                'teacher' => CAP_ALLOW,
-                'editingteacher' => CAP_ALLOW,
-                'manager' => CAP_ALLOW,
-            ],
-        ],
+    ],
 ];
-
+$deprecatedcapabilities = [
+    'mod/grouptool:view_groups' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:view_regs_course_view' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:grade' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:grade_own_group' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:create_groups' => [
+        'replacement' => 'mod/grouptool:administrate_groups',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:create_groupings' => [
+        'replacement' => 'mod/grouptool:administrate_groups',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:move_students' => [
+        'replacement' => 'mod/grouptool:administrate_registration',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:register_students' => [
+        'replacement' => 'mod/grouptool:administrate_registration',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+    'mod/grouptool:unregister_students' => [
+        'replacement' => 'mod/grouptool:administrate_unregistration',
+        'message' => 'This was replaced with another capability in Moodle 5.0!',
+    ],
+];

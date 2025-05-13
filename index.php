@@ -83,7 +83,6 @@ foreach ($grouptools as $grouptool) {
 
     $str = "";
     if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_regs_course_view', $context)
         || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         $attrib = [
                 'title' => $strgrouptool,
@@ -102,9 +101,9 @@ foreach ($grouptools as $grouptool) {
         }
         if ($grouptool->timedue) {
             $str .= html_writer::tag('div', $strduedate.': '.
-                                            html_writer::tag('span', userdate($grouptool->timedue),
-                                                             ['class' => (($colorclass == 'late') ? ' late' : '')]),
-                                     $attr);
+                html_writer::tag('span', userdate($grouptool->timedue),
+                    ['class' => (($colorclass == 'late') ? ' late' : '')]),
+                $attr);
         } else {
             $str .= html_writer::tag('div', $strduedateno, $attr);
         }
@@ -113,8 +112,7 @@ foreach ($grouptools as $grouptool) {
     $details = grouptool_get_user_reg_details($grouptool, $context);
 
     if (($grouptool->allow_reg
-            && (has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)))
+            && has_capability('mod/grouptool:view_regs_group_view', $context))
         || has_capability('mod/grouptool:register', $context)) {
         $str = html_writer::tag('div', $str.$details, ['class' => 'grouptool overview']);
     }

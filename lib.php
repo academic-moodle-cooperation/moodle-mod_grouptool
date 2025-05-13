@@ -40,23 +40,12 @@ require_once(dirname(__FILE__) . '/definitions.php');
  * @see plugin_supports() in lib/moodlelib.php
  */
 function grouptool_supports($feature) {
-    switch ($feature) {
-        case FEATURE_COMPLETION_TRACKS_VIEWS:
-        case FEATURE_COMPLETION_HAS_RULES:
-        case FEATURE_SHOW_DESCRIPTION:
-        case FEATURE_BACKUP_MOODLE2:
-        case FEATURE_MOD_INTRO:
-        case FEATURE_IDNUMBER:
-            return true;
-        case FEATURE_MOD_ARCHETYPE:
-            return MOD_ARCHETYPE_OTHER;
-        case FEATURE_MOD_PURPOSE:
-            return MOD_PURPOSE_ADMINISTRATION;
-        case FEATURE_GROUPS:
-        case FEATURE_GROUPINGS:
-        default:
-            return false;
-    }
+    return match ($feature) {
+        FEATURE_COMPLETION_TRACKS_VIEWS, FEATURE_COMPLETION_HAS_RULES, FEATURE_SHOW_DESCRIPTION, FEATURE_BACKUP_MOODLE2, FEATURE_MOD_INTRO, FEATURE_IDNUMBER => true,
+        FEATURE_MOD_ARCHETYPE => MOD_ARCHETYPE_OTHER,
+        FEATURE_MOD_PURPOSE => MOD_PURPOSE_ADMINISTRATION,
+        default => null,
+    };
 }
 
 /**
@@ -597,10 +586,9 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
 
     $context = context_module::instance($cm->id);
 
-    $creategrps = has_capability('mod/grouptool:create_groups', $context);
-    $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+    $creategrps = has_capability('mod/grouptool:administrate_groups', $context);
+    $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
-    $viewgrps = has_capability('mod/grouptool:view_groups', $context);
 
     if ($creategrps || $creategrpgs || $admingrps) {
         if ($creategrps && ($admingrps || $creategrpgs)) {
@@ -623,12 +611,12 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
         && ($gt->timeavailable < time()));
 
-    if (has_capability('mod/grouptool:register_students', $context)
+    if (has_capability('mod/grouptool:administrate_registration', $context)
         || ($regopen && has_capability('mod/grouptool:register', $context))) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'selfregistration']);
         $navref->add(get_string('selfregistration', 'grouptool'), $url);
     }
-    if (has_capability('mod/grouptool:register_students', $context)) {
+    if (has_capability('mod/grouptool:administrate_registration', $context)) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'import']);
         $navref->add(get_string('import', 'grouptool'), $url);
     }
@@ -660,14 +648,11 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         return;
     }
 
-    // TODO check right capabilities -> aks Tester or PO.
-    $creategrps = has_capability('mod/grouptool:create_groups', $context);
-    $creategrpgs = has_capability('mod/grouptool:create_groupings', $context);
+    $creategrps = has_capability('mod/grouptool:administrate_groups', $context);
+    $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
     $viewreggv = has_capability('mod/grouptool:view_regs_group_view', $context);
-    $viewgrps = has_capability('mod/grouptool:view_groups', $context);
     $managegrps = has_capability('moodle/course:managegroups', $context);
-    $viewregcw = has_capability('mod/grouptool:view_regs_course_view', $context);
 
     // Add "Administation" to menu.
     if ($admingrps) {
@@ -708,7 +693,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $reportgrouptoolversion = null;
     }
 
-    if (!is_null($reportgrouptoolversion) && $viewregcw) {
+    if (!is_null($reportgrouptoolversion)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('report', 'grouptool'),
             $url,
@@ -794,8 +779,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
 
         $str = "";
         if (has_capability('mod/grouptool:register', $context)
-            || has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)) {
+            || has_capability('mod/grouptool:view_regs_group_view', $context)) {
             $attrib = [
                 'title' => $strgrouptool, 'href' => $CFG->wwwroot .
                     '/mod/grouptool/view.php?id=' .
@@ -826,7 +810,6 @@ function grouptool_print_overview($courses, &$htmlarray) {
         $details = grouptool_get_user_reg_details($grouptool, $context);
 
         if (has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:view_regs_course_view', $context)
             || has_capability('mod/grouptool:register', $context)) {
             $str = html_writer::tag('div', $str . $details, ['class' => 'grouptool overview']);
             if (empty($htmlarray[$grouptool->course]['grouptool'])) {
@@ -853,7 +836,6 @@ function grouptool_get_user_reg_details($grouptool, $context) {
 
     $details = '';
     if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_regs_course_view', $context)
         || has_capability('mod/grouptool:view_regs_group_view', $context)) {
         // It's similar to the student mymoodle output!
         $cmid = $grouptool->coursemodule;
@@ -931,8 +913,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         }
     }
 
-    if ((has_capability('mod/grouptool:view_regs_group_view', $context) || has_capability('mod/grouptool:view_regs_course_view',
-                $context))
+    if ((has_capability('mod/grouptool:view_regs_group_view', $context))
         && $grouptool->allow_reg) {
         $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool', $userstats), ['class' => 'userstats']);
 
@@ -1076,7 +1057,7 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
 
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
-    $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
+    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability('mod/grouptool:administrate_registration',
             $context);
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
@@ -1117,7 +1098,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
-    $managesregs = has_capability('mod/grouptool:register_students', $context) || has_capability('mod/grouptool:move_students',
+    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability('mod/grouptool:administrate_registration',
             $context);
     $isopen = $grouptool->is_registration_open();
 
