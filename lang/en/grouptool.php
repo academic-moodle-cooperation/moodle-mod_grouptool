@@ -21,7 +21,7 @@
  * @author    Philipp Hager
  * @author    Hannes Laimer
  * @author    Anne Kreppenhofer
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2025 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -472,10 +472,7 @@ $string['registration_missing'] = '1 registration missing';
 $string['registration_period_end'] = 'End of registration for';
 $string['registration_period_start'] = 'Begin of registration for';
 $string['registrationdue'] = 'Registration end';
-$string['registrationnotification'] = '{$a->course->shortname} -> {$a->modulenameplural} -> {$a->grouptoolname}
-----------------------------------------------------------
-{$a->message}
-----------------------------------------------------------';
+$string['registrationnotification'] = '{$a->course->shortname} -> {$a->modulenameplural} -> {$a->grouptoolname----------------------------------------------------------{$a->message}----------------------------------------------------------';
 $string['registrations'] = 'Group-registrations';
 $string['registrations_missing'] = '{$a} registrations missing';
 $string['regpresent'] = 'User\'s already {$a}';
@@ -621,9 +618,4 @@ $string['queues_max'] = 'Max. simultaneous queue-places per participant';
 // Deprecated since version 3.3!
 $string['cfg_max_queues'] = 'Max. simultaneous queue-places per participant';
 $string['cfg_max_queues_desc'] = 'Determines in how many different groups a user can be queued at the same time by default.';
-$string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span>
-<span class="tag lastname">[lastname]</span>
-<span class="tag idnumber">[idnumber]</span>
-<span class="tag username">[username]</span>
-<span class="tag alpha">@</span>
-<span class="tag number">#</span>';
+$string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span><span class="tag lastname">[lastname]</span><span class="tag idnumber">[idnumber]</span><span class="tag username">[username]</span><span class="tag alpha">@</span><span class="tag number">#</span>';

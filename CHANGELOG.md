@@ -3,12 +3,13 @@ CHANGELOG
 5.0.0 (2025-05-05)
 ------------------
 * [FIXED] #8339 Fix grouptool not showing in activity chooser
+* [LANGSTRING] #8279 Fix langstring for AMOS
+* [CHANGED] #8107 Updated Capabilites for new plugin structure
 
 4.5.2 (2025-03-30)
 ------------------
 * [FIXED] #8231 Add Editing groupname
 * [FIXED] #8232 Add Drag and drop of groups
-* [CHANGED] #8107 Updated Capabilites for new plugin structure
 
 4.5.1 (2025-02-26)
 ------------------
