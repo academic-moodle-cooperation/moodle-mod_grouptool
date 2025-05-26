@@ -319,7 +319,6 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         if (status === 1 || status === true) {
             // Set inactive (via AJAX Request)!
             log.info('DEACTIVATE GROUP ' + grpid + '!', "grouptool");
-
             requests = ajax.call([{
                 methodname: 'mod_grouptool_deactivate_group',
                 args: {cmid: e.data.cmid, groupid: grpid},
@@ -329,31 +328,34 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                 if (result.error) {
                     var text = "AJAX Call to deactivate group " + grpid + " successfull but error occured:\n";
                     log.info(text + result.error + "\n" + status, "grouptool");
+
                 } else {
                     if (e.data.filter === 'active') {
                         node.find('td div').slideUp(600).promise().done(function() {
+
                             node.remove();
-                            if (!$('div.sortlist_container tr').length) {
+                            if (!$('tbody.mod_grouptool_sortlist_body tr').length) {
+                                log.info("No more groups in sortlist! "+$('tbody.mod_grouptool_sortlist_body tr').length,
+                                    "grouptool");
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
                                  * for all groups sortlist! */
                                 var stringstofetch = [{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
                                                       {'key': 'nogroupschoose', 'component': 'mod_grouptool'}];
                                 str.get_strings(stringstofetch).done(function(s) {
-                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {
+                                    var url = murl.relativeUrl('/mod/grouptool/administration.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
                                         'filter': e.data.filterall
                                     });
-                                    var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
+                                    var link = "<a href=\"" + url + "\">" + s[1] + "</a>";
                                     var context = {
                                         'message': s[0] + link
                                     };
-                                    var sortlistcontainer = $('div.sortlist_container');
+                                    var sortlistcontainer = $('div.mod_grouptool_sortlist');
                                     sortlistcontainer.fadeOut(600, function() {
                                         templates.render('core/notification_info', context).then(function(html) {
                                             sortlistcontainer.html(html);
                                             sortlistcontainer.fadeIn(600);
-
                                             return this;
                                         }).fail(notif.exception);
                                     });
@@ -386,9 +388,11 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                 var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
                                 var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
                                 if (firstinactive.length) {
+                                    log.info("Insert before first inactive group!"+firstinactive.length, "grouptool");
                                     node.detach();
                                     node.insertBefore(firstinactive);
                                 } else if (lastactive.length) {
+                                    log.info("Insert after last active group!"+lastactive.length, "grouptool");
                                     node.detach();
                                     node.insertAfter(lastactive);
                                 }
@@ -400,7 +404,6 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                 newnode.toggleClass('slidup');
                                 newnode.find('td div').slideDown(600);
                                 node = newnode;
-
                                 return this;
                             }).fail(notif.exception);
                         }).fail(notif.exception);
