@@ -432,7 +432,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         // If showing only inactive remove from list!
                         node.find('td div').slideUp(600).promise().done(function() {
                             node.remove();
-                            if (!$('div.sortlist_container tr').length) {
+                            if (!$('tbody.mod_grouptool_sortlist_body tr').length) {
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
                                  * for all groups sortlist! */
                                 var stringstofetch = [
@@ -440,16 +440,16 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                     {'key': 'nogroupschoose', 'component': 'mod_grouptool'}
                                 ];
                                 str.get_strings(stringstofetch).done(function(s) {
-                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {
+                                    var url = murl.relativeUrl('/mod/grouptool/administration.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
                                         'filter': e.data.filterall
                                     });
-                                    var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
+                                    var link = "<a href=\"" + url + "\">" + s[1] + "</a>";
                                     context = {
-                                        'message': s[0] + link
+                                        'message': s[0] + " " + link
                                     };
-                                    var sortlistcontainer = $('div.sortlist_container');
+                                    var sortlistcontainer = $('div.mod_grouptool_sortlist');
                                     sortlistcontainer.fadeOut(600, function() {
                                         templates.render('core/notification_info', context).then(function(html) {
                                             sortlistcontainer.html(html);
