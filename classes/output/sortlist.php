@@ -141,7 +141,7 @@ class sortlist implements \renderable {
                            ON agrp.groupid = grp.id AND agrp.grouptoolid = ?" . $grouping . "
                      WHERE grp.id " . $grpssql . $activefilter . $groupingwhere . "
                   GROUP BY grp.id
-                  ORDER BY status DESC, sort_order ASC, name ASC", $params);
+                  ORDER BY sort_order ASC, name ASC", $params);
 
             // Convert to multidimensional array and add groupings.
             $runningidx = 1;
