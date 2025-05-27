@@ -26,13 +26,13 @@
  * @module mod_grouptool/administration
  */
 define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
-    'core/notification', 'core/log'], function ($, templates, ajax, str, murl, notif, log) {
+    'core/notification', 'core/log'], function($, templates, ajax, str, murl, notif, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/administration
      */
-    var Administration = function () {
+    var Administration = function() {
         this.cmid = 0;
         this.filter = null;
         this.filterall = null;
@@ -44,7 +44,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
      *
      * @param {Event} e Event object
      */
-    Administration.prototype.renamegroup = function (e) {
+    Administration.prototype.renamegroup = function(e) {
         log.info('Rename Group!', 'grouptool');
         e.preventDefault();
         e.stopPropagation();
@@ -63,13 +63,13 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
         var infoNode = '';
         button.fadeOut(600);
         field.fadeOut(600);
-        text.fadeOut(600, function () {
+        text.fadeOut(600, function() {
             field.attr('type', 'text');
             field.fadeIn(600);
             field.focus();
             field.select();
         });
-        field.on('keydown', null, e.data, function (e) {
+        field.on('keydown', null, e.data, function(e) {
             if (e.which === 13 || e.which === 27) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -85,19 +85,19 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                     infoNode.fadeOut(600);
                     infoNode.remove();
                 }
-                requests[0].then(function (result) {
+                requests[0].then(function(result) {
                     if (result.error) {
                         context = {
                             'message': result.error
                         };
-                        templates.render('core/notification_error', context).then(function (html) {
+                        templates.render('core/notification_error', context).then(function(html) {
                             infoNode = $(html);
                             infoNode.hide();
                             node.find('.grpname div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function () {
-                                infoNode.fadeOut(600, function () {
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
                                     infoNode.remove();
                                 });
                             }, 60 * 1000);
@@ -108,10 +108,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                         context = {
                             'message': result.message
                         };
-                        templates.render('core/notification_success', context).then(function () {
+                        templates.render('core/notification_success', context).then(function() {
 
                             text.html(field.val());
-                            field.fadeOut(600, function () {
+                            field.fadeOut(600, function() {
                                 field.attr('value', field.val());
                                 field.attr('type', 'hidden');
                                 text.fadeIn(600);
@@ -129,7 +129,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 }).fail(notif.exception);
 
             } else if (e.which === 27) { // Escape!
-                field.fadeOut(600, function () {
+                field.fadeOut(600, function() {
                     text.hide();
                     field.attr('type', 'hidden');
                     field.val(text.html());
@@ -138,7 +138,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                     button.fadeIn(600);
                 });
                 if (infoNode) {
-                    infoNode.fadeOut(600, function () {
+                    infoNode.fadeOut(600, function() {
                         infoNode.remove();
                     });
                 }
@@ -152,7 +152,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
      *
      * @param {Event} e Event object
      */
-    Administration.prototype.resizegroup = function (e) {
+    Administration.prototype.resizegroup = function(e) {
         log.info('Resize Group!', 'grouptool');
         e.preventDefault();
         e.stopPropagation();
@@ -178,7 +178,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
 
         button.fadeOut(600);
         field.fadeOut(600);
-        text.fadeOut(600, function () {
+        text.fadeOut(600, function() {
             field.attr('type', 'text');
             field.fadeIn(600);
             field.focus();
@@ -186,7 +186,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
             var context = {
                 'message': strings.resizehelp
             };
-            templates.render('core/notification_info', context).then(function (html) {
+            templates.render('core/notification_info', context).then(function(html) {
                 helpNode = $(html);
                 helpNode.hide();
                 node.find('.size div').prepend(helpNode);
@@ -195,7 +195,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 return this;
             }).fail(notif.exception);
         });
-        field.on('keydown', null, null, function (e) {
+        field.on('keydown', null, null, function(e) {
             if (e.which === 13 || e.which === 27) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -215,19 +215,19 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                     helpNode.fadeOut(600);
                     helpNode.remove();
                 }
-                requests[0].then(function (result) {
+                requests[0].then(function(result) {
                     if (result.error) {
                         context = {
                             'message': result.error
                         };
-                        templates.render('core/notification_error', context).then(function (html) {
+                        templates.render('core/notification_error', context).then(function(html) {
                             infoNode = $(html);
                             infoNode.hide();
                             node.find('.size div').prepend(infoNode);
                             infoNode.fadeIn(600);
                             // Remove after 60 seconds automatically!
-                            window.setTimeout(function () {
-                                infoNode.fadeOut(600, function () {
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
                                     infoNode.remove();
                                 });
                             }, 60 * 1000);
@@ -238,7 +238,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                         context = {
                             'message': result.message
                         };
-                        templates.render('core/notification_success', context).then(function (html) {
+                        templates.render('core/notification_success', context).then(function(html) {
                             infoNode = $(html);
                             infoNode.hide();
                             node.find('.size div').prepend(infoNode);
@@ -249,15 +249,15 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             } else {
                                 text.html(newvalue);
                             }
-                            field.fadeOut(600, function () {
+                            field.fadeOut(600, function() {
                                 field.attr('value', field.val());
                                 field.attr('type', 'hidden');
                                 text.fadeIn(600);
                                 button.fadeIn(600);
                                 field.off('keydown');
                             });
-                            window.setTimeout(function () {
-                                infoNode.fadeOut(600, function () {
+                            window.setTimeout(function() {
+                                infoNode.fadeOut(600, function() {
                                     infoNode.remove();
                                 });
                             }, 5 * 1000);
@@ -271,7 +271,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 }).fail(notif.exception);
 
             } else if (e.which === 27) { // Escape!
-                field.fadeOut(600, function () {
+                field.fadeOut(600, function() {
                     text.hide();
                     field.attr('type', 'hidden');
                     field.attr('value', text.html());
@@ -280,12 +280,12 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                     button.fadeIn(600);
                 });
                 if (infoNode) {
-                    infoNode.fadeOut(600, function () {
+                    infoNode.fadeOut(600, function() {
                         infoNode.remove();
                     });
                 }
                 if (helpNode) {
-                    helpNode.fadeOut(600, function () {
+                    helpNode.fadeOut(600, function() {
                         infoNode.remove();
                     });
                 }
@@ -299,7 +299,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
      *
      * @param {Event} e Event object
      */
-    Administration.prototype.togglegroup = function (e) {
+    Administration.prototype.togglegroup = function(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -324,14 +324,14 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 args: {cmid: e.data.cmid, groupid: grpid},
                 fail: notif.exception
             }]);
-            requests[0].then(function (result) {
+            requests[0].then(function(result) {
                 if (result.error) {
                     var text = "AJAX Call to deactivate group " + grpid + " successfull but error occured:\n";
                     log.info(text + result.error + "\n" + status, "grouptool");
 
                 } else {
                     if (e.data.filter === 'active') {
-                        node.find('td div').slideUp(600).promise().done(function () {
+                        node.find('td div').slideUp(600).promise().done(function() {
 
                             node.remove();
                             if (!$('tbody.mod_grouptool_sortlist_body tr').length) {
@@ -341,7 +341,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                                  * for all groups sortlist! */
                                 var stringstofetch = [{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
                                     {'key': 'nogroupschoose', 'component': 'mod_grouptool'}];
-                                str.get_strings(stringstofetch).done(function (s) {
+                                str.get_strings(stringstofetch).done(function(s) {
                                     var url = murl.relativeUrl('/mod/grouptool/administration.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
@@ -352,8 +352,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                                         'message': s[0] + link
                                     };
                                     var sortlistcontainer = $('div.mod_grouptool_sortlist');
-                                    sortlistcontainer.fadeOut(600, function () {
-                                        templates.render('core/notification_info', context).then(function (html) {
+                                    sortlistcontainer.fadeOut(600, function() {
+                                        templates.render('core/notification_info', context).then(function(html) {
                                             sortlistcontainer.html(html);
                                             sortlistcontainer.fadeIn(600);
                                             return this;
@@ -383,8 +383,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             "size": target.closest('tr').data('size')
                         };
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
-                        // This will call the function to load and render our template.
-                        templatepromise.then(function (html) {
+                        // This will call the functionto load and render our template.
+                        templatepromise.then(function(html) {
                             var newnode = $(html);
                             node.replaceWith(newnode);
                             newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
@@ -407,14 +407,14 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 args: {cmid: e.data.cmid, groupid: grpid},
                 fail: notif.exception
             }]);
-            requests[0].then(function (result) {
+            requests[0].then(function(result) {
                 if (result.error) {
                     var text = "AJAX Call to activate group " + grpid + " successfull but error occured:\n";
                     log.info(text + result.error + "\n" + status, "grouptool");
                 } else {
                     if (e.data.filter === 'inactive') {
                         // If showing only inactive remove from list!
-                        node.find('td div').slideUp(600).promise().done(function () {
+                        node.find('td div').slideUp(600).promise().done(function() {
                             node.remove();
                             if (!$('tbody.mod_grouptool_sortlist_body tr').length) {
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
@@ -423,7 +423,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                                     {'key': 'nogroupsinactive', 'component': 'mod_grouptool'},
                                     {'key': 'nogroupschoose', 'component': 'mod_grouptool'}
                                 ];
-                                str.get_strings(stringstofetch).done(function (s) {
+                                str.get_strings(stringstofetch).done(function(s) {
                                     var url = murl.relativeUrl('/mod/grouptool/administration.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
@@ -434,8 +434,8 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                                         'message': s[0] + " " + link
                                     };
                                     var sortlistcontainer = $('div.mod_grouptool_sortlist');
-                                    sortlistcontainer.fadeOut(600, function () {
-                                        templates.render('core/notification_info', context).then(function (html) {
+                                    sortlistcontainer.fadeOut(600, function() {
+                                        templates.render('core/notification_info', context).then(function(html) {
                                             sortlistcontainer.html(html);
                                             sortlistcontainer.fadeIn(600);
 
@@ -451,7 +451,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             'id': e.data.cmid,
                             'tab': 'administration'
                         };
-                        // This will call the function to load and render our template.
+                        // This will call the functionto load and render our template.
                         context = {
                             "status": true,
                             "missing": false,
@@ -466,7 +466,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             "size": node.data('size')
                         };
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
-                        templatepromise.then(function (html) {
+                        templatepromise.then(function(html) {
                             var newnode = $(html);
                             node.replaceWith(newnode);
                             newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
@@ -491,7 +491,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
      *
      * @param {Event} e Event object
      */
-    Administration.prototype.deletegroup = function (e) {
+    Administration.prototype.deletegroup = function(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -508,7 +508,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
 
         var strings = e.data.strings;
 
-        notif.confirm(strings.title, strings.confirm, strings.yes, strings.no, function () {
+        notif.confirm(strings.title, strings.confirm, strings.yes, strings.no, function() {
             if (!grpid) {
                 log.info('No Group ID!', 'grouptool');
                 return;
@@ -521,12 +521,12 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 args: {cmid: e.data.cmid, groupid: grpid},
                 fail: notif.exception
             }]);
-            requests[0].then(function (result) {
+            requests[0].then(function(result) {
                 // So now the group's maybe recreated by grouptool instances set to do so, show notifications!
                 notif.fetchNotifications();
                 if (!result.error) {
                     // Success, remove the corresponding table entry...
-                    node.find('td div').slideUp(600).promise().done(function () {
+                    node.find('td div').slideUp(600).promise().done(function() {
                         node.remove();
                     });
                 } else {
@@ -550,7 +550,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
      * @param {int} globalsize
      * @param {int} usesize
      */
-    instance.initializer = function (cmid, filter, filterall, globalsize, usesize) {
+    instance.initializer = function(cmid, filter, filterall, globalsize, usesize) {
 
         this.cmid = cmid;
         this.filter = filter;
@@ -561,12 +561,12 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
         log.info('Initialize Grouptool group administration', "grouptool");
         $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-rename]', this, this.renamegroup);
         log.debug("Init edit size button", "grouptool");
-        str.get_strings([{key: 'ajax_edit_size_help', component: 'mod_grouptool'}]).done(function (s) {
+        str.get_strings([{key: 'ajax_edit_size_help', component: 'mod_grouptool'}]).done(function(s) {
             var strings = {resizehelp: s[0]};
             log.debug("String successfully retrieved: " + s, "grouptool");
             var resizedata = {instance: instance, strings: strings, globalsize: instance.globalsize};
             $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-resize]', resizedata, instance.resizegroup);
-        }).fail(function (ex) {
+        }).fail(function(ex) {
             log.error("Error while retrieving string: " + ex, "grouptool");
         });
         var stringstofetch = [
@@ -575,12 +575,12 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
             {key: 'yes', component: 'moodle'},
             {key: 'no', component: 'moodle'}
         ];
-        str.get_strings(stringstofetch).done(function (s) {
+        str.get_strings(stringstofetch).done(function(s) {
             log.info("Strings successfully retrieved: " + s, "grouptool");
             var strings = {title: s[0], confirm: s[1], yes: s[2], no: s[3]};
             $('.path-mod-grouptool .mod_grouptool_sortlist').on('click', 'tr[data-id] a[data-delete]',
                 {cmid: instance.cmid, strings: strings}, instance.deletegroup);
-        }).fail(function (ex) {
+        }).fail(function(ex) {
             log.error("Error while retrieving strings: " + ex, "grouptool");
         });
         $('.path-mod-grouptool .mod_grouptool_sortlist').on('click', 'tr[data-id] a[data-toggle]', this, this.togglegroup);
