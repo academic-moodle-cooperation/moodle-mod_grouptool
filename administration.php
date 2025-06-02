@@ -107,7 +107,7 @@ $PAGE->set_context($context);
 $PAGE->set_title(format_string($grouptool->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_activity_record($grouptool);
-$PAGE->add_body_class('mediumwidth');
+$PAGE->add_body_class('limitedwidth');
 
 // Mark as viewed!
 $completion = new completion_info($course);

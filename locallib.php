@@ -1186,9 +1186,8 @@ class mod_grouptool {
             $options[$grouping->id + 10] = $grouping->name;
         }
 
-        $param = optional_param('filter', null, PARAM_INT);
-        $filerselect = new single_select($url, 'filter', $options, $param);
-
+        $filerselect = new single_select($url, 'filter', $options, $filter);
+        // Should this not be in a mustache template?
         $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_creation');
         $button = $OUTPUT->single_button($url, get_string('group_creation', 'grouptool'));
         echo $OUTPUT->heading(get_string('administration', 'mod_grouptool'));
