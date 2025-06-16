@@ -22,11 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- /**
-  * @module mod_grouptool/administration
-  */
-define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/notification', 'core/log'], function($, templates,
-        ajax, str, murl, notif, log) {
+/**
+ * @module mod_grouptool/administration
+ */
+define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
+    'core/notification', 'core/log'], function($, templates, ajax, str, murl, notif, log) {
 
     /**
      * @constructor
@@ -319,7 +319,6 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
         if (status === 1 || status === true) {
             // Set inactive (via AJAX Request)!
             log.info('DEACTIVATE GROUP ' + grpid + '!', "grouptool");
-
             requests = ajax.call([{
                 methodname: 'mod_grouptool_deactivate_group',
                 args: {cmid: e.data.cmid, groupid: grpid},
@@ -329,31 +328,34 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                 if (result.error) {
                     var text = "AJAX Call to deactivate group " + grpid + " successfull but error occured:\n";
                     log.info(text + result.error + "\n" + status, "grouptool");
+
                 } else {
                     if (e.data.filter === 'active') {
                         node.find('td div').slideUp(600).promise().done(function() {
+
                             node.remove();
-                            if (!$('div.sortlist_container tr').length) {
+                            if (!$('tbody.mod_grouptool_sortlist_body tr').length) {
+                                log.info("No more groups in sortlist! " + $('tbody.mod_grouptool_sortlist_body tr').length,
+                                    "grouptool");
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
                                  * for all groups sortlist! */
                                 var stringstofetch = [{'key': 'nogroupsactive', 'component': 'mod_grouptool'},
-                                                      {'key': 'nogroupschoose', 'component': 'mod_grouptool'}];
+                                    {'key': 'nogroupschoose', 'component': 'mod_grouptool'}];
                                 str.get_strings(stringstofetch).done(function(s) {
-                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {
+                                    var url = murl.relativeUrl('/mod/grouptool/administration.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
                                         'filter': e.data.filterall
                                     });
-                                    var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
+                                    var link = "<a href=\"" + url + "\">" + s[1] + "</a>";
                                     var context = {
                                         'message': s[0] + link
                                     };
-                                    var sortlistcontainer = $('div.sortlist_container');
+                                    var sortlistcontainer = $('div.mod_grouptool_sortlist');
                                     sortlistcontainer.fadeOut(600, function() {
                                         templates.render('core/notification_info', context).then(function(html) {
                                             sortlistcontainer.html(html);
                                             sortlistcontainer.fadeIn(600);
-
                                             return this;
                                         }).fail(notif.exception);
                                     });
@@ -366,11 +368,13 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             'id': e.data.cmid,
                             'tab': 'administration'
                         };
+
                         context = {
                             "status": false,
                             "missing": false,
                             "groupings": target.closest('tr').data('groupings'),
                             "id": grpid,
+                            "grouppix": target.closest('tr').find('.grouppix').html(),
                             "checked": target.closest('tr').find('input[type=checkbox]').prop('checked'),
                             "name": target.closest('tr').data('name'),
                             "pageurl": murl.relativeUrl("/mod/grouptool/view.php", viewparams, false),
@@ -379,36 +383,19 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             "size": target.closest('tr').data('size')
                         };
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
-                        // This will call the function to load and render our template.
-                        node.toggleClass('slidup');
-                        node.find('td div').slideUp(600).promise().done(function() {
-                            templatepromise.then(function(html) {
-                                var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
-                                var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
-                                if (firstinactive.length) {
-                                    node.detach();
-                                    node.insertBefore(firstinactive);
-                                } else if (lastactive.length) {
-                                    node.detach();
-                                    node.insertAfter(lastactive);
-                                }
-                                var newnode = $(html);
-                                newnode.addClass('slidup');
-                                newnode.find('td div').slideUp(0);
-                                node.replaceWith(newnode);
-                                newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
-                                newnode.toggleClass('slidup');
-                                newnode.find('td div').slideDown(600);
-                                node = newnode;
-
-                                return this;
-                            }).fail(notif.exception);
+                        // This will call the functionto load and render our template.
+                        templatepromise.then(function(html) {
+                            var newnode = $(html);
+                            node.replaceWith(newnode);
+                            newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
+                            node = newnode;
+                            return this;
                         }).fail(notif.exception);
+
                     }
                     log.info("AJAX Call to deactivate group " + grpid + " successfull\n" + result.message + "\n" + status,
                         "grouptool");
                 }
-
                 return this;
             }).fail(notif.exception);
         } else if (status === 0 || status === false) {
@@ -429,7 +416,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                         // If showing only inactive remove from list!
                         node.find('td div').slideUp(600).promise().done(function() {
                             node.remove();
-                            if (!$('div.sortlist_container tr').length) {
+                            if (!$('tbody.mod_grouptool_sortlist_body tr').length) {
                                 /* TODO: instead we could just switch to filter all via JS/AJAX i.e. render mustache template
                                  * for all groups sortlist! */
                                 var stringstofetch = [
@@ -437,16 +424,16 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                                     {'key': 'nogroupschoose', 'component': 'mod_grouptool'}
                                 ];
                                 str.get_strings(stringstofetch).done(function(s) {
-                                    var url = murl.relativeUrl('/mod/grouptool/view.php', {
+                                    var url = murl.relativeUrl('/mod/grouptool/administration.php', {
                                         'id': e.data.cmid,
                                         'tab': 'group_administration',
                                         'filter': e.data.filterall
                                     });
-                                    var link = "<a href=\"" + url + "\">" + s[2] + "</a>";
+                                    var link = "<a href=\"" + url + "\">" + s[1] + "</a>";
                                     context = {
-                                        'message': s[0] + link
+                                        'message': s[0] + " " + link
                                     };
-                                    var sortlistcontainer = $('div.sortlist_container');
+                                    var sortlistcontainer = $('div.mod_grouptool_sortlist');
                                     sortlistcontainer.fadeOut(600, function() {
                                         templates.render('core/notification_info', context).then(function(html) {
                                             sortlistcontainer.html(html);
@@ -464,12 +451,13 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             'id': e.data.cmid,
                             'tab': 'administration'
                         };
-                        // This will call the function to load and render our template.
+                        // This will call the functionto load and render our template.
                         context = {
                             "status": true,
                             "missing": false,
                             "groupings": node.data('groupings'),
                             "id": grpid,
+                            "grouppix": target.closest('tr').find('.grouppix').html(),
                             "checked": node.find('input[type=checkbox]').prop('checked'),
                             "name": node.data('name'),
                             "pageurl": murl.relativeUrl("/mod/grouptool/view.php", viewparams, false),
@@ -478,29 +466,13 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
                             "size": node.data('size')
                         };
                         var templatepromise = templates.render('mod_grouptool/sortlist_entry', context);
-                        node.toggleClass('slidup');
-                        target.closest('tr').find('td div').slideUp(600).promise().done(function() {
-                            templatepromise.then(function(html) {
-                                var firstinactive = node.parents('table').find('tr[data-status=0], tr[data-status=false]').first();
-                                var lastactive = node.parents('table').find('tr[data-status=1], tr[data-status=true]').last();
-                                if (lastactive.length) {
-                                    node.detach();
-                                    node.insertAfter(lastactive);
-                                } else if (firstinactive.length) {
-                                    node.detach();
-                                    node.insertBefore(firstinactive);
-                                }
-                                var newnode = $(html);
-                                newnode.addClass('slidup');
-                                newnode.find('td div').slideUp(0);
-                                node.replaceWith(newnode);
-                                newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
-                                newnode.toggleClass('slidup');
-                                newnode.find('td div').slideDown(600);
-                                node = newnode;
+                        templatepromise.then(function(html) {
+                            var newnode = $(html);
+                            node.replaceWith(newnode);
+                            newnode.find('[data-drag]').removeClass('js_invisible').css('cursor', 'pointer');
+                            node = newnode;
 
-                                return this;
-                            }).fail(notif.exception);
+                            return this;
                         }).fail(notif.exception);
                     }
                     log.info("AJAX Call to activate group " + grpid + " successfull\n" + result.message, "grouptool");
@@ -607,7 +579,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url', 'core/n
             log.info("Strings successfully retrieved: " + s, "grouptool");
             var strings = {title: s[0], confirm: s[1], yes: s[2], no: s[3]};
             $('.path-mod-grouptool .mod_grouptool_sortlist').on('click', 'tr[data-id] a[data-delete]',
-                    {cmid: instance.cmid, strings: strings}, instance.deletegroup);
+                {cmid: instance.cmid, strings: strings}, instance.deletegroup);
         }).fail(function(ex) {
             log.error("Error while retrieving strings: " + ex, "grouptool");
         });
