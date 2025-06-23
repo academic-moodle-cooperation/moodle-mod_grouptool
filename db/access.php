@@ -59,18 +59,6 @@ $capabilities = [
         ],
     ],
 
-    'mod/grouptool:view_description' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'guest' => CAP_ALLOW,
-            'student' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW,
-        ],
-    ],
-
     'mod/grouptool:view_own_registration' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -88,7 +76,7 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
-    // TODO This capability should be renamed!
+
     'mod/grouptool:view_regs_group_view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -150,6 +138,9 @@ $deprecatedcapabilities = [
     'mod/grouptool:grade_own_group' => [
         'message' => 'This was deprecated in Moodle 5.0! ',
     ],
+    'mod/grouptool:view_description' => [
+        'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
     'mod/grouptool:create_groups' => [
         'replacement' => 'mod/grouptool:administrate_groups',
         'message' => 'This was replaced with another capability in Moodle 5.0!',
@@ -167,7 +158,7 @@ $deprecatedcapabilities = [
         'message' => 'This was replaced with another capability in Moodle 5.0!',
     ],
     'mod/grouptool:unregister_students' => [
-        'replacement' => 'mod/grouptool:administrate_unregistration',
+        'replacement' => 'mod/grouptool:administrate_deregistration',
         'message' => 'This was replaced with another capability in Moodle 5.0!',
     ],
 ];
