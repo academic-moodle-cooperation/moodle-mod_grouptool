@@ -5077,7 +5077,7 @@ class mod_grouptool {
      */
     public function view_unregister() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:adminstrate_deregistration', $this->context);
+        require_capability('mod/grouptool:administrate_deregistration', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);
