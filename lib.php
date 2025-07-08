@@ -889,6 +889,11 @@ function grouptool_reset_userdata($data) {
     $componentstr = get_string('modulenameplural', 'grouptool');
     $status = [];
 
+    if ($data->timeshift) {
+        shift_course_mod_dates('grouptool', ['timeavailable', 'timedue'], $data->timeshift, $data->courseid);
+        $status[] = ['component' => $componentstr, 'item' => get_string('date'), 'error' => false];
+    }
+
     $grouptoolids = $DB->get_fieldset_select('grouptool', 'id', 'course = ?',
                                               [$data->courseid]);
 
