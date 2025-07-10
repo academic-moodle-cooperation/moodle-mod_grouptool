@@ -693,7 +693,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
         $reportgrouptoolversion = null;
     }
 
-    if (!is_null($reportgrouptoolversion)) {
+    if (!is_null($reportgrouptoolversion) && has_capability('report/grouptool:view', $context)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
         $node = navigation_node::create(get_string('report', 'grouptool'),
             $url,
