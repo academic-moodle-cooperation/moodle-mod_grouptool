@@ -2372,7 +2372,7 @@ class mod_grouptool {
             if ($userid != $USER->id) {
                 throw new \mod_grouptool\local\exception\regpresent('already_queued', $message);
             } else {
-                throw new \mod_grouptool\local\exception\regpresent('you_are_aleady_queued', $message);
+                throw new \mod_grouptool\local\exception\regpresent('you_are_already_queued', $message);
             }
         }
     }
