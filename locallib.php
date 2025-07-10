@@ -4277,106 +4277,104 @@ class mod_grouptool {
                         'grouptool'));
                 }
             }
-            if (has_capability('mod/grouptool:view_description', $this->context)) {
+            $mform->addElement('header', 'generalinfo', get_string('general_information',
+                'grouptool'));
+            $mform->setExpanded('generalinfo');
 
-                $mform->addElement('header', 'generalinfo', get_string('general_information',
-                    'grouptool'));
-                $mform->setExpanded('generalinfo');
+            if (!empty($this->grouptool->use_size)) {
+                $placestats = $regstat->group_places . '&nbsp;' . get_string('total', 'grouptool');
+            } else {
+                $placestats = '∞&nbsp;' . get_string('total', 'grouptool');
+            }
+            if (($regstat->free_places != null) && !empty($this->grouptool->use_size)) {
+                $placestats .= ' / ' . $regstat->free_places . '&nbsp;' .
+                    get_string('free', 'grouptool');
+            } else {
+                $placestats .= ' / ∞&nbsp;' . get_string('free', 'grouptool');
+            }
+            if ($regstat->occupied_places != null) {
+                $placestats .= ' / ' . $regstat->occupied_places . '&nbsp;' .
+                    get_string('occupied', 'grouptool');
+            }
+            $mform->addElement('static', 'group_places', get_string('group_places', 'grouptool'),
+                $placestats);
+            $mform->addHelpButton('group_places', 'group_places', 'grouptool');
 
-                if (!empty($this->grouptool->use_size)) {
-                    $placestats = $regstat->group_places . '&nbsp;' . get_string('total', 'grouptool');
+            $mform->addElement('static', 'number_of_students', get_string('number_of_students',
+                'grouptool'), $regstat->users);
+
+            if (($this->grouptool->allow_multiple &&
+                    (count($regstat->registered) < $this->grouptool->choose_min))
+                || (!$this->grouptool->allow_multiple && !count($regstat->registered))) {
+                if ($this->grouptool->allow_multiple) {
+                    $missing = ($this->grouptool->choose_min - count($regstat->registered));
+                    $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                 } else {
-                    $placestats = '∞&nbsp;' . get_string('total', 'grouptool');
+                    $missing = 1;
+                    $stringlabel = 'registration_missing';
                 }
-                if (($regstat->free_places != null) && !empty($this->grouptool->use_size)) {
-                    $placestats .= ' / ' . $regstat->free_places . '&nbsp;' .
-                        get_string('free', 'grouptool');
+                $missingtext = get_string($stringlabel, 'grouptool', $missing);
+            } else {
+                $missingtext = "";
+            }
+
+            if (!empty($regstat->registered)) {
+                $regscumulative = [];
+                foreach ($regstat->registered as $registration) {
+                    $regscumulative[] = $registration->grpname . ' (' . $registration->rank . ')';
+                }
+                $mform->addElement('static', 'registrations', get_string('registrations',
+                    'grouptool'),
+                    html_writer::tag('div', $missingtext) . implode(', ', $regscumulative));
+            } else {
+                $mform->addElement('static', 'registrations', get_string('registrations',
+                    'grouptool'),
+                    html_writer::tag('div', $missingtext) . get_string('not_registered',
+                        'grouptool'));
+            }
+
+            if (!empty($regstat->queued)) {
+                $queuescumulative = [];
+                foreach ($regstat->queued as $queue) {
+                    $queuescumulative[] = $queue->grpname . ' (' . $queue->rank . ')';
+                }
+                $mform->addElement('static', 'queues', get_string('queues', 'grouptool'),
+                    implode(', ', $queuescumulative));
+            }
+
+            if (!empty($this->grouptool->allow_reg)) {
+                if (!empty($this->grouptool->allow_unreg)) {
+                    $unregtext = get_string('allowed', 'grouptool');
                 } else {
-                    $placestats .= ' / ∞&nbsp;' . get_string('free', 'grouptool');
+                    $unregtext = get_string('not_permitted', 'grouptool');
                 }
-                if ($regstat->occupied_places != null) {
-                    $placestats .= ' / ' . $regstat->occupied_places . '&nbsp;' .
-                        get_string('occupied', 'grouptool');
-                }
-                $mform->addElement('static', 'group_places', get_string('group_places', 'grouptool'),
-                    $placestats);
-                $mform->addHelpButton('group_places', 'group_places', 'grouptool');
-
-                $mform->addElement('static', 'number_of_students', get_string('number_of_students',
-                    'grouptool'), $regstat->users);
-
-                if (($this->grouptool->allow_multiple &&
-                        (count($regstat->registered) < $this->grouptool->choose_min))
-                    || (!$this->grouptool->allow_multiple && !count($regstat->registered))) {
-                    if ($this->grouptool->allow_multiple) {
-                        $missing = ($this->grouptool->choose_min - count($regstat->registered));
-                        $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
-                    } else {
-                        $missing = 1;
-                        $stringlabel = 'registration_missing';
+                $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'),
+                    $unregtext);
+                if (!empty($this->grouptool->allow_multiple)) {
+                    $minmaxtext = '';
+                    if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
+                        $data = [
+                            'min' => $this->grouptool->choose_min,
+                            'max' => $this->grouptool->choose_max,
+                        ];
+                        $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
+                    } else if ($this->grouptool->choose_min) {
+                        $minmaxtext = get_string('choose_min_text', 'grouptool',
+                            $this->grouptool->choose_min);
+                    } else if ($this->grouptool->choose_max) {
+                        $minmaxtext = get_string('choose_max_text', 'grouptool',
+                            $this->grouptool->choose_max);
                     }
-                    $missingtext = get_string($stringlabel, 'grouptool', $missing);
-                } else {
-                    $missingtext = "";
+                    $mform->addElement('static', 'minmax', get_string('choose_minmax_title',
+                        'grouptool'), $minmaxtext);
                 }
 
-                if (!empty($regstat->registered)) {
-                    $regscumulative = [];
-                    foreach ($regstat->registered as $registration) {
-                        $regscumulative[] = $registration->grpname . ' (' . $registration->rank . ')';
-                    }
-                    $mform->addElement('static', 'registrations', get_string('registrations',
-                        'grouptool'),
-                        html_writer::tag('div', $missingtext) . implode(', ', $regscumulative));
-                } else {
-                    $mform->addElement('static', 'registrations', get_string('registrations',
-                        'grouptool'),
-                        html_writer::tag('div', $missingtext) . get_string('not_registered',
-                            'grouptool'));
-                }
-
-                if (!empty($regstat->queued)) {
-                    $queuescumulative = [];
-                    foreach ($regstat->queued as $queue) {
-                        $queuescumulative[] = $queue->grpname . ' (' . $queue->rank . ')';
-                    }
-                    $mform->addElement('static', 'queues', get_string('queues', 'grouptool'),
-                        implode(', ', $queuescumulative));
-                }
-
-                if (!empty($this->grouptool->allow_reg)) {
-                    if (!empty($this->grouptool->allow_unreg)) {
-                        $unregtext = get_string('allowed', 'grouptool');
-                    } else {
-                        $unregtext = get_string('not_permitted', 'grouptool');
-                    }
-                    $mform->addElement('static', 'unreg', get_string('unreg_is', 'grouptool'),
-                        $unregtext);
-                    if (!empty($this->grouptool->allow_multiple)) {
-                        $minmaxtext = '';
-                        if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
-                            $data = [
-                                'min' => $this->grouptool->choose_min,
-                                'max' => $this->grouptool->choose_max,
-                            ];
-                            $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
-                        } else if ($this->grouptool->choose_min) {
-                            $minmaxtext = get_string('choose_min_text', 'grouptool',
-                                $this->grouptool->choose_min);
-                        } else if ($this->grouptool->choose_max) {
-                            $minmaxtext = get_string('choose_max_text', 'grouptool',
-                                $this->grouptool->choose_max);
-                        }
-                        $mform->addElement('static', 'minmax', get_string('choose_minmax_title',
-                            'grouptool'), $minmaxtext);
-                    }
-
-                    if (!empty($this->grouptool->use_queue)) {
-                        $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
-                            get_string('active', 'grouptool'));
-                    }
+                if (!empty($this->grouptool->use_queue)) {
+                    $mform->addElement('static', 'queueing', get_string('queueing_is', 'grouptool'),
+                        get_string('active', 'grouptool'));
                 }
             }
+
             $groups = $this->get_active_groups(true, true);
 
             // Preperation for loop.
@@ -5079,7 +5077,7 @@ class mod_grouptool {
      */
     public function view_unregister() {
         global $PAGE, $OUTPUT;
-        require_capability('mod/grouptool:adminstrate_deregistration', $this->context);
+        require_capability('mod/grouptool:administrate_deregistration', $this->context);
 
         $id = $this->cm->id;
         $form = new \mod_grouptool\unregister_form(null, ['id' => $id]);
