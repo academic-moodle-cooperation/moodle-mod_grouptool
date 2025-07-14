@@ -2384,6 +2384,7 @@ class mod_grouptool {
      * @param int $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message cached data for the language strings
      * @param int $oldagrpid (optional) ID of former active group
+     * @param bool $useunreg (optional) whether to use unregistration or not if it is activated or not
      * @return string 'string' status message
      * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
      * @throws \mod_grouptool\local\exception\exceeduserreglimit
@@ -2394,7 +2395,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function can_change_group($agrpid, $userid, $message, $oldagrpid = null) {
+    protected function can_change_group($agrpid, $userid, $message, $oldagrpid = null, $useunreg = true) {
         global $USER;
 
         if ($userid === null) {
@@ -2406,10 +2407,11 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\registration('error_getting_data');
         }
         $groupdata = reset($groupdata);
-
-        if (empty($this->grouptool->allow_unreg)) {
+        if ($useunreg && empty($this->grouptool->allow_unreg)) {
             throw new \mod_grouptool\local\exception\registration('unreg_not_allowed');
         }
+
+
 
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
@@ -2482,7 +2484,7 @@ class mod_grouptool {
         }
 
         // Check if the user can be registered or queued with respect to max registrations being incremented by 1.
-        $this->can_change_group($agrpid, $userid, $message, $oldagrpid);
+        $this->can_change_group($agrpid, $userid, $message, $oldagrpid, false);
 
         // Determine from which group to change and unregister from it!
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
@@ -3785,7 +3787,7 @@ class mod_grouptool {
                     $planned->{$queue->userid} = [];
                 }
 
-                // If user has got too many regs allready!
+                // If user has got too many regs already!
                 if (!empty($userregs[$queue->userid]) && ($userregs[$queue->userid] >= $maxregs)) {
                     $returntext .= html_writer::tag('div', get_string('too_many_regs', 'grouptool'),
                         ['class' => 'error']);
@@ -3821,7 +3823,7 @@ class mod_grouptool {
                             }
                             $message->groupname = groups_get_group_name($curgroup->groupid);
 
-                            $curtext = $this->can_change_group($curgroup->id, $queue->userid, $message, $queue->agrpid);
+                            $curtext = $this->can_change_group($curgroup->id, $queue->userid, $message, $queue->agrpid, false);
                         } catch (\mod_grouptool\local\exception\registration $e) {
                             $curerror = 1;
                             $curtext = $e->getMessage();
