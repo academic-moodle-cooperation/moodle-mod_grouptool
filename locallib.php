@@ -2411,8 +2411,6 @@ class mod_grouptool {
             throw new \mod_grouptool\local\exception\registration('unreg_not_allowed');
         }
 
-
-
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         [$userregs, $userqueues, , , $max] = $this->check_users_regs_limits($userid, true);
