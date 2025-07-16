@@ -4623,13 +4623,12 @@ class mod_grouptool {
                 $grouptext = $grouptext . html_writer::tag('div', $grouphtml, ['class' => 'panel-body']);
                 $grouptext = html_writer::tag('div', $grouptext, ['class' => 'panel-text']);
                 $grouphtml = $grouppicture . $grouptext;
-
                 if ($regrank !== false) {
-                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-success');
+                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert alert-success');
                 } else if ($queuerank !== false) {
-                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-warning');
+                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert alert-warning');
                 } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
-                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert-error group-full');
+                    $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert alert-danger group-full');
                 } else {
                     $classes = 'generalbox group empty';
                     if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
