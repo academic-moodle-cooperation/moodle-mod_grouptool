@@ -297,7 +297,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
                            ['size' => '3']);
-        $mform->setType('choose_min', PARAM_TEXT);
+        $mform->setType('choose_min', PARAM_INT);
         $choosemin = get_config('mod_grouptool', 'choose_min');
         if ($choosemin === false) {
             throw new coding_exception('invalid_param');
@@ -307,7 +307,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
                            ['size' => '3']);
-        $mform->setType('choose_max', PARAM_TEXT);
+        $mform->setType('choose_max', PARAM_INT);
         $choosemax = get_config('mod_grouptool', 'choose_max');
         if ($choosemax === false) {
             throw new coding_exception('invalid_param');
