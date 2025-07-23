@@ -405,7 +405,7 @@ function grouptool_update_queues($grouptool = 0) {
     }
 
     if ($agrps = $DB->get_records('grouptool_agrps', ['grouptoolid' => $grouptool->instance])) {
-        list($agrpsql, $params) = $DB->get_in_or_equal(array_keys($agrps));
+        [$agrpsql, $params] = $DB->get_in_or_equal(array_keys($agrps));
         $groupregs = $DB->get_records_sql_menu('SELECT agrpid, COUNT(id)
                                                   FROM {grouptool_registered}
                                                  WHERE agrpid ' . $agrpsql . ' AND modified_by >= 0
@@ -499,7 +499,7 @@ function grouptool_delete_instance($id) {
          * with correct grouptoolid or agrps_id
          */
         if (is_array($ids)) {
-            list($sql, $params) = $DB->get_in_or_equal($ids);
+            [$sql, $params] = $DB->get_in_or_equal($ids);
             $DB->delete_records_select('grouptool_queued', "agrpid " . $sql, $params);
             $DB->delete_records_select('grouptool_registered', "agrpid " . $sql, $params);
             $DB->delete_records_select('grouptool_agrps', "id " . $sql, $params);
@@ -589,40 +589,37 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $creategrps = has_capability('mod/grouptool:administrate_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
-
-    if ($creategrps || $creategrpgs || $admingrps) {
-        if ($creategrps && ($admingrps || $creategrpgs)) {
-            $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'administration']);
-            $admin = $navref->add(get_string('administration', 'grouptool'), $url);
-            $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'group_admin']);
-            $admin->add(get_string('group_administration', 'grouptool'), $url);
-            $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'group_creation']);
-            $admin->add(get_string('group_creation', 'grouptool'), $url);
-        } else if ($creategrps) {
-            $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'group_creation']);
-            $navref->add(get_string('group_creation', 'grouptool'), $url);
-        } else if ($creategrpgs || $admingrps) {
-            $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'group_admin']);
-            $navref->add(get_string('group_administration', 'grouptool'), $url);
-        }
-    }
-
+    // Grouptool
+    // Grouptool Registration
+    // Administration
+    // Administration administrate
+    // Administrtaion create grousp
+    // Group-registrations
+    // Group-registrations Import
+    // Group-registrations Unregister
     $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
         && ($gt->timeavailable < time()));
-
     if (has_capability('mod/grouptool:administrate_registration', $context)
         || ($regopen && has_capability('mod/grouptool:register', $context))) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'selfregistration']);
         $navref->add(get_string('selfregistration', 'grouptool'), $url);
     }
-    if (has_capability('mod/grouptool:administrate_registration', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'import']);
-        $navref->add(get_string('import', 'grouptool'), $url);
+    if ($admingrps) {
+        $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
+        $admin = $navref->add(get_string('administration', 'grouptool'), $url);
+        $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
+        $admin->add(get_string('group_administration', 'grouptool'), $url);
+        $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_creation']);
+        $admin->add(get_string('group_creation', 'grouptool'), $url);
     }
-    if (has_capability('mod/grouptool:view_regs_group_view', $context)) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $navref->add(get_string('users_tab', 'grouptool'), $url);
+    if (has_capability('mod/grouptool:administrate_registration', $context)) {
+        $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'overview']);
+        $groupregistrations = $navref->add(get_string('registrations', 'grouptool'), $url);
+        $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'import']);
+        $groupregistrations->add(get_string('import', 'grouptool'), $url);
+        $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'unregister']);
+        $groupregistrations->add(get_string('unregister', 'grouptool'), $url);
     }
     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
 }
@@ -789,7 +786,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
                 || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
                 $attrib['class'] = 'dimmed';
             }
-            list($cc, ) = grouptool_display_lateness(time(), $grouptool->timedue);
+            [$cc, ] = grouptool_display_lateness(time(), $grouptool->timedue);
             $str .= html_writer::tag('div', $strgrouptool . ': ' .
                 html_writer::tag('a', $grouptool->name, $attrib),
                 ['class' => 'name']);
@@ -847,7 +844,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         return '';
     }
 
-    list($colorclass, ) = grouptool_display_lateness(time(), $grouptool->timedue);
+    [$colorclass, ] = grouptool_display_lateness(time(), $grouptool->timedue);
 
     if (has_capability('mod/grouptool:register', $context)) {
         if ($grouptool->allow_reg) {
@@ -899,7 +896,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
             if (count($userstats->queued)) {
                 $tempstr = "";
                 foreach ($userstats->queued as $queue) {
-                    list($colorclass, ) = grouptool_display_lateness($queue->timestamp,
+                    [$colorclass, ] = grouptool_display_lateness($queue->timestamp,
                         $grouptool->timedue);
                     if ($tempstr != "") {
                         $tempstr .= ", ";
@@ -1113,7 +1110,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 
     if (!$managesregs && has_capability('mod/grouptool:register', $context)) {
         $userstats = $grouptool->get_registration_stats($USER->id);
-        list($allowmultiple, $choosemin, ) = $grouptool->get_reg_settings();
+        [$allowmultiple, $choosemin, ] = $grouptool->get_reg_settings();
         if ($allowmultiple) {
             $itemcount = ($choosemin - count($userstats->registered));
             $label = get_string(($itemcount > 1) ? 'register' : 'register', 'grouptool');
