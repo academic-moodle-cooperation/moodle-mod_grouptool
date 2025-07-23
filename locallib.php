@@ -1491,7 +1491,7 @@ class mod_grouptool {
                     $curfilter = 'all';
                     break;
             }
-
+            echo html_writer::end_tag("div");
             $params = ['cmid' => $this->cm->id,
                 'filter' => $curfilter,
                 'filterall' => GROUPTOOL_FILTER_ALL,

@@ -136,8 +136,7 @@ if ($node2) {
     $node2->make_active();
 }
 $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
-$header = $OUTPUT->header();
-echo $header;
+echo $OUTPUT->header();
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
 if (!($creategrps || $creategrpgs || $admingrps)) {
