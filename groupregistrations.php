@@ -118,10 +118,13 @@ $options = [
     'import' => get_string('import'),
     'unregister' => get_string('unregister', 'grouptool'),
 ];
+
 switch ($tab) {
     case 'import':
-        $select = new single_select($url, 'tab', $options, 'import', false);
-        echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
+        if(has_capability('mod/grouptool:administrate_deregistration', $context)){
+            $select = new single_select($url, 'tab', $options, 'import', false);
+            echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
+        }
         $instance->view_import();
         break;
     case 'unregister':

@@ -6598,7 +6598,12 @@ class mod_grouptool {
                     html_writer::empty_tag('br'), 'generalbox centered');
             }
             $url = new moodle_url($PAGE->url, ['tab' => 'import']);
-            $button = new single_button($url, get_string('manage_members', 'grouptool'));
+            if(has_capability('mod/grouptool:administrate_deregistration', $this->context)) {
+                $button = new single_button($url, get_string('manage_members', 'grouptool'));
+            }else{
+                $button = new single_button($url, get_string('import'));
+            }
+
             $queues = "";
             echo $OUTPUT->box(html_writer::empty_tag('br') .
                 $OUTPUT->render($button) . $queues .
