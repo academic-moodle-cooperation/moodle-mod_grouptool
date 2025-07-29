@@ -358,20 +358,20 @@ class group_creation_form extends \moodleform {
             if ((clean_param($data['from'], PARAM_INT) < 0) || !ctype_digit($data['from'])) {
                 if (isset($errors['fromto'])) {
                     $errors['fromto'] .= \html_writer::empty_tag('br') .
-                        get_string('from') . ': ' .
+                        get_string('fromdate') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 } else {
-                    $errors['fromto'] = get_string('from') . ': ' .
+                    $errors['fromto'] = get_string('fromdate') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 }
             }
             if ((clean_param($data['to'], PARAM_INT) < 0) || !ctype_digit($data['to'])) {
                 if (isset($errors['fromto'])) {
                     $errors['fromto'] .= \html_writer::empty_tag('br') .
-                        get_string('to') . ': ' .
+                        get_string('todate') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 } else {
-                    $errors['fromto'] = get_string('to') . ': ' .
+                    $errors['fromto'] = get_string('todate') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 }
             }
