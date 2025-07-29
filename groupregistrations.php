@@ -121,7 +121,7 @@ $options = [
 
 switch ($tab) {
     case 'import':
-        if(has_capability('mod/grouptool:administrate_deregistration', $context)){
+        if (has_capability('mod/grouptool:administrate_deregistration', $context)) {
             $select = new single_select($url, 'tab', $options, 'import', false);
             echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         }
