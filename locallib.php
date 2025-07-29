@@ -432,7 +432,11 @@ class mod_grouptool {
         $groups = [];
 
         // Number of groups with userpergrp+1 for properly allocating the rest without messing up the sort order.
-        $plusonegroupcount = ($usercnt / $numgrps) > $userpergrp ? $usercnt % $numgrps : 0;
+        if($numgrps <= 0) {
+            $plusonegroupcount = 0;
+        }else{
+            $plusonegroupcount = ($usercnt / $numgrps) > $userpergrp ? $usercnt % $numgrps : 0;
+        }
 
         // Allocate the users - all groups equal count first!
         for ($i = 0; $i < $numgrps; $i++) {
@@ -509,6 +513,10 @@ class mod_grouptool {
             return [0 => $error, 1 => html_writer::table($table)];
 
         } else {
+            if($numgrps <= 0) {
+                $preview = get_string('nogroupscreated', 'grouptool');
+                return [true, $preview];
+            }
             $grouping = null;
             $createdgrouping = 0;
             $createdgroups = [];

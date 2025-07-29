@@ -379,6 +379,7 @@ $string['nogroups'] = 'No groups in this course.';
 $string['nogroupsactive'] = 'No active groups in this grouptool.';
 $string['nogroupschoose'] = 'Choose groups';
 $string['nogroupscreate'] = 'Create groups';
+$string['nogroupscreated'] = 'No groups created, because there are no users in the course';
 $string['nogroupsgrouping'] = 'No groups in this grouping.';
 $string['nogroupsinactive'] = 'No inactive groups in this grouptool.';
 $string['nogrouptools'] = 'There are no grouptools!';
