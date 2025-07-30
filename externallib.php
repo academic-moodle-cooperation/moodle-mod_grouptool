@@ -241,19 +241,27 @@ class mod_grouptool_external extends external_api {
         $regs = $DB->count_records_sql($sql, $sqlparams);
         if (empty($params['size']) && $params['size'] != '0') {
             // Disable individual size for this group!
-            $DB->set_field('grouptool_agrps', 'grpsize', null, [
-                'groupid' => $params['groupid'],
-                'grouptoolid' => $cm->instance,
+            $dbsize = $DB->get_field('grouptool', 'grpsize', [
+                'id' => $cm->instance,
             ]);
-            $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', [
-                'groupid' => $params['groupid'],
-                'grouptoolid' => $cm->instance,
-            ]);
-            if (!empty($dbsize)) {
+            if ($dbsize < $regs) {
                 // Error happened...
-                $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
-            } else {
-                $result->message = get_string('resized_group', 'grouptool', $params['size']);
+                $result->error = get_string('toomanyregs', 'grouptool');
+            }else{
+                $DB->set_field('grouptool_agrps', 'grpsize', null, [
+                    'groupid' => $params['groupid'],
+                    'grouptoolid' => $cm->instance,
+                ]);
+                $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', [
+                    'groupid' => $params['groupid'],
+                    'grouptoolid' => $cm->instance,
+                ]);
+                if (!empty($dbsize)) {
+                    // Error happened...
+                    $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
+                } else {
+                    $result->message = get_string('resized_group', 'grouptool', $params['size']);
+                }
             }
         } else if (preg_match('/[1-9]\d*/', clean_param($params['size'], PARAM_INT)) == 0) {
             $result->error = get_string('grpsizezeroerror', 'grouptool');
