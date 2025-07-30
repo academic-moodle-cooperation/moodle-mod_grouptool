@@ -40,19 +40,6 @@ require_once($CFG->dirroot . "/mod/grouptool/locallib.php");
 class mod_grouptool_external extends external_api {
 
     /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function delete_group_parameters() {
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'groupid' => new external_value(PARAM_INT, 'group id'),
-            ]
-        );
-    }
-
-    /**
      * Delete a single group
      *
      * @param int $cmid course module ID
@@ -88,6 +75,19 @@ class mod_grouptool_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function delete_group_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+            ]
+        );
+    }
+
+    /**
      * Returns description of method result value
      * @return external_description
      */
@@ -96,22 +96,6 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
-    }
-
-    /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function rename_group_parameters() {
-        // Function onlinetextpreview_parameters() always return an external_function_parameters().
-        // The external_function_parameters constructor expects an array of external_description.
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'groupid' => new external_value(PARAM_INT, 'group id'),
-                'name' => new external_value(PARAM_TEXT, 'new name'),
-            ]
-        );
     }
 
     /**
@@ -175,6 +159,22 @@ class mod_grouptool_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function rename_group_parameters() {
+        // Function onlinetextpreview_parameters() always return an external_function_parameters().
+        // The external_function_parameters constructor expects an array of external_description.
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+                'name' => new external_value(PARAM_TEXT, 'new name'),
+            ]
+        );
+    }
+
+    /**
      * Returns description of method result value
      * @return external_description
      */
@@ -183,20 +183,6 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
-    }
-
-    /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function resize_group_parameters() {
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'groupid' => new external_value(PARAM_INT, 'group id'),
-                'size' => new external_value(PARAM_TEXT, 'size or 0'),
-            ]
-        );
     }
 
     /**
@@ -241,19 +227,27 @@ class mod_grouptool_external extends external_api {
         $regs = $DB->count_records_sql($sql, $sqlparams);
         if (empty($params['size']) && $params['size'] != '0') {
             // Disable individual size for this group!
-            $DB->set_field('grouptool_agrps', 'grpsize', null, [
-                'groupid' => $params['groupid'],
-                'grouptoolid' => $cm->instance,
+            $dbsize = $DB->get_field('grouptool', 'grpsize', [
+                'id' => $cm->instance,
             ]);
-            $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', [
-                'groupid' => $params['groupid'],
-                'grouptoolid' => $cm->instance,
-            ]);
-            if (!empty($dbsize)) {
+            if ($dbsize < $regs) {
                 // Error happened...
-                $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
+                $result->error = get_string('toomanyregs', 'grouptool');
             } else {
-                $result->message = get_string('resized_group', 'grouptool', $params['size']);
+                $DB->set_field('grouptool_agrps', 'grpsize', null, [
+                    'groupid' => $params['groupid'],
+                    'grouptoolid' => $cm->instance,
+                ]);
+                $dbsize = $DB->get_field('grouptool_agrps', 'grpsize', [
+                    'groupid' => $params['groupid'],
+                    'grouptoolid' => $cm->instance,
+                ]);
+                if (!empty($dbsize)) {
+                    // Error happened...
+                    $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
+                } else {
+                    $result->message = get_string('resized_group', 'grouptool', $params['size']);
+                }
             }
         } else if (preg_match('/[1-9]\d*/', clean_param($params['size'], PARAM_INT)) == 0) {
             $result->error = get_string('grpsizezeroerror', 'grouptool');
@@ -284,6 +278,20 @@ class mod_grouptool_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function resize_group_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+                'size' => new external_value(PARAM_TEXT, 'size or 0'),
+            ]
+        );
+    }
+
+    /**
      * Returns description of method result value
      * @return external_description
      */
@@ -292,19 +300,6 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
-    }
-
-    /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function activate_group_parameters() {
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'groupid' => new external_value(PARAM_INT, 'group id'),
-            ]
-        );
     }
 
     /**
@@ -354,6 +349,19 @@ class mod_grouptool_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function activate_group_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+            ]
+        );
+    }
+
+    /**
      * Returns description of method result value
      * @return external_description
      */
@@ -362,19 +370,6 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
-    }
-
-    /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function deactivate_group_parameters() {
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'groupid' => new external_value(PARAM_INT, 'group id'),
-            ]
-        );
     }
 
     /**
@@ -422,6 +417,19 @@ class mod_grouptool_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function deactivate_group_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'groupid' => new external_value(PARAM_INT, 'group id'),
+            ]
+        );
+    }
+
+    /**
      * Returns description of method result value
      * @return external_description
      */
@@ -430,24 +438,6 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
-    }
-
-    /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function reorder_groups_parameters() {
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'order' => new external_multiple_structure(
-                    new external_single_structure([
-                        'groupid' => new external_value(PARAM_INT, 'group id'),
-                        'order' => new external_value(PARAM_INT, 'order'),
-                    ])
-                ),
-            ]
-        );
     }
 
     /**
@@ -520,6 +510,24 @@ class mod_grouptool_external extends external_api {
     }
 
     /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function reorder_groups_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'order' => new external_multiple_structure(
+                    new external_single_structure([
+                        'groupid' => new external_value(PARAM_INT, 'group id'),
+                        'order' => new external_value(PARAM_INT, 'order'),
+                    ])
+                ),
+            ]
+        );
+    }
+
+    /**
      * Returns description of method result value
      * @return external_description
      */
@@ -528,20 +536,6 @@ class mod_grouptool_external extends external_api {
             'error' => new external_value(PARAM_RAW, 'either false, or error message', VALUE_DEFAULT, false),
             'message' => new external_value(PARAM_RAW, 'Returning message', VALUE_DEFAULT, ''),
         ]);
-    }
-
-    /**
-     * Returns description of method parameters
-     * @return external_function_parameters
-     */
-    public static function swap_groups_parameters() {
-        return new external_function_parameters(
-            [
-                'cmid' => new external_value(PARAM_INT, 'course module id'),
-                'a' => new external_value(PARAM_INT, 'group A id'),
-                'b' => new external_value(PARAM_INT, 'group B id'),
-            ]
-        );
     }
 
     /**
@@ -600,6 +594,20 @@ class mod_grouptool_external extends external_api {
         $result->message = get_string('swapped_groups', 'grouptool', $a);
 
         return $result;
+    }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function swap_groups_parameters() {
+        return new external_function_parameters(
+            [
+                'cmid' => new external_value(PARAM_INT, 'course module id'),
+                'a' => new external_value(PARAM_INT, 'group A id'),
+                'b' => new external_value(PARAM_INT, 'group B id'),
+            ]
+        );
     }
 
     /**
