@@ -187,6 +187,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 'message': strings.resizehelp
             };
             templates.render('core/notification_info', context).then(function(html) {
+                log.info('Helpnode fade in!', 'grouptool');
                 helpNode = $(html);
                 helpNode.hide();
                 node.find('.size div').prepend(helpNode);
@@ -202,16 +203,19 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
             }
 
             if (e.which === 13) { // Enter!
+                log.info('Enter was pressed!', 'grouptool');
                 requests = ajax.call([{
                     methodname: 'mod_grouptool_resize_group',
                     args: {cmid: parseInt(cmid), groupid: grpid, size: field.val()},
                     fail: notif.exception
                 }]);
                 if (infoNode) {
+                    log.info('Remove info node!', 'grouptool');
                     infoNode.fadeOut(600);
                     infoNode.remove();
                 }
                 if (helpNode) {
+                    log.info('Remove help node!', 'grouptool');
                     helpNode.fadeOut(600);
                     helpNode.remove();
                 }
@@ -225,14 +229,16 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             infoNode.hide();
                             node.find('.size div').prepend(infoNode);
                             infoNode.fadeIn(600);
-                            // Remove after 60 seconds automatically!
+                            log.info('Fade in info node error!', 'grouptool');
+                            // Remove after 5 seconds automatically!
                             window.setTimeout(function() {
+                                log.info('Fade out info node error!', 'grouptool');
                                 infoNode.fadeOut(600, function() {
                                     infoNode.remove();
                                 });
-                            }, 60 * 1000);
-
+                            }, 5 * 1000);
                             return this;
+
                         }).fail(notif.exception);
                     } else {
                         context = {
@@ -243,6 +249,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             infoNode.hide();
                             node.find('.size div').prepend(infoNode);
                             infoNode.fadeIn(600);
+                            log.info('Fade in info node success!', 'grouptool');
                             var newvalue = field.val();
                             if (newvalue === '') {
                                 text.html(globalsize + '*');
@@ -258,10 +265,11 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                             });
                             window.setTimeout(function() {
                                 infoNode.fadeOut(600, function() {
+                                    log.info('Fade out info node success!', 'grouptool');
                                     infoNode.remove();
                                 });
                             }, 5 * 1000);
-
+                            field.off('keydown');
                             return this;
                         }).fail(notif.exception);
                     }
@@ -271,11 +279,10 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 }).fail(notif.exception);
 
             } else if (e.which === 27) { // Escape!
+                log.info('Escape was pressed!', 'grouptool');
                 field.fadeOut(600, function() {
                     text.hide();
                     field.attr('type', 'hidden');
-                    field.attr('value', text.html());
-                    field.val(text.html());
                     text.fadeIn(600);
                     button.fadeIn(600);
                 });
@@ -286,10 +293,12 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
                 }
                 if (helpNode) {
                     helpNode.fadeOut(600, function() {
-                        infoNode.remove();
+                        helpNode.remove();
                     });
                 }
-                field.unbind('key');
+                field.off('keydown');
+                log.info('Return this!', 'grouptool');
+                return this;
             }
         });
     };
@@ -557,6 +566,7 @@ define(['jquery', 'core/templates', 'core/ajax', 'core/str', 'core/url',
         this.filterall = filterall;
         this.globalsize = globalsize;
         this.usesize = usesize;
+        this.resizeflag = false;
 
         log.info('Initialize Grouptool group administration', "grouptool");
         $('.path-mod-grouptool').on('click', 'tr[data-id] a[data-rename]', this, this.renamegroup);
