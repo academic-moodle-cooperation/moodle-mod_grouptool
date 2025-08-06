@@ -25,7 +25,6 @@ CHANGELOG
 * [FIXED] #8414 Fixed missing status colors for students in group management
 * [FIXED] #8415 Fixed Classic Theme issue where "Administration" in group management was displayed in navigation
 * [FIXED] #8416 Fixed Classic Theme issue where "Unenroll" tab was not displayed
-* [FIXED] #8418 Fixed issue preventing unenrollment until minimum group size (+1) was reached
 * [FIXED] #8429 Fixed issue where "Unenroll" was still visible when capability was disabled
 
 4.5.2 (2025-03-30)
