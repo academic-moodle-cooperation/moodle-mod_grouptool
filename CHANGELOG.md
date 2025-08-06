@@ -1,13 +1,31 @@
 CHANGELOG
 ========
-5.0.0 (2025-05-05)
+
+5.0.0 (2025-08-05)
 ------------------
 * Moodle 5.0.0 compatible version
-* [FIXED] #8349 Fix sizing of grouptool and
-* [CHANGED] #8107 Updated Capabilites for new plugin structure
-* [FIXED] #8339 Fix grouptool not showing in activity chooser
-* [LANGSTRING] #8279 Fix langstring for AMOS
-* [CHANGED] #8107 Updated Capabilites for new plugin structure
+* [CHANGED] #8107 Updated capabilities to match new plugin structure
+* [FIXED] #8242 Fixed issue where group picture disappeared after changing status from Active to Inactive
+* [FIXED] #8244 Fixed issue where current value in dropdown field reset to "Select"
+* [LANGSTRING] #8279 Revised language strings for AMOS
+* [FIXED] #8339 Fixed issue where Grouptool was not showing in activity chooser
+* [FIXED] #8349 Fixed incorrect sizing of pages and inconsistent button arrangement on the start page
+* [FEATURE] #8352 Added modulename_help extension with documentation links
+* [FIXED] #8371 Corrected typo in language string
+* [FIXED] #8379 Fixed nested error message when repeatedly setting the individual group size too low
+* [FIXED] #8380 Fixed issue where resetting individual group size to default allowed more signups than permitted
+* [FIXED] #8381 Fixed issue where students could see the "Grouptool Report" tab
+* [FIXED] #8383 Adjusted help text
+* [FIXED] #8386 Fixed inconsistency between info display and input of individual group size when process was aborted mid-way
+* [FIXED] #8400 Fixed issue where max number for "Multiple Signups" allowed letters and special characters
+* [FIXED] #8405 Fixed issue where waiting lists could not be resolved
+* [FIXED] #8406 Fixed issue where groups from the last grouping were always preselected
+* [LANGSTRING] #8412 Renamed language string for error message "Create groups from X to Y"
+* [FIXED] #8413 Fixed error when creating a group with a global group without prior enrollment
+* [FIXED] #8414 Fixed missing status colors for students in group management
+* [FIXED] #8415 Fixed Classic Theme issue where "Administration" in group management was displayed in navigation
+* [FIXED] #8416 Fixed Classic Theme issue where "Unenroll" tab was not displayed
+* [FIXED] #8429 Fixed issue where "Unenroll" was still visible when capability was disabled
 
 4.5.2 (2025-03-30)
 ------------------
