@@ -139,7 +139,7 @@ class mod_grouptool_external extends external_api {
             $result->error = get_string('groupnameexists', 'group', $params['name']);
             // If the group name is too long.
         } else if (!empty($params) && strlen($params['name']) >= 255) {
-            $result->error = get_string('groupnametoolong', 'grouptool', $params['name']);
+            $result->error = get_string('groupnamelength', 'grouptool', $params['name']);
         } else {
             $group = new stdClass();
             $group->id = $params['groupid'];
