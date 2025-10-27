@@ -50,46 +50,46 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code
  */
 abstract class base extends advanced_testcase {
     /** Default number of students to create */
-    const DEFAULT_STUDENT_COUNT = 10;
+    protected const DEFAULT_STUDENT_COUNT = 10;
     /** Default number of teachers to create */
-    const DEFAULT_TEACHER_COUNT = 2;
+    protected const DEFAULT_TEACHER_COUNT = 2;
     /** Default number of editing teachers to create */
-    const DEFAULT_EDITING_TEACHER_COUNT = 2;
+    protected const DEFAULT_EDITING_TEACHER_COUNT = 2;
     /** Number of timestamps to create */
-    const DEFAULT_TIMESTAMP_COUNT = 6;
+    protected const DEFAULT_TIMESTAMP_COUNT = 6;
     /** Optional extra number of students to create */
-    const EXTRA_STUDENT_COUNT = 40;
+    protected const EXTRA_STUDENT_COUNT = 40;
     /** Optional number of suspended students */
-    const EXTRA_SUSPENDED_COUNT = 10;
+    protected const EXTRA_SUSPENDED_COUNT = 10;
     /** Optional extra number of teachers to create */
-    const EXTRA_TEACHER_COUNT = 5;
+    protected const EXTRA_TEACHER_COUNT = 5;
     /** Optional extra number of editing teachers to create */
-    const EXTRA_EDITING_TEACHER_COUNT = 5;
+    protected const EXTRA_EDITING_TEACHER_COUNT = 5;
     /** Number of groups to create */
-    const GROUP_COUNT = 10;
+    protected const GROUP_COUNT = 10;
 
     /** @var stdClass $course New course created to hold the grouptools */
     protected $course = null;
 
-    /** @var array $teachers List of DEFAULT_TEACHER_COUNT teachers in the course*/
+    /** @var array $teachers List of DEFAULT_TEACHER_COUNT teachers in the course */
     protected $teachers = null;
 
     /** @var array $editingteachers List of DEFAULT_EDITING_TEACHER_COUNT editing teachers in the course */
     protected $editingteachers = null;
 
-    /** @var array $students List of DEFAULT_STUDENT_COUNT students in the course*/
+    /** @var array $students List of DEFAULT_STUDENT_COUNT students in the course */
     protected $students = null;
 
-    /** @var array $extrateachers List of EXTRA_TEACHER_COUNT teachers in the course*/
+    /** @var array $extrateachers List of EXTRA_TEACHER_COUNT teachers in the course */
     protected $extrateachers = null;
 
-    /** @var array $extraeditingteachers List of EXTRA_EDITING_TEACHER_COUNT editing teachers in the course*/
+    /** @var array $extraeditingteachers List of EXTRA_EDITING_TEACHER_COUNT editing teachers in the course */
     protected $extraeditingteachers = null;
 
-    /** @var array $extrastudents List of EXTRA_STUDENT_COUNT students in the course*/
+    /** @var array $extrastudents List of EXTRA_STUDENT_COUNT students in the course */
     protected $extrastudents = null;
 
-    /** @var array $extrasuspendedstudents List of EXTRA_SUSPENDED_COUNT students in the course*/
+    /** @var array $extrasuspendedstudents List of EXTRA_SUSPENDED_COUNT students in the course */
     protected $extrasuspendedstudents = null;
 
     /** @var array $groups List of 10 groups in the course */
@@ -302,9 +302,9 @@ abstract class base extends advanced_testcase {
         $message->groupname = $agrps[$agrpids[0]]->name;
 
         return [
-                0 => $agrps,
-                1 => $agrpids,
-                2 => $message,
+            0 => $agrps,
+            1 => $agrpids,
+            2 => $message,
         ];
     }
 }

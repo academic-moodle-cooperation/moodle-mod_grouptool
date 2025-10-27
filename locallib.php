@@ -59,41 +59,41 @@ class mod_grouptool {
     /**
      * filter all groups
      */
-    const FILTER_ALL = 0;
+    public const FILTER_ALL = 0;
     /**
      * filter active groups
      */
-    const FILTER_ACTIVE = 1;
+    public const FILTER_ACTIVE = 1;
     /**
      * filter inactive groups
      */
-    const FILTER_INACTIVE = 2;
+    public const FILTER_INACTIVE = 2;
 
     /**
      * NAME_TAGS - the tags available for grouptool's group naming schemes
      */
-    const NAME_TAGS = ['[firstname]', '[lastname]', '[idnumber]', '[username]', '@', '#'];
+    public const NAME_TAGS = ['[firstname]', '[lastname]', '[idnumber]', '[username]', '@', '#'];
 
     /**
      * HIDE_GROUPMEMBERS - never show groupmembers no matter what...
      */
-    const HIDE_GROUPMEMBERS = GROUPTOOL_HIDE_GROUPMEMBERS;
+    public const HIDE_GROUPMEMBERS = GROUPTOOL_HIDE_GROUPMEMBERS;
     /**
      * SHOW_GROUPMEMBERS_AFTER_DUE - show groupmembers after due date
      */
-    const SHOW_GROUPMEMBERS_AFTER_DUE = GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE;
+    public const SHOW_GROUPMEMBERS_AFTER_DUE = GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE;
     /**
      * SHOW_GROUPMEMBERS_AFTER_DUE - show members of own group(s) after due date
      */
-    const SHOW_OWN_GROUPMEMBERS_AFTER_DUE = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE;
+    public const SHOW_OWN_GROUPMEMBERS_AFTER_DUE = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE;
     /**
      * SHOW_OWN_GROUPMEMBERS_AFTER_REG - show members of own group(s) immediately after registration
      */
-    const SHOW_OWN_GROUPMEMBERS_AFTER_REG = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG;
+    public const SHOW_OWN_GROUPMEMBERS_AFTER_REG = GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG;
     /**
      * SHOW_GROUPMEMBERS - show groupmembers no matter what...
      */
-    const SHOW_GROUPMEMBERS = GROUPTOOL_SHOW_GROUPMEMBERS;
+    public const SHOW_GROUPMEMBERS = GROUPTOOL_SHOW_GROUPMEMBERS;
 
     /**
      * Constructor for the grouptool class
@@ -1703,7 +1703,7 @@ class mod_grouptool {
                         $data->from = 1;
                         $data->to = $data->numberofgroups;
                         $data->digits = 1;
-                        // go on to GROUPTOOL_FROMTO_GROUPS
+                        // Go on to GROUPTOOL_FROMTO_GROUPS!
                     case GROUPTOOL_FROMTO_GROUPS:
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
@@ -1843,7 +1843,7 @@ class mod_grouptool {
                     $data->from = 1;
                     $data->to = $data->numberofgroups;
                     $data->digits = 1;
-                    // go to GROUPTOOL_FROMTO_GROUPS case
+                    // Go to GROUPTOOL_FROMTO_GROUPS case!
                 case GROUPTOOL_FROMTO_GROUPS:
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;
@@ -3720,7 +3720,6 @@ class mod_grouptool {
      */
     public function view_starting_page() {
         global $OUTPUT, $DB, $USER, $CFG;
-        // TODO add caoabilities.
         $id = $this->cm->id;
         $registrationdetail = "";
         if (property_exists($this->grouptool, "allow_reg") && $this->grouptool->allow_reg == 1) {
@@ -3761,7 +3760,7 @@ class mod_grouptool {
         $numberofusers = $regstats->users . " " . get_string('users');
         $detailsregistration = '';
 
-        // TODO if regstration is open.
+        // If regstration is open.
         $registrations = false;
 
         if (!empty($this->grouptool->timeavailable) && (time() >= $this->grouptool->timeavailable)) {
@@ -3898,7 +3897,7 @@ class mod_grouptool {
         switch ($userid) {
             case null:
                 $userid = $USER->id;
-                // no user data, set id and go to default case
+                // No user data, set id and go to default case.
             default:
                 $groups = $this->get_active_groups(false, false);
                 break;
@@ -5439,7 +5438,7 @@ class mod_grouptool {
                                 // If user is marked, we register him right now!
                                 $reg->modified_by = $USER->id;
                                 $DB->update_record('grouptool_registered', $reg);
-                                // TODO do we have to delete his marks and queues if theres enough registrations?
+                                // Do we have to delete his marks and queues if theres enough registrations?
                             } else {
                                 $reg = new stdClass();
                                 $reg->agrpid = $agrp[$group];

@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
 
 /**
@@ -39,10 +40,12 @@ class registration_deleted extends registration {
      * @return string
      */
     public function get_description() {
-        return "The registration for the user with id '" . $this->data['other']['userid'] .
-               "' in agrp with id '" . $this->data['other']['agrpid'] . "' (= group with id '" . $this->data['other']['groupid'] . "')" .
-               " in " . $this->objecttable . " with course module id '$this->contextinstanceid' has been deleted" .
-               (!empty($this->data['other']['source']) ? ' by ' . $this->data['other']['source'] : '');
+        return "The registration for the user with id '" .
+            $this->data['other']['userid'] .
+            "' in agrp with id '" . $this->data['other']['agrpid'] . "' (= group with id '" .
+            $this->data['other']['groupid'] . "')" .
+            " in " . $this->objecttable . " with course module id '$this->contextinstanceid' has been deleted" .
+            (!empty($this->data['other']['source']) ? ' by ' . $this->data['other']['source'] : '');
     }
 
     /**

@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
 
 /**
@@ -54,14 +55,14 @@ class group_creation_started extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_groupamount(\stdClass | \cm_info $cm, $pattern, $amount, $grouping = 0) {
+    public static function create_groupamount(\stdClass|\cm_info $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => [
-                'mode'     => 'groups_amount',
-                'pattern'  => $pattern,
-                'amount'   => $amount,
+                'mode' => 'groups_amount',
+                'pattern' => $pattern,
+                'amount' => $amount,
                 'grouping' => $grouping,
             ],
         ]);
@@ -78,14 +79,14 @@ class group_creation_started extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_memberamount(\stdClass | \cm_info $cm, $pattern, $amount, $grouping = 0) {
+    public static function create_memberamount(\stdClass|\cm_info $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => [
-                'mode'     => 'members_amount',
-                'pattern'  => $pattern,
-                'amount'   => $amount,
+                'mode' => 'members_amount',
+                'pattern' => $pattern,
+                'amount' => $amount,
                 'grouping' => $grouping,
             ],
         ]);
@@ -103,15 +104,15 @@ class group_creation_started extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_fromto(\stdClass | \cm_info $cm, $pattern, $from, $to, $grouping = 0) {
+    public static function create_fromto(\stdClass|\cm_info $cm, $pattern, $from, $to, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => [
-                'mode'     => 'fromto',
-                'pattern'  => $pattern,
-                'from'     => $from,
-                'to'         => $to,
+                'mode' => 'fromto',
+                'pattern' => $pattern,
+                'from' => $from,
+                'to' => $to,
                 'grouping' => $grouping,
             ],
         ]);
@@ -127,13 +128,13 @@ class group_creation_started extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_person(\stdClass | \cm_info $cm, $pattern, $grouping = 0) {
+    public static function create_person(\stdClass|\cm_info $cm, $pattern, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
             'context' => \context_module::instance($cm->id),
             'other' => [
-                'mode'     => '1-person-groups',
-                'pattern'  => $pattern,
+                'mode' => '1-person-groups',
+                'pattern' => $pattern,
                 'grouping' => $grouping,
             ],
         ]);
@@ -154,27 +155,31 @@ class group_creation_started extends \core\event\base {
         switch ($this->data['other']['mode']) {
             case 'groups_amount':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                       "course module id '$this->contextinstanceid' by defining the amount of groups (" .
-                       $this->data['other']['amount'] . ") using '" . $this->data['other']['pattern'] . "' as pattern for the groupnames" .
-                       $add . ".";
-            break;
+                    "course module id '$this->contextinstanceid' by defining the amount of groups (" .
+                    $this->data['other']['amount'] . ") using '" .
+                    $this->data['other']['pattern'] . "' as pattern for the groupnames" .
+                    $add . ".";
+                break;
             case 'members_amount':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                       "course module id '$this->contextinstanceid' by defining the amount of members per group (" .
-                       $this->data['other']['amount'] . ") using '" . $this->data['other']['pattern'] . "' as pattern for the groupnames" .
-                       $add . ".";
-            break;
+                    "course module id '$this->contextinstanceid' by defining the amount of members per group (" .
+                    $this->data['other']['amount'] . ") using '" .
+                    $this->data['other']['pattern'] . "' as pattern for the groupnames" .
+                    $add . ".";
+                break;
             case 'fromto':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                       "course module id '$this->contextinstanceid' by defining values to start (" . $this->data['other']['from'] .
-                       ") and stop (" . $this->data['other']['to'] . ") using '" . $this->data['other']['pattern'] .
-                       "' as pattern for the groupnames" . $add . ".";
-            break;
+                    "course module id '$this->contextinstanceid' by defining values to start (" .
+                    $this->data['other']['from'] .
+                    ") and stop (" . $this->data['other']['to'] . ") using '" . $this->data['other']['pattern'] .
+                    "' as pattern for the groupnames" . $add . ".";
+                break;
             case '1-person-groups':
-                return "The user with id '$this->userid' started creating 1-person-groups for each user via '" . $this->objecttable .
-                       "' with the course module id '$this->contextinstanceid' using '" . $this->data['other']['pattern'] .
-                       "' as pattern for the groupnames" . $add . ".";
-            break;
+                return "The user with id '$this->userid' started creating 1-person-groups for each user via '" .
+                    $this->objecttable .
+                    "' with the course module id '$this->contextinstanceid' using '" . $this->data['other']['pattern'] .
+                    "' as pattern for the groupnames" . $add . ".";
+                break;
         }
         return '';
     }
@@ -202,8 +207,8 @@ class group_creation_started extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();

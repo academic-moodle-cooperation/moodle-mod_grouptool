@@ -41,7 +41,12 @@ require_once(dirname(__FILE__) . '/definitions.php');
  */
 function grouptool_supports($feature) {
     return match ($feature) {
-        FEATURE_COMPLETION_TRACKS_VIEWS, FEATURE_COMPLETION_HAS_RULES, FEATURE_SHOW_DESCRIPTION, FEATURE_BACKUP_MOODLE2, FEATURE_MOD_INTRO, FEATURE_IDNUMBER => true,
+        FEATURE_COMPLETION_TRACKS_VIEWS,
+        FEATURE_COMPLETION_HAS_RULES,
+        FEATURE_SHOW_DESCRIPTION,
+        FEATURE_BACKUP_MOODLE2,
+        FEATURE_MOD_INTRO,
+        FEATURE_IDNUMBER => true,
         FEATURE_MOD_ARCHETYPE => MOD_ARCHETYPE_OTHER,
         FEATURE_MOD_PURPOSE => MOD_PURPOSE_ADMINISTRATION,
         default => null,
@@ -127,8 +132,8 @@ function grouptool_add_instance(stdClass $grouptool) {
     foreach ($coursegroups as $groupid) {
         if (
             !$DB->record_exists('grouptool_agrps', [
-            'grouptoolid' => $return,
-            'groupid' => $groupid,
+                'grouptoolid' => $return,
+                'groupid' => $groupid,
             ])
         ) {
             $record = new stdClass();
@@ -209,8 +214,8 @@ function grouptool_update_instance(stdClass $grouptool) {
     foreach ($coursegroups as $groupid) {
         if (
             !$DB->record_exists('grouptool_agrps', [
-            'grouptoolid' => $grouptool->instance,
-            'groupid' => $groupid,
+                'grouptoolid' => $grouptool->instance,
+                'groupid' => $groupid,
             ])
         ) {
             $record = new stdClass();
@@ -450,8 +455,8 @@ function grouptool_update_queues($grouptool = 0) {
                     unset($record->id);
                     if (
                         !$DB->record_exists('grouptool_registered', [
-                        'agrpid' => $agrpid,
-                        'userid' => $record->userid,
+                            'agrpid' => $agrpid,
+                            'userid' => $record->userid,
                         ])
                     ) {
                         unset($record->priority);
@@ -463,9 +468,9 @@ function grouptool_update_queues($grouptool = 0) {
                         }
                     } else if (
                         $mark = $DB->get_record('grouptool_registered', [
-                        'agrpid' => $agrpid,
-                        'userid' => $record->userid,
-                        'modified_by' => -1,
+                            'agrpid' => $agrpid,
+                            'userid' => $record->userid,
+                            'modified_by' => -1,
                         ])
                     ) {
                         $mark->modified_by = 0;
@@ -596,21 +601,12 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         return;
     }
 
-    // TODO Delete old nodes.
-
     $context = context_module::instance($cm->id);
 
     $creategrps = has_capability('mod/grouptool:administrate_groups', $context);
     $creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
-    // Grouptool
-    // Grouptool Registration
-    // Administration
-    // Administration administrate
-    // Administrtaion create grousp
-    // Group-registrations
-    // Group-registrations Import
-    // Group-registrations Unregister
+
     $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
         && ($gt->timeavailable < time()));
@@ -925,7 +921,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
                     ($grouptool->allow_multiple &&
                         (count($userstats->registered) < $grouptool->choose_min)) ||
                     (!$grouptool->allow_multiple &&
-                    !count($userstats->registered))
+                        !count($userstats->registered))
                 ) {
                     if ($grouptool->allow_multiple) {
                         $missing = ($grouptool->choose_min - count($userstats->registered));
