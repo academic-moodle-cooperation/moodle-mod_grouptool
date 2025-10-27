@@ -98,12 +98,12 @@ class user_imported extends \core\event\base {
      */
     public function get_description() {
         if ($this->data['other']['type'] == 'force') {
-            $force = ' and a registration in active-group '.$this->data['other']['agrp'].' has been forced';
+            $force = ' and a registration in active-group ' . $this->data['other']['agrp'] . ' has been forced';
         } else {
             $force = '';
         }
-        return "The user with id '".$this->data['other']['user']."' was imported".
-               " in the group with id '".$this->data['other']['group']."'".$force.
+        return "The user with id '" . $this->data['other']['user'] . "' was imported" .
+               " in the group with id '" . $this->data['other']['group'] . "'" . $force .
                " in grouptool with course module id '$this->contextinstanceid' by user with id '$this->userid'";
     }
 
@@ -140,8 +140,10 @@ class user_imported extends \core\event\base {
     protected function validate_data() {
         parent::validate_data();
         // Make sure this class is never used without proper object details.
-        if (($this->data['other']['type'] == 'force')
-            && empty($this->objectid) || empty($this->objecttable)) {
+        if (
+            ($this->data['other']['type'] == 'force')
+            && empty($this->objectid) || empty($this->objecttable)
+        ) {
             throw new \coding_exception('The user_imported event must define objectid and object table.');
         }
         // Make sure the context level is set to module.

@@ -54,15 +54,15 @@ abstract class export extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['groupingid'])) {
-            $add = ' for grouping with id \''.$this->data['other']['groupingid'].'\'';
+            $add = ' for grouping with id \'' . $this->data['other']['groupingid'] . '\'';
         } else {
             $add = '';
         }
         if (!empty($this->data['other']['groupid'])) {
             if (!empty($add)) {
-                $add .= ' and group with id \''.$this->data['other']['groupid'].'\'';
+                $add .= ' and group with id \'' . $this->data['other']['groupid'] . '\'';
             } else {
-                $add = ' for group with id \''.$this->data['other']['groupid'].'\'';
+                $add = ' for group with id \'' . $this->data['other']['groupid'] . '\'';
             }
         } else {
             if (empty($add)) {
@@ -70,7 +70,7 @@ abstract class export extends \core\event\base {
             }
         }
         return "The user with id '$this->userid' exported the {$this->exportsubject} for '{$this->objecttable}' with the " .
-               "course module id '$this->contextinstanceid'".$add." as '".$this->data['other']['format_readable']."'.";
+               "course module id '$this->contextinstanceid'" . $add . " as '" . $this->data['other']['format_readable'] . "'.";
     }
 
     /**
@@ -106,7 +106,7 @@ abstract class export extends \core\event\base {
         parent::validate_data();
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The '.self::get_name().' event must define objectid and object table.');
+            throw new \coding_exception('The ' . self::get_name() . ' event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {

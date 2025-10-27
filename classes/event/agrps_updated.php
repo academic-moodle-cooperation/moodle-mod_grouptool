@@ -99,23 +99,23 @@ class agrps_updated extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['grouping'])) {
-            $add = ' in grouping with id \''.$this->data['other']['grouping'].'\'';
+            $add = ' in grouping with id \'' . $this->data['other']['grouping'] . '\'';
         } else {
             $add = '';
         }
         if (!empty($this->data['other']['pattern'])) {
             if (!empty($add)) {
-                $add .= ' affecting '.$this->data['other']['numgrps'].
-                        ' groups (namepattern = \''.$this->data['other']['pattern'].'\')';
+                $add .= ' affecting ' . $this->data['other']['numgrps'] .
+                        ' groups (namepattern = \'' . $this->data['other']['pattern'] . '\')';
             } else {
-                $add = ' affecting '.$this->data['other']['numgrps'].
-                       ' groups (namepattern = \''.$this->data['other']['pattern'].'\')';
+                $add = ' affecting ' . $this->data['other']['numgrps'] .
+                       ' groups (namepattern = \'' . $this->data['other']['pattern'] . '\')';
             }
         }
 
-        return "The user with id '$this->userid' updated the active groups".
-               "for '{$this->objecttable}' with the ".
-               "course module id '$this->contextinstanceid'".$add.".";
+        return "The user with id '$this->userid' updated the active groups" .
+               "for '{$this->objecttable}' with the " .
+               "course module id '$this->contextinstanceid'" . $add . ".";
     }
 
     /**
@@ -147,8 +147,10 @@ class agrps_updated extends \core\event\base {
         }
 
         // Make sure that all three are set if one of them ist set!
-        if ((!empty($this->data['other']['pattern']) || !empty($this->data['other']['numgrps']))
-             && (empty($this->data['other']['pattern']) || empty($this->data['other']['numgrps']))) {
+        if (
+            (!empty($this->data['other']['pattern']) || !empty($this->data['other']['numgrps']))
+             && (empty($this->data['other']['pattern']) || empty($this->data['other']['numgrps']))
+        ) {
             throw new \coding_exception('If any of pattern or numgrps are specified, every single one of them must be specified!');
         }
     }

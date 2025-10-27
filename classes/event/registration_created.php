@@ -39,10 +39,10 @@ class registration_created extends registration {
      * @return string
      */
     public function get_description() {
-        return "The user with id '".$this->userid."' created an registration for the user with id '".$this->data['other']['userid'].
-               "' in agrp with id '".$this->data['other']['agrpid']."' (= group with id '".$this->data['other']['groupid']."')".
-               " in ".$this->objecttable." with course module id '$this->contextinstanceid'".
-               (!empty($this->data['other']['source']) ? ' by '.$this->data['other']['source'] : '');
+        return "The user with id '" . $this->userid . "' created an registration for the user with id '" . $this->data['other']['userid'] .
+               "' in agrp with id '" . $this->data['other']['agrpid'] . "' (= group with id '" . $this->data['other']['groupid'] . "')" .
+               " in " . $this->objecttable . " with course module id '$this->contextinstanceid'" .
+               (!empty($this->data['other']['source']) ? ' by ' . $this->data['other']['source'] : '');
     }
 
     /**
@@ -55,4 +55,3 @@ class registration_created extends registration {
         return get_string('eventregistrationcreated', 'grouptool');
     }
 }
-

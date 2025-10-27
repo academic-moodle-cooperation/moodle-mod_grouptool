@@ -37,7 +37,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends \plugin_renderer_base {
-
     /**
      * Render a sortable list of groups with some additional controls
      *
@@ -133,5 +132,4 @@ class renderer extends \plugin_renderer_base {
         }
         return $this->output->box($this->output->notification($message, 'info'), 'generalbox', 'nogroupsinfo');
     }
-
 }

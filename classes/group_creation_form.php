@@ -93,8 +93,10 @@ class group_creation_form extends \moodleform {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed!
              */
-            $mform->addElement('header', 'group_creation', get_string('groupcreation',
-                'grouptool'));
+            $mform->addElement('header', 'group_creation', get_string(
+                'groupcreation',
+                'grouptool'
+            ));
 
             $options = [0 => get_string('all')];
             $options += $this->_customdata['roles'];
@@ -114,8 +116,10 @@ class group_creation_form extends \moodleform {
                     foreach ($cohorts as $cohort) {
                         $options[$cohort->id] = $cohort->name;
                     }
-                    $mform->addElement('select', 'cohortid', get_string('selectfromcohort',
-                        'grouptool'), $options);
+                    $mform->addElement('select', 'cohortid', get_string(
+                        'selectfromcohort',
+                        'grouptool'
+                    ), $options);
                     $mform->setDefault('cohortid', '0');
                 }
             } else {
@@ -134,16 +138,41 @@ class group_creation_form extends \moodleform {
 
             $radioarray = [];
             $selectionname = get_string('groupcreationmode', 'grouptool');
-            $radioarray[0] = $mform->addElement('radio', 'mode', $selectionname, get_string('define_amount_groups', 'grouptool'),
-                GROUPTOOL_GROUPS_AMOUNT);
-            $radioarray[1] = $mform->addElement('radio', 'mode', '', get_string('define_amount_members', 'grouptool'),
-                GROUPTOOL_MEMBERS_AMOUNT);
-            $radioarray[2] = $mform->addElement('radio', 'mode', '', get_string('create_1_person_groups', 'grouptool'),
-                GROUPTOOL_1_PERSON_GROUPS);
-            $radioarray[3] = $mform->addElement('radio', 'mode', '', get_string('create_fromto_groups', 'grouptool'),
-                GROUPTOOL_FROMTO_GROUPS);
-            $radioarray[4] = $mform->addElement('radio', 'mode', '', get_string('create_n_m_groups', 'grouptool'),
-                GROUPTOOL_N_M_GROUPS);
+            $radioarray[0] = $mform->addElement(
+                'radio',
+                'mode',
+                $selectionname,
+                get_string('define_amount_groups', 'grouptool'),
+                GROUPTOOL_GROUPS_AMOUNT
+            );
+            $radioarray[1] = $mform->addElement(
+                'radio',
+                'mode',
+                '',
+                get_string('define_amount_members', 'grouptool'),
+                GROUPTOOL_MEMBERS_AMOUNT
+            );
+            $radioarray[2] = $mform->addElement(
+                'radio',
+                'mode',
+                '',
+                get_string('create_1_person_groups', 'grouptool'),
+                GROUPTOOL_1_PERSON_GROUPS
+            );
+            $radioarray[3] = $mform->addElement(
+                'radio',
+                'mode',
+                '',
+                get_string('create_fromto_groups', 'grouptool'),
+                GROUPTOOL_FROMTO_GROUPS
+            );
+            $radioarray[4] = $mform->addElement(
+                'radio',
+                'mode',
+                '',
+                get_string('create_n_m_groups', 'grouptool'),
+                GROUPTOOL_N_M_GROUPS
+            );
 
             $radioarray[0]->_helpbutton = $OUTPUT->help_icon('define_amount_groups', 'grouptool', '');
             $radioarray[1]->_helpbutton = $OUTPUT->help_icon('define_amount_members', 'grouptool', '');
@@ -220,8 +249,11 @@ class group_creation_form extends \moodleform {
 
             $tags = [];
             foreach (\mod_grouptool::NAME_TAGS as $tag) {
-                $tags[] = html_writer::tag('button', $tag,
-                    ['type' => 'button', 'class' => 'btm btn-secondary nametag', 'data-nametag' => $tag]);
+                $tags[] = html_writer::tag(
+                    'button',
+                    $tag,
+                    ['type' => 'button', 'class' => 'btm btn-secondary nametag', 'data-nametag' => $tag]
+                );
             }
 
             $naminggrp = [];
@@ -303,8 +335,12 @@ class group_creation_form extends \moodleform {
                 $mform->hideIf('groupingname', 'grouping', 'noteq', '-1');
             }
 
-            $mform->addElement('select', 'enablegroupmessaging', get_string('enablemessaging', 'group'),
-                [0 => get_string('no'), 1 => get_string('yes')]);
+            $mform->addElement(
+                'select',
+                'enablegroupmessaging',
+                get_string('enablemessaging', 'group'),
+                [0 => get_string('no'), 1 => get_string('yes')]
+            );
             $mform->addHelpButton('enablegroupmessaging', 'enablemessaging', 'group');
 
             $buttonarray = [];
@@ -328,12 +364,16 @@ class group_creation_form extends \moodleform {
     public function validation($data, $files) {
         $parenterrors = parent::validation($data, $files);
         $errors = [];
-        if (!empty($data['createGroups']) && $data['grouping'] == "-1"
-            && (empty($data['groupingname']) || $data['groupingname'] == "")) {
+        if (
+            !empty($data['createGroups']) && $data['grouping'] == "-1"
+            && (empty($data['groupingname']) || $data['groupingname'] == "")
+        ) {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
-        if (!empty($data['createGroups']) && in_array($data['mode'], [GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS])
-            && ($data['numberofgroups'] <= 0)) {
+        if (
+            !empty($data['createGroups']) && in_array($data['mode'], [GROUPTOOL_GROUPS_AMOUNT, GROUPTOOL_N_M_GROUPS])
+            && ($data['numberofgroups'] <= 0)
+        ) {
             $errors['numberofgroups'] = get_string('mustbeposint', 'grouptool');
         }
         if (!empty($data['createGroups'])) {

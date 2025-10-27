@@ -74,14 +74,21 @@ class unregister_form extends \moodleform {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed
              */
-            $mdlform->addElement('header', 'groupuser_unregister', get_string('groupuser_unregister',
-                                                                        'grouptool'));
+            $mdlform->addElement('header', 'groupuser_unregister', get_string(
+                'groupuser_unregister',
+                'grouptool'
+            ));
 
             $active = new sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
             $inactive = new sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
-            $groups = $mdlform->createElement('selectgroups', 'groups', get_string('choose_targetgroup_unregister', 'grouptool'),
-                null, ['size' => 15]);
+            $groups = $mdlform->createElement(
+                'selectgroups',
+                'groups',
+                get_string('choose_targetgroup_unregister', 'grouptool'),
+                null,
+                ['size' => 15]
+            );
 
             if (!empty($active->groups)) {
                 $options = [];
@@ -141,4 +148,3 @@ class unregister_form extends \moodleform {
         return $errors;
     }
 }
-

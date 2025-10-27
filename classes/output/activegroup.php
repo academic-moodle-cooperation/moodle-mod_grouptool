@@ -85,7 +85,7 @@ class activegroup {
      * @param int[] $groupings (optional) array of active groups grouping ids
      * @param bool $selected (optional) selection status of active group (selected or not)
      */
-    public function __construct($id, $groupid, $grouptoolid, $name, $size, $order, $status, $groupings=[], $selected=false) {
+    public function __construct($id, $groupid, $grouptoolid, $name, $size, $order, $status, $groupings = [], $selected = false) {
         $this->id = $id;
         $this->groupid = $groupid;
         $this->grouptoolid = $grouptoolid;
@@ -104,9 +104,17 @@ class activegroup {
      * @return \mod_grouptool\output\activegroup active group object
      */
     public static function construct_from_obj($data) {
-        return new activegroup($data->id, $data->groupid, $data->grouptoolid, $data->name,
-                               $data->size, $data->order, $data->status, $data->groupings,
-                               $data->selected);
+        return new activegroup(
+            $data->id,
+            $data->groupid,
+            $data->grouptoolid,
+            $data->name,
+            $data->size,
+            $data->order,
+            $data->status,
+            $data->groupings,
+            $data->selected
+        );
     }
 
     /**

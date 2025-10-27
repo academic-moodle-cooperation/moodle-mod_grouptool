@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_st
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_grouptool_activity_task extends restore_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -54,8 +53,10 @@ class restore_grouptool_activity_task extends restore_activity_task {
      */
     protected function define_my_steps() {
         // Grouptool only has one structure step!
-        $this->add_step(new restore_grouptool_activity_structure_step('grouptool_structure',
-                                                                      'grouptool.xml'));
+        $this->add_step(new restore_grouptool_activity_structure_step(
+            'grouptool_structure',
+            'grouptool.xml'
+        ));
     }
 
     /**
@@ -77,13 +78,18 @@ class restore_grouptool_activity_task extends restore_activity_task {
     public static function define_decode_rules() {
         $rules = [];
 
-        $rules[] = new restore_decode_rule('GROUPTOOLVIEWBYID', '/mod/grouptool/view.php?id=$1',
-                                           'course_module');
-        $rules[] = new restore_decode_rule('GROUPTOOLINDEX', '/mod/grouptool/index.php?id=$1',
-                                           'course');
+        $rules[] = new restore_decode_rule(
+            'GROUPTOOLVIEWBYID',
+            '/mod/grouptool/view.php?id=$1',
+            'course_module'
+        );
+        $rules[] = new restore_decode_rule(
+            'GROUPTOOLINDEX',
+            '/mod/grouptool/index.php?id=$1',
+            'course'
+        );
 
         return $rules;
-
     }
 
     /**
@@ -98,74 +104,163 @@ class restore_grouptool_activity_task extends restore_activity_task {
          * @todo change to using standard-action-pattern add/delete/update/view
          * + additional info  ../../db/log.php
          */
-        $rules[] = new restore_log_rule('grouptool', 'add', 'view.php?id={course_module}',
-                                        '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'update',
-                                        'view.php?id={course_module}', '{grouptool}');
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'add',
+            'view.php?id={course_module}',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'update',
+            'view.php?id={course_module}',
+            '{grouptool}'
+        );
 
-        $rules[] = new restore_log_rule('grouptool',
-                                        'view administration',
-                                        'view.php?id={course_module}&tab=administration',
-                                        '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool',
-                                        'view grading',
-                                        'view.php?id={course_module}&tab=grading',
-                                        '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'view registration',
-                                        'view.php?id={course_module}&tab=registration',
-                                        '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'view import',
-                                        'view.php?id={course_module}&tab=import', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'view overview',
-                                        'view.php?id={course_module}&tab=overview', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'view userlist',
-                                        'view.php?id={course_module}&tab=userlist', '{grouptool}');
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'view administration',
+            'view.php?id={course_module}&tab=administration',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'view grading',
+            'view.php?id={course_module}&tab=grading',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'view registration',
+            'view.php?id={course_module}&tab=registration',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'view import',
+            'view.php?id={course_module}&tab=import',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'view overview',
+            'view.php?id={course_module}&tab=overview',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'view userlist',
+            'view.php?id={course_module}&tab=userlist',
+            '{grouptool}'
+        );
 
-        $rules[] = new restore_log_rule('grouptool', 'export',
-                                        'download.php?id={course_module}&groupingid={grouping}'.
-                                        '&groupid={group}&format=[format]', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'export', 'download.php?id={course_module}'.
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'export',
+            'download.php?id={course_module}&groupingid={grouping}' .
+            '&groupid={group}&format=[format]',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'export',
+            'download.php?id={course_module}' .
                                         '&groupingid={grouping}&groupid={group}&format=[format]',
-                                        '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'export',
-                                        'download.php?id={course_module}&groupingid={grouping}'.
-                                        '&groupid={group}&format=[format]', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'export',
-                                        'download.php?id={course_module}&groupingid={grouping}'.
-                                        '&groupid={group}&format=[format]', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'export',
-                                        'download.php?id={course_module}&groupingid={grouping}'.
-                                        '&groupid={group}&format=[format]', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'export',
-                                        'download.php?id={course_module}&groupingid={grouping}'.
-                                        '&groupid={group}&format=[format]', '{grouptool}');
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'export',
+            'download.php?id={course_module}&groupingid={grouping}' .
+            '&groupid={group}&format=[format]',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'export',
+            'download.php?id={course_module}&groupingid={grouping}' .
+            '&groupid={group}&format=[format]',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'export',
+            'download.php?id={course_module}&groupingid={grouping}' .
+            '&groupid={group}&format=[format]',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'export',
+            'download.php?id={course_module}&groupingid={grouping}' .
+            '&groupid={group}&format=[format]',
+            '{grouptool}'
+        );
 
-        $rules[] = new restore_log_rule('grouptool', 'register',
-                                        'view.php?id={course_module}&tab=overview&'.
-                                        'agrpid={grouptool_agrp}', '{user}');
-        $rules[] = new restore_log_rule('grouptool', 'unregister',
-                                        'view.php?id={course_module}&tab=overview&'.
-                                        'agrpid={grouptool_agrp}', '{user}');
-        $rules[] = new restore_log_rule('grouptool', 'resolve queue',
-                                        'view.php?id={course_module}&tab=overview', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'import',
-                                        'view.php?id={course_module}&tab=overview&groupid={group}',
-                                        '{group}');
-        $rules[] = new restore_log_rule('grouptool', 'push registrations',
-                                        'view.php?id={course_module}&tab=overview', '{grouptool}');
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'register',
+            'view.php?id={course_module}&tab=overview&' .
+            'agrpid={grouptool_agrp}',
+            '{user}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'unregister',
+            'view.php?id={course_module}&tab=overview&' .
+            'agrpid={grouptool_agrp}',
+            '{user}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'resolve queue',
+            'view.php?id={course_module}&tab=overview',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'import',
+            'view.php?id={course_module}&tab=overview&groupid={group}',
+            '{group}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'push registrations',
+            'view.php?id={course_module}&tab=overview',
+            '{grouptool}'
+        );
 
-        $rules[] = new restore_log_rule('grouptool', 'create groups',
-                                        'view.php?id={course_module}&tab=overview', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'create groups',
-                                        'view.php?id={course_module}&tab=overview&'.
-                                        'groupingid={grouping}', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'create groupings',
-                                        'view.php?id={course_module}&tab=overview', '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'update agrps',
-                                        'view.php?id={course_module}&tab=overview&groupid={group}',
-                                        '{grouptool}');
-        $rules[] = new restore_log_rule('grouptool', 'update agrps',
-                                        'view.php?id={course_module}&tab=overview', '{grouptool}');
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'create groups',
+            'view.php?id={course_module}&tab=overview',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'create groups',
+            'view.php?id={course_module}&tab=overview&' .
+            'groupingid={grouping}',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'create groupings',
+            'view.php?id={course_module}&tab=overview',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'update agrps',
+            'view.php?id={course_module}&tab=overview&groupid={group}',
+            '{grouptool}'
+        );
+        $rules[] = new restore_log_rule(
+            'grouptool',
+            'update agrps',
+            'view.php?id={course_module}&tab=overview',
+            '{grouptool}'
+        );
 
         return $rules;
     }

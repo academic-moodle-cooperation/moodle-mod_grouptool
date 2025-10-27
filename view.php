@@ -37,7 +37,8 @@
 // TODO split tabs in different PHP files and define it only when really needed (=import-tab , needed for progress bar)!
 // @codingStandardsIgnoreLine
 if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
-    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister')) {
+    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister')
+) {
     // @codingStandardsIgnoreLine
     define('NO_OUTPUT_BUFFERING', true);
 // @codingStandardsIgnoreLine
@@ -121,20 +122,26 @@ if (empty($cm->uservisible)) {
         $SESSION->mod_grouptool->currenttab = 'default';
     }
 
-    if (!isset($SESSION->mod_grouptool->currenttab)
+    if (
+        !isset($SESSION->mod_grouptool->currenttab)
         || ($SESSION->mod_grouptool->currenttab == 'noaccess')
-        || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
+        || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')
+    ) {
         // Set standard-tab according to users capabilities!
         if (has_capability('mod/grouptool:administrate_groups', $context)) {
             $SESSION->mod_grouptool->currenttab = 'group_admin';
-        } else if (has_capability('mod/grouptool:administrate_registration', $context)
-            || has_capability('mod/grouptool:register', $context)) {
+        } else if (
+            has_capability('mod/grouptool:administrate_registration', $context)
+            || has_capability('mod/grouptool:register', $context)
+        ) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
-} else if (has_capability('mod/grouptool:administrate_registration', $context)
+} else if (
+    has_capability('mod/grouptool:administrate_registration', $context)
     || has_capability('mod/grouptool:register', $context)
-    || has_capability('mod/grouptool:preview', $context)) {
+    || has_capability('mod/grouptool:preview', $context)
+) {
     $SESSION->mod_grouptool->currenttab = 'selfregistration';
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';

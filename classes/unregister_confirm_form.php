@@ -99,4 +99,3 @@ class unregister_confirm_form extends \moodleform {
         return $errors;
     }
 }
-

@@ -52,7 +52,7 @@ if (isset($CFG)) {
  * @copyright  2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, pluginprovider, preference_provider, core_userlist_provider {
+class provider implements core_userlist_provider, metadataprovider, pluginprovider, preference_provider {
     /**
      * Provides meta data that is stored about a user with mod_publication
      *
@@ -138,8 +138,10 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
         ];
 
         // Get all who are queued or registered or marked or have modified, but only real users, no empty values!
-        foreach (['grouptool_queued' => ['userid'],
-                  'grouptool_registered' => ['userid', 'modified_by'], ] as $table => $fields) {
+        foreach (
+            ['grouptool_queued' => ['userid'],
+                  'grouptool_registered' => ['userid', 'modified_by'], ] as $table => $fields
+        ) {
             foreach ($fields as $field) {
                 $sql = "SELECT r." . $field . "
                           FROM {context} ctx
@@ -185,14 +187,20 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
 
                 $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', 'grouptoolid = ?', [$grouptool->id]);
-                list($agrpsql, $agrpparams) = $DB->get_in_or_equal($agrpids, SQL_PARAMS_NAMED, 'agrp');
+                [$agrpsql, $agrpparams] = $DB->get_in_or_equal($agrpids, SQL_PARAMS_NAMED, 'agrp');
 
-                list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+                [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
 
-                $DB->delete_records_select('grouptool_registered', "agrpid ".$agrpsql." AND userid ".$usersql,
-                        $agrpparams + $userparams);
-                $DB->delete_records_select('grouptool_queued', "agrpid ".$agrpsql." AND userid ".$usersql,
-                        $agrpparams + $userparams);
+                $DB->delete_records_select(
+                    'grouptool_registered',
+                    "agrpid " . $agrpsql . " AND userid " . $usersql,
+                    $agrpparams + $userparams
+                );
+                $DB->delete_records_select(
+                    'grouptool_queued',
+                    "agrpid " . $agrpsql . " AND userid " . $usersql,
+                    $agrpparams + $userparams
+                );
                 $instance = new \mod_grouptool($cm->id, $grouptool, $cm);
                 foreach ($agrpids as $cur) {
                     $instance->fill_from_queue($cur);
@@ -220,7 +228,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
             return;
         }
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT
                     c.id AS contextid,
@@ -283,8 +291,12 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
         foreach ($preferences as $cur) {
             $value = get_user_preferences($cur, null, $userid);
             if ($value !== null) {
-                writer::with_context($context)->export_user_preference('mod_grouptool', $cur, $value,
-                        get_string('privacy:metadata:' . $cur, 'mod_grouptool'));
+                writer::with_context($context)->export_user_preference(
+                    'mod_grouptool',
+                    $cur,
+                    $value,
+                    get_string('privacy:metadata:' . $cur, 'mod_grouptool')
+                );
             }
         }
     }
@@ -307,12 +319,15 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
                                          JOIN {groups} g ON g.id = agrp.groupid
                                          WHERE agrp.grouptoolid = :grouptoolid", ['grouptoolid' => $grouptool->get_settings()->id]);
 
-        list($agrpssql, $agrpsparams) = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED);
-        $sql = "userid = :userid AND agrpid ".$agrpssql;
+        [$agrpssql, $agrpsparams] = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED);
+        $sql = "userid = :userid AND agrpid " . $agrpssql;
         $queues = $DB->get_records_select('grouptool_queued', $sql, ['userid' => $user->id] + $agrpsparams);
-        $sql = "(userid = :userid OR modified_by = :modifierid) AND agrpid ".$agrpssql;
-        $regs = $DB->get_records_select('grouptool_registered', $sql,
-                ['userid' => $user->id, 'modifierid' => $user->id] + $agrpsparams);
+        $sql = "(userid = :userid OR modified_by = :modifierid) AND agrpid " . $agrpssql;
+        $regs = $DB->get_records_select(
+            'grouptool_registered',
+            $sql,
+            ['userid' => $user->id, 'modifierid' => $user->id] + $agrpsparams
+        );
 
         $export = new \stdClass();
         $strmarked = get_string('grp_marked', 'grouptool');
@@ -407,7 +422,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
             return;
         }
 
-        list($ctxsql, $ctxparams) = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'ctx');
+        [$ctxsql, $ctxparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'ctx');
 
         // Apparently we can't trust anything that comes via the context.
         // Go go mega query to find out it we have an grouptool context that matches an existing grouptool.
@@ -416,7 +431,7 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
                     JOIN {course_modules} cm ON g.id = cm.instance AND g.course = cm.course
                     JOIN {modules} m ON m.id = cm.module AND m.name = :modulename
                     JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextmodule
-                    WHERE ctx.id ".$ctxsql;
+                    WHERE ctx.id " . $ctxsql;
         $params = ['modulename' => 'grouptool', 'contextmodule' => CONTEXT_MODULE];
 
         if (!$records = $DB->get_records_sql($sql, $params + $ctxparams)) {
@@ -435,19 +450,24 @@ class provider implements metadataprovider, pluginprovider, preference_provider,
             return;
         }
 
-        list($select, $params) = $DB->get_in_or_equal($grouptoolids);
-        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', 'grouptoolid '.$select, $params);
+        [$select, $params] = $DB->get_in_or_equal($grouptoolids);
+        $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', 'grouptoolid ' . $select, $params);
 
         if (empty($agrpids)) {
             return;
         }
 
-        list($agrpssql, $agrpparams) = $DB->get_in_or_equal($agrpids, SQL_PARAMS_NAMED);
-        $DB->delete_records_select('grouptool_registered',
-                "(userid = :userid OR modified_by = :modifierid) AND agrpid ".$agrpssql,
-                $agrpparams + ['userid' => $user->id, 'modifierid' => $user->id]);
-        $DB->delete_records_select('grouptool_queued', "userid = :userid AND agrpid ".$agrpssql,
-                $agrpparams + ['userid' => $user->id]);
+        [$agrpssql, $agrpparams] = $DB->get_in_or_equal($agrpids, SQL_PARAMS_NAMED);
+        $DB->delete_records_select(
+            'grouptool_registered',
+            "(userid = :userid OR modified_by = :modifierid) AND agrpid " . $agrpssql,
+            $agrpparams + ['userid' => $user->id, 'modifierid' => $user->id]
+        );
+        $DB->delete_records_select(
+            'grouptool_queued',
+            "userid = :userid AND agrpid " . $agrpssql,
+            $agrpparams + ['userid' => $user->id]
+        );
 
         $grouptools = $DB->get_records_list('grouptool', 'id', $grouptoolids);
         foreach ($grouptools as $cur) {

@@ -38,7 +38,6 @@ use core_completion\activity_custom_completion;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class custom_completion extends activity_custom_completion {
-
     /**
      * Fetches the completion state for a given completion rule.
      *
@@ -59,13 +58,15 @@ class custom_completion extends activity_custom_completion {
 
         // If completion option is enabled, evaluate it and return true/false.
         if ($grouptool->completionregister) {
-            $status = $grouptool->completionregister <= $DB->get_field_sql("
+            $status = $grouptool->completionregister <= $DB->get_field_sql(
+                "
              SELECT COUNT(DISTINCT a.id)
              FROM {grouptool_registered} r
                  INNER JOIN {grouptool_agrps} a ON a.id=r.agrpid
              WHERE
                  r.userid=:userid AND a.grouptoolid=:grouptoolid",
-                           ['userid' => $userid, 'grouptoolid' => $grouptool->id]);
+                ['userid' => $userid, 'grouptoolid' => $grouptool->id]
+            );
             return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
         } else {
             // Completion option is not enabled so just return $type.

@@ -33,7 +33,6 @@ namespace mod_grouptool\local\exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class notenoughregs extends registration {
-
     /**
      * Constructor
      *
@@ -48,4 +47,3 @@ class notenoughregs extends registration {
         parent::__construct($text, 'grouptool', $a);
     }
 }
-

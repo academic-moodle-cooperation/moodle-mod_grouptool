@@ -123,12 +123,18 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
         } else if (!empty($regs) && $data['size'] < $regs) {
             $errors['size'] = get_string('toomanyregs', 'grouptool');
         } else {
-            $DB->set_field('grouptool_agrps', 'grpsize', $data['size'],
-                           ['groupid' => $data['resize'], 'grouptoolid' => $data['instance']]);
-            if ($data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
+            $DB->set_field(
+                'grouptool_agrps',
+                'grpsize',
+                $data['size'],
+                ['groupid' => $data['resize'], 'grouptoolid' => $data['instance']]
+            );
+            if (
+                $data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
                         'groupid'     => $data['resize'],
                         'grouptoolid' => $data['instance'],
-                    ])) {
+                    ])
+            ) {
                 // Error happened...
                 $errors['size'] = get_string('couldnt_resize_group', 'grouptool', $data['size']);
             }
@@ -137,4 +143,3 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
         return $errors;
     }
 }
-

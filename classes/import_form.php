@@ -74,14 +74,21 @@ class import_form extends \moodleform {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed
              */
-            $mform->addElement('header', 'groupuser_import', get_string('groupuser_import',
-                                                                        'grouptool'));
+            $mform->addElement('header', 'groupuser_import', get_string(
+                'groupuser_import',
+                'grouptool'
+            ));
 
             $active = new sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
             $inactive = new sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
-            $groups = $mform->createElement('selectgroups', 'groups', get_string('choose_targetgroup_import', 'grouptool'), null,
-                    ['size' => 15]);
+            $groups = $mform->createElement(
+                'selectgroups',
+                'groups',
+                get_string('choose_targetgroup_import', 'grouptool'),
+                null,
+                ['size' => 15]
+            );
 
             if (!empty($active->groups)) {
                 $options = [];
@@ -141,4 +148,3 @@ class import_form extends \moodleform {
         return $errors;
     }
 }
-

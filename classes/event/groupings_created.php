@@ -78,8 +78,8 @@ class groupings_created extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' used '{$this->objecttable}' with the " .
-               "course module id '$this->contextinstanceid' to create groupings for groups with ids ".
-               implode(', ', $this->data['other']).".";
+               "course module id '$this->contextinstanceid' to create groupings for groups with ids " .
+               implode(', ', $this->data['other']) . ".";
     }
 
     /**

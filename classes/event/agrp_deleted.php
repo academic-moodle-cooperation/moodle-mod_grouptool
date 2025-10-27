@@ -76,8 +76,8 @@ class agrp_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-            return "The active group with id '".$this->data['other']->agrpid."' ".
-                   "representing group with id '".$this->data['other']->groupid."' ".
+            return "The active group with id '" . $this->data['other']->agrpid . "' " .
+                   "representing group with id '" . $this->data['other']->groupid . "' " .
                    "in grouptool with the course module id '$this->contextinstanceid' has been deleted.";
     }
 

@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 
-require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 /**
  * Class needed for report-editdates support
  *
@@ -34,9 +34,7 @@ require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
  * @copyright     2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_grouptool_report_editdates_integration
-extends report_editdates_mod_date_extractor {
-
+class mod_grouptool_report_editdates_integration extends report_editdates_mod_date_extractor {
     /**
      * mod_grouptool_report_editdates_integration constructor.
      *
@@ -59,13 +57,19 @@ extends report_editdates_mod_date_extractor {
 
         return [
                 'timeavailable' => new report_editdates_date_setting(
-                        get_string('availabledate', 'grouptool'),
-                        $grouptool->timeavailable,
-                        self::DATETIME, true, 5),
+                    get_string('availabledate', 'grouptool'),
+                    $grouptool->timeavailable,
+                    self::DATETIME,
+                    true,
+                    5
+                ),
                 'timedue' => new report_editdates_date_setting(
-                        get_string('duedate', 'grouptool'),
-                        $grouptool->timedue,
-                        self::DATETIME, true, 5),
+                    get_string('duedate', 'grouptool'),
+                    $grouptool->timedue,
+                    self::DATETIME,
+                    true,
+                    5
+                ),
                 ];
     }
 

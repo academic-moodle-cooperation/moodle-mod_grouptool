@@ -93,7 +93,6 @@ class group_rename_form extends \moodleform {
         $grp[] = $mform->createElement('cancel');
         $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);
-
     }
 
     /**

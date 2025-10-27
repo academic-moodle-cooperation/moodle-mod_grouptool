@@ -76,9 +76,9 @@ class group_recreated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The group with id '".$this->data['other']['groupid']."' has been recreated by the eventhandler as group with id '".
-               $this->data['other']['newid']."'". " because it was used in grouptool with the course module id '".
-               $this->contextinstanceid."'.";
+        return "The group with id '" . $this->data['other']['groupid'] . "' has been recreated by the eventhandler as group with id '" .
+               $this->data['other']['newid'] . "'" . " because it was used in grouptool with the course module id '" .
+               $this->contextinstanceid . "'.";
     }
 
     /**

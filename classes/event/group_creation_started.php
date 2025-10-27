@@ -147,33 +147,33 @@ class group_creation_started extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['grouping'])) {
-            $add = ' and added these to the grouping with id \''.$this->data['other']['grouping'].'\'';
+            $add = ' and added these to the grouping with id \'' . $this->data['other']['grouping'] . '\'';
         } else {
             $add = '';
         }
         switch ($this->data['other']['mode']) {
             case 'groups_amount':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                       "course module id '$this->contextinstanceid' by defining the amount of groups (".
-                       $this->data['other']['amount'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".
-                       $add.".";
+                       "course module id '$this->contextinstanceid' by defining the amount of groups (" .
+                       $this->data['other']['amount'] . ") using '" . $this->data['other']['pattern'] . "' as pattern for the groupnames" .
+                       $add . ".";
             break;
             case 'members_amount':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                       "course module id '$this->contextinstanceid' by defining the amount of members per group (".
-                       $this->data['other']['amount'].") using '".$this->data['other']['pattern']."' as pattern for the groupnames".
-                       $add.".";
+                       "course module id '$this->contextinstanceid' by defining the amount of members per group (" .
+                       $this->data['other']['amount'] . ") using '" . $this->data['other']['pattern'] . "' as pattern for the groupnames" .
+                       $add . ".";
             break;
             case 'fromto':
                 return "The user with id '$this->userid' started creating groups via '{$this->objecttable}' with the " .
-                       "course module id '$this->contextinstanceid' by defining values to start (".$this->data['other']['from'].
-                       ") and stop (".$this->data['other']['to'].") using '".$this->data['other']['pattern'].
-                       "' as pattern for the groupnames".$add.".";
+                       "course module id '$this->contextinstanceid' by defining values to start (" . $this->data['other']['from'] .
+                       ") and stop (" . $this->data['other']['to'] . ") using '" . $this->data['other']['pattern'] .
+                       "' as pattern for the groupnames" . $add . ".";
             break;
             case '1-person-groups':
-                return "The user with id '$this->userid' started creating 1-person-groups for each user via '".$this->objecttable.
-                       "' with the course module id '$this->contextinstanceid' using '".$this->data['other']['pattern'].
-                       "' as pattern for the groupnames".$add.".";
+                return "The user with id '$this->userid' started creating 1-person-groups for each user via '" . $this->objecttable .
+                       "' with the course module id '$this->contextinstanceid' using '" . $this->data['other']['pattern'] .
+                       "' as pattern for the groupnames" . $add . ".";
             break;
         }
         return '';
@@ -228,14 +228,13 @@ class group_creation_started extends \core\event\base {
                 if (empty($this->data['other']['to'])) {
                     throw new \coding_exception('Upper limit has to be specified!');
                 }
-            break;
+                break;
             case 'members amount':
             case 'groups amount':
                 if (empty($this->data['other']['amount'])) {
                     throw new \coding_exception('Amount of groups/members has to be specified!');
                 }
-            break;
+                break;
         }
     }
 }
-

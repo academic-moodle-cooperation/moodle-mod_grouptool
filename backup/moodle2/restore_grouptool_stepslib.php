@@ -32,7 +32,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_grouptool_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Defines the structure for grouptool and it's elements to be restored
      *
@@ -50,12 +49,16 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $paths[] = $agrp;
 
         if ($userinfo) {
-            $registration = new restore_path_element('agrp_registration',
-                                                     '/activity/grouptool/agrps/agrp/registrations'.
-                                                     '/registration');
+            $registration = new restore_path_element(
+                'agrp_registration',
+                '/activity/grouptool/agrps/agrp/registrations' .
+                '/registration'
+            );
             $paths[] = $registration;
-            $queue = new restore_path_element('agrp_queue',
-                                              '/activity/grouptool/agrps/agrp/queues/queue');
+            $queue = new restore_path_element(
+                'agrp_queue',
+                '/activity/grouptool/agrps/agrp/queues/queue'
+            );
             $paths[] = $queue;
         }
 
@@ -123,9 +126,9 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $old = $data->groupid;
         $data->groupid = $this->get_mappingid('group', $data->groupid);
         if ($data->groupid === false) {
-            $message = "Couldn't find mapping id for group with former id-# ".$old.
-                       " so we have to skip it.".html_writer::empty_tag('br').
-                       "The group was ".($data->active ? 'active' : 'inactive')." in this instance";
+            $message = "Couldn't find mapping id for group with former id-# " . $old .
+                       " so we have to skip it." . html_writer::empty_tag('br') .
+                       "The group was " . ($data->active ? 'active' : 'inactive') . " in this instance";
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_agrps', $data);
@@ -162,11 +165,10 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->modified_by = $this->get_mappingid('user', $data->modified_by);
 
         if ($data->agrpid === false) {
-
-            $message = "Couldn't find mapping id for agrp with former id-# ".$oldagrp." so we have to skip it.";
+            $message = "Couldn't find mapping id for agrp with former id-# " . $oldagrp . " so we have to skip it.";
             debugging($message);
         } else if ($data->userid === false) {
-            $message = "Couldn't find mapping id for user with former id-# ".$old." so we have to skip it.";
+            $message = "Couldn't find mapping id for user with former id-# " . $old . " so we have to skip it.";
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_registered', $data);
@@ -202,10 +204,10 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->userid = $this->get_mappingid('user', $data->userid);
 
         if ($data->agrpid === false) {
-            $message = "Couldn't find mapping id for agrp with former id-# ".$oldagrp." so we have to skip it.";
+            $message = "Couldn't find mapping id for agrp with former id-# " . $oldagrp . " so we have to skip it.";
             debugging($message);
         } else if ($data->userid === false) {
-            $message = "Couldn't find mapping id for user with former id-# ".$old." so we have to skip it.";
+            $message = "Couldn't find mapping id for user with former id-# " . $old . " so we have to skip it.";
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_queued', $data);

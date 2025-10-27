@@ -110,7 +110,7 @@ class sortlist implements \renderable {
             foreach ($coursegroups as $group) {
                 $groups[] = $group->id;
             }
-            list($grpssql, $params) = $DB->get_in_or_equal($groups);
+            [$grpssql, $params] = $DB->get_in_or_equal($groups);
             $grouping = '';
             $groupingwhere = '';
             if ($this->filter == \mod_grouptool::FILTER_ACTIVE) {
@@ -153,12 +153,14 @@ class sortlist implements \renderable {
                     $groupdata[$key]->status = $group->status ? true : false;
                 }
                 $runningidx++;
-                $groupdata[$key]->groupings = $DB->get_records_sql_menu("
+                $groupdata[$key]->groupings = $DB->get_records_sql_menu(
+                    "
                                                     SELECT DISTINCT groupingid, name
                                                       FROM {groupings_groups}
                                                  LEFT JOIN {groupings} ON {groupings_groups}.groupingid = {groupings}.id
                                                      WHERE {groupings}.courseid = ? AND {groupings_groups}.groupid = ?",
-                    [$courseid, $group->groupid]);
+                    [$courseid, $group->groupid]
+                );
             }
         }
 

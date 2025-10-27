@@ -27,8 +27,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 
 /**
  * Module instance settings form
@@ -39,7 +39,6 @@ require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_grouptool_mod_form extends moodleform_mod {
-
     /**
      * Defines forms elements
      *
@@ -82,12 +81,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Adding the standard "name" field!
-        $mform->addElement('text', 'name',
-            get_string('grouptoolname', 'grouptool'), ['size' => '64']);
+        $mform->addElement(
+            'text',
+            'name',
+            get_string('grouptoolname', 'grouptool'),
+            ['size' => '64']
+        );
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
-        $mform->addRule('name',
-            get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addRule(
+            'name',
+            get_string('maximumchars', '', 255),
+            'maxlength',
+            255,
+            'client'
+        );
         $mform->addHelpButton('name', 'grouptoolname', 'grouptool');
 
         // Adding the standard "intro" and "introformat" fields!
@@ -121,8 +129,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
          * Adding the "grouptool" fieldset, where all individual-settings are made
          * (except of active-groups)
          */
-        $mform->addElement('header', 'grouptoolfieldset', get_string('grouptoolfieldset',
-                                                                     'grouptool'));
+        $mform->addElement('header', 'grouptoolfieldset', get_string(
+            'grouptoolfieldset',
+            'grouptool'
+        ));
         $mform->setExpanded('grouptoolfieldset');
 
         $mform->addElement('selectyesno', 'allow_reg', get_string('allow_reg', 'grouptool'));
@@ -140,8 +150,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
                 GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
                 GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes'),
         ];
-        $mform->addElement('select', 'show_members',
-            get_string('show_members', 'grouptool'), $options);
+        $mform->addElement(
+            'select',
+            'show_members',
+            get_string('show_members', 'grouptool'),
+            $options
+        );
         $showmembers = get_config('mod_grouptool', 'show_members');
         if ($showmembers === false) {
             throw new coding_exception('invalid_param');
@@ -149,15 +163,17 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->setDefault('show_members', $showmembers);
         $mform->addHelpButton('show_members', 'show_members', 'grouptool');
 
-        $mform->addElement('selectyesno', 'immediate_reg', get_string('immediate_reg',
-                                                                      'grouptool'));
+        $mform->addElement('selectyesno', 'immediate_reg', get_string(
+            'immediate_reg',
+            'grouptool'
+        ));
         $immediatereg = get_config('mod_grouptool', 'immediate_reg');
         if ($immediatereg === false) {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('immediate_reg', (($immediatereg !== false) ? $immediatereg : 0));
         $mform->addHelpButton('immediate_reg', 'immediate_reg', 'grouptool');
-        $mform->hideIf ('immediate_reg', 'allow_reg', 'eq', 0);
+        $mform->hideIf('immediate_reg', 'allow_reg', 'eq', 0);
 
         $mform->addElement('selectyesno', 'allow_unreg', get_string('allow_unreg', 'grouptool'));
         $allowunreg = get_config('mod_grouptool', 'allow_unreg');
@@ -166,13 +182,21 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('allow_unreg', (($allowunreg !== false) ? $allowunreg : 0));
         $mform->addHelpButton('allow_unreg', 'allow_unreg', 'grouptool');
-        $mform->hideIf ('allow_unreg', 'allow_reg', 'eq', 0);
+        $mform->hideIf('allow_unreg', 'allow_reg', 'eq', 0);
 
         $size = [];
-        $size[] = $mform->createElement('text', 'grpsize',
-            get_string('size', 'grouptool'), ['size' => '5']);
-        $size[] = $mform->createElement('checkbox', 'use_size', '',
-            get_string('use_size', 'grouptool'));
+        $size[] = $mform->createElement(
+            'text',
+            'grpsize',
+            get_string('size', 'grouptool'),
+            ['size' => '5']
+        );
+        $size[] = $mform->createElement(
+            'checkbox',
+            'use_size',
+            '',
+            get_string('use_size', 'grouptool')
+        );
         // We have to clean this params by ourselves afterwards otherwise we get problems with texts getting mapped to 0!
         $mform->setType('grpsize', PARAM_RAW);
         $grpsize = get_config('mod_grouptool', 'grpsize');
@@ -186,11 +210,16 @@ class mod_grouptool_mod_form extends moodleform_mod {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('use_size', (($usesize !== false) ? $usesize : 0));
-        $mform->addGroup($size, 'size_grp',
-            get_string('size', 'grouptool'), ' ', false);
+        $mform->addGroup(
+            $size,
+            'size_grp',
+            get_string('size', 'grouptool'),
+            ' ',
+            false
+        );
         $mform->addHelpButton('size_grp', 'size_grp', 'grouptool');
-        $mform->disabledIf ('grpsize', 'use_size', 'notchecked');
-        $mform->hideIf ('size_grp', 'allow_reg', 'eq', 0);
+        $mform->disabledIf('grpsize', 'use_size', 'notchecked');
+        $mform->hideIf('size_grp', 'allow_reg', 'eq', 0);
 
         /*
          * ---------------------------------------------------------------------
@@ -201,14 +230,22 @@ class mod_grouptool_mod_form extends moodleform_mod {
          * where all settings related to queues and multiple registrations
          * are made (except of active-groups)
          */
-        $mform->addElement('header', 'queue_and_multiple_reg',
-                           get_string('queue_and_multiple_reg_title', 'grouptool'));
+        $mform->addElement(
+            'header',
+            'queue_and_multiple_reg',
+            get_string('queue_and_multiple_reg_title', 'grouptool')
+        );
 
-        $usequeueel = $mform->createElement('checkbox', 'use_queue',
-            get_string('use_queue', 'grouptool'));
+        $usequeueel = $mform->createElement(
+            'checkbox',
+            'use_queue',
+            get_string('use_queue', 'grouptool')
+        );
         if ($queues > 0) {
             $mform->addElement('html', $OUTPUT->notification(
-                get_string('queuespresenterror', 'grouptool'), 'info'));
+                get_string('queuespresenterror', 'grouptool'),
+                'info'
+            ));
             $usequeueel->setPersistantFreeze(1);
             $usequeueel->setValue(1);
             $usequeueel->freeze();
@@ -228,10 +265,19 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $queue = [];
         $queue[] = $mform->createElement('text', 'users_queues_limit', '', ['size' => '3']);
-        $queue[] = $mform->createElement('checkbox', 'limit_users_queues', '',
-            get_string('limit', 'grouptool'));
-        $mform->addGroup($queue, 'users_queues_grp',
-            get_string('users_queues_limit', 'grouptool'), ' ', false);
+        $queue[] = $mform->createElement(
+            'checkbox',
+            'limit_users_queues',
+            '',
+            get_string('limit', 'grouptool')
+        );
+        $mform->addGroup(
+            $queue,
+            'users_queues_grp',
+            get_string('users_queues_limit', 'grouptool'),
+            ' ',
+            false
+        );
         $mform->setType('users_queues_limit', PARAM_TEXT);
         $maxqueues = get_config('mod_grouptool', 'users_queues_limit');
         if ($maxqueues === false) {
@@ -254,10 +300,19 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         $queue = [];
         $queue[] = $mform->createElement('text', 'groups_queues_limit', '', ['size' => '3']);
-        $queue[] = $mform->createElement('checkbox', 'limit_groups_queues', '',
-            get_string('limit', 'grouptool'));
-        $mform->addGroup($queue, 'groups_queues_grp',
-            get_string('groups_queues_limit', 'grouptool'), ' ', false);
+        $queue[] = $mform->createElement(
+            'checkbox',
+            'limit_groups_queues',
+            '',
+            get_string('limit', 'grouptool')
+        );
+        $mform->addGroup(
+            $queue,
+            'groups_queues_grp',
+            get_string('groups_queues_limit', 'grouptool'),
+            ' ',
+            false
+        );
         $mform->setType('groups_queues_limit', PARAM_TEXT);
         $maxqueues = get_config('mod_grouptool', 'groups_queues_limit');
         if ($maxqueues === false) {
@@ -293,33 +348,41 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('allow_multiple', (($allowmultiple !== false) ? $allowmultiple : 0));
         $mform->addHelpButton('allow_multiple', 'allow_multiple', 'grouptool');
-        $mform->disabledIf ('allow_multiple', 'allow_reg', 'eq', 0);
+        $mform->disabledIf('allow_multiple', 'allow_reg', 'eq', 0);
 
-        $mform->addElement('text', 'choose_min', get_string('choose_min', 'grouptool'),
-                           ['size' => '3']);
+        $mform->addElement(
+            'text',
+            'choose_min',
+            get_string('choose_min', 'grouptool'),
+            ['size' => '3']
+        );
         $mform->setType('choose_min', PARAM_INT);
         $choosemin = get_config('mod_grouptool', 'choose_min');
         if ($choosemin === false) {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('choose_min', (($choosemin !== false) ? $choosemin : 1));
-        $mform->hideIf ('choose_min', 'allow_reg', 'eq', 0);
+        $mform->hideIf('choose_min', 'allow_reg', 'eq', 0);
 
-        $mform->addElement('text', 'choose_max', get_string('choose_max', 'grouptool'),
-                           ['size' => '3']);
+        $mform->addElement(
+            'text',
+            'choose_max',
+            get_string('choose_max', 'grouptool'),
+            ['size' => '3']
+        );
         $mform->setType('choose_max', PARAM_INT);
         $choosemax = get_config('mod_grouptool', 'choose_max');
         if ($choosemax === false) {
             throw new coding_exception('invalid_param');
         }
         $mform->setDefault('choose_max', (($choosemax !== false) ? $choosemax : 1));
-        $mform->hideIf ('choose_max', 'allow_reg', 'eq', 0);
+        $mform->hideIf('choose_max', 'allow_reg', 'eq', 0);
 
         if ($maxregs > 1) {
             $mform->freeze('allow_multiple');
         } else {
-            $mform->hideIf ('choose_max', 'allow_multiple', 'notchecked');
-            $mform->hideIf ('choose_min', 'allow_multiple', 'notchecked');
+            $mform->hideIf('choose_max', 'allow_multiple', 'notchecked');
+            $mform->hideIf('choose_min', 'allow_multiple', 'notchecked');
         }
         /*
          * ---------------------------------------------------------
@@ -337,8 +400,12 @@ class mod_grouptool_mod_form extends moodleform_mod {
                 GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool'),
         ];
 
-        $mform->addElement('select', 'ifmemberadded', get_string('ifmemberadded', 'grouptool'),
-                           $options);
+        $mform->addElement(
+            'select',
+            'ifmemberadded',
+            get_string('ifmemberadded', 'grouptool'),
+            $options
+        );
         $mform->setType('ifmemberadded', PARAM_INT);
         $mform->addHelpButton('ifmemberadded', 'ifmemberadded', 'grouptool');
         $ifmemberadded = get_config('mod_grouptool', 'ifmemberadded');
@@ -347,31 +414,43 @@ class mod_grouptool_mod_form extends moodleform_mod {
         }
         $mform->setDefault('ifmemberadded', (($ifmemberadded !== false) ? $ifmemberadded : GROUPTOOL_IGNORE));
 
-        $mform->addElement('select', 'ifmemberremoved', get_string('ifmemberremoved', 'grouptool'),
-                           $options);
+        $mform->addElement(
+            'select',
+            'ifmemberremoved',
+            get_string('ifmemberremoved', 'grouptool'),
+            $options
+        );
         $mform->setType('ifmemberremoved', PARAM_INT);
         $mform->addHelpButton('ifmemberremoved', 'ifmemberremoved', 'grouptool');
         $ifmemberremoved = get_config('mod_grouptool', 'ifmemberremoved');
         if ($ifmemberremoved === false) {
             throw new coding_exception('invalid_param');
         }
-        $mform->setDefault('ifmemberremoved',
-            (($ifmemberremoved !== false) ? $ifmemberremoved : GROUPTOOL_IGNORE));
+        $mform->setDefault(
+            'ifmemberremoved',
+            (($ifmemberremoved !== false) ? $ifmemberremoved : GROUPTOOL_IGNORE)
+        );
 
         $options = [
                 GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
                 GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'),
         ];
-        $mform->addElement('select', 'ifgroupdeleted', get_string('ifgroupdeleted', 'grouptool'),
-                           $options);
+        $mform->addElement(
+            'select',
+            'ifgroupdeleted',
+            get_string('ifgroupdeleted', 'grouptool'),
+            $options
+        );
         $mform->setType('ifgroupdeleted', PARAM_INT);
         $mform->addHelpButton('ifgroupdeleted', 'ifgroupdeleted', 'grouptool');
         $ifgroupdeleted = get_config('mod_grouptool', 'ifgroupdeleted');
         if ($ifgroupdeleted === false) {
             throw new coding_exception('invalid_param');
         }
-        $mform->setDefault('ifgroupdeleted',
-            (($ifgroupdeleted !== false) ? $ifgroupdeleted : GROUPTOOL_RECREATE_GROUP));
+        $mform->setDefault(
+            'ifgroupdeleted',
+            (($ifgroupdeleted !== false) ? $ifgroupdeleted : GROUPTOOL_RECREATE_GROUP)
+        );
 
         /*
          * ---------------------------------------------------------
@@ -434,9 +513,10 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['timedue'] = get_string('determinismerror', 'grouptool');
         }
 
-        if (!empty($data['use_size'])
+        if (
+            !empty($data['use_size'])
             && (($data['grpsize'] <= 0) || !ctype_digit($data['grpsize']))
-            ) {
+        ) {
             $errors['size_grp'] = get_string('grpsizezeroerror', 'grouptool');
         }
         if (!empty($data['instance'])) {
@@ -486,8 +566,9 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $minuserregs = 0;
             $queues = 0;
         }
-        if (!empty($data['use_size']) && ($data['grpsize'] < $maxgrpregs)
-            ) {
+        if (
+            !empty($data['use_size']) && ($data['grpsize'] < $maxgrpregs)
+        ) {
             if (empty($errors['size_grp'])) {
                 $errors['size_grp'] = get_string('toomanyregs', 'grouptool');
             } else {
@@ -495,13 +576,17 @@ class mod_grouptool_mod_form extends moodleform_mod {
             }
         }
 
-        if (!empty($data['use_queue']) && !empty($data['limit_groups_queues']) &&
-            ($data['groups_queues_limit'] <= 0 || (!filter_var($data['groups_queues_limit'], FILTER_VALIDATE_INT)))) {
+        if (
+            !empty($data['use_queue']) && !empty($data['limit_groups_queues']) &&
+            ($data['groups_queues_limit'] <= 0 || (!filter_var($data['groups_queues_limit'], FILTER_VALIDATE_INT)))
+        ) {
             $errors['groups_queues_grp'] = get_string('queuesizeerror', 'grouptool');
         }
 
-        if (!empty($data['use_queue']) && !empty($data['limit_users_queues']) &&
-            ($data['users_queues_limit'] <= 0 || (!filter_var($data['users_queues_limit'], FILTER_VALIDATE_INT)))) {
+        if (
+            !empty($data['use_queue']) && !empty($data['limit_users_queues']) &&
+            ($data['users_queues_limit'] <= 0 || (!filter_var($data['users_queues_limit'], FILTER_VALIDATE_INT)))
+        ) {
             $errors['users_queues_grp'] = get_string('queuesizeerror', 'grouptool');
         }
 
@@ -519,7 +604,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         if (!empty($data['allow_multiple']) && ($data['choose_min'] > $data['choose_max'])) {
             if (isset($errors['choose_max'])) {
-                $errors['choose_max'] .= html_writer::empty_tag('br').
+                $errors['choose_max'] .= html_writer::empty_tag('br') .
                                          get_string('mustbegtoeqmin', 'grouptool');
             } else {
                 $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
@@ -528,24 +613,38 @@ class mod_grouptool_mod_form extends moodleform_mod {
 
         if (!empty($data['allow_multiple']) && ($data['choose_max'] < $maxuserregs)) {
             if (isset($errors['choose_max'])) {
-                $errors['choose_max'] .= html_writer::empty_tag('br').
-                                         get_string('toomanyregspresent', 'grouptool',
-                                                    $maxuserregs);
+                $errors['choose_max'] .= html_writer::empty_tag('br') .
+                                         get_string(
+                                             'toomanyregspresent',
+                                             'grouptool',
+                                             $maxuserregs
+                                         );
             } else {
-                $errors['choose_max'] = get_string('toomanyregspresent', 'grouptool',
-                                                   $maxuserregs);
+                $errors['choose_max'] = get_string(
+                    'toomanyregspresent',
+                    'grouptool',
+                    $maxuserregs
+                );
             }
         }
 
-        if (!empty($data['allow_multiple']) && !empty($minuserregs)
-            && ($data['choose_min'] > $minuserregs)) {
+        if (
+            !empty($data['allow_multiple']) && !empty($minuserregs)
+            && ($data['choose_min'] > $minuserregs)
+        ) {
             if (isset($errors['choose_min'])) {
-                $errors['choose_min'] .= html_writer::empty_tag('br').
-                                         get_string('toolessregspresent', 'grouptool',
-                                                    $minuserregs);
+                $errors['choose_min'] .= html_writer::empty_tag('br') .
+                                         get_string(
+                                             'toolessregspresent',
+                                             'grouptool',
+                                             $minuserregs
+                                         );
             } else {
-                $errors['choose_min'] = get_string('toolessregspresent', 'grouptool',
-                                                   $minuserregs);
+                $errors['choose_min'] = get_string(
+                    'toolessregspresent',
+                    'grouptool',
+                    $minuserregs
+                );
             }
         }
 
@@ -553,9 +652,11 @@ class mod_grouptool_mod_form extends moodleform_mod {
             $errors['choose_min'] = get_string('mustbegt0', 'grouptool');
         }
 
-        if ((empty($data['allow_multiple']) && !empty($data['completionregister']) &&
+        if (
+            (empty($data['allow_multiple']) && !empty($data['completionregister']) &&
                 $data['completionregister'] > 1) || (!empty($data['allow_multiple']) &&
-                        !empty($data['completionregister']) && $data['completionregister'] > $data['choose_max'])) {
+                        !empty($data['completionregister']) && $data['completionregister'] > $data['choose_max'])
+        ) {
             $errors['completionregistergroup'] = get_string('moreregsthanpossible', 'grouptool');
         }
 
@@ -573,17 +674,32 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $suffix = $this->get_suffix();
 
         $group = [];
-        $group[] =& $mform->createElement('checkbox',
-            'completionregisterenabled'.$suffix, '', get_string('completionregister', 'grouptool'));
-        $group[] =& $mform->createElement('text', 'completionregister'.$suffix, '', ['size' => 3]);
-        $mform->setType('completionregister'.$suffix, PARAM_INT);
-        $mform->addGroup($group, 'completionregistergroup'.$suffix,
-            get_string('require_registration', 'grouptool'), [' '], false);
-        $mform->addHelpButton('completionregistergroup'.$suffix,
-            'require_registration', 'grouptool');
-        $mform->disabledIf('completionregister'.$suffix,
-            'completionregisterenabled'.$suffix, 'notchecked');
-        return ['completionregistergroup'.$suffix];
+        $group[] =& $mform->createElement(
+            'checkbox',
+            'completionregisterenabled' . $suffix,
+            '',
+            get_string('completionregister', 'grouptool')
+        );
+        $group[] =& $mform->createElement('text', 'completionregister' . $suffix, '', ['size' => 3]);
+        $mform->setType('completionregister' . $suffix, PARAM_INT);
+        $mform->addGroup(
+            $group,
+            'completionregistergroup' . $suffix,
+            get_string('require_registration', 'grouptool'),
+            [' '],
+            false
+        );
+        $mform->addHelpButton(
+            'completionregistergroup' . $suffix,
+            'require_registration',
+            'grouptool'
+        );
+        $mform->disabledIf(
+            'completionregister' . $suffix,
+            'completionregisterenabled' . $suffix,
+            'notchecked'
+        );
+        return ['completionregistergroup' . $suffix];
     }
     /**
      * Determines if completion is enabled for this module.
@@ -593,7 +709,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
      */
     public function completion_rule_enabled($data) {
         $suffix = $this->get_suffix();
-        return (!empty($data['completionregisterenabled'.$suffix]) && $data['completionregister'.$suffix] != 0);
+        return (!empty($data['completionregisterenabled' . $suffix]) && $data['completionregister' . $suffix] != 0);
     }
 
     /**

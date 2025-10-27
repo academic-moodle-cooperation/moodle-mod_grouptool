@@ -33,7 +33,6 @@ namespace mod_grouptool\local\exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class exceeduserreglimit extends registration {
-
     /**
      * Constructor
      */
@@ -41,4 +40,3 @@ class exceeduserreglimit extends registration {
         parent::__construct('exceeduserreglimit', 'grouptool');
     }
 }
-

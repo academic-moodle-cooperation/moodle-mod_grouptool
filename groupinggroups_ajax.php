@@ -25,7 +25,7 @@
 
 define('AJAX_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->libdir .'/grouplib.php');
+require_once($CFG->libdir . '/grouplib.php');
 
 $groupingid = required_param('groupingid', PARAM_INT);
 $contextid = required_param('contextid', PARAM_INT);
@@ -39,7 +39,7 @@ if (!isloggedin()) {
     die();
 }
 
-list($context, $course, $cm) = get_context_info_array($contextid);
+[$context, $course, $cm] = get_context_info_array($contextid);
 require_login($course, false, $cm);
 
 $contextid = null; // Now we have a context object throw away the id from the user!
@@ -65,7 +65,7 @@ foreach ($groups as $key => $group) {
     }
     $option = new stdClass();
     $option->id = $key;
-    $option->name = $group->name.' ('.$membercount.')';
+    $option->name = $group->name . ' (' . $membercount . ')';
     $options[] = $option;
 }
 

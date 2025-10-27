@@ -27,18 +27,18 @@ require_once('../../config.php');
 
 global $CFG, $DB, $PAGE, $OUTPUT;
 
-require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
 $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
 $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 $context = context_module::instance($cmid);
 $PAGE->set_context($context);
-$url = new moodle_url($CFG->wwwroot.'/mod/grouptool/download.php', ['id' => $cmid]);
+$url = new moodle_url($CFG->wwwroot . '/mod/grouptool/download.php', ['id' => $cmid]);
 $PAGE->set_url($url);
 $course = $DB->get_record('course', ['id' => $cm->course]);
 
-$instance = new mod_grouptool($cmid, $grouptool, $cm, $course, $context );
+$instance = new mod_grouptool($cmid, $grouptool, $cm, $course, $context);
 
 
 require_login($cm->course, true, $cm);
@@ -59,13 +59,13 @@ if (empty($cm->uservisible)) {
         // User cannot access the activity, but on the course page they will.
         // see a link to it, greyed-out, with information (HTML format) from.
         // $cm->availableinfo about why they can't access it.
-        $text = html_writer::empty_tag('br').$cm->availableinfo;
+        $text = html_writer::empty_tag('br') . $cm->availableinfo;
     } else {
         // User cannot access the activity and they will not see it at all.
         $text = '';
     }
-    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool').
-                                          html_writer::empty_tag('br').$text, 'error');
+    $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool') .
+                                          html_writer::empty_tag('br') . $text, 'error');
     echo $OUTPUT->header();
     echo $OUTPUT->box($notification, 'generalbox centered');
     echo $OUTPUT->footer();
@@ -77,16 +77,16 @@ $format = required_param('format', PARAM_INT);
 switch ($format) {
     case GROUPTOOL_PDF:
         $readableformat = 'PDF';
-    break;
+        break;
     case GROUPTOOL_TXT:
         $readableformat = 'TXT';
-    break;
+        break;
     case GROUPTOOL_XLSX:
         $readableformat = 'XLSX';
-    break;
+        break;
     case GROUPTOOL_ODS:
         $readableformat = 'ODS';
-    break;
+        break;
     default:
         $readableformat = 'unknown';
 }
@@ -108,7 +108,7 @@ switch ($tab) {
                 ],
         ]);
         $event->trigger();
-    break;
+        break;
 }
 
 

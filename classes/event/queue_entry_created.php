@@ -69,14 +69,14 @@ class queue_entry_created extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['source'])) {
-            $source = ' by '.$this->data['other']['source'];
+            $source = ' by ' . $this->data['other']['source'];
         } else {
             $source = '';
         }
 
-        return "The user with id '".$this->userid."' created an queue entry for the user with id '".$this->data['other']['userid'].
-               "' in agrp with id '".$this->data['other']['agrpid']."' (= group with id '".$this->data['other']['groupid']."')".
-               " in ".$this->objecttable." with course module id '$this->contextinstanceid'".$source;
+        return "The user with id '" . $this->userid . "' created an queue entry for the user with id '" . $this->data['other']['userid'] .
+               "' in agrp with id '" . $this->data['other']['agrpid'] . "' (= group with id '" . $this->data['other']['groupid'] . "')" .
+               " in " . $this->objecttable . " with course module id '$this->contextinstanceid'" . $source;
     }
 
     /**

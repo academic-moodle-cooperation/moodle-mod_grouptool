@@ -23,8 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/locallib.php');
 
 $id = required_param('id', PARAM_INT);   // Course.
 
@@ -49,8 +49,10 @@ $PAGE->set_context($coursecontext);
 echo $OUTPUT->header();
 
 if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
-    notice(get_string('nogrouptools', 'grouptool'), new moodle_url('/course/view.php',
-                                                                   ['id' => $course->id]));
+    notice(get_string('nogrouptools', 'grouptool'), new moodle_url(
+        '/course/view.php',
+        ['id' => $course->id]
+    ));
 }
 
 $table = new html_table();
@@ -73,7 +75,6 @@ if ($course->format == 'weeks') {
 }
 
 foreach ($grouptools as $grouptool) {
-
     // Just some info.
     $context = context_module::instance($grouptool->coursemodule, MUST_EXIST);
 
@@ -82,28 +83,39 @@ foreach ($grouptools as $grouptool) {
     $strduedateno = get_string('duedateno', 'grouptool');
 
     $str = "";
-    if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_regs_group_view', $context)) {
+    if (
+        has_capability('mod/grouptool:register', $context)
+        || has_capability('mod/grouptool:view_regs_group_view', $context)
+    ) {
         $attrib = [
                 'title' => $strgrouptool,
-                'href'  => $CFG->wwwroot.'/mod/grouptool/view.php?id='.$grouptool->coursemodule,
+                'href'  => $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $grouptool->coursemodule,
         ];
         if ($grouptool->visible) {
             $attrib['class'] = 'dimmed';
         }
-        list($colorclass, $unused) = grouptool_display_lateness(time(), $grouptool->timedue);
+        [$colorclass, $unused] = grouptool_display_lateness(time(), $grouptool->timedue);
 
         $attr = ['class' => 'info'];
         if ($grouptool->timeavailable > time()) {
-            $str .= html_writer::tag('div', get_string('availabledate', 'grouptool').': '.
+            $str .= html_writer::tag(
+                'div',
+                get_string('availabledate', 'grouptool') . ': ' .
                     html_writer::tag('span', userdate($grouptool->timeavailable)),
-                    $attr);
+                $attr
+            );
         }
         if ($grouptool->timedue) {
-            $str .= html_writer::tag('div', $strduedate.': '.
-                html_writer::tag('span', userdate($grouptool->timedue),
-                    ['class' => (($colorclass == 'late') ? ' late' : '')]),
-                $attr);
+            $str .= html_writer::tag(
+                'div',
+                $strduedate . ': ' .
+                html_writer::tag(
+                    'span',
+                    userdate($grouptool->timedue),
+                    ['class' => (($colorclass == 'late') ? ' late' : '')]
+                ),
+                $attr
+            );
         } else {
             $str .= html_writer::tag('div', $strduedateno, $attr);
         }
@@ -111,23 +123,27 @@ foreach ($grouptools as $grouptool) {
 
     $details = grouptool_get_user_reg_details($grouptool, $context);
 
-    if (($grouptool->allow_reg
+    if (
+        ($grouptool->allow_reg
             && has_capability('mod/grouptool:view_regs_group_view', $context))
-        || has_capability('mod/grouptool:register', $context)) {
-        $str = html_writer::tag('div', $str.$details, ['class' => 'grouptool overview']);
+        || has_capability('mod/grouptool:register', $context)
+    ) {
+        $str = html_writer::tag('div', $str . $details, ['class' => 'grouptool overview']);
     }
 
     $info = $str;
 
     if (!$grouptool->visible) {
         $link = html_writer::link(
-                new moodle_url('/mod/grouptool/view.php', ['id' => $grouptool->coursemodule]),
-                format_string($grouptool->name, true),
-                ['class' => 'dimmed']);
+            new moodle_url('/mod/grouptool/view.php', ['id' => $grouptool->coursemodule]),
+            format_string($grouptool->name, true),
+            ['class' => 'dimmed']
+        );
     } else {
         $link = html_writer::link(
-                new moodle_url('/mod/grouptool/view.php', ['id' => $grouptool->coursemodule]),
-                format_string($grouptool->name, true));
+            new moodle_url('/mod/grouptool/view.php', ['id' => $grouptool->coursemodule]),
+            format_string($grouptool->name, true)
+        );
     }
 
     if ($grouptool->alwaysshowdescription || (time() > $grouptool->timeavailable)) {

@@ -55,11 +55,18 @@ function xmldb_grouptool_upgrade($oldversion) {
      * }
      */
     if ($oldversion < 2012061300) {
-
         // Define field active to be added to grouptool_agrps.
         $table = new xmldb_table('grouptool_agrps');
-        $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0',
-                                 'max_members');
+        $field = new xmldb_field(
+            'active',
+            XMLDB_TYPE_INTEGER,
+            '4',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'max_members'
+        );
 
         // Conditionally launch add field active.
         if (!$dbman->field_exists($table, $field)) {
@@ -71,7 +78,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2012062200) {
-
         // Define field use_size to be added to grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('use_size', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'choose_max');
@@ -86,7 +92,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2012062500) {
-
         // Rename field max_members on table grouptool_agrps to size.
         $table = new xmldb_table('grouptool_agrps');
         $field = new xmldb_field('max_members', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sort_order');
@@ -113,7 +118,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         $field = new xmldb_field('size', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'sort_order');
         // Launch rename field size --> grpsize.
         $dbman->rename_field($table, $field, 'grpsize');
-        $pbar->update(2, $count, "Rename grouptool_agrps->size ".
+        $pbar->update(2, $count, "Rename grouptool_agrps->size " .
                                  "to grouptool_agrps->grpsize...finished");
 
         $pbar->update(3, $count, "drop key agrp_id...");
@@ -130,9 +135,12 @@ function xmldb_grouptool_upgrade($oldversion) {
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
-        $pbar->update(5, $count,
-                      "rename field grouptool_registered->agroup_id ".
-                      "to grouptool_registered->agrp_id...");
+        $pbar->update(
+            5,
+            $count,
+            "rename field grouptool_registered->agroup_id " .
+            "to grouptool_registered->agrp_id..."
+        );
         // Rename field agroup_id on table grouptool_registered to agrp_id.
         $field = new xmldb_field('agroup_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
         // Launch rename field agrp_id.
@@ -166,8 +174,11 @@ function xmldb_grouptool_upgrade($oldversion) {
         if ($dbman->index_exists($table, $index)) {
             $dbman->drop_index($table, $index);
         }
-        $pbar->update(10, $count,
-                      "rename field grouptool_queued->agroup_id to grouptool_queued->agrp_id...");
+        $pbar->update(
+            10,
+            $count,
+            "rename field grouptool_queued->agroup_id to grouptool_queued->agrp_id..."
+        );
         // Rename field agroup_id on table grouptool_registered to agrp_id.
         $field = new xmldb_field('agroup_id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
         // Launch rename field agrp_id.
@@ -193,7 +204,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2012071001) {
-
         // Define field use_size to be added to grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('use_size', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'grpsize');
@@ -213,7 +223,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2012072202) {
-
         // Define field active to be added to grouptool_agrps.
         $table = new xmldb_table('grouptool_agrps');
         $field = new xmldb_field('active', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'grpsize');
@@ -228,7 +237,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2012072900) {
-
         // Define field ifmemberadded to be added to grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('ifmemberadded', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'choose_max');
@@ -259,7 +267,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2013112300) {
-
         // Define field alwaysshowdescription to be added to grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('alwaysshowdescription', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'introformat');
@@ -360,7 +367,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2014031900) {
-
         // Define field alwaysshowdescription to be added to grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('alwaysshowdescription', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'introformat');
@@ -395,23 +401,23 @@ function xmldb_grouptool_upgrade($oldversion) {
         ];
         // Check if everything is all right!
         foreach ($settingsnames as $key => $cur) {
-            $name = 'grouptool_'.$cur;
+            $name = 'grouptool_' . $cur;
             if (!isset($CFG->$name)) {
                 unset($settingsnames[$key]);
-                echo "Can't find setting for '".$name."'. It will be ignored. Please check the setting after the upgrade!".
-                     html_writer::empty_tag('br')."<br />";
+                echo "Can't find setting for '" . $name . "'. It will be ignored. Please check the setting after the upgrade!" .
+                     html_writer::empty_tag('br') . "<br />";
                 continue;
             }
             if ($DB->count_records('config', ['name' => $name]) != 1) {
                 unset($settingsnames[$key]);
-                echo "Can't select setting for '".$name.
-                     "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!".
-                     html_writer::empty_tag('br')."<br />";
+                echo "Can't select setting for '" . $name .
+                     "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!" .
+                     html_writer::empty_tag('br') . "<br />";
                 continue;
             }
         }
         foreach ($settingsnames as $cur) {
-            $name = 'grouptool_'.$cur;
+            $name = 'grouptool_' . $cur;
             set_config($cur, $CFG->$name, 'mod_grouptool');
             if (get_config('mod_grouptool', $cur) !== false) {
                 $DB->delete_records('config', ['name' => $name]);
@@ -426,8 +432,13 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     if ($oldversion < 2015042200) {
         // Fix a misspelled - and already corrected - string identifier blocking language customisations.
-        $DB->set_field_select('tool_customlang', 'stringid', 'create_assign_groupings', $DB->sql_like('stringid', ':stringid'),
-                              ['stringid' => 'create_assign_Groupings']);
+        $DB->set_field_select(
+            'tool_customlang',
+            'stringid',
+            'create_assign_groupings',
+            $DB->sql_like('stringid', ':stringid'),
+            ['stringid' => 'create_assign_Groupings']
+        );
 
         // Grouptool savepoint reached.
         upgrade_mod_savepoint(true, 2015042200, 'grouptool');
@@ -437,7 +448,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     // Put any upgrade step following this!
 
     if ($oldversion < 2017012500) {
-
         $table = new xmldb_table('grouptool');
 
         // Rename field queues_max on table grouptool to NEWNAMEGOESHERE.
@@ -453,8 +463,16 @@ function xmldb_grouptool_upgrade($oldversion) {
         $dbman->change_field_notnull($table, $field);
 
         // Define field groups_queues_limit to be added to grouptool.
-        $field = new xmldb_field('groups_queues_limit', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0',
-                                 'users_queues_limit');
+        $field = new xmldb_field(
+            'groups_queues_limit',
+            XMLDB_TYPE_INTEGER,
+            '10',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'users_queues_limit'
+        );
         // Conditionally launch add field groups_queues_limit.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -468,8 +486,8 @@ function xmldb_grouptool_upgrade($oldversion) {
     // Put any upgrade step following this!
 
     if ($oldversion < 2017050100) {
-        require_once($CFG->dirroot.'/calendar/lib.php');
-        require_once($CFG->dirroot.'/mod/grouptool/definitions.php');
+        require_once($CFG->dirroot . '/calendar/lib.php');
+        require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 
         // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
         $count = $DB->count_records('event', [
@@ -516,8 +534,13 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     if ($oldversion < 2018060100) {
         // Replace unprefixed user preference mygroups_only with mod_grouptool_mygroups_only!
-        $DB->set_field_select('user_preferences', 'name', 'mod_grouptool_mygroups_only', $DB->sql_like('name', ':name'),
-                ['name' => 'mygroups_only']);
+        $DB->set_field_select(
+            'user_preferences',
+            'name',
+            'mod_grouptool_mygroups_only',
+            $DB->sql_like('name', ':name'),
+            ['name' => 'mygroups_only']
+        );
 
         // Checkmark savepoint reached.
         upgrade_mod_savepoint(true, 2018060100, 'grouptool');
@@ -525,7 +548,6 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     // Get rid of obsolete use_individual field.
     if ($oldversion < 2020061000) {
-
         // Define field use_individual to be dropped from grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('use_individual');
@@ -540,7 +562,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021051901) {
-
         // Define field completionregister to be added to grouptool.
         $table = new xmldb_table('grouptool');
         $field = new xmldb_field('completionregister', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'ifgroupdeleted');
@@ -555,7 +576,6 @@ function xmldb_grouptool_upgrade($oldversion) {
     }
 
     if ($oldversion < 2022113000) {
-
         // Define index agrpid-userid (unique) to be dropped form grouptool_registered.
         $table = new xmldb_table('grouptool_registered');
         $index = new xmldb_index('agrpid-userid', XMLDB_INDEX_UNIQUE, ['agrpid', 'userid']);

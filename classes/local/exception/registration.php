@@ -33,7 +33,6 @@ namespace mod_grouptool\local\exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class registration extends \moodle_exception {
-
     /**
      * Constructor
      *
@@ -41,9 +40,8 @@ class registration extends \moodle_exception {
      * @param string $module (optional) location of the string definition
      * @param mixed $a (optional) additional data used in the language string
      */
-    public function __construct($description = 'general_registration_exception', $module='grouptool', $a = null) {
+    public function __construct($description = 'general_registration_exception', $module = 'grouptool', $a = null) {
 
         parent::__construct($description, $module, '', $a);
     }
 }
-
