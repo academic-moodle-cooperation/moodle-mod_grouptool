@@ -56,8 +56,10 @@ function grouptool_supports($feature) {
  */
 function mod_grouptool_get_completion_active_rule_descriptions($cm) {
     // Values will be present in cm_info, and we assume these are up to date.
-    if (empty($cm->customdata['customcompletionrules'])
-        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+    if (
+        empty($cm->customdata['customcompletionrules'])
+        || $cm->completion != COMPLETION_TRACKING_AUTOMATIC
+    ) {
         return [];
     }
 
@@ -123,10 +125,12 @@ function grouptool_add_instance(stdClass $grouptool) {
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', [$grouptool->course]);
     foreach ($coursegroups as $groupid) {
-        if (!$DB->record_exists('grouptool_agrps', [
+        if (
+            !$DB->record_exists('grouptool_agrps', [
             'grouptoolid' => $return,
             'groupid' => $groupid,
-        ])) {
+            ])
+        ) {
             $record = new stdClass();
             $record->grouptoolid = $return;
             $record->groupid = $groupid;
@@ -203,10 +207,12 @@ function grouptool_update_instance(stdClass $grouptool) {
 
     $coursegroups = $DB->get_fieldset_select('groups', 'id', 'courseid = ?', [$grouptool->course]);
     foreach ($coursegroups as $groupid) {
-        if (!$DB->record_exists('grouptool_agrps', [
+        if (
+            !$DB->record_exists('grouptool_agrps', [
             'grouptoolid' => $grouptool->instance,
             'groupid' => $groupid,
-        ])) {
+            ])
+        ) {
             $record = new stdClass();
             $record->grouptoolid = $grouptool->instance;
             $record->groupid = $groupid;
@@ -361,7 +367,6 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
         }
     }
     return true;
-
 }
 
 /**
@@ -426,8 +431,13 @@ function grouptool_update_queues($grouptool = 0) {
                   GROUP BY queued.id, priority
                   ORDER BY priority DESC, queued.timestamp ASC";
 
-            if ($records = $DB->get_records_sql($sql, array_merge([$min],
-                $params, [$agrpid]))) {
+            if (
+                $records = $DB->get_records_sql($sql, array_merge(
+                    [$min],
+                    $params,
+                    [$agrpid]
+                ))
+            ) {
                 foreach ($records as $record) {
                     if (!empty($grouptool->use_size) && ($groupregs[$agrpid] >= $size)) {
                         // Group is full!
@@ -438,10 +448,12 @@ function grouptool_update_queues($grouptool = 0) {
                         continue;
                     }
                     unset($record->id);
-                    if (!$DB->record_exists('grouptool_registered', [
+                    if (
+                        !$DB->record_exists('grouptool_registered', [
                         'agrpid' => $agrpid,
                         'userid' => $record->userid,
-                    ])) {
+                        ])
+                    ) {
                         unset($record->priority);
                         unset($record->regs);
                         $record->modified_by = 0;
@@ -449,11 +461,13 @@ function grouptool_update_queues($grouptool = 0) {
                         if (!empty($grouptool->immediate_reg)) {
                             groups_add_member($agrp->groupid, $record->userid);
                         }
-                    } else if ($mark = $DB->get_record('grouptool_registered', [
+                    } else if (
+                        $mark = $DB->get_record('grouptool_registered', [
                         'agrpid' => $agrpid,
                         'userid' => $record->userid,
                         'modified_by' => -1,
-                    ])) {
+                        ])
+                    ) {
                         $mark->modified_by = 0;
                         $DB->update_record('grouptool_registered', $mark);
                         if (!empty($grouptool->immediate_reg)) {
@@ -600,8 +614,10 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
         && ($gt->timeavailable < time()));
-    if (has_capability('mod/grouptool:administrate_registration', $context)
-        || ($regopen && has_capability('mod/grouptool:register', $context))) {
+    if (
+        has_capability('mod/grouptool:administrate_registration', $context)
+        || ($regopen && has_capability('mod/grouptool:register', $context))
+    ) {
         $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'selfregistration']);
         $navref->add(get_string('selfregistration', 'grouptool'), $url);
     }
@@ -654,28 +670,39 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     // Add "Administation" to menu.
     if ($admingrps) {
         $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
-        $node = navigation_node::create(get_string('administration', 'grouptool'),
+        $node = navigation_node::create(
+            get_string('administration', 'grouptool'),
             $url,
-            navigation_node::TYPE_SETTING, null, 'mod_grouptool_administration');
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_grouptool_administration'
+        );
         $navref->add_node($node);
     }
 
     // Add "Registrations" to menu.
     if ($viewreggv) {
         $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'overview']);
-        $node = navigation_node::create(get_string('registrations', 'grouptool'),
+        $node = navigation_node::create(
+            get_string('registrations', 'grouptool'),
             $url,
-            navigation_node::TYPE_SETTING, null, 'mod_grouptool_registration');
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_grouptool_registration'
+        );
         $navref->add_node($node);
-
     }
 
     // Add "viewmoodlegroups" to more menu.
     if ($managegrps) {
         $url = new moodle_url('/group/index.php', ['id' => $course->id]);
-        $node = navigation_node::create(get_string('viewmoodlegroups', 'grouptool'),
+        $node = navigation_node::create(
+            get_string('viewmoodlegroups', 'grouptool'),
             $url,
-            navigation_node::TYPE_SETTING, null, 'mod_grouptool_viewmoodlegroups');
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_grouptool_viewmoodlegroups'
+        );
         $node->forceintomoremenu = true;
         $navref->add_node($node);
     }
@@ -692,9 +719,13 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
 
     if (!is_null($reportgrouptoolversion) && has_capability('report/grouptool:view', $context)) {
         $url = new moodle_url('/report/grouptool/index.php', ['id' => $course->id]);
-        $node = navigation_node::create(get_string('report', 'grouptool'),
+        $node = navigation_node::create(
+            get_string('report', 'grouptool'),
             $url,
-            navigation_node::TYPE_SETTING, null, 'mod_grouptool_report');
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_grouptool_report'
+        );
         $node->forceintomoremenu = true;
         $navref->add_node($node);
     }
@@ -715,27 +746,51 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
     $time = $timedue - $timesubmitted;
     if (empty($timedue)) {
         $colorclass = 'early';
-        $timeremaining = ' (' . html_writer::tag('span', format_time($time),
-                ['class' => 'early']) . ')';
+        $timeremaining = ' (' . html_writer::tag(
+            'span',
+            format_time($time),
+            ['class' => 'early']
+        ) . ')';
     } else if ($time >= 7 * 24 * 60 * 60) { // More than 7 days?
         $colorclass = 'early';
-        $timeremaining = ' (' . html_writer::tag('span', get_string('early', 'grouptool',
-                format_time($time)),
-                ['class' => 'early']) . ')';
+        $timeremaining = ' (' . html_writer::tag(
+            'span',
+            get_string(
+                'early',
+                'grouptool',
+                format_time($time)
+            ),
+            ['class' => 'early']
+        ) . ')';
     } else if ($time >= 24 * 60 * 60) { // More than 1 day (less than 7 days)?
         $colorclass = 'soon';
-        $timeremaining = ' (' . html_writer::tag('span', get_string('early', 'grouptool',
-                format_time($time)),
-                ['class' => 'soon']) . ')';
+        $timeremaining = ' (' . html_writer::tag(
+            'span',
+            get_string(
+                'early',
+                'grouptool',
+                format_time($time)
+            ),
+            ['class' => 'soon']
+        ) . ')';
     } else if ($time >= 0) { // In future but less than 1 day?
         $colorclass = 'today';
-        $timeremaining = ' (' . html_writer::tag('span', get_string('early', 'grouptool',
-                format_time($time)),
-                ['class' => 'today']) . ')';
+        $timeremaining = ' (' . html_writer::tag(
+            'span',
+            get_string(
+                'early',
+                'grouptool',
+                format_time($time)
+            ),
+            ['class' => 'today']
+        ) . ')';
     } else {
         $colorclass = 'late';
-        $timeremaining = ' (' . html_writer::tag('span', get_string('late', 'grouptool',
-                format_time($time)), ['class' => 'late']) . ')';
+        $timeremaining = ' (' . html_writer::tag('span', get_string(
+            'late',
+            'grouptool',
+            format_time($time)
+        ), ['class' => 'late']) . ')';
     }
     return [$colorclass, $timeremaining];
 }
@@ -767,7 +822,6 @@ function grouptool_print_overview($courses, &$htmlarray) {
     }
 
     foreach ($grouptools as $grouptool) {
-
         $context = context_module::instance($grouptool->coursemodule, MUST_EXIST);
 
         $strgrouptool = get_string('grouptool', 'grouptool');
@@ -775,21 +829,28 @@ function grouptool_print_overview($courses, &$htmlarray) {
         $strduedateno = get_string('duedateno', 'grouptool');
 
         $str = "";
-        if (has_capability('mod/grouptool:register', $context)
-            || has_capability('mod/grouptool:view_regs_group_view', $context)) {
+        if (
+            has_capability('mod/grouptool:register', $context)
+            || has_capability('mod/grouptool:view_regs_group_view', $context)
+        ) {
             $attrib = [
                 'title' => $strgrouptool, 'href' => $CFG->wwwroot .
                     '/mod/grouptool/view.php?id=' .
                     $grouptool->coursemodule,
             ];
-            if (!$grouptool->visible
-                || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))) {
+            if (
+                !$grouptool->visible
+                || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))
+            ) {
                 $attrib['class'] = 'dimmed';
             }
             [$cc, ] = grouptool_display_lateness(time(), $grouptool->timedue);
-            $str .= html_writer::tag('div', $strgrouptool . ': ' .
+            $str .= html_writer::tag(
+                'div',
+                $strgrouptool . ': ' .
                 html_writer::tag('a', $grouptool->name, $attrib),
-                ['class' => 'name']);
+                ['class' => 'name']
+            );
             $attr = ['class' => 'info'];
             if ($grouptool->timeavailable > time()) {
                 $ta = $grouptool->timeavailable;
@@ -806,8 +867,10 @@ function grouptool_print_overview($courses, &$htmlarray) {
         }
         $details = grouptool_get_user_reg_details($grouptool, $context);
 
-        if (has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:register', $context)) {
+        if (
+            has_capability('mod/grouptool:view_regs_group_view', $context)
+            || has_capability('mod/grouptool:register', $context)
+        ) {
             $str = html_writer::tag('div', $str . $details, ['class' => 'grouptool overview']);
             if (empty($htmlarray[$grouptool->course]['grouptool'])) {
                 $htmlarray[$grouptool->course]['grouptool'] = $str;
@@ -832,8 +895,10 @@ function grouptool_get_user_reg_details($grouptool, $context) {
     global $USER, $DB;
 
     $details = '';
-    if (has_capability('mod/grouptool:register', $context)
-        || has_capability('mod/grouptool:view_regs_group_view', $context)) {
+    if (
+        has_capability('mod/grouptool:register', $context)
+        || has_capability('mod/grouptool:view_regs_group_view', $context)
+    ) {
         // It's similar to the student mymoodle output!
         $cmid = $grouptool->coursemodule;
         $cm = get_coursemodule_from_id('grouptool', $cmid);
@@ -856,9 +921,12 @@ function grouptool_get_user_reg_details($grouptool, $context) {
                     }
                     $tempstr .= html_writer::tag('span', $registration->grpname);
                 }
-                if (($grouptool->allow_multiple &&
-                        (count($userstats->registered) < $grouptool->choose_min))
-                    || (!$grouptool->allow_multiple && !count($userstats->registered))) {
+                if (
+                    ($grouptool->allow_multiple &&
+                        (count($userstats->registered) < $grouptool->choose_min)) ||
+                    (!$grouptool->allow_multiple &&
+                    !count($userstats->registered))
+                ) {
                     if ($grouptool->allow_multiple) {
                         $missing = ($grouptool->choose_min - count($userstats->registered));
                         $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
@@ -866,16 +934,22 @@ function grouptool_get_user_reg_details($grouptool, $context) {
                         $missing = 1;
                         $stringlabel = 'registration_missing';
                     }
-                    $details .= html_writer::tag('div',
-                        html_writer::tag('div',
+                    $details .= html_writer::tag(
+                        'div',
+                        html_writer::tag(
+                            'div',
                             get_string($stringlabel, 'grouptool', $missing),
-                            ['class' => $colorclass]) . ' ' .
+                            ['class' => $colorclass]
+                        ) . ' ' .
                         get_string('registrations', 'grouptool') . ': ' . $tempstr,
-                        ['class' => 'registered']);
+                        ['class' => 'registered']
+                    );
                 } else {
-                    $details .= html_writer::tag('div',
+                    $details .= html_writer::tag(
+                        'div',
                         get_string('registrations', 'grouptool') . ': ' . $tempstr,
-                        ['class' => 'registered']);
+                        ['class' => 'registered']
+                    );
                 }
             } else {
                 if ($grouptool->allow_multiple) {
@@ -885,24 +959,33 @@ function grouptool_get_user_reg_details($grouptool, $context) {
                     $missing = 1;
                     $stringlabel = 'registration_missing';
                 }
-                $details .= html_writer::tag('div',
-                    html_writer::tag('div',
+                $details .= html_writer::tag(
+                    'div',
+                    html_writer::tag(
+                        'div',
                         get_string($stringlabel, 'grouptool', $missing),
-                        ['class' => $colorclass]) .
+                        ['class' => $colorclass]
+                    ) .
                     get_string('registrations', 'grouptool') . ': ' .
                     get_string('not_registered', 'grouptool'),
-                    ['class' => 'registered']);
+                    ['class' => 'registered']
+                );
             }
             if (count($userstats->queued)) {
                 $tempstr = "";
                 foreach ($userstats->queued as $queue) {
-                    [$colorclass, ] = grouptool_display_lateness($queue->timestamp,
-                        $grouptool->timedue);
+                    [$colorclass, ] = grouptool_display_lateness(
+                        $queue->timestamp,
+                        $grouptool->timedue
+                    );
                     if ($tempstr != "") {
                         $tempstr .= ", ";
                     }
-                    $tempstr .= html_writer::tag('span', $queue->grpname . ' (' . $queue->rank . ')',
-                        ['class' => $colorclass]);
+                    $tempstr .= html_writer::tag(
+                        'span',
+                        $queue->grpname . ' (' . $queue->rank . ')',
+                        ['class' => $colorclass]
+                    );
                 }
                 $details .= html_writer::tag('div', get_string('queues', 'grouptool') . ': ' .
                     $tempstr, ['class' => 'queued']);
@@ -910,10 +993,11 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         }
     }
 
-    if ((has_capability('mod/grouptool:view_regs_group_view', $context))
-        && $grouptool->allow_reg) {
+    if (
+        (has_capability('mod/grouptool:view_regs_group_view', $context))
+        && $grouptool->allow_reg
+    ) {
         $details .= html_writer::tag('div', get_string('global_userstats', 'grouptool', $userstats), ['class' => 'userstats']);
-
     }
 
     return html_writer::tag('div', $details, ['class' => 'details']);
@@ -939,8 +1023,12 @@ function grouptool_reset_userdata($data) {
     $componentstr = get_string('modulenameplural', 'grouptool');
     $status = [];
 
-    $grouptoolids = $DB->get_fieldset_select('grouptool', 'id', 'course = ?',
-        [$data->courseid]);
+    $grouptoolids = $DB->get_fieldset_select(
+        'grouptool',
+        'id',
+        'course = ?',
+        [$data->courseid]
+    );
 
     $agrps = $DB->get_records_list('grouptool_agrps', 'grouptoolid', $grouptoolids);
 
@@ -995,21 +1083,36 @@ function grouptool_reset_userdata($data) {
  */
 function grouptool_reset_course_form_definition(MoodleQuickForm &$mform) {
     $mform->addElement('header', 'grouptoolheader', get_string('modulenameplural', 'grouptool'));
-    $mform->addElement('advcheckbox', 'reset_grouptool_agrps',
-        get_string('reset_agrps', 'grouptool'));
+    $mform->addElement(
+        'advcheckbox',
+        'reset_grouptool_agrps',
+        get_string('reset_agrps', 'grouptool')
+    );
     $mform->addHelpButton('reset_grouptool_agrps', 'reset_agrps', 'grouptool');
-    $mform->addElement('advcheckbox', 'reset_grouptool_registrations',
-        get_string('reset_registrations', 'grouptool'));
+    $mform->addElement(
+        'advcheckbox',
+        'reset_grouptool_registrations',
+        get_string('reset_registrations', 'grouptool')
+    );
     $mform->addHelpButton('reset_grouptool_registrations', 'reset_registrations', 'grouptool');
     $mform->disabledIf('reset_grouptool_registrations', 'reset_grouptool_agrps', 'checked');
-    $mform->addElement('advcheckbox', 'reset_grouptool_queues',
-        get_string('reset_queues', 'grouptool'));
+    $mform->addElement(
+        'advcheckbox',
+        'reset_grouptool_queues',
+        get_string('reset_queues', 'grouptool')
+    );
     $mform->addHelpButton('reset_grouptool_queues', 'reset_queues', 'grouptool');
     $mform->disabledIf('reset_grouptool_queues', 'reset_grouptool_agrps', 'checked');
-    $mform->addElement('advcheckbox', 'reset_grouptool_transparent_unreg',
-        get_string('reset_transparent_unreg', 'grouptool'));
-    $mform->addHelpButton('reset_grouptool_transparent_unreg', 'reset_transparent_unreg',
-        'grouptool');
+    $mform->addElement(
+        'advcheckbox',
+        'reset_grouptool_transparent_unreg',
+        get_string('reset_transparent_unreg', 'grouptool')
+    );
+    $mform->addHelpButton(
+        'reset_grouptool_transparent_unreg',
+        'reset_transparent_unreg',
+        'grouptool'
+    );
 }
 
 /**
@@ -1054,8 +1157,10 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
 
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
-    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability('mod/grouptool:administrate_registration',
-            $context);
+    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
+        'mod/grouptool:administrate_registration',
+        $context
+    );
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
         return ((has_capability('mod/grouptool:register', $context))
@@ -1095,8 +1200,10 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
-    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability('mod/grouptool:administrate_registration',
-            $context);
+    $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
+        'mod/grouptool:administrate_registration',
+        $context
+    );
     $isopen = $grouptool->is_registration_open();
 
     $url = new \moodle_url('/mod/grouptool/view.php', [
@@ -1122,8 +1229,10 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
             $label = get_string('view_registrations', 'grouptool');
             $itemcount = -1;
         }
-        if (($allowmultiple && ($choosemin - count($userstats->registered)) == 0) ||
-            (!empty($userstats->registered) ? 0 : 1) == 0) {
+        if (
+            ($allowmultiple && ($choosemin - count($userstats->registered)) == 0) ||
+            (!empty($userstats->registered) ? 0 : 1) == 0
+        ) {
             // If enough registration were made we want to remove the event from the dashboard for the student.
             return null;
         }

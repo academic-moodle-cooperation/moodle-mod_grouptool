@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
  * @author Philipp Hager <philipp.hager@tuwien.ac.at> strongly based on mod_assign's privacy unit tests!
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class privacy_test extends base {
+final class privacy_test extends base {
     /*
      * The base test class already contains a setUp-method setting up a course including users and groups.
      */
@@ -68,7 +68,8 @@ class privacy_test extends base {
         $user1 = $this->students[0];
         self::getDataGenerator()->enrol_user($user1->id, $course1->id, 'student');
         // Need a second user to create queue entries.
-        $user2 = $this->students[1];;
+        $user2 = $this->students[1];
+        ;
         self::getDataGenerator()->enrol_user($user2->id, $course1->id, 'student');
         self::getDataGenerator()->enrol_user($user2->id, $course2->id, 'student');
 
@@ -424,14 +425,23 @@ class privacy_test extends base {
         // Only the entry for user 3 is gone!
         self::assertCount(0, $data);
 
-        $userlist = new \core_privacy\local\request\approved_userlist($gt1->get_context(), 'grouptool',
-            [$user1->id, $user2->id, $user3->id]);
+        $userlist = new \core_privacy\local\request\approved_userlist(
+            $gt1->get_context(),
+            'grouptool',
+            [$user1->id, $user2->id, $user3->id]
+        );
         provider::delete_data_for_users($userlist);
-        $userlist = new \core_privacy\local\request\approved_userlist($gt2->get_context(), 'grouptool',
-            [$user1->id, $user2->id, $user3->id]);
+        $userlist = new \core_privacy\local\request\approved_userlist(
+            $gt2->get_context(),
+            'grouptool',
+            [$user1->id, $user2->id, $user3->id]
+        );
         provider::delete_data_for_users($userlist);
-        $userlist = new \core_privacy\local\request\approved_userlist($gt3->get_context(), 'grouptool',
-            [$user1->id, $user2->id, $user3->id]);
+        $userlist = new \core_privacy\local\request\approved_userlist(
+            $gt3->get_context(),
+            'grouptool',
+            [$user1->id, $user2->id, $user3->id]
+        );
         provider::delete_data_for_users($userlist);
 
         // Everything should be gone!

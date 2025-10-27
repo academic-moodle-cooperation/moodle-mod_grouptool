@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code
  * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class locallib_test extends \mod_grouptool\local\tests\base {
+final class locallib_test extends \mod_grouptool\local\tests\base {
     /*
      * The base test class already contains a setUp-method setting up a course including users and groups.
      */
@@ -90,4 +90,3 @@ class locallib_test extends \mod_grouptool\local\tests\base {
         // TODO: wirite test for groups_get_all_groups().
     }
 }
-
