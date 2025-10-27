@@ -22,6 +22,7 @@
  * @copyright  2018 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\privacy;
 
 use core_privacy\local\metadata\collection;
@@ -56,21 +57,21 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Provides meta data that is stored about a user with mod_publication
      *
-     * @param  collection $collection A collection of meta data items to be added to.
+     * @param collection $collection A collection of meta data items to be added to.
      * @return  collection Returns the collection of metadata.
      */
     public static function get_metadata(collection $collection): collection {
         $queued = [
-                'agrpid' => 'privacy:metadata:agrpid',
-                'userid' => 'privacy:metadata:userid',
-                'timestamp' => 'privacy:metadata:timestamp',
+            'agrpid' => 'privacy:metadata:agrpid',
+            'userid' => 'privacy:metadata:userid',
+            'timestamp' => 'privacy:metadata:timestamp',
         ];
 
         $registered = [
-                'agrpid' => 'privacy:metadata:agrpid',
-                'userid' => 'privacy:metadata:userid',
-                'timestamp' => 'privacy:metadata:timestamp',
-                'modified_by' => 'privacy:metadata:modified_by',
+            'agrpid' => 'privacy:metadata:agrpid',
+            'userid' => 'privacy:metadata:userid',
+            'timestamp' => 'privacy:metadata:timestamp',
+            'modified_by' => 'privacy:metadata:modified_by',
         ];
 
         $collection->add_database_table('grouptool_queued', $queued, 'privacy:metadata:queued');
@@ -91,16 +92,16 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Returns all of the contexts that has information relating to the userid.
      *
-     * @param  int $userid The user ID.
+     * @param int $userid The user ID.
      * @return contextlist an object with the contexts related to a userid.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
         $params = [
-                'modulename' => 'grouptool',
-                'contextlevel' => CONTEXT_MODULE,
-                'queueuserid' => $userid,
-                'reguserid' => $userid,
-                'regmodifierid' => $userid,
+            'modulename' => 'grouptool',
+            'contextlevel' => CONTEXT_MODULE,
+            'queueuserid' => $userid,
+            'reguserid' => $userid,
+            'regmodifierid' => $userid,
         ];
 
         $sql = "SELECT ctx.id
@@ -122,7 +123,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Get the list of users who have data within a context.
      *
-     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
@@ -132,13 +133,13 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         }
 
         $params = [
-                'modulename' => 'grouptool',
-                'contextid' => $context->id,
-                'contextlevel' => CONTEXT_MODULE,
+            'modulename' => 'grouptool',
+            'contextid' => $context->id,
+            'contextlevel' => CONTEXT_MODULE,
         ];
 
         // Get all who are queued or registered or marked or have modified, but only real users, no empty values!
-        foreach (['grouptool_queued' => ['userid'], 'grouptool_registered' => ['userid', 'modified_by'], ] as $table => $fields) {
+        foreach (['grouptool_queued' => ['userid'], 'grouptool_registered' => ['userid', 'modified_by']] as $table => $fields) {
             foreach ($fields as $field) {
                 $sql = "SELECT r." . $field . "
                           FROM {context} ctx
@@ -156,7 +157,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Delete multiple users within a single context.
      *
-     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
@@ -273,7 +274,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Stores the user preferences related to mod_publication.
      *
-     * @param  int $userid The user ID that we want the preferences for.
+     * @param int $userid The user ID that we want the preferences for.
      * @throws \dml_exception
      * @throws \coding_exception
      */
@@ -301,9 +302,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Export overrides for this grouptool.
      *
-     * @param  \context $context Context
-     * @param  \mod_grouptool $grouptool The publication object.
-     * @param  \stdClass $user The user object.
+     * @param \context $context Context
+     * @param \mod_grouptool $grouptool The publication object.
+     * @param \stdClass $user The user object.
      * @throws \coding_exception
      * @throws \dml_exception
      */
@@ -333,9 +334,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         if (!empty($regs)) {
             foreach ($regs as $cur) {
                 $tmp = [
-                        'group' => $agrps[$cur->agrpid]->name,
-                        'status' => ($cur->modified_by === -1) ? $strmarked : $strregistered,
-                        'timestamp' => transform::datetime($cur->timestamp),
+                    'group' => $agrps[$cur->agrpid]->name,
+                    'status' => ($cur->modified_by === -1) ? $strmarked : $strregistered,
+                    'timestamp' => transform::datetime($cur->timestamp),
                 ];
                 if ($cur->userid != $user->id) {
                     if (!isset($export->modified)) {
@@ -361,9 +362,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
             $export->queues = [];
             foreach ($queues as $cur) {
                 $export->queues[] = [
-                        'group' => $agrps[$cur->agrpid]->name,
-                        'status' => $strqueued,
-                        'timestamp' => transform::datetime($cur->timestamp),
+                    'group' => $agrps[$cur->agrpid]->name,
+                    'status' => $strqueued,
+                    'timestamp' => transform::datetime($cur->timestamp),
                 ];
             }
         }
