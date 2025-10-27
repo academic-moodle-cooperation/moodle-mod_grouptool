@@ -1699,10 +1699,11 @@ class mod_grouptool {
                         break;
                     case GROUPTOOL_N_M_GROUPS:
                         /* Shortcut here: create_fromto_groups does exactly what we want,
-                         * with from = 1 and to = number of groups to create! */
+                         with from = 1 and to = number of groups to create! */
                         $data->from = 1;
                         $data->to = $data->numberofgroups;
                         $data->digits = 1;
+                        // go on to GROUPTOOL_FROMTO_GROUPS
                     case GROUPTOOL_FROMTO_GROUPS:
                         if (!isset($data->groupingname)) {
                             $data->groupingname = null;
@@ -1838,10 +1839,11 @@ class mod_grouptool {
                     break;
                 case GROUPTOOL_N_M_GROUPS:
                     /* Shortcut here: create_fromto_groups does exactly what we want,
-                     * with from = 1 and to = number of groups to create! */
+                    * with from = 1 and to = number of groups to create! */
                     $data->from = 1;
                     $data->to = $data->numberofgroups;
                     $data->digits = 1;
+                    // go to GROUPTOOL_FROMTO_GROUPS case
                 case GROUPTOOL_FROMTO_GROUPS:
                     if (!isset($data->groupingname)) {
                         $data->groupingname = null;
@@ -3896,6 +3898,7 @@ class mod_grouptool {
         switch ($userid) {
             case null:
                 $userid = $USER->id;
+                // no user data, set id and go to default case
             default:
                 $groups = $this->get_active_groups(false, false);
                 break;
