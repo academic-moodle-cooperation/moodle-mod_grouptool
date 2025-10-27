@@ -138,10 +138,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         ];
 
         // Get all who are queued or registered or marked or have modified, but only real users, no empty values!
-        foreach (
-            ['grouptool_queued' => ['userid'],
-                  'grouptool_registered' => ['userid', 'modified_by'], ] as $table => $fields
-        ) {
+        foreach (['grouptool_queued' => ['userid'], 'grouptool_registered' => ['userid', 'modified_by'], ] as $table => $fields) {
             foreach ($fields as $field) {
                 $sql = "SELECT r." . $field . "
                           FROM {context} ctx
