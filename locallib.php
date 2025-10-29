@@ -5753,7 +5753,8 @@ class mod_grouptool {
             $groupdata->useridentity = self::convert_associative_array_into_nested_index_array(self::get_useridentity_fields());
 
             $statushelp = new help_icon('status', 'mod_grouptool');
-            if (!$onlydata) {
+            $groupdata->downloadcapability = has_capability('mod/grouptool:export', $this->context);
+            if (!$onlydata  ) {
                 $groupdata->statushelp = $statushelp->export_for_template($OUTPUT);
                 // Format will be added in template!
                 $groupdownloadurl = new moodle_url($downloadurl, ['groupid' => $groupinfo[$agrp->id]->id]);
