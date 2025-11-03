@@ -5754,7 +5754,7 @@ class mod_grouptool {
 
             $statushelp = new help_icon('status', 'mod_grouptool');
             $groupdata->downloadcapability = has_capability('mod/grouptool:export', $this->context);
-            if (!$onlydata  ) {
+            if (!$onlydata) {
                 $groupdata->statushelp = $statushelp->export_for_template($OUTPUT);
                 // Format will be added in template!
                 $groupdownloadurl = new moodle_url($downloadurl, ['groupid' => $groupinfo[$agrp->id]->id]);
