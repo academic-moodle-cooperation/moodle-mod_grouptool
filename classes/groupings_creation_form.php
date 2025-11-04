@@ -64,9 +64,9 @@ class groupings_creation_form extends \moodleform {
         $course = $DB->get_record('course', ['id' => $cm->course]);
 
         foreach ($this->_customdata['selected'] as $select) {
-            $mform->addElement('hidden', 'selected['.$select.']');
-            $mform->setDefault('selected['.$select.']', $select);
-            $mform->setType('selected['.$select.']', PARAM_INT);
+            $mform->addElement('hidden', 'selected[' . $select . ']');
+            $mform->setDefault('selected[' . $select . ']', $select);
+            $mform->setType('selected[' . $select . ']', PARAM_INT);
         }
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_admin');
@@ -101,11 +101,13 @@ class groupings_creation_form extends \moodleform {
 
         $mform->addElement('text', 'name', get_string('groupingname', 'group'));
         $mform->setType('name', PARAM_TEXT);
-        $mform->hideIf ('name', 'target', 'noteq', '-1');
+        $mform->hideIf('name', 'target', 'noteq', '-1');
 
         $grp = [];
-        $grp[] = $mform->createElement('submit', 'createGroupings', get_string('create_assign_groupings',
-                                                                               'grouptool'));
+        $grp[] = $mform->createElement('submit', 'createGroupings', get_string(
+            'create_assign_groupings',
+            'grouptool'
+        ));
         $grp[] = $mform->createElement('cancel');
         $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);

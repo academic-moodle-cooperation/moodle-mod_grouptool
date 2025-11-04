@@ -101,18 +101,18 @@ class user_moved extends \core\event\base {
     public function get_description() {
         switch ($this->data['other']['type']) {
             case 'promotion':
-                return "The user with id '".$this->data['other']['to']['userid']."' was promoted".
-                       " from the queue of active-group with id '".$this->data['other']['from']['agrpid']."' (group id '".
-                       $this->data['other']['from']['groupid']."')".
-                       " in ".$this->objecttable." with course module id '$this->contextinstanceid'";
+                return "The user with id '" . $this->data['other']['to']['userid'] . "' was promoted" .
+                       " from the queue of active-group with id '" . $this->data['other']['from']['agrpid'] . "' (group id '" .
+                       $this->data['other']['from']['groupid'] . "')" .
+                       " in " . $this->objecttable . " with course module id '$this->contextinstanceid'";
             break;
             default:
             case 'move':
-                return "The user with id '".$this->data['other']['to']['userid']."' was moved".
-                       " from active-group with id '".$this->data['other']['from']['agrpid']."' (group id '".
-                       $this->data['other']['from']['groupid']."')"." to active-group with id '".
-                       $this->data['other']['to']['agrpid']."' (group id '".$this->data['other']['to']['groupid']."')".
-                       " in ".$this->objecttable." with course module id '$this->contextinstanceid'";
+                return "The user with id '" . $this->data['other']['to']['userid'] . "' was moved" .
+                       " from active-group with id '" . $this->data['other']['from']['agrpid'] . "' (group id '" .
+                       $this->data['other']['from']['groupid'] . "')" . " to active-group with id '" .
+                       $this->data['other']['to']['agrpid'] . "' (group id '" . $this->data['other']['to']['groupid'] . "')" .
+                       " in " . $this->objecttable . " with course module id '$this->contextinstanceid'";
             break;
         }
     }

@@ -52,4 +52,3 @@ class overview_exported extends export {
         return get_string('eventoverviewexported', 'grouptool');
     }
 }
-

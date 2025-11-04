@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/backup_grouptool_ste
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_grouptool_activity_task extends backup_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -53,8 +52,10 @@ class backup_grouptool_activity_task extends backup_activity_task {
      */
     protected function define_my_steps() {
         // Grouptool only has one structure step!
-        $this->add_step(new backup_grouptool_activity_structure_step('grouptool_structure',
-                'grouptool.xml'));
+        $this->add_step(new backup_grouptool_activity_structure_step(
+            'grouptool_structure',
+            'grouptool.xml'
+        ));
     }
 
     /**
@@ -70,10 +71,10 @@ class backup_grouptool_activity_task extends backup_activity_task {
         $base = preg_quote($CFG->wwwroot, "/");
 
         // Link to the list of grouptools.
-        $search = "/(".$base."\/mod\/grouptool\/index.php\?id\=)([0-9]+)/";
+        $search = "/(" . $base . "\/mod\/grouptool\/index.php\?id\=)([0-9]+)/";
         $content = preg_replace($search, '$@GROUPTOOLINDEX*$2@$', $content);
         // Link to grouptool view by moduleid.
-        $search = "/(".$base."\/mod\/grouptool\/view.php\?id\=)([0-9]+)/";
+        $search = "/(" . $base . "\/mod\/grouptool\/view.php\?id\=)([0-9]+)/";
         $content = preg_replace($search, '$@GROUPTOOLVIEWBYID*$2@$', $content);
 
         return $content;

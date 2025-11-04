@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
 
 /**
@@ -76,9 +77,10 @@ class group_recreated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The group with id '".$this->data['other']['groupid']."' has been recreated by the eventhandler as group with id '".
-               $this->data['other']['newid']."'". " because it was used in grouptool with the course module id '".
-               $this->contextinstanceid."'.";
+        return "The group with id '" .
+            $this->data['other']['groupid'] . "' has been recreated by the eventhandler as group with id '" .
+            $this->data['other']['newid'] . "'" . " because it was used in grouptool with the course module id '" .
+            $this->contextinstanceid . "'.";
     }
 
     /**
@@ -94,8 +96,8 @@ class group_recreated extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();

@@ -155,6 +155,3 @@ switch ($tab) {
         $instance->view_administration();
 }
 echo $OUTPUT->footer();
-
-
-

@@ -100,8 +100,10 @@ class observer {
                 $reg->userid = $event->relateduserid;
                 $reg->timestamp = time();
                 $reg->modified_by = 0; // There's no way we can get the teachers id!
-                if (!$DB->record_exists('grouptool_registered', ['agrpid' => $reg->agrpid,
-                                                                 'userid' => $reg->userid, ])) {
+                if (
+                    !$DB->record_exists('grouptool_registered', ['agrpid' => $reg->agrpid,
+                                                                 'userid' => $reg->userid, ])
+                ) {
                     $reg->id = $DB->insert_record('grouptool_registered', $reg);
                     $reg->groupid = $event->objectid;
                     $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false, MUST_EXIST);
@@ -162,21 +164,28 @@ class observer {
                              WHERE reg.userid = :userid
                                    AND agrps.grouptoolid = :grouptoolid
                                    AND agrps.groupid = :groupid";
-                    if ($regs = $DB->get_records_sql($sql, ['grouptoolid' => $grouptool->id,
+                    if (
+                        $regs = $DB->get_records_sql($sql, ['grouptoolid' => $grouptool->id,
                                                             'userid'      => $event->relateduserid,
-                                                            'groupid'     => $event->objectid, ])) {
+                                                            'groupid'     => $event->objectid, ])
+                    ) {
                         $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
                         foreach ($regs as $reg) {
                             // Trigger event!
-                            $cm = get_coursemodule_from_instance('grouptool', $grouptool->id, $grouptool->course, false,
-                                                                 MUST_EXIST);
+                            $cm = get_coursemodule_from_instance(
+                                'grouptool',
+                                $grouptool->id,
+                                $grouptool->course,
+                                false,
+                                MUST_EXIST
+                            );
                             registration_deleted::create_via_eventhandler($cm, $reg)->trigger();
                         }
 
                         // Get next queued user and put him in the group (and delete queue entry)!
                         if (!empty($grouptool->use_queue)) {
                             // We include it right here, because we want to have it slim!
-                            require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+                            require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
                             $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
                             $instance = new \mod_grouptool($cm->id, $grouptool, $cm);
 
@@ -239,7 +248,7 @@ class observer {
                             group_recreated::create_from_object($logdata)->trigger();
 
                             if ($grouptool->immediate_reg) {
-                                require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+                                require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
                                 $instance = new \mod_grouptool($cmid, $grouptool);
                                 $instance->push_registrations();
                             }
@@ -249,15 +258,17 @@ class observer {
                             $infodata->grouptoolname = $grouptool->name;
                             $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
                             $infodata->groupurl = (new \moodle_url('/group/members.php', ['group' => $newid]))->out();
-                            notification::add(get_string('notification:group_recreated', 'grouptool', $infodata),
-                                    notification::INFO);
+                            notification::add(
+                                get_string('notification:group_recreated', 'grouptool', $infodata),
+                                notification::INFO
+                            );
                         } else {
                             throw new moodle_exception('error', 'moodle');
                             return false;
                         }
                     } else {
                         if ($grouptool->immediate_reg) {
-                            require_once($CFG->dirroot.'/mod/grouptool/locallib.php');
+                            require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
                             $instance = new \mod_grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
@@ -266,13 +277,17 @@ class observer {
                         $infodata->grouptoolname = $grouptool->name;
                         $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
                         $infodata->groupurl = (new \moodle_url('/group/members.php', ['group' => $data->id]))->out();
-                        notification::add(get_string('notification:registrations_recreated', 'grouptool', $infodata),
-                                notification::INFO);
+                        notification::add(
+                            get_string('notification:registrations_recreated', 'grouptool', $infodata),
+                            notification::INFO
+                        );
                     }
                     break;
                 case GROUPTOOL_DELETE_REF:
-                    if ($agrpid = $DB->get_field('grouptool_agrps', 'id', ['groupid'     => $data->id,
-                                                                           'grouptoolid' => $grouptool->id, ])) {
+                    if (
+                        $agrpid = $DB->get_field('grouptool_agrps', 'id', ['groupid'     => $data->id,
+                                                                           'grouptoolid' => $grouptool->id, ])
+                    ) {
                         $agrpids[] = $agrpid;
                     }
                     break;
@@ -285,8 +300,10 @@ class observer {
             $DB->delete_records_list('grouptool_registered', 'agrpid', $agrpids);
             foreach ($regs as $cur) {
                 if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
-                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_coursemodule_from_instance('grouptool',
-                                                                                             $agrps[$cur->agrpid]->grouptoolid);
+                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_coursemodule_from_instance(
+                        'grouptool',
+                        $agrps[$cur->agrpid]->grouptoolid
+                    );
                 }
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
                 registration_deleted::create_via_eventhandler($cms[$agrps[$cur->agrpid]->grouptoolid], $cur);
@@ -295,8 +312,10 @@ class observer {
             $DB->delete_records_list('grouptool_queued', 'agrpid', $agrpids);
             foreach ($queues as $cur) {
                 if (empty($cms[$agrps[$cur->agrpid]->grouptoolid])) {
-                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_coursemodule_from_instance('grouptool',
-                                                                                             $agrps[$cur->agrpid]->grouptoolid);
+                    $cms[$agrps[$cur->agrpid]->grouptoolid] = get_coursemodule_from_instance(
+                        'grouptool',
+                        $agrps[$cur->agrpid]->grouptoolid
+                    );
                 }
                 // Trigger event!
                 $cur->groupid = $agrps[$cur->agrpid]->groupid;
@@ -308,7 +327,7 @@ class observer {
             if ($grouprecreated && !empty($agrpids)) {
                 // Group has already ben recreated due to another instance, just deactivate it!
                 [$sqlids, $sqlparams] = $DB->get_in_or_equal($agrpids);
-                $DB->set_field_select('grouptool_agrps', 'active', 0, "id ".$sqlids, $sqlparams);
+                $DB->set_field_select('grouptool_agrps', 'active', 0, "id " . $sqlids, $sqlparams);
             } else if (!empty($agrpids)) {
                 $DB->delete_records_list('grouptool_agrps', 'id', $agrpids);
                 foreach ($agrps as $cur) {
@@ -360,8 +379,10 @@ class observer {
                 $newagrp->sort_order = $sortorder[$grouptool->id]->max + 1;
             }
             $newagrp->active = 0;
-            if (!$DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->id,
-                                                        'groupid'     => $data->id, ])) {
+            if (
+                !$DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->id,
+                                                        'groupid'     => $data->id, ])
+            ) {
                 $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp);
                 // Trigger event!
                 $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);

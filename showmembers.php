@@ -51,12 +51,16 @@ echo $OUTPUT->header();
 
 $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
-if (!has_capability('mod/grouptool:view_regs_group_view', $context)
-    && !$grouptool->canshowmembers($agrpid)) {
-    echo html_writer::tag('div', get_string('not_allowed_to_show_members', 'grouptool'),
-        ['class' => 'reg']);
+if (
+    !has_capability('mod/grouptool:view_regs_group_view', $context)
+    && !$grouptool->canshowmembers($agrpid)
+) {
+    echo html_writer::tag(
+        'div',
+        get_string('not_allowed_to_show_members', 'grouptool'),
+        ['class' => 'reg']
+    );
 } else {
-
     $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context);
     $group = $grouptool->get_active_groups(true, true, $agrpid);
     $group = current($group);

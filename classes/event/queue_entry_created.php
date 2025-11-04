@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
 
 /**
@@ -52,12 +53,12 @@ class queue_entry_created extends \core\event\base {
      * @return \core\event\base event object
      * @throws \coding_exception
      */
-    public static function create_direct(\stdClass | \cm_info $cm, \stdClass $regdata) {
+    public static function create_direct(\stdClass|\cm_info $cm, \stdClass $regdata) {
         $regdata->source = null;
         $event = self::create([
             'objectid' => $regdata->id,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => (array)$regdata,
+            'context' => \context_module::instance($cm->id),
+            'other' => (array)$regdata,
         ]);
         return $event;
     }
@@ -69,14 +70,16 @@ class queue_entry_created extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['source'])) {
-            $source = ' by '.$this->data['other']['source'];
+            $source = ' by ' . $this->data['other']['source'];
         } else {
             $source = '';
         }
 
-        return "The user with id '".$this->userid."' created an queue entry for the user with id '".$this->data['other']['userid'].
-               "' in agrp with id '".$this->data['other']['agrpid']."' (= group with id '".$this->data['other']['groupid']."')".
-               " in ".$this->objecttable." with course module id '$this->contextinstanceid'".$source;
+        return "The user with id '" .
+            $this->userid . "' created an queue entry for the user with id '" . $this->data['other']['userid'] .
+            "' in agrp with id '" . $this->data['other']['agrpid'] . "' (= group with id '" .
+            $this->data['other']['groupid'] . "')" .
+            " in " . $this->objecttable . " with course module id '$this->contextinstanceid'" . $source;
     }
 
     /**
@@ -97,8 +100,8 @@ class queue_entry_created extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url("/mod/grouptool/view.php", [
-            'id'      => $this->contextinstanceid,
-            'tab'     => 'overview',
+            'id' => $this->contextinstanceid,
+            'tab' => 'overview',
             'groupid' => $this->data['other']['groupid'],
         ]);
     }
@@ -106,8 +109,8 @@ class queue_entry_created extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws \coding_exception
      */
     protected function validate_data() {
         parent::validate_data();

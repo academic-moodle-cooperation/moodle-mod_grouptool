@@ -25,7 +25,8 @@
 
 // @codingStandardsIgnoreLine
 if (((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
-    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))) {
+    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))
+) {
     // @codingStandardsIgnoreLine
     define('NO_OUTPUT_BUFFERING', true);
 // @codingStandardsIgnoreLine
@@ -140,5 +141,3 @@ switch ($tab) {
         $instance->view_overview();
 }
 echo $OUTPUT->footer();
-
-

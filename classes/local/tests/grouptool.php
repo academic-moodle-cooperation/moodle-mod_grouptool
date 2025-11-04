@@ -76,7 +76,7 @@ class grouptool extends mod_grouptool {
      * @throws regpresent
      * @throws required_capability_exception
      */
-    public function testable_register_in_agrp($agrpid, $userid=0, $previewonly=false) {
+    public function testable_register_in_agrp($agrpid, $userid = 0, $previewonly = false) {
         return parent::register_in_agrp($agrpid, $userid, $previewonly);
     }
 
@@ -93,7 +93,7 @@ class grouptool extends mod_grouptool {
      * @throws registration
      * @throws required_capability_exception
      */
-    public function testable_unregister_from_agrp($agrpid, $userid=0, $previewonly=false) {
+    public function testable_unregister_from_agrp($agrpid, $userid = 0, $previewonly = false) {
         return parent::unregister_from_agrp($agrpid, $userid, $previewonly);
     }
 
@@ -126,7 +126,7 @@ class grouptool extends mod_grouptool {
      * @throws regpresent
      * @throws required_capability_exception
      */
-    public function testable_can_change_group($agrpid, $userid=0, $message=null, $oldagrpid = null) {
+    public function testable_can_change_group($agrpid, $userid = 0, $message = null, $oldagrpid = null) {
         return parent::can_change_group($agrpid, $userid, $message, $oldagrpid);
     }
 

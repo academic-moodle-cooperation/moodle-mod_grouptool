@@ -33,7 +33,6 @@ namespace mod_grouptool\output;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sortlist_controller implements \renderable {
-
     /** @var \mod_grouptool\output\sortlist Sortlist instance */
     public $sortlist = null;
 
@@ -52,7 +51,6 @@ class sortlist_controller implements \renderable {
         $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);
 
         if (!empty($gobutton) && ($classes != null) && (count($classes) != 0) && !empty($action)) {
-
             $groups = [];
             foreach ($classes as $groupingid) {
                 $groups = array_merge($groups, groups_get_all_groups($this->sortlist->cm->course, 0, $groupingid));

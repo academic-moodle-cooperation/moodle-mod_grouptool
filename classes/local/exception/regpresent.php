@@ -33,7 +33,6 @@ namespace mod_grouptool\local\exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class regpresent extends registration {
-
     /**
      * Constructor
      *
@@ -46,7 +45,7 @@ class regpresent extends registration {
             $text = get_string('already_registered', 'grouptool');
         }
         if ($a === null) {
-            $a = new \stdClass;
+            $a = new \stdClass();
             $a->username = '';
             $a->groupname = '';
         }

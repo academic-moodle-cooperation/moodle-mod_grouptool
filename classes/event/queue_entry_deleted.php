@@ -106,20 +106,20 @@ class queue_entry_deleted extends \core\event\base {
      */
     public function get_description() {
         if (!empty($this->data['other']['reason'])) {
-            $reason = ' due to '.$this->data['other']['reason'];
+            $reason = ' due to ' . $this->data['other']['reason'];
         } else {
             $reason = '';
         }
 
         if (!empty($this->data['other']['source'])) {
-            $source = ' by '.$this->data['other']['source'];
+            $source = ' by ' . $this->data['other']['source'];
         } else {
             $source = '';
         }
 
-        return "The queue entry for the user with id '".$this->data['other']['userid'].
-               "' in agrp with id '".$this->data['other']['agrpid']."'".
-               " in ".$this->objecttable." with course module id '$this->contextinstanceid' was deleted".$source.$reason;
+        return "The queue entry for the user with id '" . $this->data['other']['userid'] .
+               "' in agrp with id '" . $this->data['other']['agrpid'] . "'" .
+               " in " . $this->objecttable . " with course module id '$this->contextinstanceid' was deleted" . $source . $reason;
     }
 
     /**

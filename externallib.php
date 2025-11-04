@@ -38,7 +38,6 @@ require_once($CFG->dirroot . "/mod/grouptool/locallib.php");
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_grouptool_external extends external_api {
-
     /**
      * Delete a single group
      *
@@ -139,7 +138,7 @@ class mod_grouptool_external extends external_api {
             $result->error = get_string('groupnameexists', 'group', $params['name']);
             // If the group name is too long.
         } else if (!empty($params) && strlen($params['name']) >= 255) {
-            $result->error = get_string('groupnametoolong', 'grouptool', $params['name']);
+            $result->error = get_string('groupnamelength', 'grouptool', $params['name']);
         } else {
             $group = new stdClass();
             $group->id = $params['groupid'];
@@ -254,13 +253,19 @@ class mod_grouptool_external extends external_api {
         } else if (!empty($regs) && $params['size'] < $regs) {
             $result->error = get_string('toomanyregs', 'grouptool');
         } else {
-            $DB->set_field('grouptool_agrps', 'grpsize', clean_param($params['size'], PARAM_INT),
-                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
+            $DB->set_field(
+                'grouptool_agrps',
+                'grpsize',
+                clean_param($params['size'], PARAM_INT),
+                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]
+            );
             $DB->set_field('grouptool', 'use_size', 1, ['id' => $cm->instance]);
-            if ($params['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
+            if (
+                $params['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
                     'groupid' => $params['groupid'],
                     'grouptoolid' => $cm->instance,
-                ])) {
+                ])
+            ) {
                 // Error happened...
                 $result->error = get_string('couldnt_resize_group', 'grouptool', $params['size']);
             } else {
@@ -333,8 +338,13 @@ class mod_grouptool_external extends external_api {
         require_login($course, true, $cm);
 
         $DB->set_field('grouptool_agrps', 'active', 1, ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
-        if ($DB->get_field('grouptool_agrps', 'active',
-                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 0) {
+        if (
+            $DB->get_field(
+                'grouptool_agrps',
+                'active',
+                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]
+            ) == 0
+        ) {
             $a = new stdClass();
             $a->groupid = $params['groupid'];
             $a->grouptoolid = $cm->instance;
@@ -403,8 +413,13 @@ class mod_grouptool_external extends external_api {
         require_login($course, true, $cm);
 
         $DB->set_field('grouptool_agrps', 'active', 0, ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]);
-        if ($DB->get_field('grouptool_agrps', 'active',
-                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]) == 1) {
+        if (
+            $DB->get_field(
+                'grouptool_agrps',
+                'active',
+                ['groupid' => $params['groupid'], 'grouptoolid' => $cm->instance]
+            ) == 1
+        ) {
             $a = new stdClass();
             $a->groupid = $params['groupid'];
             $a->grouptoolid = $cm->instance;
@@ -488,11 +503,13 @@ class mod_grouptool_external extends external_api {
                     'groupid' => $cur['groupid'],
                     'grouptoolid' => $cm->instance,
                 ]);
-                if (!$DB->record_exists('grouptool_agrps', [
+                if (
+                    !$DB->record_exists('grouptool_agrps', [
                     'groupid' => $cur['groupid'],
                     'grouptoolid' => $cm->instance,
                     'sort_order' => $cur['order'],
-                ])) {
+                    ])
+                ) {
                     $failed[] = "groupid " . $cur['groupid'];
                 }
             }
