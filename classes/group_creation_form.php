@@ -370,7 +370,7 @@ class group_creation_form extends \moodleform {
         ) {
             $errors['groupingname'] = get_string('must_specify_groupingname', 'grouptool');
         }
-        if(!empty($data['namingscheme']) && strlen($data['namingscheme']) > 255) {
+        if (!empty($data['namingscheme']) && strlen($data['namingscheme']) > 255) {
             $errors['namingscheme'] = get_string('groupnamelength', 'grouptool');
         }
         if (
