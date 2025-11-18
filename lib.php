@@ -603,7 +603,6 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
 
     $context = context_module::instance($cm->id);
 
-
     $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
     $viewreggv = has_capability('mod/grouptool:view_regs_group_view', $context);
     $managegrps = has_capability('moodle/course:managegroups', $context);
