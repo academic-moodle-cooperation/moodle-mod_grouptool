@@ -84,9 +84,7 @@ $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
 // Build site according to user capability.
-$creategrps = has_capability('mod/grouptool:administrate_groups', $context);
-$creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
-$admingrps = has_capability('mod/grouptool:administrate_groups', $context);
+$viewreggv = has_capability('mod/grouptool:view_regs_group_view', $context);
 
 
 if (!isset($SESSION->mod_grouptool)) {
@@ -110,7 +108,7 @@ $header = $OUTPUT->header();
 echo $header;
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
-if (!($creategrps || $creategrpgs || $admingrps)) {
+if (!($viewreggv)) {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
     $tab = 'noaccess';
 }
