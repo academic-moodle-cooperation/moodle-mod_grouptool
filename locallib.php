@@ -7321,16 +7321,22 @@ class mod_grouptool {
                     html_writer::empty_tag('br'), 'generalbox centered');
             }
             $url = new moodle_url($PAGE->url, ['tab' => 'import']);
-            if (has_capability('mod/grouptool:administrate_deregistration', $this->context)) {
+            $button = null;
+            if (has_capability('mod/grouptool:administrate_deregistration', $this->context) && has_capability('mod/grouptool:administrate_registration', $this->context)) {
                 $button = new single_button($url, get_string('manage_members', 'grouptool'));
-            } else {
+            } else if (has_capability('mod/grouptool:administrate_registration', $this->context)) {
                 $button = new single_button($url, get_string('import'));
+            } else if (has_capability('mod/grouptool:administrate_deregistration', $this->context)) {
+                $url = new moodle_url($PAGE->url, ['tab' => 'unregister']);
+                $button = new single_button($url, get_string('unregister', 'grouptool'));
             }
 
             $queues = "";
-            echo $OUTPUT->box(html_writer::empty_tag('br') .
-                $OUTPUT->render($button) . $queues .
-                html_writer::empty_tag('br'), 'generalbox');
+            if ($button) {
+                echo $OUTPUT->box(html_writer::empty_tag('br') .
+                    $OUTPUT->render($button) . $queues .
+                    html_writer::empty_tag('br'), 'generalbox');
+            }
             echo "<br />";
             // If we don't only get the data, the output happens directly per group!
             $this->group_overview_table($groupingid, $groupid, false, $includeinactive);
