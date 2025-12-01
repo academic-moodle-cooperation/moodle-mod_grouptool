@@ -457,16 +457,25 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         }
 
         [$agrpssql, $agrpparams] = $DB->get_in_or_equal($agrpids, SQL_PARAMS_NAMED);
+        // First delete all registrations and queues in which the user is the active part.
         $DB->delete_records_select(
             'grouptool_registered',
-            "(userid = :userid OR modified_by = :modifierid) AND agrpid " . $agrpssql,
-            $agrpparams + ['userid' => $user->id, 'modifierid' => $user->id]
+            "userid = :userid AND agrpid " . $agrpssql,
+            $agrpparams + ['userid' => $user->id]
         );
         $DB->delete_records_select(
             'grouptool_queued',
             "userid = :userid AND agrpid " . $agrpssql,
             $agrpparams + ['userid' => $user->id]
         );
+
+        // Then set all registrations modified by the user to be modified by userid = userid (system).
+        $sql = "UPDATE {grouptool_registered}
+               SET modified_by = userid
+             WHERE modified_by = :modifierid
+               AND agrpid " . $agrpssql;
+
+        $DB->execute($sql, $agrpparams + ['modifierid' => $user->id]);
 
         $grouptools = $DB->get_records_list('grouptool', 'id', $grouptoolids);
         foreach ($grouptools as $cur) {
@@ -477,5 +486,6 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 $grouptool->fill_from_queue($agrpid);
             }
         }
+
     }
 }
