@@ -448,6 +448,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
             return;
         }
 
+        // Get agrp IDs
         [$select, $params] = $DB->get_in_or_equal($grouptoolids);
         $agrpids = $DB->get_fieldset_select('grouptool_agrps', 'id', 'grouptoolid ' . $select, $params);
 
