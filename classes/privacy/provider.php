@@ -486,6 +486,5 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                 $grouptool->fill_from_queue($agrpid);
             }
         }
-
     }
 }
