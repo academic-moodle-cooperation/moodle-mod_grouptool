@@ -99,9 +99,9 @@ $completion->set_module_viewed($cm);
 $inactive = [];
 $tabs = [];
 $row = [];
-$creategrps = has_capability('mod/grouptool:administrate_groups', $context);
-$creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
+$adminreg = has_capability('mod/grouptool:administrate_registration', $context);
+$viewreg = has_capability('mod/grouptool:view_regs_group_view', $context);
 
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
@@ -113,35 +113,20 @@ $cm = $modinfo->get_cm($cm->id);
 if (empty($cm->uservisible)) {
     $SESSION->mod_grouptool->currenttab = 'conditions_prevent_access';
     $tab = 'conditions_prevent_access';
-    // TODO USE RIGHT CAPABILITIES HERE.
-} else if ($creategrps || $creategrpgs || $admingrps) {
+} else if ($admingrps || $adminreg || $viewreg) {
     $tab = optional_param('tab', null, PARAM_ALPHAEXT);
     if ($tab) {
         $SESSION->mod_grouptool->currenttab = $tab;
     } else {
         $SESSION->mod_grouptool->currenttab = 'default';
     }
-
-    if (
-        !isset($SESSION->mod_grouptool->currenttab)
-        || ($SESSION->mod_grouptool->currenttab == 'noaccess')
-        || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')
-    ) {
+    if (!isset($SESSION->mod_grouptool->currenttab) || ($SESSION->mod_grouptool->currenttab == 'noaccess') || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
-        if (has_capability('mod/grouptool:administrate_groups', $context)) {
-            $SESSION->mod_grouptool->currenttab = 'group_admin';
-        } else if (
-            has_capability('mod/grouptool:administrate_registration', $context)
-            || has_capability('mod/grouptool:register', $context)
-        ) {
+         if (has_capability('mod/grouptool:register', $context) || has_capability('mod/grouptool:preview', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
-} else if (
-    has_capability('mod/grouptool:administrate_registration', $context)
-    || has_capability('mod/grouptool:register', $context)
-    || has_capability('mod/grouptool:preview', $context)
-) {
+} else if (has_capability('mod/grouptool:register', $context) || has_capability('mod/grouptool:preview', $context)) {
     $SESSION->mod_grouptool->currenttab = 'selfregistration';
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
