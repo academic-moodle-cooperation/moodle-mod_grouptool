@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool;
 
 use context_course;
@@ -43,10 +44,10 @@ class pdf extends \pdf {
     /** int NORMLINEHEIGHT = 12 */
     const NORMLINEHEIGHT = 12;
 
-    /** @var string[] $header1 defines what's in the upper row of page-header **/
+    /** @var string[] $header1 defines what's in the upper row of page-header * */
     protected $header1 = null;
 
-    /** @var string[] $header2 defines what's in the lower row of page-header **/
+    /** @var string[] $header2 defines what's in the lower row of page-header * */
     protected $header2 = null;
 
     /**
@@ -76,7 +77,7 @@ class pdf extends \pdf {
     /** @var int|null used to calculate heights of text-blocks */
     protected $bigheight = null;
 
-    /** @var array Holds all instance specific useridentityfields*/
+    /** @var array Holds all instance specific useridentityfields */
     protected $useridentityfields = null;
 
     /**
@@ -141,7 +142,7 @@ class pdf extends \pdf {
 
         // Set document information!
         $this->SetCreator(format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]) . ' | ' .
-                get_string('pluginname', 'grouptool'));
+            get_string('pluginname', 'grouptool'));
         $this->SetAuthor(fullname($USER));
 
         // Set header/footer!
@@ -162,13 +163,13 @@ class pdf extends \pdf {
         }
 
         // Set default monospaced font!
-        $this->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/'freeserif');
+        $this->SetDefaultMonospacedFont(/*PDF_FONT_MONOSPACED*/ 'freeserif');
 
         // Set auto page breaks!
-        $this->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/10);
+        $this->SetAutoPageBreak(true, /*PDF_MARGIN_BOTTOM*/ 10);
 
         // Set image scale factor.
-        $this->setImageScale(/*PDF_IMAGE_SCALE_RATIO*/1);
+        $this->setImageScale(/*PDF_IMAGE_SCALE_RATIO*/ 1);
 
         /*
          * ---------------------------------------------------------
@@ -978,8 +979,10 @@ class pdf extends \pdf {
 
         if (isset($row['status'])) {
             $rowstatus = $row['status'];
+        } else if (isset($row['rank'])) {
+            $rowstatus = $row['rank'];
         } else {
-            $rowstatus = "?";
+            $rowstatus = $row['queues'];
         }
         $this->MultiCell(
             0.1 * $writewidth,
@@ -1125,11 +1128,11 @@ class pdf extends \pdf {
         }
         // Todo: Consider caching result of this calculation as it is the same for each row in one export.
         $basicwidths = [
-                'fullname' => 0.225,
-                'identity' => $this->calculate_identitycolumn_width(0.375, 1.5),
-                'email' => $this->calculate_identitycolumn_width(0.375, 1.5) * 1.5,
-                'registrations' => 0.225,
-                'queues' => 0.175,
+            'fullname' => 0.225,
+            'identity' => $this->calculate_identitycolumn_width(0.375, 1.5),
+            'email' => $this->calculate_identitycolumn_width(0.375, 1.5) * 1.5,
+            'registrations' => 0.225,
+            'queues' => 0.175,
         ];
         $totalwidth = array_sum($basicwidths);
         $colapsedwidth = $totalwidth;
@@ -1175,7 +1178,7 @@ class pdf extends \pdf {
             if ($key == 'email') {
                 $curwidth = $widths['email'];
             }
-            if (property_exists((object) $row, strtolower($key))) {
+            if (property_exists((object)$row, strtolower($key))) {
                 $key = strtolower($key);
             }
             if (!in_array($key, $collapsed)) {
@@ -1203,7 +1206,7 @@ class pdf extends \pdf {
         if (!in_array('registrations', $collapsed)) {
             if (!empty($row['registrations']) && is_array($row['registrations'])) {
                 $registrationsstring = (count($row['registrations']) > 1) ?
-                        implode("\n", $row['registrations']) : $row['registrations'][0];
+                    implode("\n", $row['registrations']) : $row['registrations'][0];
                 if ($getheightonly) {
                     $this->MultiCell(
                         $widths['registrations'],
