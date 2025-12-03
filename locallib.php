@@ -3798,6 +3798,14 @@ class mod_grouptool {
 
         $templatename = 'mod_grouptool/startingpage';
         $data = [
+            'administrategroups' => has_capability(
+                'mod/grouptool:administrate_groups',
+                $this->context
+            ),
+            'previewselfregistration' => has_capability(
+                'mod/grouptool:preview',
+                $this->context
+            ),
             'buttonadministratelink' => $CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_admin',
             'buttonpreviewlink' => $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $id . '&tab=selfregistration',
             'queueing' => $queuing,
