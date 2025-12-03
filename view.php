@@ -122,7 +122,7 @@ if (empty($cm->uservisible)) {
     }
     if (!isset($SESSION->mod_grouptool->currenttab) || ($SESSION->mod_grouptool->currenttab == 'noaccess') || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')) {
         // Set standard-tab according to users capabilities!
-         if (has_capability('mod/grouptool:register', $context) || has_capability('mod/grouptool:preview', $context)) {
+        if (has_capability('mod/grouptool:register', $context) || has_capability('mod/grouptool:preview', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
