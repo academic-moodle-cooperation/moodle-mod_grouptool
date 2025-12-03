@@ -167,30 +167,13 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot($PAGE->cm->modname, $grouptool);
 $event->trigger();
 /* END OF VIEW EVENT */
-
 $node = $PAGE->secondarynav->find_active_node();
 if ($node) {
     $node->make_inactive();
-
-    switch ($tab) {
-        case 'default':
-        case 'selfregistration':
-        case 'noaccess':
-        case 'condition_prevent_access':
-            $node2 = $PAGE->secondarynav->find("modulepage", null);
-            break;
-        case 'group_admin':
-        case 'group_creation':
-            $node2 = $PAGE->secondarynav->find("mod_grouptool_administration", navigation_node::TYPE_SETTING);
-            break;
-        case 'overview':
-        case 'import':
-        case 'unregister_user':
-            $node2 = $PAGE->secondarynav->find("mod_grouptool_registration", navigation_node::TYPE_SETTING);
-            break;
-        default:
-            $node2 = false;
-    }
+    $node2 = match ($tab) {
+        'default', 'selfregistration', 'noaccess', 'condition_prevent_access' => $PAGE->secondarynav->find("modulepage", null),
+        default => false,
+    };
     if ($node2) {
         $node2->make_active();
     }
@@ -206,24 +189,9 @@ switch ($tab) {
     case 'default':
         $instance->view_starting_page();
         break;
-    case 'group_admin':
-        $instance->view_administration();
-        break;
-    case 'overview':
-        $instance->view_overview();
-        break;
-    case 'group_creation':
-        $instance->view_creation();
-        break;
     case 'selfregistration':
         // Send cached tab output so selfregistration can add the header once updated.
         $instance->view_selfregistration($outputcache);
-        break;
-    case 'import':
-        $instance->view_import();
-        break;
-    case 'unregister':
-        $instance->view_unregister();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
