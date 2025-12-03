@@ -37,6 +37,8 @@
 
     Example context (json):
     {
+    "administrategroups": true,
+    "previewselfregistration": true,
     "usesize": true,
     "courseediturl": "https://example.com/course/modedit.php?update=5218&return=1",
     "buttonadministratelink": "https://example.com/mod/grouptool/admin.php",
@@ -53,8 +55,8 @@
 <div class="mod_grouptool_starting_page conatiner">
     <div class="buttons row align-items-start">
         <div >
-            <a href="{{buttonadministratelink}}" class="btn btn-secondary" >{{#str}}group_administration, mod_grouptool{{/str}}</a>
-            <a href="{{buttonpreviewlink}}" class="btn btn-secondary" >{{#str}}selfregistration, mod_grouptool{{/str}}</a>
+            {{#administrategroups}}<a href="{{buttonadministratelink}}" class="btn btn-secondary" >{{#str}}group_administration, mod_grouptool{{/str}}</a> {{/administrategroups}}
+            {{#previewselfregistration}}<a href="{{buttonpreviewlink}}" class="btn btn-secondary" >{{#str}}selfregistration, mod_grouptool{{/str}}</a> {{/previewselfregistration}}
         </div>
     </div>
     <br>
