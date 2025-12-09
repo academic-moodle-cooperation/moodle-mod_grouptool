@@ -59,14 +59,6 @@ $capabilities = [
         ],
     ],
 
-    'mod/grouptool:view_own_registration' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'legacy' => [
-            'student' => CAP_ALLOW,
-        ],
-    ],
-
     'mod/grouptool:export' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -140,6 +132,9 @@ $deprecatedcapabilities = [
     ],
     'mod/grouptool:view_description' => [
         'message' => 'This was deprecated in Moodle 5.0! ',
+    ],
+    'mod/grouptool:view_own_registration' => [
+        'message' => 'This was deprecated in Moodle 5.1! ',
     ],
     'mod/grouptool:create_groups' => [
         'replacement' => 'mod/grouptool:administrate_groups',

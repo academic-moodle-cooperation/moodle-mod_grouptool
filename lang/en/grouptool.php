@@ -281,7 +281,6 @@ $string['grouptool:preview'] = 'Show preview of registration view';
 $string['grouptool:register'] = 'Register self in an active group using grouptool';
 $string['grouptool:view'] = 'View Grouptool';
 $string['grouptool:view_groups'] = 'View active groups';
-$string['grouptool:view_own_registration'] = 'View own registration(s).';
 $string['grouptool:view_regs_course_view'] = 'View a userlist containing who\'s registered/queued in which active group using grouptool.';
 $string['grouptool:view_regs_group_view'] = 'View a grouped list containing who\'s registered/queued in which active group using grouptool.';
 $string['grouptoolfieldset'] = 'Instance settings';
@@ -621,3 +620,6 @@ $string['name_scheme_tags'] = '<span class="tag firstname">[firstname]</span><sp
 $string['grouptool:register_students'] = 'Register students in an active group using grouptool. (Also used for resolving queues)';
 $string['grouptool:unregister_students'] = 'Deregister students from groups using grouptool.';
 $string['grouptool:view_description'] = 'View grouptools description';
+// Deprecated since version 5.1!
+$string['grouptool:view_own_registration'] = 'View own registration(s).';
+
