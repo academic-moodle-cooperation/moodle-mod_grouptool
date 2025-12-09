@@ -4497,7 +4497,11 @@ class mod_grouptool {
             $action = optional_param('action', 'reg', PARAM_ALPHA);
             $confirmmessage = '';
             if ($action == 'unreg') {
-                require_capability('mod/grouptool:register', $this->context);
+                if (has_capability('mod/grouptool:preview', $this->context)){
+                    require_capability('mod/grouptool:preview', $this->context);
+                } else {
+                    require_capability('mod/grouptool:register', $this->context);
+                }
                 $agrpid = required_param('group', PARAM_INT);
                 // Unregister user and get feedback!
                 try {
@@ -4507,7 +4511,11 @@ class mod_grouptool {
                     $confirmmessage = $e->getMessage();
                 }
             } else if ($action == 'reg') {
-                require_capability('mod/grouptool:register', $this->context);
+                if (has_capability('mod/grouptool:preview', $this->context)){
+                    require_capability('mod/grouptool:preview', $this->context);
+                } else {
+                    require_capability('mod/grouptool:register', $this->context);
+                } ;
                 $agrpid = required_param('group', PARAM_INT);
                 // Register user and get feedback!
                 try {
@@ -4557,7 +4565,12 @@ class mod_grouptool {
                 require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $this->resolve_queues(true); // This is try only!
             } else if ($action == 'unreg') {
-                require_capability('mod/grouptool:register', $this->context);
+
+                if (has_capability('mod/grouptool:preview', $this->context)){
+                    require_capability('mod/grouptool:preview', $this->context);
+                } else {
+                    require_capability('mod/grouptool:register', $this->context);
+                };
                 $attr['group'] = $agrpid;
                 // This is try only!
                 try {
@@ -4567,7 +4580,11 @@ class mod_grouptool {
                     $confirmmessage = $e->getMessage();
                 }
             } else {
-                require_capability('mod/grouptool:register', $this->context);
+                if (has_capability('mod/grouptool:preview', $this->context)){
+                    require_capability('mod/grouptool:preview', $this->context);
+                } else {
+                    require_capability('mod/grouptool:register', $this->context);
+                };
                 $action = 'reg';
                 $attr['group'] = $agrpid;
                 // This is try only!
@@ -4851,7 +4868,7 @@ class mod_grouptool {
                     && $this->get_rank_in_queue($group->registered, $userid) != false
                 ) {
                     // User is already registered --> unreg button!
-                    if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
+                    if ($this->grouptool->allow_unreg && (has_capability('mod/grouptool:register', $this->context) || has_capability('mod/grouptool:preview', $this->context))) {
                         $label = get_string('unreg', 'grouptool');
                         $buttonattr = [
                             'type' => 'submit',
@@ -4877,7 +4894,7 @@ class mod_grouptool {
                     && $this->get_rank_in_queue($group->queued, $userid) != false
                 ) {
                     // We're sorry, but user's already queued in this group!
-                    if ($this->grouptool->allow_unreg && has_capability('mod/grouptool:register', $this->context)) {
+                    if ($this->grouptool->allow_unreg && (has_capability('mod/grouptool:register', $this->context) || has_capability('mod/grouptool:preview', $this->context))) {
                         $label = get_string('unqueue', 'grouptool');
                         $buttonattr = [
                             'type' => 'submit',
@@ -4937,7 +4954,7 @@ class mod_grouptool {
                             // Can be registered?
                             $this->check_can_be_registered($group, $userregs, $userqueues, $usermarks);
 
-                            if (has_capability('mod/grouptool:register', $this->context)) {
+                            if ( (has_capability('mod/grouptool:register', $this->context) || has_capability('mod/grouptool:preview', $this->context))) {
                                 // Register button!
                                 $label = get_string('register', 'grouptool');
                                 $buttonattr = [
@@ -4952,7 +4969,7 @@ class mod_grouptool {
                             if (!$this->grouptool->use_queue) {
                                 throw new \mod_grouptool\local\exception\exceedgroupsize();
                             } else {
-                                if (has_capability('mod/grouptool:register', $this->context)) {
+                                if ( (has_capability('mod/grouptool:register', $this->context) || has_capability('mod/grouptool:preview', $this->context))) {
                                     // There's no place left in the group, so we try to queue the user!
                                     $this->can_be_queued($group->agrpid, $USER->id, $message);
 
@@ -4971,7 +4988,7 @@ class mod_grouptool {
                             /* The user has not enough registrations, queue entries or marks,
                              * so we try to mark the user! (Exceptions get handled above!) */
                             [$queued, ] = $this->can_be_marked($group->agrpid, $USER->id, $message);
-                            if (!$queued && has_capability('mod/grouptool:register', $this->context)) {
+                            if (!$queued &&  (has_capability('mod/grouptool:register', $this->context) || has_capability('mod/grouptool:preview', $this->context))) {
                                 // Register button!
                                 $label = get_string('register', 'grouptool');
                                 $buttonattr = [
@@ -4981,7 +4998,7 @@ class mod_grouptool {
                                     'class' => 'regbutton btn btn-primary',
                                 ];
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
-                            } else if (has_capability('mod/grouptool:register', $this->context)) {
+                            } else if ( (has_capability('mod/grouptool:register', $this->context) || has_capability('mod/grouptool:preview', $this->context))) {
                                 // Queue button!
                                 $label = get_string('queue', 'grouptool');
                                 $buttonattr = [
