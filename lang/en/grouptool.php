@@ -622,4 +622,3 @@ $string['grouptool:unregister_students'] = 'Deregister students from groups usin
 $string['grouptool:view_description'] = 'View grouptools description';
 // Deprecated since version 5.1!
 $string['grouptool:view_own_registration'] = 'View own registration(s).';
-
