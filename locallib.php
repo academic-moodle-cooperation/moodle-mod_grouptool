@@ -4565,12 +4565,11 @@ class mod_grouptool {
                 require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $this->resolve_queues(true); // This is try only!
             } else if ($action == 'unreg') {
-
                 if (has_capability('mod/grouptool:preview', $this->context)){
                     require_capability('mod/grouptool:preview', $this->context);
                 } else {
                     require_capability('mod/grouptool:register', $this->context);
-                };
+                }
                 $attr['group'] = $agrpid;
                 // This is try only!
                 try {
@@ -4584,7 +4583,7 @@ class mod_grouptool {
                     require_capability('mod/grouptool:preview', $this->context);
                 } else {
                     require_capability('mod/grouptool:register', $this->context);
-                };
+                }
                 $action = 'reg';
                 $attr['group'] = $agrpid;
                 // This is try only!
