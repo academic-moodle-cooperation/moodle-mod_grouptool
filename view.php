@@ -99,9 +99,9 @@ $completion->set_module_viewed($cm);
 $inactive = [];
 $tabs = [];
 $row = [];
-$creategrps = has_capability('mod/grouptool:administrate_groups', $context);
-$creategrpgs = has_capability('mod/grouptool:administrate_groups', $context);
 $admingrps = has_capability('mod/grouptool:administrate_groups', $context);
+$adminreg = has_capability('mod/grouptool:administrate_registration', $context);
+$viewreg = has_capability('mod/grouptool:view_regs_group_view', $context);
 
 if (!isset($SESSION->mod_grouptool)) {
     $SESSION->mod_grouptool = new stdClass();
@@ -113,35 +113,24 @@ $cm = $modinfo->get_cm($cm->id);
 if (empty($cm->uservisible)) {
     $SESSION->mod_grouptool->currenttab = 'conditions_prevent_access';
     $tab = 'conditions_prevent_access';
-    // TODO USE RIGHT CAPABILITIES HERE.
-} else if ($creategrps || $creategrpgs || $admingrps) {
+} else if ($admingrps || $adminreg || $viewreg) {
     $tab = optional_param('tab', null, PARAM_ALPHAEXT);
     if ($tab) {
         $SESSION->mod_grouptool->currenttab = $tab;
     } else {
         $SESSION->mod_grouptool->currenttab = 'default';
     }
-
     if (
         !isset($SESSION->mod_grouptool->currenttab)
         || ($SESSION->mod_grouptool->currenttab == 'noaccess')
         || ($SESSION->mod_grouptool->currenttab == 'conditions_prevent_access')
     ) {
         // Set standard-tab according to users capabilities!
-        if (has_capability('mod/grouptool:administrate_groups', $context)) {
-            $SESSION->mod_grouptool->currenttab = 'group_admin';
-        } else if (
-            has_capability('mod/grouptool:administrate_registration', $context)
-            || has_capability('mod/grouptool:register', $context)
-        ) {
+        if (has_capability('mod/grouptool:register', $context) || has_capability('mod/grouptool:preview', $context)) {
             $SESSION->mod_grouptool->currenttab = 'selfregistration';
         }
     }
-} else if (
-    has_capability('mod/grouptool:administrate_registration', $context)
-    || has_capability('mod/grouptool:register', $context)
-    || has_capability('mod/grouptool:preview', $context)
-) {
+} else if (has_capability('mod/grouptool:register', $context) || has_capability('mod/grouptool:preview', $context)) {
     $SESSION->mod_grouptool->currenttab = 'selfregistration';
 } else {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
@@ -167,30 +156,13 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot($PAGE->cm->modname, $grouptool);
 $event->trigger();
 /* END OF VIEW EVENT */
-
 $node = $PAGE->secondarynav->find_active_node();
 if ($node) {
     $node->make_inactive();
-
-    switch ($tab) {
-        case 'default':
-        case 'selfregistration':
-        case 'noaccess':
-        case 'condition_prevent_access':
-            $node2 = $PAGE->secondarynav->find("modulepage", null);
-            break;
-        case 'group_admin':
-        case 'group_creation':
-            $node2 = $PAGE->secondarynav->find("mod_grouptool_administration", navigation_node::TYPE_SETTING);
-            break;
-        case 'overview':
-        case 'import':
-        case 'unregister_user':
-            $node2 = $PAGE->secondarynav->find("mod_grouptool_registration", navigation_node::TYPE_SETTING);
-            break;
-        default:
-            $node2 = false;
-    }
+    $node2 = match ($tab) {
+        'default', 'selfregistration', 'noaccess', 'condition_prevent_access' => $PAGE->secondarynav->find("modulepage", null),
+        default => false,
+    };
     if ($node2) {
         $node2->make_active();
     }
@@ -206,24 +178,9 @@ switch ($tab) {
     case 'default':
         $instance->view_starting_page();
         break;
-    case 'group_admin':
-        $instance->view_administration();
-        break;
-    case 'overview':
-        $instance->view_overview();
-        break;
-    case 'group_creation':
-        $instance->view_creation();
-        break;
     case 'selfregistration':
         // Send cached tab output so selfregistration can add the header once updated.
         $instance->view_selfregistration($outputcache);
-        break;
-    case 'import':
-        $instance->view_import();
-        break;
-    case 'unregister':
-        $instance->view_unregister();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
