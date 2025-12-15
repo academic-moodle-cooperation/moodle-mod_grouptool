@@ -297,7 +297,6 @@ class group_creation_form extends \moodleform {
                 $mform->addHelpButton('selectfromgroup', 'selectfromgroup', 'grouptool');
                 $mform->hideIf('selectfromgroup', 'mode', 'eq', GROUPTOOL_FROMTO_GROUPS);
                 $mform->hideIf('selectfromgroup', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
-                $mform->hideIf('selectfromgroup', 'allocateby', 'eq', 'random');
             } else {
                 $mform->addElement('hidden', 'selectfromgroup');
                 $mform->setType('selectfromgroup', PARAM_INT);
