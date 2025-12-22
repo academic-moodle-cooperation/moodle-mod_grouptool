@@ -135,9 +135,7 @@ class sortlist implements \renderable {
                     SELECT MAX(grp.id) AS groupid, MAX(agrp.id) AS id,
                            MAX(agrp.grouptoolid) AS grouptoolid,  MAX(grp.name) AS name,
                            MAX(agrp.grpsize) AS size, MAX(agrp.sort_order) AS sort_order,
-                           MAX(agrp.active) AS status 
-                      FROM {groups} grp 
-                 LEFT JOIN {grouptool_agrps} agrp
+                           MAX(agrp.active) AS status FROM {groups} grp LEFT JOIN {grouptool_agrps} agrp
                            ON agrp.groupid = grp.id AND agrp.grouptoolid = ?" . $grouping . "
                      WHERE grp.id " . $grpssql . $activefilter . $groupingwhere . "
                   GROUP BY grp.id

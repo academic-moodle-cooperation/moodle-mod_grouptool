@@ -50,6 +50,8 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
      *
      * 1 Assertions
      *
+     * @covers \mod_grouptool\grouptool::get_name
+     *
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
@@ -63,6 +65,8 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
      * Tests get_active_groups method in locallib
      *
      * 2 Assertions
+     *
+     * @covers \mod_grouptool\grouptool::get_active_groups
      *
      * @throws coding_exception
      * @throws dml_exception
@@ -104,7 +108,6 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
     public function test_create_one_person_groups_creates_groups_and_memberships(): void {
         global $DB;
 
-        // base::setUp() already did resetAfterTest(true) and setAdminUser().
         $grouptool = $this->create_instance();
 
         // Use a small subset to keep the test fast and deterministic.
@@ -123,11 +126,11 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $result = $method->invoke(
             $grouptool,
             $users,
-            '[idnumber]', // namescheme
-            0,            // grouping = none
-            null,         // groupingname
-            false,        // previewonly
-            0             // enablegroupmessaging
+            '[idnumber]',
+            0,
+            null,
+            false,
+            0
         );
 
         // Assert return format and success.
@@ -151,8 +154,6 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
             [$grouptool->get_grouptool()->id]
         );
 
-        // base::create_instance() already activates/creates agrps for its pre-created groups,
-        // so there may already be existing agrps. We want only the *new* ones:
         // Filter by groups that did not exist before.
         $beforegroupids = array_keys($beforegroups ?? []);
         $newgroupids = array_values(array_diff($createdgroupids, $beforegroupids));
@@ -197,14 +198,13 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
      * @throws \moodle_exception
      */
     public function test_groups_parse_name_replacements(): void {
-        // base::setUp() already created course/users and set admin user.
         $grouptool = $this->create_instance();
 
         // Access private method via reflection.
         $ref = new \ReflectionClass($grouptool);
         $method = $ref->getMethod('groups_parse_name');
 
-        // --- 1) Single member replaces tags with full values (or "no<tag>#") ---
+        // Single member replaces tags with full values (or "no<tag>#") ---.
         $u = (object)[
             'firstname' => 'John',
             'lastname'  => 'Doe',
@@ -216,40 +216,37 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $parsed = $method->invoke($grouptool, $scheme, 0, $u, 0);
         $this->assertSame('G-John-Doe-ID-42-jdoe', $parsed);
 
-        // --- 2) No members: tags are removed (replaced with empty strings) ---
+        // No members: tags are removed (replaced with empty strings) ---.
         $scheme3 = 'X[firstname]Y[lastname]Z';
         $parsed3 = $method->invoke($grouptool, $scheme3, 0, null, 0);
         $this->assertSame('XYZ', $parsed3);
 
-        // --- 3) Array members: tag values become concatenated 3-char chunks with '-' ---
+        // Array members: tag values become concatenated 3-char chunks with '-' ---.
         $m1 = (object)['firstname' => 'Michael', 'lastname' => 'Miller', 'idnumber' => 'ABCDEF', 'username' => 'michael'];
-        $m2 = (object)['firstname' => 'Sarah',   'lastname' => 'Smith',  'idnumber' => 'XYZ',    'username' => 'sarah'];
+        $m2 = (object)['firstname' => 'Sarah', 'lastname' => 'Smith', 'idnumber' => 'XYZ', 'username' => 'sarah'];
         $scheme4 = '[firstname]-[lastname]-[idnumber]-[username]';
         $parsed4 = $method->invoke($grouptool, $scheme4, 0, [$m1, $m2], 0);
 
-        // firstname: Mic-Sar, lastname: Mil-Smi, idnumber: ABC-XYZ, username: mic-sar (first 3 chars)
         $this->assertSame('Mic-Sar-Mil-Smi-ABC-XYZ-mic-sar', $parsed4);
 
-        // --- 4) '@' letter conversion (simple A,B,C...) ---
-        // groupnumber 0 -> A, 1 -> B, 2 -> C.
+        // ... '@' letter conversion (simple A,B,C...) ---.
         $scheme5 = 'G@';
         $this->assertSame('GA', $method->invoke($grouptool, $scheme5, 0, null, 0));
         $this->assertSame('GB', $method->invoke($grouptool, $scheme5, 1, null, 0));
         $this->assertSame('GC', $method->invoke($grouptool, $scheme5, 2, null, 0));
 
-        // --- 5) '#' numeric replacement (groupnumber + 1), with and without padding ---
+        // ... '#' numeric replacement (groupnumber + 1), with and without padding ---.
         $scheme6 = 'G#';
         $this->assertSame('G1', $method->invoke($grouptool, $scheme6, 0, null, 0));
         $this->assertSame('G2', $method->invoke($grouptool, $scheme6, 1, null, 0));
 
         $scheme7 = 'G#';
-        // digits=3 => 001, 002, ...
         $this->assertSame('G001', $method->invoke($grouptool, $scheme7, 0, null, 3));
         $this->assertSame('G010', $method->invoke($grouptool, $scheme7, 9, null, 3));
 
-        // --- 6) Combined '@' + '#' + tags ---
+        // Combined '@' + '#' + tags ---.
         $scheme8 = 'Team-@-#-[username]';
-        $parsed8 = $method->invoke($grouptool, $scheme8, 4, $u, 2); // groupnumber=4 => 'E', # => 05
+        $parsed8 = $method->invoke($grouptool, $scheme8, 4, $u, 2);
         $this->assertSame('Team-E-05-jdoe', $parsed8);
     }
     /**
@@ -265,7 +262,6 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
     public function test_add_missing_agrps_adds_missing_and_sets_inactive(): void {
         global $DB;
 
-        // base::setUp() already resetAfterTest(true) + created course, groups, users and set admin.
         $grouptool = $this->create_instance();
 
         // Sanity: ensure the course has groups from base::setUp().
@@ -274,14 +270,21 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $coursegroupids = array_map('intval', array_keys($coursegroups));
 
         // Ensure there are some missing agrps by deleting agrps for two existing course groups.
-        $groupids_to_remove = array_slice($coursegroupids, 0, 2);
-        $this->assertCount(2, $groupids_to_remove);
+        $groupidstoremove = array_slice($coursegroupids, 0, 2);
+        $this->assertCount(2, $groupidstoremove);
 
         // Confirm agrps exist first (create_instance() sets them active for its created records).
-        foreach ($groupids_to_remove as $gid) {
+        foreach ($groupidstoremove as $gid) {
             // If the test data doesn't have agrps for a given group, pick a different one.
             // But in typical grouptool setup, there should be an agrp for each initial group.
-            if (!$DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->get_grouptool()->id, 'groupid' => $gid])) {
+            if (
+                !$DB->record_exists(
+                    'grouptool_agrps',
+                    [
+                        'grouptoolid' => $grouptool->get_grouptool()->id,
+                        'groupid' => $gid]
+                )
+            ) {
                 // Create it so we can remove it and test re-adding.
                 // We do it directly to avoid depending on other methods.
                 $DB->insert_record('grouptool_agrps', (object)[
@@ -294,9 +297,14 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         }
 
         // Remove them to create the "missing" situation.
-        $DB->delete_records_list('grouptool_agrps', 'groupid', $groupids_to_remove, ['grouptoolid' => $grouptool->get_grouptool()->id]);
+        $DB->delete_records_list(
+            'grouptool_agrps',
+            'groupid',
+            $groupidstoremove,
+            ['grouptoolid' => $grouptool->get_grouptool()->id]
+        );
 
-        foreach ($groupids_to_remove as $gid) {
+        foreach ($groupidstoremove as $gid) {
             $this->assertFalse(
                 $DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->get_grouptool()->id, 'groupid' => $gid]),
                 'Precondition failed: agrp record still exists after deletion.'
@@ -307,7 +315,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $grouptool->add_missing_agrps();
 
         // Now the missing ones must exist again, and must be inactive.
-        foreach ($groupids_to_remove as $gid) {
+        foreach ($groupidstoremove as $gid) {
             $agrp = $DB->get_record('grouptool_agrps', [
                 'grouptoolid' => $grouptool->get_grouptool()->id,
                 'groupid' => $gid,
@@ -316,9 +324,9 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
             $this->assertSame(0, (int)$agrp->active, 'Newly added agrp should be set inactive.');
         }
 
-        // Also verify that existing agrps were not unintentionally changed:
+        // Also verify that existing agrps were not unintentionally changed:.
         // Pick one group id that wasn't removed and ensure its agrp is still active (given create_instance() sets them active).
-        $untouched = array_values(array_diff($coursegroupids, $groupids_to_remove));
+        $untouched = array_values(array_diff($coursegroupids, $groupidstoremove));
         $this->assertNotEmpty($untouched);
         $untouchedgid = $untouched[0];
 
@@ -349,8 +357,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
     public function test_add_agrp_entry_inserts_and_reuses_existing(): void {
         global $DB;
 
-        $grouptool = $this->create_instance(['allow_reg' => 1]); // ensure allow_reg=true
-
+        $grouptool = $this->create_instance(['allow_reg' => 1]);
         // Create a fresh course group that definitely exists but has no agrp yet.
         $group = self::getDataGenerator()->create_group(['courseid' => $this->course->id]);
         $groupid = (int)$group->id;
@@ -364,7 +371,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $ref = new \ReflectionClass($grouptool);
         $method = $ref->getMethod('add_agrp_entry');
 
-        // --- Case 1: Insert new record.
+        // Case 1: Insert new record.
         /** @var \stdClass $newagrp */
         $newagrp = $method->invoke($grouptool, $groupid);
 
@@ -373,11 +380,11 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
 
         $record = $DB->get_record('grouptool_agrps', ['id' => $newagrp->id], '*', MUST_EXIST);
         $this->assertSame($groupid, (int)$record->groupid);
-        $this->assertSame( $grouptool->get_grouptool()->id, $record->grouptoolid);
+        $this->assertSame($grouptool->get_grouptool()->id, $record->grouptoolid);
         $this->assertSame(999999, (int)$record->sort_order);
         $this->assertSame(1, (int)$record->active);
 
-        // --- Case 2: Existing record path (should reuse same id, and force active=1 when allow_reg=1).
+        // Case 2: Existing record path (should reuse same id, and force active=1 when allow_reg=1).
         // Set active to 0 artificially to verify add_agrp_entry forces it back to 1.
         $DB->set_field('grouptool_agrps', 'active', 0, ['id' => $record->id]);
         $this->assertSame(0, (int)$DB->get_field('grouptool_agrps', 'active', ['id' => $record->id]));
@@ -386,8 +393,11 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $existing = $method->invoke($grouptool, $groupid);
 
         $this->assertSame((int)$record->id, (int)$existing->id, 'Expected existing agrp id to be reused.');
-        $this->assertSame(1, (int)$DB->get_field('grouptool_agrps', 'active', ['id' => $record->id]),
-            'Expected active to be forced to 1 when allow_reg is enabled.');
+        $this->assertSame(
+            1,
+            (int)$DB->get_field('grouptool_agrps', 'active', ['id' => $record->id]),
+            'Expected active to be forced to 1 when allow_reg is enabled.'
+        );
     }
 
     /**
@@ -410,10 +420,10 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
     private function call_create_groups_private(
         grouptool | \mod_grouptool\local\tests\grouptool $grouptool,
         \stdClass $data,
-        array     $users,
-        int       $userpergrp,
-        int       $numgrps,
-        bool      $previewonly
+        array $users,
+        int $userpergrp,
+        int $numgrps,
+        bool $previewonly
     ): array {
         $ref = new \ReflectionClass($grouptool);
         $method = $ref->getMethod('create_groups');
@@ -483,7 +493,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $users = array_slice($this->students, 0, 6);
 
         $data = (object)[
-            'allocateby' => 'no',               // We'll rely on given $users order? Actually "no" means: do not allocate users.
+            'allocateby' => 'no', // We'll rely on given $users order? Actually "no" means: do not allocate users.
             // For membership creation, allocateby must not be 'no'. Use random (seed fixed) for deterministic membership.
             'seed' => 222,
             'namingscheme' => 'GT-#',
@@ -587,8 +597,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         // Also ensure no agrp entries were left behind for newly created groups (best-effort).
         // Since groups should have been deleted, there should be no agrps referencing non-existing groups.
         $sql = "SELECT ga.id
-              FROM {grouptool_agrps} ga 
-         LEFT JOIN {groups} g ON g.id = ga.groupid
+              FROM {grouptool_agrps} ga LEFT JOIN {groups} g ON g.id = ga.groupid
              WHERE ga.grouptoolid = ? AND g.id IS NULL";
         $orphans = $DB->get_fieldset_sql($sql, [$grouptool->get_grouptool()->id]);
         $this->assertEmpty($orphans, 'Expected no orphaned agrp records after cleanup.');
@@ -618,17 +627,17 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $grouptool = $this->create_instance(['use_size' => 0, 'grpsize' => 3]);
 
         $from = 1;
-        $to = 3; // => 3 groups.
+        $to = 3;
 
         $data = (object)[
             'from' => $from,
             'to' => $to,
             'digits' => 2,
-            'namingscheme' => 'FT-#',         // FT-01, FT-02, FT-03
+            'namingscheme' => 'FT-#',
             'grouping' => 0,
             'groupingname' => '',
             'enablegroupmessaging' => 0,
-            'numberofmembers' => 5,           // different from instance grpsize, should be written to agrps and enable use_size.
+            'numberofmembers' => 5,
         ];
 
         $beforegroups = groups_get_all_groups($this->course->id);
@@ -664,7 +673,6 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
                 'groupid' => $g,
             ], '*', MUST_EXIST);
 
-            // grpsize is only set if numberofmembers is not empty AND differs from instance grpsize.
             $this->assertSame(5, (int)$agrp->grpsize);
         }
 
@@ -672,5 +680,75 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $instancerecord = $DB->get_record('grouptool', ['id' => $grouptool->get_grouptool()->id], '*', MUST_EXIST);
         $this->assertSame(1, (int)$instancerecord->use_size);
     }
+    /**
+     * Tests create_group_groupings() in preview mode for selected groups only.
+     *
+     * Verifies:
+     * - Only "active" groups (when use_all is empty/false) are processed
+     * - In preview mode, groupings are created+assigned internally but then rolled back (deleted)
+     * - Method returns error=false and an HTML table
+     *
+     * Note: create_group_groupings() is private, so we call it via Reflection.
+     *
+     * @covers \mod_grouptool\grouptool::create_group_groupings
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function test_create_group_groupings_preview_selected_groups_rolls_back(): void {
+        global $SESSION;
 
+        $grouptool = $this->create_instance();
+
+        // Course groups created by base::setUp().
+        $groups = groups_get_all_groups($this->course->id);
+        $this->assertNotEmpty($groups);
+
+        // Select exactly 2 groups to be "active".
+        $groupids = array_keys($groups);
+        $selected = array_slice($groupids, 0, 2);
+        $this->assertCount(2, $selected);
+
+        // Prepare SESSION structure expected by the method.
+        $SESSION->grouptool = new \stdClass();
+        $SESSION->grouptool->view_administration = new \stdClass();
+        $SESSION->grouptool->view_administration->use_all = 0; // Only selected groups.
+        $SESSION->grouptool->view_administration->grouplist = [];
+
+        foreach ($groups as $group) {
+            $SESSION->grouptool->view_administration->grouplist[$group->id] = [
+                'active' => in_array($group->id, $selected, true) ? 1 : 0,
+            ];
+        }
+
+        // Preconditions: grouping with same name must not already exist (otherwise we'd get an error).
+        foreach ($selected as $gid) {
+            $g = $groups[$gid];
+            $this->assertFalse(groups_get_grouping_by_name($this->course->id, $g->name));
+        }
+
+        // Call private method via reflection (previewonly = true).
+        $ref = new \ReflectionClass($grouptool);
+        $method = $ref->getMethod('create_group_groupings');
+
+        /** @var array $result */
+        $result = $method->invoke($grouptool, $this->course->id, true);
+
+        // Assert: success + HTML table.
+        $this->assertIsArray($result);
+        $this->assertFalse($result[0], 'Preview run should not return error in this setup.');
+        $this->assertIsString($result[1]);
+        $this->assertStringContainsString('<table', $result[1]);
+
+        // Because previewonly=true, the method must undo creations:.
+        // groupings with those names should NOT exist after the call.
+        foreach ($selected as $gid) {
+            $g = $groups[$gid];
+            $this->assertFalse(
+                groups_get_grouping_by_name($this->course->id, $g->name),
+                'Preview mode must roll back (delete) created groupings.'
+            );
+        }
+    }
 }

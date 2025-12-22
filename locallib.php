@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-global $CFG;
 
 /**
  * Contains class mod_grouptool with most of grouptool's logic.
@@ -29,6 +28,8 @@ global $CFG;
 use JetBrains\PhpStorm\NoReturn;
 
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 require_once($CFG->libdir . '/formslib.php');
@@ -1459,7 +1460,6 @@ class mod_grouptool {
                         'grouptoolid' => $this->cm->instance,
                     ]);
                     $this->fill_from_queue($fromform->resize);
-                    // IF WARTELISTE IS ACTIVE, AND STUDENT WLL BE REMOVED FROM GROUP, SEND MAIL
                 } else {
                     $group = new stdClass();
                     $group->id = $DB->get_field('grouptool_agrps', 'id', [
