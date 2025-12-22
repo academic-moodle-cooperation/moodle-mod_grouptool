@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+global $CFG;
 
 /**
  * Contains class mod_grouptool with most of grouptool's logic.
@@ -48,13 +49,13 @@ require_once($CFG->libdir . '/pdflib.php');
  */
 class mod_grouptool {
     /** @var object */
-    protected $cm;
+    protected object $cm;
     /** @var object */
-    protected $course;
+    protected mixed $course;
     /** @var object */
-    protected $grouptool;
+    protected mixed $grouptool;
     /** @var object instance's context record */
-    protected $context;
+    protected object $context;
 
     /**
      * filter all groups
@@ -113,22 +114,18 @@ class mod_grouptool {
         global $DB;
         global $DB;
 
-        if ($cmid == 'staticonly') {
-            // Use static functions only!
-            return;
-        }
-        if (!empty($cm) && $cm != null) {
+        if (!empty($cm)) {
             $this->cm = $cm;
         } else if (!$this->cm = get_coursemodule_from_id('grouptool', $cmid)) {
             throw new moodle_exception('invalidcoursemodule');
         }
-        if (!empty($context) && $context != null) {
+        if (!empty($context)) {
             $this->context = $context;
         } else {
             $this->context = context_module::instance($this->cm->id);
         }
 
-        if (!empty($course) && $course != null) {
+        if (!empty($course)) {
             $this->course = $course;
         } else if (!$this->course = $DB->get_record('course', ['id' => $this->cm->course])) {
             throw new moodle_exception('invalidid', 'grouptool');
@@ -147,11 +144,6 @@ class mod_grouptool {
 
         $this->grouptool->cmidnumber = $this->cm->idnumber;
         $this->grouptool->course = $this->course->id;
-
-        /*
-         * visibility handled by require_login() with $cm parameter
-         * get current group only when really needed
-         */
     }
 
     /**
@@ -159,7 +151,7 @@ class mod_grouptool {
      *
      * @return string the name
      */
-    public function get_name() {
+    public function get_name(): string {
         return $this->grouptool->name;
     }
 
@@ -168,7 +160,7 @@ class mod_grouptool {
      *
      * @return object Grouptool's DB record
      */
-    public function get_settings() {
+    public function get_settings(): object {
         return $this->grouptool;
     }
 
@@ -177,7 +169,7 @@ class mod_grouptool {
      *
      * @return array [allow_multiple, choose_min, choose_max]
      */
-    public function get_reg_settings() {
+    public function get_reg_settings(): array {
         return [$this->grouptool->allow_multiple, $this->grouptool->choose_min, $this->grouptool->choose_max];
     }
 
@@ -188,10 +180,10 @@ class mod_grouptool {
      * If cancel=null only continue button is displayed!
      *
      * @param string $message The question to ask the user
-     * @param single_button|moodle_url|string $continue The single_button component representing the
+     * @param moodle_url|single_button|string $continue The single_button component representing the
      *                                                  Continue answer. Can also be a moodle_url
      *                                                  or string URL
-     * @param single_button|moodle_url|string $cancel The single_button component representing the
+     * @param moodle_url|single_button|string|null $cancel The single_button component representing the
      *                                                  Cancel answer. Can also be a moodle_url or
      *                                                  string URL
      * @return string HTML fragment
@@ -238,12 +230,12 @@ class mod_grouptool {
      *
      * @param string $namescheme The scheme used for building group names
      * @param int $groupnumber The number of the group to be used in the parsed format string
-     * @param stdClass|array $members optional object or array of objects containing data of members
+     * @param array|stdClass|null $members optional object or array of objects containing data of members
      *                              for the tags to be replaced with
      * @param int $digits optional number of digits for from-to-group-creation
      * @return string the parsed format string
      */
-    private function groups_parse_name($namescheme, $groupnumber, $members = null, $digits = 0) {
+    private function groups_parse_name(string $namescheme, int $groupnumber, array|stdClass $members = null, int $digits = 0): string {
 
         $tags = ['firstname', 'lastname', 'idnumber', 'username'];
         $pregsearch = "#\[(" . implode("|", $tags) . ")\]#";
@@ -288,7 +280,7 @@ class mod_grouptool {
             }
         }
 
-        if (strstr($namescheme, '@') !== false) { // Convert $groupnumber to a character series!
+        if (str_contains($namescheme, '@')) { // Convert $groupnumber to a character series!
             if ($groupnumber > GROUPTOOL_BEP) {
                 $nexttempnumber = $groupnumber;
                 $string = "";
@@ -312,7 +304,7 @@ class mod_grouptool {
             }
         }
 
-        if (strstr($namescheme, '#') !== false) {
+        if (str_contains($namescheme, '#')) {
             if ($digits != 0) {
                 $format = '%0' . $digits . 'd';
             } else {
@@ -329,7 +321,7 @@ class mod_grouptool {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function add_missing_agrps() {
+    public function add_missing_agrps(): void {
         global $DB;
 
         // Get all course's group-IDs!
@@ -397,7 +389,7 @@ class mod_grouptool {
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance
      *
-     * @param stdClass $data data from administration-form with all settings for group creation
+     * @param stdClass|array  $data data from administration-form with all settings for group creation
      * @param stdClass[] $users which users to registrate in the created groups
      * @param int $userpergrp how many users should be registrated per group
      * @param int $numgrps how many groups should be created
@@ -408,7 +400,7 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    private function create_groups($data, $users, $userpergrp, $numgrps, $previewonly = false) {
+    private function create_groups(stdClass|array $data, array $users, int $userpergrp, int $numgrps, bool $previewonly = false): array {
         global $DB, $USER;
 
         require_capability('mod/grouptool:administrate_groups', $this->context);
@@ -623,7 +615,7 @@ class mod_grouptool {
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance also used for creation of N groups with M members!
      *
-     * @param stdClass $data data from administration-form with all settings for group creation
+     * @param stdClass|array $data data from administration-form with all settings for group creation
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      * @throws coding_exception
@@ -631,7 +623,7 @@ class mod_grouptool {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    private function create_fromto_groups($data, $previewonly = false) {
+    private function create_fromto_groups(stdClass|array $data, bool $previewonly = false): array {
         global $DB, $OUTPUT;
 
         require_capability('mod/grouptool:administrate_groups', $this->context);
@@ -753,7 +745,7 @@ class mod_grouptool {
                     groups_delete_grouping($createdgrouping);
                 }
                 return [
-                    0 => $failed,
+                    0 => true,
                     1 => get_string('group_creation_failed', 'grouptool') . html_writer::empty_tag('br') . $error,
                 ];
             } else {
@@ -772,7 +764,7 @@ class mod_grouptool {
                     $numgrps,
                     $groupingid
                 )->trigger();
-                return [0 => $failed, 1 => get_string('groups_created', 'grouptool')];
+                return [0 => false, 1 => get_string('groups_created', 'grouptool')];
             }
         }
     }
@@ -809,19 +801,26 @@ class mod_grouptool {
         // Allocate members from the selected role to groups!
         $usercnt = count($users);
 
+        if ($usercnt === 0) {
+            // Keep the original return contract: error + message.
+            return [0 => true, 1 => get_string('nousersselected', 'grouptool')];
+        }
+
+        $digits = ceil(log10($usercnt));
+        $namescheme = trim($namescheme);
+
         // Prepare group data!
         $groups = [];
         $i = 0;
-        $digits = ceil(log10(count($users)));
         foreach ($users as $user) {
-            $groups[$i] = [];
-            $groups[$i]['name'] = $this->groups_parse_name(
-                trim($namescheme),
-                $i,
-                $user,
-                $digits
-            );
-            $groups[$i]['member'] = $user;
+            if (!is_object($user) || empty($user->id)) {
+                throw new coding_exception('Invalid user object in users array.');
+            }
+            $name = $this->groups_parse_name($namescheme, $i, $user, $digits);
+            $groups[] = [
+                'name' => $name,
+                'member' => $user,
+            ];
             $i++;
         }
 
@@ -1458,6 +1457,8 @@ class mod_grouptool {
                         'groupid' => $fromform->resize,
                         'grouptoolid' => $this->cm->instance,
                     ]);
+                    $this->fill_from_queue($fromform->resize);
+                    // IF WARTELISTE IS ACTIVE, AND STUDENT WLL BE REMOVED FROM GROUP, SEND MAIL
                 } else {
                     $group = new stdClass();
                     $group->id = $DB->get_field('grouptool_agrps', 'id', [
@@ -1466,6 +1467,7 @@ class mod_grouptool {
                     ]);
                     $group->grpsize = $fromform->size;
                     $DB->update_record('grouptool_agrps', $group);
+                    $this->fill_from_queue($fromform->resize);
                 }
             } else if (!$gform->is_cancelled()) {
                 $data = new stdClass();
@@ -5254,7 +5256,7 @@ class mod_grouptool {
      * import users into a certain moodle-group and enrole them if not allready enroled
      *
      * @param int[] $groups array of ids of groups to import into
-     * @param stdClass $data from form in import tab (textfield with idnumbers and group-selection)
+     * @param stdClass|string $data from form in import tab (textfield with idnumbers and group-selection)
      * @param int[] $ignored which user ids to ignore when importing (used if conflicting users should be ignored)
      * @param bool $forceregistration Force registration in grouptool
      * @param bool $previewonly optional preview only, don't take any action
@@ -5262,7 +5264,7 @@ class mod_grouptool {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function import($groups, $data, $ignored = [], $forceregistration = false, $previewonly = false) {
+    public function import(array $groups, stdClass|string $data, $ignored = [], $forceregistration = false, $previewonly = false): array {
         global $DB, $OUTPUT, $USER;
 
         $message = "";
