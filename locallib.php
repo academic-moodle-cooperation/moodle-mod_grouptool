@@ -198,7 +198,7 @@ class mod_grouptool {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public static function confirm($message, $continue, $cancel = null) {
+    public static function confirm(string $message, moodle_url|single_button|string $continue, moodle_url|single_button|string $cancel = null): string {
         global $OUTPUT;
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
@@ -224,22 +224,13 @@ class mod_grouptool {
                     ' URL (string/moodle_url), single_button instance or null.');
             }
         }
+        $data = [
+            'message' => $message,
+            'continuebutton' => $OUTPUT->render($continue),
+            'cancelbutton' => $cancel ? $OUTPUT->render($cancel) : null,
+        ];
 
-        $output = $OUTPUT->box_start('generalbox modal modal-dialog modal-in-page show', 'notice');
-        $output .= $OUTPUT->box_start('modal-content', 'modal-content');
-        $output .= $OUTPUT->box_start('modal-header', 'modal-header');
-        $output .= html_writer::tag('h4', get_string('confirm'));
-        $output .= $OUTPUT->box_end();
-        $output .= $OUTPUT->box_start('modal-body', 'modal-body');
-        $output .= html_writer::tag('p', $message);
-        $output .= $OUTPUT->box_end();
-        $output .= $OUTPUT->box_start('modal-footer', 'modal-footer');
-        $cancel = ($cancel != null) ? $OUTPUT->render($cancel) : "";
-        $output .= html_writer::tag('div', $OUTPUT->render($continue) . $cancel, ['class' => 'buttons']);
-        $output .= $OUTPUT->box_end();
-        $output .= $OUTPUT->box_end();
-        $output .= $OUTPUT->box_end();
-        return $output;
+        return $OUTPUT->render_from_template('mod_grouptool/confirm', $data);
     }
 
     /**
