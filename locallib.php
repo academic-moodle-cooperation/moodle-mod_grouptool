@@ -231,7 +231,7 @@ class mod_grouptool {
      *
      * @param string $namescheme The scheme used for building group names
      * @param int $groupnumber The number of the group to be used in the parsed format string
-     * @param array|stdClass $members optional object or array of objects containing data of members
+     * @param array|stdClass|null $members optional object or array of objects containing data of members
      *                              for the tags to be replaced with
      * @param int $digits optional number of digits for from-to-group-creation
      * @return string the parsed format string

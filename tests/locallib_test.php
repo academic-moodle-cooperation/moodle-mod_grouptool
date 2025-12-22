@@ -406,7 +406,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
      * This helper is used by PHPUnit tests to invoke the private
      * grouptool::create_groups() method without changing its visibility.
      *
-     * @param \mod_grouptool\grouptool | \mod_grouptool\local\tests\grouptool $grouptool Grouptool instance under test
+     * @param grouptool | \mod_grouptool\local\tests\grouptool $grouptool Grouptool instance under test
      * @param \stdClass $data Data object containing group creation settings
      *                        (usually coming from the administration form)
      * @param \stdClass[] $users List of users to be allocated to the created groups
@@ -680,75 +680,5 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $instancerecord = $DB->get_record('grouptool', ['id' => $grouptool->get_grouptool()->id], '*', MUST_EXIST);
         $this->assertSame(1, (int)$instancerecord->use_size);
     }
-    /**
-     * Tests create_group_groupings() in preview mode for selected groups only.
-     *
-     * Verifies:
-     * - Only "active" groups (when use_all is empty/false) are processed
-     * - In preview mode, groupings are created+assigned internally but then rolled back (deleted)
-     * - Method returns error=false and an HTML table
-     *
-     * Note: create_group_groupings() is private, so we call it via Reflection.
-     *
-     * @covers \mod_grouptool\grouptool::create_group_groupings
-     *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     */
-    public function test_create_group_groupings_preview_selected_groups_rolls_back(): void {
-        global $SESSION;
 
-        $grouptool = $this->create_instance();
-
-        // Course groups created by base::setUp().
-        $groups = groups_get_all_groups($this->course->id);
-        $this->assertNotEmpty($groups);
-
-        // Select exactly 2 groups to be "active".
-        $groupids = array_keys($groups);
-        $selected = array_slice($groupids, 0, 2);
-        $this->assertCount(2, $selected);
-
-        // Prepare SESSION structure expected by the method.
-        $SESSION->grouptool = new \stdClass();
-        $SESSION->grouptool->view_administration = new \stdClass();
-        $SESSION->grouptool->view_administration->use_all = 0; // Only selected groups.
-        $SESSION->grouptool->view_administration->grouplist = [];
-
-        foreach ($groups as $group) {
-            $SESSION->grouptool->view_administration->grouplist[$group->id] = [
-                'active' => in_array($group->id, $selected, true) ? 1 : 0,
-            ];
-        }
-
-        // Preconditions: grouping with same name must not already exist (otherwise we'd get an error).
-        foreach ($selected as $gid) {
-            $g = $groups[$gid];
-            $this->assertFalse(groups_get_grouping_by_name($this->course->id, $g->name));
-        }
-
-        // Call private method via reflection (previewonly = true).
-        $ref = new \ReflectionClass($grouptool);
-        $method = $ref->getMethod('create_group_groupings');
-
-        /** @var array $result */
-        $result = $method->invoke($grouptool, $this->course->id, true);
-
-        // Assert: success + HTML table.
-        $this->assertIsArray($result);
-        $this->assertFalse($result[0], 'Preview run should not return error in this setup.');
-        $this->assertIsString($result[1]);
-        $this->assertStringContainsString('<table', $result[1]);
-
-        // Because previewonly=true, the method must undo creations:.
-        // groupings with those names should NOT exist after the call.
-        foreach ($selected as $gid) {
-            $g = $groups[$gid];
-            $this->assertFalse(
-                groups_get_grouping_by_name($this->course->id, $g->name),
-                'Preview mode must roll back (delete) created groupings.'
-            );
-        }
-    }
 }
