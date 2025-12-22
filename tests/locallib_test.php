@@ -680,5 +680,175 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $instancerecord = $DB->get_record('grouptool', ['id' => $grouptool->get_grouptool()->id], '*', MUST_EXIST);
         $this->assertSame(1, (int)$instancerecord->use_size);
     }
+    /**
+     * 1) If use_queue is disabled, fill_from_queue() should do nothing and return true.
+     *
+     * @covers \mod_grouptool\grouptool::fill_from_queue
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function test_fill_from_queue_use_queue_disabled_returns_true(): void {
+        $grouptool = $this->create_instance(['use_queue' => 0]);
+
+        // Pick any existing agrpid.
+        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
+        $this->assertNotEmpty($agrps);
+        $agrpid = (int)array_key_first($agrps);
+
+        $this->assertTrue($grouptool->fill_from_queue($agrpid));
+    }
+
+    /**
+     * 2) If queue has entries and group has free space, fill_from_queue() should:
+     * - move user from queue to registered
+     * - add user to Moodle group when immediate_reg is enabled
+     * - delete the queue entry
+     * - send a Moodle message to the user
+     *
+     * @covers \mod_grouptool\grouptool::fill_from_queue
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function test_fill_from_queue_moves_user_registers_adds_member_and_sends_message(): void {
+        global $DB, $USER;
+
+        $grouptool = $this->create_instance([
+            'use_queue' => 1,
+            'use_size' => 1,
+            'grpsize' => 10,        // big enough so it won't be "full"
+            'immediate_reg' => 1,   // adds to Moodle group immediately
+            'allow_multiple' => 1,  // keep it simple, avoid limit cleanup logic
+            'choose_min' => 1,
+            'choose_max' => 99,
+        ]);
+
+        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
+        $this->assertNotEmpty($agrps);
+        $agrpid = (int)array_key_first($agrps);
+
+        $groupdata = $grouptool->get_active_groups(true, true, $agrpid);
+        $groupdata = reset($groupdata);
+        $this->assertNotEmpty($groupdata);
+        $groupid = (int)$groupdata->id;
+
+        $userid = (int)$this->students[0]->id;
+
+        $DB->delete_records('grouptool_registered', ['userid' => $userid, 'agrpid' => $agrpid]);
+
+        groups_remove_member($groupid, $userid);
+
+        $queue = (object)[
+            'agrpid' => $agrpid,
+            'userid' => $userid,
+            'timestamp' => time() - 100,
+            'modified_by' => (int)$USER->id,
+        ];
+        $queueid = $DB->insert_record('grouptool_queued', $queue, true);
+
+        $sink = $this->redirectMessages();
+
+        $ok = $grouptool->fill_from_queue($agrpid);
+
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertTrue($ok);
+
+        $this->assertFalse($DB->record_exists('grouptool_queued', ['id' => $queueid]));
+
+        $this->assertTrue($DB->record_exists('grouptool_registered', [
+            'userid' => $userid,
+            'agrpid' => $agrpid,
+        ]));
+
+        $members = groups_get_members($groupid);
+        $this->assertArrayHasKey($userid, $members);
+
+        $this->assertCount(1, $messages);
+        $msg = $messages[0];
+        $this->assertSame('mod_grouptool', $msg->component);
+        $this->assertSame('grouptool_moveupreg', $msg->eventtype);
+        $this->assertSame($userid, (int)$msg->useridto);
+    }
+
+    /**
+     * 3) If use_size is enabled and group is already full, fill_from_queue() should:
+     * - not register the queued user
+     * - not delete the queue entry
+     * - not send a message
+     *
+     * @covers \mod_grouptool\grouptool::fill_from_queue
+     *
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
+     */
+    public function test_fill_from_queue_does_nothing_when_group_is_full_and_sends_no_message(): void {
+        global $DB, $USER;
+
+        $grouptool = $this->create_instance([
+            'use_queue' => 1,
+            'use_size' => 1,
+            'grpsize' => 1,
+            'immediate_reg' => 0,
+            'allow_multiple' => 1,
+            'choose_min' => 1,
+            'choose_max' => 99,
+        ]);
+
+        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
+        $this->assertNotEmpty($agrps);
+        $agrpid = (int)array_key_first($agrps);
+
+        $groupdata = $grouptool->get_active_groups(true, true, $agrpid);
+        $groupdata = reset($groupdata);
+        $this->assertNotEmpty($groupdata);
+        $groupid = (int)$groupdata->id;
+
+        $existinguserid = (int)$this->students[1]->id;
+        $DB->delete_records('grouptool_registered', ['userid' => $existinguserid, 'agrpid' => $agrpid]);
+
+        $fullrecord = (object)[
+            'groupid' => $groupid,
+            'agrpid' => $agrpid,
+            'userid' => $existinguserid,
+            'timestamp' => time() - 200,
+            'modified_by' => (int)$USER->id,
+        ];
+        $DB->insert_record('grouptool_registered', $fullrecord);
+
+        $queueduserid = (int)$this->students[2]->id;
+        $DB->delete_records('grouptool_registered', ['userid' => $queueduserid, 'agrpid' => $agrpid]);
+
+        $queue = (object)[
+            'agrpid' => $agrpid,
+            'userid' => $queueduserid,
+            'timestamp' => time() - 100,
+            'modified_by' => (int)$USER->id,
+        ];
+        $queueid = $DB->insert_record('grouptool_queued', $queue, true);
+
+        $sink = $this->redirectMessages();
+
+        $ok = $grouptool->fill_from_queue($agrpid);
+
+        $messages = $sink->get_messages();
+        $sink->close();
+
+        $this->assertTrue($ok);
+
+        $this->assertTrue($DB->record_exists('grouptool_queued', ['id' => $queueid]));
+        $this->assertFalse($DB->record_exists('grouptool_registered', [
+            'userid' => $queueduserid,
+            'agrpid' => $agrpid,
+        ]));
+
+        $this->assertCount(0, $messages);
+    }
+
 
 }

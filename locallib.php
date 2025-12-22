@@ -2081,7 +2081,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception|\core\exception\moodle_exception
      */
-    public function fill_from_queue($agrpid) {
+    public function fill_from_queue(int $agrpid): bool {
         global $DB, $CFG, $OUTPUT;
 
         if (empty($this->grouptool->use_queue)) {
