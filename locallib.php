@@ -190,7 +190,7 @@ class mod_grouptool {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public static function confirm(string $message, moodle_url|single_button|string $continue, moodle_url|single_button|string $cancel = null): string {
+    public static function confirm(string $message, moodle_url|single_button|string $continue, moodle_url|single_button|string|null $cancel = null): string {
         global $OUTPUT;
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
@@ -230,12 +230,12 @@ class mod_grouptool {
      *
      * @param string $namescheme The scheme used for building group names
      * @param int $groupnumber The number of the group to be used in the parsed format string
-     * @param array|stdClass|null $members optional object or array of objects containing data of members
+     * @param array|stdClass $members optional object or array of objects containing data of members
      *                              for the tags to be replaced with
      * @param int $digits optional number of digits for from-to-group-creation
      * @return string the parsed format string
      */
-    private function groups_parse_name(string $namescheme, int $groupnumber, array|stdClass $members = null, int $digits = 0): string {
+    private function groups_parse_name(string $namescheme, int $groupnumber, array|stdClass|null $members = null, int $digits = 0): string {
 
         $tags = ['firstname', 'lastname', 'idnumber', 'username'];
         $pregsearch = "#\[(" . implode("|", $tags) . ")\]#";
@@ -353,7 +353,7 @@ class mod_grouptool {
      * @return stdClass (new) agrp record
      * @throws dml_exception
      */
-    protected function add_agrp_entry($groupid) {
+    protected function add_agrp_entry(int $groupid) {
         global $DB;
 
         // Insert into agrp-table!
@@ -894,12 +894,13 @@ class mod_grouptool {
                 $newgroup->name = $group['name'];
                 $newgroup->enablemessaging = $enablegroupmessaging == 1 ? 1 : null;
                 $groupid = groups_create_group($newgroup);
+
                 // Insert into agrp-table!
                 $newagrp = new stdClass();
                 $newagrp->groupid = $groupid;
                 $newagrp->grouptoolid = $this->grouptool->id;
                 $newagrp->sort_order = 999999;
-                if ($this->grouptool->allow_reg == true) {
+                if ($this->grouptool->allow_reg) {
                     $newagrp->active = 1;
                 } else {
                     $newagrp->active = 0;
@@ -919,7 +920,7 @@ class mod_grouptool {
                         'grouptoolid' => $this->grouptool->id,
                         'groupid' => $groupid,
                     ]);
-                    if ($this->grouptool->allow_reg == true) {
+                    if ($this->grouptool->allow_reg) {
                         $DB->set_field('grouptool_agrps', 'active', 1, ['id' => $newagrp->id]);
                     }
                 }
@@ -978,7 +979,7 @@ class mod_grouptool {
      * $SESSION->grouptool->view_administration->grouplist[$group->id]['active']
      * to determin which groups have been selected
      *
-     * @param int $courseid optional id of course to create for
+     * @param int|null  $courseid optional id of course to create for
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      * @throws coding_exception
@@ -1097,7 +1098,7 @@ class mod_grouptool {
      * to determin which groups have been selected
      *
      * @param int $target -1 for new grouping or groupingid
-     * @param string $name name for new grouping if $target = -1
+     * @param string|null  $name name for new grouping if $target = -1
      * @param bool $previewonly optional only show preview of created groups
      * @return array ( 0 => error, 1 => message )
      * @throws coding_exception
