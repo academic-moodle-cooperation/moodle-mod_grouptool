@@ -719,10 +719,9 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $grouptool = $this->create_instance([
             'use_queue' => 1,
             'use_size' => 1,
-            'grpsize' => 10,        // big enough so it won't be "full"
-            'immediate_reg' => 1,   // adds to Moodle group immediately
-            'allow_multiple' => 1,  // keep it simple, avoid limit cleanup logic
-            'choose_min' => 1,
+            'grpsize' => 10,
+            'immediate_reg' => 1,
+            'allow_multiple' => 1,
             'choose_max' => 99,
         ]);
 
@@ -849,6 +848,4 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
 
         $this->assertCount(0, $messages);
     }
-
-
 }
