@@ -25,6 +25,8 @@
 
 namespace mod_grouptool;
 
+use mod_grouptool\local\tests\grouptool;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
@@ -406,10 +408,10 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
      * This helper is used by PHPUnit tests to invoke the private
      * grouptool::create_groups() method without changing its visibility.
      *
-     * @param grouptool | \mod_grouptool\local\tests\grouptool $grouptool Grouptool instance under test
+     * @param \mod_grouptool\local\tests\grouptool $grouptool Grouptool instance under test
      * @param \stdClass $data Data object containing group creation settings
      *                        (usually coming from the administration form)
-     * @param \stdClass[] $users List of users to be allocated to the created groups
+     * @param \stdClass[]|array $users List of users to be allocated to the created groups
      * @param int $userpergrp Number of users per group
      * @param int $numgrps Number of groups to create
      * @param bool $previewonly Whether to run in preview-only mode
@@ -418,7 +420,7 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
      * @throws \ReflectionException If the method cannot be reflected
      */
     private function call_create_groups_private(
-        grouptool | \mod_grouptool\local\tests\grouptool $grouptool,
+        \mod_grouptool\local\tests\grouptool $grouptool,
         \stdClass $data,
         array $users,
         int $userpergrp,
