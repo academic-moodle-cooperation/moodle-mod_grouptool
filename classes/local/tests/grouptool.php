@@ -201,5 +201,4 @@ class grouptool extends mod_grouptool {
     public function get_context() {
         return $this->context;
     }
-
 }
