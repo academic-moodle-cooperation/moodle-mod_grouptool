@@ -498,7 +498,7 @@ function grouptool_update_queues(int|stdClass $grouptool = 0): void {
                     $moodlemessage->subject = $postsubject;
                     $messagedata = [
                         'courseurl' => $CFG->wwwroot . '/course/view.php?id=' . $cm->id,
-                        'course'=> [
+                        'course' => [
                             'shortname' => format_string($course->shortname, true),
                         ],
                         'coursegrouptoolsurl' => $CFG->wwwroot . '/mod/grouptool/index.php?id=' . $cm->id,
@@ -784,50 +784,50 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
     if (empty($timedue)) {
         $colorclass = 'early';
         $timeremaining = ' (' . html_writer::tag(
-            'span',
-            format_time($time),
-            ['class' => 'early']
-        ) . ')';
+                'span',
+                format_time($time),
+                ['class' => 'early']
+            ) . ')';
     } else if ($time >= 7 * 24 * 60 * 60) { // More than 7 days?
         $colorclass = 'early';
         $timeremaining = ' (' . html_writer::tag(
-            'span',
-            get_string(
-                'early',
-                'grouptool',
-                format_time($time)
-            ),
-            ['class' => 'early']
-        ) . ')';
+                'span',
+                get_string(
+                    'early',
+                    'grouptool',
+                    format_time($time)
+                ),
+                ['class' => 'early']
+            ) . ')';
     } else if ($time >= 24 * 60 * 60) { // More than 1 day (less than 7 days)?
         $colorclass = 'soon';
         $timeremaining = ' (' . html_writer::tag(
-            'span',
-            get_string(
-                'early',
-                'grouptool',
-                format_time($time)
-            ),
-            ['class' => 'soon']
-        ) . ')';
+                'span',
+                get_string(
+                    'early',
+                    'grouptool',
+                    format_time($time)
+                ),
+                ['class' => 'soon']
+            ) . ')';
     } else if ($time >= 0) { // In future but less than 1 day?
         $colorclass = 'today';
         $timeremaining = ' (' . html_writer::tag(
-            'span',
-            get_string(
-                'early',
-                'grouptool',
-                format_time($time)
-            ),
-            ['class' => 'today']
-        ) . ')';
+                'span',
+                get_string(
+                    'early',
+                    'grouptool',
+                    format_time($time)
+                ),
+                ['class' => 'today']
+            ) . ')';
     } else {
         $colorclass = 'late';
         $timeremaining = ' (' . html_writer::tag('span', get_string(
-            'late',
-            'grouptool',
-            format_time($time)
-        ), ['class' => 'late']) . ')';
+                'late',
+                'grouptool',
+                format_time($time)
+            ), ['class' => 'late']) . ')';
     }
     return [$colorclass, $timeremaining];
 }
@@ -881,7 +881,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
             ) {
                 $attrib['class'] = 'dimmed';
             }
-            [$cc, ] = grouptool_display_lateness(time(), $grouptool->timedue);
+            [$cc,] = grouptool_display_lateness(time(), $grouptool->timedue);
             $str .= html_writer::tag(
                 'div',
                 $strgrouptool . ': ' .
@@ -946,7 +946,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         return '';
     }
 
-    [$colorclass, ] = grouptool_display_lateness(time(), $grouptool->timedue);
+    [$colorclass,] = grouptool_display_lateness(time(), $grouptool->timedue);
 
     if (has_capability('mod/grouptool:register', $context)) {
         if ($grouptool->allow_reg) {
@@ -1011,7 +1011,7 @@ function grouptool_get_user_reg_details($grouptool, $context) {
             if (count($userstats->queued)) {
                 $tempstr = "";
                 foreach ($userstats->queued as $queue) {
-                    [$colorclass, ] = grouptool_display_lateness(
+                    [$colorclass,] = grouptool_display_lateness(
                         $queue->timestamp,
                         $grouptool->timedue
                     );
@@ -1195,9 +1195,9 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course);
 
     $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
-        'mod/grouptool:administrate_registration',
-        $context
-    );
+            'mod/grouptool:administrate_registration',
+            $context
+        );
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
         return ((has_capability('mod/grouptool:register', $context))
@@ -1238,9 +1238,9 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 
     $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
-        'mod/grouptool:administrate_registration',
-        $context
-    );
+            'mod/grouptool:administrate_registration',
+            $context
+        );
     $isopen = $grouptool->is_registration_open();
 
     $url = new \moodle_url('/mod/grouptool/view.php', [
@@ -1254,7 +1254,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
 
     if (!$managesregs && has_capability('mod/grouptool:register', $context)) {
         $userstats = $grouptool->get_registration_stats($USER->id);
-        [$allowmultiple, $choosemin, ] = $grouptool->get_reg_settings();
+        [$allowmultiple, $choosemin,] = $grouptool->get_reg_settings();
         if ($allowmultiple) {
             $itemcount = ($choosemin - count($userstats->registered));
             $label = get_string(($itemcount > 1) ? 'register' : 'register', 'grouptool');
