@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code
  *
  * @package   mod_grouptool
  * @author    Hannes Laimer
+ * @author    Anne Kreppenhofer
  * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -841,13 +842,12 @@ final class locallib_test extends \mod_grouptool\local\tests\base {
         $sink->close();
 
         $this->assertTrue($ok);
-
+        $this->assertCount(0, $messages);
         $this->assertTrue($DB->record_exists('grouptool_queued', ['id' => $queueid]));
         $this->assertFalse($DB->record_exists('grouptool_registered', [
             'userid' => $queueduserid,
             'agrpid' => $agrpid,
         ]));
-
         $this->assertCount(0, $messages);
     }
 }
