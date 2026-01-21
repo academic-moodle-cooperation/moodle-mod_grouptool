@@ -3987,7 +3987,7 @@ class mod_grouptool {
      * @throws required_capability_exception
      */
     public function resolve_queues($previewonly = false) {
-        global $DB, $USER;
+        global $DB, $USER, $CFG, $OUTPUT;
         $error = false;
         $returntext = "";
         $status = [];
@@ -4222,6 +4222,38 @@ class mod_grouptool {
                             'userid' => $to->userid,
                         ], MUST_EXIST);
                         \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
+
+                        // Send message
+                        $postsubject = $this->course->shortname . ': ' .
+                            get_string('modulenameplural', 'grouptool') . ': ' .
+                            format_string($this->grouptool->name, true);
+                        $messageuser = $DB->get_record('user', ['id' => $to->userid]);
+                        $moodlemessage = new \core\message\message();
+                        $userfrom = core_user::get_noreply_user();
+                        $moodlemessage->component = 'mod_grouptool';
+                        $moodlemessage->name = 'grouptool_moveupreg';
+                        $moodlemessage->courseid = $this->course->id;
+                        $moodlemessage->userfrom = $userfrom;
+                        $moodlemessage->userto = $messageuser;
+                        $moodlemessage->subject = $postsubject;
+                        $moodlemessage->fullmessage = get_string(
+                            'registrationnotification',
+                            'mod_grouptool',
+                            $context
+                        );
+                        $moodlemessage->fullmessageformat = FORMAT_HTML;
+                        $moodlemessage->fullmessagehtml =
+                            $OUTPUT->render_from_template('mod_grouptool/registrationnotification', $context);
+                        $moodlemessage->smallmessage = get_string(
+                            'registrationnotification',
+                            'mod_grouptool',
+                            $context
+                        );
+                        $moodlemessage->notification = 1;
+                        $moodlemessage->contexturl = $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $this->cm->id;
+                        $moodlemessage->contexturlname = $this->grouptool->name;
+
+                        message_send($moodlemessage);
 
                         if ($DB->record_exists('grouptool_queued', $attr)) {
                             $returntext .= "Could not delete!";
