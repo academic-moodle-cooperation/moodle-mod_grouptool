@@ -1,6 +1,23 @@
 CHANGELOG
 ========
 
+5.1.0 (2026-01-21)
+------------------
+* Moodle 5.1.0 compatible version
+* [FIXED] #8549 Fixed resolving group queue not sending notifications
+* [FIXED] #8375 Fixed deprecated print error function
+* [LANGSTRING] #8448 Added missing language strings (EN & DE)
+* [FIXED] #8532 Fixed trainers being assigned to groups when no students and no self-registration are present
+* [FIXED] #8557 Fixed incorrect notifications after setting individual group size
+* [FIXED] #8560 Fixed waitlist places not shown in PDF export
+* [FIXED] #8561 Fixed “Import” view still showing after removing capability_administrate_registration
+* [FIXED] #8562 Fixed export view still showing after removing export capability
+* [FIXED] #8565 Fixed capability checks for administrate_groups and view_regs_group_view
+* [FIXED] #8577 General help text corrections
+* [FIXED] #8584 Fixed capability checks for preview and view_own_registration
+* [FIXED] #8585 Fixed Privacy API: deleting a user now removes all registrations created for others
+* [FIXED] #8619 Fixed group selection disappearing when using “Random” member assignment
+
 5.0.0 (2025-08-05)
 ------------------
 * Moodle 5.0.0 compatible version

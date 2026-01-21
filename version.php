@@ -28,7 +28,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2025080500.02;
+$plugin->version   = 2026012100;
 $plugin->requires  = 2025041400;
 $plugin->component = 'mod_grouptool';
 $plugin->maturity  = MATURITY_STABLE;
