@@ -4224,6 +4224,19 @@ class mod_grouptool {
                         \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
 
                         // Send message
+                        $to->groupname = groups_get_group_name($to->agrpid);
+                        $context = (object)[
+                            'course' => $this->course,
+                            'courseurl' => $CFG->wwwroot . "/course/view.php?id=" . $this->course->id,
+                            'coursegrouptoolsurl' => $CFG->wwwroot . "/mod/grouptool/index.php?id=" . $this->course->id,
+                            'grouptoolurl' => $CFG->wwwroot . "/mod/grouptool/view.php?id=" . $this->cm->id,
+                            'grouptoolname' => format_string($this->grouptool->name, true),
+                            'groupname' => $to->groupname,
+                            'message' => get_string('register_you_in_group_success', 'grouptool', (object)[
+                                'groupname' => $to->groupname,
+                            ]),
+                        ];
+
                         $postsubject = $this->course->shortname . ': ' .
                             get_string('modulenameplural', 'grouptool') . ': ' .
                             format_string($this->grouptool->name, true);
