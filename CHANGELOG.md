@@ -7,7 +7,6 @@ CHANGELOG
 * [FIXED] #8549 Fixed resolving group queue not sending notifications
 * [FIXED] #8375 Fixed deprecated print error function
 * [LANGSTRING] #8448 Added missing language strings (EN & DE)
-* [FIXED] #8532 Fixed trainers being assigned to groups when no students and no self-registration are present
 * [FIXED] #8557 Fixed incorrect notifications after setting individual group size
 * [FIXED] #8560 Fixed waitlist places not shown in PDF export
 * [FIXED] #8561 Fixed “Import” view still showing after removing capability_administrate_registration
