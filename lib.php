@@ -399,13 +399,12 @@ function mod_grouptool_core_calendar_get_event_action_string(string $eventtype):
 /**
  * function looks through all the queues and moves users from queue to reg if there's place
  *
- * @param stdClass|int $grouptool grouptool object or grouptoolid
+ * @param int|stdClass $grouptool grouptool object or grouptoolid
  * @throws coding_exception
  * @throws dml_exception
  */
-function grouptool_update_queues($grouptool = 0) {
-    global $DB;
-
+function grouptool_update_queues(int|stdClass $grouptool = 0): void {
+    global $DB, $OUTPUT, $CFG;
     // Update queues and move users from queue to reg if there's place!
     if (!is_object($grouptool)) {
         $grouptool = $DB->get_record('grouptool', ['id' => $grouptool], MUST_EXIST);
@@ -479,10 +478,52 @@ function grouptool_update_queues($grouptool = 0) {
                             groups_add_member($agrp->groupid, $record->userid);
                         }
                     }
+                    $cmid = $grouptool->coursemodule;
+                    $cm = get_coursemodule_from_id('grouptool', $cmid);
+                    $course = $DB->get_record('course', ['id' => $cm->course]);
+                    $context = context_module::instance($cm->id);
+
+                    $postsubject = $course->shortname . ': ' .
+                        get_string('modulenameplural', 'grouptool') . ': ' .
+                        format_string($grouptool->name, true);
+
+                    $messageuser = $DB->get_record('user', ['id' => $record->userid]);
+                    $moodlemessage = new \core\message\message();
+                    $userfrom = core_user::get_noreply_user();
+                    $moodlemessage->component = 'mod_grouptool';
+                    $moodlemessage->name = 'grouptool_moveupreg';
+                    $moodlemessage->courseid = $course->id;
+                    $moodlemessage->userfrom = $userfrom;
+                    $moodlemessage->userto = $messageuser;
+                    $moodlemessage->subject = $postsubject;
+                    $messagedata = [
+                        'courseurl' => $CFG->wwwroot . '/course/view.php?id=' . $cm->id,
+                        'course' => [
+                            'shortname' => format_string($course->shortname, true),
+                        ],
+                        'coursegrouptoolsurl' => $CFG->wwwroot . '/mod/grouptool/index.php?id=' . $cm->id,
+                        'grouptoolurl' => $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $grouptool->id,
+                        'grouptoolname' => format_string($grouptool->name, true),
+                        'groupname' => format_string(groups_get_group_name($agrp->groupid), true),
+                    ];
+                    $moodlemessage->fullmessage = get_string(
+                        'registrationnotification',
+                        'mod_grouptool',
+                        $messagedata
+                    );
+                    $moodlemessage->fullmessageformat = FORMAT_HTML;
+                    $moodlemessage->fullmessagehtml =
+                        $OUTPUT->render_from_template('mod_grouptool/registrationnotification', $messagedata);
+                    $moodlemessage->notification = 1;
+                    $moodlemessage->contexturl = $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $cm->id;
+                    $moodlemessage->contexturlname = $grouptool->name;
+
+                    message_send($moodlemessage);
                     $DB->delete_records('grouptool_queued', [
                         'agrpid' => $agrpid,
                         'userid' => $record->userid,
                     ]);
+
                     $groupregs[$agrpid]++;
                 }
             }
@@ -706,7 +747,7 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     // Add "report grouptool" to more menu.
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
 
-    // TODO Remove it from here and add to Grouptool Report
+    // TODO Remove it from here and add to Grouptool Report.
     try {
         $reportgrouptoolversion = $reportplugins['grouptool'];
     } catch (Exception $ex) {

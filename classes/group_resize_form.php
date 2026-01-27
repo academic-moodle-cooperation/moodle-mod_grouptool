@@ -22,6 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool;
 
 defined('MOODLE_INTERNAL') || die();
@@ -119,7 +120,7 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
         $params = ['grouptoolid' => $data['instance'], 'groupid' => $data['resize']];
         $regs = $DB->count_records_sql($sql, $params);
         if (($data['size'] != '') && (clean_param($data['size'], PARAM_INT) <= 0)) {
-                $errors['size'] = get_string('grpsizezeroerror', 'grouptool');
+            $errors['size'] = get_string('grpsizezeroerror', 'grouptool');
         } else if (!empty($regs) && $data['size'] < $regs) {
             $errors['size'] = get_string('toomanyregs', 'grouptool');
         } else {
@@ -131,9 +132,9 @@ LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_b
             );
             if (
                 $data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
-                        'groupid'     => $data['resize'],
-                        'grouptoolid' => $data['instance'],
-                    ])
+                    'groupid' => $data['resize'],
+                    'grouptoolid' => $data['instance'],
+                ])
             ) {
                 // Error happened...
                 $errors['size'] = get_string('couldnt_resize_group', 'grouptool', $data['size']);

@@ -307,4 +307,22 @@ abstract class base extends advanced_testcase {
             2 => $message,
         ];
     }
+    /**
+     * Inserts one queue entry for a user into an agrp.
+     *
+     * @param int $agrpid
+     * @param int $userid
+     * @return int inserted queue id
+     */
+    protected function insert_queue_entry(int $agrpid, int $userid): int {
+        global $DB, $USER;
+
+        $queue = (object)[
+            'agrpid' => $agrpid,
+            'userid' => $userid,
+            'timestamp' => time() - 100,
+            'modified_by' => (int)$USER->id,
+        ];
+        return (int)$DB->insert_record('grouptool_queued', $queue, true);
+    }
 }
