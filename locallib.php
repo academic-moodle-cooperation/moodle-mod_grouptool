@@ -4224,7 +4224,7 @@ class mod_grouptool {
                         \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
 
                         // Send message
-                        $to->groupname = groups_get_group_name($to->agrpid);
+                        $to->groupname = format_string(groups_get_group_name($to->agrpid));
                         $context = (object)[
                             'course' => $this->course,
                             'courseurl' => $CFG->wwwroot . "/course/view.php?id=" . $this->course->id,
