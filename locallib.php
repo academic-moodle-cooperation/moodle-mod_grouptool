@@ -1250,7 +1250,6 @@ class mod_grouptool {
         $filerselect = new single_select($url, 'filter', $options, $filter);
         // Should this not be in a mustache template?
         $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/administration.php?id=' . $id . '&tab=group_creation');
-        $button = $OUTPUT->single_button($url, get_string('group_creation', 'grouptool'));
         echo $OUTPUT->heading(get_string('administration', 'mod_grouptool'));
         echo "<br>";
         echo html_writer::start_tag("div", ["class" => "container"]);
@@ -1260,7 +1259,7 @@ class mod_grouptool {
         echo html_writer::end_tag("div");
         echo html_writer::start_tag("div", ["class" => "col-md-4 offset-md-4"]);
         echo html_writer::start_tag("div", ["class" => "float-right"]);
-        echo $button;
+        echo html_writer::tag('a', get_string('group_creation', 'grouptool'), ['href' => $url, 'class' => 'btn btn-primary']);
         echo html_writer::end_tag("div");
         echo html_writer::end_tag("div");
         echo html_writer::end_tag("div");
