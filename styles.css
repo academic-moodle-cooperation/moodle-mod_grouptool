@@ -450,3 +450,16 @@
 .path-mod-grouptool #group-message-button {
     padding-left: 5px;
 }
+
+#fgroup_id_actiongrp > .col-md-3 {
+    display: none;
+}
+
+#fgroup_id_actiongrp > .felement {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+#fgroup_id_actiongrp .d-flex.flex-wrap.align-items-center {
+    justify-content: flex-start;
+}
