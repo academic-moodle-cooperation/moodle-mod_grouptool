@@ -526,6 +526,7 @@ $string['sources_missing'] = 'There\'s at least 1 group without a chosen source 
 $string['start'] = 'Start';
 $string['status'] = 'Status';
 $string['status_help'] = '<ul><li><strong>✔</strong> registered in Moodle-group and grouptool</li><li><strong>?</strong> registered in Moodle-group but not in grouptool</li><li><strong>+</strong> registered in grouptool but not in Moodle-group</li><li><strong>1, 2, 3...</strong> queued in grouptool</li></ul>';
+$string['studentview'] = 'Student view';
 $string['successfully_deleted_groups'] = 'Successfully deleted groups!';
 $string['swapped_groups'] = 'Swapped groups <strong>{$a->a}</strong> (order <strong>{$a->aorder}</strong>) and <strong>{$a->b}</strong> (order <strong>{$a->border}</strong>)!';
 $string['switched_to_all_groups'] = 'Changed group filter to all groups!';
