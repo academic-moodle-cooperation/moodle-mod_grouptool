@@ -7336,7 +7336,7 @@ class mod_grouptool {
             'orientation' => $orientation,
             'inactive' => $includeinactive,
         ]);
-
+        echo $OUTPUT->heading(get_string('registrations', 'mod_grouptool'));
         // Process submitted form!
         if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
             // Execution has been confirmed?!
