@@ -119,8 +119,8 @@
             active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}"
             class="{{#status}} {{#str}}
             active, core{{/str}}{{/status}}{{^status}}{{#str}}inactive, core{{/str}}{{/status}}">
-            {{#status}}<span class="badge bg-success text-light">Active </span>{{/status}}
-            {{^status}}<span class="badge bg-secondary text-dark"> Inactive</span> {{/status}}
+            {{#status}}<span class="badge bg-success text-light">{{#str}} active, core{{/str}} </span>{{/status}}
+            {{^status}}<span class="badge bg-secondary text-dark">{{#str}}inactive, core{{/str}}</span> {{/status}}
             </a>
         </div>
     </td>
@@ -130,7 +130,7 @@
                target="_blank"
                title="{{#str}}settingspage, mod_grouptool{{/str}}">
                 {{#pix}}
-                    i/settings, core,
+                    t/editstring, core,
                     {{#str}}
                         settingspage, mod_grouptool
                     {{/str}}

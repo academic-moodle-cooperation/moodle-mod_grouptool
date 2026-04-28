@@ -21,7 +21,7 @@
  * @author    Philipp Hager
  * @author    Hannes Laimer
  * @author    Anne Kreppenhofer
- * @copyright 2025 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
