@@ -39,6 +39,8 @@ try {
 
 require_course_login($course);
 
+// \core_courseformat\activityoverviewbase::redirect_to_overview_page($id, 'grouptool');
+
 /* TRIGGER THE VIEW ALL EVENT */
 $event = course_module_instance_list_viewed::create([
     'context' => context_course::instance($course->id),
