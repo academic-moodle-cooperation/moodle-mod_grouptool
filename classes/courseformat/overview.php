@@ -56,8 +56,6 @@ class overview extends activityoverviewbase {
         core_string_manager $stringmanager,
     ) {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-
         parent::__construct($cm, $rendererhelper, $stringmanager);
 
         $this->grouptool = new \mod_grouptool(
@@ -131,7 +129,6 @@ class overview extends activityoverviewbase {
         }
 
         $registrations = $this->grouptool->get_registration_stats($USER->id);
-        // TODO Add langsring for Rgeisered students
         return new overviewitem(
             name: 'Registered students',
             value: true,

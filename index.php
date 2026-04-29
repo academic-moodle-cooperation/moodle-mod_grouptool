@@ -26,7 +26,6 @@
 use mod_grouptool\event\course_module_instance_list_viewed;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
 
 $id = required_param('id', PARAM_INT);   // Course.
 
