@@ -36,7 +36,15 @@ use mod_grouptool\dates;
 class overview extends activityoverviewbase {
     /** @var \mod_grouptool $grouptool the grouptool instance. */
     private \mod_grouptool $grouptool;
+    /**
+     * @var renderer_helper
+     */
+    protected readonly renderer_helper $rendererhelper;
 
+    /**
+     * @var core_string_manager
+     */
+    protected readonly core_string_manager $stringmanager;
     /**
      * Constructor.
      *
@@ -49,8 +57,8 @@ class overview extends activityoverviewbase {
      */
     public function __construct(
         cm_info $cm,
-        protected readonly renderer_helper $rendererhelper,
-        protected readonly core_string_manager $stringmanager,
+        renderer_helper $rendererhelper,
+        core_string_manager $stringmanager,
     ) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
