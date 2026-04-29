@@ -129,7 +129,7 @@ class overview extends activityoverviewbase {
         }
 
         $registrations = $this->grouptool->get_registration_stats($USER->id);
-        # TODO Add langsring for Rgeisered students
+        // TODO Add langsring for Rgeisered students
         return new overviewitem(
             name: 'Registered students',
             value: true,
