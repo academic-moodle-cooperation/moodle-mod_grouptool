@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace mod_grouptool\courseformat;
 
 use cm_info;
@@ -50,25 +65,26 @@ class overview extends activityoverviewbase {
         );
     }
     #[\Override]
-     public function get_due_date_overview(): ?overviewitem {
+    public function get_due_date_overview(): ?overviewitem {
         global $USER;
 
         $duedate = $this->grouptool->get_settings()->timedue;
 
         if (empty($duedate)) {
             return new overviewitem(
-                name: get_string('duedate','grouptool'),
+                name: get_string('duedate', 'grouptool'),
                 value: null,
                 content: '-',
             );
         }
 
         return new overviewitem(
-            name: get_string('duedate','grouptool'),
+            name: get_string('duedate', 'grouptool'),
             value: $duedate,
             content: userdate($duedate),
         );
     }
+    #[\Override]
     public function get_actions_overview(): ?overviewitem {
         if (!has_capability('mod/grouptool:preview', $this->context)) {
             return null;
@@ -97,7 +113,8 @@ class overview extends activityoverviewbase {
     }
     /**
      * Returns an overview item with the count of registered students for this activity
-     * Checks if the user has the capability to view the registration overview and then returns the count of registered students and total students.
+     * Checks if the user has the capability to view the registration overview and
+     * then returns the count of registered students and total students.
      * @return overviewitem|null
      * @throws \coding_exception
      * @throws \dml_exception
@@ -111,7 +128,7 @@ class overview extends activityoverviewbase {
         }
 
         $registrations = $this->grouptool->get_registration_stats($USER->id);
-        # TODO Add langsring for Rgeisered students
+        // TODO Add langsring for Rgeisered students
         return new overviewitem(
             name: 'Registered students',
             value: true,
@@ -139,7 +156,7 @@ class overview extends activityoverviewbase {
         }
 
         $registration = $this->grouptool->get_user_reg_count($USER->id);
-        [,$min,]=$this->grouptool->get_reg_settings();
+        [, $min, ] = $this->grouptool->get_reg_settings();
 
         if ($registration >= $min && $registration > 0) {
             return new overviewitem(
@@ -155,7 +172,4 @@ class overview extends activityoverviewbase {
             content: get_string('not_registered', 'grouptool')
         );
     }
-
-
-
 }
