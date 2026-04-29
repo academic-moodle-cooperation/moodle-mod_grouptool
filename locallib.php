@@ -103,7 +103,7 @@ class mod_grouptool {
      * If cmid is set create the cm, course, checkmark objects.
      *
      * @param int $cmid the current course module id - not set for new grouptools
-     * @param stdClass $grouptool usually null, but if we have it we pass it to save db access
+     * @param stdClass|null $grouptool usually null, but if we have it we pass it to save db access
      * @param stdClass $cm usually null, but if we have it we pass it to save db access
      * @param stdClass $course usually null, but if we have it we pass it to save db access
      * @param context_module $context
@@ -112,7 +112,6 @@ class mod_grouptool {
      * @throws \moodle_exception
      */
     public function __construct($cmid, $grouptool, $cm = null, $course = null, $context = null) {
-        global $DB;
         global $DB;
 
         if (!empty($cm)) {
