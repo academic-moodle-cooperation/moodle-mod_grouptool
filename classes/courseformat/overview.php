@@ -159,7 +159,7 @@ class overview extends activityoverviewbase {
         }
 
         $registration = $this->grouptool->get_user_reg_count($USER->id);
-        [, $min, ] = $this->grouptool->get_reg_settings();
+        [,$min,]=$this->grouptool->get_reg_settings();
 
         if ($registration >= $min && $registration > 0) {
             return new overviewitem(
@@ -175,4 +175,7 @@ class overview extends activityoverviewbase {
             content: get_string('not_registered', 'grouptool')
         );
     }
+
+
+
 }
