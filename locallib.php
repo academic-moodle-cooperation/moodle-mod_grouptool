@@ -3292,7 +3292,7 @@ class mod_grouptool {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function get_user_reg_count($userid = 0) {
+    public function get_user_reg_count($userid = 0) {
         global $DB, $USER;
 
         if (empty($userid)) {
