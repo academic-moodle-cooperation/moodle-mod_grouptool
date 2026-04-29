@@ -38,10 +38,7 @@ class overview extends activityoverviewbase {
     private \mod_grouptool $grouptool;
     /** @var renderer_helper */
     protected readonly renderer_helper $rendererhelper;
-
-    /**
-     * @var core_string_manager
-     */
+    /** @var core_string_manager */
     protected readonly core_string_manager $stringmanager;
     /**
      * Constructor.
