@@ -92,7 +92,6 @@ class overview extends activityoverviewbase {
             content: userdate($duedate),
         );
     }
-    #[\Override]
     public function get_actions_overview(): ?overviewitem {
         if (!has_capability('mod/grouptool:preview', $this->context)) {
             return null;
