@@ -99,10 +99,20 @@ if ($node) {
     $node->make_inactive();
 }
 
-$node2 = $PAGE->secondarynav->find("mod_grouptool_registration", navigation_node::TYPE_SETTING);
+$node2 = $PAGE->secondarynav->find('mod_grouptool_registration', navigation_node::TYPE_SETTING);
 if ($node2) {
     $node2->make_active();
 }
+
+$node = $PAGE->navigation->find_active_node();
+if ($node) {
+    $node->make_inactive();
+}
+$node3 = $PAGE->navigation->find('mod_grouptool_registration', null);
+if ($node3) {
+    $node3->make_active();
+}
+
 $instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
 $header = $OUTPUT->header();
 echo $header;
