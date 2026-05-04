@@ -167,8 +167,19 @@ if ($node) {
         $node2->make_active();
     }
 }
-
-if ($tab != 'selfregistration') {
+if ($tab == 'selfregistration') {
+    $node = $PAGE->navigation->find_active_node();
+    if ($node) {
+        $node->make_inactive();
+        $node3 = match ($tab) {
+            'selfregistration' => $PAGE->navigation->find("mod_grouptool_selfregistration", null),
+            default => false,
+        };
+        if ($node3) {
+            $node3->make_active();
+        }
+    }
+} else {
     // Output starts here!
     echo $OUTPUT->header();
     echo $outputcache;
