@@ -314,29 +314,8 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     $event->description = format_module_intro('grouptool', $grouptool, $cm->id);
                 }
             }
-
-            if ($grouptool->timeavailable) {
-                $event->eventtype = GROUPTOOL_EVENT_TYPE_AVAILABLEFROM;
-                $event->name = get_string('calendaravailable', 'grouptool', $grouptool->name);
-
-                $event->timestart = $grouptool->timeavailable;
-                $event->timesort = $grouptool->timeavailable;
-                $select = "modulename = :modulename
-                           AND instance = :instance
-                           AND eventtype = :eventtype
-                           AND groupid = 0
-                           AND courseid <> 0";
-                $params = ['modulename' => 'grouptool', 'instance' => $grouptool->id, 'eventtype' => $event->eventtype];
-                $event->id = $DB->get_field_select('event', 'id', $select, $params);
-
-                // Now process the event.
-                if ($event->id) {
-                    $calendarevent = calendar_event::load($event->id);
-                    $calendarevent->update($event, false);
-                } else {
-                    calendar_event::create($event, false);
-                }
-            } else {
+            // REMOVE in a later version, we need to remove the old events if there are any, because they might have wrong times and names.
+            if (!$grouptool->timeavailable) {
                 $DB->delete_records('event', [
                     'modulename' => 'grouptool', 'instance' => $grouptool->id,
                     'eventtype' => GROUPTOOL_EVENT_TYPE_AVAILABLEFROM,
