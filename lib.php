@@ -630,18 +630,9 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
     $gt = $module;
     $regopen = ($gt->allow_reg && (($gt->timedue == 0) || (time() < $gt->timedue))
         && ($gt->timeavailable < time()));
-    if (
-        has_capability('mod/grouptool:administrate_registration', $context)
-        || ($regopen && has_capability('mod/grouptool:register', $context))
-    ) {
-        $url = new moodle_url('/mod/grouptool/view.php', ['id' => $cm->id, 'tab' => 'selfregistration']);
-        $navref->add(get_string('selfregistration', 'grouptool'), $url, null, null, 'mod_grouptool_selfregistration');
-    }
     if ($admingrps) {
         $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
         $admin = $navref->add(get_string('administration', 'grouptool'), $url, null, null, 'mod_grouptool_administration');
-        $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_admin']);
-        $admin->add(get_string('group_administration', 'grouptool'), $url, null, null, 'mod_grouptool_group_administration');
         $url = new moodle_url('/mod/grouptool/administration.php', ['id' => $cm->id, 'tab' => 'group_creation']);
         $admin->add(get_string('group_creation', 'grouptool'), $url, null, null, 'mod_grouptool_group_creation');
     }
@@ -649,9 +640,9 @@ function grouptool_extend_navigation(navigation_node $navref, stdClass $course, 
         $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'overview']);
         $groupregistrations = $navref->add(get_string('registrations', 'grouptool'), $url, null, null, 'mod_grouptool_registration');
         $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'import']);
-        $groupregistrations->add(get_string('import', 'grouptool'), $url);
+        $groupregistrations->add(get_string('import', 'grouptool'), $url, null, null, 'mod_grouptool_import');
         $url = new moodle_url('/mod/grouptool/groupregistrations.php', ['id' => $cm->id, 'tab' => 'unregister']);
-        $groupregistrations->add(get_string('unregister', 'grouptool'), $url);
+        $groupregistrations->add(get_string('unregister', 'grouptool'), $url, null, null, 'mod_grouptool_unregister');
     }
     $navref->nodetype = navigation_node::NODETYPE_BRANCH;
 }
