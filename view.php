@@ -167,7 +167,6 @@ if ($node) {
         $node2->make_active();
     }
 }
-
 if ($tab != 'selfregistration') {
     // Output starts here!
     echo $OUTPUT->header();
