@@ -50,12 +50,12 @@ final class privacy_test extends base {
      *
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
-     * @throws \mod_grouptool\local\exception\exceedgroupsize
-     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserreglimit
-     * @throws \mod_grouptool\local\exception\registration
-     * @throws \mod_grouptool\local\exception\regpresent
+     * @throws \mod_grouptool\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\exception\exceedgroupsize
+     * @throws \mod_grouptool\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\exception\exceeduserreglimit
+     * @throws \mod_grouptool\exception\registration
+     * @throws \mod_grouptool\exception\regpresent
      * @throws \moodle_exception
      * @throws \required_capability_exception
      */
@@ -132,13 +132,13 @@ final class privacy_test extends base {
      *
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
-     * @throws \mod_grouptool\local\exception\exceedgroupsize
-     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserreglimit
-     * @throws \mod_grouptool\local\exception\notenoughregs
-     * @throws \mod_grouptool\local\exception\registration
-     * @throws \mod_grouptool\local\exception\regpresent
+     * @throws \mod_grouptool\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\exception\exceedgroupsize
+     * @throws \mod_grouptool\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\exception\exceeduserreglimit
+     * @throws \mod_grouptool\exception\notenoughregs
+     * @throws \mod_grouptool\exception\registration
+     * @throws \mod_grouptool\exception\regpresent
      * @throws \moodle_exception
      * @throws \required_capability_exception
      */
@@ -267,13 +267,13 @@ final class privacy_test extends base {
      *
      * @throws \coding_exception
      * @throws \dml_exception
-     * @throws \mod_grouptool\local\exception\exceedgroupqueuelimit
-     * @throws \mod_grouptool\local\exception\exceedgroupsize
-     * @throws \mod_grouptool\local\exception\exceeduserqueuelimit
-     * @throws \mod_grouptool\local\exception\exceeduserreglimit
-     * @throws \mod_grouptool\local\exception\notenoughregs
-     * @throws \mod_grouptool\local\exception\registration
-     * @throws \mod_grouptool\local\exception\regpresent
+     * @throws \mod_grouptool\exception\exceedgroupqueuelimit
+     * @throws \mod_grouptool\exception\exceedgroupsize
+     * @throws \mod_grouptool\exception\exceeduserqueuelimit
+     * @throws \mod_grouptool\exception\exceeduserreglimit
+     * @throws \mod_grouptool\exception\notenoughregs
+     * @throws \mod_grouptool\exception\registration
+     * @throws \mod_grouptool\exception\regpresent
      * @throws \moodle_exception
      * @throws \required_capability_exception
      */

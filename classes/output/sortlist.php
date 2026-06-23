@@ -25,6 +25,8 @@
 
 namespace mod_grouptool\output;
 
+use mod_grouptool\domain\activegroup;
+
 /**
  * Representation a sortable collection of active groups with advanced fields!
  *
@@ -38,7 +40,7 @@ class sortlist implements \renderable {
     public $tableclass = 'coloredrows';
     /** @var \stdClass[] $groupings array of non-empty groupings of this course */
     public $groupings = [];
-    /** @var \mod_grouptool\output\activegroup[] $groups array of activegroups */
+    /** @var \mod_grouptool\domain\activegroup[] $groups array of activegroups */
     public $groups = [];
     /** @var int $globalsize active groups standard/global group size */
     public $globalsize = 0;
@@ -189,8 +191,8 @@ class sortlist implements \renderable {
     /**
      * Compare if two groups are in correct order
      *
-     * @param \mod_grouptool\output\activegroup $a
-     * @param \mod_grouptool\output\activegroup $b
+     * @param \mod_grouptool\domain\activegroup $a
+     * @param \mod_grouptool\domain\activegroup $b
      *
      * @return int -1 (a > b)| 0 (a == b)| 1 (a > b)
      */

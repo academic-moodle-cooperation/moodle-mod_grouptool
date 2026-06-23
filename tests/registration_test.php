@@ -105,8 +105,8 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         try {
             $text = null;
             $text = $grouptool->testable_register_in_agrp($agrpids[1], $this->students[0]->id, false);
-        } catch (\mod_grouptool\local\exception\registration $e) {
-            self::assertInstanceOf('\mod_grouptool\local\exception\exceeduserreglimit', $e);
+        } catch (exception\registration $e) {
+            self::assertInstanceOf('\mod_grouptool\exception\exceeduserreglimit', $e);
         }
         self::assertEquals(null, $text);
 
@@ -127,8 +127,8 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $text = null;
         try {
             $text = $grouptool->testable_register_in_agrp($agrpids[0], $this->students[3]->id, false);
-        } catch (\mod_grouptool\local\exception\registration $e) {
-            self::assertInstanceOf('\mod_grouptool\local\exception\exceedgroupsize', $e);
+        } catch (exception\registration $e) {
+            self::assertInstanceOf('\mod_grouptool\exception\exceedgroupsize', $e);
         }
         self::assertEquals('', $text);
 
@@ -181,8 +181,8 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $text = null;
         try {
             $text = $grouptool->testable_register_in_agrp($agrpids[1], $this->students[3]->id, false);
-        } catch (\mod_grouptool\local\exception\registration $e) {
-            self::assertInstanceOf('\mod_grouptool\local\exception\exceeduserreglimit', $e);
+        } catch (exception\registration $e) {
+            self::assertInstanceOf('\mod_grouptool\exception\exceeduserreglimit', $e);
         }
         self::assertEquals('', $text);
 
@@ -190,8 +190,8 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $text = null;
         try {
             $text = $grouptool->testable_register_in_agrp($agrpids[0], $this->students[4]->id, false);
-        } catch (\mod_grouptool\local\exception\registration $e) {
-            self::assertInstanceOf('\mod_grouptool\local\exception\exceedgroupqueuelimit', $e);
+        } catch (exception\registration $e) {
+            self::assertInstanceOf('\mod_grouptool\exception\exceedgroupqueuelimit', $e);
         }
         self::assertEquals('', $text);
 
@@ -269,8 +269,8 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         // Now try to queue user 2 in group 1 too, exceeding user's queue limitation!
         try {
             $text = $grouptool->testable_register_in_agrp($agrpids[1], $this->students[2]->id, false);
-        } catch (\mod_grouptool\local\exception\registration $e) {
-            self::assertInstanceOf('\mod_grouptool\local\exception\exceeduserqueuelimit', $e);
+        } catch (exception\registration $e) {
+            self::assertInstanceOf('\mod_grouptool\exception\exceeduserqueuelimit', $e);
         }
         self::assertEquals('', $text);
 
@@ -330,9 +330,9 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         // Groupchange for student 2 fails, because he's neither registered nor queued or marked anywhere!
         try {
             $grouptool->testable_can_change_group($agrpids[1], $this->students[2]->id, $message);
-        } catch (\mod_grouptool\local\exception\registration $e) {
+        } catch (exception\registration $e) {
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\registration', $e);
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
             self::assertEquals($comptext, $text);
         }
@@ -428,10 +428,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $thrown = true;
         try {
             $grouptool->testable_register_in_agrp($agrpids[4], $this->students[4]->id, false);
-        } catch (\mod_grouptool\local\exception\regpresent $e) {
+        } catch (exception\regpresent $e) {
             $thrown = true;
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\regpresent', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\regpresent', $e);
             $comptext = get_string('already_marked', 'grouptool', $message);
             self::assertEquals($comptext, $text);
         }
@@ -449,10 +449,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $message->groupname = $agrps[$agrpids[4]]->name;
         try {
             $grouptool->testable_register_in_agrp($agrpids[4], $this->students[0]->id, false);
-        } catch (\mod_grouptool\local\exception\exceedgroupqueuelimit $e) {
+        } catch (exception\exceedgroupqueuelimit $e) {
             $thrown = true;
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\exceedgroupqueuelimit', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\exceedgroupqueuelimit', $e);
             $comptext = get_string('exceedgroupqueuelimit', 'grouptool', $message);
             self::assertEquals($comptext, $text);
         }
@@ -466,10 +466,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $message->username = fullname($this->students[4]);
         try {
             $grouptool->testable_register_in_agrp($agrpids[4], $this->students[4]->id, false);
-        } catch (\mod_grouptool\local\exception\regpresent $e) {
+        } catch (exception\regpresent $e) {
             $thrown = true;
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\regpresent', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\regpresent', $e);
             $comptext = get_string('already_queued', 'grouptool', $message);
             self::assertEquals($comptext, $text);
         }
@@ -481,10 +481,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         try {
             $message->username = fullname($this->students[3]);
             $grouptool->testable_register_in_agrp($agrpids[4], $this->students[3]->id, false);
-        } catch (\mod_grouptool\local\exception\regpresent $e) {
+        } catch (exception\regpresent $e) {
             $thrown = true;
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\registration', $e);
             $comptext = get_string('already_registered', 'grouptool', $message);
             self::assertEquals($comptext, $text);
         }
@@ -497,10 +497,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $message->groupname = $agrps[$agrpids[4]]->name;
         try {
             $grouptool->testable_can_change_group($agrpids[4], $this->students[2]->id, $message);
-        } catch (\mod_grouptool\local\exception\registration $e) {
+        } catch (exception\registration $e) {
             $thrown = true;
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\registration', $e);
             $comptext = get_string('groupchange_from_non_unique_reg', 'grouptool');
             self::assertEquals($comptext, $text);
         }
@@ -522,10 +522,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $thrown = false;
         try {
             $grouptool->testable_can_change_group($agrpids[2], $this->students[2]->id, $message, $agrpids[2]);
-        } catch (\mod_grouptool\local\exception\registration $e) {
+        } catch (exception\registration $e) {
             $thrown = true;
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\registration', $e);
             $comptext = get_string('unreg_not_allowed', 'grouptool');
             self::assertEquals($comptext, $text);
         }
@@ -535,9 +535,9 @@ final class registration_test extends \mod_grouptool\local\tests\base {
 
         try {
             $grouptool->testable_can_change_group($agrpids[2], $this->students[2]->id, $message, $agrpids[2]);
-        } catch (\mod_grouptool\local\exception\registration $e) {
+        } catch (exception\registration $e) {
             $text = $e->getMessage();
-            self::assertInstanceOf('\mod_grouptool\local\exception\registration', $e);
+            self::assertInstanceOf('\mod_grouptool\exception\registration', $e);
             $comptext = get_string('unreg_not_allowed', 'grouptool');
             self::assertEquals($comptext, $text);
         }
