@@ -33,16 +33,16 @@ use stdClass;
  */
 class grouptool_instance {
     /** @var cm_info|stdClass The course module record. */
-    protected cm_info|stdClass $cm;
+    public cm_info|stdClass $cm;
 
     /** @var stdClass The course record. */
-    protected stdClass $course;
+    public stdClass $course;
 
     /** @var grouptool_data_object The grouptool database record. */
-    protected grouptool_data_object $grouptool;
+    public grouptool_data_object $grouptool;
 
     /** @var context_module The module context. */
-    protected context_module $context;
+    public context_module $context;
 
     /** @var grouptool_utils Utility helper for grouptool functionality. */
     protected grouptool_utils $grouptoolutils;
