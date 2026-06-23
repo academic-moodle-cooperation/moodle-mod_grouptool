@@ -15,14 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains mod_grouptool's groupings creation form
+ * Contains mod_grouptool's group rename form
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool;
+
+namespace mod_grouptool\form;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,23 +31,23 @@ defined('MOODLE_INTERNAL') || die();
 if (isset($CFG)) {
     require_once($CFG->libdir . '/formslib.php');
     require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
-    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+    require_once($CFG->dirroot . '/mod/grouptool/lib.php');
 }
 
 /**
- * class representing the moodleform used in the administration tab
+ * class representing the moodleform used for renaming groups
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class groupings_creation_form extends \moodleform {
-    /** @var \context_module */
-    protected $context = null;
+class group_rename_form extends \moodleform {
+    /** @var \stdClass */
+    private $course = null;
 
     /**
-     * Definition of administration form
+     * Definition of rename form
      *
      * @throws \coding_exception
      * @throws \dml_exception
@@ -59,15 +60,15 @@ class groupings_creation_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = \context_module::instance($this->_customdata['id']);
-        $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
-        $course = $DB->get_record('course', ['id' => $cm->course]);
 
-        foreach ($this->_customdata['selected'] as $select) {
-            $mform->addElement('hidden', 'selected[' . $select . ']');
-            $mform->setDefault('selected[' . $select . ']', $select);
-            $mform->setType('selected[' . $select . ']', PARAM_INT);
-        }
+        $mform->addElement('hidden', 'instance');
+        $mform->setDefault('instance', $this->_customdata['instance']);
+        $mform->setType('instance', PARAM_INT);
+
+        $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
+        $course = $DB->get_record('course', ['id' => $cm->course]);
+        $this->course = $course;
+
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_admin');
         $mform->setType('tab', PARAM_TEXT);
@@ -76,45 +77,26 @@ class groupings_creation_form extends \moodleform {
         $mform->setDefault('courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('hidden', 'bulkaction');
-        $mform->setDefault('bulkaction', 'grouping');
-        $mform->setType('bulkaction', PARAM_TEXT);
+        $mform->addElement('hidden', 'rename');
+        $mform->setType('rename', PARAM_INT);
+        $mform->setDefault('rename', $this->_customdata['rename']);
 
-        $mform->addElement('hidden', 'start_bulkaction');
-        $mform->setDefault('start_bulkaction', 1);
-        $mform->setType('start_bulkaction', PARAM_BOOL);
-
-        $groupingel = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
-        $options = ['' => get_string('choose', 'grouptool')];
-        $options['-1'] = get_string('onenewgrouping', 'grouptool');
-        $options['-2'] = get_string('onenewgroupingpergroup', 'grouptool');
-        $groupingel->addOptGroup("", $options);
-        if ($groupings = groups_get_all_groupings($course->id)) {
-            $options = [];
-            foreach ($groupings as $grouping) {
-                $options[$grouping->id] = strip_tags(format_string($grouping->name));
-            }
-            $groupingel->addOptGroup("————————————————————————", $options);
-        }
-        $mform->addElement($groupingel);
-        $mform->addHelpButton('target', 'groupingselect', 'grouptool');
-
-        $mform->addElement('text', 'name', get_string('groupingname', 'group'));
+        $mform->addElement('text', 'name', get_string('name'));
         $mform->setType('name', PARAM_TEXT);
-        $mform->hideIf('name', 'target', 'noteq', '-1');
+
+        $mform->addElement('hidden', 'courseid');
+        $mform->setDefault('courseid', $course->id);
+        $mform->setType('courseid', PARAM_INT);
 
         $grp = [];
-        $grp[] = $mform->createElement('submit', 'createGroupings', get_string(
-            'create_assign_groupings',
-            'grouptool'
-        ));
+        $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
         $grp[] = $mform->createElement('cancel');
         $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);
     }
 
     /**
-     * Validation for administration-form
+     * Validation for rename form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
@@ -123,18 +105,25 @@ class groupings_creation_form extends \moodleform {
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function validation($data, $files) {
-        $parenterrors = parent::validation($data, $files);
-        $errors = [];
+        global $DB;
 
-        if (($data['target'] == -1) && empty($data['name'])) {
-            $errors['name'] = get_string('required');
-        }
-        if (($data['target'] == -1) && groups_get_grouping_by_name($data['courseid'], $data['name'])) {
-            $errors['name'] = get_string('groupingnameexists', 'group', $data['name']);
+        $errors = parent::validation($data, $files);
+        if (empty($data['name'])) {
+            $errors['name'] = get_string('choose_group', 'grouptool');
+        } else {
+            $group = groups_get_group_by_name($this->course->id, $data['name']);
+            $group = $DB->get_record('groups', ['id' => $group]);
+            if (!empty($group) && ($group->id != $data['rename'])) {
+                $errors['name'] = get_string('groupnameexists', 'group', $data['name']);
+            }
+            if (strlen($data['name']) >= 255) {
+                $errors['name'] = get_string('groupinfo', 'grouptool');
+            }
         }
 
-        return array_merge($parenterrors, $errors);
+        return $errors;
     }
 }

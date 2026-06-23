@@ -15,15 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains mod_grouptool's group resize form
+ * Contains mod_grouptool's groupings creation form
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace mod_grouptool;
+namespace mod_grouptool\form;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,20 +30,23 @@ defined('MOODLE_INTERNAL') || die();
 if (isset($CFG)) {
     require_once($CFG->libdir . '/formslib.php');
     require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
-    require_once($CFG->dirroot . '/mod/grouptool/lib.php');
+    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 }
 
 /**
- * class representing the moodleform used when resizing groups
+ * class representing the moodleform used in the administration tab
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class group_resize_form extends \moodleform {
+class groupings_creation_form extends \moodleform {
+    /** @var \context_module */
+    protected $context = null;
+
     /**
-     * Definition of resize form
+     * Definition of administration form
      *
      * @throws \coding_exception
      * @throws \dml_exception
@@ -57,15 +59,15 @@ class group_resize_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-
-        $mform->addElement('hidden', 'instance');
-        $mform->setDefault('instance', $this->_customdata['instance']);
-        $mform->setType('instance', PARAM_INT);
-
-        $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
+        $this->context = \context_module::instance($this->_customdata['id']);
+        $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', ['id' => $cm->course]);
-        $group = $DB->get_record('groups', ['id' => $this->_customdata['resize']]);
 
+        foreach ($this->_customdata['selected'] as $select) {
+            $mform->addElement('hidden', 'selected[' . $select . ']');
+            $mform->setDefault('selected[' . $select . ']', $select);
+            $mform->setType('selected[' . $select . ']', PARAM_INT);
+        }
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_admin');
         $mform->setType('tab', PARAM_TEXT);
@@ -74,30 +76,45 @@ class group_resize_form extends \moodleform {
         $mform->setDefault('courseid', $course->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('hidden', 'resize');
-        $mform->setType('resize', PARAM_INT);
-        $mform->setDefault('resize', $this->_customdata['resize']);
+        $mform->addElement('hidden', 'bulkaction');
+        $mform->setDefault('bulkaction', 'grouping');
+        $mform->setType('bulkaction', PARAM_TEXT);
 
-        $mform->addElement('hidden', 'name');
+        $mform->addElement('hidden', 'start_bulkaction');
+        $mform->setDefault('start_bulkaction', 1);
+        $mform->setType('start_bulkaction', PARAM_BOOL);
+
+        $groupingel = $mform->createElement('selectgroups', 'target', get_string('groupingselect', 'grouptool'));
+        $options = ['' => get_string('choose', 'grouptool')];
+        $options['-1'] = get_string('onenewgrouping', 'grouptool');
+        $options['-2'] = get_string('onenewgroupingpergroup', 'grouptool');
+        $groupingel->addOptGroup("", $options);
+        if ($groupings = groups_get_all_groupings($course->id)) {
+            $options = [];
+            foreach ($groupings as $grouping) {
+                $options[$grouping->id] = strip_tags(format_string($grouping->name));
+            }
+            $groupingel->addOptGroup("————————————————————————", $options);
+        }
+        $mform->addElement($groupingel);
+        $mform->addHelpButton('target', 'groupingselect', 'grouptool');
+
+        $mform->addElement('text', 'name', get_string('groupingname', 'group'));
         $mform->setType('name', PARAM_TEXT);
-        $mform->setDefault('name', $group->name);
-
-        $mform->addElement('text', 'size', get_string('size'));
-        $mform->setType('size', PARAM_INT);
-
-        $mform->addElement('hidden', 'courseid');
-        $mform->setDefault('courseid', $course->id);
-        $mform->setType('courseid', PARAM_INT);
+        $mform->hideIf('name', 'target', 'noteq', '-1');
 
         $grp = [];
-        $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
+        $grp[] = $mform->createElement('submit', 'createGroupings', get_string(
+            'create_assign_groupings',
+            'grouptool'
+        ));
         $grp[] = $mform->createElement('cancel');
         $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
         $mform->setType('actionbuttons', PARAM_RAW);
     }
 
     /**
-     * Validation for resize form
+     * Validation for administration-form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
@@ -106,41 +123,18 @@ class group_resize_form extends \moodleform {
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
      * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function validation($data, $files) {
-        global $DB;
+        $parenterrors = parent::validation($data, $files);
+        $errors = [];
 
-        $errors = parent::validation($data, $files);
-        $sql = '
-   SELECT COUNT(reg.id) AS regcnt
-     FROM {grouptool_agrps} agrps
-LEFT JOIN {grouptool_registered} reg ON reg.agrpid = agrps.id AND reg.modified_by >= 0
-    WHERE agrps.grouptoolid = :grouptoolid AND agrps.groupid = :groupid';
-        $params = ['grouptoolid' => $data['instance'], 'groupid' => $data['resize']];
-        $regs = $DB->count_records_sql($sql, $params);
-        if (($data['size'] != '') && (clean_param($data['size'], PARAM_INT) <= 0)) {
-            $errors['size'] = get_string('grpsizezeroerror', 'grouptool');
-        } else if (!empty($regs) && $data['size'] < $regs) {
-            $errors['size'] = get_string('toomanyregs', 'grouptool');
-        } else {
-            $DB->set_field(
-                'grouptool_agrps',
-                'grpsize',
-                $data['size'],
-                ['groupid' => $data['resize'], 'grouptoolid' => $data['instance']]
-            );
-            if (
-                $data['size'] != $DB->get_field('grouptool_agrps', 'grpsize', [
-                    'groupid' => $data['resize'],
-                    'grouptoolid' => $data['instance'],
-                ])
-            ) {
-                // Error happened...
-                $errors['size'] = get_string('couldnt_resize_group', 'grouptool', $data['size']);
-            }
+        if (($data['target'] == -1) && empty($data['name'])) {
+            $errors['name'] = get_string('required');
+        }
+        if (($data['target'] == -1) && groups_get_grouping_by_name($data['courseid'], $data['name'])) {
+            $errors['name'] = get_string('groupingnameexists', 'group', $data['name']);
         }
 
-        return $errors;
+        return array_merge($parenterrors, $errors);
     }
 }

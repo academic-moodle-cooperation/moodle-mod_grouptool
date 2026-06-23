@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains mod_grouptool's unregister form
+ * Contains mod_grouptool's import form
  *
  * @package   mod_grouptool
- * @author    Hannes Laimer
- * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool;
+namespace mod_grouptool\form;
 
 use mod_grouptool\output\sortlist;
 
@@ -36,19 +36,19 @@ if (isset($CFG)) {
 }
 
 /**
- * class representing the moodleform used in the unregister-tab
+ * class representing the moodleform used in the import-tab
  *
  * @package   mod_grouptool
- * @author    Hannes Laimer
- * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Philipp Hager
+ * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class unregister_form extends \moodleform {
+class import_form extends \moodleform {
     /** @var \context_module */
     private $context = null;
 
     /**
-     * Definition of unregister form
+     * Definition of import form
      *
      * @throws \coding_exception
      * @throws \dml_exception
@@ -56,36 +56,36 @@ class unregister_form extends \moodleform {
     protected function definition() {
         global $DB;
 
-        $mdlform = $this->_form;
+        $mform = $this->_form;
 
-        $mdlform->addElement('hidden', 'id');
-        $mdlform->setDefault('id', $this->_customdata['id']);
-        $mdlform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'id');
+        $mform->setDefault('id', $this->_customdata['id']);
+        $mform->setType('id', PARAM_INT);
         $this->context = \context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', ['id' => $cm->course]);
 
-        $mdlform->addElement('hidden', 'tab');
-        $mdlform->setDefault('tab', 'unregister');
-        $mdlform->setType('tab', PARAM_TEXT);
+        $mform->addElement('hidden', 'tab');
+        $mform->setDefault('tab', 'import');
+        $mform->setType('tab', PARAM_TEXT);
 
-        if (has_capability('mod/grouptool:administrate_deregistration', $this->context)) {
+        if (has_capability('mod/grouptool:administrate_registration', $this->context)) {
             /* -------------------------------------------------------------------------------
              * Adding the "group creation" fieldset, where all the common settings are showed
              */
-            $mdlform->addElement('header', 'groupuser_unregister', get_string(
-                'groupuser_unregister',
+            $mform->addElement('header', 'groupuser_import', get_string(
+                'groupuser_import',
                 'grouptool'
             ));
 
             $active = new sortlist($course->id, $cm, \mod_grouptool::FILTER_ACTIVE);
             $inactive = new sortlist($course->id, $cm, \mod_grouptool::FILTER_INACTIVE);
 
-            $groups = $mdlform->createElement(
+            $groups = $mform->createElement(
                 'selectgroups',
                 'groups',
-                get_string('choose_targetgroup_unregister', 'grouptool'),
+                get_string('choose_targetgroup_import', 'grouptool'),
                 null,
                 ['size' => 15]
             );
@@ -106,31 +106,31 @@ class unregister_form extends \moodleform {
                 $groups->addOptGroup(get_string('inactivegroups', 'grouptool'), $options);
             }
             $groups->setMultiple(true);
-            $mdlform->addElement($groups);
-            $mdlform->setType('groups', PARAM_INT);
-            $mdlform->addRule('groups', null, 'required', null, 'client');
+            $mform->addElement($groups);
+            $mform->setType('groups', PARAM_INT);
+            $mform->addRule('groups', null, 'required', null, 'client');
 
-            $mdlform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
+            $mform->addElement('textarea', 'data', get_string('userlist', 'grouptool'), [
                 'wrap' => 'virtual',
                 'rows' => '20',
                 'cols' => '50',
             ]);
-            $mdlform->addHelpButton('data', 'userlist', 'grouptool');
-            $mdlform->addRule('data', null, 'required', null, 'client');
-            $mdlform->addRule('data', null, 'required', null, 'server');
+            $mform->addHelpButton('data', 'userlist', 'grouptool');
+            $mform->addRule('data', null, 'required', null, 'client');
+            $mform->addRule('data', null, 'required', null, 'server');
 
-            $mdlform->addElement('advcheckbox', 'unregfrommgroups', '', get_string('unregfrommgroups', 'grouptool'));
-            $mdlform->addHelpButton('unregfrommgroups', 'unregfrommgroups', 'grouptool');
-            if ($forcedereg = get_config('mod_grouptool', 'force_dereg')) {
-                $mdlform->setDefault('unregfrommgroups', $forcedereg);
+            $mform->addElement('advcheckbox', 'forceregistration', '', get_string('forceregistration', 'grouptool'));
+            $mform->addHelpButton('forceregistration', 'forceregistration', 'grouptool');
+            if ($forceimportreg = get_config('mod_grouptool', 'force_importreg')) {
+                $mform->setDefault('forceregistration', $forceimportreg);
             }
 
-            $mdlform->addElement('submit', 'submitbutton', get_string('unregisterbutton', 'grouptool'));
+            $mform->addElement('submit', 'submitbutton', get_string('importbutton', 'grouptool'));
         }
     }
 
     /**
-     * Validation for unregister form
+     * Validation for import form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
