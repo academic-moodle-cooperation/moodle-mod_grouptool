@@ -22,21 +22,21 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\local\exception;
+namespace mod_grouptool\exception;
 
 /**
- * Exception when the user's queue limit will be exceeded!
+ * Exception when the group's queue limit will be exceeded!
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class exceeduserqueuelimit extends registration {
+class exceedgroupqueuelimit extends registration {
     /**
      * Constructor
      */
     public function __construct() {
-        parent::__construct('exceeduserqueuelimit', 'grouptool');
+        parent::__construct('exceedgroupqueuelimit', 'grouptool');
     }
 }

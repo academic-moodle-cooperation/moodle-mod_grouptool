@@ -22,7 +22,7 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\local\exception;
+namespace mod_grouptool\exception;
 
 /**
  * Exception when the group's size will be exceeded!
