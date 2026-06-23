@@ -22,26 +22,34 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\local\exception;
+namespace mod_grouptool\exception;
 
 /**
- * General exception during the registration/queue/marking process!
+ * Exception when the user is already registered/queued/marked for this group!
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class registration extends \moodle_exception {
+class regpresent extends registration {
     /**
      * Constructor
      *
-     * @param string $description (optional) exception description string identifier
-     * @param string $module (optional) location of the string definition
-     * @param mixed $a (optional) additional data used in the language string
+     * @param string $text (optional) Text to be used
+     * @param string $a (optional) Additional data used by language string
+     * @throws \coding_exception
      */
-    public function __construct($description = 'general_registration_exception', $module = 'grouptool', $a = null) {
+    public function __construct($text = '', $a = null) {
+        if ($text == '') {
+            $text = get_string('already_registered', 'grouptool');
+        }
+        if ($a === null) {
+            $a = new \stdClass();
+            $a->username = '';
+            $a->groupname = '';
+        }
 
-        parent::__construct($description, $module, '', $a);
+        parent::__construct($text, 'grouptool', $a);
     }
 }
