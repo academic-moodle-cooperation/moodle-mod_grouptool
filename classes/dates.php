@@ -25,6 +25,7 @@
 namespace mod_grouptool;
 
 use core\activity_dates;
+use mod_grouptool\local\grouptool_instance;
 
 /**
  * Class for fetching the important dates in mod_assign for a given module instance and a user.
@@ -44,7 +45,7 @@ class dates extends activity_dates {
         require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
         $course = get_course($this->cm->course);
-        $grouptool = new \mod_grouptool($this->cm->id, null, $this->cm, $course);
+        $grouptool = new grouptool_instance($this->cm->id, null, $this->cm, $course);
         $grouptoolsettings = $grouptool->get_settings();
 
         $timeopen = $grouptoolsettings->timeavailable ?? null;

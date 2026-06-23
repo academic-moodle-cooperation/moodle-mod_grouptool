@@ -24,6 +24,9 @@
  */
 
 // @codingStandardsIgnoreLine
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\view_controller;
+
 if (((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
     || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))
 ) {
@@ -103,9 +106,10 @@ $node2 = $PAGE->secondarynav->find("mod_grouptool_registration", navigation_node
 if ($node2) {
     $node2->make_active();
 }
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
-$header = $OUTPUT->header();
-echo $header;
+
+$viewcontroller = new view_controller($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
+
+echo $OUTPUT->header();
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
 if (!($viewreggv)) {
@@ -124,20 +128,20 @@ switch ($tab) {
             $select = new single_select($url, 'tab', $options, 'import', false);
             echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         }
-        $instance->view_import();
+        $viewcontroller->view_import();
         break;
     case 'unregister':
         if (has_capability('mod/grouptool:administrate_registration', $context)) {
             $select = new single_select($url, 'tab', $options, 'unregister', false);
             echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         }
-        $instance->view_unregister();
+        $viewcontroller->view_unregister();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
     default:
-        $instance->view_overview();
+        $viewcontroller->view_overview();
 }
 echo $OUTPUT->footer();

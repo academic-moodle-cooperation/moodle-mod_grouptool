@@ -36,7 +36,11 @@
 
 // TODO split tabs in different PHP files and define it only when really needed (=import-tab , needed for progress bar)!
 // @codingStandardsIgnoreLine
-if ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\view_controller;
+
+if (
+    (isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
     || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister')
 ) {
     // @codingStandardsIgnoreLine
@@ -85,7 +89,7 @@ $PAGE->set_activity_record($grouptool);
 $PAGE->add_body_class('limitedwidth');
 
 
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
+$viewcontroller = new view_controller($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 
 // Cache output so header can be generated after new completion infos are avaliable.
 $outputcache = '';
@@ -148,7 +152,7 @@ $event = \mod_grouptool\event\course_module_viewed::create([
     'context' => context_module::instance($cm->id),
     'other' => [
         'tab' => $tab,
-        'name' => $instance->get_name(),
+        'name' => $viewcontroller->get_name(),
     ],
 ]);
 $event->add_record_snapshot('course', $course);
@@ -176,11 +180,11 @@ if ($tab != 'selfregistration') {
 
 switch ($tab) {
     case 'default':
-        $instance->view_starting_page();
+        $viewcontroller->view_starting_page();
         break;
     case 'selfregistration':
         // Send cached tab output so selfregistration can add the header once updated.
-        $instance->view_selfregistration($outputcache);
+        $viewcontroller->view_selfregistration($outputcache);
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');

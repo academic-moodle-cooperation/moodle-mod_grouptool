@@ -23,6 +23,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\view_controller;
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
@@ -135,7 +138,7 @@ $node2 = $PAGE->secondarynav->find("mod_grouptool_administration", navigation_no
 if ($node2) {
     $node2->make_active();
 }
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
+$viewcontroller = new view_controller($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 echo $OUTPUT->header();
 
 $tab = optional_param('tab', null, PARAM_ALPHAEXT);
@@ -145,13 +148,13 @@ if (!($creategrps || $creategrpgs || $admingrps)) {
 }
 switch ($tab) {
     case 'group_creation':
-        $instance->view_creation();
+        $viewcontroller->view_creation();
         break;
     case 'noaccess':
         $notification = $OUTPUT->notification(get_string('noaccess', 'grouptool'), 'error');
         echo $OUTPUT->box($notification, 'generalbox centered');
         break;
     default:
-        $instance->view_administration();
+        $viewcontroller->view_administration();
 }
 echo $OUTPUT->footer();
