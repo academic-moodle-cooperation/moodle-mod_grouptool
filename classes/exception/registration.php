@@ -22,28 +22,26 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\local\exception;
+namespace mod_grouptool\exception;
 
 /**
- * Exception when the user has not enough marked groups to be registered completely
+ * General exception during the registration/queue/marking process!
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class notenoughregs extends registration {
+class registration extends \moodle_exception {
     /**
      * Constructor
      *
-     * @param string $text (optional) Text to use instead of standard-text (notenoughregs, grouptool)
-     * @param mixed $a (optional) Data used by language string
+     * @param string $description (optional) exception description string identifier
+     * @param string $module (optional) location of the string definition
+     * @param mixed $a (optional) additional data used in the language string
      */
-    public function __construct($text = '', $a = null) {
-        if ($text === '') {
-            $text = 'notenoughregs';
-        }
+    public function __construct($description = 'general_registration_exception', $module = 'grouptool', $a = null) {
 
-        parent::__construct($text, 'grouptool', $a);
+        parent::__construct($description, $module, '', $a);
     }
 }
