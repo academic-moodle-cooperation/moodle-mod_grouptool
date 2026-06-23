@@ -22,10 +22,12 @@
     The purpose of this template is to display a single group in mod_grouptool's group overview.
 
     Classes required for JS:
-    * none
+    * grouptool-sort-name
 
     Data attributes required for JS:
-    * none
+    * data-sort-field
+    * data-firstname
+    * data-lastname
 
     Context variables required for this template:
     * name The group's name
@@ -74,16 +76,64 @@
         },
         "userlink": "https://example.com/user/view.php?course=4",
         "reg_data": [
-            {"userid": 1, "status": "✔", "name": "Clark Kent", "idnumber": "04567890", "email": "clark@dailyplanet.com"},
-            {"userid": 2, "status": "+", "name": "Bruce Wayne", "idnumber": "12345678", "email": "office@wayne-enterprises.com"}
+            {
+                "userid": 1,
+                "status": "✔",
+                "name": "Clark Kent",
+                "firstname": "Clark",
+                "lastname": "Kent",
+                "idnumber": "04567890",
+                "email": "clark@dailyplanet.com"
+            },
+            {
+                "userid": 2,
+                "status": "+",
+                "name": "Bruce Wayne",
+                "firstname": "Bruce",
+                "lastname": "Wayne",
+                "idnumber": "12345678",
+                "email": "office@wayne-enterprises.com"
+            }
         ],
         "mreg_data": [
-            {"userid": 3, "status": "?", "name": "Stephen V Strange, M.D.", "idnumber": "90123456", "email": "magic@kamar-taj.np"},
-            {"userid": 4, "status": "?", "name": "Oliver Queen", "idnumber": "78901234", "email": "ras@nanda-parbat.org"}
+            {
+                "userid": 3,
+                "status": "?",
+                "name": "Stephen V Strange, M.D.",
+                "firstname": "Stephen",
+                "lastname": "Strange",
+                "idnumber": "90123456",
+                "email": "magic@kamar-taj.np"
+            },
+            {
+                "userid": 4,
+                "status": "?",
+                "name": "Oliver Queen",
+                "firstname": "Oliver",
+                "lastname": "Queen",
+                "idnumber": "78901234",
+                "email": "ras@nanda-parbat.org"
+            }
         ],
         "queue_data": [
-            {"userid": 5, "rank": "1", "name": "Tony Stark", "idnumber": "56789012", "email": "genius@start-enterprises.com"},
-            {"userid": 6, "rank": "2", "name": "James Rhodes", "idnumber": "34567890", "email": "user6@example.com"}
+            {
+                "userid": 5,
+                "rank": "1",
+                "name": "Tony Stark",
+                "firstname": "Tony",
+                "lastname": "Stark",
+                "idnumber": "56789012",
+                "email": "genius@start-enterprises.com"
+            },
+            {
+                "userid": 6,
+                "rank": "2",
+                "name": "James Rhodes",
+                "firstname": "James",
+                "lastname": "Rhodes",
+                "idnumber": "34567890",
+                "email": "user6@example.com"
+            }
         ]
     }
 }}
@@ -93,67 +143,94 @@
             }}{{#outdated}}<small class="p-l-1"><i class="fa fa-user-circle text-info" title = "{{!
             }}{{#str}} not_synced_reg_present, mod_grouptool {{/str}}" aria-hidden="true"></i></small>{{/outdated}}
         </h3>
-       {{#downloadcapability}}
-        <div class="download"><span class="title">{{#str}} download, core {{/str}}:</span>{{!
+        {{#downloadcapability}}
+            <div class="download"><span class="title">{{#str}} download, core {{/str}}:</span>{{!
             }}<a href="{{downloadurl}}&format={{formattxt}}">.TXT</a>{{!
             }}<a href="{{downloadurl}}&format={{formatxlsx}}">.XLSX</a>{{!
             }}<a href="{{downloadurl}}&format={{formatpdf}}">.PDF</a>{{!
             }}<a href="{{downloadurl}}&format={{formatods}}">.ODS</a>{{!
         }}</div>
-       {{/downloadcapability}}
+        {{/downloadcapability}}
         <span class="groupsize">{{#str}}total, mod_grouptool{{/str}} {{total}}</span> / {{!
         }}<span class="registered">{{#str}}registered, mod_grouptool{{/str}} {{registered}}</span> / {{!
         }}<span class="queued">{{#str}}queued, mod_grouptool{{/str}} {{queued}}</span> / {{!
         }}<span class="free">{{#str}}free, mod_grouptool{{/str}} {{free}}</span>
     </div>
+
     <table class="centeredblock userlist table table-striped table-hover table-condensed">
         <thead>
-            <tr>
-                <th class="text-center">{{#str}}status, mod_grouptool{{/str}}{{#statushelp}}{{>core/help_icon}}{{/statushelp}}</th>
-                <th class="">{{#str}} fullname, core {{/str}}</th>
-                {{#useridentity}}
-                    <th class="">{{value}}</th>
-                {{/useridentity}}
-            </tr>
+        <tr>
+            <th class="text-center">
+                {{#str}}status, mod_grouptool{{/str}}{{#statushelp}}{{>core/help_icon}}{{/statushelp}}
+            </th>
+            <th class="">
+                <button type="button" class="btn btn-link p-0 grouptool-sort-name" data-sort-field="lastname">
+                    {{#str}} lastname {{/str}}
+                </button>
+                /
+                <button type="button" class="btn btn-link p-0 grouptool-sort-name" data-sort-field="firstname">
+                    {{#str}} firstname {{/str}}
+                </button>
+            </th>
+            {{#useridentity}}
+                <th class="">{{value}}</th>
+            {{/useridentity}}
+        </tr>
         </thead>
         <tbody>
         {{#reg_data}}
             <tr class="">
                 <td class="status">{{status}}</td>
-                <td class="userlink"><a href="{{userlink}}&id={{userid}}" title="{{name}}">{{name}}</a></td>
+                <td class="userlink" data-firstname="{{firstname}}" data-lastname="{{lastname}}">
+                    <a href="{{userlink}}&id={{userid}}" title="{{name}}">
+                    {{lastname}} / {{firstname}}
+                    </a>
+                </td>
                 {{#useridentityvalues}}
                     <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
                 {{/useridentityvalues}}
             </tr>
         {{/reg_data}}
+
         {{#mreg_data}}
             <tr class="">
                 <td class="status">{{status}}</td>
-                <td class="userlink"><a href="{{userlink}}&id={{userid}}" title="{{name}}">{{name}}</a></td>
+                <td class="userlink" data-firstname="{{firstname}}" data-lastname="{{lastname}}">
+                    <a href="{{userlink}}&id={{userid}}" title="{{name}}">
+                    {{lastname}} / {{firstname}}
+                    </a>
+                </td>
                 {{#useridentityvalues}}
                     <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
                 {{/useridentityvalues}}
             </tr>
         {{/mreg_data}}
+
         {{^reg_data}}{{^mreg_data}}
             <tr class="regentry reg">
                 <td class="no_registrations" colspan="100">{{#str}} no_registrations, mod_grouptool {{/str}}</td>
             </tr>
         {{/mreg_data}}{{/reg_data}}
+
         {{#queue_data}}
             <tr class="">
                 <td class="status">{{rank}}</td>
-                <td class="userlink"><a href="{{userlink}}&id={{userid}}" title="{{name}}">{{name}}</a></td>
+                <td class="userlink">
+                    <a href="{{userlink}}&id={{userid}}" title="{{name}}">
+                    {{lastname}} / {{firstname}}
+                    </a>
+                </td>
                 {{#useridentityvalues}}
                     <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
                 {{/useridentityvalues}}
             </tr>
         {{/queue_data}}
+
         {{^queue_data}}
             <tr class="queueentry queue">
                 <td class="no_queues" colspan="100">{{#str}} nobody_queued, mod_grouptool {{/str}}</td>
             </tr>
         {{/queue_data}}
         </tbody>
-        </table>
+    </table>
 </div>
