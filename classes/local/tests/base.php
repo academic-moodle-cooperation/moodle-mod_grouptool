@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 
 
 use advanced_testcase;
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\grouptool_instance;
+use mod_grouptool\local\model\group_manager;
 use stdClass;
 use mod_grouptool_generator;
 use coding_exception;
@@ -118,22 +121,22 @@ abstract class base extends advanced_testcase {
         $this->course = self::getDataGenerator()->create_course();
         $this->teachers = [];
         for ($i = 0; $i < self::DEFAULT_TEACHER_COUNT; $i++) {
-            array_push($this->teachers, self::getDataGenerator()->create_user());
+            $this->teachers[] = self::getDataGenerator()->create_user();
         }
 
         $this->editingteachers = [];
         for ($i = 0; $i < self::DEFAULT_EDITING_TEACHER_COUNT; $i++) {
-            array_push($this->editingteachers, self::getDataGenerator()->create_user());
+            $this->editingteachers[] = self::getDataGenerator()->create_user();
         }
 
         $this->students = [];
         for ($i = 0; $i < self::DEFAULT_STUDENT_COUNT; $i++) {
-            array_push($this->students, self::getDataGenerator()->create_user());
+            $this->students[] = self::getDataGenerator()->create_user();
         }
 
         $this->groups = [];
         for ($i = 0; $i < self::GROUP_COUNT; $i++) {
-            array_push($this->groups, self::getDataGenerator()->create_group(['courseid' => $this->course->id]));
+            $this->groups[] = self::getDataGenerator()->create_group(['courseid' => $this->course->id]);
         }
 
         $this->timestamps = [];
@@ -148,9 +151,9 @@ abstract class base extends advanced_testcase {
             $year = rand(1980, date('Y'));
             // Steps of 5 minutes from 5 minute duration to 5 hours!
             $dur = rand(1, 60);
-            array_push($this->timestamps, mktime(0, 0, 0, $month, $day, $year));
-            array_push($this->starts, mktime($hour, $minute, $second, $month, $day, $year));
-            array_push($this->stops, mktime($hour, $minute + (5 * $dur), $second, $month, $day, $year));
+            $this->timestamps[] = mktime(0, 0, 0, $month, $day, $year);
+            $this->starts[] = mktime($hour, $minute, $second, $month, $day, $year);
+            $this->stops[] = mktime($hour, $minute + (5 * $dur), $second, $month, $day, $year);
         }
 
         $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
@@ -196,22 +199,22 @@ abstract class base extends advanced_testcase {
         global $DB;
         $this->extrateachers = [];
         for ($i = 0; $i < self::EXTRA_TEACHER_COUNT; $i++) {
-            array_push($this->extrateachers, self::getDataGenerator()->create_user());
+            $this->extrateachers[] = self::getDataGenerator()->create_user();
         }
 
         $this->extraeditingteachers = [];
         for ($i = 0; $i < self::EXTRA_EDITING_TEACHER_COUNT; $i++) {
-            array_push($this->extraeditingteachers, self::getDataGenerator()->create_user());
+            $this->extraeditingteachers[] = self::getDataGenerator()->create_user();
         }
 
         $this->extrastudents = [];
         for ($i = 0; $i < self::EXTRA_STUDENT_COUNT; $i++) {
-            array_push($this->extrastudents, self::getDataGenerator()->create_user());
+            $this->extrastudents[] = self::getDataGenerator()->create_user();
         }
 
         $this->extrasuspendedstudents = [];
         for ($i = 0; $i < self::EXTRA_SUSPENDED_COUNT; $i++) {
-            array_push($this->extrasuspendedstudents, self::getDataGenerator()->create_user());
+            $this->extrasuspendedstudents[] = self::getDataGenerator()->create_user();
         }
 
         $teacherrole = $DB->get_record('role', ['shortname' => 'teacher']);
@@ -266,12 +269,12 @@ abstract class base extends advanced_testcase {
      * Convenience function to create a testable instance of an assignment acc.
      *
      * @param array $params Array of parameters to pass to the generator
-     * @return grouptool Testable wrapper around the assign class.
+     * @return grouptool_instance Testable wrapper around the assign class.
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
-    protected function create_instance($params = []) {
+    protected function create_instance(array $params = []): grouptool_instance {
         global $DB;
 
         /** @var mod_grouptool_generator $generator */
@@ -282,20 +285,21 @@ abstract class base extends advanced_testcase {
 
         $DB->set_field('grouptool_agrps', 'active', 1, ['grouptoolid' => $instance->id]);
 
-        return new grouptool($cm->id, $instance, $cm, $this->course);
+        return new grouptool_instance($cm->id, $instance, $cm, $this->course);
     }
 
     /**
      * Get's all active groups indexed by active group ID as well as agrpids and prepares a message object!
      *
-     * @param grouptool $grouptool The grouptool instance to fetch data for
+     * @param grouptool_instance $grouptool The grouptool instance to fetch data for
      * @return array agrps, agrpids, message-object
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    protected function get_agrps_and_prepare_message($grouptool) {
+    protected function get_agrps_and_prepare_message(grouptool_instance $grouptool): array {
         // Get all active groups indexed by active group ID!
-        $agrps = $grouptool->get_active_groups(false, false, 0, 0, 0, false);
+        $groupmanager = new group_manager($grouptool->cm, $grouptool->grouptool, $grouptool->context, $grouptool->course);
+        $agrps = $groupmanager->get_active_groups(false, false, 0, 0, 0, false);
         $agrpids = array_keys($agrps);
         $message = new stdClass();
         $message->username = fullname($this->students[0]);
@@ -307,12 +311,14 @@ abstract class base extends advanced_testcase {
             2 => $message,
         ];
     }
+
     /**
      * Inserts one queue entry for a user into an agrp.
      *
      * @param int $agrpid
      * @param int $userid
      * @return int inserted queue id
+     * @throws dml_exception
      */
     protected function insert_queue_entry(int $agrpid, int $userid): int {
         global $DB, $USER;

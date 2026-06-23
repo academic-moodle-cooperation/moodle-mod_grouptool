@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 
 // Make sure the code being tested is accessible.
 global $CFG;
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php'); // Include the code to test!
 
 /**
  * This class contains the test cases for the formular validation.
