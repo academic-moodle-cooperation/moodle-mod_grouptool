@@ -152,4 +152,7 @@ class mod_grouptool {
 
         $this->grouptool->course = $this->course->id;
     }
+
+    public function register_in_agrp(int $agrpid, int $userid, bool $previewonly) {
+    }
 }
