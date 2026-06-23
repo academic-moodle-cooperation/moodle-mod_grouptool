@@ -23,7 +23,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_grouptool;
+namespace mod_grouptool\form;
 
 use html_writer;
 
