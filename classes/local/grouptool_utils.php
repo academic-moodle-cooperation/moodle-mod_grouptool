@@ -29,9 +29,13 @@ use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\output\html_writer;
 use core\output\single_button;
-use mod_grouptool\stdClass;
+use core_php_time_limit;
+use core_table\output\html_table_cell;
+use core_table\output\html_table_row;
 use moodle_url;
+use progress_bar;
 use single_select;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -102,7 +106,7 @@ class grouptool_utils extends grouptool_instance {
                 $queues++;
             }
         }
-        if (!empty($this->grouptool->users_queues_limit) && ($queues > $this->grouptool->users_queues_limit)) {
+        if (!empty($this->grouptool->usersqueueslimit) && ($queues > $this->grouptool->usersqueueslimit)) {
             throw new exceeduserqueuelimit();
         }
 
@@ -111,7 +115,7 @@ class grouptool_utils extends grouptool_instance {
                 unset($cur->type);
                 $cur->modified_by = $USER->id;
                 $DB->update_record('grouptool_registered', $cur);
-                if ($this->grouptool->immediate_reg) {
+                if ($this->grouptool->immediatereg) {
                     groups_add_member($cur->groupid, $userid);
                 }
             } else {
@@ -268,12 +272,12 @@ class grouptool_utils extends grouptool_instance {
             $groupdata = $this->get_active_groups(true, true, $cur->agrpid);
             $groupdata = current($groupdata);
 
-            if ($this->grouptool->use_size) {
-                $notfull = empty($this->grouptool->groups_queues_limit)
-                    || (count($groupdata->queued) < $this->grouptool->groups_queues_limit);
+            if ($this->grouptool->usesize) {
+                $notfull = empty($this->grouptool->groupsqueueslimit)
+                    || (count($groupdata->queued) < $this->grouptool->groupsqueueslimit);
                 if (count($groupdata->registered) < $groupdata->grpsize) {
                     $cur->type = 'reg';
-                } else if ($this->grouptool->use_queue && $notfull) {
+                } else if ($this->grouptool->usequeue && $notfull) {
                     $cur->type = 'queue';
                 } else {
                     // Place occupied in the meanwhile, must look for another group!
@@ -405,7 +409,7 @@ class grouptool_utils extends grouptool_instance {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function import(array $groups, stdClass|string $data, $ignored = [], $forceregistration = false, $previewonly = false): array {
+    public function import(array $groups, stdClass|string $data, array $ignored = [], $forceregistration = false, $previewonly = false): array {
         global $DB, $OUTPUT, $USER;
 
         $message = "";
@@ -1148,5 +1152,4 @@ class grouptool_utils extends grouptool_instance {
 
         return [$source, $orderby];
     }
-
 }

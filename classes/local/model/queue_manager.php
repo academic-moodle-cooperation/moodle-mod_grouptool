@@ -23,6 +23,14 @@ use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\local\grouptool_utils;
 use stdClass;
 
+/**
+ * Class containing the logic for managing the queue of a grouptool instance
+ *
+ * @package   mod_grouptool
+ * @author    Anne Kreppenhofer
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class queue_manager extends grouptool_instance {
     /**
      * Fills the group as much as possible with entries from the queue.
@@ -40,7 +48,7 @@ class queue_manager extends grouptool_instance {
         $registrationmanager = new registration_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
-        if (empty($this->grouptool->use_queue)) {
+        if (empty($this->grouptool->usequeue)) {
             return true;
         }
 
@@ -66,7 +74,7 @@ class queue_manager extends grouptool_instance {
                  WHERE queued.agrpid = ?
               GROUP BY queued.id
               ORDER BY priority DESC, queued.timestamp ASC";
-        $params = array_merge([$this->grouptool->choose_min], $agrpsparam, [$agrpid]);
+        $params = array_merge([$this->grouptool->choosemin], $agrpsparam, [$agrpid]);
         $records = $DB->get_records_sql($sql, $params);
 
         if (empty($records) || count($records) == 0) {
@@ -77,7 +85,7 @@ class queue_manager extends grouptool_instance {
         $message->groupname = $groupdata->name;
 
         foreach ($records as $record) {
-            if (!empty($this->grouptool->use_size) && ($groupdata->grpsize <= count($groupdata->registered))) {
+            if (!empty($this->grouptool->usesize) && ($groupdata->grpsize <= count($groupdata->registered))) {
                 return true;
             }
             $newrecord = clone $record;
@@ -85,12 +93,12 @@ class queue_manager extends grouptool_instance {
             $newrecord->modified_by = $newrecord->userid;
             $newrecord->id = $DB->insert_record('grouptool_registered', $newrecord);
             $groupdata->registered[] = $newrecord;
-            if (!empty($this->grouptool->immediate_reg)) {
+            if (!empty($this->grouptool->immediatereg)) {
                 groups_add_member($groupdata->id, $newrecord->userid);
             }
-            $allowm = $this->grouptool->allow_multiple;
+            $allowm = $this->grouptool->allowmultiple;
             $usrregcnt = $registrationmanager->get_user_reg_count($newrecord->userid);
-            $max = $this->grouptool->choose_max;
+            $max = $this->grouptool->choosemax;
             if (($allowm && ($usrregcnt >= $max)) || !$allowm) {
                 $agrps = $groupmanager->get_active_groups(
                     false,
@@ -343,7 +351,7 @@ class queue_manager extends grouptool_instance {
             $agrpsfiltersql = " AND agrp.id " . $agrpssql;
             $agrpsfilterparams = array_merge([$grouptool->id], $agrpsparam);
             // Get queue-entries (sorted by timestamp)!
-            if (!empty($grouptool->allow_multiple)) {
+            if (!empty($grouptool->allowmultiple)) {
                 $queuedsql = " WHERE queued.agrpid " . $agrpssql . " ";
                 $queuedparams = array_merge($agrpsparam, $agrpsparam);
 
@@ -357,7 +365,7 @@ class queue_manager extends grouptool_instance {
                     " . $queuedsql . "
                     GROUP BY queued.id
                     ORDER BY priority DESC, queued.timestamp ASC",
-                    array_merge([$grouptool->choose_min], $queuedparams)
+                    array_merge([$grouptool->choosemin], $queuedparams)
                 );
             } else {
                 $queuedsql = " WHERE queued.agrpid " . $agrpssql . " ";
@@ -398,7 +406,7 @@ class queue_manager extends grouptool_instance {
                                                  WHERE (r.id IS NOT NULL OR q.id IS NOT NULL)", $params + $params2);
             $planned = new stdClass();
             $curgroup = null;
-            $maxregs = !empty($this->grouptool->allow_multiple) ? $this->grouptool->choose_max : 1;
+            $maxregs = !empty($this->grouptool->allowmultiple) ? $this->grouptool->choosemax : 1;
             reset($groupsdata);
             $message = new stdClass();
             foreach ($queueentries as $queue) {

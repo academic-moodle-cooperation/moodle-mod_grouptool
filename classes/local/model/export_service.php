@@ -22,6 +22,14 @@ use MoodleExcelWorkbook;
 use MoodleODSWorkbook;
 use stdClass;
 
+/**
+ * Class containing the logic for exporting data from grouptool to XLSX or ODS files
+ *
+ * @package   mod_grouptool
+ * @author    Anne Kreppenhofer
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class export_service extends grouptool_instance {
     /**
      * Fill workbook (either XLSX or ODS) with data

@@ -48,10 +48,15 @@ use moodle_url;
 use MoodleQuickForm;
 use stdClass;
 
-
+/**
+ * Class containing the logic for the view-controller of the grouptool module
+ *
+ * @package   mod_grouptool
+ * @author    Anne Kreppenhofer
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class view_controller extends grouptool_instance {
-
-
     /**
      * Shows the starting page of the grouptool
      * @return void
@@ -72,13 +77,13 @@ class view_controller extends grouptool_instance {
         $registationmanager = new registration_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
-        if (property_exists($this->grouptool, "allow_reg") && $this->grouptool->allow_reg == 1) {
+        if (property_exists($this->grouptool, "allowreg") && $this->grouptool->allowreg == 1) {
             if ($registrationdetail != "") {
                 $registrationdetail .= " <br> ";
             }
             $registrationdetail .= get_string('cfg_allow_reg', 'grouptool');
         }
-        if (property_exists($this->grouptool, "allow_unreg") && $this->grouptool->allow_unreg == 1) {
+        if (property_exists($this->grouptool, "allowunreg") && $this->grouptool->allowunreg == 1) {
             if ($registrationdetail != "") {
                 $registrationdetail .= " <br> ";
             }
@@ -100,7 +105,7 @@ class view_controller extends grouptool_instance {
         if ($countactivegroups < 1) {
             $groupplacedetails = get_string('no_active_groups', 'grouptool');
         }
-        if (property_exists($this->grouptool, "use_queue") && $this->grouptool->use_queue == 1) {
+        if (property_exists($this->grouptool, "usequeue") && $this->grouptool->usequeue == 1) {
             $queuing = true;
         } else {
             $queuing = false;
@@ -247,7 +252,6 @@ class view_controller extends grouptool_instance {
                     $confirmmessage = $e->getMessage();
                 }
             } else if ($action == 'resolvequeues') {
-
                 // TODO remove from this page!
                 require_capability('mod/grouptool:administrate_registration', $this->context);
                 [$error, $confirmmessage] = $queuemanager->resolve_queues();
@@ -392,12 +396,12 @@ class view_controller extends grouptool_instance {
             ));
             $mform->setExpanded('generalinfo');
 
-            if (!empty($this->grouptool->use_size)) {
+            if (!empty($this->grouptool->usesize)) {
                 $placestats = $regstat->group_places . '&nbsp;' . get_string('total', 'grouptool');
             } else {
                 $placestats = '∞&nbsp;' . get_string('total', 'grouptool');
             }
-            if (($regstat->free_places != null) && !empty($this->grouptool->use_size)) {
+            if (($regstat->free_places != null) && !empty($this->grouptool->usesize)) {
                 $placestats .= ' / ' . $regstat->free_places . '&nbsp;' .
                     get_string('free', 'grouptool');
             } else {
@@ -421,13 +425,13 @@ class view_controller extends grouptool_instance {
             ), $regstat->users);
 
             if (
-                ($this->grouptool->allow_multiple &&
-                    (count($regstat->registered) < $this->grouptool->choose_min)) ||
-                (!$this->grouptool->allow_multiple &&
+                ($this->grouptool->allowmultiple &&
+                    (count($regstat->registered) < $this->grouptool->choosemin)) ||
+                (!$this->grouptool->allowmultiple &&
                     !count($regstat->registered))
             ) {
-                if ($this->grouptool->allow_multiple) {
-                    $missing = ($this->grouptool->choose_min - count($regstat->registered));
+                if ($this->grouptool->allowmultiple) {
+                    $missing = ($this->grouptool->choosemin - count($regstat->registered));
                     $stringlabel = ($missing > 1) ? 'registrations_missing' : 'registration_missing';
                 } else {
                     $missing = 1;
@@ -480,8 +484,8 @@ class view_controller extends grouptool_instance {
                 );
             }
 
-            if (!empty($this->grouptool->allow_reg)) {
-                if (!empty($this->grouptool->allow_unreg)) {
+            if (!empty($this->grouptool->allowreg)) {
+                if (!empty($this->grouptool->allowunreg)) {
                     $unregtext = get_string('allowed', 'grouptool');
                 } else {
                     $unregtext = get_string('not_permitted', 'grouptool');
@@ -492,25 +496,25 @@ class view_controller extends grouptool_instance {
                     get_string('unreg_is', 'grouptool'),
                     $unregtext
                 );
-                if (!empty($this->grouptool->allow_multiple)) {
+                if (!empty($this->grouptool->allowmultiple)) {
                     $minmaxtext = '';
-                    if ($this->grouptool->choose_min && $this->grouptool->choose_max) {
+                    if ($this->grouptool->choosemin && $this->grouptool->choosemax) {
                         $data = [
-                            'min' => $this->grouptool->choose_min,
-                            'max' => $this->grouptool->choose_max,
+                            'min' => $this->grouptool->choosemin,
+                            'max' => $this->grouptool->choosemax,
                         ];
                         $minmaxtext = get_string('choose_min_max_text', 'grouptool', $data);
-                    } else if ($this->grouptool->choose_min) {
+                    } else if ($this->grouptool->choosemin) {
                         $minmaxtext = get_string(
                             'choose_min_text',
                             'grouptool',
-                            $this->grouptool->choose_min
+                            $this->grouptool->choosemin
                         );
-                    } else if ($this->grouptool->choose_max) {
+                    } else if ($this->grouptool->choosemax) {
                         $minmaxtext = get_string(
                             'choose_max_text',
                             'grouptool',
-                            $this->grouptool->choose_max
+                            $this->grouptool->choosemax
                         );
                     }
                     $mform->addElement('static', 'minmax', get_string(
@@ -519,7 +523,7 @@ class view_controller extends grouptool_instance {
                     ), $minmaxtext);
                 }
 
-                if (!empty($this->grouptool->use_queue)) {
+                if (!empty($this->grouptool->usequeue)) {
                     $mform->addElement(
                         'static',
                         'queueing',
@@ -535,7 +539,7 @@ class view_controller extends grouptool_instance {
             $userregs = $registrationmanager->get_user_reg_count($userid);
             $userqueues = $queuemanager->get_user_queues_count($userid);
             $usermarks = $utils->count_user_marks($userid);
-            $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+            $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
             $mform->addElement('header', 'groups', get_string('groups'));
             $mform->setExpanded('groups');
             // Checkbox control for only unoccupied groups filter.
@@ -548,7 +552,7 @@ class view_controller extends grouptool_instance {
             // Prepare formular-content for registration-action!
             foreach ($groups as $key => &$group) {
                 $registered = count($group->registered);
-                $grpsize = ($this->grouptool->use_size) ? $group->grpsize : '∞';
+                $grpsize = ($this->grouptool->usesize) ? $group->grpsize : '∞';
 
                 $grouphtml = html_writer::tag(
                     'span',
@@ -556,7 +560,7 @@ class view_controller extends grouptool_instance {
                     ": " . $registered . "/" . $grpsize,
                     ['class' => 'fillratio']
                 );
-                if ($this->grouptool->use_queue) {
+                if ($this->grouptool->usequeue) {
                     $queued = count($group->queued);
                     $grouphtml .= html_writer::tag(
                         'span',
@@ -594,7 +598,7 @@ class view_controller extends grouptool_instance {
                 ) {
                     // User is already registered --> unreg button!
                     if (
-                        $this->grouptool->allow_unreg &&
+                        $this->grouptool->allowunreg &&
                         (
                             has_capability('mod/grouptool:register', $this->context) ||
                             has_capability('mod/grouptool:preview', $this->context)
@@ -626,7 +630,7 @@ class view_controller extends grouptool_instance {
                 ) {
                     // We're sorry, but user's already queued in this group!
                     if (
-                        $this->grouptool->allow_unreg &&
+                        $this->grouptool->allowunreg &&
                         (
                             has_capability('mod/grouptool:register', $this->context) ||
                             has_capability('mod/grouptool:preview', $this->context)
@@ -665,7 +669,7 @@ class view_controller extends grouptool_instance {
                     // Groupchange!
                     $label = get_string('change_group', 'grouptool');
                     if (
-                        $this->grouptool->use_size
+                        $this->grouptool->usesize
                         && count($group->registered) >= $group->grpsize
                     ) {
                         $label .= ' (' . get_string('queue', 'grouptool') . ')';
@@ -706,7 +710,7 @@ class view_controller extends grouptool_instance {
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                             }
                         } catch (exceedgroupsize $e) {
-                            if (!$this->grouptool->use_queue) {
+                            if (!$this->grouptool->usequeue) {
                                 throw new exceedgroupsize();
                             } else {
                                 if (
@@ -762,7 +766,7 @@ class view_controller extends grouptool_instance {
                                 $grouphtml .= html_writer::tag('button', $label, $buttonattr);
                             }
                         }
-                    } catch (exceedgroupqueuelimit|exceedgroupsize $e) {
+                    } catch (exceedgroupqueuelimit | exceedgroupsize $e) {
                         // Group is full!
                         $grouphtml .= html_writer::tag(
                             'div',
@@ -856,18 +860,18 @@ class view_controller extends grouptool_instance {
                     $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert alert-success');
                 } else if ($queuerank !== false) {
                     $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert alert-warning');
-                } else if (($this->grouptool->use_size) && ($registered >= $group->grpsize) && $regopen) {
+                } else if (($this->grouptool->usesize) && ($registered >= $group->grpsize) && $regopen) {
                     $grouphtml = $OUTPUT->box($grouphtml, 'generalbox group alert alert-danger group-full');
                 } else {
                     $classes = 'generalbox group empty';
-                    if (($this->grouptool->use_size) && ($registered >= $group->grpsize)) {
+                    if (($this->grouptool->usesize) && ($registered >= $group->grpsize)) {
                         $classes .= ' group-full';
                     }
                     $grouphtml = $OUTPUT->box($grouphtml, $classes);
                 }
                 $mform->addElement('html', $grouphtml);
             }
-            if ($this->grouptool->show_members) {
+            if ($this->grouptool->showmembers) {
                 $params = new stdClass();
                 $params->courseid = $this->course;
                 $params->showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context);
@@ -1269,7 +1273,7 @@ class view_controller extends grouptool_instance {
                 'filter' => $curfilter,
                 'filterall' => GROUPTOOL_FILTER_ALL,
                 'globalsize' => $this->grouptool->grpsize,
-                'usesize' => (bool)$this->grouptool->use_size, ];
+                'usesize' => (bool)$this->grouptool->usesize, ];
             $PAGE->requires->js_call_amd('mod_grouptool/administration', 'initializer', $params);
         }
     }
@@ -1411,7 +1415,7 @@ class view_controller extends grouptool_instance {
         }
 
         // Create the form-object!
-        $showgrpsize = $this->grouptool->use_size;
+        $showgrpsize = $this->grouptool->usesize;
         $mform = new group_creation_form(null, [
             'id' => $id,
             'roles' => $rolenames,

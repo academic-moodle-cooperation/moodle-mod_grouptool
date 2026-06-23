@@ -61,40 +61,40 @@ class grouptool_data_object {
     public int $timeavailable = 0;
 
     /** @var int Defines when group members should be shown. */
-    public int $show_members = 0;
+    public int $showmembers = 0;
 
     /** @var int Whether registrations are allowed. */
-    public int $allow_reg = 0;
+    public int $allowreg = 0;
 
     /** @var int Whether registrations are applied immediately. */
-    public int $immediate_reg = 0;
+    public int $immediatereg = 0;
 
     /** @var int Whether users may unregister themselves. */
-    public int $allow_unreg = 0;
+    public int $allowunreg = 0;
 
     /** @var int The default group size. */
     public int $grpsize = 0;
 
     /** @var int Whether group size limits are used. */
-    public int $use_size = 0;
+    public int $usesize = 0;
 
     /** @var int Whether queues are used. */
-    public int $use_queue = 0;
+    public int $usequeue = 0;
 
     /** @var int The maximum number of queues a user may join. */
-    public int $users_queues_limit = 0;
+    public int $usersqueueslimit = 0;
 
     /** @var int The maximum queue size per group. */
-    public int $groups_queues_limit = 0;
+    public int $groupsqueueslimit = 0;
 
     /** @var int Whether multiple registrations are allowed. */
-    public int $allow_multiple = 0;
+    public int $allowmultiple = 0;
 
     /** @var int The minimum number of groups a user has to choose. */
-    public int $choose_min = 0;
+    public int $choosemin = 0;
 
     /** @var int The maximum number of groups a user may choose. */
-    public int $choose_max = 0;
+    public int $choosemax = 0;
 
     /** @var int Behaviour when a member is added to a group. */
     public int $ifmemberadded = 0;

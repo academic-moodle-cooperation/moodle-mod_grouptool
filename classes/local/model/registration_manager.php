@@ -14,17 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Contains class mod_grouptool with most of grouptool's logic.
- *
- * @package   mod_grouptool
- * @author    Philipp Hager
- * @author    Hannes Laimer
- * @author    Anne Kreppenhofer
- * @copyright 2024 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace mod_grouptool\local\model;
 
 use completion_info;
@@ -43,6 +32,14 @@ use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\local\grouptool_utils;
 use stdClass;
 
+/**
+ * Class containing the logic for registering and unregistering users in grouptool
+ *
+ * @package   mod_grouptool
+ * @author    Anne Kreppenhofer
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class registration_manager extends grouptool_instance {
     /**
      * Return true if the registration is open, false otherwise!
@@ -50,7 +47,7 @@ class registration_manager extends grouptool_instance {
      * @return bool true if reg is open, false otherwise
      */
     public function is_registration_open() {
-        return ($this->grouptool->allow_reg && (($this->grouptool->timedue == 0) || (time() < $this->grouptool->timedue))
+        return ($this->grouptool->allowreg && (($this->grouptool->timedue == 0) || (time() < $this->grouptool->timedue))
             && (time() > $this->grouptool->timeavailable));
     }
     /**
@@ -83,7 +80,7 @@ class registration_manager extends grouptool_instance {
             require_capability('mod/grouptool:register', $this->context);
         }
 
-        $regopen = ($this->grouptool->allow_reg
+        $regopen = ($this->grouptool->allowreg
             && (($this->grouptool->timedue == 0)
                 || (time() < $this->grouptool->timedue))
             && ($this->grouptool->timeavailable <= time()));
@@ -135,7 +132,7 @@ class registration_manager extends grouptool_instance {
 
             return $return;
         } catch (exceedgroupsize $e) {
-            if (!$this->grouptool->use_queue) {
+            if (!$this->grouptool->usequeue) {
                 // Shortcut: throw the exception again, if we don't use queues!
                 throw $e;
             }
@@ -208,7 +205,7 @@ class registration_manager extends grouptool_instance {
             require_capability('mod/grouptool:register', $this->context);
         }
 
-        $regopen = ($this->grouptool->allow_reg
+        $regopen = ($this->grouptool->allowreg
             && (($this->grouptool->timedue == 0)
                 || (time() < $this->grouptool->timedue))
             && ($this->grouptool->timeavailable < time()));
@@ -217,7 +214,7 @@ class registration_manager extends grouptool_instance {
             throw new registration('reg_not_open');
         }
 
-        if (!$force && empty($this->grouptool->allow_unreg)) {
+        if (!$force && empty($this->grouptool->allowunreg)) {
             throw new registration('unreg_not_allowed');
         }
 
@@ -267,7 +264,7 @@ class registration_manager extends grouptool_instance {
             "userid = ? AND agrpid " . $agrpsql,
             $params
         );
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
         if ($userregs + $userqueues <= $min) {
             if ($userid == $USER->id) {
                 $text = 'you_have_too_less_regs';
@@ -298,7 +295,7 @@ class registration_manager extends grouptool_instance {
                 'agrpid' => $agrpid,
                 'userid' => $userid,
             ]);
-            if (!$force && !empty($this->grouptool->immediate_reg)) {
+            if (!$force && !empty($this->grouptool->immediatereg)) {
                 groups_remove_member($groupdata->id, $userid);
             }
             foreach ($records as $data) {
@@ -307,7 +304,7 @@ class registration_manager extends grouptool_instance {
                 \mod_grouptool\event\registration_deleted::create_direct($this->cm, $data)->trigger();
             }
             // Get next queued user and put him in the group (and delete queue entry)!
-            if (!empty($this->grouptool->use_queue) && !empty($groupdata->queued)) {
+            if (!empty($this->grouptool->usequeue) && !empty($groupdata->queued)) {
                 $queuemanager->fill_from_queue($agrpid);
             }
             // Update completion state.
@@ -453,7 +450,7 @@ class registration_manager extends grouptool_instance {
                 ], IGNORE_MISSING)
             ) {
                 $DB->delete_records('grouptool_registered', ['id' => $reg->id]);
-                if (!empty($this->grouptool->immediate_reg)) {
+                if (!empty($this->grouptool->immediatereg)) {
                     groups_remove_member($reg->groupid, $userid);
                 }
                 // Trigger the event!
@@ -492,7 +489,7 @@ class registration_manager extends grouptool_instance {
                 MUST_EXIST
             );
             $DB->delete_records_select('grouptool_registered', "userid = ? AND agrpid " . $agrpsql, $params);
-            if (!empty($oldgrp) && !empty($this->grouptool->immediate_reg)) {
+            if (!empty($oldgrp) && !empty($this->grouptool->immediatereg)) {
                 groups_remove_member($oldgrp, $userid);
             }
 
@@ -518,7 +515,7 @@ class registration_manager extends grouptool_instance {
 
             return $return;
         } catch (exceedgroupsize $e) {
-            if (!$this->grouptool->use_queue) {
+            if (!$this->grouptool->usequeue) {
                 // Shortcut: throw the exception again, if we don't use queues!
                 throw $e;
             }
@@ -570,7 +567,7 @@ class registration_manager extends grouptool_instance {
         $record->timestamp = time();
         $record->modified_by = $USER->id;
         $record->id = $DB->insert_record('grouptool_registered', $record);
-        if ($this->grouptool->immediate_reg) {
+        if ($this->grouptool->immediatereg) {
             groups_add_member($groupdata->id, $userid);
         }
         // Trigger the event!
@@ -1016,7 +1013,7 @@ class registration_manager extends grouptool_instance {
 
         [$usql, $uparams] = $DB->get_in_or_equal(array_keys($users), SQL_PARAMS_NAMED, 'usr');
 
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 1;
+        $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 1;
 
         if ($min == 0) {
             return 0;
@@ -1104,7 +1101,7 @@ class registration_manager extends grouptool_instance {
         foreach ($groups as $group) {
             $group = $groupmanager->get_active_groups(true, true, $group->agrpid, $group->id);
             $group = current($group);
-            if ($this->grouptool->use_size) {
+            if ($this->grouptool->usesize) {
                 $return->group_places += $group->grpsize;
             }
             $return->occupied_places += count($group->registered);
@@ -1142,7 +1139,7 @@ class registration_manager extends grouptool_instance {
                 }
             }
         }
-        $return->free_places = ($this->grouptool->use_size) ? ($return->group_places - $return->occupied_places) : null;
+        $return->free_places = ($this->grouptool->usesize) ? ($return->group_places - $return->occupied_places) : null;
         $return->users = count_enrolled_users($this->context, 'mod/grouptool:register');
 
         $agrps = $DB->get_records('grouptool_agrps', ['grouptoolid' => $this->cm->instance, 'active' => 1]);

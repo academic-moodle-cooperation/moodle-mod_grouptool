@@ -27,7 +27,8 @@
 use mod_grouptool\domain\grouptool_data_object;
 use mod_grouptool\local\model\view_controller;
 
-if (((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
+if (
+    ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
     || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))
 ) {
     // @codingStandardsIgnoreLine

@@ -37,6 +37,14 @@ use required_capability_exception;
 use single_select;
 use stdClass;
 
+/**
+ * Class containing
+ *
+ * @package   mod_grouptool
+ * @author    Anne Kreppenhofer
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class group_manager extends grouptool_instance {
     /**
      * Create moodle-groups and also create non-active entries for the created groups
@@ -330,7 +338,7 @@ class group_manager extends grouptool_instance {
                 $a = new stdClass();
                 $a->field = get_string('number_of_members', 'grouptool');
                 $a->globalsize = $this->grouptool->grpsize;
-                if ($data->numberofmembers != $this->grouptool->grpsize && !$this->grouptool->use_size) {
+                if ($data->numberofmembers != $this->grouptool->grpsize && !$this->grouptool->usesize) {
                     echo $OUTPUT->notification(get_string('groupsize_gets_enabled', 'grouptool', $a), 'info');
                 }
             }
@@ -403,7 +411,7 @@ class group_manager extends grouptool_instance {
             } else {
                 // Activate group size if we already used it when creating groups!
                 if (!empty($data->numberofmembers)) {
-                    $this->grouptool->use_size = true;
+                    $this->grouptool->usesize = true;
                     $DB->update_record('grouptool', $this->grouptool);
                 }
 
@@ -553,7 +561,7 @@ class group_manager extends grouptool_instance {
                 $newagrp->groupid = $groupid;
                 $newagrp->grouptoolid = $this->grouptool->id;
                 $newagrp->sort_order = 999999;
-                if ($this->grouptool->allow_reg) {
+                if ($this->grouptool->allowreg) {
                     $newagrp->active = 1;
                 } else {
                     $newagrp->active = 0;
@@ -573,7 +581,7 @@ class group_manager extends grouptool_instance {
                         'grouptoolid' => $this->grouptool->id,
                         'groupid' => $groupid,
                     ]);
-                    if ($this->grouptool->allow_reg) {
+                    if ($this->grouptool->allowreg) {
                         $DB->set_field('grouptool_agrps', 'active', 1, ['id' => $newagrp->id]);
                     }
                 }
@@ -961,9 +969,9 @@ class group_manager extends grouptool_instance {
     public function get_active_groups(
         bool $includeregs = false,
         bool $includequeues = false,
-        int  $agrpid = 0,
-        int  $groupid = 0,
-        int  $groupingid = 0,
+        int $agrpid = 0,
+        int $groupid = 0,
+        int $groupingid = 0,
         bool $indexbygroup = true,
         bool $includeinactive = false,
         bool $ignoregtinstance = false
@@ -992,14 +1000,13 @@ class group_manager extends grouptool_instance {
             $groupingidwhere = "";
         }
 
-        if (!empty($this->grouptool->use_size)) {
+        if (!empty($this->grouptool->usesize)) {
             $grouptoolgrpsize = get_config('mod_grouptool', 'grpsize');
             $grpsize = (!empty($this->grouptool->grpsize) ? $this->grouptool->grpsize : $grouptoolgrpsize);
             if (empty($grpsize)) {
                 $grpsize = 3;
             }
             $sizesql = " COALESCE(agrp.grpsize, " . $grpsize . ") AS grpsize,";
-
         } else {
             $sizesql = "";
         }
@@ -1059,14 +1066,14 @@ class group_manager extends grouptool_instance {
             }
 
             if (
-                (!empty($this->grouptool->use_size))
-                || ($this->grouptool->use_queue && $includequeues)
+                (!empty($this->grouptool->usesize))
+                || ($this->grouptool->usequeue && $includequeues)
                 || ($includeregs)
             ) {
                 $keys = array_keys($groupdata);
                 foreach ($keys as $key) {
                     $groupdata[$key]->queued = null;
-                    if ($includequeues && $this->grouptool->use_queue) {
+                    if ($includequeues && $this->grouptool->usequeue) {
                         $attr = ['agrpid' => $groupdata[$key]->agrpid];
                         $groupdata[$key]->queued = $DB->get_records('grouptool_queued', $attr);
                     }
@@ -1144,7 +1151,7 @@ class group_manager extends grouptool_instance {
         $newagrp->groupid = $groupid;
         $newagrp->grouptoolid = $this->grouptool->id;
         $newagrp->sort_order = 999999;
-        if ($this->grouptool->allow_reg) {
+        if ($this->grouptool->allowreg) {
             $newagrp->active = 1;
         } else {
             $newagrp->active = 0;
@@ -1160,7 +1167,7 @@ class group_manager extends grouptool_instance {
              * because group gets already created in eventhandler
              */
             $newagrp->id = $DB->get_field('grouptool_agrps', 'id', $attr);
-            if ($this->grouptool->allow_reg) {
+            if ($this->grouptool->allowreg) {
                 $DB->set_field('grouptool_agrps', 'active', 1, ['id' => $newagrp->id]);
             }
         }
@@ -1293,7 +1300,7 @@ class group_manager extends grouptool_instance {
             // We give additional 1 second per registration/queue/moodle entry in this group!
             core_php_time_limit::raise(30 * (count($registered) + count($members) + count($queued)));
 
-            if (!empty($this->grouptool->use_size)) {
+            if (!empty($this->grouptool->usesize)) {
                 if (!empty($agrp->grpsize)) {
                     $size = $agrp->grpsize;
                     $free = $agrp->grpsize - count($registered);

@@ -29,6 +29,14 @@ use mod_grouptool\exception\regpresent;
 use mod_grouptool\local\grouptool_instance;
 use stdClass;
 
+/**
+ * Class containing the logic for managing the queue of a grouptool instance.
+ *
+ * @package   mod_grouptool
+ * @author    Anne Kreppenhofer
+ * @copyright 2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class permission_manager extends grouptool_instance {
     /**
      * Check if user can change the group! Works different by returning 0 or 1!
@@ -125,7 +133,7 @@ class permission_manager extends grouptool_instance {
             throw new registration('error_getting_data');
         }
         $groupdata = reset($groupdata);
-        if ($useunreg && empty($this->grouptool->allow_unreg)) {
+        if ($useunreg && empty($this->grouptool->allowunreg)) {
             throw new registration('unreg_not_allowed');
         }
 
@@ -142,18 +150,18 @@ class permission_manager extends grouptool_instance {
         }
 
         if (
-            $this->grouptool->use_size && !empty($groupdata->registered)
+            $this->grouptool->usesize && !empty($groupdata->registered)
             && (count($groupdata->registered) >= $groupdata->grpsize)
         ) {
-            if (!$this->grouptool->use_queue) {
+            if (!$this->grouptool->usequeue) {
                 // We can't register the user nor queue the user!
                 throw new exceedgroupsize();
-            } else if (count($groupdata->queued) >= $this->grouptool->groups_queues_limit) {
+            } else if (count($groupdata->queued) >= $this->grouptool->groupsqueueslimit) {
                 throw new exceedgroupqueuelimit();
             }
 
             if (
-                $this->grouptool->users_queues_limit && ($userqueues >= $this->grouptool->users_queues_limit)
+                $this->grouptool->usersqueueslimit && ($userqueues >= $this->grouptool->usersqueueslimit)
                 && ($userqueues != 1)
             ) {
                 // We can't queue him, due to exceeding his queue limit or not being able to determine which queue entry to unreg!
@@ -201,7 +209,7 @@ class permission_manager extends grouptool_instance {
             }
         }
 
-        switch ($this->grouptool->show_members) {
+        switch ($this->grouptool->showmembers) {
             case self::SHOW_GROUPMEMBERS:
                 $showmembers = true;
                 break;
@@ -254,8 +262,8 @@ class permission_manager extends grouptool_instance {
         );
         $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid " . $agrpsql, $params);
         $marks = $this->count_user_marks($userid);
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        $max = $this->grouptool->allowmultiple ? $this->grouptool->choosemax : 1;
+        $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
 
         if ($change) {
             if ($min > ($marks + $userregs + $userqueues)) {
@@ -300,11 +308,11 @@ class permission_manager extends grouptool_instance {
         }
         $groupdata = reset($groupdata);
 
-        $full = !empty($this->grouptool->groups_queues_limit)
-            && (count($groupdata->queued) >= $this->grouptool->groups_queues_limit);
+        $full = !empty($this->grouptool->groupsqueueslimit)
+            && (count($groupdata->queued) >= $this->grouptool->groupsqueueslimit);
         if (
-            $this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)
-            && (!$this->grouptool->use_queue || $full)
+            $this->grouptool->usesize && (count($groupdata->registered) >= $groupdata->grpsize)
+            && (!$this->grouptool->usequeue || $full)
         ) {
             throw new exceedgroupsize();
         }
@@ -313,7 +321,7 @@ class permission_manager extends grouptool_instance {
 
         $this->check_users_regs_limits($userid);
 
-        if ($this->grouptool->use_size && (count($groupdata->registered) >= $groupdata->grpsize)) {
+        if ($this->grouptool->usesize && (count($groupdata->registered) >= $groupdata->grpsize)) {
             if ($userid != $USER->id) {
                 return [1, get_string('queue_in_group', 'grouptool', $message)];
             } else {
@@ -349,7 +357,7 @@ class permission_manager extends grouptool_instance {
         global $USER, $DB;
 
         // Shortcut if we don't use queues!
-        if (!$this->grouptool->use_queue) {
+        if (!$this->grouptool->usequeue) {
             throw new exceedgroupsize();
         }
 
@@ -387,13 +395,13 @@ class permission_manager extends grouptool_instance {
         }
 
         if (
-            $this->grouptool->users_queues_limit && (($queueswithmarks > $this->grouptool->users_queues_limit)
-                || ($queues >= $this->grouptool->users_queues_limit))
+            $this->grouptool->usersqueueslimit && (($queueswithmarks > $this->grouptool->usersqueueslimit)
+                || ($queues >= $this->grouptool->usersqueueslimit))
         ) {
             throw new exceeduserqueuelimit();
         }
 
-        if ($this->grouptool->groups_queues_limit && (count($groupdata->queued) >= $this->grouptool->groups_queues_limit)) {
+        if ($this->grouptool->groupsqueueslimit && (count($groupdata->queued) >= $this->grouptool->groupsqueueslimit)) {
             throw new exceedgroupqueuelimit();
         }
 
@@ -402,8 +410,8 @@ class permission_manager extends grouptool_instance {
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $userregs = $this->get_user_reg_count($userid);
         $marks = $this->count_user_marks($userid);
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
+        $max = $this->grouptool->allowmultiple ? $this->grouptool->choosemax : 1;
+        $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
         if ($max <= ($marks + $userregs + $queues)) {
             throw new exceeduserreglimit();
         }
@@ -431,9 +439,9 @@ class permission_manager extends grouptool_instance {
      * @throws notenoughregs
      */
     public function check_can_be_registered($group, $userregs, $queues, $marks) {
-        $max = $this->grouptool->allow_multiple ? $this->grouptool->choose_max : 1;
-        $min = $this->grouptool->allow_multiple ? $this->grouptool->choose_min : 0;
-        if ($this->grouptool->use_size && (count($group->registered) >= $group->grpsize)) {
+        $max = $this->grouptool->allowmultiple ? $this->grouptool->choosemax : 1;
+        $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
+        if ($this->grouptool->usesize && (count($group->registered) >= $group->grpsize)) {
             throw new exceedgroupsize();
         }
         if ($max <= ($marks + $userregs + $queues)) {

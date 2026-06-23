@@ -158,6 +158,6 @@ class grouptool_instance {
      * @return array [allow_multiple, choose_min, choose_max]
      */
     public function get_reg_settings(): array {
-        return [$this->grouptool->allow_multiple, $this->grouptool->choose_min, $this->grouptool->choose_max];
+        return [$this->grouptool->allowmultiple, $this->grouptool->choosemin, $this->grouptool->choosemax];
     }
 }
