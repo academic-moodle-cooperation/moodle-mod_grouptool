@@ -17,8 +17,10 @@
 namespace mod_grouptool\local\model;
 
 use core\exception\coding_exception;
+use core\exception\moodle_exception;
 use core\exception\required_capability_exception;
 use dml_exception;
+use Exception;
 use mod_grouptool\exception\exceedgroupqueuelimit;
 use mod_grouptool\exception\exceedgroupsize;
 use mod_grouptool\exception\exceeduserqueuelimit;
@@ -27,7 +29,9 @@ use mod_grouptool\exception\notenoughregs;
 use mod_grouptool\exception\registration;
 use mod_grouptool\exception\regpresent;
 use mod_grouptool\local\grouptool_instance;
+use mod_grouptool\local\grouptool_utils;
 use stdClass;
+use Throwable;
 
 /**
  * Class containing the logic for managing the queue of a grouptool instance.
@@ -43,9 +47,9 @@ class permission_manager extends grouptool_instance {
      *
      * @param int $agrpid ID of the active group
      * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
-     * @return bool whether or not user qualifies for a group change
+     * @return bool whether user qualifies for a group change
      */
-    public function qualifies_for_groupchange($agrpid, $userid) {
+    public function qualifies_for_groupchange(int $agrpid, int $userid): bool {
         // Not really used here, but at least empty values needed by can_change_group()!
         $message = new stdClass();
         $message->username = '';
@@ -53,14 +57,13 @@ class permission_manager extends grouptool_instance {
 
         try {
             $this->can_change_group($agrpid, $userid, $message);
-        } catch (Exception $e) {
-            return false;
-        } catch (Throwable $e) {
+        } catch (Exception|Throwable) {
             return false;
         }
 
         return true;
     }
+
     /**
      * Check if user is already registered, queued or marked for registration, throw exception in that case!
      *
@@ -70,11 +73,16 @@ class permission_manager extends grouptool_instance {
      * @param stdClass $message (optional) cached data for the language strings
      * @throws regpresent
      * @throws dml_exception
+     * @throws coding_exception
+     * @throws moodle_exception
      */
-    protected function check_reg_present($agrpid, $userid, $groupdata, $message) {
+    protected function check_reg_present(int $agrpid, int $userid, stdClass $groupdata, stdClass $message): void {
         global $USER;
 
-        if ($this->grpmarked($agrpid, $userid)) {
+        $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
+        if ($utils->grpmarked($agrpid, $userid)) {
             // Allready marked for registration!?!
             if ($userid != $USER->id) {
                 throw new regpresent('already_marked', $message);
@@ -83,7 +91,7 @@ class permission_manager extends grouptool_instance {
             }
         }
 
-        if (!empty($groupdata->registered) && $this->get_rank_in_queue($groupdata->registered, $userid) != false) {
+        if (!empty($groupdata->registered) && $queuemanager->get_rank_in_queue($groupdata->registered, $userid)) {
             // We're sorry, but user's already registered in this group!
             if ($userid != $USER->id) {
                 throw new regpresent('already_registered', $message);
@@ -92,7 +100,7 @@ class permission_manager extends grouptool_instance {
             }
         }
 
-        if (!empty($groupdata->queued) && $this->get_rank_in_queue($groupdata->queued, $userid) != false) {
+        if (!empty($groupdata->queued) && $queuemanager->get_rank_in_queue($groupdata->queued, $userid)) {
             // We're sorry, but user's already queued in this group!
             if ($userid != $USER->id) {
                 throw new regpresent('already_queued', $message);
@@ -107,28 +115,34 @@ class permission_manager extends grouptool_instance {
      * Check if user can change the group! Works different by returning 0 or 1!
      *
      * @param int $agrpid ID of the active group
-     * @param int $userid ID of user to queue or null (then $USER->id is used)
+     * @param int|null $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message cached data for the language strings
-     * @param int $oldagrpid (optional) ID of former active group
+     * @param int|null $oldagrpid (optional) ID of former active group
      * @param bool $useunreg (optional) whether to use unregistration or not if it is activated or not
      * @return string 'string' status message
-     * @throws exceedgroupqueuelimit
-     * @throws exceeduserreglimit
-     * @throws exceeduserqueuelimit
-     * @throws registration
-     * @throws regpresent
+     * @throws \coding_exception
+     * @throws \moodle_exception
      * @throws coding_exception
      * @throws dml_exception
+     * @throws exceedgroupqueuelimit
+     * @throws exceedgroupsize
+     * @throws exceeduserqueuelimit
+     * @throws exceeduserreglimit
+     * @throws moodle_exception
+     * @throws registration
+     * @throws regpresent
      * @throws required_capability_exception
      */
-    public function can_change_group($agrpid, $userid, $message, $oldagrpid = null, $useunreg = true) {
+    public function can_change_group(int $agrpid, ?int $userid, stdClass $message, int $oldagrpid = null, bool $useunreg = true): string {
         global $USER;
+
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         if ($userid === null) {
             $userid = $USER->id;
         }
 
-        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        $groupdata = $groupmanager->get_active_groups(true, true, $agrpid);
         if (count($groupdata) != 1) {
             throw new registration('error_getting_data');
         }
@@ -172,20 +186,21 @@ class permission_manager extends grouptool_instance {
         // We have no 'you'-version of the string here!
         return get_string('change_group_to', 'grouptool', $message);
     }
+
     /**
      * Returns whether or not a user should be able to see the members of this active group.
      * Either if regrank or queuerank are not set, agrp has to be set!
      *
-     * @param int|object $agrp Active group's DB ID or active group object
-     * @param int|bool $regrank The registration rank in this active group
+     * @param object|int|null $agrp Active group's DB ID or active group object
+     * @param bool|int|null $regrank The registration rank in this active group
      *                          (false if not registered or null if it has to be determined for the current user)
-     * @param int|bool $queuerank The queue rank in this active group
+     * @param bool|int|null $queuerank The queue rank in this active group
      *                            (false if not queued or null if it has to be determined for the current user)
      * @return bool true if user can show, false if not!
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function canshowmembers($agrp = null, $regrank = null, $queuerank = null) {
+    public function canshowmembers(object|int $agrp = null, bool|int $regrank = null, bool|int $queuerank = null): bool {
         global $DB, $USER;
 
         if (
@@ -231,6 +246,7 @@ class permission_manager extends grouptool_instance {
 
         return $showmembers;
     }
+
     /**
      * Checks if user has to many, too less registrations and return values!
      *
@@ -239,12 +255,15 @@ class permission_manager extends grouptool_instance {
      * @return array $userregs, $userqueues, $marks, $min, $max
      * @throws exceeduserreglimit
      * @throws registration
-     * @throws coding_exception
      * @throws dml_exception
+     * @throws coding_exception
+     * @throws moodle_exception
      * @throws required_capability_exception
      */
-    protected function check_users_regs_limits($userid, $change = false) {
+    protected function check_users_regs_limits(int $userid, bool $change = false): array {
         global $DB;
+
+        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
         $agrpids = $DB->get_fieldset_select(
@@ -261,7 +280,7 @@ class permission_manager extends grouptool_instance {
             $params
         );
         $userqueues = $DB->count_records_select('grouptool_queued', "userid = ? AND agrpid " . $agrpsql, $params);
-        $marks = $this->count_user_marks($userid);
+        $marks = $utils->count_user_marks($userid);
         $max = $this->grouptool->allowmultiple ? $this->grouptool->choosemax : 1;
         $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
 
@@ -295,14 +314,17 @@ class permission_manager extends grouptool_instance {
      * @throws registration
      * @throws regpresent
      * @throws exceedgroupsize
-     * @throws coding_exception
      * @throws dml_exception
+     * @throws coding_exception
+     * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function can_be_marked(int $agrpid, int $userid, stdClass $message) {
+    public function can_be_marked(int $agrpid, int $userid, stdClass $message): array {
         global $USER;
 
-        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
+        $groupdata = $groupmanager->get_active_groups(true, true, $agrpid);
         if (count($groupdata) != 1) {
             throw new registration('error_getting_data');
         }
@@ -335,12 +357,13 @@ class permission_manager extends grouptool_instance {
             }
         }
     }
+
     /**
      * Check if user can be queued, else throw exception!
      *
      * @param int $agrpid ID of the active group
-     * @param int $userid (optional) ID of user to queue or null (then $USER->id is used)
-     * @param stdClass $message (optional) prepared message object containing username and groupname or null
+     * @param int|null $userid (optional) ID of user to queue or null (then $USER->id is used)
+     * @param stdClass|null $message (optional) prepared message object containing username and groupname or null
      * @return string status message
      * @throws exceedgroupqueuelimit
      * @throws exceeduserqueuelimit
@@ -351,10 +374,16 @@ class permission_manager extends grouptool_instance {
      * @throws regpresent
      * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function can_be_queued($agrpid, $userid = null, $message = null) {
+    public function can_be_queued(int $agrpid, ?int $userid = null, ?stdClass $message = null): string {
         global $USER, $DB;
+
+        $registrationmanager = new registration_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         // Shortcut if we don't use queues!
         if (!$this->grouptool->usequeue) {
@@ -365,7 +394,7 @@ class permission_manager extends grouptool_instance {
             $userid = $USER->id;
         }
 
-        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        $groupdata = $groupmanager->get_active_groups(true, true, $agrpid);
         if (count($groupdata) != 1) {
             throw new registration('error_getting_data');
         }
@@ -384,9 +413,9 @@ class permission_manager extends grouptool_instance {
 
         /* Get user's marks and also check if enough (queue) places are available,
          * otherwise display an info and remove marked entry. */
-        $usermarks = $this->get_user_marks($userid);
+        $usermarks = $utils->get_user_marks($userid);
 
-        $queues = $this->get_user_queues_count($userid);
+        $queues = $queuemanager->get_user_queues_count($userid);
         $queueswithmarks = $queues;
         foreach ($usermarks as $cur) {
             if ($cur->type != 'reg') {
@@ -408,8 +437,8 @@ class permission_manager extends grouptool_instance {
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // We have to filter only active groups to ensure no problems counting userregs and -queues.
-        $userregs = $this->get_user_reg_count($userid);
-        $marks = $this->count_user_marks($userid);
+        $userregs = $registrationmanager->get_user_reg_count($userid);
+        $marks = $utils->count_user_marks($userid);
         $max = $this->grouptool->allowmultiple ? $this->grouptool->choosemax : 1;
         $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
         if ($max <= ($marks + $userregs + $queues)) {
@@ -426,6 +455,7 @@ class permission_manager extends grouptool_instance {
             return get_string('queue_you_in_group', 'grouptool', $message);
         }
     }
+
     /**
      *
      * Checks if a given count of userregs, queues and marks matches the limits for a given group
@@ -438,7 +468,7 @@ class permission_manager extends grouptool_instance {
      * @throws exceeduserreglimit
      * @throws notenoughregs
      */
-    public function check_can_be_registered($group, $userregs, $queues, $marks) {
+    public function check_can_be_registered(stdClass $group, int $userregs, int $queues, int $marks): void {
         $max = $this->grouptool->allowmultiple ? $this->grouptool->choosemax : 1;
         $min = $this->grouptool->allowmultiple ? $this->grouptool->choosemin : 0;
         if ($this->grouptool->usesize && (count($group->registered) >= $group->grpsize)) {
@@ -457,26 +487,34 @@ class permission_manager extends grouptool_instance {
      * Checks if user can be registered, else throw exception!
      *
      * @param int $agrpid ID of the active group
-     * @param int $userid ID of user to queue or null (then $USER->id is used)
+     * @param int|null $userid ID of user to queue or null (then $USER->id is used)
      * @param stdClass $message prepared message object containing username and groupname or null
      * @return string status message
+     * @throws \coding_exception
+     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws exceedgroupsize
      * @throws exceeduserreglimit
+     * @throws moodle_exception
      * @throws notenoughregs
      * @throws registration
      * @throws regpresent
-     * @throws coding_exception
-     * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function can_be_registered($agrpid, $userid, $message) {
+    public function can_be_registered(int $agrpid, ?int $userid, stdClass $message): string {
         global $USER;
+
+        $registrationmanager = new registration_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         if ($userid === null) {
             $userid = $USER->id;
         }
 
-        $groupdata = $this->get_active_groups(true, true, $agrpid);
+        $groupdata = $groupmanager->get_active_groups(true, true, $agrpid);
         if (count($groupdata) != 1) {
             throw new registration('error_getting_data');
         }
@@ -485,9 +523,9 @@ class permission_manager extends grouptool_instance {
         $this->check_reg_present($agrpid, $userid, $groupdata, $message);
 
         // Check if enough (queue) places are available, otherwise display an info and remove marked entry.
-        $userregs = $this->get_user_reg_count($userid);
-        $queues = $this->get_user_queues_count($userid);
-        $marks = $this->count_user_marks($userid);
+        $userregs = $registrationmanager->get_user_reg_count($userid);
+        $queues = $queuemanager->get_user_queues_count($userid);
+        $marks = $utils->count_user_marks($userid);
 
         $this->check_can_be_registered($groupdata, $userregs, $queues, $marks);
 

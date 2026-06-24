@@ -20,6 +20,7 @@
  * @package    mod_grouptool
  * @copyright  2019 Academic Moodle Cooperation https://www.academic-moodle-cooperation.org/
  * @author     Philipp Hager <philipp.hager@tuwien.ac.at>
+ * @author     Anne Kreppenhofer
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

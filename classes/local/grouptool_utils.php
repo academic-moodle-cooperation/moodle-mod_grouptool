@@ -25,6 +25,7 @@
 
 namespace mod_grouptool\local;
 
+use completion_info;
 use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\output\html_writer;
@@ -32,14 +33,25 @@ use core\output\single_button;
 use core_php_time_limit;
 use core_table\output\html_table_cell;
 use core_table\output\html_table_row;
+use dml_exception;
+use Exception;
+use html_table;
+use mod_grouptool\exception\exceedgroupsize;
+use mod_grouptool\exception\exceeduserqueuelimit;
+use mod_grouptool\exception\exceeduserreglimit;
+use mod_grouptool\exception\registration;
+use mod_grouptool\exception\regpresent;
+use mod_grouptool\local\model\group_manager;
+use mod_grouptool\local\model\permission_manager;
+use mod_grouptool\local\model\queue_manager;
 use moodle_url;
 use progress_bar;
+use required_capability_exception;
 use single_select;
 use stdClass;
+use Throwable;
 
 defined('MOODLE_INTERNAL') || die();
-
-global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
 /**
  * Class grouptool_utils
@@ -65,12 +77,15 @@ class grouptool_utils extends grouptool_instance {
     public function mark_for_reg($agrpid, $userid, $message) {
         global $DB, $USER;
 
-        $groupdata = $this->get_active_groups(false, false, $agrpid);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $permissionmanager = new permission_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
+        $groupdata = $groupmanager->get_active_groups(false, false, $agrpid);
         if (count($groupdata) != 1) {
             throw new registration('error_getting_data');
         }
 
-        $this->can_be_marked($agrpid, $userid, $message);
+        $permissionmanager->can_be_marked($agrpid, $userid, $message);
 
         $record = new stdClass();
         $record->agrpid = $agrpid;
@@ -94,7 +109,7 @@ class grouptool_utils extends grouptool_instance {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function convert_marks_to_regs($userid) {
+    public function convert_marks_to_regs(int $userid): void {
         global $DB, $USER;
 
         // Get user's marks!
@@ -130,13 +145,15 @@ class grouptool_utils extends grouptool_instance {
     /**
      * checks the found userdata, and return error rows if no user was found or multiple were fund
      * @param array $userinfo data that was found
-     * @param array $user the data given by the user
+     * @param array|string $user the data given by the user
      * @param array $importfields the fields which were checked
      * @return array rows for the table, possibly empty if exactly one user was found
+     * @throws \coding_exception
      * @throws coding_exception
      */
-    private function check_userinfo($userinfo, $user, $importfields) {
+    public function check_userinfo(array $userinfo, array|string $user, array $importfields): array {
         global $OUTPUT;
+
         $errorrows = [];
         if (empty($userinfo)) {
             $errorrows[0] = new html_table_row();
@@ -155,11 +172,11 @@ class grouptool_utils extends grouptool_instance {
     /**
      * Searches users based on the information given and the fields to consider
      * @param array $importfields the fields to check
-     * @param array $user the data for thse fields
+     * @param array|string $user the data for thse fields
      * @return array the found user/s
      * @throws dml_exception
      */
-    private function find_userinfo($importfields, $user) {
+    public function find_userinfo(array $importfields, array|string $user): array {
         global $DB;
         $userinfo = [];
         foreach ($importfields as $field) {
@@ -243,6 +260,8 @@ class grouptool_utils extends grouptool_instance {
     public function get_user_marks($userid = 0) {
         global $DB, $USER, $OUTPUT;
 
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
         if (empty($userid)) {
             $userid = $USER->id;
         }
@@ -269,7 +288,7 @@ class grouptool_utils extends grouptool_instance {
 
         $marks = $DB->get_records_sql($sql, $params);
         foreach ($marks as $id => $cur) {
-            $groupdata = $this->get_active_groups(true, true, $cur->agrpid);
+            $groupdata = $groupmanager->get_active_groups(true, true, $cur->agrpid);
             $groupdata = current($groupdata);
 
             if ($this->grouptool->usesize) {
@@ -367,7 +386,7 @@ class grouptool_utils extends grouptool_instance {
      * @throws coding_exception Thrown if smthg very unexpected happened (couldn't instantiate manual enrol instance or similar)
      * @throws dml_exception
      */
-    protected function force_enrol_student($userid) {
+    public function force_enrol_student($userid) {
         global $CFG, $DB;
 
         require_once($CFG->dirroot . '/enrol/manual/locallib.php');
@@ -426,8 +445,6 @@ class grouptool_utils extends grouptool_instance {
             $groupinfo[$group] = groups_get_group($group);
         }
         $imported = [];
-        $columns = $DB->get_columns('user');
-
         $agrp = [];
         foreach ($groups as $group) {
             $agrp[$group] = $DB->get_field('grouptool_agrps', 'id', [
@@ -707,8 +724,9 @@ class grouptool_utils extends grouptool_instance {
      *
      * @param mixed[] $row Associative array with table data for this user
      * @param stdClass $user the user's DB record
+     * @throws coding_exception
      */
-    public function add_namefields_useridentity(&$row, $user) {
+    public function add_namefields_useridentity(array &$row, stdClass $user): void {
         global $CFG;
         $namefields = \core_user\fields::for_name()->get_required_fields();
         foreach ($namefields as $namefield) {
@@ -830,6 +848,8 @@ class grouptool_utils extends grouptool_instance {
     public function render_members_link($group) {
         global $CFG, $DB;
 
+        $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
         $output = get_string('show_members', 'grouptool');
 
         // Now create the link around it - we need https on loginhttps pages!
@@ -927,7 +947,7 @@ class grouptool_utils extends grouptool_instance {
                     'idnumber' => $showidnumber ? $users[$cur]->idnumber : '',
                     'fullname' => fullname($users[$cur]),
                     'id' => $cur,
-                    'rank' => $this->get_rank_in_queue($queuedlist, $cur),
+                    'rank' => $queuemanager->get_rank_in_queue($queuedlist, $cur),
                 ];
             }
         }
@@ -1133,7 +1153,7 @@ class grouptool_utils extends grouptool_instance {
         if ($data->selectfromgroup) {
             $source['groupid'] = $data->selectfromgroup;
         }
-        $orderby = "";
+
         switch ($data->allocateby) {
             default:
                 throw new moodle_exception('unknoworder');

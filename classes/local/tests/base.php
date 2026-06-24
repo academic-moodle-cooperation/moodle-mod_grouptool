@@ -23,11 +23,11 @@ use dml_exception;
 use mod_grouptool\domain\grouptool_data_object;
 use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\local\model\group_manager;
+use mod_grouptool\local\model\permission_manager;
 use mod_grouptool\local\model\queue_manager;
 use mod_grouptool\local\model\registration_manager;
 use mod_grouptool_generator;
 use moodle_exception;
-use required_capability_exception;
 use stdClass;
 
 global $CFG;
@@ -117,7 +117,7 @@ abstract class base extends advanced_testcase {
         global $DB;
 
         parent::setUp();
-        $this->resetAfterTest(true);
+        $this->resetAfterTest();
 
         $this->course = self::getDataGenerator()->create_course();
 
@@ -290,7 +290,7 @@ abstract class base extends advanced_testcase {
             $instance,
             $cm,
             $this->course,
-           context_module::instance($cm->id)
+            context_module::instance($cm->id)
         );
     }
 
@@ -334,6 +334,22 @@ abstract class base extends advanced_testcase {
      */
     protected function create_queue_manager(grouptool_instance $grouptool): queue_manager {
         return new queue_manager(
+            $grouptool->get_cm()->id,
+            $grouptool->get_grouptool(),
+            $grouptool->get_cm(),
+            $grouptool->get_course(),
+            $grouptool->get_context()
+        );
+    }
+
+    /**
+     * Creates a permission manager for a grouptool instance.
+     *
+     * @param grouptool_instance $grouptool The grouptool instance.
+     * @return permission_manager The permission manager.
+     */
+    protected function create_permission_manager(grouptool_instance $grouptool): permission_manager {
+        return new permission_manager(
             $grouptool->get_cm()->id,
             $grouptool->get_grouptool(),
             $grouptool->get_cm(),
@@ -389,27 +405,6 @@ abstract class base extends advanced_testcase {
             'modified_by' => (int)$USER->id,
         ];
 
-        return (int)$DB->insert_record('grouptool_queued', $queue, true);
-    }
-
-    /**
-     * Resolves the course parameter for create_instance().
-     *
-     * @param array $params Instance parameters.
-     * @return stdClass Course record.
-     * @throws dml_exception
-     */
-    private function resolve_course_from_params(array $params): stdClass {
-        global $DB;
-
-        if (!isset($params['course'])) {
-            return $this->course;
-        }
-
-        if ($params['course'] instanceof stdClass) {
-            return $params['course'];
-        }
-
-        return $DB->get_record('course', ['id' => $params['course']], '*', MUST_EXIST);
+        return (int)$DB->insert_record('grouptool_queued', $queue);
     }
 }

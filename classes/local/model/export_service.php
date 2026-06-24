@@ -21,6 +21,31 @@ use mod_grouptool\local\grouptool_instance;
 use MoodleExcelWorkbook;
 use MoodleODSWorkbook;
 use stdClass;
+use cache_helper;
+use completion_info;
+use context_course;
+use core\exception\moodle_exception;
+use core\exception\required_capability_exception;
+use core_php_time_limit;
+use dml_exception;
+use Exception;
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
+use mod_grouptool\event\registration_deleted;
+use mod_grouptool\event\registration_push_started;
+use mod_grouptool\exception\exceedgroupqueuelimit;
+use mod_grouptool\exception\exceedgroupsize;
+use mod_grouptool\exception\exceeduserqueuelimit;
+use mod_grouptool\exception\exceeduserreglimit;
+use mod_grouptool\exception\notenoughregs;
+use mod_grouptool\exception\registration;
+use mod_grouptool\exception\regpresent;
+use mod_grouptool\local\grouptool_utils;
+use progress_bar;
+use Throwable;
+
 
 /**
  * Class containing the logic for exporting data from grouptool to XLSX or ODS files

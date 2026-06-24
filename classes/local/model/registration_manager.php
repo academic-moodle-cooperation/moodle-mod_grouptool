@@ -16,11 +16,21 @@
 
 namespace mod_grouptool\local\model;
 
+use cache_helper;
 use completion_info;
+use context_course;
 use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\exception\required_capability_exception;
+use core_php_time_limit;
 use dml_exception;
+use Exception;
+use html_table;
+use html_table_cell;
+use html_table_row;
+use html_writer;
+use mod_grouptool\event\registration_deleted;
+use mod_grouptool\event\registration_push_started;
 use mod_grouptool\exception\exceedgroupqueuelimit;
 use mod_grouptool\exception\exceedgroupsize;
 use mod_grouptool\exception\exceeduserqueuelimit;
@@ -30,7 +40,9 @@ use mod_grouptool\exception\registration;
 use mod_grouptool\exception\regpresent;
 use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\local\grouptool_utils;
+use progress_bar;
 use stdClass;
+use Throwable;
 
 /**
  * Class containing the logic for registering and unregistering users in grouptool
@@ -148,7 +160,7 @@ class registration_manager extends grouptool_instance {
                 }
 
                 return $return;
-            } catch (notenoughregs $e) {
+            } catch (notenoughregs) {
                 /* The user has not enough registrations, queue entries or marks,
                  * so we try to mark the user! (Exceptions get handled above!) */
                 if ($previewonly) {
@@ -159,7 +171,7 @@ class registration_manager extends grouptool_instance {
 
                 return $return;
             }
-        } catch (notenoughregs $e) {
+        } catch (notenoughregs) {
             /* The user has not enough registrations, queue entries or marks,
              * so we try to mark the user! (Exceptions get handled above!) */
             if ($previewonly) {
@@ -301,7 +313,7 @@ class registration_manager extends grouptool_instance {
             foreach ($records as $data) {
                 // Trigger the event!
                 $data->groupid = $groupdata->id;
-                \mod_grouptool\event\registration_deleted::create_direct($this->cm, $data)->trigger();
+                registration_deleted::create_direct($this->cm, $data)->trigger();
             }
             // Get next queued user and put him in the group (and delete queue entry)!
             if (!empty($this->grouptool->usequeue) && !empty($groupdata->queued)) {
@@ -437,7 +449,7 @@ class registration_manager extends grouptool_instance {
                 // Trigger the event!
                 \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $queue);
                 // Let other queued be promoted to registered status!
-                $this->fill_from_queue($queue->agrpid);
+                $queuemanager->fill_from_queue($queue->agrpid);
             }
             $sql = "SELECT reg.*, agrp.groupid
                       FROM {grouptool_registered} reg
@@ -454,9 +466,9 @@ class registration_manager extends grouptool_instance {
                     groups_remove_member($reg->groupid, $userid);
                 }
                 // Trigger the event!
-                \mod_grouptool\event\registration_deleted::create_direct($this->cm, $reg);
+                registration_deleted::create_direct($this->cm, $reg);
                 // Let other queued be promoted to registered status!
-                $this->fill_from_queue($reg->agrpid);
+                $queuemanager->fill_from_queue($reg->agrpid);
             }
         } else if (count($userqueues) == 1) {
             // Delete his queue!
@@ -495,7 +507,7 @@ class registration_manager extends grouptool_instance {
 
             // Trigger the event!
             $reg->groupid = $oldgrp;
-            \mod_grouptool\event\registration_deleted::create_direct($this->cm, $reg);
+            registration_deleted::create_direct($this->cm, $reg);
 
             // Let other queued be promoted to registered status!
             $queuemanager->fill_from_queue($reg->agrpid);
@@ -629,9 +641,6 @@ class registration_manager extends grouptool_instance {
     public function unregister($groups, $data, $unregfrommgroups = true, $previewonly = false, $unregfromallagrps = false) {
         global $DB, $OUTPUT;
 
-        $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
-        $permissionmanager = new permission_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         $message = "";
@@ -700,11 +709,11 @@ class registration_manager extends grouptool_instance {
         raise_memory_limit(MEMORY_HUGE);
         $followchangessetting = $DB->get_field('grouptool', 'ifmemberremoved', ['id' => $this->grouptool->id]);
         foreach ($users as $user) {
-            $userinfo = $this->find_userinfo($importfields, $user);
+            $userinfo = $utils->find_userinfo($importfields, $user);
             $pbar->update($processed, $count, get_string('import_progress_search', 'grouptool') . ' ' . $user);
             $row = new html_table_row();
             $errors = 0;
-            foreach ($this->check_userinfo($userinfo, $user, $importfields) as $errorrow) {
+            foreach ($utils->check_userinfo($userinfo, $user, $importfields) as $errorrow) {
                 $prevtable->data[] = $errorrow;
                 $errors++;
                 $error = true;
@@ -900,6 +909,7 @@ class registration_manager extends grouptool_instance {
         $message .= html_writer::table($prevtable);
         return [$error, $message];
     }
+
     /**
      * push in grouptool registered users to moodle-groups
      *
@@ -910,17 +920,21 @@ class registration_manager extends grouptool_instance {
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
+     * @throws moodle_exception
      */
     public function push_registrations(int $groupid = 0, int $groupingid = 0, bool $previewonly = false) {
         global $DB, $OUTPUT;
 
+        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
         // Trigger the event!
-        \mod_grouptool\event\registration_push_started::create_from_object($this->cm)->trigger();
+        registration_push_started::create_from_object($this->cm)->trigger();
 
         $userinfo = get_enrolled_users($this->context);
         $return = [];
         // Get active groups filtered by groupid, grouping_id, grouptoolid!
-        $agrps = $this->get_active_groups(true, false, 0, $groupid, $groupingid);
+        $agrps = $groupmanager->get_active_groups(true, false, 0, $groupid, $groupingid);
         foreach ($agrps as $groupid => $agrp) {
             foreach ($agrp->registered as $reg) {
                 $info = new stdClass();
@@ -938,7 +952,7 @@ class registration_manager extends grouptool_instance {
                              * so we can add the user to the group
                              */
                             try {
-                                $this->force_enrol_student($reg->userid);
+                                $utils->force_enrol_student($reg->userid);
                             } catch (Exception $e) {
                                 $return[] = $OUTPUT->notification($e->getMessage(), \core\output\notification::NOTIFY_ERROR);
                             } catch (Throwable $t) {
@@ -977,13 +991,10 @@ class registration_manager extends grouptool_instance {
         switch (count($return)) {
             default:
                 return [false, implode("<br />\n", $return)];
-                break;
             case 1:
                 return [false, current($return)];
-                break;
             case 0:
                 return [true, get_string('nothing_to_push', 'grouptool')];
-                break;
         }
     }
     /**
@@ -1063,14 +1074,15 @@ class registration_manager extends grouptool_instance {
      * else if $user == null data about $USERs registrations/queues is added
      * else data about $userids registrations/queues is added
      *
-     * @param int $userid id of user for whom data should be added
+     * @param int|null $userid id of user for whom data should be added
      *                    or 0 (=$USER) or null (=no userdata)
      * @return stdClass object containing information about active groups
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
+     * @throws moodle_exception
      */
-    public function get_registration_stats($userid = null) {
+    public function get_registration_stats(int $userid = null): stdClass {
         global $USER, $DB;
 
         $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);

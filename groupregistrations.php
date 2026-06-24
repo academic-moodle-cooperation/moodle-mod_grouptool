@@ -116,8 +116,6 @@ if ($mainnode = $PAGE->navigation->find('mod_grouptool_registration', null)) {
 
 $viewcontroller = new view_controller($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 
-echo $OUTPUT->header();
-
 if (!$canviewregistrations) {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
     $tab = 'noaccess';
