@@ -24,9 +24,6 @@
  */
 
 // @codingStandardsIgnoreLine
-use mod_grouptool\domain\grouptool_data_object;
-use mod_grouptool\local\model\view_controller;
-
 if (
     ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
     || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))
@@ -36,7 +33,6 @@ if (
 }
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/mod/grouptool/lib.php');
@@ -46,7 +42,8 @@ require_once($CFG->libdir . '/gradelib.php');
 require_once($CFG->libdir . '/grade/grade_grade.php');
 require_once($CFG->libdir . '/pdflib.php');
 
-defined('MOODLE_INTERNAL') || die();
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\view_controller;
 
 global $SESSION, $OUTPUT, $CFG, $DB, $PAGE;
 

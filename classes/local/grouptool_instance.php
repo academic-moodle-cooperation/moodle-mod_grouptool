@@ -15,7 +15,6 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_grouptool\local;
-namespace mod_grouptool\local;
 
 use cm_info;
 use context_module;
@@ -33,16 +32,16 @@ use stdClass;
  */
 class grouptool_instance {
     /** @var cm_info|stdClass The course module record. */
-    public cm_info|stdClass $cm;
+    protected cm_info|stdClass $cm;
 
     /** @var stdClass The course record. */
-    public stdClass $course;
+    protected stdClass $course;
 
     /** @var grouptool_data_object The grouptool database record. */
-    public grouptool_data_object $grouptool;
+    protected grouptool_data_object $grouptool;
 
     /** @var context_module The module context. */
-    public context_module $context;
+    protected context_module $context;
 
     /** @var grouptool_utils Utility helper for grouptool functionality. */
     protected grouptool_utils $grouptoolutils;
@@ -84,6 +83,7 @@ class grouptool_instance {
      * SHOW_GROUPMEMBERS - show groupmembers no matter what...
      */
     public const int SHOW_GROUPMEMBERS = GROUPTOOL_SHOW_GROUPMEMBERS;
+
     /**
      * Constructor for the grouptool instance.
      *
@@ -99,11 +99,11 @@ class grouptool_instance {
      * @throws \moodle_exception
      */
     public function __construct(
-        int $cmid,
+        int                    $cmid,
         ?grouptool_data_object $grouptool = null,
-        cm_info|stdClass|null $cm = null,
-        ?stdClass $course = null,
-        ?context_module $context = null
+        cm_info|stdClass|null  $cm = null,
+        ?stdClass              $course = null,
+        ?context_module        $context = null
     ) {
         global $DB;
 
@@ -136,6 +136,7 @@ class grouptool_instance {
         }
         $this->grouptool->course = $this->course->id;
     }
+
     /**
      * Return the grouptools name
      *
@@ -144,6 +145,7 @@ class grouptool_instance {
     public function get_name(): string {
         return $this->grouptool->name;
     }
+
     /**
      * Return Grouptool's settings
      *
@@ -152,6 +154,7 @@ class grouptool_instance {
     public function get_settings(): grouptool_data_object {
         return $this->grouptool;
     }
+
     /**
      * Return Grouptool's multiple registrations settings
      *
@@ -159,5 +162,41 @@ class grouptool_instance {
      */
     public function get_reg_settings(): array {
         return [$this->grouptool->allowmultiple, $this->grouptool->choosemin, $this->grouptool->choosemax];
+    }
+
+    /**
+     * Return the course record
+     *
+     * @return stdClass The course record
+     */
+    public function get_course(): stdClass {
+        return $this->course;
+    }
+
+    /**
+     * Return the course module record
+     *
+     * @return cm_info|stdClass The course module record
+     */
+    public function get_cm(): cm_info|stdClass {
+        return $this->cm;
+    }
+
+    /**
+     * Return the module context
+     *
+     * @return context_module The module context
+     */
+    public function get_context(): context_module {
+        return $this->context;
+    }
+
+    /**
+     * Return the grouptool data object
+     *
+     * @return grouptool_data_object The grouptool data object
+     */
+    public function get_grouptool(): grouptool_data_object {
+        return $this->grouptool;
     }
 }

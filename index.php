@@ -24,11 +24,16 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/locallib.php');
+
+global $DB, $OUTPUT, $PAGE, $CFG;
 
 $id = required_param('id', PARAM_INT);   // Course.
 
-$course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
+try {
+    $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
+} catch (dml_exception) {
+    throw new moodle_exception('invalidcourseid', 'grouptool');
+}
 
 require_course_login($course);
 
