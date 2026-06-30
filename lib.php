@@ -24,6 +24,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\registration_manager;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/definitions.php');
@@ -1205,13 +1208,13 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $course = $DB->get_record('course', ['id' => $cm->course]);
     $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
+    $registration_manager = new registration_manager($cm->id,new grouptool_data_object($grouptool),$cm, $course, $context);
 
     $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
         'mod/grouptool:administrate_registration',
         $context
     );
-    $isopen = $grouptool->is_registration_open();
+    $isopen = $registration_manager->is_registration_open();
 
     $url = new \moodle_url('/mod/grouptool/view.php', [
         'id' => $cm->id,
@@ -1223,8 +1226,8 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $label = '';
 
     if (!$managesregs && has_capability('mod/grouptool:register', $context)) {
-        $userstats = $grouptool->get_registration_stats($USER->id);
-        [$allowmultiple, $choosemin, ] = $grouptool->get_reg_settings();
+        $userstats = $registration_manager->get_registration_stats($USER->id);
+        [$allowmultiple, $choosemin, ] = $registration_manager->get_reg_settings();
         if ($allowmultiple) {
             $itemcount = ($choosemin - count($userstats->registered));
             $label = get_string(($itemcount > 1) ? 'register' : 'register', 'grouptool');
@@ -1246,7 +1249,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
         // Clickable if registration is open and registrations are missing or enough registrations are made!
         $actionable = ($isopen && ($itemcount > 0)) || ($itemcount <= 0);
     } else if ($managesregs) {
-        $missing = $grouptool->get_missing_registrations();
+        $missing = $registration_manager->get_missing_registrations();
         $itemcount = ($missing > 0) ? $missing : 0;
         if ($missing > 1) {
             $label = get_string('myoverview_registrations_missing', 'grouptool');

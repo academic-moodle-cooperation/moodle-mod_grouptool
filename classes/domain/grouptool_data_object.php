@@ -29,7 +29,7 @@ use stdClass;
  * @copyright   2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grouptool_data_object {
+class grouptool_data_object extends \stdClass {
     /** @var int The database id of the grouptool instance. */
     public int $id;
 

@@ -140,7 +140,7 @@ class mod_grouptool {
         }
 
         if ($grouptool) {
-            $this->grouptool = $grouptool;
+            $this->grouptool =  new grouptool_data_object($grouptool);
         } else if (
             !$this->grouptool = new grouptool_data_object($DB->get_record(
                 'grouptool',
