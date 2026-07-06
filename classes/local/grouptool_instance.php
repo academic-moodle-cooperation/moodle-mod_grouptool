@@ -99,11 +99,11 @@ class grouptool_instance {
      * @throws \moodle_exception
      */
     public function __construct(
-        int                    $cmid,
+        int $cmid,
         ?grouptool_data_object $grouptool = null,
-        cm_info|stdClass|null  $cm = null,
-        ?stdClass              $course = null,
-        ?context_module        $context = null
+        cm_info|stdClass|null $cm = null,
+        ?stdClass $course = null,
+        ?context_module $context = null
     ) {
         global $DB;
 

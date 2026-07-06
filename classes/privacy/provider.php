@@ -199,7 +199,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                     "agrpid " . $agrpsql . " AND userid " . $usersql,
                     $agrpparams + $userparams
                 );
-                $instance = new queue_manager($cm->id,new grouptool_data_object($grouptool), $cm);
+                $instance = new queue_manager($cm->id, new grouptool_data_object($grouptool), $cm);
                 foreach ($agrpids as $cur) {
                     $instance->fill_from_queue($cur);
                 }

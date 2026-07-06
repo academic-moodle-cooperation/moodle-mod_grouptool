@@ -280,7 +280,6 @@ abstract class base extends advanced_testcase {
         $instance = new grouptool_data_object($generator->create_instance($params));
         $cm = get_coursemodule_from_instance('grouptool', $instance->id);
 
-
         $DB->set_field('grouptool_agrps', 'active', 1, [
             'grouptoolid' => $instance->id,
         ]);

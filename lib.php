@@ -207,8 +207,8 @@ function grouptool_update_instance(stdClass $grouptool) {
         $cmid = $grouptool->coursemodule;
         $cm = get_coursemodule_from_id('grouptool', $cmid);
         $course = $DB->get_record('course', ['id' => $cm->course]);
-        $instance = new mod_grouptool($cmid, $grouptool, $cm, $course);
-        $instance->push_registrations();
+        $registrationmanager = new registration_manager($cm->id, new grouptool_data_object($grouptool), $cm, $course);
+        $registrationmanager->push_registrations();
     }
 
     grouptool_refresh_events($grouptool->course, $grouptool);
@@ -721,10 +721,10 @@ function grouptool_extend_settings_navigation(settings_navigation $settings, nav
     $reportplugins = core_plugin_manager::instance()->get_installed_plugins('report');
 
     // TODO Remove it from here and add to Grouptool Report.
-    try {
-        $reportgrouptoolversion = $reportplugins['grouptool'];
-    } catch (Exception $ex) {
+    if (!isset($reportplugins['grouptool'])) {
         $reportgrouptoolversion = null;
+    } else {
+        $reportgrouptoolversion = $reportplugins['grouptool'];
     }
 
     if (!is_null($reportgrouptoolversion) && has_capability('report/grouptool:view', $context)) {
@@ -1201,20 +1201,18 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
 function mod_grouptool_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
     global $CFG, $USER, $DB;
 
-    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-
     $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
     $context = context_module::instance($cm->id);
     $course = $DB->get_record('course', ['id' => $cm->course]);
     $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $registration_manager = new registration_manager($cm->id,new grouptool_data_object($grouptool),$cm, $course, $context);
+    $registrationmanager = new registration_manager($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 
     $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
         'mod/grouptool:administrate_registration',
         $context
     );
-    $isopen = $registration_manager->is_registration_open();
+    $isopen = $registrationmanager->is_registration_open();
 
     $url = new \moodle_url('/mod/grouptool/view.php', [
         'id' => $cm->id,
@@ -1226,8 +1224,8 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $label = '';
 
     if (!$managesregs && has_capability('mod/grouptool:register', $context)) {
-        $userstats = $registration_manager->get_registration_stats($USER->id);
-        [$allowmultiple, $choosemin, ] = $registration_manager->get_reg_settings();
+        $userstats = $registrationmanager->get_registration_stats($USER->id);
+        [$allowmultiple, $choosemin, ] = $registrationmanager->get_reg_settings();
         if ($allowmultiple) {
             $itemcount = ($choosemin - count($userstats->registered));
             $label = get_string(($itemcount > 1) ? 'register' : 'register', 'grouptool');
@@ -1249,7 +1247,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
         // Clickable if registration is open and registrations are missing or enough registrations are made!
         $actionable = ($isopen && ($itemcount > 0)) || ($itemcount <= 0);
     } else if ($managesregs) {
-        $missing = $registration_manager->get_missing_registrations();
+        $missing = $registrationmanager->get_missing_registrations();
         $itemcount = ($missing > 0) ? $missing : 0;
         if ($missing > 1) {
             $label = get_string('myoverview_registrations_missing', 'grouptool');
@@ -1274,7 +1272,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
  * @param int $itemcount The item count associated with the action event.
  * @return bool
  */
-function mod_grouptool_core_calendar_event_action_shows_item_count(calendar_event $event, $itemcount = 0) {
+function mod_grouptool_core_calendar_event_action_shows_item_count(calendar_event $event, int $itemcount = 0): bool {
     // List of event types where the action event's item count should be shown.
     $showitemcountfor = [
         GROUPTOOL_EVENT_TYPE_DUE,
@@ -1288,7 +1286,7 @@ function mod_grouptool_core_calendar_event_action_shows_item_count(calendar_even
  *
  * @return string[] Mapping array with font awesome classes indexed by image names
  */
-function mod_grouptool_get_fontawesome_icon_map() {
+function mod_grouptool_get_fontawesome_icon_map(): array {
     return [
         'mod_grouptool:active' => 'fa-circle text-success',
         'mod_grouptool:inactive' => 'fa-circle',

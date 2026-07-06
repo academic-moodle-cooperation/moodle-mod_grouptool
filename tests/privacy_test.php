@@ -4,7 +4,7 @@
 // It is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
-// later.
+// (at your option) any later version.
 //
 // It is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -591,13 +591,13 @@ final class privacy_test extends base {
         [$insql, $params] = $DB->get_in_or_equal($agrpids);
 
         return $DB->record_exists_select(
-                'grouptool_registered',
-                '(userid = ? OR modified_by = ?) AND agrpid ' . $insql,
-                array_merge([$userid, $userid], $params)
-            ) || $DB->record_exists_select(
-                'grouptool_queued',
-                '(userid = ?) AND agrpid ' . $insql,
-                array_merge([$userid, $userid], $params)
-            );
+            'grouptool_registered',
+            '(userid = ? OR modified_by = ?) AND agrpid ' . $insql,
+            array_merge([$userid, $userid], $params)
+        ) || $DB->record_exists_select(
+            'grouptool_queued',
+            '(userid = ?) AND agrpid ' . $insql,
+            array_merge([$userid, $userid], $params)
+        );
     }
 }

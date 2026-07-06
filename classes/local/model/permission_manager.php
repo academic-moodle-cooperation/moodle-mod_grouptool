@@ -57,7 +57,7 @@ class permission_manager extends grouptool_instance {
 
         try {
             $this->can_change_group($agrpid, $userid, $message);
-        } catch (Exception|Throwable) {
+        } catch (Exception | Throwable) {
             return false;
         }
 
