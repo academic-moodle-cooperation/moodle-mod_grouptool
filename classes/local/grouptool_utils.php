@@ -248,16 +248,16 @@ class grouptool_utils extends grouptool_instance {
     /**
      * Return all marks for the specified user
      *
-     * The marks are the registation entries before they become active
+     * The marks are the registration entries before they become active
      * (i.e. if not enough groups have been chosen).
      *
      * @param int $userid (optional) User-ID for which the marks should be returned
-     * @return stdClass[] Users marks
-     * @throws coding_exception
+     * @return array|null Users marks
+     * @throws \coding_exception
+     * @throws \moodle_exception
      * @throws dml_exception
-     * @throws required_capability_exception
      */
-    public function get_user_marks($userid = 0) {
+    public function get_user_marks(int $userid = 0): ?array {
         global $DB, $USER, $OUTPUT;
 
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);

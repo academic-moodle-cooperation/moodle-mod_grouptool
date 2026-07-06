@@ -129,6 +129,12 @@ final class registration_test extends \mod_grouptool\local\tests\base {
         $message->username = fullname($this->students[3]);
 
         $groupmanager = $this->create_group_manager($grouptool);
+        $curcount= $registrationmanager->get_group_registrations_count($agrpids[0]);
+        if ($curcount >= $grouptool->get_grouptool()->grpsize) {
+            self::assertTrue(true);
+        } else {
+            self::fail('Group size: '.$curcount.' is not as expected: '.$grouptool->get_grouptool()->grpsize);
+        }
         $text = null;
         try {
             $text = $registrationmanager->register_in_agrp($agrpids[0], $this->students[3]->id, false);
@@ -455,9 +461,10 @@ final class registration_test extends \mod_grouptool\local\tests\base {
 
         $thrown = false;
         $message->groupname = $agrps[$agrpids[4]]->name;
+        $permissionmanager = $this->create_permission_manager($grouptool);
 
         try {
-            $registrationmanager->can_change_group($agrpids[4], $this->students[2]->id, $message);
+            $permissionmanager->can_change_group($agrpids[4], $this->students[2]->id, $message);
         } catch (exception\registration $e) {
             $thrown = true;
             self::assertInstanceOf(exception\registration::class, $e);

@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\model;
 
+require_once($CFG->dirroot . '/group/lib.php');
+
 use cache_helper;
 use completion_info;
 use context_course;
@@ -1172,5 +1174,26 @@ class registration_manager extends grouptool_instance {
         $return->notreg_users = $return->users - $return->reg_users;
 
         return $return;
+    }
+    /**
+     * Returns the amount of registrations for a particular active group.
+     *
+     * @param int $agrpid ID of the active group
+     * @return int amount of registrations (includes queues!)
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
+    public function get_group_registrations_count(int $agrpid){
+        global $DB;
+
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
+        $agrp = $groupmanager->get_active_groups(false, false, $agrpid);
+        if (count($agrp) != 1) {
+            throw new registration('error_getting_data');
+        }
+        return $DB->count_records('grouptool_registered', ['agrpid' => $agrpid]) +
+            $DB->count_records('grouptool_queued', ['agrpid' => $agrpid]);
     }
 }

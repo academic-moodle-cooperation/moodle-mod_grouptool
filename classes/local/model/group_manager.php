@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\model;
 
+require_once($CFG->dirroot . '/group/lib.php');
+
 use coding_exception;
 use core\output\notification;
 use core_php_time_limit;

@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\tests;
 
+defined('MOODLE_INTERNAL') || die();
+
 use advanced_testcase;
 use coding_exception;
 use context_module;

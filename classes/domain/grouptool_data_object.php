@@ -119,6 +119,30 @@ class grouptool_data_object extends \stdClass {
         foreach ($values as $key => $value) {
             if (property_exists($this, $key)) {
                 $this->$key = $value;
+                continue;
+            }
+            if ($key == 'use_size') {
+                $this->usesize = $value;
+            }else if ($key == 'show_members') {
+                $this->showmembers = $value;
+            }else if ($key == 'allow_reg') {
+                $this->allowreg = $value;
+            }else if ($key == 'immediate_reg') {
+                $this->immediatereg = $value;
+            }else if ($key == 'allow_unreg') {
+                $this->allowunreg = $value;
+            }else if ($key == 'use_queue') {
+                $this->usequeue = $value;
+            }else if ($key == 'users_queues_limit') {
+                $this->usersqueueslimit = $value;
+            }else if ($key == 'groups_queues_limit') {
+                $this->groupsqueueslimit = $value;
+            }else if ($key == 'allow_multiple') {
+                $this->allowmultiple = $value;
+            }else if ($key == 'choose_min') {
+                $this->choosemin = $value;
+            }else if ($key == 'choose_max') {
+                $this->choosemax = $value;
             }
         }
     }
