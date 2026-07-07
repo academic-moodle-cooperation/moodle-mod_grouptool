@@ -50,9 +50,6 @@ use mod_grouptool\local\model\queue_manager;
 use moodle_exception;
 use stdClass;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Privacy class for requesting user data.
  *

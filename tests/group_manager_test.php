@@ -28,8 +28,6 @@ namespace mod_grouptool\local\model;
 
 use mod_grouptool\local\tests\base;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests for group_manager.
  *

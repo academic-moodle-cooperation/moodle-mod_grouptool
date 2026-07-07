@@ -31,8 +31,6 @@ use dml_exception;
 use mod_grouptool\local\tests\base;
 use moodle_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests for queue_manager.
  *

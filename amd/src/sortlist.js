@@ -93,7 +93,8 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                         template = 'core/notification_error';
                         context.message = result.error;
                         autoFadeOut = 60 * 1000;
-                        log.info("AJAX Call to reorder groups successfull\nError ocured:" + result.error + "\n" + status, "grouptool");
+                        log.info("AJAX Call to reorder groups successfull\nError ocured:" +
+                            result.error + "\n" + status, "grouptool");
                         templates.render(template, context).then(function (html) {
                             var infoNode = $(html);
                             infoNode.hide(0);

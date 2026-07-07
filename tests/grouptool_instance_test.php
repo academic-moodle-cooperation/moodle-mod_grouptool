@@ -24,12 +24,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 namespace mod_grouptool\local;
 
 use mod_grouptool\local\tests\base;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests for grouptool_instance.

@@ -33,8 +33,6 @@ use moodle_exception;
 use required_capability_exception;
 use Throwable;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * This class contains the test cases for registration handling.
  *

@@ -37,8 +37,6 @@ use mod_grouptool\privacy\provider;
 use moodle_exception;
 use required_capability_exception;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for mod_grouptool's privacy provider.
  *

@@ -896,10 +896,8 @@ class view_controller extends grouptool_instance {
     public function view_administration(): void {
         global $SESSION, $OUTPUT, $PAGE, $DB, $USER, $CFG;
 
-        $registrationmanager = new registration_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
-        $permissionmanager = new permission_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         $output = $PAGE->get_renderer('mod_grouptool');
