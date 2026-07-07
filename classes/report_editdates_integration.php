@@ -25,8 +25,6 @@
 defined('MOODLE_INTERNAL') || die;
 
 
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-
 /**
  * Class needed for report-editdates support
  *

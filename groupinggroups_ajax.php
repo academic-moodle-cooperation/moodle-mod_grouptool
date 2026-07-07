@@ -24,7 +24,11 @@
  */
 
 define('AJAX_SCRIPT', true);
+
 require_once(dirname(__FILE__) . '/../../config.php');
+
+global $CFG, $DB, $PAGE;
+
 require_once($CFG->libdir . '/grouplib.php');
 
 $groupingid = required_param('groupingid', PARAM_INT);

@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\model;
 
+global $CFG;
+
 require_once($CFG->dirroot . '/group/lib.php');
 
 use cache_helper;

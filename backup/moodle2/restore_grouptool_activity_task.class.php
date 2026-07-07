@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 // Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_stepslib.php');
 
