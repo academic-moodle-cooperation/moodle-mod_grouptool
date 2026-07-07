@@ -300,6 +300,9 @@ abstract class base extends advanced_testcase {
      *
      * @param grouptool_instance $grouptool The grouptool instance.
      * @return group_manager The group manager.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     protected function create_group_manager(grouptool_instance $grouptool): group_manager {
         return new group_manager(
@@ -316,6 +319,9 @@ abstract class base extends advanced_testcase {
      *
      * @param grouptool_instance $grouptool The grouptool instance.
      * @return registration_manager The registration manager.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     protected function create_registration_manager(grouptool_instance $grouptool): registration_manager {
         return new registration_manager(
@@ -332,6 +338,10 @@ abstract class base extends advanced_testcase {
      *
      * @param grouptool_instance $grouptool The grouptool instance.
      * @return queue_manager The queue manager.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     *
      */
     protected function create_queue_manager(grouptool_instance $grouptool): queue_manager {
         return new queue_manager(
@@ -348,6 +358,9 @@ abstract class base extends advanced_testcase {
      *
      * @param grouptool_instance $grouptool The grouptool instance.
      * @return permission_manager The permission manager.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     protected function create_permission_manager(grouptool_instance $grouptool): permission_manager {
         return new permission_manager(
@@ -364,8 +377,10 @@ abstract class base extends advanced_testcase {
      *
      * @param grouptool_instance $grouptool The grouptool instance.
      * @return array{0: array, 1: array, 2: stdClass} Agrps, agrp ids and message object.
+     * @throws coding_exception
      * @throws dml_exception
-     */
+     * @throws moodle_exception
+ */
     protected function get_agrps_and_prepare_message(grouptool_instance $grouptool): array {
         $groupmanager = $this->create_group_manager($grouptool);
 
