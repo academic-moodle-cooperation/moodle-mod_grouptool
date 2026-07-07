@@ -16,37 +16,17 @@
 
 namespace mod_grouptool\local\model;
 
+use context_module;
 use core\exception\coding_exception;
+use core\exception\moodle_exception;
+use core\exception\required_capability_exception;
 use core_user\fields;
+use dml_exception;
 use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\pdf;
 use MoodleExcelWorkbook;
 use MoodleODSWorkbook;
 use stdClass;
-use cache_helper;
-use completion_info;
-use context_course;
-use core\exception\moodle_exception;
-use core\exception\required_capability_exception;
-use core_php_time_limit;
-use dml_exception;
-use Exception;
-use html_table;
-use html_table_cell;
-use html_table_row;
-use html_writer;
-use mod_grouptool\event\registration_deleted;
-use mod_grouptool\event\registration_push_started;
-use mod_grouptool\exception\exceedgroupqueuelimit;
-use mod_grouptool\exception\exceedgroupsize;
-use mod_grouptool\exception\exceeduserqueuelimit;
-use mod_grouptool\exception\exceeduserreglimit;
-use mod_grouptool\exception\notenoughregs;
-use mod_grouptool\exception\registration;
-use mod_grouptool\exception\regpresent;
-use mod_grouptool\local\grouptool_utils;
-use progress_bar;
-use Throwable;
 
 
 /**
@@ -66,7 +46,7 @@ class export_service extends grouptool_instance {
      * @param string[] $collapsed array with collapsed columns
      * @throws coding_exception
      */
-    private function overview_fill_workbook(&$workbook, $groups, $collapsed = []) {
+    private function overview_fill_workbook(MoodleExcelWorkbook|MoodleODSWorkbook &$workbook, array $groups, array $collapsed = []): void {
         global $CFG;
         if (count($groups) > 0) {
             $columnwidth = [7, 22, 14, 17]; // Unit: mm!
@@ -180,7 +160,7 @@ class export_service extends grouptool_instance {
                 $groupinfo[] = [get_string('free', 'grouptool'), $group->free];
                 $regdata = $group->reg_data;
                 $queuedata = $group->queue_data;
-                $mregdata = isset($group->mreg_data) ? $group->mreg_data : [];
+                $mregdata = $group->mreg_data ?? [];
                 // Groupname as headline!
                 $groupworksheets[$key]->write_string(0, 0, $groupname, $headlineformat);
                 $groupworksheets[$key]->merge_cells(0, 0, 0, $columncount - 1);
@@ -671,10 +651,13 @@ class export_service extends grouptool_instance {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_overview_txt($groupid = 0, $groupingid = 0, $includeinactive = false) {
+    public function download_overview_txt(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
         ob_start();
+
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+
         $lines = [];
-        $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
+        $groups = $groupmanager->group_overview_table($groupingid, $groupid, true, $includeinactive);
         if (count($groups) > 0) {
             $lines[] = "*** " . get_string('status', 'grouptool') . "\n";
             foreach (explode("</li>", get_string('status_help', 'grouptool')) as $legendline) {
@@ -760,8 +743,9 @@ class export_service extends grouptool_instance {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_overview_raw($groupid = 0, $groupingid = 0, $includeinactive = false) {
-        return $this->group_overview_table($groupid, $groupingid, true, $includeinactive);
+    public function download_overview_raw(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): array|int|string {
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+        return $groupmanager->group_overview_table($groupid, $groupingid, true, $includeinactive);
     }
 
     /**
@@ -770,13 +754,16 @@ class export_service extends grouptool_instance {
      * @param int $groupid optional get only this group
      * @param int $groupingid optional get only this grouping
      * @param bool $includeinactive optional include inactive groups too!
+     * @return void
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_overview_pdf($groupid = 0, $groupingid = 0, $includeinactive = false) {
-        $data = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
+    public function download_overview_pdf(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+
+        $data = $groupmanager->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $timeavailable = $this->grouptool->timeavailable;
@@ -811,7 +798,7 @@ class export_service extends grouptool_instance {
                     get_string('free', 'grouptool') . ' ' . $group->free;
                 $regdata = $group->reg_data;
                 $queuedata = $group->queue_data;
-                $mregdata = isset($group->mreg_data) ? $group->mreg_data : [];
+                $mregdata = $group->mreg_data ?? [];
                 $pdf->add_grp_overview($groupname, $groupinfo, $regdata, $queuedata, $mregdata);
                 $pdf->MultiCell(
                     0,
@@ -936,12 +923,20 @@ class export_service extends grouptool_instance {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_overview_ods($groupid = 0, $groupingid = 0, $includeinactive = false) {
+    public function download_overview_ods(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
+
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+
         global $CFG;
 
         require_once($CFG->libdir . "/odslib.class.php");
 
-        $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
+        $coursename = format_string(
+            $this->course->fullname,
+            true,
+            ['context' => context_module::instance($this->cm->id)]
+        );
+
         $grouptoolname = $this->grouptool->name;
 
         if (!empty($groupid)) {
@@ -957,7 +952,7 @@ class export_service extends grouptool_instance {
         $filename = clean_filename("$filename.ods");
         $workbook = new MoodleODSWorkbook("-");
 
-        $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
+        $groups = $groupmanager->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $this->overview_fill_workbook($workbook, $groups);
 
@@ -976,10 +971,12 @@ class export_service extends grouptool_instance {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function download_overview_xlsx($groupid = 0, $groupingid = 0, $includeinactive = false) {
+    public function download_overview_xlsx(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
         global $CFG;
 
         require_once($CFG->libdir . "/excellib.class.php");
+
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
 
         $coursename = format_string($this->course->fullname, true, ['context' => context_module::instance($this->cm->id)]);
         $grouptoolname = $this->grouptool->name;
@@ -999,7 +996,7 @@ class export_service extends grouptool_instance {
         $filename = clean_filename("$filename.xlsx");
         $workbook = new MoodleExcelWorkbook("-", 'Excel2007');
 
-        $groups = $this->group_overview_table($groupingid, $groupid, true, $includeinactive);
+        $groups = $groupmanager->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
         $this->overview_fill_workbook($workbook, $groups);
 
