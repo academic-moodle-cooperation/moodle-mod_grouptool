@@ -279,8 +279,8 @@ final class registration_test extends base {
      * Tests group change for single registration mode.
      *
      * @covers \mod_grouptool\local\model\registration_manager::register_in_agrp
-     * @covers \mod_grouptool\local\model\registration_manager::can_change_group
-     * @covers \mod_grouptool\local\model\registration_manager::qualifies_for_groupchange
+     * @covers \mod_grouptool\local\model\permission_manager::can_change_group
+     * @covers \mod_grouptool\local\model\permission_manager::qualifies_for_groupchange
      *
      * @throws Throwable
      * @throws coding_exception
@@ -353,7 +353,7 @@ final class registration_test extends base {
      * Tests group change for multiple registration mode.
      *
      * @covers \mod_grouptool\local\model\registration_manager::register_in_agrp
-     * @covers \mod_grouptool\local\model\registration_manager::can_change_group
+     * @covers \mod_grouptool\local\model\permission_manager::can_change_group
      * @covers \mod_grouptool\local\model\registration_manager::change_group
      *
      * @throws Throwable
