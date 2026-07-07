@@ -29,13 +29,17 @@ use completion_info;
 use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\output\html_writer;
+use core\output\notification;
 use core\output\single_button;
 use core_php_time_limit;
 use core_table\output\html_table_cell;
 use core_table\output\html_table_row;
+use core_user\fields;
 use dml_exception;
 use Exception;
 use html_table;
+use mod_grouptool\event\agrp_created;
+use mod_grouptool\event\user_imported;
 use mod_grouptool\exception\exceedgroupsize;
 use mod_grouptool\exception\exceeduserqueuelimit;
 use mod_grouptool\exception\exceeduserreglimit;
@@ -159,7 +163,7 @@ class grouptool_utils extends grouptool_instance {
             $errorrows[0] = new html_table_row();
             $errorrows[0]->cells[] = new html_table_cell($OUTPUT->notification(
                 get_string('user_not_found', 'grouptool', $user),
-                \core\output\notification::NOTIFY_ERROR
+                notification::NOTIFY_ERROR
             ));
         } else if (count($userinfo) > 1) {
             foreach ($this->generate_multiple_users_table($userinfo, $importfields) as $tmprow) {
@@ -239,7 +243,7 @@ class grouptool_utils extends grouptool_instance {
                 'found_multiple',
                 'grouptool'
             ),
-            \core\output\notification::NOTIFY_ERROR
+            notification::NOTIFY_ERROR
         ));
         $tmprows[0]->cells[$curkey]->rowspan = count($tmprows);
         return $tmprows;
@@ -305,7 +309,7 @@ class grouptool_utils extends grouptool_instance {
                     $info->userid = $userid;
                     echo $OUTPUT->notification(
                         get_string('already_occupied', 'grouptool', $info),
-                        \core\output\notification::NOTIFY_ERROR
+                        notification::NOTIFY_ERROR
                     );
                     $DB->delete_records('grouptool_registered', ['id' => $id]);
                     unset($marks[$id]);
@@ -462,7 +466,7 @@ class grouptool_utils extends grouptool_instance {
                     'import_in_inactive_group_warning',
                     'grouptool',
                     $groupinfo[$group]->name
-                ), \core\output\notification::NOTIFY_ERROR);
+                ), notification::NOTIFY_ERROR);
             }
             // We use MAX to trick Postgres into thinking this is a full GROUP BY statement!
             $sql = '     SELECT agrps.id AS id, MAX(agrps.groupid) AS grpid, COUNT(regs.id) AS regs,
@@ -485,7 +489,7 @@ class grouptool_utils extends grouptool_instance {
                             'overflowwarning',
                             'grouptool',
                             $cur
-                        ), \core\output\notification::NOTIFY_ERROR));
+                        ), notification::NOTIFY_ERROR));
                     }
                 } else {
                     if (($cur->regs + $usercnt) > $cur->globalsize && $previewonly) {
@@ -493,7 +497,7 @@ class grouptool_utils extends grouptool_instance {
                             'overflowwarning',
                             'grouptool',
                             $cur
-                        ), \core\output\notification::NOTIFY_ERROR));
+                        ), notification::NOTIFY_ERROR));
                     }
                 }
             }
@@ -553,12 +557,12 @@ class grouptool_utils extends grouptool_instance {
                     } catch (Exception $e) {
                         $row->cells[] = new html_table_cell($OUTPUT->notification(
                             $e->getMessage(),
-                            \core\output\notification::NOTIFY_ERROR
+                            notification::NOTIFY_ERROR
                         ));
                     } catch (Throwable $t) {
                         $row->cells[] = new html_table_cell($OUTPUT->notification(
                             $t->getMessage(),
-                            \core\output\notification::NOTIFY_ERROR
+                            notification::NOTIFY_ERROR
                         ));
                     }
                 }
@@ -589,7 +593,7 @@ class grouptool_utils extends grouptool_instance {
                                 'import_user_problem',
                                 'grouptool',
                                 $data
-                            ), \core\output\notification::NOTIFY_ERROR);
+                            ), notification::NOTIFY_ERROR);
                             $row->cells[] = new html_table_cell($notification);
                             $row->attributes['class'] = 'error';
                         } else {
@@ -617,12 +621,12 @@ class grouptool_utils extends grouptool_instance {
                             $agrp[$group]->sort_order = $newgrpdata->sortorder + 1;
                             $agrp[$group]->grpsize = $newgrpdata->grpsize;
                             $agrp[$group]->id = $DB->insert_record('grouptool_agrps', $agrp[$group]);
-                            \mod_grouptool\event\agrp_created::create_from_object($this->cm, $agrp[$group])->trigger();
+                            agrp_created::create_from_object($this->cm, $agrp[$group])->trigger();
                             $notification = $OUTPUT->notification(get_string(
                                 'import_in_inactive_group_rejected',
                                 'grouptool',
                                 $agrp[$group]
-                            ), \core\output\notification::NOTIFY_ERROR);
+                            ), notification::NOTIFY_ERROR);
                             $row->cells[] = $notification;
                             $row->attributes['class'] = 'error';
                             $agrp[$group] = $agrp[$group]->id;
@@ -658,7 +662,7 @@ class grouptool_utils extends grouptool_instance {
                             // Delete every queue entry here!
                             $DB->delete_records('grouptool_queued', ['agrpid' => $agrp[$group], 'userid' => $userinfo->id]);
 
-                            \mod_grouptool\event\user_imported::import_forced(
+                            user_imported::import_forced(
                                 $this->cm,
                                 $reg->id,
                                 $agrp[$group],
@@ -671,7 +675,7 @@ class grouptool_utils extends grouptool_instance {
 
                             if (!$forceregistration) {
                                 // Trigger the event!
-                                \mod_grouptool\event\user_imported::import($this->cm, $group, $userinfo->id)->trigger();
+                                user_imported::import($this->cm, $group, $userinfo->id)->trigger();
                             }
                         }
                     } else if ($userinfo) {
@@ -728,7 +732,7 @@ class grouptool_utils extends grouptool_instance {
      */
     public function add_namefields_useridentity(array &$row, stdClass $user): void {
         global $CFG;
-        $namefields = \core_user\fields::for_name()->get_required_fields();
+        $namefields = fields::for_name()->get_required_fields();
         foreach ($namefields as $namefield) {
             if (!empty($user->$namefield)) {
                 $row[$namefield] = $user->$namefield;
@@ -768,7 +772,7 @@ class grouptool_utils extends grouptool_instance {
      */
     public function get_namefields_useridentity($row, $user) {
         global $CFG;
-        $namefields = \core_user\fields::for_name()->get_required_fields();
+        $namefields = fields::for_name()->get_required_fields();
         foreach ($namefields as $namefield) {
             if (!empty($user->$namefield)) {
                 $row[$namefield] = $user->$namefield;
@@ -887,7 +891,7 @@ class grouptool_utils extends grouptool_instance {
         $mdlregs = array_combine($mdlregs, $mdlregs);
 
         $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $this->context);
-        $userfields = \core_user\fields::for_name()->get_sql(
+        $userfields = fields::for_name()->get_sql(
             "",
             false,
             '',
@@ -958,6 +962,7 @@ class grouptool_utils extends grouptool_instance {
         // And finally wrap in a span!
         return html_writer::tag('span', $output, ['class' => 'showmembers memberstooltip']);
     }
+
     /**
      * Print a message along with button choices for Continue/Cancel
      *
@@ -1009,6 +1014,7 @@ class grouptool_utils extends grouptool_instance {
 
         return $OUTPUT->render_from_template('mod_grouptool/confirm', $data);
     }
+
     /**
      * Requires the JS libraries for the message group button.
      *
@@ -1024,6 +1030,7 @@ class grouptool_utils extends grouptool_instance {
         $PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send', ['#group-message-button']);
         $done = true;
     }
+
     /**
      * Helper function used to print empty cells for hidden columns
      * @return void
@@ -1031,6 +1038,7 @@ class grouptool_utils extends grouptool_instance {
     public static function print_empty_cell(): void {
         echo html_writer::tag('td', '', ['class' => '']);
     }
+
     /**
      * Get showuseridentity itentifiers and their display text on the current instance
      *
@@ -1048,10 +1056,11 @@ class grouptool_utils extends grouptool_instance {
 
         $useridentity = [];
         foreach ($useridentityfields as $identifier) {
-            $useridentity[$identifier] = \core_user\fields::get_display_name($identifier);
+            $useridentity[$identifier] = fields::get_display_name($identifier);
         }
         return $useridentity;
     }
+
     /**
      * Helper function to convert a given associative array into
      * a nested index array so it can be iterated thorough by mustache.
@@ -1066,6 +1075,7 @@ class grouptool_utils extends grouptool_instance {
         }
         return $outarray;
     }
+
     /**
      * Returns a ready to print string containing all given useridentity values separated by tabstops
      *
@@ -1079,6 +1089,7 @@ class grouptool_utils extends grouptool_instance {
         }
         return $outstring;
     }
+
     /**
      * Returns a single select to change currently selected page-orientation.
      *
@@ -1133,6 +1144,7 @@ class grouptool_utils extends grouptool_instance {
             return '';
         }
     }
+
     /**
      * returns the source of potential users and order mode
      *

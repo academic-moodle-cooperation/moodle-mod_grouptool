@@ -22,7 +22,13 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\form;
+
+use coding_exception;
+use context_module;
+use dml_exception;
+use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,15 +47,15 @@ if (isset($CFG)) {
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class groupings_creation_form extends \moodleform {
-    /** @var \context_module */
+class groupings_creation_form extends moodleform {
+    /** @var context_module */
     protected $context = null;
 
     /**
      * Definition of administration form
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function definition() {
         global $DB;
@@ -59,7 +65,7 @@ class groupings_creation_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = \context_module::instance($this->_customdata['id']);
+        $this->context = context_module::instance($this->_customdata['id']);
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', ['id' => $cm->course]);
 
@@ -122,7 +128,7 @@ class groupings_creation_form extends \moodleform {
      * @param array $files array of uploaded files "element_name"=>tmp_file_path
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function validation($data, $files) {
         $parenterrors = parent::validation($data, $files);

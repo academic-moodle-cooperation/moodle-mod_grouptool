@@ -165,7 +165,7 @@ class restore_grouptool_activity_task extends restore_activity_task {
             'grouptool',
             'export',
             'download.php?id={course_module}' .
-                                        '&groupingid={grouping}&groupid={group}&format=[format]',
+            '&groupingid={grouping}&groupid={group}&format=[format]',
             '{grouptool}'
         );
         $rules[] = new restore_log_rule(

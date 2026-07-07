@@ -29,7 +29,7 @@ require_once($CFG->libdir . '/grouplib.php');
 
 $groupingid = required_param('groupingid', PARAM_INT);
 $contextid = required_param('contextid', PARAM_INT);
-$lang   = optional_param('lang', 'en', PARAM_LANG);
+$lang = optional_param('lang', 'en', PARAM_LANG);
 
 // If session has expired and its an ajax request so we cant do a page redirect!
 if (!isloggedin()) {
@@ -45,8 +45,8 @@ require_login($course, false, $cm);
 $contextid = null; // Now we have a context object throw away the id from the user!
 $PAGE->set_context($context);
 $PAGE->set_url('/mod/grouptool/groupinggroups_ajax.php', [
-        'contextid' => $context->id,
-        'groupingid'    => $groupingid,
+    'contextid' => $context->id,
+    'groupingid' => $groupingid,
 ]);
 
 // Get groupings groups.

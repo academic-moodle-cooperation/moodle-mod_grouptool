@@ -25,6 +25,14 @@
 
 namespace mod_grouptool\event;
 
+use cm_info;
+use coding_exception;
+use context_module;
+use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
+
 /**
  * The \mod_grouptool\group_creation_started class holds the logic for the event
  *
@@ -33,7 +41,7 @@ namespace mod_grouptool\event;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class group_creation_started extends \core\event\base {
+class group_creation_started extends base {
     /**
      * Init method.
      *
@@ -48,17 +56,17 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating groups by amount
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int $amount number of created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_groupamount(\stdClass|\cm_info $cm, $pattern, $amount, $grouping = 0) {
+    public static function create_groupamount(stdClass|cm_info $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
             'other' => [
                 'mode' => 'groups_amount',
                 'pattern' => $pattern,
@@ -72,17 +80,17 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating groups by amount of groupmembers
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int $amount number of created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_memberamount(\stdClass|\cm_info $cm, $pattern, $amount, $grouping = 0) {
+    public static function create_memberamount(stdClass|cm_info $cm, $pattern, $amount, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
             'other' => [
                 'mode' => 'members_amount',
                 'pattern' => $pattern,
@@ -96,18 +104,18 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating groups from X to Y
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int $from lowest index for created groups
      * @param int $to highest index for created groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_fromto(\stdClass|\cm_info $cm, $pattern, $from, $to, $grouping = 0) {
+    public static function create_fromto(stdClass|cm_info $cm, $pattern, $from, $to, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
             'other' => [
                 'mode' => 'fromto',
                 'pattern' => $pattern,
@@ -122,16 +130,16 @@ class group_creation_started extends \core\event\base {
     /**
      * Convenience method to create event object when creating 1-person-groups
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param string $pattern name scheme used when creating groups
      * @param int|0 $grouping optional id of grouping used for created groups (0 if no grouping used)
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_person(\stdClass|\cm_info $cm, $pattern, $grouping = 0) {
+    public static function create_person(stdClass|cm_info $cm, $pattern, $grouping = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
             'other' => [
                 'mode' => '1-person-groups',
                 'pattern' => $pattern,
@@ -188,7 +196,7 @@ class group_creation_started extends \core\event\base {
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventgroupcreationstarted', 'grouptool');
@@ -197,47 +205,47 @@ class group_creation_started extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
+        return new moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
      * Custom validation.
      *
      * @return void
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
 
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The group_creation_started event must define objectid and object table.');
+            throw new coding_exception('The group_creation_started event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         if (empty($this->data['other']['pattern'])) {
-            throw new \coding_exception('Namepattern/Namingscheme has to be specified!');
+            throw new coding_exception('Namepattern/Namingscheme has to be specified!');
         }
         switch ($this->data['other']['mode']) {
             case 'fromto':
                 if (empty($this->data['other']['from'])) {
-                    throw new \coding_exception('Lower limit has to be specified!');
+                    throw new coding_exception('Lower limit has to be specified!');
                 }
                 if (empty($this->data['other']['to'])) {
-                    throw new \coding_exception('Upper limit has to be specified!');
+                    throw new coding_exception('Upper limit has to be specified!');
                 }
                 break;
             case 'members amount':
             case 'groups amount':
                 if (empty($this->data['other']['amount'])) {
-                    throw new \coding_exception('Amount of groups/members has to be specified!');
+                    throw new coding_exception('Amount of groups/members has to be specified!');
                 }
                 break;
         }

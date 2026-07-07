@@ -380,7 +380,7 @@ abstract class base extends advanced_testcase {
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
- */
+     */
     protected function get_agrps_and_prepare_message(grouptool_instance $grouptool): array {
         $groupmanager = $this->create_group_manager($grouptool);
 

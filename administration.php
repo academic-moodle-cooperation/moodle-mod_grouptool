@@ -27,7 +27,6 @@ use mod_grouptool\domain\grouptool_data_object;
 use mod_grouptool\local\model\view_controller;
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/mod/grouptool/lib.php');

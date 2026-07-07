@@ -17,7 +17,9 @@
 namespace mod_grouptool\local\model;
 
 use core\exception\coding_exception;
+use core_user\fields;
 use mod_grouptool\local\grouptool_instance;
+use mod_grouptool\pdf;
 use MoodleExcelWorkbook;
 use MoodleODSWorkbook;
 use stdClass;
@@ -138,7 +140,7 @@ class export_service extends grouptool_instance {
 
             // We create a dummy user-object to get the fullname-format!
             $dummy = new stdClass();
-            $namefields = \core_user\fields::for_name()->get_required_fields();
+            $namefields = fields::for_name()->get_required_fields();
             foreach ($namefields as $namefield) {
                 $dummy->$namefield = $namefield;
             }
@@ -254,7 +256,7 @@ class export_service extends grouptool_instance {
 
                 // First we output every namefield from used by fullname in exact the defined order!
                 foreach ($namefields as $namefield) {
-                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($namefield), $regheadformat);
+                    $groupworksheets[$key]->write_string(7, $k, fields::get_display_name($namefield), $regheadformat);
                     $hidden = in_array($namefield, $collapsed) ? true : false;
                     $columnwidth[$namefield] = empty($columnwidth[$namefield]) ? $columnwidth[0] : $columnwidth[$namefield];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth[$namefield], null, $hidden);
@@ -266,12 +268,12 @@ class export_service extends grouptool_instance {
                     $curfieldcount = 1;
                     foreach ($fields as $field) {
                         if ($curfieldcount == count($fields)) {
-                            $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name($field), $regheadlast);
+                            $groupworksheets[$key]->write_string(7, $k, fields::get_display_name($field), $regheadlast);
                         } else {
                             $groupworksheets[$key]->write_string(
                                 7,
                                 $k,
-                                \core_user\fields::get_display_name($field),
+                                fields::get_display_name($field),
                                 $regheadformat
                             );
                             $curfieldcount++;
@@ -285,7 +287,7 @@ class export_service extends grouptool_instance {
                     $groupworksheets[$key]->write_string(
                         7,
                         $k,
-                        \core_user\fields::get_display_name('idnumber'),
+                        fields::get_display_name('idnumber'),
                         $regheadformat
                     );
                     $hidden = in_array('idnumber', $collapsed) ? true : false;
@@ -293,7 +295,7 @@ class export_service extends grouptool_instance {
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
                     $k++; // ...k is equal to n+1!
 
-                    $groupworksheets[$key]->write_string(7, $k, \core_user\fields::get_display_name('email'), $regheadlast);
+                    $groupworksheets[$key]->write_string(7, $k, fields::get_display_name('email'), $regheadlast);
                     $hidden = in_array('email', $collapsed) ? true : false;
                     $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                     $groupworksheets[$key]->set_column($k, $k, $columnwidth['email'], null, $hidden);
@@ -314,7 +316,7 @@ class export_service extends grouptool_instance {
                         $allgroupsworksheet->write_string(
                             $j + 7,
                             $k,
-                            \core_user\fields::get_display_name($namefield),
+                            fields::get_display_name($namefield),
                             $regheadformat
                         );
                         $hidden = in_array($namefield, $collapsed) ? true : false;
@@ -331,14 +333,14 @@ class export_service extends grouptool_instance {
                                 $allgroupsworksheet->write_string(
                                     $j + 7,
                                     $k,
-                                    \core_user\fields::get_display_name($field),
+                                    fields::get_display_name($field),
                                     $regheadlast
                                 );
                             } else {
                                 $allgroupsworksheet->write_string(
                                     $j + 7,
                                     $k,
-                                    \core_user\fields::get_display_name($field),
+                                    fields::get_display_name($field),
                                     $regheadformat
                                 );
                                 $curfieldcount++;
@@ -352,7 +354,7 @@ class export_service extends grouptool_instance {
                         $allgroupsworksheet->write_string(
                             $j + 7,
                             $k,
-                            \core_user\fields::get_display_name('idnumber'),
+                            fields::get_display_name('idnumber'),
                             $regheadformat
                         );
                         $hidden = in_array('idnumber', $collapsed) ? true : false;
@@ -360,7 +362,7 @@ class export_service extends grouptool_instance {
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['idnumber'], null, $hidden);
                         $k++; // ...k is equal to n+1!
 
-                        $allgroupsworksheet->write_string($j + 7, $k, \core_user\fields::get_display_name('email'), $regheadlast);
+                        $allgroupsworksheet->write_string($j + 7, $k, fields::get_display_name('email'), $regheadlast);
                         $hidden = in_array('email', $collapsed) ? true : false;
                         $columnwidth['email'] = empty($columnwidth['email']) ? $columnwidth[0] : $columnwidth['email'];
                         $allgroupsworksheet->set_column($k, $k, $columnwidth['email'], null, $hidden);
@@ -791,7 +793,7 @@ class export_service extends grouptool_instance {
             }
         }
 
-        $pdf = new \mod_grouptool\pdf(
+        $pdf = new pdf(
             'overview',
             $coursename,
             $grouptoolname,

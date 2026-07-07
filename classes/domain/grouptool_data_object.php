@@ -29,7 +29,7 @@ use stdClass;
  * @copyright   2026 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grouptool_data_object extends \stdClass {
+class grouptool_data_object extends stdClass {
     /** @var int The database id of the grouptool instance. */
     public int $id;
 
@@ -123,25 +123,25 @@ class grouptool_data_object extends \stdClass {
             }
             if ($key == 'use_size') {
                 $this->usesize = $value;
-            }else if ($key == 'show_members') {
+            } else if ($key == 'show_members') {
                 $this->showmembers = $value;
-            }else if ($key == 'allow_reg') {
+            } else if ($key == 'allow_reg') {
                 $this->allowreg = $value;
-            }else if ($key == 'immediate_reg') {
+            } else if ($key == 'immediate_reg') {
                 $this->immediatereg = $value;
-            }else if ($key == 'allow_unreg') {
+            } else if ($key == 'allow_unreg') {
                 $this->allowunreg = $value;
-            }else if ($key == 'use_queue') {
+            } else if ($key == 'use_queue') {
                 $this->usequeue = $value;
-            }else if ($key == 'users_queues_limit') {
+            } else if ($key == 'users_queues_limit') {
                 $this->usersqueueslimit = $value;
-            }else if ($key == 'groups_queues_limit') {
+            } else if ($key == 'groups_queues_limit') {
                 $this->groupsqueueslimit = $value;
-            }else if ($key == 'allow_multiple') {
+            } else if ($key == 'allow_multiple') {
                 $this->allowmultiple = $value;
-            }else if ($key == 'choose_min') {
+            } else if ($key == 'choose_min') {
                 $this->choosemin = $value;
-            }else if ($key == 'choose_max') {
+            } else if ($key == 'choose_max') {
                 $this->choosemax = $value;
             }
         }

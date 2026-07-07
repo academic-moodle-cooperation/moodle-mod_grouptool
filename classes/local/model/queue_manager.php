@@ -16,8 +16,14 @@
 
 namespace mod_grouptool\local\model;
 
+use core\exception\moodle_exception;
+use core\message\message;
 use core\output\html_writer;
 use core_user;
+use mod_grouptool\event\dequeuing_started;
+use mod_grouptool\event\queue_entry_created;
+use mod_grouptool\event\queue_entry_deleted;
+use mod_grouptool\event\user_moved;
 use mod_grouptool\exception\registration;
 use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\local\grouptool_utils;
@@ -40,7 +46,7 @@ class queue_manager extends grouptool_instance {
      * @return bool true if everything went fine!
      * @throws coding_exception
      * @throws dml_exception
-     * @throws required_capability_exception|\core\exception\moodle_exception
+     * @throws required_capability_exception|moodle_exception
      */
     public function fill_from_queue(int $agrpid): bool {
         global $DB, $CFG, $OUTPUT;
@@ -127,7 +133,7 @@ class queue_manager extends grouptool_instance {
                 );
                 foreach ($records as $cur) {
                     // Trigger the event!
-                    \mod_grouptool\event\queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
+                    queue_entry_deleted::create_limit_violation($this->cm, $cur)->trigger();
                 }
             }
 
@@ -148,7 +154,7 @@ class queue_manager extends grouptool_instance {
                 format_string($this->grouptool->name, true);
 
             $messageuser = $DB->get_record('user', ['id' => $newrecord->userid]);
-            $moodlemessage = new \core\message\message();
+            $moodlemessage = new message();
             $userfrom = core_user::get_noreply_user();
             $moodlemessage->component = 'mod_grouptool';
             $moodlemessage->name = 'grouptool_moveupreg';
@@ -174,11 +180,12 @@ class queue_manager extends grouptool_instance {
 
             // Trigger the event!
             // We fetched groupid above in SQL.
-            \mod_grouptool\event\user_moved::promotion_from_queue($this->cm, $record, $newrecord)->trigger();
+            user_moved::promotion_from_queue($this->cm, $record, $newrecord)->trigger();
         }
 
         return true;
     }
+
     /**
      * Add a queue entry for a certain user/agrp-combination.
      *
@@ -219,13 +226,14 @@ class queue_manager extends grouptool_instance {
         $record->id = $DB->insert_record('grouptool_queued', $record);
         // Trigger the event!
         $record->groupid = $groupdata->id;
-        \mod_grouptool\event\queue_entry_created::create_direct($this->cm, $record)->trigger();
+        queue_entry_created::create_direct($this->cm, $record)->trigger();
         if ($userid != $USER->id) {
             return get_string('queue_in_group_success', 'grouptool', $message);
         } else {
             return get_string('queue_you_in_group_success', 'grouptool', $message);
         }
     }
+
     /**
      * returns number of queue-entries for a particular user in a particular grouptool-instance
      *
@@ -257,6 +265,7 @@ class queue_manager extends grouptool_instance {
                                        FROM {grouptool_queued}
                                        WHERE userid = ? AND agrpid ' . $sql, $params);
     }
+
     /**
      * returns rank in queue for a particular user
      * if $data is an array uses array (like queue/reg-info returned by {@see get_active_groups()})
@@ -301,6 +310,7 @@ class queue_manager extends grouptool_instance {
 
         return $DB->count_records_sql($sql, $params);
     }
+
     /**
      * resolves queues by filling empty group places in defined order with students from the queue
      *
@@ -327,7 +337,7 @@ class queue_manager extends grouptool_instance {
         $status = [];
 
         // Trigger event!
-        \mod_grouptool\event\dequeuing_started::create_from_object($this->cm)->trigger();
+        dequeuing_started::create_from_object($this->cm)->trigger();
 
         $grouptool = $this->grouptool;
         $context = $this->context;
@@ -555,7 +565,7 @@ class queue_manager extends grouptool_instance {
                             'agrpid' => $to->agrpid,
                             'userid' => $to->userid,
                         ], MUST_EXIST);
-                        \mod_grouptool\event\user_moved::move($this->cm, $queue, $to)->trigger();
+                        user_moved::move($this->cm, $queue, $to)->trigger();
 
                         // Send message
                         $to->groupname = format_string(groups_get_group_name($to->agrpid));
@@ -575,7 +585,7 @@ class queue_manager extends grouptool_instance {
                             get_string('modulenameplural', 'grouptool') . ': ' .
                             format_string($this->grouptool->name, true);
                         $messageuser = $DB->get_record('user', ['id' => $to->userid]);
-                        $moodlemessage = new \core\message\message();
+                        $moodlemessage = new message();
                         $userfrom = core_user::get_noreply_user();
                         $moodlemessage->component = 'mod_grouptool';
                         $moodlemessage->name = 'grouptool_moveupreg';
@@ -622,6 +632,7 @@ class queue_manager extends grouptool_instance {
 
         return [$error, $returntext];
     }
+
     /**
      * helperfunction compares to objects using a particular timestamp-property
      *

@@ -54,7 +54,7 @@ class group_manager extends grouptool_instance {
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance
      *
-     * @param stdClass|array  $data data from administration-form with all settings for group creation
+     * @param stdClass|array $data data from administration-form with all settings for group creation
      * @param stdClass[] $users which users to registrate in the created groups
      * @param int $userpergrp how many users should be registrated per group
      * @param int $numgrps how many groups should be created
@@ -275,6 +275,7 @@ class group_manager extends grouptool_instance {
 
         return [$failed, $preview];
     }
+
     /**
      * Create moodle-groups and also create non-active entries for the created groups
      * for this instance also used for creation of N groups with M members!
@@ -753,6 +754,7 @@ class group_manager extends grouptool_instance {
         }
         return [0 => $error, 1 => $return];
     }
+
     /**
      * Create a grouping for all selected moodle-groups
      *
@@ -866,6 +868,7 @@ class group_manager extends grouptool_instance {
         }
         return [0 => $error, 1 => $return];
     }
+
     /**
      * Parse a group name for characters to replace
      *
@@ -955,6 +958,7 @@ class group_manager extends grouptool_instance {
         }
         return $namescheme;
     }
+
     /**
      * gets data about active groups for this instance or all instances if ignoregtinstance is set
      *
@@ -1109,6 +1113,7 @@ class group_manager extends grouptool_instance {
 
         return $groupdata;
     }
+
     /**
      *  Adds all missin agrp-entries for this instance!
      *
@@ -1178,6 +1183,7 @@ class group_manager extends grouptool_instance {
 
         return $newagrp;
     }
+
     /**
      * Returns a single select to change currently selected grouping.
      *
@@ -1230,6 +1236,7 @@ class group_manager extends grouptool_instance {
         }
         return new single_select($url, 'groupid', $options, $groupid, false);
     }
+
     /**
      * get all data necessary for displaying/exporting group-overview table
      *

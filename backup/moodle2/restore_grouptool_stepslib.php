@@ -127,8 +127,8 @@ class restore_grouptool_activity_structure_step extends restore_activity_structu
         $data->groupid = $this->get_mappingid('group', $data->groupid);
         if ($data->groupid === false) {
             $message = "Couldn't find mapping id for group with former id-# " . $old .
-                       " so we have to skip it." . html_writer::empty_tag('br') .
-                       "The group was " . ($data->active ? 'active' : 'inactive') . " in this instance";
+                " so we have to skip it." . html_writer::empty_tag('br') .
+                "The group was " . ($data->active ? 'active' : 'inactive') . " in this instance";
             debugging($message);
         } else {
             $newitemid = $DB->insert_record('grouptool_agrps', $data);

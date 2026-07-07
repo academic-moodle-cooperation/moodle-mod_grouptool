@@ -22,7 +22,11 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\exception;
+
+use coding_exception;
+use stdClass;
 
 /**
  * Exception when the user is already registered/queued/marked for this group!
@@ -38,14 +42,14 @@ class regpresent extends registration {
      *
      * @param string $text (optional) Text to be used
      * @param string $a (optional) Additional data used by language string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function __construct($text = '', $a = null) {
         if ($text == '') {
             $text = get_string('already_registered', 'grouptool');
         }
         if ($a === null) {
-            $a = new \stdClass();
+            $a = new stdClass();
             $a->username = '';
             $a->groupname = '';
         }

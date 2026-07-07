@@ -26,12 +26,16 @@
 
 namespace mod_grouptool\local\tests;
 
+use coding_exception;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use dml_exception;
 use mod_grouptool\local\grouptool_instance;
 use mod_grouptool\privacy\provider;
+use moodle_exception;
+use required_capability_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -50,10 +54,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::get_contexts_for_userid
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_get_contexts_for_userid(): void {
         $this->resetAfterTest();
@@ -121,10 +125,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::get_users_in_context
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_get_users_in_context(): void {
         $course = $this->course;
@@ -201,10 +205,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::export_user_data
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_export_user_data_student(): void {
         $user = $this->students[0];
@@ -244,10 +248,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::export_user_data
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_export_user_data_teacher(): void {
         $teacher = $this->editingteachers[0];
@@ -285,10 +289,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::delete_data_for_all_users_in_context
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_delete_data_for_all_users_in_context(): void {
         $user1 = $this->students[0];
@@ -341,10 +345,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::delete_data_for_user
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_delete_data_for_user(): void {
         $user1 = $this->students[0];
@@ -414,10 +418,10 @@ final class privacy_test extends base {
      *
      * @covers \mod_grouptool\privacy\provider::delete_data_for_users
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
-     * @throws \required_capability_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
      */
     public function test_delete_data_for_users(): void {
         global $DB;
@@ -538,7 +542,7 @@ final class privacy_test extends base {
      * @param int $userid The registered user id.
      * @param int $modifiedby The modifier user id.
      * @return int The created registration id.
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     private function insert_registration_record(
         grouptool_instance $grouptool,
@@ -572,7 +576,7 @@ final class privacy_test extends base {
      * @param grouptool_instance $grouptool The grouptool instance.
      * @param int $userid The user id.
      * @return bool Whether data exists.
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     private function has_user_data_for_grouptool(grouptool_instance $grouptool, int $userid): bool {
         global $DB;

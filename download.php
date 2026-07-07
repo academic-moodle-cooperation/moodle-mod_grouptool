@@ -23,11 +23,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_grouptool\event\overview_exported;
+
 require_once('../../config.php');
 
 global $CFG, $DB, $PAGE, $OUTPUT;
-
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
 $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
@@ -65,7 +65,7 @@ if (empty($cm->uservisible)) {
         $text = '';
     }
     $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool') .
-                                          html_writer::empty_tag('br') . $text, 'error');
+        html_writer::empty_tag('br') . $text, 'error');
     echo $OUTPUT->header();
     echo $OUTPUT->box($notification, 'generalbox centered');
     echo $OUTPUT->footer();
@@ -96,16 +96,16 @@ switch ($tab) {
     case 'overview':
         require_capability('mod/grouptool:view_regs_group_view', $context);
         // Trigger overview event.
-        $event = \mod_grouptool\event\overview_exported::create([
-                'objectid' => $cm->instance,
-                'context'  => context_module::instance($cm->id),
-                'other'    => [
+        $event = overview_exported::create([
+            'objectid' => $cm->instance,
+            'context' => context_module::instance($cm->id),
+            'other' => [
                 'tab' => $tab,
                 'format_readable' => $readableformat,
                 'format' => $format,
                 'groupid' => $groupid,
                 'groupingid' => $groupingid,
-                ],
+            ],
         ]);
         $event->trigger();
         break;

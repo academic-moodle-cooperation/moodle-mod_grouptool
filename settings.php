@@ -61,11 +61,11 @@ if ($ADMIN->fulltree) {
 
     // Show groupmembers?
     $options = [
-        GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes'),
-        GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
+        GROUPTOOL_SHOW_GROUPMEMBERS => get_string('yes'),
+        GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE => get_string('showafterdue', 'grouptool'),
         GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
         GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
-        GROUPTOOL_HIDE_GROUPMEMBERS               => get_string('no'),
+        GROUPTOOL_HIDE_GROUPMEMBERS => get_string('no'),
     ];
     $settings->add(new admin_setting_configselect(
         'mod_grouptool/show_members',
@@ -193,7 +193,7 @@ if ($ADMIN->fulltree) {
 
     $options = [
         GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
-        GROUPTOOL_DELETE_REF     => get_string('delete_reference', 'grouptool'),
+        GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'),
     ];
 
     $settings->add(new admin_setting_configselect(

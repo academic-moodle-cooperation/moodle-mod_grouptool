@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Creator: CorelDRAW 2021 (64-Bit) -->
-<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24px" height="24px" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
-viewBox="0 0 0.94 0.94"
- xmlns:xlink="http://www.w3.org/1999/xlink"
- xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="24px"
+     height="24px"
+     version="1.1"
+     style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+     viewBox="0 0 0.94 0.94">
  <defs>
   <style type="text/css">
    <![CDATA[
@@ -14,22 +15,22 @@ viewBox="0 0 0.94 0.94"
    ]]>
   </style>
  </defs>
- <g id="Ebene_x0020_1">
+    <g id="Ebene_x0020_1">
   <metadata id="CorelCorpID_0Corel-Layer"/>
-  <g id="_1546874581008">
+        <g id="_1546874581008">
    <rect class="fil0" width="0.94" height="0.94"/>
-   <g>
+            <g>
     <g>
      <path class="fil0 str0" d="M0.85 0.48c0,-0.06 -0.04,-0.1 -0.1,-0.1 -0.05,0 -0.1,0.04 -0.1,0.1"/>
-     <circle class="fil0 str1" cx="0.75" cy="0.26" r="0.04"/>
+        <circle class="fil0 str1" cx="0.75" cy="0.26" r="0.04"/>
     </g>
-    <g>
+                <g>
      <path class="fil0 str0" d="M0.09 0.48c0,-0.06 0.05,-0.1 0.1,-0.1 0.06,0 0.1,0.04 0.1,0.1"/>
-     <circle class="fil0 str1" cx="0.19" cy="0.26" r="0.04"/>
+                    <circle class="fil0 str1" cx="0.19" cy="0.26" r="0.04"/>
     </g>
-    <g>
+                <g>
      <path class="fil0 str0" d="M0.28 0.73c0,-0.1 0.09,-0.19 0.19,-0.19 0.11,0 0.19,0.09 0.19,0.19"/>
-     <circle class="fil0 str1" cx="0.47" cy="0.38" r="0.08"/>
+                    <circle class="fil0 str1" cx="0.47" cy="0.38" r="0.08"/>
     </g>
    </g>
   </g>

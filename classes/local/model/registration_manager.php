@@ -24,6 +24,8 @@ use context_course;
 use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\exception\required_capability_exception;
+use core\output\notification;
+use core_message\api;
 use core_php_time_limit;
 use dml_exception;
 use Exception;
@@ -31,6 +33,8 @@ use html_table;
 use html_table_cell;
 use html_table_row;
 use html_writer;
+use mod_grouptool\event\queue_entry_deleted;
+use mod_grouptool\event\registration_created;
 use mod_grouptool\event\registration_deleted;
 use mod_grouptool\event\registration_push_started;
 use mod_grouptool\exception\exceedgroupqueuelimit;
@@ -64,6 +68,7 @@ class registration_manager extends grouptool_instance {
         return ($this->grouptool->allowreg && (($this->grouptool->timedue == 0) || (time() < $this->grouptool->timedue))
             && (time() > $this->grouptool->timeavailable));
     }
+
     /**
      * registers/queues a user in a certain active-group
      *
@@ -351,7 +356,7 @@ class registration_manager extends grouptool_instance {
             foreach ($records as $cur) {
                 // Trigger the Event!
                 $cur->groupid = $groupdata->id;
-                \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur)->trigger();
+                queue_entry_deleted::create_direct($this->cm, $cur)->trigger();
             }
             if ($userid == $USER->id) {
                 return get_string('unqueue_you_from_group_success', 'grouptool', $message);
@@ -449,7 +454,7 @@ class registration_manager extends grouptool_instance {
             ) {
                 $DB->delete_records('grouptool_queued', ['id' => $queue->id]);
                 // Trigger the event!
-                \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $queue);
+                queue_entry_deleted::create_direct($this->cm, $queue);
                 // Let other queued be promoted to registered status!
                 $queuemanager->fill_from_queue($queue->agrpid);
             }
@@ -481,7 +486,7 @@ class registration_manager extends grouptool_instance {
             $DB->delete_records_select('grouptool_queued', "userid = ? AND agrpid " . $agrpsql, $params);
             foreach ($queues as $cur) {
                 // Trigger the event!
-                \mod_grouptool\event\queue_entry_deleted::create_direct($this->cm, $cur);
+                queue_entry_deleted::create_direct($this->cm, $cur);
 
                 // Let other queued be promoted to registered status!
                 $queuemanager->fill_from_queue($cur->agrpid);
@@ -586,13 +591,14 @@ class registration_manager extends grouptool_instance {
         }
         // Trigger the event!
         $record->groupid = $groupdata->id;
-        \mod_grouptool\event\registration_created::create_direct($this->cm, $record)->trigger();
+        registration_created::create_direct($this->cm, $record)->trigger();
         if ($userid != $USER->id) {
             return get_string('register_in_group_success', 'grouptool', $message);
         } else {
             return get_string('register_you_in_group_success', 'grouptool', $message);
         }
     }
+
     /**
      * returns number of reg-entries for a particular user in a particular grouptool-instance
      *
@@ -624,6 +630,7 @@ class registration_manager extends grouptool_instance {
                                        FROM {grouptool_registered}
                                        WHERE modified_by >= 0 AND userid = ? AND agrpid ' . $sql, $params);
     }
+
     /**
      * Unregisters users from groups according to the passed parameters
      *
@@ -685,7 +692,7 @@ class registration_manager extends grouptool_instance {
                         'unregister_in_inactive_group_warning',
                         'grouptool',
                         $groupname[$group]
-                    ), \core\output\notification::NOTIFY_ERROR);
+                    ), notification::NOTIFY_ERROR);
                 }
             }
         }
@@ -731,12 +738,12 @@ class registration_manager extends grouptool_instance {
                     if (empty($userinfo->deleted)) {
                         $text = get_string('user_is_not_enrolled', 'grouptool', $userinfo);
                         $row->cells[] = new html_table_cell(
-                            $OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR)
+                            $OUTPUT->notification($text, notification::NOTIFY_ERROR)
                         );
                     } else {
                         $text = get_string('user_is_deleted', 'grouptool', $userinfo);
                         $row->cells[] = new html_table_cell(
-                            $OUTPUT->notification($text, \core\output\notification::NOTIFY_ERROR)
+                            $OUTPUT->notification($text, notification::NOTIFY_ERROR)
                         );
                     }
                     $error = true;
@@ -800,14 +807,14 @@ class registration_manager extends grouptool_instance {
 
                             $context = context_course::instance($this->grouptool->course);
                             if (
-                                $conversation = \core_message\api::get_conversation_by_area(
+                                $conversation = api::get_conversation_by_area(
                                     'core_group',
                                     'groups',
                                     $group,
                                     $context->id
                                 )
                             ) {
-                                \core_message\api::remove_members_from_conversation([$data['id']], $conversation->id);
+                                api::remove_members_from_conversation([$data['id']], $conversation->id);
                             }
                         }
 
@@ -956,9 +963,9 @@ class registration_manager extends grouptool_instance {
                             try {
                                 $utils->force_enrol_student($reg->userid);
                             } catch (Exception $e) {
-                                $return[] = $OUTPUT->notification($e->getMessage(), \core\output\notification::NOTIFY_ERROR);
+                                $return[] = $OUTPUT->notification($e->getMessage(), notification::NOTIFY_ERROR);
                             } catch (Throwable $t) {
-                                $return[] = $OUTPUT->notification($t->getMessage(), \core\output\notification::NOTIFY_ERROR);
+                                $return[] = $OUTPUT->notification($t->getMessage(), notification::NOTIFY_ERROR);
                             }
                         }
                         if (groups_add_member($groupid, $reg->userid)) {
@@ -999,6 +1006,7 @@ class registration_manager extends grouptool_instance {
                 return [true, get_string('nothing_to_push', 'grouptool')];
         }
     }
+
     /**
      * Returns the amount of registrations missing in this grouptool instance.
      *
@@ -1069,6 +1077,7 @@ class registration_manager extends grouptool_instance {
 
         return $missing;
     }
+
     /**
      * returns object with information about registrations/queues for each group
      * (optional with userdata)
@@ -1175,6 +1184,7 @@ class registration_manager extends grouptool_instance {
 
         return $return;
     }
+
     /**
      * Returns the amount of registrations for a particular active group.
      *
@@ -1184,7 +1194,7 @@ class registration_manager extends grouptool_instance {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public function get_group_registrations_count(int $agrpid){
+    public function get_group_registrations_count(int $agrpid) {
         global $DB;
 
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);

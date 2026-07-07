@@ -24,6 +24,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\message\message;
+use core_calendar\action_factory;
+use core_calendar\local\event\entities\action_interface;
+use core_calendar\local\event\value_objects\action;
 use mod_grouptool\domain\grouptool_data_object;
 use mod_grouptool\local\model\registration_manager;
 
@@ -470,7 +474,7 @@ function grouptool_update_queues(int|stdClass $grouptool = 0): void {
                         format_string($grouptool->name, true);
 
                     $messageuser = $DB->get_record('user', ['id' => $record->userid]);
-                    $moodlemessage = new \core\message\message();
+                    $moodlemessage = new message();
                     $userfrom = core_user::get_noreply_user();
                     $moodlemessage->component = 'mod_grouptool';
                     $moodlemessage->name = 'grouptool_moveupreg';
@@ -1192,13 +1196,13 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
  * is not displayed on the block.
  *
  * @param calendar_event $event
- * @param \core_calendar\action_factory $factory
- * @return \core_calendar\local\event\entities\action_interface|\core_calendar\local\event\value_objects\action
+ * @param action_factory $factory
+ * @return action_interface|action
  * @throws coding_exception
  * @throws dml_exception
  * @throws moodle_exception
  */
-function mod_grouptool_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory) {
+function mod_grouptool_core_calendar_provide_event_action(calendar_event $event, action_factory $factory) {
     global $CFG, $USER, $DB;
 
     $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
@@ -1214,7 +1218,7 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     );
     $isopen = $registrationmanager->is_registration_open();
 
-    $url = new \moodle_url('/mod/grouptool/view.php', [
+    $url = new moodle_url('/mod/grouptool/view.php', [
         'id' => $cm->id,
     ]);
 

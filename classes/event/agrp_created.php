@@ -22,8 +22,16 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use cm_info;
+use coding_exception;
+use context_module;
 use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * The \mod_grouptool\agrp_created class holds the logic for the event
@@ -33,7 +41,7 @@ use core\event\base;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class agrp_created extends \core\event\base {
+class agrp_created extends base {
     /**
      * Init method.
      *
@@ -48,15 +56,15 @@ class agrp_created extends \core\event\base {
     /**
      * Create the event object and set properties.
      *
-     * @param \stdClass|\cm_info $cm Course-Module object
-     * @param \stdClass $agrp active-group object which has been created
+     * @param stdClass|cm_info $cm Course-Module object
+     * @param stdClass $agrp active-group object which has been created
      * @return base
-     * @throws \coding_exception
+     * @throws coding_exception
      */
-    public static function create_from_object(\stdClass | \cm_info $cm, \stdClass $agrp) {
+    public static function create_from_object(stdClass|cm_info $cm, stdClass $agrp) {
         $event = self::create([
             'objectid' => $agrp->id,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
             'other' => (array)$agrp,
         ]);
         return $event;
@@ -65,11 +73,11 @@ class agrp_created extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", ['id'  => $this->contextinstanceid, 'tab' => 'overview']);
+        return new moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -80,8 +88,8 @@ class agrp_created extends \core\event\base {
     public function get_description() {
         if (!empty($this->data['other']['id'])) {
             return "The user with id '$this->userid' created an active groups entry with id '" .
-                   $this->data['other']['id'] . " for '{$this->objecttable}' with the course module id '" .
-                   $this->contextinstanceid . "' for group with id '" . $this->data['other']['groupid'] . ".";
+                $this->data['other']['id'] . " for '{$this->objecttable}' with the course module id '" .
+                $this->contextinstanceid . "' for group with id '" . $this->data['other']['groupid'] . ".";
         }
 
         return '';
@@ -91,7 +99,7 @@ class agrp_created extends \core\event\base {
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventagrpcreated', 'grouptool');
@@ -101,26 +109,26 @@ class agrp_created extends \core\event\base {
      * Custom validation.
      *
      * @return void
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
 
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The agrp_created event must define objectid and object table.');
+            throw new coding_exception('The agrp_created event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         if (empty($this->data['other']['groupid'])) {
-            throw new \coding_exception('Group-ID must be specified.');
+            throw new coding_exception('Group-ID must be specified.');
         }
 
         if (empty($this->data['other']['id'])) {
-            throw new \coding_exception('Active-Group-ID must be specified.');
+            throw new coding_exception('Active-Group-ID must be specified.');
         }
     }
 }

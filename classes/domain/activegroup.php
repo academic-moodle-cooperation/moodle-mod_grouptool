@@ -25,6 +25,10 @@
 
 namespace mod_grouptool\domain;
 
+use dml_exception;
+use moodle_url;
+use stdClass;
+
 /**
  * Representation of single group with additional data!
  *
@@ -58,7 +62,7 @@ class activegroup {
     /** @var bool */
     public $checked = false;
 
-    /** @var \moodle_url url to edit this group */
+    /** @var moodle_url url to edit this group */
     public $editurl = null;
 
     /** @var array */
@@ -101,7 +105,7 @@ class activegroup {
     /**
      * Convenience method using data in object
      *
-     * @param \stdClass $data Object containing all necessary data
+     * @param stdClass $data Object containing all necessary data
      * @return activegroup active group object
      */
     public static function construct_from_obj($data) {
@@ -124,7 +128,7 @@ class activegroup {
      * @param int $groupid ID of related moodle-group
      * @param int $grouptoolid ID of related grouptool instance
      * @return activegroup active group object
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public function get_by_groupid($groupid, $grouptoolid) {
         global $DB;
@@ -157,7 +161,7 @@ class activegroup {
      * Load active groups related groupings
      *
      * @return void
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public function load_groupings() {
         global $DB;

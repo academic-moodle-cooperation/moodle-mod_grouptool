@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->libdir . '/grouplib.php');
 require_once($CFG->dirroot . '/group/lib.php');
-require_once($CFG->dirroot . "/mod/grouptool/locallib.php");
 
 /**
  * Grouptool's external class containing all external functions!
@@ -505,9 +504,9 @@ class mod_grouptool_external extends external_api {
                 ]);
                 if (
                     !$DB->record_exists('grouptool_agrps', [
-                    'groupid' => $cur['groupid'],
-                    'grouptoolid' => $cm->instance,
-                    'sort_order' => $cur['order'],
+                        'groupid' => $cur['groupid'],
+                        'grouptoolid' => $cm->instance,
+                        'sort_order' => $cur['order'],
                     ])
                 ) {
                     $failed[] = "groupid " . $cur['groupid'];

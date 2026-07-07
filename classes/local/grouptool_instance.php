@@ -17,7 +17,9 @@
 namespace mod_grouptool\local;
 
 use cm_info;
+use coding_exception;
 use context_module;
+use dml_exception;
 use mod_grouptool\domain\grouptool_data_object;
 use moodle_exception;
 use stdClass;
@@ -94,9 +96,9 @@ class grouptool_instance {
      * @param cm_info|stdClass|null $cm Optional course module object.
      * @param stdClass|null $course Optional course record.
      * @param context_module|null $context Optional module context.
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function __construct(
         int $cmid,

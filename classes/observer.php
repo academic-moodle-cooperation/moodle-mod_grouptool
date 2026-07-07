@@ -22,9 +22,17 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool;
 
+use coding_exception;
+use core\event\group_created;
+use core\event\group_deleted;
+use core\event\group_member_added;
+use core\event\group_member_removed;
 use core\exception\moodle_exception;
+use dml_exception;
+use mod_grouptool;
 use mod_grouptool\event\agrp_created;
 use mod_grouptool\event\agrp_deleted;
 use mod_grouptool\event\registration_created;
@@ -32,6 +40,8 @@ use mod_grouptool\event\registration_deleted;
 use mod_grouptool\event\queue_entry_deleted;
 use mod_grouptool\event\group_recreated;
 use core\notification;
+use moodle_url;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -52,12 +62,12 @@ class observer {
     /**
      * group_member_added
      *
-     * @param \core\event\group_member_added $event Event object containing useful data
+     * @param group_member_added $event Event object containing useful data
      * @return bool true if success
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public static function group_member_added(\core\event\group_member_added $event) {
+    public static function group_member_added(group_member_added $event) {
         global $DB;
 
         $sql = "SELECT DISTINCT grpt.id, grpt.ifmemberadded, grpt.course,
@@ -66,7 +76,7 @@ class observer {
                 JOIN {grouptool_agrps} agrp ON agrp.grouptoolid = grpt.id
                 WHERE (agrp.groupid = ?) AND (agrp.active = ?) AND (grpt.ifmemberadded = ?)";
         $params = [$event->objectid, 1, GROUPTOOL_FOLLOW];
-        if (! $grouptools = $DB->get_records_sql($sql, $params)) {
+        if (!$grouptools = $DB->get_records_sql($sql, $params)) {
             return true;
         }
 
@@ -79,30 +89,30 @@ class observer {
                INNER JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid
                     WHERE reg.modified_by >= 0 AND agrps.groupid = :groupid AND reg.userid = :userid";
         $regs = $DB->get_records_sql($regsql, ['groupid' => $event->objectid,
-                                               'userid'  => $event->relateduserid, ]);
+            'userid' => $event->relateduserid, ]);
         $markssql = "SELECT reg.agrpid, reg.id, reg.userid, reg.timestamp
                        FROM {grouptool_agrps} agrps
                  INNER JOIN {grouptool_registered} reg ON agrps.id = reg.agrpid
                       WHERE reg.modified_by = -1 AND agrps.groupid = :groupid AND reg.userid = :userid";
         $marks = $DB->get_records_sql($markssql, ['groupid' => $event->objectid,
-                                                  'userid'  => $event->relateduserid, ]);
+            'userid' => $event->relateduserid, ]);
 
         $queuesql = "SELECT queue.agrpid AS agrpid, queue.id AS id
                        FROM {grouptool_agrps} agrps
                   LEFT JOIN {grouptool_queued} queue ON agrps.id = queue.agrpid
                       WHERE agrps.groupid = :groupid AND queue.userid = :userid";
         $queues = $DB->get_records_sql($queuesql, ['groupid' => $event->objectid,
-                                                   'userid'  => $event->relateduserid, ]);
+            'userid' => $event->relateduserid, ]);
         foreach ($grouptools as $grouptool) {
             if (!key_exists($grouptool->agrpid, $regs)) {
-                $reg = new \stdClass();
+                $reg = new stdClass();
                 $reg->agrpid = $agrp[$grouptool->id]->id;
                 $reg->userid = $event->relateduserid;
                 $reg->timestamp = time();
                 $reg->modified_by = 0; // There's no way we can get the teachers id!
                 if (
                     !$DB->record_exists('grouptool_registered', ['agrpid' => $reg->agrpid,
-                                                                 'userid' => $reg->userid, ])
+                        'userid' => $reg->userid, ])
                 ) {
                     $reg->id = $DB->insert_record('grouptool_registered', $reg);
                     $reg->groupid = $event->objectid;
@@ -131,13 +141,13 @@ class observer {
      * event:       groups_member_removed
      * schedule:    instant
      *
-     * @param \core\event\group_member_removed $event Event object containing useful data
+     * @param group_member_removed $event Event object containing useful data
      * @return bool true if success
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws \moodle_exception
      */
-    public static function group_member_removed(\core\event\group_member_removed $event) {
+    public static function group_member_removed(group_member_removed $event) {
         global $DB, $CFG;
 
         $sql = "SELECT DISTINCT {grouptool}.id, {grouptool}.ifmemberremoved, {grouptool}.course,
@@ -148,7 +158,7 @@ class observer {
                      RIGHT JOIN {grouptool_agrps} agrp ON agrp.grouptoolid = {grouptool}.id
                           WHERE agrp.groupid = ?";
         $params = [$event->objectid];
-        if (! $grouptools = $DB->get_records_sql($sql, $params)) {
+        if (!$grouptools = $DB->get_records_sql($sql, $params)) {
             return true;
         }
         $sql = "SELECT agrps.grouptoolid grouptoolid, agrps.id id
@@ -166,8 +176,8 @@ class observer {
                                    AND agrps.groupid = :groupid";
                     if (
                         $regs = $DB->get_records_sql($sql, ['grouptoolid' => $grouptool->id,
-                                                            'userid'      => $event->relateduserid,
-                                                            'groupid'     => $event->objectid, ])
+                            'userid' => $event->relateduserid,
+                            'groupid' => $event->objectid, ])
                     ) {
                         $DB->delete_records_list('grouptool_registered', 'id', array_keys($regs));
                         foreach ($regs as $reg) {
@@ -187,7 +197,7 @@ class observer {
                             // We include it right here, because we want to have it slim!
                             require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
                             $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
-                            $instance = new \mod_grouptool($cm->id, $grouptool, $cm);
+                            $instance = new mod_grouptool($cm->id, $grouptool, $cm);
 
                             $instance->fill_from_queue($agrp[$grouptool->id]->id);
                         }
@@ -204,19 +214,19 @@ class observer {
     /**
      * group_deleted
      *
-     * @param \core\event\group_deleted $event Event object containing useful data
+     * @param group_deleted $event Event object containing useful data
      * @return bool true if success
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws \moodle_exception
      */
-    public static function group_deleted(\core\event\group_deleted $event) {
+    public static function group_deleted(group_deleted $event) {
         global $CFG, $DB;
 
         $data = $event->get_record_snapshot('groups', $event->objectid);
         $course = $DB->get_record('course', ['id' => $data->courseid], '*', MUST_EXIST);
 
-        if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
+        if (!$grouptools = get_all_instances_in_course('grouptool', $course)) {
             return true;
         }
 
@@ -240,24 +250,24 @@ class observer {
                             }
                             // Trigger event!
                             $logdata = (object)[
-                                'cmid'     => $cmid,
-                                'groupid'  => $data->id,
-                                'newid'    => $newid,
+                                'cmid' => $cmid,
+                                'groupid' => $data->id,
+                                'newid' => $newid,
                                 'courseid' => $data->courseid,
                             ];
                             group_recreated::create_from_object($logdata)->trigger();
 
                             if ($grouptool->immediate_reg) {
                                 require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-                                $instance = new \mod_grouptool($cmid, $grouptool);
+                                $instance = new mod_grouptool($cmid, $grouptool);
                                 $instance->push_registrations();
                             }
                             $grouprecreated = true;
-                            $infodata = new \stdClass();
+                            $infodata = new stdClass();
                             $infodata->groupname = $data->name;
                             $infodata->grouptoolname = $grouptool->name;
-                            $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
-                            $infodata->groupurl = (new \moodle_url('/group/members.php', ['group' => $newid]))->out();
+                            $infodata->grouptoolurl = (new moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
+                            $infodata->groupurl = (new moodle_url('/group/members.php', ['group' => $newid]))->out();
                             notification::add(
                                 get_string('notification:group_recreated', 'grouptool', $infodata),
                                 notification::INFO
@@ -269,14 +279,14 @@ class observer {
                     } else {
                         if ($grouptool->immediate_reg) {
                             require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-                            $instance = new \mod_grouptool($cmid, $grouptool);
+                            $instance = new mod_grouptool($cmid, $grouptool);
                             $instance->push_registrations();
                         }
-                        $infodata = new \stdClass();
+                        $infodata = new stdClass();
                         $infodata->groupname = $data->name;
                         $infodata->grouptoolname = $grouptool->name;
-                        $infodata->grouptoolurl = (new \moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
-                        $infodata->groupurl = (new \moodle_url('/group/members.php', ['group' => $data->id]))->out();
+                        $infodata->grouptoolurl = (new moodle_url('/mod/grouptool/view.php', ['id' => $cmid]))->out();
+                        $infodata->groupurl = (new moodle_url('/group/members.php', ['group' => $data->id]))->out();
                         notification::add(
                             get_string('notification:registrations_recreated', 'grouptool', $infodata),
                             notification::INFO
@@ -285,8 +295,8 @@ class observer {
                     break;
                 case GROUPTOOL_DELETE_REF:
                     if (
-                        $agrpid = $DB->get_field('grouptool_agrps', 'id', ['groupid'     => $data->id,
-                                                                           'grouptoolid' => $grouptool->id, ])
+                        $agrpid = $DB->get_field('grouptool_agrps', 'id', ['groupid' => $data->id,
+                            'grouptoolid' => $grouptool->id, ])
                     ) {
                         $agrpids[] = $agrpid;
                     }
@@ -335,7 +345,7 @@ class observer {
                         $cms[$cur->grouptoolid] = get_coursemodule_from_instance('grouptool', $cur->grouptoolid);
                     }
                     // Trigger event!
-                    $logdata = new \stdClass();
+                    $logdata = new stdClass();
                     $logdata->id = $cur->id;
                     $logdata->cmid = $cms[$cur->grouptoolid]->id;
                     $logdata->groupid = $cur->groupid;
@@ -352,25 +362,25 @@ class observer {
     /**
      * group_created
      *
-     * @param  \core\event\group_created $event Event object containing useful data
+     * @param group_created $event Event object containing useful data
      * @return bool true if success
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public static function group_created(\core\event\group_created $event) {
+    public static function group_created(group_created $event) {
         global $DB;
 
         $data = $event->get_record_snapshot('groups', $event->objectid);
         $course = $DB->get_record('course', ['id' => $data->courseid]);
 
-        if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
+        if (!$grouptools = get_all_instances_in_course('grouptool', $course)) {
             return true;
         }
         $sortorder = $DB->get_records_sql("SELECT agrp.grouptoolid, MAX(agrp.sort_order) AS max
                                              FROM {grouptool_agrps} agrp
                                          GROUP BY agrp.grouptoolid");
         foreach ($grouptools as $grouptool) {
-            $newagrp = new \stdClass();
+            $newagrp = new stdClass();
             $newagrp->grouptoolid = $grouptool->id;
             $newagrp->groupid = $data->id;
             if (!array_key_exists($grouptool->id, $sortorder)) {
@@ -381,7 +391,7 @@ class observer {
             $newagrp->active = 0;
             if (
                 !$DB->record_exists('grouptool_agrps', ['grouptoolid' => $grouptool->id,
-                                                        'groupid'     => $data->id, ])
+                    'groupid' => $data->id, ])
             ) {
                 $newagrp->id = $DB->insert_record('grouptool_agrps', $newagrp);
                 // Trigger event!

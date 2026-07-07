@@ -27,12 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 $messageproviders = [
 // Any additional messages needed? TODO: Think about sending other messages too!
 
-/*
- * Registration info for users who get registrated because they're queued and another person
- * unregisters from that group
- */
+    /*
+     * Registration info for users who get registrated because they're queued and another person
+     * unregisters from that group
+     */
     'grouptool_moveupreg' => [
-            'capability'  => 'mod/grouptool:register',
+        'capability' => 'mod/grouptool:register',
     ],
 
 ];

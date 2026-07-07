@@ -22,7 +22,16 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use cm_info;
+use coding_exception;
+use context_module;
+use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * The \mod_grouptool\agrps_updated class holds the logic for the event
@@ -32,7 +41,7 @@ namespace mod_grouptool\event;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class agrps_updated extends \core\event\base {
+class agrps_updated extends base {
     /**
      * Init method.
      *
@@ -47,14 +56,14 @@ class agrps_updated extends \core\event\base {
     /**
      * Convenience method to create from course-module object
      *
-     * @param \stdClass|\cm_info $cm course module object
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @param stdClass|cm_info $cm course module object
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_convenient(\stdClass | \cm_info $cm) {
+    public static function create_convenient(stdClass|cm_info $cm) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
         ]);
         return $event;
     }
@@ -62,17 +71,17 @@ class agrps_updated extends \core\event\base {
     /**
      * Convenience method to create from course-module object and form data
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param string $pattern pattern for group names
      * @param int $numgrps number of created groups
      * @param int|0 $groupingid optional id of grouping used for these groups (0 if not in grouping)
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_groupcreation(\stdClass | \cm_info $cm, $pattern, $numgrps, $groupingid = 0) {
+    public static function create_groupcreation(stdClass|cm_info $cm, $pattern, $numgrps, $groupingid = 0) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
             'other' => [
                 'pattern' => $pattern,
                 'numgrps' => $numgrps,
@@ -85,11 +94,11 @@ class agrps_updated extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
+        return new moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -106,23 +115,23 @@ class agrps_updated extends \core\event\base {
         if (!empty($this->data['other']['pattern'])) {
             if (!empty($add)) {
                 $add .= ' affecting ' . $this->data['other']['numgrps'] .
-                        ' groups (namepattern = \'' . $this->data['other']['pattern'] . '\')';
+                    ' groups (namepattern = \'' . $this->data['other']['pattern'] . '\')';
             } else {
                 $add = ' affecting ' . $this->data['other']['numgrps'] .
-                       ' groups (namepattern = \'' . $this->data['other']['pattern'] . '\')';
+                    ' groups (namepattern = \'' . $this->data['other']['pattern'] . '\')';
             }
         }
 
         return "The user with id '$this->userid' updated the active groups" .
-               "for '{$this->objecttable}' with the " .
-               "course module id '$this->contextinstanceid'" . $add . ".";
+            "for '{$this->objecttable}' with the " .
+            "course module id '$this->contextinstanceid'" . $add . ".";
     }
 
     /**
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventagrpsupdated', 'grouptool');
@@ -131,27 +140,27 @@ class agrps_updated extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
 
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The agrps_updated event must define objectid and object table.');
+            throw new coding_exception('The agrps_updated event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         // Make sure that all three are set if one of them ist set!
         if (
             (!empty($this->data['other']['pattern']) || !empty($this->data['other']['numgrps']))
-             && (empty($this->data['other']['pattern']) || empty($this->data['other']['numgrps']))
+            && (empty($this->data['other']['pattern']) || empty($this->data['other']['numgrps']))
         ) {
-            throw new \coding_exception('If any of pattern or numgrps are specified, every single one of them must be specified!');
+            throw new coding_exception('If any of pattern or numgrps are specified, every single one of them must be specified!');
         }
     }
 }

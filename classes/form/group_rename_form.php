@@ -25,6 +25,11 @@
 
 namespace mod_grouptool\form;
 
+use coding_exception;
+use dml_exception;
+use moodleform;
+use stdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 // Global variable $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
@@ -42,15 +47,15 @@ if (isset($CFG)) {
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class group_rename_form extends \moodleform {
-    /** @var \stdClass */
+class group_rename_form extends moodleform {
+    /** @var stdClass */
     private $course = null;
 
     /**
      * Definition of rename form
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function definition() {
         global $DB;
@@ -104,8 +109,8 @@ class group_rename_form extends \moodleform {
      * @param array $files array of uploaded files "element_name"=>tmp_file_path
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function validation($data, $files) {
         global $DB;

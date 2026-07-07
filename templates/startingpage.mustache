@@ -54,43 +54,45 @@
 }}
 <div class="mod_grouptool_starting_page conatiner">
     <div class="buttons row align-items-start">
-        <div >
-            {{#administrategroups}}<a href="{{buttonadministratelink}}" class="btn btn-secondary" >{{#str}}group_administration, mod_grouptool{{/str}}</a> {{/administrategroups}}
-            {{#previewselfregistration}}<a href="{{buttonpreviewlink}}" class="btn btn-secondary" >{{#str}}studentview, mod_grouptool{{/str}}</a> {{/previewselfregistration}}
+        <div>
+            {{#administrategroups}}<a href="{{buttonadministratelink}}" class="btn btn-secondary">{{#str}}
+                group_administration, mod_grouptool{{/str}}</a> {{/administrategroups}}
+            {{#previewselfregistration}}<a href="{{buttonpreviewlink}}" class="btn btn-secondary">{{#str}}
+                studentview, mod_grouptool{{/str}}</a> {{/previewselfregistration}}
         </div>
     </div>
     <br>
     <div class="genaral_information row align-items-start">
-        <div >
+        <div>
             <h2>{{#str}}general_information, mod_grouptool{{/str}}</h2>
         </div>
     </div>
     <div class="row align-items-start">
-            <table class="table table-bordered ">
-                <tr>
-                    <td>{{#str}}registration_details, mod_grouptool{{/str}}</td>
-                    <td>{{&registrationdetails}}</td>
-                </tr>
-                <tr>
-                    <td>{{#str}}group_places, mod_grouptool{{/str}}</td>
-                    <td>{{groupplacedetails}}</td>
-                </tr>
-                {{#queueing}}
+        <table class="table table-bordered ">
+            <tr>
+                <td>{{#str}}registration_details, mod_grouptool{{/str}}</td>
+                <td>{{&registrationdetails}}</td>
+            </tr>
+            <tr>
+                <td>{{#str}}group_places, mod_grouptool{{/str}}</td>
+                <td>{{groupplacedetails}}</td>
+            </tr>
+            {{#queueing}}
                 <tr>
                     <td>{{#str}}queue_places, mod_grouptool{{/str}}</td>
                     <td>{{queueplacedetails}}</td>
                 </tr>
-                {{/queueing}}
-                <tr>
-                    <td>{{#str}}number_of_students, mod_grouptool{{/str}}</td>
-                    <td>{{numberofusers}}</td>
-                </tr>
-                {{#registrations}}
+            {{/queueing}}
+            <tr>
+                <td>{{#str}}number_of_students, mod_grouptool{{/str}}</td>
+                <td>{{numberofusers}}</td>
+            </tr>
+            {{#registrations}}
                 <tr>
                     <td>{{#str}}registrations, mod_grouptool{{/str}}</td>
                     <td>{{&detailsregistration}}</td>
                 </tr>
-                {{/registrations}}
-            </table>
+            {{/registrations}}
+        </table>
     </div>
 </div>

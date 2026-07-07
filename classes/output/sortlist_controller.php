@@ -22,7 +22,14 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\output;
+
+use coding_exception;
+use renderable;
+use const PARAM_ALPHA;
+use const PARAM_BOOL;
+use const PARAM_INT;
 
 /**
  * Representation of a controller for use with sortlist!
@@ -32,23 +39,23 @@ namespace mod_grouptool\output;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class sortlist_controller implements \renderable {
-    /** @var \mod_grouptool\output\sortlist Sortlist instance */
+class sortlist_controller implements renderable {
+    /** @var sortlist Sortlist instance */
     public $sortlist = null;
 
     /**
      * Constructor
      *
-     * @param \mod_grouptool\output\sortlist $sortlist Sortlist to be used without
-     * @throws \coding_exception
+     * @param sortlist $sortlist Sortlist to be used without
+     * @throws coding_exception
      */
     public function __construct(sortlist &$sortlist) {
         global $SESSION;
         $this->sortlist = $sortlist;
 
-        $classes = optional_param_array('classes', [0], \PARAM_INT);
-        $action = optional_param('class_action', 0, \PARAM_ALPHA);
-        $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);
+        $classes = optional_param_array('classes', [0], PARAM_INT);
+        $action = optional_param('class_action', 0, PARAM_ALPHA);
+        $gobutton = optional_param('do_class_action', 0, PARAM_BOOL);
 
         if (!empty($gobutton) && ($classes != null) && (count($classes) != 0) && !empty($action)) {
             $groups = [];

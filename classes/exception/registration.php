@@ -22,7 +22,10 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\exception;
+
+use moodle_exception;
 
 /**
  * General exception during the registration/queue/marking process!
@@ -32,7 +35,7 @@ namespace mod_grouptool\exception;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class registration extends \moodle_exception {
+class registration extends moodle_exception {
     /**
      * Constructor
      *

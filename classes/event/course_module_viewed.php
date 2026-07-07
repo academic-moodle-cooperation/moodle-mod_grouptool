@@ -22,7 +22,11 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+use moodle_exception;
+use moodle_url;
+
 /**
  * The \mod_grouptool\course_module_viewed class holds the logic for the event
  *
@@ -45,12 +49,12 @@ class course_module_viewed extends \core\event\course_module_viewed {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", [
-            'id'  => $this->contextinstanceid,
+        return new moodle_url("/mod/$this->objecttable/view.php", [
+            'id' => $this->contextinstanceid,
             'tab' => $this->data['other']['tab'],
         ]);
     }

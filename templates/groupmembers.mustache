@@ -62,41 +62,53 @@
 <div class="showmembersoverlay" role="tooltip">
     <table>
         <thead>
-            <tr>
-                <td>{{# str }} status, mod_grouptool {{/ str }}{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td>
-                <td>{{# str }} user, mod_grouptool {{/ str }}</td>
-                {{#showidnumber}}<td>{{# str }} idnumber {{/ str }}</td>{{/showidnumber}}
-            </tr>
+        <tr>
+            <td>{{# str }} status, mod_grouptool {{/ str }}{{#statushelp}} {{>core/help_icon}}{{/statushelp}}</td>
+            <td>{{# str }} user, mod_grouptool {{/ str }}</td>
+            {{#showidnumber}}
+                <td>{{# str }} idnumber {{/ str }}</td>{{/showidnumber}}
+        </tr>
         </thead>
         <tbody>
-            {{#absregs}}<tr>
+        {{#absregs}}
+            <tr>
                 <td>✔</td>
                 <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
-                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                {{#showidnumber}}
+                    <td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/absregs}}
-            {{#gtregs}}<tr>
+        {{#gtregs}}
+            <tr>
                 <td>+</td>
                 <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
-                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                {{#showidnumber}}
+                    <td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/gtregs}}
-            {{#mregs}}<tr>
+        {{#mregs}}
+            <tr>
                 <td>?</td>
                 <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
-                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                {{#showidnumber}}
+                    <td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/mregs}}
-            {{! NO REGISTRATIONS }}{{^absregs}}{{^gtregs}}{{^mregs}}<tr class="regentry reg">
-                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_registrations">{{!
+        {{! NO REGISTRATIONS }}{{^absregs}}{{^gtregs}}{{^mregs}}
+            <tr class="regentry reg">
+                <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}"
+                    class="no_registrations">{{!
                     }}{{# str }} no_registrations, mod_grouptool {{/ str }}{{!
                 }}</td>
             </tr>{{/mregs}}{{/gtregs}}{{/absregs}}{{! END OF NO REGISTRATIONS }}
         </tbody>
         <tbody>
-            {{#queued}}<tr class="queueentry queue">
+        {{#queued}}
+            <tr class="queueentry queue">
                 <td>{{rank}}</td>
                 <td><a href="{{profileurl}}{{id}}" title="{{fullname}}" target="_blank">{{fullname}}</a></td>
-                {{#showidnumber}}<td>{{idnumber}}</td>{{/showidnumber}}
+                {{#showidnumber}}
+                    <td>{{idnumber}}</td>{{/showidnumber}}
             </tr>{{/queued}}
-            {{! NOBODY QUEUED }}{{^queued}}<tr class="queueentry queue">
+        {{! NOBODY QUEUED }}{{^queued}}
+            <tr class="queueentry queue">
                 <td colspan="{{#showidnumber}}3{{/showidnumber}}{{^showidnumber}}2{{/showidnumber}}" class="no_queues">{{!
                 }}{{# str }} nobody_queued, mod_grouptool {{/ str }}{{!
                 }}</td>

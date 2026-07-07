@@ -22,7 +22,10 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+use coding_exception;
+
 /**
  * The \mod_grouptool\overview_exported class holds the logic for the event
  *
@@ -46,7 +49,7 @@ class overview_exported extends export {
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventoverviewexported', 'grouptool');

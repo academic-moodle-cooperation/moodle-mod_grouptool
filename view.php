@@ -47,6 +47,7 @@ if (
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\event\course_module_viewed;
 use mod_grouptool\local\model\view_controller;
 
 defined('MOODLE_INTERNAL') || die();
@@ -146,7 +147,7 @@ $tab = $SESSION->mod_grouptool->currenttab; // Shortcut!
 
 
 /* TRIGGER THE VIEW EVENT */
-$event = \mod_grouptool\event\course_module_viewed::create([
+$event = course_module_viewed::create([
     'objectid' => $cm->instance,
     'context' => context_module::instance($cm->id),
     'other' => [

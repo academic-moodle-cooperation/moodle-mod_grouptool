@@ -25,7 +25,14 @@
 
 namespace mod_grouptool\form;
 
+use coding_exception;
+use context_course;
+use context_module;
+use dml_exception;
 use html_writer;
+use mod_grouptool;
+use mod_grouptool\output\sortlist;
+use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -44,12 +51,12 @@ if (isset($CFG)) {
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class group_creation_form extends \moodleform {
-    /** @var \context_module */
+class group_creation_form extends moodleform {
+    /** @var context_module */
     private $context = null;
 
     /**
-     * @var \mod_grouptool\output\sortlist contains reference to our sortlist, so we can alter current active entries afterwards
+     * @var sortlist contains reference to our sortlist, so we can alter current active entries afterwards
      */
     private $_sortlist = null;
 
@@ -68,8 +75,8 @@ class group_creation_form extends \moodleform {
     /**
      * Definition of group creation form
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function definition() {
         global $DB, $PAGE;
@@ -78,12 +85,12 @@ class group_creation_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = \context_module::instance($this->_customdata['id']);
+        $this->context = context_module::instance($this->_customdata['id']);
 
         $cm = get_coursemodule_from_id('grouptool', $this->_customdata['id']);
         $course = $DB->get_record('course', ['id' => $cm->course]);
         $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
-        $coursecontext = \context_course::instance($cm->course);
+        $coursecontext = context_course::instance($cm->course);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'group_creation');
@@ -218,8 +225,8 @@ class group_creation_form extends \moodleform {
              */
             $mform->setType('digits', PARAM_RAW);
             $fromtoglue = [
-                ' ' . \html_writer::tag('label', '-', ['for' => 'id_from']) . ' ',
-                ' ' . \html_writer::tag('label', get_string('digits', 'grouptool'), ['for' => 'id_digits']) . ' ',
+                ' ' . html_writer::tag('label', '-', ['for' => 'id_from']) . ' ',
+                ' ' . html_writer::tag('label', get_string('digits', 'grouptool'), ['for' => 'id_digits']) . ' ',
             ];
             $mform->addGroup($fromto, 'fromto', get_string('groupfromtodigits', 'grouptool'), $fromtoglue, false);
             $mform->hideIf('fromto', 'mode', 'noteq', GROUPTOOL_FROMTO_GROUPS);
@@ -248,7 +255,7 @@ class group_creation_form extends \moodleform {
             $mform->hideIf('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
             $tags = [];
-            foreach (\mod_grouptool::NAME_TAGS as $tag) {
+            foreach (mod_grouptool::NAME_TAGS as $tag) {
                 $tags[] = html_writer::tag(
                     'button',
                     $tag,
@@ -358,7 +365,7 @@ class group_creation_form extends \moodleform {
      * @param array $files array of uploaded files "element_name"=>tmp_file_path
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function validation($data, $files) {
         $parenterrors = parent::validation($data, $files);
@@ -399,7 +406,7 @@ class group_creation_form extends \moodleform {
             }
             if ((clean_param($data['from'], PARAM_INT) < 0) || !ctype_digit($data['from'])) {
                 if (isset($errors['fromto'])) {
-                    $errors['fromto'] .= \html_writer::empty_tag('br') .
+                    $errors['fromto'] .= html_writer::empty_tag('br') .
                         get_string('fromdate') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 } else {
@@ -409,7 +416,7 @@ class group_creation_form extends \moodleform {
             }
             if ((clean_param($data['to'], PARAM_INT) < 0) || !ctype_digit($data['to'])) {
                 if (isset($errors['fromto'])) {
-                    $errors['fromto'] .= \html_writer::empty_tag('br') .
+                    $errors['fromto'] .= html_writer::empty_tag('br') .
                         get_string('todate') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 } else {
@@ -419,7 +426,7 @@ class group_creation_form extends \moodleform {
             }
             if ((clean_param($data['digits'], PARAM_INT) < 0) || !ctype_digit($data['digits'])) {
                 if (isset($errors['fromto'])) {
-                    $errors['fromto'] .= \html_writer::empty_tag('br') .
+                    $errors['fromto'] .= html_writer::empty_tag('br') .
                         get_string('digits', 'grouptool') . ': ' .
                         get_string('mustbegt0', 'grouptool');
                 } else {

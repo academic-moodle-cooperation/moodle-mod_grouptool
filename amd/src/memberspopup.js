@@ -21,28 +21,28 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- /**
-  * @module mod_grouptool/memberspopup
-  */
-define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str', 'core/log'], function($, ModalFactory, templates,
-                                                                                                        url, str, log) {
+/**
+ * @module mod_grouptool/memberspopup
+ */
+define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str', 'core/log'], function ($, ModalFactory, templates,
+                                                                                                         url, str, log) {
 
     /**
      * @constructor
      * @alias module:mod_grouptool/memberspopup
      */
-    var Memberspopup = function() {
+    var Memberspopup = function () {
         this.showidnumber = false;
         this.courseid = '';
     };
-
+    log.info('trying memeberspopup', 'mod_grouptool');
     var instance = new Memberspopup();
 
     /**
      * Initializes the JS module
      * @param {object} config
      */
-    instance.initializer = function(config) {
+    instance.initializer = function (config) {
 
         instance.showidnumber = config.showidnumber;
         instance.courseid = config.courseid;
@@ -56,12 +56,12 @@ define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str'
             });
         }
 
-        str.get_string('groupmembers').done(function(s) {
+        str.get_string('groupmembers').done(function (s) {
             log.info('Done loading strings...', 'mod_grouptool');
-            instance.modalpromise.done(function(modal) {
+            instance.modalpromise.done(function (modal) {
                 log.info('Done preparing modal...', 'mod_grouptool');
                 instance.modal = modal;
-                $('#registration_form').on('click', 'span.memberstooltip > a', null, function(e) {
+                $('#registration_form').on('click', 'span.memberstooltip > a', null, function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                     var element = $(e.target);
@@ -118,19 +118,19 @@ define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str'
                     var promise = templates.render('mod_grouptool/groupmembers', context);
 
                     // How we deal with promise objects is by adding callbacks.
-                    promise.done(function(source) {
+                    promise.done(function (source) {
                         // Here eventually I have my compiled template, and any javascript that it generated.
                         instance.modal.setTitle(name);
                         instance.modal.setBody(source);
                         instance.modal.show();
-                    }).fail(function(ex) {
+                    }).fail(function (ex) {
                         // Deal with this exception (I recommend core/notify exception function for this).
                         instance.modal.setBody(ex.message);
                         instance.modal.show();
                     });
                 });
             });
-        }).fail(function(ex) {
+        }).fail(function (ex) {
             log.error("Error getting strings: " + ex, "mod_grouptool");
         });
     };

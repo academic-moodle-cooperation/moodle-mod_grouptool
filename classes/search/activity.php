@@ -22,9 +22,14 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\search;
 
+use coding_exception;
+use context_module;
+use core_search\base_activity;
 use core_search\document;
+use dml_missing_record_exception;
 
 /**
  * Search area for mod_grouptool activities.
@@ -34,7 +39,7 @@ use core_search\document;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activity extends \core_search\base_activity {
+class activity extends base_activity {
     /**
      * Returns true if this area uses file indexing.
      *
@@ -48,14 +53,14 @@ class activity extends \core_search\base_activity {
      * Add the attached description files.
      *
      * @param document $document The current document
-     * @throws \dml_missing_record_exception
-     * @throws \coding_exception
+     * @throws dml_missing_record_exception
+     * @throws coding_exception
      */
     public function attach_files($document) {
         $fs = get_file_storage();
 
         $cm = $this->get_cm($this->get_module_name(), $document->get('itemid'), $document->get('courseid'));
-        $context = \context_module::instance($cm->id);
+        $context = context_module::instance($cm->id);
 
         $files = $fs->get_area_files($context->id, 'mod_grouptool', 'intro', false, 'sortorder DESC, id ASC', false);
 

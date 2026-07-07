@@ -135,12 +135,12 @@ final class registration_test extends base {
         $message->groupname = $agrps[$agrpids[0]]->name;
         $message->username = fullname($this->students[3]);
 
-        $curcount= $registrationmanager->get_group_registrations_count($agrpids[0]);
+        $curcount = $registrationmanager->get_group_registrations_count($agrpids[0]);
 
         if ($curcount >= $grouptool->get_grouptool()->grpsize) {
             self::assertTrue(true);
         } else {
-            self::fail('Group size: '.$curcount.' is not as expected: '.$grouptool->get_grouptool()->grpsize);
+            self::fail('Group size: ' . $curcount . ' is not as expected: ' . $grouptool->get_grouptool()->grpsize);
         }
         $text = null;
         try {

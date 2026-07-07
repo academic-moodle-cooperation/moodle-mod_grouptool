@@ -22,7 +22,13 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use coding_exception;
+use core\event\base;
+use moodle_exception;
+use moodle_url;
 
 /**
  * The \mod_grouptool\export base class holds the common logic for the export events
@@ -32,7 +38,7 @@ namespace mod_grouptool\event;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class export extends \core\event\base {
+abstract class export extends base {
     /** @var string either 'overview' or 'userlist' used as tab-value and text and string identifier! */
     protected $exportsubject = '';
 
@@ -70,7 +76,7 @@ abstract class export extends \core\event\base {
             }
         }
         return "The user with id '$this->userid' exported the {$this->exportsubject} for '{$this->objecttable}' with the " .
-               "course module id '$this->contextinstanceid'" . $add . " as '" . $this->data['other']['format_readable'] . "'.";
+            "course module id '$this->contextinstanceid'" . $add . " as '" . $this->data['other']['format_readable'] . "'.";
     }
 
     /**
@@ -85,11 +91,11 @@ abstract class export extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/download.php", [
+        return new moodle_url("/mod/$this->objecttable/download.php", [
             'id' => $this->contextinstanceid,
             'tab' => $this->exportsubject,
             'format' => $this->data['other']['format'],
@@ -99,31 +105,31 @@ abstract class export extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The ' . self::get_name() . ' event must define objectid and object table.');
+            throw new coding_exception('The ' . self::get_name() . ' event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         // ...format, format_readable, groupid, groupingid.
         if (!key_exists('format', $this->data['other'])) {
-            throw new \coding_exception('Format has to be specified!');
+            throw new coding_exception('Format has to be specified!');
         }
 
         if (!key_exists('groupid', $this->data['other'])) {
-            throw new \coding_exception('Group-ID-Key missing!');
+            throw new coding_exception('Group-ID-Key missing!');
         }
 
         if (!key_exists('groupingid', $this->data['other'])) {
-            throw new \coding_exception('Grouping-ID-Key missing!');
+            throw new coding_exception('Grouping-ID-Key missing!');
         }
 
         if (!key_exists('format_readable', $this->data['other']) || empty($this->data['other']['format_readable'])) {

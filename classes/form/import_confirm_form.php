@@ -22,7 +22,12 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\form;
+
+use coding_exception;
+use context_module;
+use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,13 +46,14 @@ if (isset($CFG)) {
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class import_confirm_form extends \moodleform {
-    /** @var \context_module */
+class import_confirm_form extends moodleform {
+    /** @var context_module */
     private $context = null;
+
     /**
      * Definition of import form
      *
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     protected function definition() {
         $mform = $this->_form;
@@ -55,7 +61,7 @@ class import_confirm_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = \context_module::instance($this->_customdata['id']);
+        $this->context = context_module::instance($this->_customdata['id']);
 
         $mform->addElement('hidden', 'tab');
         $mform->setDefault('tab', 'import');

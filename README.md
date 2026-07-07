@@ -1,4 +1,4 @@
-Grouptool 
+Grouptool
 ================
 
 This file is part of the mod_grouptool plugin for Moodle - <http://moodle.org/>
@@ -13,27 +13,32 @@ This file is part of the mod_grouptool plugin for Moodle - <http://moodle.org/>
 Description
 -----------
 
-With the Grouptool activity, teachers can create groups and give students the opportunity to register and deregister for these groups independently or, if necessary, to register for waiting lists. 
+With the Grouptool activity, teachers can create groups and give students the opportunity to register and deregister for
+these groups independently or, if necessary, to register for waiting lists.
 
 
 Usage
 -------
 
-In a course, the participants are to give group presentations. The teacher therefore creates a group for each presentation topic in the grouptool and specifies the maximum number of participants for each topic. They also allow waiting lists. Students can now register for the group of their choice within the specified period. If the desired group is already full, they can sign up for the waiting list and move up if someone in the group de-registers. After the registration deadline, the teacher starts an allocation process that assigns the participants on the waiting list to other groups with open places.
+In a course, the participants are to give group presentations. The teacher therefore creates a group for each
+presentation topic in the grouptool and specifies the maximum number of participants for each topic. They also allow
+waiting lists. Students can now register for the group of their choice within the specified period. If the desired group
+is already full, they can sign up for the waiting list and move up if someone in the group de-registers. After the
+registration deadline, the teacher starts an allocation process that assigns the participants on the waiting list to
+other groups with open places.
 
 
 Installation
 ------------
 
-* Copy the  code directly to the mod/grouptool directory.
+* Copy the code directly to the mod/grouptool directory.
 
 * Log into Moodle as administrator.
 
 * Open the administration area (http://your-moodle-site/admin) to start the installation
   automatically.
 
-
-Privacy API 
+Privacy API
 --------------
 
 The plugin fully implements the Moodle Privacy API.
@@ -42,7 +47,8 @@ The plugin fully implements the Moodle Privacy API.
 Documentation
 -------------
 
-You can find a documentation for the plugin on the [AMC website](https://academic-moodle-cooperation.org/mod_grouptool/).
+You can find a documentation for the plugin on
+the [AMC website](https://academic-moodle-cooperation.org/mod_grouptool/).
 
 
 Bug Reports / Support
@@ -74,6 +80,5 @@ General Public License for more details.
 
 You should have received a copy of the GNU General Public License with Moodle. If not, see
 <http://www.gnu.org/licenses/>.
-
 
 Good luck and have fun!
