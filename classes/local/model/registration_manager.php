@@ -384,9 +384,9 @@ class registration_manager extends grouptool_instance {
      * Changes group for certain user. This is only possible if unreg is allowed and we can determine which group to change!
      *
      * @param int $agrpid ID of active group to change to
-     * @param int $userid (optional) ID of user to change group for or null ($USER->id is used).
-     * @param stdClass $message (optional) prepared message object containing username and groupname or null.
-     * @param int $oldagrpid (optional) ID of former active group
+     * @param int|null $userid (optional) ID of user to change group for or null ($USER->id is used).
+     * @param stdClass|null $message (optional) prepared message object containing username and groupname or null.
+     * @param int|null $oldagrpid (optional) ID of former active group
      * @return string success message
      * @throws exceedgroupqueuelimit
      * @throws exceeduserreglimit
@@ -398,7 +398,7 @@ class registration_manager extends grouptool_instance {
      * @throws required_capability_exception
      * @throws moodle_exception
      */
-    public function change_group($agrpid, $userid = null, $message = null, $oldagrpid = null) {
+    public function change_group(int $agrpid, ?int $userid = null, ?stdClass $message = null, ?int $oldagrpid = null): string {
         global $DB, $USER;
 
         $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);

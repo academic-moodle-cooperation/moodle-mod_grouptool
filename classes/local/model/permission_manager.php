@@ -135,7 +135,7 @@ class permission_manager extends grouptool_instance {
      * @throws regpresent
      * @throws required_capability_exception
      */
-    public function can_change_group(int $agrpid, ?int $userid, stdClass $message, int $oldagrpid = null, bool $useunreg = true): string {
+    public function can_change_group(int $agrpid, ?int $userid, stdClass $message, ?int $oldagrpid = null, bool $useunreg = true): string {
         global $USER;
 
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
@@ -202,7 +202,7 @@ class permission_manager extends grouptool_instance {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function canshowmembers(object|int $agrp = null, bool|int $regrank = null, bool|int $queuerank = null): bool {
+    public function canshowmembers(object|int|null $agrp = null, bool|int|null $regrank = null, bool|int $queuerank = null): bool {
         global $DB, $USER;
 
         if (

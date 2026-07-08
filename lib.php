@@ -810,92 +810,6 @@ function grouptool_display_lateness($timesubmitted = null, $timedue = null) {
 }
 
 /**
- * prepare text for mymoodle-Page to be displayed
- *
- * @param stdClass[] $courses
- * @param string[][] $htmlarray
- * @throws coding_exception
- * @throws dml_exception
- * @throws moodle_exception
- * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
- * @deprecated since 3.3
- */
-function grouptool_print_overview($courses, &$htmlarray) {
-    global $CFG;
-
-    debugging('The function grouptool_print_overview() is now deprecated.', DEBUG_DEVELOPER);
-
-    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-
-    if (empty($courses) || !is_array($courses) || count($courses) == 0) {
-        return;
-    }
-
-    if (!$grouptools = get_all_instances_in_courses('grouptool', $courses)) {
-        return;
-    }
-
-    foreach ($grouptools as $grouptool) {
-        $context = context_module::instance($grouptool->coursemodule, MUST_EXIST);
-
-        $strgrouptool = get_string('grouptool', 'grouptool');
-        $strduedate = get_string('duedate', 'grouptool');
-        $strduedateno = get_string('duedateno', 'grouptool');
-
-        $str = "";
-        if (
-            has_capability('mod/grouptool:register', $context)
-            || has_capability('mod/grouptool:view_regs_group_view', $context)
-        ) {
-            $attrib = [
-                'title' => $strgrouptool, 'href' => $CFG->wwwroot .
-                    '/mod/grouptool/view.php?id=' .
-                    $grouptool->coursemodule,
-            ];
-            if (
-                !$grouptool->visible
-                || (($grouptool->timedue != 0) && ($grouptool->timedue <= time()))
-            ) {
-                $attrib['class'] = 'dimmed';
-            }
-            [$cc, ] = grouptool_display_lateness(time(), $grouptool->timedue);
-            $str .= html_writer::tag(
-                'div',
-                $strgrouptool . ': ' .
-                html_writer::tag('a', $grouptool->name, $attrib),
-                ['class' => 'name']
-            );
-            $attr = ['class' => 'info'];
-            if ($grouptool->timeavailable > time()) {
-                $ta = $grouptool->timeavailable;
-                $str .= html_writer::tag('div', get_string('availabledate', 'grouptool') . ': ' .
-                    html_writer::tag('span', userdate($ta)), $attr);
-            }
-            if ($grouptool->timedue) {
-                $tagargs = ['class' => (($cc == 'late') ? ' late' : '')];
-                $datesnippet = html_writer::tag('span', userdate($grouptool->timedue), $tagargs);
-                $str .= html_writer::tag('div', $strduedate . ': ' . $datesnippet, $attr);
-            } else {
-                $str .= html_writer::tag('div', $strduedateno, $attr);
-            }
-        }
-        $details = grouptool_get_user_reg_details($grouptool, $context);
-
-        if (
-            has_capability('mod/grouptool:view_regs_group_view', $context)
-            || has_capability('mod/grouptool:register', $context)
-        ) {
-            $str = html_writer::tag('div', $str . $details, ['class' => 'grouptool overview']);
-            if (empty($htmlarray[$grouptool->course]['grouptool'])) {
-                $htmlarray[$grouptool->course]['grouptool'] = $str;
-            } else {
-                $htmlarray[$grouptool->course]['grouptool'] .= $str;
-            }
-        }
-    }
-}
-
-/**
  * Get a nice overview over user's registration details!
  *
  * @param stdClass $grouptool Grouptool DB record with additional coursemodule property set!
@@ -905,7 +819,7 @@ function grouptool_print_overview($courses, &$htmlarray) {
  * @throws dml_exception
  * @throws moodle_exception
  */
-function grouptool_get_user_reg_details($grouptool, $context) {
+function grouptool_get_user_reg_details($grouptool, context $context) {
     global $USER, $DB;
 
     $details = '';
@@ -917,8 +831,8 @@ function grouptool_get_user_reg_details($grouptool, $context) {
         $cmid = $grouptool->coursemodule;
         $cm = get_coursemodule_from_id('grouptool', $cmid);
         $course = $DB->get_record('course', ['id' => $cm->course]);
-        $instance = new mod_grouptool($grouptool->coursemodule, $grouptool, $cm, $course, $context);
-        $userstats = $instance->get_registration_stats($USER->id);
+        $registrationmanager = new registration_manager($cmid, new grouptool_data_object($grouptool), $cm, $course);
+        $userstats = $registrationmanager->get_registration_stats($USER->id);
     } else {
         return '';
     }
