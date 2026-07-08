@@ -923,8 +923,14 @@ function grouptool_get_user_reg_details($grouptool, context $context) {
                         ['class' => $colorclass]
                     );
                 }
-                $details .= html_writer::tag('div', get_string('queues', 'grouptool') . ': ' .
-                    $tempstr, ['class' => 'queued']);
+                $details .= html_writer::tag(
+                    'div',
+                    get_string(
+                        'queues',
+                        'grouptool'
+                    ) . ': ' . $tempstr,
+                    ['class' => 'queued']
+                );
             }
         }
     }
@@ -1098,12 +1104,17 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
         return ((has_capability('mod/grouptool:register', $context))
-            || ($managesregs && ($registrationmanager->get_missing_registrations() >= 1 || $registrationmanager->is_registration_open())));
+            || ($managesregs
+                && ($registrationmanager->get_missing_registrations() >= 1
+                    || $registrationmanager->is_registration_open())));
     }
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_AVAILABLEFROM) {
-        return time() <= $registrationmanager->get_settings()->timeavailable && ((has_capability('mod/grouptool:register', $context))
-                || ($managesregs && ($registrationmanager->get_missing_registrations() >= 1 || $registrationmanager->is_registration_open())));
+        return time() <= $registrationmanager->get_settings()->timeavailable
+            && ((has_capability('mod/grouptool:register', $context))
+                || ($managesregs
+                    && ($registrationmanager->get_missing_registrations() >= 1
+                        || $registrationmanager->is_registration_open())));
     }
 
     return false;
@@ -1130,7 +1141,13 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
     $course = $DB->get_record('course', ['id' => $cm->course]);
     $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $registrationmanager = new registration_manager($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
+    $registrationmanager = new registration_manager(
+        $cm->id,
+        new grouptool_data_object($grouptool),
+        $cm,
+        $course,
+        $context
+    );
 
     $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
         'mod/grouptool:administrate_registration',

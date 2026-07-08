@@ -22,6 +22,10 @@
  * @copyright     2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\queue_manager;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -276,7 +280,7 @@ class mod_grouptool_external extends external_api {
         $agrpid = $DB->get_field('grouptool_agrps', 'id', ['grouptoolid' => $cm->instance, 'groupid' => $params['groupid']]);
         $grouptoolrec = $DB->get_record('grouptool', ['id' => $cm->instance]);
         if (!empty($grouptoolrec->use_queue)) {
-            $queuemangaer = new \mod_grouptool\local\model\queue_manager($cmid, new \mod_grouptool\domain\grouptool_data_object($grouptoolrec), $cm, $course, $context);
+            $queuemangaer = new queue_manager($cmid, new grouptool_data_object($grouptoolrec), $cm, $course, $context);
             $queuemangaer->fill_from_queue($agrpid);
         }
 

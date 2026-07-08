@@ -1252,7 +1252,12 @@ class group_manager extends grouptool_instance {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function group_overview_table(int $groupingid = 0, int $groupid = 0, bool $onlydata = false, bool $includeinactive = false): int|array|string {
+    public function group_overview_table(
+        int $groupingid = 0,
+        int $groupid = 0,
+        bool $onlydata = false,
+        bool $includeinactive = false
+    ): int|array|string {
         global $OUTPUT, $CFG, $DB;
 
         $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);

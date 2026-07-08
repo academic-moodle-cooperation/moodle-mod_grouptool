@@ -23,7 +23,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_grouptool\domain\grouptool_data_object;
 use mod_grouptool\event\overview_exported;
+use mod_grouptool\local\model\export_service;
 
 require_once('../../config.php');
 
@@ -111,7 +113,7 @@ switch ($tab) {
 
 
 // Tab determines which table to download (userlist or group overview)!
-$exportservice = new \mod_grouptool\local\model\export_service($cmid, new \mod_grouptool\domain\grouptool_data_object($grouptool), $cm, $course, $context);
+$exportservice = new export_service($cmid, new grouptool_data_object($grouptool), $cm, $course, $context);
 switch ($tab) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');
