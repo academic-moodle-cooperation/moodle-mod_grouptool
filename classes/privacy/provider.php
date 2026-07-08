@@ -308,12 +308,12 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
      * Export overrides for this grouptool.
      *
      * @param context $context Context
-     * @param mod_grouptool $grouptool The publication object.
+     * @param grouptool_instance $grouptool The publication object.
      * @param stdClass $user The user object.
      * @throws coding_exception
      * @throws dml_exception
      */
-    public static function export_regs(context $context, grouptool_instance $grouptool, stdClass $user) {
+    public static function export_regs(context $context, grouptool_instance $grouptool, stdClass $user): void {
         global $DB;
 
         // Get all active groups including inactive indexed by agrpid!
