@@ -111,7 +111,7 @@ switch ($tab) {
 
 
 // Tab determines which table to download (userlist or group overview)!
-$exportservice = new \mod_grouptool\local\model\export_service($cmid, $grouptool, $cm, $course, $context);
+$exportservice = new \mod_grouptool\local\model\export_service($cmid, new \mod_grouptool\domain\grouptool_data_object($grouptool), $cm, $course, $context);
 switch ($tab) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');

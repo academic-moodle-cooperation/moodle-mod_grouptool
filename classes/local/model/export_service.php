@@ -23,6 +23,7 @@ use core\exception\required_capability_exception;
 use core_user\fields;
 use dml_exception;
 use mod_grouptool\local\grouptool_instance;
+use mod_grouptool\local\grouptool_utils;
 use mod_grouptool\pdf;
 use MoodleExcelWorkbook;
 use MoodleODSWorkbook;
@@ -52,7 +53,8 @@ class export_service extends grouptool_instance {
     public function download_overview_txt(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
         ob_start();
 
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $grouptoolutils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         $lines = [];
         $groups = $groupmanager->group_overview_table($groupingid, $groupid, true, $includeinactive);
@@ -83,7 +85,7 @@ class export_service extends grouptool_instance {
                     $lines[] = "\t" . get_string('registrations', 'grouptool');
                     foreach ($group->reg_data as $reg) {
                         $lines[] = "\t\t" . $reg['status'] . "\t" . $reg['name'] .
-                            $this->grouptoolutils->get_useridentity_values_for_txt($reg['useridentityvalues']);
+                            $grouptoolutils->get_useridentity_values_for_txt($reg['useridentityvalues']);
                     }
                 } else if ($mregs == 0) {
                     $lines[] = "\t\t--" . get_string('no_registrations', 'grouptool') . "--";
@@ -91,14 +93,14 @@ class export_service extends grouptool_instance {
                 if ($mregs >= 1) {
                     foreach ($group->mreg_data as $mreg) {
                         $lines[] = "\t\t?\t" . $mreg['name'] . "\t" .
-                            $this->grouptoolutils->get_useridentity_values_for_txt($mreg['useridentityvalues']);
+                            $grouptoolutils->get_useridentity_values_for_txt($mreg['useridentityvalues']);
                     }
                 }
                 if ($group->queued > 0) {
                     $lines[] = "\t" . get_string('queue', 'grouptool');
                     foreach ($group->queue_data as $queue) {
                         $lines[] = "\t\t" . $queue['rank'] . "\t" . $queue['name'] . "\t" .
-                            $this->grouptoolutils->get_useridentity_values_for_txt($queue['useridentityvalues']);
+                            $grouptoolutils->get_useridentity_values_for_txt($queue['useridentityvalues']);
                     }
                 } else {
                     $lines[] = "\t\t--" . get_string('nobody_queued', 'grouptool') . "--";
@@ -147,7 +149,7 @@ class export_service extends grouptool_instance {
      * @throws required_capability_exception
      */
     public function download_overview_raw(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): array|int|string {
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         return $groupmanager->group_overview_table($groupid, $groupingid, true, $includeinactive);
     }
 
@@ -164,7 +166,7 @@ class export_service extends grouptool_instance {
      * @throws required_capability_exception
      */
     public function download_overview_pdf(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         $data = $groupmanager->group_overview_table($groupingid, $groupid, true, $includeinactive);
 
@@ -328,7 +330,7 @@ class export_service extends grouptool_instance {
      */
     public function download_overview_ods(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): void {
 
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         global $CFG;
 
@@ -981,7 +983,7 @@ class export_service extends grouptool_instance {
 
         require_once($CFG->libdir . "/excellib.class.php");
 
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->course, $this->cm, $this->context);
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
         $coursename = format_string(
             $this->course->fullname,

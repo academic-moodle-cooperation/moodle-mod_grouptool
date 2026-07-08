@@ -28,6 +28,7 @@ namespace mod_grouptool;
 use coding_exception;
 use context_course;
 use core_user\fields;
+use mod_grouptool\local\grouptool_utils;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -135,7 +136,7 @@ class pdf extends \pdf {
             );
         }
 
-        $this->useridentityfields = grouptool::get_useridentity_fields();
+        $this->useridentityfields = grouptool_utils::get_useridentity_fields();
         $this->setFontSubsetting(false);
 
         // Set orientation (P/L)!
