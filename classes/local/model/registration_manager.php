@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\model;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 
 require_once($CFG->dirroot . '/group/lib.php');

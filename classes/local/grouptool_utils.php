@@ -615,9 +615,9 @@ class grouptool_utils extends grouptool_instance {
                     ];
                     if (!$previewonly && $userinfo) {
                         $pbar->update($processed, $count, get_string(
-                                'import_progress_import',
-                                'grouptool'
-                            ) . ' ' . fullname($userinfo) . '...');
+                            'import_progress_import',
+                            'grouptool'
+                        ) . ' ' . fullname($userinfo) . '...');
 
                         if (in_array($userinfo->id, $ignored[$group])) {
                             // We ignore the user for this import in this group!

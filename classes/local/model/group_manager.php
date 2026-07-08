@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\model;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 
 require_once($CFG->dirroot . '/group/lib.php');
@@ -652,7 +654,7 @@ class group_manager extends grouptool_instance {
      * @throws moodle_exception
      * @throws required_capability_exception
      */
-    public function create_group_groupings(int $courseid = null, bool $previewonly = false): array {
+    public function create_group_groupings(?int $courseid = null, bool $previewonly = false): array {
         global $SESSION, $OUTPUT;
 
         require_capability('mod/grouptool:administrate_groups', $this->context);

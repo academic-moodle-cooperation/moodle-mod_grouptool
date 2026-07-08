@@ -16,6 +16,8 @@
 
 namespace mod_grouptool\local\model;
 
+defined('MOODLE_INTERNAL') || die();
+
 use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\exception\required_capability_exception;
