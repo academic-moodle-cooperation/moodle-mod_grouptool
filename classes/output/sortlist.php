@@ -123,11 +123,11 @@ class sortlist implements renderable {
             [$grpssql, $params] = $DB->get_in_or_equal($groups);
             $grouping = '';
             $groupingwhere = '';
-            if ($this->filter == mod_grouptool::FILTER_ACTIVE) {
+            if ($this->filter == FILTER_ACTIVE) {
                 $activefilter = ' AND active = 1 ';
-            } else if ($this->filter == mod_grouptool::FILTER_INACTIVE) {
+            } else if ($this->filter == FILTER_INACTIVE) {
                 $activefilter = ' AND active = 0 ';
-            } else if ($this->filter == mod_grouptool::FILTER_ALL) {
+            } else if ($this->filter == FILTER_ALL) {
                 $activefilter = '';
             } else if ($this->filter > 10) {
                 $activefilter = '';

@@ -255,7 +255,7 @@ class group_creation_form extends moodleform {
             $mform->hideIf('allocateby', 'mode', 'eq', GROUPTOOL_N_M_GROUPS);
 
             $tags = [];
-            foreach (mod_grouptool::NAME_TAGS as $tag) {
+            foreach (NAME_TAGS as $tag) {
                 $tags[] = html_writer::tag(
                     'button',
                     $tag,

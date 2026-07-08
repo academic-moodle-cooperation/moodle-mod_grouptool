@@ -116,23 +116,23 @@ class renderer extends plugin_renderer_base {
     protected function get_no_groups_info(sortlist $sortlist) {
 
         switch ($sortlist->filter) {
-            case mod_grouptool::FILTER_ACTIVE:
-                $url = new moodle_url($this->page->url, ['filter' => mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
+            case FILTER_ACTIVE:
+                $url = new moodle_url($this->page->url, ['filter' => FILTER_ALL, 'tab' => 'group_admin']);
                 $message = get_string('nogroupsactive', 'grouptool') . ' ' .
                     html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
-            case mod_grouptool::FILTER_INACTIVE:
-                $url = new moodle_url($this->page->url, ['filter' => mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
+            case FILTER_INACTIVE:
+                $url = new moodle_url($this->page->url, ['filter' => FILTER_ALL, 'tab' => 'group_admin']);
                 $message = get_string('nogroupsinactive', 'grouptool') . ' ' .
                     html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
                 break;
-            case mod_grouptool::FILTER_ALL:
+            case FILTER_ALL:
                 $url = new moodle_url($this->page->url, ['tab' => 'group_creation']);
                 $message = get_string('nogroups', 'grouptool') . ' ' .
                     html_writer::link($url, get_string('nogroupscreate', 'grouptool'));
                 break;
             default:
-                $url = new moodle_url($this->page->url, ['filter' => mod_grouptool::FILTER_ALL, 'tab' => 'group_admin']);
+                $url = new moodle_url($this->page->url, ['filter' => FILTER_ALL, 'tab' => 'group_admin']);
                 $message = get_string('nogroupsgrouping', 'grouptool') . ' ' .
                     html_writer::link($url, get_string('nogroupschoose', 'grouptool'));
         }

@@ -85,8 +85,8 @@ class import_form extends moodleform {
                 'grouptool'
             ));
 
-            $active = new sortlist($course->id, $cm, mod_grouptool::FILTER_ACTIVE);
-            $inactive = new sortlist($course->id, $cm, mod_grouptool::FILTER_INACTIVE);
+            $active = new sortlist($course->id, $cm, FILTER_ACTIVE);
+            $inactive = new sortlist($course->id, $cm, FILTER_INACTIVE);
 
             $groups = $mform->createElement(
                 'selectgroups',
