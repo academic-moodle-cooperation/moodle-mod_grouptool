@@ -26,13 +26,13 @@
  * @module mod_grouptool/sortlist
  */
 define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/log', 'core/notification'],
-    function ($, jqui, ajax, templates, str, log, notif) {
+    function($, jqui, ajax, templates, str, log, notif) {
 
         /**
          * @constructor
          * @alias module:mod_grouptool/sortlist
          */
-        var Sortlist = function () {
+        var Sortlist = function() {
             this.cmid = 0;
         };
 
@@ -42,7 +42,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
          * @param {Event} e Event object
          * @param {object} ui Jquery UI instance
          */
-        Sortlist.prototype.dragStartHandler = function (e, ui) {
+        Sortlist.prototype.dragStartHandler = function(e, ui) {
             // Get our drag object!
             var helper = ui.helper;
 
@@ -54,7 +54,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
          *
          * @param {Event} e Event object
          */
-        Sortlist.prototype.dragEndHandler = function (e) {
+        Sortlist.prototype.dragEndHandler = function(e) {
             // Set the hidden fields containing the sort order new!
             var neworderparams = [];
 
@@ -63,7 +63,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
             sortlistEntries.first().find('a[data-moveup]').css('visibility', 'hidden');
             sortlistEntries.last().find('a[data-movedown]').css('visibility', 'hidden');
 
-            sortlistEntries.each(function (index) {
+            sortlistEntries.each(function(index) {
                 // Using attr here, to have updated values seen in the HTML too!
                 $(this).attr('order', index + 1);
                 $(this).find('input[name="order[' + $(this).data('id') + ']"]').val(index + 1);
@@ -81,7 +81,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                     args: {cmid: e.data.cmid, order: neworderparams},
                     fail: notif.exception
                 }]);
-                requests[0].then(function (result) {
+                requests[0].then(function(result) {
                     var context = {
                         'message': '',
                         'extraclasses': 'infonode'
@@ -95,13 +95,13 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                         autoFadeOut = 60 * 1000;
                         log.info("AJAX Call to reorder groups successfull\nError ocured:" +
                             result.error + "\n" + status, "grouptool");
-                        templates.render(template, context).then(function (html) {
+                        templates.render(template, context).then(function(html) {
                             var infoNode = $(html);
                             infoNode.hide(0);
                             $('table.drag_list').before(infoNode);
-                            infoNode.slideDown(600, function () {
-                                window.setTimeout(function () {
-                                    infoNode.slideUp(600, function () {
+                            infoNode.slideDown(600, function() {
+                                window.setTimeout(function() {
+                                    infoNode.slideUp(600, function() {
                                         infoNode.remove();
                                     });
                                 }, autoFadeOut);
@@ -125,7 +125,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
          *
          * @param {Event} e Event object
          */
-        Sortlist.prototype.moveDown = function (e) {
+        Sortlist.prototype.moveDown = function(e) {
             // Swap sort-order-values!
             var target = $(e.target);
             var nodeA = target.closest('.mod_grouptool_sortlist_entry');
@@ -142,7 +142,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 args: {cmid: e.data.cmid, a: nodeA.data('id'), b: nodeB.data('id')},
                 fail: notif.exception
             }]);
-            requests[0].then(function (result) {
+            requests[0].then(function(result) {
                 if (result.error) {
                     notif.exception(result.error);
                 } else {
@@ -166,7 +166,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
          *
          * @param {Event} e Event object
          */
-        Sortlist.prototype.moveUp = function (e) {
+        Sortlist.prototype.moveUp = function(e) {
             // Swap sort-order-values!
             var target = $(e.target);
             var nodeA = target.closest('.mod_grouptool_sortlist_entry');
@@ -184,7 +184,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 args: {cmid: e.data.cmid, a: nodeA.data('id'), b: nodeB.data('id')},
                 fail: notif.exception
             }]);
-            requests[0].then(function (result) {
+            requests[0].then(function(result) {
                 if (result.error) {
                     notif.exception(result.error);
                 } else {
@@ -210,7 +210,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
          *
          * @param {int} cmid
          */
-        instance.initializer = function (cmid) {
+        instance.initializer = function(cmid) {
 
             instance.cmid = cmid;
 
@@ -225,7 +225,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
                 helper: 'clone',
                 axis: 'y',
                 start: instance.dragStartHandler,
-                stop: function (e) {
+                stop: function(e) {
                     e.data = instance;
                     instance.dragEndHandler(e);
                 }
@@ -244,14 +244,14 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
             // Enhanced checkbox-controller functionality!
             var checkboxControlsAction = $('button[name="do_class_action"]');
             if (checkboxControlsAction) {
-                require(['mod_grouptool/multiseltoggle'], function (toggle) {
+                require(['mod_grouptool/multiseltoggle'], function(toggle) {
                     var select = $('select[name="classes[]"]');
                     toggle.enable(select.get()[0]);
                 });
-                checkboxControlsAction.on('click', function (e) {
+                checkboxControlsAction.on('click', function(e) {
                     // Get the new state and continue!
                     var newstate = '';
-                    $('input[name="class_action"]').each(function (idx, current) {
+                    $('input[name="class_action"]').each(function(idx, current) {
                         if ($(current).prop('checked') === true) {
                             newstate = $(current).val();
                             log.info('Update checkboxes \'' + newstate + '\'!');
@@ -265,7 +265,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
             }
 
             // Action button to select all!
-            $('.simple_select_all').on('click', function (e) {
+            $('.simple_select_all').on('click', function(e) {
                 log.info('Bind select-all handler!', 'grouptool');
                 e.preventDefault();
                 e.stopPropagation();
@@ -274,7 +274,7 @@ define(['jquery', 'jqueryui', 'core/ajax', 'core/templates', 'core/str', 'core/l
             });
 
             // Action button to select none!
-            $('.simple_select_none').on('click', function (e) {
+            $('.simple_select_none').on('click', function(e) {
                 log.info('Bind deselect-all handler!', 'grouptool');
                 e.preventDefault();
                 e.stopPropagation();

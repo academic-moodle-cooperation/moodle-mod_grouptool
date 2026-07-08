@@ -25,12 +25,12 @@
 /**
  * @module mod_grouptool/grading
  */
-define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, str, log) {
+define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, str, log) {
 
     /**
      * @constructor
      */
-    var Grading = function () {
+    var Grading = function() {
         this.contextid = 0;
         this.lang = '';
 
@@ -45,7 +45,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, s
      *
      * @param {Event} e Event object
      */
-    Grading.prototype.updateGroups = function (e) {
+    Grading.prototype.updateGroups = function(e) {
         var groupingid = 0;
 
         log.info("Update groups!", "grouptool");
@@ -67,10 +67,10 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, s
                 'contextid': contextid
             },
             dataType: 'json',
-            beforeSend: function () {
+            beforeSend: function() {
                 log.info("Request groups for grouping " + groupingid, "grouptool");
             },
-            success: function (data) {
+            success: function(data) {
 
                 if (!data.error) {
                     var options = '';
@@ -90,7 +90,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, s
                     log.error(data.error, "grouptool");
                 }
             },
-            error: function (jqXHR, error) {
+            error: function(jqXHR, error) {
                 log.error(error, "grouptool");
             }
         };
@@ -105,21 +105,21 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, s
      *
      * @param {object} params
      */
-    instance.initializer = function (params) {
+    instance.initializer = function(params) {
         instance.contextid = params.contextid;
         $(this.SELECTORS.GROUPINGSELECT).on('change', null, this, instance.updateGroups);
 
         var form = $('#grading_form');
         var selects = form.find('input[name="selected[]"]');
 
-        form.on('click', '.checkboxcontroller a.select_all', function (e) {
+        form.on('click', '.checkboxcontroller a.select_all', function(e) {
             e.stopPropagation();
             e.preventDefault();
 
             // Select all!
             selects.prop('checked', true);
         });
-        form.on('click', '.checkboxcontroller a.select_none', function (e) {
+        form.on('click', '.checkboxcontroller a.select_none', function(e) {
             e.stopPropagation();
             e.preventDefault();
 

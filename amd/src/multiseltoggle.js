@@ -25,7 +25,7 @@
 /**
  * @module mod_grouptool/multiseltoggle
  */
-define(['jquery', 'core/str', 'core/log'], function ($, str, log) {
+define(['jquery', 'core/str', 'core/log'], function($, str, log) {
 
     var PLUS = 'fa-plus'; // Alternatives: 'fa-plus-square' or 'fa-plus-square-o'!
     var MINUS = 'fa-minus'; // Alternatives: 'fa-minus-square' or 'fa-minus-square-o'!
@@ -35,7 +35,7 @@ define(['jquery', 'core/str', 'core/log'], function ($, str, log) {
      * @constructor
      * @alias module:mod_grouptool/multiseltoggle
      */
-    var MultiSelToggle = function () {
+    var MultiSelToggle = function() {
         this.selectmultiple = '';
         this.selectsingle = '';
         this.el = {};
@@ -46,7 +46,7 @@ define(['jquery', 'core/str', 'core/log'], function ($, str, log) {
      *
      * @param {Event} e Event object
      */
-    MultiSelToggle.prototype.toggle = function (e) {
+    MultiSelToggle.prototype.toggle = function(e) {
         var x = e.currentTarget;
         if (instance.el.multiple) {
             // Remove multiple and set icon classes to [+]!
@@ -68,13 +68,13 @@ define(['jquery', 'core/str', 'core/log'], function ($, str, log) {
      *
      * @param {string|element} el Element selector to enable switch for.
      */
-    instance.enable = function (el) {
+    instance.enable = function(el) {
         instance.el = el;
         var stringstofetch = [
             {'key': 'selectmultiple', 'component': 'mod_grouptool'},
             {'key': 'selectsingle', 'component': 'mod_grouptool'}
         ];
-        str.get_strings(stringstofetch).done(function (s) {
+        str.get_strings(stringstofetch).done(function(s) {
             instance.selectmultiple = s[0];
             instance.selectsingle = s[1];
             log.info('Enable multiselect/singleselect switch for element (' + instance.el + ').', 'grouptool');

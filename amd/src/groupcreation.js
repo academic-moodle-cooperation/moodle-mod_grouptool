@@ -25,12 +25,12 @@
 /**
  * @module mod_grouptool/groupcreation
  */
-define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, str, log) {
+define(['jquery', 'core/config', 'core/str', 'core/log'], function($, config, str, log) {
     /**
      * @contructor
      * @alias module:mod_grouptool/groupcreation
      */
-    var Groupcreation = function () {
+    var Groupcreation = function() {
         this.SELECTORS = {
             FIELDSETCONTAINSADVANCED: 'fieldset.containsadvancedelements',
             DIVFITEMADVANCED: 'div.fitem.advanced',
@@ -52,7 +52,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, s
      *
      * @param {Event} e Event object
      */
-    Groupcreation.prototype.addTag = function (e) {
+    Groupcreation.prototype.addTag = function(e) {
         log.info('Add tag...', 'grouptool');
 
         var targetfield = $('input[name=namingscheme]');
@@ -80,7 +80,7 @@ define(['jquery', 'core/config', 'core/str', 'core/log'], function ($, config, s
     /**
      * AMD initializer
      */
-    instance.initializer = function () {
+    instance.initializer = function() {
         log.info('Initialise grouptool group creation js...', 'grouptool');
         // Add JS-Eventhandler for each tag!
         var nametag = $('[data-nametag]');
