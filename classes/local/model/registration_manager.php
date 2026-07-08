@@ -1097,7 +1097,7 @@ class registration_manager extends grouptool_instance {
      * @throws required_capability_exception
      * @throws moodle_exception
      */
-    public function get_registration_stats(int $userid = null): stdClass {
+    public function get_registration_stats(?int $userid = null): stdClass {
         global $USER, $DB;
 
         $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);

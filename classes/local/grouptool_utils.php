@@ -78,7 +78,11 @@ class grouptool_utils extends grouptool_instance {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public static function confirm(string $message, moodle_url|single_button|string $continue, moodle_url|single_button|string|null $cancel = null): string {
+    public static function confirm(
+        string $message,
+        moodle_url|single_button|string $continue,
+        moodle_url|single_button|string|null $cancel = null
+    ): string {
         global $OUTPUT;
         if (!($continue instanceof single_button)) {
             if (is_string($continue)) {
@@ -125,7 +129,11 @@ class grouptool_utils extends grouptool_instance {
         if ($done) {
             return;
         }
-        $PAGE->requires->js_call_amd('mod_grouptool/message_group_button', 'send', ['#group-message-button']);
+        $PAGE->requires->js_call_amd(
+            'mod_grouptool/message_group_button',
+            'send',
+            ['#group-message-button']
+        );
         $done = true;
     }
 
