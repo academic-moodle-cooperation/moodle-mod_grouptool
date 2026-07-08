@@ -276,8 +276,8 @@ class mod_grouptool_external extends external_api {
         $agrpid = $DB->get_field('grouptool_agrps', 'id', ['grouptoolid' => $cm->instance, 'groupid' => $params['groupid']]);
         $grouptoolrec = $DB->get_record('grouptool', ['id' => $cm->instance]);
         if (!empty($grouptoolrec->use_queue)) {
-            $grouptool = new mod_grouptool($cm->id, $grouptoolrec, $cm, $course);
-            $grouptool->fill_from_queue($agrpid);
+            $queuemangaer = new \mod_grouptool\local\model\queue_manager($cmid, new \mod_grouptool\domain\grouptool_data_object($grouptoolrec), $cm, $course, $context);
+            $queuemangaer->fill_from_queue($agrpid);
         }
 
         return $result;

@@ -888,6 +888,7 @@ class grouptool_utils extends grouptool_instance {
 
         require_once($CFG->dirroot . '/enrol/manual/locallib.php');
         require_once($CFG->libdir . '/accesslib.php');
+
         if (!$enrolmanual = enrol_get_plugin('manual')) {
             throw new coding_exception(get_string('cant_enrol', 'grouptool'));
         }

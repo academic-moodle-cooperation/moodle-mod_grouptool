@@ -38,8 +38,6 @@ $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/download.php', ['id' => $c
 $PAGE->set_url($url);
 $course = $DB->get_record('course', ['id' => $cm->course]);
 
-$instance = new mod_grouptool($cmid, $grouptool, $cm, $course, $context);
-
 
 require_login($cm->course, true, $cm);
 
@@ -113,25 +111,26 @@ switch ($tab) {
 
 
 // Tab determines which table to download (userlist or group overview)!
+$exportservice = new \mod_grouptool\local\model\export_service($cmid, $grouptool, $cm, $course, $context);
 switch ($tab) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');
         switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                $instance->download_overview_pdf($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_pdf($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                $instance->download_overview_txt($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_txt($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                $instance->download_overview_xlsx($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_xlsx($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                $instance->download_overview_ods($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_ods($groupid, $groupingid, $includeinactive);
                 break;
             default:
                 break;

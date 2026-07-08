@@ -195,11 +195,9 @@ class observer {
                         // Get next queued user and put him in the group (and delete queue entry)!
                         if (!empty($grouptool->use_queue)) {
                             // We include it right here, because we want to have it slim!
-                            require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
                             $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
-                            $instance = new mod_grouptool($cm->id, $grouptool, $cm);
-
-                            $instance->fill_from_queue($agrp[$grouptool->id]->id);
+                            $queuemangaer = new \mod_grouptool\local\model\queue_manager($cm->id, new \mod_grouptool\domain\grouptool_data_object($grouptool));
+                            $queuemangaer->fill_from_queue($agrp[$grouptool->id]->id);
                         }
                     }
                     break;
@@ -258,9 +256,8 @@ class observer {
                             group_recreated::create_from_object($logdata)->trigger();
 
                             if ($grouptool->immediate_reg) {
-                                require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-                                $instance = new mod_grouptool($cmid, $grouptool);
-                                $instance->push_registrations();
+                                $registrationmanager = new \mod_grouptool\local\model\registration_manager($cmid, new \mod_grouptool\domain\grouptool_data_object($grouptool));
+                                $registrationmanager->push_registrations();
                             }
                             $grouprecreated = true;
                             $infodata = new stdClass();
@@ -278,9 +275,8 @@ class observer {
                         }
                     } else {
                         if ($grouptool->immediate_reg) {
-                            require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-                            $instance = new mod_grouptool($cmid, $grouptool);
-                            $instance->push_registrations();
+                            $registrationmanager = new \mod_grouptool\local\model\registration_manager($cmid, new \mod_grouptool\domain\grouptool_data_object($grouptool));
+                            $registrationmanager->push_registrations();
                         }
                         $infodata = new stdClass();
                         $infodata->groupname = $data->name;

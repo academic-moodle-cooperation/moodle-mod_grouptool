@@ -207,7 +207,6 @@ function grouptool_update_instance(stdClass $grouptool) {
 
     // Register students if immediate registration has been turned on!
     if ($grouptool->immediate_reg) {
-        require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
         $cmid = $grouptool->coursemodule;
         $cm = get_coursemodule_from_id('grouptool', $cmid);
         $course = $DB->get_record('course', ['id' => $cm->course]);

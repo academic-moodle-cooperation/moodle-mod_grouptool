@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
 if (isset($CFG)) {
     require_once($CFG->libdir . '/formslib.php');
     require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
-    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 }
 
 /**
