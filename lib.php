@@ -46,7 +46,7 @@ require_once(dirname(__FILE__) . '/definitions.php');
  * @return mixed true if the feature is supported, null if unknown
  * @see plugin_supports() in lib/moodlelib.php
  */
-function grouptool_supports($feature) {
+function grouptool_supports(string $feature): mixed {
     return match ($feature) {
         FEATURE_COMPLETION_TRACKS_VIEWS,
         FEATURE_COMPLETION_HAS_RULES,
@@ -63,10 +63,11 @@ function grouptool_supports($feature) {
 /**
  * Callback which returns human-readable strings describing the active completion custom rules for the module instance.
  *
- * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
+ * @param stdClass|cm_info $cm object with fields ->completion and ->customdata['customcompletionrules']
  * @return array $descriptions the array of descriptions for the custom rules.
+ * @throws coding_exception
  */
-function mod_grouptool_get_completion_active_rule_descriptions($cm) {
+function mod_grouptool_get_completion_active_rule_descriptions(stdClass|cm_info $cm): array {
     // Values will be present in cm_info, and we assume these are up to date.
     if (
         empty($cm->customdata['customcompletionrules'])
@@ -103,7 +104,7 @@ function mod_grouptool_get_completion_active_rule_descriptions($cm) {
  * @throws coding_exception
  * @throws dml_exception
  */
-function grouptool_add_instance(stdClass $grouptool) {
+function grouptool_add_instance(stdClass $grouptool): bool|int {
     global $DB;
 
     $grouptool->timecreated = time();
@@ -169,7 +170,7 @@ function grouptool_add_instance(stdClass $grouptool) {
  * @throws dml_exception
  * @throws moodle_exception
  */
-function grouptool_update_instance(stdClass $grouptool) {
+function grouptool_update_instance(stdClass $grouptool): bool {
     global $DB, $CFG;
 
     $grouptool->timemodified = time();
@@ -320,7 +321,8 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                     $event->description = format_module_intro('grouptool', $grouptool, $cm->id);
                 }
             }
-            // REMOVE in a later version, we need to remove the old events if there are any, because they might have wrong times and names.
+            // REMOVE in a later version, we need to remove the old events,
+            // if there are any, because they might have wrong times and names.
             if (!$grouptool->timeavailable) {
                 $DB->delete_records('event', [
                     'modulename' => 'grouptool', 'instance' => $grouptool->id,
@@ -338,7 +340,11 @@ function grouptool_refresh_events($courseid = 0, $instance = null, $cm = null) {
                            AND eventtype = :eventtype
                            AND groupid = 0
                            AND courseid <> 0";
-                $params = ['modulename' => 'grouptool', 'instance' => $grouptool->id, 'eventtype' => $event->eventtype];
+                $params = [
+                    'modulename' => 'grouptool',
+                    'instance' => $grouptool->id,
+                    'eventtype' => $event->eventtype,
+                ];
                 $event->id = $DB->get_field_select('event', 'id', $select, $params);
 
                 // Now process the event.
@@ -498,7 +504,10 @@ function grouptool_update_queues(int|stdClass $grouptool = 0): void {
                     );
                     $moodlemessage->fullmessageformat = FORMAT_HTML;
                     $moodlemessage->fullmessagehtml =
-                        $OUTPUT->render_from_template('mod_grouptool/registrationnotification', $messagedata);
+                        $OUTPUT->render_from_template(
+                            'mod_grouptool/registrationnotification',
+                            $messagedata
+                        );
                     $moodlemessage->notification = 1;
                     $moodlemessage->contexturl = $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $cm->id;
                     $moodlemessage->contexturlname = $grouptool->name;
@@ -528,7 +537,7 @@ function grouptool_update_queues(int|stdClass $grouptool = 0): void {
  * @throws coding_exception
  * @throws dml_exception
  */
-function grouptool_delete_instance($id) {
+function grouptool_delete_instance(int $id): bool {
     global $DB;
 
     if (!$grouptool = $DB->get_record('grouptool', ['id' => $id])) {

@@ -144,8 +144,13 @@ class pdf extends \pdf {
         $this->setPageOrientation($orientation);
 
         // Set document information!
-        $this->SetCreator(format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]) . ' | ' .
-            get_string('pluginname', 'grouptool'));
+        $this->SetCreator(
+            format_string(
+                $SITE->fullname,
+                true,
+                ['context' => context_course::instance(SITEID)]
+            ) . ' | ' . get_string('pluginname', 'grouptool')
+        );
         $this->SetAuthor(fullname($USER));
 
         // Set header/footer!
