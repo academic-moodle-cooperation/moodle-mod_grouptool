@@ -202,7 +202,7 @@ class permission_manager extends grouptool_instance {
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function canshowmembers(object|int|null $agrp = null, bool|int|null $regrank = null, bool|int $queuerank = null): bool {
+    public function canshowmembers(object|int|null $agrp = null, bool|int|null $regrank = null, bool|int|null $queuerank = null): bool {
         global $DB, $USER;
 
         if (
