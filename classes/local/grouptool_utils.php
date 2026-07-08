@@ -26,6 +26,7 @@
 namespace mod_grouptool\local;
 
 use completion_info;
+use core\context;
 use core\exception\coding_exception;
 use core\exception\moodle_exception;
 use core\output\html_writer;
@@ -222,11 +223,12 @@ class grouptool_utils extends grouptool_instance {
      *
      * @param moodle_url $downloadurl The base download URL to use
      * @param int $groupid (optional) ID of group to use for the download or 0 for all groups download
+     * @param context|null $context (optional) The context to check for export capability
      * @return string HTML snippet with download links encapsulated in DIV
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public static function get_download_links(moodle_url $downloadurl, int $groupid = 0, $context = null) {
+    public static function get_download_links(moodle_url $downloadurl, int $groupid = 0, ?context $context = null): string {
         if (has_capability('mod/grouptool:export', $context)) {
             $class = 'download';
             if ($groupid) {
