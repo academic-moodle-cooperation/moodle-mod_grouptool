@@ -1076,14 +1076,12 @@ function grouptool_reset_course_form_defaults() {
 function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
     global $CFG, $DB;
 
-    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-
     $cm = get_fast_modinfo($event->courseid)->instances['grouptool'][$event->instance];
     $context = context_module::instance($cm->id);
     $course = $DB->get_record('course', ['id' => $cm->course]);
     $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
-    $grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course);
+    $registrationmanager = new registration_manager($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 
     $managesregs = has_capability('mod/grouptool:administrate_registration', $context) || has_capability(
         'mod/grouptool:administrate_registration',
@@ -1092,12 +1090,12 @@ function mod_grouptool_core_calendar_is_event_visible(calendar_event $event) {
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_DUE) {
         return ((has_capability('mod/grouptool:register', $context))
-            || ($managesregs && ($grouptool->get_missing_registrations() >= 1 || $grouptool->is_registration_open())));
+            || ($managesregs && ($registrationmanager->get_missing_registrations() >= 1 || $registrationmanager->is_registration_open())));
     }
 
     if ($event->eventtype == GROUPTOOL_EVENT_TYPE_AVAILABLEFROM) {
-        return time() <= $grouptool->get_settings()->timeavailable && ((has_capability('mod/grouptool:register', $context))
-                || ($managesregs && ($grouptool->get_missing_registrations() >= 1 || $grouptool->is_registration_open())));
+        return time() <= $registrationmanager->get_settings()->timeavailable && ((has_capability('mod/grouptool:register', $context))
+                || ($managesregs && ($registrationmanager->get_missing_registrations() >= 1 || $registrationmanager->is_registration_open())));
     }
 
     return false;
