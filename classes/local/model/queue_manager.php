@@ -352,49 +352,50 @@ class queue_manager extends grouptool_instance {
             0,
             false
         );
+        if (empty($agrps)) {
+            return [true, get_string('no_active_groups', 'grouptool')];
+        }
+
         [$agrpsql, $params] = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'reg');
         [$agrpsql2, $params2] = $DB->get_in_or_equal(array_keys($agrps), SQL_PARAMS_NAMED, 'queue');
 
-        if (!empty($agrps)) {
-            $agrpids = array_keys($agrps);
-            [$agrpssql, $agrpsparam] = $DB->get_in_or_equal($agrpids);
-            $agrpsfiltersql = " AND agrp.id " . $agrpssql;
-            $agrpsfilterparams = array_merge([$grouptool->id], $agrpsparam);
-            // Get queue-entries (sorted by timestamp)!
-            if (!empty($grouptool->allowmultiple)) {
-                $queuedsql = " WHERE queued.agrpid " . $agrpssql . " ";
-                $queuedparams = array_merge($agrpsparam, $agrpsparam);
+        $agrpids = array_keys($agrps);
+        [$agrpssql, $agrpsparam] = $DB->get_in_or_equal($agrpids);
+        $agrpsfiltersql = " AND agrp.id " . $agrpssql;
+        $agrpsfilterparams = array_merge([$grouptool->id], $agrpsparam);
+        // Get queue-entries (sorted by timestamp)!
+        if (!empty($grouptool->allowmultiple)) {
+            $queuedsql = " WHERE queued.agrpid " . $agrpssql . " ";
+            $queuedparams = array_merge($agrpsparam, $agrpsparam);
 
-                $queueentries = $DB->get_records_sql(
-                    "
+            $queueentries = $DB->get_records_sql(
+                "
                       SELECT queued.id, MAX(queued.agrpid) AS agrpid, MAX(queued.userid) AS userid,
                              MAX(queued.timestamp) AS timestamp, (COUNT(DISTINCT reg.id) < ?) AS priority
                         FROM {grouptool_queued} queued
                    LEFT JOIN {grouptool_registered} reg ON queued.userid = reg.userid AND reg.agrpid " . $agrpssql .
-                    " AND reg.modified_by >= 0
+                " AND reg.modified_by >= 0
                     " . $queuedsql . "
                     GROUP BY queued.id
                     ORDER BY priority DESC, queued.timestamp ASC",
-                    array_merge([$grouptool->choosemin], $queuedparams)
-                );
-            } else {
-                $queuedsql = " WHERE queued.agrpid " . $agrpssql . " ";
-                $queuedparams = $agrpsparam;
-                $queueentries = $DB->get_records_sql(
-                    "SELECT *, '1' AS priority
+                array_merge([$grouptool->choosemin], $queuedparams)
+            );
+        } else {
+            $queuedsql = " WHERE queued.agrpid " . $agrpssql . " ";
+            $queuedparams = $agrpsparam;
+            $queueentries = $DB->get_records_sql(
+                "SELECT *, '1' AS priority
                                                         FROM {grouptool_queued} queued" .
-                    $queuedsql .
-                    "ORDER BY timestamp ASC",
-                    $queuedparams
-                );
-            }
-            $userregs = $DB->get_records_sql_menu('SELECT reg.userid, COUNT(DISTINCT reg.id)
+                $queuedsql .
+                "ORDER BY timestamp ASC",
+                $queuedparams
+            );
+        }
+        $userregs = $DB->get_records_sql_menu('SELECT reg.userid, COUNT(DISTINCT reg.id)
                                                      FROM {grouptool_registered} reg
                                                     WHERE reg.agrpid ' . $agrpssql . ' AND modified_by >= 0
                                                  GROUP BY reg.userid', $agrpsparam);
-        } else {
-            return [true, get_string('no_active_groups', 'grouptool')];
-        }
+
 
         // Get group entries (sorted by sort-order)!
         $groupsdata = $DB->get_records_sql("
