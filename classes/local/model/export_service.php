@@ -419,12 +419,6 @@ class export_service extends grouptool_instance {
             $regentrylast->set_top(1);
             $noregentriesformat = $workbook->add_format($regentryprop);
             $noregentriesformat->set_align('center');
-            $queueentryformat = $workbook->add_format($queueentryprop);
-            $queueentryformat->set_right(1);
-            $queueentryformat->set_top(1);
-            $queueentryformat->set_bottom(false);
-            $queueentrylast = $workbook->add_format($queueentryprop);
-            $queueentrylast->set_top(1);
             $noqueueentriesformat = $workbook->add_format($queueentryprop);
             $noqueueentriesformat->set_align('center');
 
