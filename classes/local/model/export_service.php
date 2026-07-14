@@ -137,23 +137,6 @@ class export_service extends grouptool_instance {
     }
 
     /**
-     * returns raw data for overview
-     *
-     * @param int $groupid optional get only this group
-     * @param int $groupingid optional get only this grouping
-     * @param bool $includeinactive optional include inactive groups too!
-     * @return array|int|string raw data
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
-     * @throws required_capability_exception
-     */
-    public function download_overview_raw(int $groupid = 0, int $groupingid = 0, bool $includeinactive = false): array|int|string {
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
-        return $groupmanager->group_overview_table($groupid, $groupingid, true, $includeinactive);
-    }
-
-    /**
      * outputs generated pdf-file for overview (forces download)
      *
      * @param int $groupid optional get only this group
