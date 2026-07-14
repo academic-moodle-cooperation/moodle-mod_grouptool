@@ -149,7 +149,7 @@ class registration_manager extends grouptool_instance {
                 // Update completion state if submission is changed.
                 $completion = new completion_info($this->course);
                 if ($completion->is_enabled($this->cm) && $this->grouptool->completionregister) {
-                    $completion->update_state($this->cm, COMPLETION_COMPLETE);
+                    $completion->update_state($this->cm, COMPLETION_COMPLETE, $userid);
                 }
             }
 
