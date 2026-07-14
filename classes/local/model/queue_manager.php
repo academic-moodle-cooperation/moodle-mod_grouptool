@@ -396,7 +396,6 @@ class queue_manager extends grouptool_instance {
                                                     WHERE reg.agrpid ' . $agrpssql . ' AND modified_by >= 0
                                                  GROUP BY reg.userid', $agrpsparam);
 
-
         // Get group entries (sorted by sort-order)!
         $groupsdata = $DB->get_records_sql("
                 SELECT agrp.id AS id, MAX(agrp.groupid) AS groupid, MAX(agrp.grpsize) AS grpsize,
