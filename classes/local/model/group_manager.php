@@ -1258,7 +1258,7 @@ class group_manager extends grouptool_instance {
         bool $onlydata = false,
         bool $includeinactive = false
     ): int|array|string {
-        global $OUTPUT, $CFG, $DB;
+        global $OUTPUT, $CFG, $DB, $PAGE;
 
         $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
@@ -1292,6 +1292,8 @@ class group_manager extends grouptool_instance {
             // Echo the Global-downloadlinks!
             echo $utils->get_download_links($downloadurl, 0, $this->context);
         }
+
+        $PAGE->requires->js_call_amd('mod_grouptool/sortoverview', 'init');
 
         foreach ($agrps as $agrp) {
             // We give each group 30 seconds (minimum) and hope it doesn't time out because of no output in case of download!
@@ -1458,7 +1460,7 @@ class group_manager extends grouptool_instance {
                     if (!array_key_exists($curuser, $userinfo)) {
                         $userinfo[$curuser] = $DB->get_record('user', ['id' => $curuser]);
                     }
-                    $fullname = fullname($userinfo[$curuser]->firstname);
+                    $fullname = fullname($userinfo[$curuser]);
                     $rank = $queuemanager->get_rank_in_queue($queuedlist, $curuser);
 
                     $row = [];
