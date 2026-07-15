@@ -251,13 +251,6 @@ class view_controller extends grouptool_instance {
                     $error = true;
                     $confirmmessage = $e->getMessage();
                 }
-            } else if ($action == 'resolvequeues') {
-                // TODO remove from this page!
-                require_capability('mod/grouptool:administrate_registration', $this->context);
-                [$error, $confirmmessage] = $queuemanager->resolve_queues();
-                if ($error == -1) {
-                    $error = true;
-                }
             }
 
             if ($error === true) {
@@ -284,24 +277,12 @@ class view_controller extends grouptool_instance {
                 $agrpid = reset($agrpid);
                 $action = 'unreg';
             }
-            $resolvequeues = optional_param('resolve_queues', 0, PARAM_BOOL);
-            if (!empty($resolvequeues)) {
-                $action = 'resolvequeues';
-            }
-
             $attr = [];
 
-            if ($action == 'resolvequeues') {
-                require_capability('mod/grouptool:administrate_registration', $this->context);
-                // TODO remove from this page!
-                [$error, $confirmmessage] = $queuemanager->resolve_queues(true); // This is try only!
-                if ($error == -1) {
-                    $error = true;
-                }
-            } else if ($action == 'unreg') {
-                if (!has_capability('mod/grouptool:preview', $this->context)) {
-                    require_capability('mod/grouptool:register', $this->context);
-                }
+            if (!has_capability('mod/grouptool:preview', $this->context)) {
+                require_capability('mod/grouptool:register', $this->context);
+            }
+            if ($action == 'unreg') {
                 $attr['group'] = $agrpid;
                 // This is try only!
                 try {
@@ -311,9 +292,6 @@ class view_controller extends grouptool_instance {
                     $confirmmessage = $e->getMessage();
                 }
             } else {
-                if (!has_capability('mod/grouptool:preview', $this->context)) {
-                    require_capability('mod/grouptool:register', $this->context);
-                }
                 $action = 'reg';
                 $attr['group'] = $agrpid;
                 // This is try only!
@@ -332,7 +310,7 @@ class view_controller extends grouptool_instance {
             $continue = new moodle_url($PAGE->url, $attr);
             $cancel = new moodle_url($PAGE->url);
 
-            if (($error === true) && ($action != 'resolvequeues')) {
+            if ($error === true) {
                 $continue->remove_params('confirm', 'group');
                 $continue = new single_button($continue, get_string('continue'), 'get');
                 $cancel = null;
@@ -373,22 +351,6 @@ class view_controller extends grouptool_instance {
                     )
                 );
                 $mform->addGroup($buttonarray, 'buttonar', '', [''], false);
-            }
-            if (
-                !empty($this->grouptool->timedue) && (time() >= $this->grouptool->timedue) &&
-                has_capability('mod/grouptool:administrate_registration', $this->context)
-            ) {
-                if ($regstat->queued_users > 0) {
-                    // Insert queue-resolving button!
-                    $mform->addElement('header', 'resolveheader', get_string(
-                        'resolve_queue_legend',
-                        'grouptool'
-                    ));
-                    $mform->addElement('submit', 'resolve_queues', get_string(
-                        'resolve_queue',
-                        'grouptool'
-                    ));
-                }
             }
             $mform->addElement('header', 'generalinfo', get_string(
                 'general_information',
@@ -1558,9 +1520,10 @@ class view_controller extends grouptool_instance {
      * @throws required_capability_exception
      */
     public function view_overview(): void {
-        global $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT, $USER;
 
         $registrationmanager = new registration_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $queuemanager = new queue_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
         $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
 
@@ -1568,7 +1531,11 @@ class view_controller extends grouptool_instance {
         $groupingid = optional_param('groupingid', 0, PARAM_INT);
         $orientation = optional_param('orientation', 0, PARAM_BOOL);
         $includeinactive = optional_param('inactive', 0, PARAM_BOOL);
-        $url = new moodle_url($PAGE->url, [
+        $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
+        $resolvequeues = optional_param('resolve_queues', 0, PARAM_BOOL);
+        $confirmed = optional_param('confirm', 0, PARAM_BOOL);
+
+        $overviewurl = new moodle_url($PAGE->url, [
             'tab' => 'overview',
             'sesskey' => sesskey(),
             'groupid' => $groupid,
@@ -1576,41 +1543,68 @@ class view_controller extends grouptool_instance {
             'orientation' => $orientation,
             'inactive' => $includeinactive,
         ]);
+
         echo $OUTPUT->heading(get_string('registrations', 'mod_grouptool'));
-        // Process submitted form!
-        if (data_submitted() && confirm_sesskey() && optional_param('confirm', 0, PARAM_BOOL)) {
-            // Execution has been confirmed?!
+
+        // Process submitted actions.
+        if (data_submitted() && confirm_sesskey() && $confirmed) {
             $hideform = false;
-            $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
-            if ($pushtomdl) {
+
+            if ($resolvequeues) {
+                require_capability('mod/grouptool:administrate_registration', $this->context);
+
+                [$error, $message] = $queuemanager->resolve_queues();
+                $iserror = ($error === true || $error === -1);
+
+                echo $OUTPUT->notification(
+                    $message,
+                    $iserror ? notification::NOTIFY_ERROR : notification::NOTIFY_SUCCESS
+                );
+            } else if ($pushtomdl) {
                 [$error, $message] = $registrationmanager->push_registrations($groupid, $groupingid);
-                if ($error) {
-                    echo $OUTPUT->notification($message, notification::NOTIFY_ERROR);
-                } else {
-                    echo $OUTPUT->notification($message, notification::NOTIFY_SUCCESS);
-                }
+
+                echo $OUTPUT->notification(
+                    $message,
+                    $error ? notification::NOTIFY_ERROR : notification::NOTIFY_SUCCESS
+                );
             }
         } else if (data_submitted() && confirm_sesskey()) {
-            // Display confirm-dialog!
+            // Display a confirmation dialog before executing an action.
             $hideform = true;
 
-            $pushtomdl = optional_param('pushtomdl', 0, PARAM_BOOL);
-            if ($pushtomdl) {
-                // This is try only!
-                [$error, $message] = $registrationmanager->push_registrations($groupid, $groupingid, true);
-                $attr = [];
-                $attr['confirm'] = 1;
-                $attr['pushtomdl'] = 1;
-                $attr['sesskey'] = sesskey();
+            if ($resolvequeues) {
+                require_capability('mod/grouptool:administrate_registration', $this->context);
 
-                $continue = new moodle_url($PAGE->url, $attr);
-                $cancel = new moodle_url($PAGE->url);
+                // Preview the queue resolution.
+                [$error, $message] = $queuemanager->resolve_queues(true);
+
+                $continue = new moodle_url($overviewurl, [
+                    'confirm' => 1,
+                    'resolve_queues' => 1,
+                ]);
+                $cancel = new moodle_url($overviewurl);
+
+                echo $utils->confirm($message, $continue, $cancel);
+            } else if ($pushtomdl) {
+                // Preview the Moodle group synchronisation.
+                [$error, $message] = $registrationmanager->push_registrations(
+                    $groupid,
+                    $groupingid,
+                    true
+                );
+
+                $continue = new moodle_url($overviewurl, [
+                    'confirm' => 1,
+                    'pushtomdl' => 1,
+                ]);
+                $cancel = new moodle_url($overviewurl);
 
                 if ($error) {
-                    $continue->remove_params('confirm', 'group');
+                    $continue->remove_params('confirm', 'pushtomdl');
                     $continue = new single_button($continue, get_string('continue'), 'get');
                     $cancel = null;
                 }
+
                 echo $utils->confirm($message, $continue, $cancel);
             } else {
                 $hideform = false;
@@ -1620,16 +1614,16 @@ class view_controller extends grouptool_instance {
         }
 
         if (!$hideform) {
-            $groupingselect = $groupmanager->get_grouping_select($url, $groupingid);
-            $groupselect = $groupmanager->get_groups_select($url, $groupingid, $groupid);
-            $orientationselect = $utils->get_orientation_select($url, $orientation);
+            $groupingselect = $groupmanager->get_grouping_select($overviewurl, $groupingid);
+            $groupselect = $groupmanager->get_groups_select($overviewurl, $groupingid, $groupid);
+            $orientationselect = $utils->get_orientation_select($overviewurl, $orientation);
 
             if ($includeinactive) {
                 $inactivetext = get_string('inactivegroups_hide', 'grouptool');
-                $inactiveurl = new moodle_url($url, ['inactive' => 0]);
+                $inactiveurl = new moodle_url($overviewurl, ['inactive' => 0]);
             } else {
                 $inactivetext = get_string('inactivegroups_show', 'grouptool');
-                $inactiveurl = new moodle_url($url, ['inactive' => 1]);
+                $inactiveurl = new moodle_url($overviewurl, ['inactive' => 1]);
             }
 
             $syncstatus = $utils->get_sync_status();
@@ -1639,43 +1633,92 @@ class view_controller extends grouptool_instance {
                  * Out of sync? --> show button to get registrations from grouptool to moodle
                  * (just register not already registered persons and let the others be)
                  */
-                $url = new moodle_url($PAGE->url, ['tab' => 'overview', 'pushtomdl' => 1, 'sesskey' => sesskey()]);
-                $button = new single_button(
-                    $url,
+                $syncurl = new moodle_url($PAGE->url, [
+                    'tab' => 'overview',
+                    'pushtomdl' => 1,
+                    'sesskey' => sesskey(),
+                ]);
+                $syncbutton = new single_button(
+                    $syncurl,
                     get_string('updatemdlgrps', 'grouptool'),
                     'post',
                     'primary'
                 );
-                echo $OUTPUT->box(html_writer::empty_tag('br') .
-                    $OUTPUT->render($button) .
-                    html_writer::empty_tag('br'), 'generalbox centered');
-            }
-            $url = new moodle_url($PAGE->url, ['tab' => 'import']);
-            $button = null;
-            if (has_capability('mod/grouptool:administrate_deregistration', $this->context) && has_capability('mod/grouptool:administrate_registration', $this->context)) {
-                $button = new single_button($url, get_string('manage_members', 'grouptool'));
-            } else if (has_capability('mod/grouptool:administrate_registration', $this->context)) {
-                $button = new single_button($url, get_string('import'));
-            } else if (has_capability('mod/grouptool:administrate_deregistration', $this->context)) {
-                $url = new moodle_url($PAGE->url, ['tab' => 'unregister']);
-                $button = new single_button($url, get_string('unregister', 'grouptool'));
+                echo $OUTPUT->box(
+                    html_writer::empty_tag('br') .
+                    $OUTPUT->render($syncbutton) .
+                    html_writer::empty_tag('br'),
+                    'generalbox centered'
+                );
             }
 
-            $queues = "";
-            if ($button) {
-                echo $OUTPUT->box(html_writer::empty_tag('br') .
-                    $OUTPUT->render($button) . $queues .
-                    html_writer::empty_tag('br'), 'generalbox');
+            // Create the member-management button according to the user's capabilities.
+            $managebutton = null;
+            $manageurl = new moodle_url($PAGE->url, ['tab' => 'import']);
+
+            if (
+                has_capability('mod/grouptool:administrate_deregistration', $this->context) &&
+                has_capability('mod/grouptool:administrate_registration', $this->context)
+            ) {
+                $managebutton = new single_button(
+                    $manageurl,
+                    get_string('manage_members', 'grouptool')
+                );
+            } else if (has_capability('mod/grouptool:administrate_registration', $this->context)) {
+                $managebutton = new single_button($manageurl, get_string('import'));
+            } else if (has_capability('mod/grouptool:administrate_deregistration', $this->context)) {
+                $manageurl = new moodle_url($PAGE->url, ['tab' => 'unregister']);
+                $managebutton = new single_button(
+                    $manageurl,
+                    get_string('unregister', 'grouptool')
+                );
             }
-            echo "<br />";
+
+            // Show the queue-resolution button next to the member-management button.
+            $resolvebutton = null;
+            $regstat = $registrationmanager->get_registration_stats($USER->id);
+
+            if (
+                !empty($this->grouptool->timedue) &&
+                time() >= $this->grouptool->timedue &&
+                $regstat->queued_users > 0 &&
+                has_capability('mod/grouptool:administrate_registration', $this->context)
+            ) {
+                $resolveurl = new moodle_url($overviewurl, ['resolve_queues' => 1]);
+                $resolvebutton = new single_button(
+                    $resolveurl,
+                    get_string('resolve_queue', 'grouptool'),
+                    'post',
+                    'primary'
+                );
+            }
+
+            $buttons = [];
+            if ($managebutton !== null) {
+                $buttons[] = $OUTPUT->render($managebutton);
+            }
+            if ($resolvebutton !== null) {
+                $buttons[] = $OUTPUT->render($resolvebutton);
+            }
+
+            if (!empty($buttons)) {
+                $buttonrow = html_writer::div(
+                    implode('', $buttons),
+                    'd-flex flex-wrap align-items-center gap-2'
+                );
+                echo $OUTPUT->box($buttonrow, 'generalbox');
+            }
+
+            echo html_writer::empty_tag('br');
+
             // If we don't only get the data, the output happens directly per group!
             $groupmanager->group_overview_table($groupingid, $groupid, false, $includeinactive);
             $select = html_writer::tag(
-                'div',
-                get_string('grouping', 'group') . '&nbsp;' .
+                    'div',
+                    get_string('grouping', 'group') . '&nbsp;' .
                     $OUTPUT->render($groupingselect),
-                ['class' => 'centered grouptool_overview_filter']
-            ) .
+                    ['class' => 'centered grouptool_overview_filter']
+                ) .
                 html_writer::tag(
                     'div',
                     get_string('group', 'group') . '&nbsp;' .
