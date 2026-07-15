@@ -848,6 +848,279 @@ class view_controller extends grouptool_instance {
     }
 
     /**
+     * Outputs the content of the creation tab and manages actions taken in this tab
+     *
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     */
+    public function view_creation(): void {
+        global $SESSION, $OUTPUT;
+
+        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
+
+        $id = $this->cm->id;
+        $context = $this->context;
+
+        $rolenames = [];
+        if ($roles = get_profile_roles($context)) {
+            foreach ($roles as $role) {
+                $rolenames[$role->id] = strip_tags(role_get_name($role, $context));
+            }
+        }
+
+        // Check if everything has been confirmed, so we can finally start working!
+        if (optional_param('confirm', 0, PARAM_BOOL)) {
+            if (isset($SESSION->grouptool->view_administration->createGroups)) {
+                require_capability('mod/grouptool:administrate_groups', $this->context);
+                // Create groups!
+                $data = $SESSION->grouptool->view_administration;
+                $error = false;
+                $preview = '';
+                // Display only active users if the option was selected or they do not have the capability to view suspended users.
+                $onlyactive = !empty($data->includeonlyactiveenrol)
+                    || !has_capability('moodle/course:viewsuspendedusers', $context);
+                [$source, $orderby] = $utils->view_creation_get_source_orderby($data);
+                switch ($data->mode) {
+                    case GROUPTOOL_GROUPS_AMOUNT:
+                        // Allocate members from the selected role to groups!
+                        $users = groups_get_potential_members(
+                            $this->course->id,
+                            $data->roleid,
+                            $source,
+                            $orderby,
+                            null,
+                            $onlyactive
+                        );
+                        $usercnt = count($users);
+                        $numgrps = $data->numberofgroups;
+                        $userpergrp = floor($usercnt / $numgrps);
+                        [$error, $preview] = $groupmanager->create_groups($data, $users, $userpergrp, $numgrps);
+                        break;
+                    case GROUPTOOL_MEMBERS_AMOUNT:
+                        // Allocate members from the selected role to groups!
+                        $users = groups_get_potential_members(
+                            $this->course->id,
+                            $data->roleid,
+                            $source,
+                            $orderby,
+                            null,
+                            $onlyactive
+                        );
+                        $usercnt = count($users);
+                        $numgrps = ceil($usercnt / $data->numberofmembers);
+                        $userpergrp = $data->numberofmembers;
+                        if (!empty($data->nosmallgroups) && $usercnt % $data->numberofmembers != 0) {
+                            /*
+                             *  If there would be one group with a small number of member
+                             *  reduce the number of groups
+                             */
+                            $missing = $userpergrp * $numgrps - $usercnt;
+                            if ($missing > $userpergrp * (1 - GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
+                                // Spread the users from the last small group!
+                                $numgrps--;
+                                $userpergrp = floor($usercnt / $numgrps);
+                            }
+                        }
+                        [$error, $preview] = $groupmanager->create_groups($data, $users, $userpergrp, $numgrps);
+                        break;
+                    case GROUPTOOL_1_PERSON_GROUPS:
+                        $users = groups_get_potential_members(
+                            $this->course->id,
+                            $data->roleid,
+                            $source,
+                            'lastname ASC, firstname ASC',
+                            null,
+                            $onlyactive
+                        );
+                        if (!isset($data->groupingname)) {
+                            $data->groupingname = null;
+                        }
+                        [$error, $prev] = $groupmanager->create_one_person_groups(
+                            $users,
+                            $data->namingscheme,
+                            $data->grouping,
+                            $data->groupingname,
+                            false,
+                            $data->enablegroupmessaging
+                        );
+                        $preview = $prev;
+                        break;
+                    case GROUPTOOL_N_M_GROUPS:
+                        /* Shortcut here: create_fromto_groups does exactly what we want,
+                         with from = 1 and to = number of groups to create! */
+                        $data->from = 1;
+                        $data->to = $data->numberofgroups;
+                        $data->digits = 1;
+                        // Go on to GROUPTOOL_FROMTO_GROUPS!
+                    case GROUPTOOL_FROMTO_GROUPS:
+                        if (!isset($data->groupingname)) {
+                            $data->groupingname = null;
+                        }
+                        [$error, $preview] = $groupmanager->create_fromto_groups($data);
+                        break;
+                }
+                if (!$error && has_capability('mod/grouptool:administrate_groups', $this->context)) {
+                    $linktext = '<i class="fa fa-long-arrow-right" aria-hidden="true"></i>' .
+                        get_string('group_administration', 'grouptool');
+                    $urlparams = [
+                        'id' => $this->cm->id,
+                        'tab' => 'group_admin',
+                    ];
+                    $preview .= html_writer::link(new moodle_url('/mod/grouptool/view.php', $urlparams), $linktext, [
+                        'class' => 'ml-1',
+                    ]);
+                }
+                $preview = $OUTPUT->notification($preview, $error ? notification::NOTIFY_ERROR :
+                    notification::NOTIFY_SUCCESS);
+                echo $OUTPUT->box(
+                    html_writer::tag('div', $preview, ['class' => 'centered']),
+                    'generalbox'
+                );
+            }
+            unset($SESSION->grouptool->view_administration);
+        }
+
+        // Create the form-object!
+        $showgrpsize = $this->grouptool->usesize;
+        $mform = new group_creation_form(null, [
+            'id' => $id,
+            'roles' => $rolenames,
+            'show_grpsize' => $showgrpsize,
+        ]);
+        unset($showgrpsize);
+        if ($mform->is_cancelled()) {
+            // Go back to the administration tab!
+            unset($SESSION->grouptool->view_administration);
+            $this->view_administration();
+        } else if ($fromform = $mform->get_data()) {
+            require_capability('mod/grouptool:administrate_groups', $this->context);
+            // Save submitted data in session and show confirmation dialog!
+            if (!isset($SESSION->grouptool)) {
+                $SESSION->grouptool = new stdClass();
+            }
+            $SESSION->grouptool->view_administration = $fromform;
+            $data = $SESSION->grouptool->view_administration;
+            $preview = "";
+            $error = false;
+            [$source, $orderby] = $utils->view_creation_get_source_orderby($data);
+            $onlyactive = !empty($data->includeonlyactiveenrol)
+                || !has_capability('moodle/course:viewsuspendedusers', $context);
+            switch ($data->mode) {
+                case GROUPTOOL_GROUPS_AMOUNT:
+                    // Allocate members from the selected role to groups!
+                    $users = groups_get_potential_members(
+                        $this->course->id,
+                        $data->roleid,
+                        $source,
+                        $orderby,
+                        null,
+                        $onlyactive
+                    );
+                    $usercnt = count($users);
+                    $numgrps = clean_param($data->numberofgroups, PARAM_INT);
+                    $userpergrp = floor($usercnt / $numgrps);
+                    [$error, $preview] = $groupmanager->create_groups(
+                        $data,
+                        $users,
+                        $userpergrp,
+                        $numgrps,
+                        true
+                    );
+                    break;
+                case GROUPTOOL_MEMBERS_AMOUNT:
+                    // Allocate members from the selected role to groups!
+                    $users = groups_get_potential_members(
+                        $this->course->id,
+                        $data->roleid,
+                        $source,
+                        $orderby,
+                        null,
+                        $onlyactive
+                    );
+                    $usercnt = count($users);
+                    $numgrps = ceil($usercnt / $data->numberofmembers);
+                    $userpergrp = clean_param($data->numberofmembers, PARAM_INT);
+                    if (!empty($data->nosmallgroups) && $usercnt % clean_param($data->numberofmembers, PARAM_INT) != 0) {
+                        /*
+                         *  If there would be one group with a small number of member
+                         *  reduce the number of groups
+                         */
+                        $missing = $userpergrp * $numgrps - $usercnt;
+                        if ($missing > $userpergrp * (1 - GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
+                            // Spread the users from the last small group!
+                            $numgrps--;
+                            $userpergrp = floor($usercnt / $numgrps);
+                        }
+                    }
+                    [$error, $preview] = $groupmanager->create_groups(
+                        $data,
+                        $users,
+                        $userpergrp,
+                        $numgrps,
+                        true
+                    );
+                    break;
+                case GROUPTOOL_1_PERSON_GROUPS:
+                    $users = groups_get_potential_members(
+                        $this->course->id,
+                        $data->roleid,
+                        $source,
+                        'lastname ASC, firstname ASC',
+                        null,
+                        $onlyactive
+                    );
+                    if (!isset($data->groupingname)) {
+                        $data->groupingname = null;
+                    }
+                    [$error, $prev] = $groupmanager->create_one_person_groups(
+                        $users,
+                        $data->namingscheme,
+                        $data->grouping,
+                        $data->groupingname,
+                        true,
+                        $data->enablegroupmessaging
+                    );
+                    $preview = $prev;
+                    break;
+                case GROUPTOOL_N_M_GROUPS:
+                    /* Shortcut here: create_fromto_groups does exactly what we want,
+                    * with from = 1 and to = number of groups to create! */
+                    $data->from = 1;
+                    $data->to = $data->numberofgroups;
+                    $data->digits = 1;
+                    // Go to GROUPTOOL_FROMTO_GROUPS case!
+                case GROUPTOOL_FROMTO_GROUPS:
+                    if (!isset($data->groupingname)) {
+                        $data->groupingname = null;
+                    }
+                    [$error, $preview] = $groupmanager->create_fromto_groups($data, true);
+                    break;
+            }
+            $preview = html_writer::tag('div', $preview, ['class' => 'centered']);
+            $tab = required_param('tab', PARAM_ALPHANUMEXT);
+            if ($error) {
+                $text = get_string('create_groups_confirm_problem', 'grouptool');
+                $url = new moodle_url("administration.php?id=$id&tab=" . $tab);
+                $back = new single_button($url, get_string('back'), 'post');
+                $confirmboxcontent = $utils->confirm($text, $back);
+            } else {
+                $continue = "administration.php?id=$id&tab=" . $tab . "&confirm=true";
+                $cancel = "administration.php?id=$id&tab=" . $tab;
+                $text = get_string('create_groups_confirm', 'grouptool');
+                $confirmboxcontent = $utils->confirm($text, $continue, $cancel);
+            }
+            echo $OUTPUT->heading(get_string('preview'), 2, 'centered') .
+                $OUTPUT->box($preview, 'generalbox') .
+                $confirmboxcontent;
+        } else {
+            $mform->display();
+        }
+    }
+
+    /**
      * Outputs the content of the administration tab and manages actions taken in this tab
      *
      * @throws coding_exception
@@ -1239,279 +1512,6 @@ class view_controller extends grouptool_instance {
     }
 
     /**
-     * Outputs the content of the creation tab and manages actions taken in this tab
-     *
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws moodle_exception
-     * @throws required_capability_exception
-     */
-    public function view_creation(): void {
-        global $SESSION, $OUTPUT;
-
-        $groupmanager = new group_manager($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
-        $utils = new grouptool_utils($this->cm->id, $this->grouptool, $this->cm, $this->course, $this->context);
-
-        $id = $this->cm->id;
-        $context = $this->context;
-
-        $rolenames = [];
-        if ($roles = get_profile_roles($context)) {
-            foreach ($roles as $role) {
-                $rolenames[$role->id] = strip_tags(role_get_name($role, $context));
-            }
-        }
-
-        // Check if everything has been confirmed, so we can finally start working!
-        if (optional_param('confirm', 0, PARAM_BOOL)) {
-            if (isset($SESSION->grouptool->view_administration->createGroups)) {
-                require_capability('mod/grouptool:administrate_groups', $this->context);
-                // Create groups!
-                $data = $SESSION->grouptool->view_administration;
-                $error = false;
-                $preview = '';
-                // Display only active users if the option was selected or they do not have the capability to view suspended users.
-                $onlyactive = !empty($data->includeonlyactiveenrol)
-                    || !has_capability('moodle/course:viewsuspendedusers', $context);
-                [$source, $orderby] = $utils->view_creation_get_source_orderby($data);
-                switch ($data->mode) {
-                    case GROUPTOOL_GROUPS_AMOUNT:
-                        // Allocate members from the selected role to groups!
-                        $users = groups_get_potential_members(
-                            $this->course->id,
-                            $data->roleid,
-                            $source,
-                            $orderby,
-                            null,
-                            $onlyactive
-                        );
-                        $usercnt = count($users);
-                        $numgrps = $data->numberofgroups;
-                        $userpergrp = floor($usercnt / $numgrps);
-                        [$error, $preview] = $groupmanager->create_groups($data, $users, $userpergrp, $numgrps);
-                        break;
-                    case GROUPTOOL_MEMBERS_AMOUNT:
-                        // Allocate members from the selected role to groups!
-                        $users = groups_get_potential_members(
-                            $this->course->id,
-                            $data->roleid,
-                            $source,
-                            $orderby,
-                            null,
-                            $onlyactive
-                        );
-                        $usercnt = count($users);
-                        $numgrps = ceil($usercnt / $data->numberofmembers);
-                        $userpergrp = $data->numberofmembers;
-                        if (!empty($data->nosmallgroups) && $usercnt % $data->numberofmembers != 0) {
-                            /*
-                             *  If there would be one group with a small number of member
-                             *  reduce the number of groups
-                             */
-                            $missing = $userpergrp * $numgrps - $usercnt;
-                            if ($missing > $userpergrp * (1 - GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
-                                // Spread the users from the last small group!
-                                $numgrps--;
-                                $userpergrp = floor($usercnt / $numgrps);
-                            }
-                        }
-                        [$error, $preview] = $groupmanager->create_groups($data, $users, $userpergrp, $numgrps);
-                        break;
-                    case GROUPTOOL_1_PERSON_GROUPS:
-                        $users = groups_get_potential_members(
-                            $this->course->id,
-                            $data->roleid,
-                            $source,
-                            'lastname ASC, firstname ASC',
-                            null,
-                            $onlyactive
-                        );
-                        if (!isset($data->groupingname)) {
-                            $data->groupingname = null;
-                        }
-                        [$error, $prev] = $groupmanager->create_one_person_groups(
-                            $users,
-                            $data->namingscheme,
-                            $data->grouping,
-                            $data->groupingname,
-                            false,
-                            $data->enablegroupmessaging
-                        );
-                        $preview = $prev;
-                        break;
-                    case GROUPTOOL_N_M_GROUPS:
-                        /* Shortcut here: create_fromto_groups does exactly what we want,
-                         with from = 1 and to = number of groups to create! */
-                        $data->from = 1;
-                        $data->to = $data->numberofgroups;
-                        $data->digits = 1;
-                        // Go on to GROUPTOOL_FROMTO_GROUPS!
-                    case GROUPTOOL_FROMTO_GROUPS:
-                        if (!isset($data->groupingname)) {
-                            $data->groupingname = null;
-                        }
-                        [$error, $preview] = $groupmanager->create_fromto_groups($data);
-                        break;
-                }
-                if (!$error && has_capability('mod/grouptool:administrate_groups', $this->context)) {
-                    $linktext = '<i class="fa fa-long-arrow-right" aria-hidden="true"></i>' .
-                        get_string('group_administration', 'grouptool');
-                    $urlparams = [
-                        'id' => $this->cm->id,
-                        'tab' => 'group_admin',
-                    ];
-                    $preview .= html_writer::link(new moodle_url('/mod/grouptool/view.php', $urlparams), $linktext, [
-                        'class' => 'ml-1',
-                    ]);
-                }
-                $preview = $OUTPUT->notification($preview, $error ? notification::NOTIFY_ERROR :
-                    notification::NOTIFY_SUCCESS);
-                echo $OUTPUT->box(
-                    html_writer::tag('div', $preview, ['class' => 'centered']),
-                    'generalbox'
-                );
-            }
-            unset($SESSION->grouptool->view_administration);
-        }
-
-        // Create the form-object!
-        $showgrpsize = $this->grouptool->usesize;
-        $mform = new group_creation_form(null, [
-            'id' => $id,
-            'roles' => $rolenames,
-            'show_grpsize' => $showgrpsize,
-        ]);
-        unset($showgrpsize);
-        if ($mform->is_cancelled()) {
-            // Go back to the administration tab!
-            unset($SESSION->grouptool->view_administration);
-            $this->view_administration();
-        } else if ($fromform = $mform->get_data()) {
-            require_capability('mod/grouptool:administrate_groups', $this->context);
-            // Save submitted data in session and show confirmation dialog!
-            if (!isset($SESSION->grouptool)) {
-                $SESSION->grouptool = new stdClass();
-            }
-            $SESSION->grouptool->view_administration = $fromform;
-            $data = $SESSION->grouptool->view_administration;
-            $preview = "";
-            $error = false;
-            [$source, $orderby] = $utils->view_creation_get_source_orderby($data);
-            $onlyactive = !empty($data->includeonlyactiveenrol)
-                || !has_capability('moodle/course:viewsuspendedusers', $context);
-            switch ($data->mode) {
-                case GROUPTOOL_GROUPS_AMOUNT:
-                    // Allocate members from the selected role to groups!
-                    $users = groups_get_potential_members(
-                        $this->course->id,
-                        $data->roleid,
-                        $source,
-                        $orderby,
-                        null,
-                        $onlyactive
-                    );
-                    $usercnt = count($users);
-                    $numgrps = clean_param($data->numberofgroups, PARAM_INT);
-                    $userpergrp = floor($usercnt / $numgrps);
-                    [$error, $preview] = $groupmanager->create_groups(
-                        $data,
-                        $users,
-                        $userpergrp,
-                        $numgrps,
-                        true
-                    );
-                    break;
-                case GROUPTOOL_MEMBERS_AMOUNT:
-                    // Allocate members from the selected role to groups!
-                    $users = groups_get_potential_members(
-                        $this->course->id,
-                        $data->roleid,
-                        $source,
-                        $orderby,
-                        null,
-                        $onlyactive
-                    );
-                    $usercnt = count($users);
-                    $numgrps = ceil($usercnt / $data->numberofmembers);
-                    $userpergrp = clean_param($data->numberofmembers, PARAM_INT);
-                    if (!empty($data->nosmallgroups) && $usercnt % clean_param($data->numberofmembers, PARAM_INT) != 0) {
-                        /*
-                         *  If there would be one group with a small number of member
-                         *  reduce the number of groups
-                         */
-                        $missing = $userpergrp * $numgrps - $usercnt;
-                        if ($missing > $userpergrp * (1 - GROUPTOOL_AUTOGROUP_MIN_RATIO)) {
-                            // Spread the users from the last small group!
-                            $numgrps--;
-                            $userpergrp = floor($usercnt / $numgrps);
-                        }
-                    }
-                    [$error, $preview] = $groupmanager->create_groups(
-                        $data,
-                        $users,
-                        $userpergrp,
-                        $numgrps,
-                        true
-                    );
-                    break;
-                case GROUPTOOL_1_PERSON_GROUPS:
-                    $users = groups_get_potential_members(
-                        $this->course->id,
-                        $data->roleid,
-                        $source,
-                        'lastname ASC, firstname ASC',
-                        null,
-                        $onlyactive
-                    );
-                    if (!isset($data->groupingname)) {
-                        $data->groupingname = null;
-                    }
-                    [$error, $prev] = $groupmanager->create_one_person_groups(
-                        $users,
-                        $data->namingscheme,
-                        $data->grouping,
-                        $data->groupingname,
-                        true,
-                        $data->enablegroupmessaging
-                    );
-                    $preview = $prev;
-                    break;
-                case GROUPTOOL_N_M_GROUPS:
-                    /* Shortcut here: create_fromto_groups does exactly what we want,
-                    * with from = 1 and to = number of groups to create! */
-                    $data->from = 1;
-                    $data->to = $data->numberofgroups;
-                    $data->digits = 1;
-                    // Go to GROUPTOOL_FROMTO_GROUPS case!
-                case GROUPTOOL_FROMTO_GROUPS:
-                    if (!isset($data->groupingname)) {
-                        $data->groupingname = null;
-                    }
-                    [$error, $preview] = $groupmanager->create_fromto_groups($data, true);
-                    break;
-            }
-            $preview = html_writer::tag('div', $preview, ['class' => 'centered']);
-            $tab = required_param('tab', PARAM_ALPHANUMEXT);
-            if ($error) {
-                $text = get_string('create_groups_confirm_problem', 'grouptool');
-                $url = new moodle_url("administration.php?id=$id&tab=" . $tab);
-                $back = new single_button($url, get_string('back'), 'post');
-                $confirmboxcontent = $utils->confirm($text, $back);
-            } else {
-                $continue = "administration.php?id=$id&tab=" . $tab . "&confirm=true";
-                $cancel = "administration.php?id=$id&tab=" . $tab;
-                $text = get_string('create_groups_confirm', 'grouptool');
-                $confirmboxcontent = $utils->confirm($text, $continue, $cancel);
-            }
-            echo $OUTPUT->heading(get_string('preview'), 2, 'centered') .
-                $OUTPUT->box($preview, 'generalbox') .
-                $confirmboxcontent;
-        } else {
-            $mform->display();
-        }
-    }
-
-    /**
      * view overview tab
      *
      * @throws coding_exception
@@ -1714,11 +1714,11 @@ class view_controller extends grouptool_instance {
             // If we don't only get the data, the output happens directly per group!
             $groupmanager->group_overview_table($groupingid, $groupid, false, $includeinactive);
             $select = html_writer::tag(
-                    'div',
-                    get_string('grouping', 'group') . '&nbsp;' .
+                'div',
+                get_string('grouping', 'group') . '&nbsp;' .
                     $OUTPUT->render($groupingselect),
-                    ['class' => 'centered grouptool_overview_filter']
-                ) .
+                ['class' => 'centered grouptool_overview_filter']
+            ) .
                 html_writer::tag(
                     'div',
                     get_string('group', 'group') . '&nbsp;' .
