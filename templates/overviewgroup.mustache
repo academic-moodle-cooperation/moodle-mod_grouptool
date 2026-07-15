@@ -8,21 +8,25 @@
 
     Moodle is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+    along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
     @template mod_grouptool/overviewgroup
 
     Grouptool's overview group template.
 
-    The purpose of this template is to display a single group in mod_grouptool's group overview.
+    The purpose of this template is to display a single group in
+    mod_grouptool's group overview.
 
     Classes required for JS:
+    * grouptool-user-table
     * grouptool-sort-name
+    * grouptool-sortable-user
+    * grouptool-static-row
 
     Data attributes required for JS:
     * data-sort-field
@@ -34,16 +38,16 @@
     * outdated True if group is not up to date
     * uptodate True if group is up to date
     * inactive True if group is not active
-    * downloadurl URL to download group's data (format parameter gets appended)
+    * downloadurl URL to download group's data
     * total Total group places
-    * registered occupied group places
-    * queued occupied queue places
-    * free amount of free places
-    * statushelp help icon for status column
-    * userlink
-    * reg_data
-    * mreg_data
-    * queue_data
+    * registered Occupied group places
+    * queued Occupied queue places
+    * free Amount of free places
+    * statushelp Help icon for status column
+    * userlink User profile URL
+    * reg_data Registered users
+    * mreg_data Manually registered or marked users
+    * queue_data Queued users
 
     Example context (json):
     {
@@ -63,15 +67,24 @@
             "alt": "Help with Status",
             "icon": {
                 "attributes": [
-                    { "name": "alt", "value": "Help with Status" },
-                    { "name": "title","value": "Help with Status" },
-                    { "name": "src", "value" : "http:\/\/localhost\/moodle_33\/theme\/image.php\/boost\/core\/1494407719\/help" }
+                    {
+                        "name": "alt",
+                        "value": "Help with Status"
+                    },
+                    {
+                        "name": "title",
+                        "value": "Help with Status"
+                    },
+                    {
+                        "name": "src",
+                        "value": "http://localhost/moodle_33/theme/image.php/boost/core/1494407719/help"
+                    }
                 ],
                 "extraclasses": "iconhelp"
             },
             "linktext": null,
             "title": "Help with Status",
-            "url": "http:\/\/localhost\/moodle_33\/help.php?component=mod_grouptool&identifier=status&lang=en",
+            "url": "http://localhost/moodle_33/help.php?component=mod_grouptool&identifier=status&lang=en",
             "ltr": true
         },
         "userlink": "https://example.com/user/view.php?course=4",
@@ -137,99 +150,211 @@
         ]
     }
 }}
+
 <div class="box generalbox groupcontainer p-y-1 {{#inactive}}dimmed_text{{/inactive}}"
      id="yui_3_17_2_1_1494398782636_28">
+
     <div class="groupinfo">
-        <h3>{{name}}{{!
-            }}{{#outdated}}<small class="p-l-1"><i class="fa fa-user-circle text-info" title="{{!
-            }}{{#str}} not_synced_reg_present, mod_grouptool {{/str}}" aria-hidden="true"></i></small>{{/outdated}}
+        <h3>
+            {{name}}
+            {{#outdated}}
+                <small class="p-l-1">
+                    <i class="fa fa-user-circle text-info"
+                       title="{{#str}}not_synced_reg_present, mod_grouptool{{/str}}"
+                       aria-hidden="true">
+                    </i>
+                </small>
+            {{/outdated}}
         </h3>
+
         {{#downloadcapability}}
-            <div class="download"><span class="title">{{#str}} download, core {{/str}}:</span>{{!
-            }}<a href="{{downloadurl}}&format={{formattxt}}">.TXT</a>{{!
-            }}<a href="{{downloadurl}}&format={{formatxlsx}}">.XLSX</a>{{!
-            }}<a href="{{downloadurl}}&format={{formatpdf}}">.PDF</a>{{!
-            }}<a href="{{downloadurl}}&format={{formatods}}">.ODS</a>{{!
-        }}</div>
+            <div class="download">
+                <span class="title">
+                    {{#str}}download, core{{/str}}:
+                </span>
+
+                <a href="{{downloadurl}}&format={{formattxt}}">.TXT</a>
+                <a href="{{downloadurl}}&format={{formatxlsx}}">.XLSX</a>
+                <a href="{{downloadurl}}&format={{formatpdf}}">.PDF</a>
+                <a href="{{downloadurl}}&format={{formatods}}">.ODS</a>
+            </div>
         {{/downloadcapability}}
-        <span class="groupsize">{{#str}}total, mod_grouptool{{/str}} {{total}}</span> / {{!
-        }}<span class="registered">{{#str}}registered, mod_grouptool{{/str}} {{registered}}</span> / {{!
-        }}<span class="queued">{{#str}}queued, mod_grouptool{{/str}} {{queued}}</span> / {{!
-        }}<span class="free">{{#str}}free, mod_grouptool{{/str}} {{free}}</span>
+
+        <span class="groupsize">
+            {{#str}}total, mod_grouptool{{/str}} {{total}}
+        </span>
+        /
+        <span class="registered">
+            {{#str}}registered, mod_grouptool{{/str}} {{registered}}
+        </span>
+        /
+        <span class="queued">
+            {{#str}}queued, mod_grouptool{{/str}} {{queued}}
+        </span>
+        /
+        <span class="free">
+            {{#str}}free, mod_grouptool{{/str}} {{free}}
+        </span>
     </div>
 
-    <table class="centeredblock userlist table table-striped table-hover table-condensed">
+    <table class="centeredblock userlist table table-striped table-hover table-condensed grouptool-user-table">
         <thead>
         <tr>
             <th class="text-center">
-                {{#str}}status, mod_grouptool{{/str}}{{#statushelp}}{{>core/help_icon}}{{/statushelp}}
+                {{#str}}status, mod_grouptool{{/str}}
+                {{#statushelp}}
+                    {{>core/help_icon}}
+                {{/statushelp}}
             </th>
-            <th class="">
-                <button type="button" class="btn btn-link p-0 grouptool-sort-name" data-sort-field="lastname">
-                    {{#str}} lastname {{/str}}
+
+            <th>
+                <button type="button"
+                        class="btn btn-link p-0 grouptool-sort-name"
+                        data-sort-field="lastname"
+                        aria-label="{{#str}}lastname{{/str}}">
+
+                    {{#str}}lastname{{/str}}
+
+                    <i class="fa fa-sort grouptool-sort-default"
+                       aria-hidden="true">
+                    </i>
+
+                    <i class="fa fa-sort-up grouptool-sort-ascending d-none"
+                       aria-hidden="true">
+                    </i>
+
+                    <i class="fa fa-sort-down grouptool-sort-descending d-none"
+                       aria-hidden="true">
+                    </i>
                 </button>
+
                 /
-                <button type="button" class="btn btn-link p-0 grouptool-sort-name" data-sort-field="firstname">
-                    {{#str}} firstname {{/str}}
+
+                <button type="button"
+                        class="btn btn-link p-0 grouptool-sort-name"
+                        data-sort-field="firstname"
+                        aria-label="{{#str}}firstname{{/str}}">
+
+                    {{#str}}firstname{{/str}}
+
+                    <i class="fa fa-sort grouptool-sort-default"
+                       aria-hidden="true">
+                    </i>
+
+                    <i class="fa fa-sort-up grouptool-sort-ascending d-none"
+                       aria-hidden="true">
+                    </i>
+
+                    <i class="fa fa-sort-down grouptool-sort-descending d-none"
+                       aria-hidden="true">
+                    </i>
                 </button>
             </th>
+
             {{#useridentity}}
-                <th class="">{{value}}</th>
+                <th>
+                    {{value}}
+                </th>
             {{/useridentity}}
         </tr>
         </thead>
+
         <tbody>
         {{#reg_data}}
-            <tr class="">
-                <td class="status">{{status}}</td>
-                <td class="userlink" data-firstname="{{firstname}}" data-lastname="{{lastname}}">
-                    <a href="{{userlink}}&id={{userid}}" title="{{name}}">
-                    {{lastname}} / {{firstname}}
+            <tr class="grouptool-sortable-user"
+                data-firstname="{{firstname}}"
+                data-lastname="{{lastname}}">
+
+                <td class="status">
+                    {{status}}
+                </td>
+
+                <td class="userlink">
+                    <a href="{{userlink}}&id={{userid}}"
+                    title="{{name}}">
+                    {{name}}
                     </a>
                 </td>
+
                 {{#useridentityvalues}}
-                    <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
+                    <td class="{{key}}">
+                            <span class="{{key}}">
+                                {{value}}
+                            </span>
+                    </td>
                 {{/useridentityvalues}}
             </tr>
         {{/reg_data}}
 
         {{#mreg_data}}
-            <tr class="">
-                <td class="status">{{status}}</td>
-                <td class="userlink" data-firstname="{{firstname}}" data-lastname="{{lastname}}">
-                    <a href="{{userlink}}&id={{userid}}" title="{{name}}">
-                    {{lastname}} / {{firstname}}
+            <tr class="grouptool-sortable-user"
+                data-firstname="{{firstname}}"
+                data-lastname="{{lastname}}">
+
+                <td class="status">
+                    {{status}}
+                </td>
+
+                <td class="userlink">
+                    <a href="{{userlink}}&id={{userid}}"
+                    title="{{name}}">
+                    {{name}}
                     </a>
                 </td>
+
                 {{#useridentityvalues}}
-                    <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
+                    <td class="{{key}}">
+                            <span class="{{key}}">
+                                {{value}}
+                            </span>
+                    </td>
                 {{/useridentityvalues}}
             </tr>
         {{/mreg_data}}
 
-        {{^reg_data}}{{^mreg_data}}
-            <tr class="regentry reg">
-                <td class="no_registrations" colspan="100">{{#str}} no_registrations, mod_grouptool {{/str}}</td>
-            </tr>
-        {{/mreg_data}}{{/reg_data}}
+        {{^reg_data}}
+            {{^mreg_data}}
+                <tr class="regentry reg grouptool-static-row">
+                    <td class="no_registrations"
+                        colspan="100">
+                        {{#str}}no_registrations, mod_grouptool{{/str}}
+                    </td>
+                </tr>
+            {{/mreg_data}}
+        {{/reg_data}}
 
         {{#queue_data}}
-            <tr class="">
-                <td class="status">{{rank}}</td>
+            <tr class="grouptool-sortable-user"
+                data-firstname="{{firstname}}"
+                data-lastname="{{lastname}}">
+
+                <td class="status">
+                    {{rank}}
+                </td>
+
                 <td class="userlink">
-                    <a href="{{userlink}}&id={{userid}}" title="{{name}}">
-                    {{lastname}} / {{firstname}}
+                    <a href="{{userlink}}&id={{userid}}"
+                    title="{{name}}">
+                    {{name}}
                     </a>
                 </td>
+
                 {{#useridentityvalues}}
-                    <td class="{{key}}"><span class="{{key}}">{{value}}</span></td>
+                    <td class="{{key}}">
+                            <span class="{{key}}">
+                                {{value}}
+                            </span>
+                    </td>
                 {{/useridentityvalues}}
             </tr>
         {{/queue_data}}
 
         {{^queue_data}}
-            <tr class="queueentry queue">
-                <td class="no_queues" colspan="100">{{#str}} nobody_queued, mod_grouptool {{/str}}</td>
+            <tr class="queueentry queue grouptool-static-row">
+                <td class="no_queues"
+                    colspan="100">
+                    {{#str}}nobody_queued, mod_grouptool{{/str}}
+                </td>
             </tr>
         {{/queue_data}}
         </tbody>
