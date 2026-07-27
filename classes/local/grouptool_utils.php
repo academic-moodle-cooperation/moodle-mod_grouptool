@@ -481,6 +481,7 @@ class grouptool_utils extends grouptool_instance {
      * @return array ($error, $message)
      * @throws coding_exception
      * @throws dml_exception
+     * @throws moodle_exception
      */
     public function import(array $groups, stdClass|string $data, array $ignored = [], $forceregistration = false, $previewonly = false): array {
         global $DB, $OUTPUT, $USER;

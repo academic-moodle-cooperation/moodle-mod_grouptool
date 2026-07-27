@@ -30,6 +30,7 @@ use coding_exception;
 use dml_exception;
 use mod_grouptool;
 use mod_grouptool\domain\activegroup;
+use mod_grouptool\local\grouptool_instance;
 use renderable;
 use stdClass;
 use const PARAM_ALPHA;
@@ -123,11 +124,11 @@ class sortlist implements renderable {
             [$grpssql, $params] = $DB->get_in_or_equal($groups);
             $grouping = '';
             $groupingwhere = '';
-            if ($this->filter == FILTER_ACTIVE) {
+            if ($this->filter == grouptool_instance::FILTER_ACTIVE) {
                 $activefilter = ' AND active = 1 ';
-            } else if ($this->filter == FILTER_INACTIVE) {
+            } else if ($this->filter == grouptool_instance::FILTER_INACTIVE) {
                 $activefilter = ' AND active = 0 ';
-            } else if ($this->filter == FILTER_ALL) {
+            } else if ($this->filter == grouptool_instance::FILTER_ALL) {
                 $activefilter = '';
             } else if ($this->filter > 10) {
                 $activefilter = '';
