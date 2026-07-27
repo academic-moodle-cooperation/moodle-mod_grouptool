@@ -85,8 +85,8 @@ class unregister_form extends moodleform {
                 'grouptool'
             ));
 
-            $active = new sortlist($course->id, $cm, FILTER_ACTIVE);
-            $inactive = new sortlist($course->id, $cm, FILTER_INACTIVE);
+            $active = new sortlist($course->id, $cm, mod_grouptool\local\grouptool_instance::FILTER_ACTIVE);
+            $inactive = new sortlist($course->id, $cm, mod_grouptool\local\grouptool_instance::FILTER_INACTIVE);
 
             $groups = $mdlform->createElement(
                 'selectgroups',
