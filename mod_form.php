@@ -27,6 +27,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 
@@ -144,11 +146,11 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addHelpButton('allow_reg', 'allow_reg', 'grouptool');
 
         $options = [
-                GROUPTOOL_HIDE_GROUPMEMBERS               => get_string('no'),
-                GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE     => get_string('showafterdue', 'grouptool'),
-                GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
-                GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
-                GROUPTOOL_SHOW_GROUPMEMBERS               => get_string('yes'),
+            GROUPTOOL_HIDE_GROUPMEMBERS => get_string('no'),
+            GROUPTOOL_SHOW_GROUPMEMBERS_AFTER_DUE => get_string('showafterdue', 'grouptool'),
+            GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_DUE => get_string('showownafterdue', 'grouptool'),
+            GROUPTOOL_SHOW_OWN_GROUPMEMBERS_AFTER_REG => get_string('showownafterreg', 'grouptool'),
+            GROUPTOOL_SHOW_GROUPMEMBERS => get_string('yes'),
         ];
         $mform->addElement(
             'select',
@@ -396,8 +398,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         $mform->addHelpButton('moodlesync', 'moodlesync', 'grouptool');
 
         $options = [
-                GROUPTOOL_IGNORE => get_string('ignorechanges', 'grouptool'),
-                GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool'),
+            GROUPTOOL_IGNORE => get_string('ignorechanges', 'grouptool'),
+            GROUPTOOL_FOLLOW => get_string('followchanges', 'grouptool'),
         ];
 
         $mform->addElement(
@@ -432,8 +434,8 @@ class mod_grouptool_mod_form extends moodleform_mod {
         );
 
         $options = [
-                GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
-                GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'),
+            GROUPTOOL_RECREATE_GROUP => get_string('recreate_group', 'grouptool'),
+            GROUPTOOL_DELETE_REF => get_string('delete_reference', 'grouptool'),
         ];
         $mform->addElement(
             'select',
@@ -487,7 +489,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         parent::data_preprocessing($defaultvalues);
 
         $defaultvalues['completionregisterenabled'] =
-                !empty($defaultvalues['completionregister']) ? 1 : 0;
+            !empty($defaultvalues['completionregister']) ? 1 : 0;
         if (empty($defaultvalues['completionregister'])) {
             $defaultvalues['completionregister'] = 1;
         }
@@ -605,7 +607,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['allow_multiple']) && ($data['choose_min'] > $data['choose_max'])) {
             if (isset($errors['choose_max'])) {
                 $errors['choose_max'] .= html_writer::empty_tag('br') .
-                                         get_string('mustbegtoeqmin', 'grouptool');
+                    get_string('mustbegtoeqmin', 'grouptool');
             } else {
                 $errors['choose_max'] = get_string('mustbegtoeqmin', 'grouptool');
             }
@@ -614,11 +616,11 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (!empty($data['allow_multiple']) && ($data['choose_max'] < $maxuserregs)) {
             if (isset($errors['choose_max'])) {
                 $errors['choose_max'] .= html_writer::empty_tag('br') .
-                                         get_string(
-                                             'toomanyregspresent',
-                                             'grouptool',
-                                             $maxuserregs
-                                         );
+                    get_string(
+                        'toomanyregspresent',
+                        'grouptool',
+                        $maxuserregs
+                    );
             } else {
                 $errors['choose_max'] = get_string(
                     'toomanyregspresent',
@@ -634,11 +636,11 @@ class mod_grouptool_mod_form extends moodleform_mod {
         ) {
             if (isset($errors['choose_min'])) {
                 $errors['choose_min'] .= html_writer::empty_tag('br') .
-                                         get_string(
-                                             'toolessregspresent',
-                                             'grouptool',
-                                             $minuserregs
-                                         );
+                    get_string(
+                        'toolessregspresent',
+                        'grouptool',
+                        $minuserregs
+                    );
             } else {
                 $errors['choose_min'] = get_string(
                     'toolessregspresent',
@@ -655,7 +657,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         if (
             (empty($data['allow_multiple']) && !empty($data['completionregister']) &&
                 $data['completionregister'] > 1) || (!empty($data['allow_multiple']) &&
-                        !empty($data['completionregister']) && $data['completionregister'] > $data['choose_max'])
+                !empty($data['completionregister']) && $data['completionregister'] > $data['choose_max'])
         ) {
             $errors['completionregistergroup'] = get_string('moreregsthanpossible', 'grouptool');
         }
@@ -701,6 +703,7 @@ class mod_grouptool_mod_form extends moodleform_mod {
         );
         return ['completionregistergroup' . $suffix];
     }
+
     /**
      * Determines if completion is enabled for this module.
      *

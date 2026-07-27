@@ -25,6 +25,10 @@
 
 namespace mod_grouptool\privacy;
 
+use coding_exception;
+use context;
+use context_module;
+use context_system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\metadata\provider as metadataprovider;
 use core_privacy\local\request\contextlist;
@@ -37,13 +41,14 @@ use core_privacy\local\request\helper;
 use core_privacy\local\request\core_userlist_provider;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\approved_userlist;
-
-defined('MOODLE_INTERNAL') || die();
-
-// Global variable $CFG is always set, but with this little wrapper PHPStorm won't give wrong error messages!
-if (isset($CFG)) {
-    require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-}
+use dml_exception;
+use mod_grouptool;
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\grouptool_instance;
+use mod_grouptool\local\model\group_manager;
+use mod_grouptool\local\model\queue_manager;
+use moodle_exception;
+use stdClass;
 
 /**
  * Privacy class for requesting user data.
@@ -199,7 +204,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
                     "agrpid " . $agrpsql . " AND userid " . $usersql,
                     $agrpparams + $userparams
                 );
-                $instance = new \mod_grouptool($cm->id, $grouptool, $cm);
+                $instance = new queue_manager($cm->id, new grouptool_data_object($grouptool), $cm);
                 foreach ($agrpids as $cur) {
                     $instance->fill_from_queue($cur);
                 }
@@ -213,9 +218,9 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
      *
      *
      * @param approved_contextlist $contextlist contexts that we are writing data out from.
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
@@ -245,7 +250,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         $user = $contextlist->get_user();
 
         foreach ($grouptools as $grouptool) {
-            $context = \context_module::instance($grouptool->cmid);
+            $context = context_module::instance($grouptool->cmid);
             $mappings[$grouptool->id] = $grouptool->contextid;
 
             // Check that the context is a module context.
@@ -259,7 +264,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
             $cm = get_coursemodule_from_instance('grouptool', $grouptool->id);
 
             $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
-            $grouptool = new \mod_grouptool($cm->id, $grouptool, $cm, $course);
+            $grouptool = new grouptool_instance($cm->id, new grouptool_data_object($grouptool), $cm, $course);
 
             writer::with_context($context)->export_data([], $grouptooldata);
 
@@ -275,11 +280,11 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
      * Stores the user preferences related to mod_publication.
      *
      * @param int $userid The user ID that we want the preferences for.
-     * @throws \dml_exception
-     * @throws \coding_exception
+     * @throws dml_exception
+     * @throws coding_exception
      */
     public static function export_user_preferences(int $userid) {
-        $context = \context_system::instance();
+        $context = context_system::instance();
 
         $preferences = [
             'mod_grouptool_group_filter',
@@ -302,13 +307,13 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Export overrides for this grouptool.
      *
-     * @param \context $context Context
-     * @param \mod_grouptool $grouptool The publication object.
-     * @param \stdClass $user The user object.
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @param context $context Context
+     * @param grouptool_instance $grouptool The publication object.
+     * @param stdClass $user The user object.
+     * @throws coding_exception
+     * @throws dml_exception
      */
-    public static function export_regs(\context $context, \mod_grouptool $grouptool, \stdClass $user) {
+    public static function export_regs(context $context, grouptool_instance $grouptool, stdClass $user): void {
         global $DB;
 
         // Get all active groups including inactive indexed by agrpid!
@@ -327,7 +332,7 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
             ['userid' => $user->id, 'modifierid' => $user->id] + $agrpsparams
         );
 
-        $export = new \stdClass();
+        $export = new stdClass();
         $strmarked = get_string('grp_marked', 'grouptool');
         $strregistered = get_string('registered', 'grouptool');
         $strqueued = get_string('queued', 'grouptool');
@@ -374,10 +379,10 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
     /**
      * Delete all use data which matches the specified context.
      *
-     * @param \context $context The module context.
-     * @throws \dml_exception
+     * @param context $context The module context.
+     * @throws dml_exception
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(context $context) {
         global $DB;
 
         if ($context->contextlevel == CONTEXT_MODULE) {
@@ -406,8 +411,8 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
      * Delete all user data for the specified user, in the specified contexts.
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
-     * @throws \dml_exception
-     * @throws \coding_exception
+     * @throws dml_exception
+     * @throws coding_exception
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
@@ -480,10 +485,11 @@ class provider implements core_userlist_provider, metadataprovider, pluginprovid
         $grouptools = $DB->get_records_list('grouptool', 'id', $grouptoolids);
         foreach ($grouptools as $cur) {
             $cm = get_coursemodule_from_instance('grouptool', $cur->id);
-            $grouptool = new \mod_grouptool($cm->id, $cur, $cm);
-            $gtagrps = array_keys($grouptool->get_active_groups(false, false, 0, 0, 0, false));
+            $queuemanager = new queue_manager($cm->id, new grouptool_data_object($cur), $cm);
+            $groupmanager = new group_manager($cm->id, new grouptool_data_object($cur), $cm);
+            $gtagrps = array_keys($groupmanager->get_active_groups(false, false, 0, 0, 0, false));
             foreach (array_intersect($agrpids, $gtagrps) as $agrpid) {
-                $grouptool->fill_from_queue($agrpid);
+                $queuemanager->fill_from_queue($agrpid);
             }
         }
     }

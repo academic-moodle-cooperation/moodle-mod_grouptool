@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 // Because it exists (must)!
 require_once($CFG->dirroot . '/mod/grouptool/backup/moodle2/restore_grouptool_stepslib.php');
 
@@ -165,7 +167,7 @@ class restore_grouptool_activity_task extends restore_activity_task {
             'grouptool',
             'export',
             'download.php?id={course_module}' .
-                                        '&groupingid={grouping}&groupid={group}&format=[format]',
+            '&groupingid={grouping}&groupid={group}&format=[format]',
             '{grouptool}'
         );
         $rules[] = new restore_log_rule(

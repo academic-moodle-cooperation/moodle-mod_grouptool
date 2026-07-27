@@ -73,10 +73,12 @@
             <input type="checkbox" name="selected[]"
                    title="{{#str}}select, grouptool{{/str}}"
                    class="checkbox_status class0 {{#groupingids}} class{{.}}{{/groupingids}}"
-                   value="{{id}}" />
+                   value="{{id}}"/>
         </div>
     </td>
-    <td class="cell c1 buttons js_invisible" data-drag><div>{{#pix}} i/dragdrop, core, {{#str}} drag, grouptool {{/str}}{{/pix}}</div></td>
+    <td class="cell c1 buttons js_invisible" data-drag>
+        <div>{{#pix}} i/dragdrop, core, {{#str}} drag, grouptool {{/str}}{{/pix}}</div>
+    </td>
     <td class="cell c1 grpname" style="text-align:left;width:20%;">
         <div>
             <input type="hidden" name="name[{{id}}]" value="{{name}}" class="form-control"/>

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains mod_grouptool's group rename form
+ * Contains mod_grouptool's confirmation form for imports
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
@@ -23,7 +23,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_grouptool;
+namespace mod_grouptool\form;
+
+use coding_exception;
+use context_module;
+use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,68 +39,58 @@ if (isset($CFG)) {
 }
 
 /**
- * class representing the moodleform used for renaming groups
+ * class representing the moodleform used in the import-tab to confirm import
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class group_rename_form extends \moodleform {
-    /** @var \stdClass */
-    private $course = null;
+class import_confirm_form extends moodleform {
+    /** @var context_module */
+    private $context = null;
 
     /**
-     * Definition of rename form
+     * Definition of import form
      *
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
      */
     protected function definition() {
-        global $DB;
-
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-
-        $mform->addElement('hidden', 'instance');
-        $mform->setDefault('instance', $this->_customdata['instance']);
-        $mform->setType('instance', PARAM_INT);
-
-        $cm = get_coursemodule_from_instance('grouptool', $this->_customdata['instance']);
-        $course = $DB->get_record('course', ['id' => $cm->course]);
-        $this->course = $course;
+        $this->context = context_module::instance($this->_customdata['id']);
 
         $mform->addElement('hidden', 'tab');
-        $mform->setDefault('tab', 'group_admin');
+        $mform->setDefault('tab', 'import');
         $mform->setType('tab', PARAM_TEXT);
 
-        $mform->addElement('hidden', 'courseid');
-        $mform->setDefault('courseid', $course->id);
-        $mform->setType('courseid', PARAM_INT);
+        foreach ($this->_customdata['groups'] as $group) {
+            $mform->addElement('hidden', "groups[$group]");
+            $mform->setDefault("groups[$group]", $group);
+            $mform->setType("groups[$group]", PARAM_INT);
+        }
 
-        $mform->addElement('hidden', 'rename');
-        $mform->setType('rename', PARAM_INT);
-        $mform->setDefault('rename', $this->_customdata['rename']);
+        $mform->addElement('hidden', 'data');
+        $mform->setDefault('data', $this->_customdata['data']);
+        $mform->setType('data', PARAM_NOTAGS);
 
-        $mform->addElement('text', 'name', get_string('name'));
-        $mform->setType('name', PARAM_TEXT);
+        $mform->addElement('hidden', 'forceregistration');
+        $mform->setDefault('forceregistration', $this->_customdata['forceregistration']);
+        $mform->setType('forceregistration', PARAM_BOOL);
 
-        $mform->addElement('hidden', 'courseid');
-        $mform->setDefault('courseid', $course->id);
-        $mform->setType('courseid', PARAM_INT);
+        $mform->addElement('html', $this->_customdata['confirmmessage']);
 
-        $grp = [];
-        $grp[] = $mform->createElement('submit', 'submit', get_string('savechanges'));
-        $grp[] = $mform->createElement('cancel');
-        $mform->addGroup($grp, 'actionbuttons', '', [' '], false);
-        $mform->setType('actionbuttons', PARAM_RAW);
+        $buttonarray = [];
+        $buttonarray[] = &$mform->createElement('submit', 'confirm', get_string('continue'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', [' '], false);
     }
 
     /**
-     * Validation for rename form
+     * Validation for import form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *
@@ -104,25 +98,9 @@ class group_rename_form extends \moodleform {
      * @param array $files array of uploaded files "element_name"=>tmp_file_path
      * @return array of "element_name"=>"error_description" if there are errors,
      *               or an empty array if everything is OK.
-     * @throws \coding_exception
-     * @throws \dml_exception
      */
     public function validation($data, $files) {
-        global $DB;
-
         $errors = parent::validation($data, $files);
-        if (empty($data['name'])) {
-            $errors['name'] = get_string('choose_group', 'grouptool');
-        } else {
-            $group = groups_get_group_by_name($this->course->id, $data['name']);
-            $group = $DB->get_record('groups', ['id' => $group]);
-            if (!empty($group) && ($group->id != $data['rename'])) {
-                $errors['name'] = get_string('groupnameexists', 'group', $data['name']);
-            }
-            if (strlen($data['name']) >= 255) {
-                $errors['name'] = get_string('groupinfo', 'grouptool');
-            }
-        }
 
         return $errors;
     }

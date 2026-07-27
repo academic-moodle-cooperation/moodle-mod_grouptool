@@ -52,8 +52,7 @@ class custom_completion extends activity_custom_completion {
         $userid = $this->userid;
         $cm = $this->cm;
 
-        require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-                // Get grouptool details.
+        // Get grouptool details.
         $grouptool = $DB->get_record('grouptool', ['id' => $cm->instance], '*', MUST_EXIST);
 
         // If completion option is enabled, evaluate it and return true/false.

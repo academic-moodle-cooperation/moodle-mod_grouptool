@@ -19,15 +19,21 @@
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
+ * @author    Anne Kreppenhofer
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
-require_once($CFG->libdir . '/grouplib.php');
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+use core_user\fields;
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\group_manager;
+use mod_grouptool\local\model\permission_manager;
 
-global $OUTPUT, $DB;
+require_once(dirname(__FILE__) . '/../../config.php');
+
+global $OUTPUT, $DB, $PAGE, $CFG;
+
+require_once($CFG->libdir . '/grouplib.php');
 
 $agrpid = required_param('agrpid', PARAM_INT);
 
@@ -49,7 +55,9 @@ require_login($cm->course, true, $cm);
 
 echo $OUTPUT->header();
 
-$grouptool = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
+$permissionmanager = new permission_manager($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
+$groupmanager = new group_manager($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
+
 
 if (
     !has_capability('mod/grouptool:view_regs_group_view', $context)
@@ -62,7 +70,7 @@ if (
     );
 } else {
     $showidnumber = has_capability('mod/grouptool:view_regs_group_view', $context);
-    $group = $grouptool->get_active_groups(true, true, $agrpid);
+    $group = $groupmanager->get_active_groups(true, true, $agrpid);
     $group = current($group);
 
     echo $OUTPUT->heading($group->name, 2, 'showmembersheading');
@@ -99,15 +107,22 @@ if (
     $context->statushelp = $helpicon->export_for_template($OUTPUT);
     $context->name = $group->name;
 
-    // Cache needed user records right now!
-    $userfields = \core_user\fields::for_name()->get_sql();
-    if ($showidnumber) {
-        $fields = "id,idnumber" . $userfields;
-    } else {
-        $fields = "id" . $userfields;
-    }
-    $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
+    // Cache needed user records right now.
+    $userfields = fields::for_name()->get_sql('', false, '', 'id');
 
+    if ($showidnumber) {
+        $fields = 'id, idnumber' . $userfields->selects;
+    } else {
+        $fields = 'id' . $userfields->selects;
+    }
+
+    $userids = array_unique(array_merge($gtregs, $queued));
+
+    if (!empty($userids)) {
+        $users = $DB->get_records_list('user', 'id', $userids, null, $fields);
+    } else {
+        $users = [];
+    }
     $context->absregs = [];
     if (!empty($absregs)) {
         foreach ($absregs as $cur) {

@@ -23,11 +23,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\event\overview_exported;
+use mod_grouptool\local\model\export_service;
+
 require_once('../../config.php');
 
 global $CFG, $DB, $PAGE, $OUTPUT;
-
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
 $cmid = required_param('id', PARAM_INT);
 $cm = get_coursemodule_from_id('grouptool', $cmid);
@@ -37,8 +39,6 @@ $PAGE->set_context($context);
 $url = new moodle_url($CFG->wwwroot . '/mod/grouptool/download.php', ['id' => $cmid]);
 $PAGE->set_url($url);
 $course = $DB->get_record('course', ['id' => $cm->course]);
-
-$instance = new mod_grouptool($cmid, $grouptool, $cm, $course, $context);
 
 
 require_login($cm->course, true, $cm);
@@ -65,7 +65,7 @@ if (empty($cm->uservisible)) {
         $text = '';
     }
     $notification = $OUTPUT->notification(get_string('conditions_prevent_access', 'grouptool') .
-                                          html_writer::empty_tag('br') . $text, 'error');
+        html_writer::empty_tag('br') . $text, 'error');
     echo $OUTPUT->header();
     echo $OUTPUT->box($notification, 'generalbox centered');
     echo $OUTPUT->footer();
@@ -96,16 +96,16 @@ switch ($tab) {
     case 'overview':
         require_capability('mod/grouptool:view_regs_group_view', $context);
         // Trigger overview event.
-        $event = \mod_grouptool\event\overview_exported::create([
-                'objectid' => $cm->instance,
-                'context'  => context_module::instance($cm->id),
-                'other'    => [
+        $event = overview_exported::create([
+            'objectid' => $cm->instance,
+            'context' => context_module::instance($cm->id),
+            'other' => [
                 'tab' => $tab,
                 'format_readable' => $readableformat,
                 'format' => $format,
                 'groupid' => $groupid,
                 'groupingid' => $groupingid,
-                ],
+            ],
         ]);
         $event->trigger();
         break;
@@ -113,25 +113,26 @@ switch ($tab) {
 
 
 // Tab determines which table to download (userlist or group overview)!
+$exportservice = new export_service($cmid, new grouptool_data_object($grouptool), $cm, $course, $context);
 switch ($tab) {
     case 'overview':
         $PAGE->url->param('tab', 'overview');
         switch ($format) {
             case GROUPTOOL_PDF:
                 $PAGE->url->param('format', GROUPTOOL_PDF);
-                $instance->download_overview_pdf($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_pdf($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_TXT:
                 $PAGE->url->param('format', GROUPTOOL_TXT);
-                $instance->download_overview_txt($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_txt($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_XLSX:
                 $PAGE->url->param('format', GROUPTOOL_XLSX);
-                $instance->download_overview_xlsx($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_xlsx($groupid, $groupingid, $includeinactive);
                 break;
             case GROUPTOOL_ODS:
                 $PAGE->url->param('format', GROUPTOOL_ODS);
-                $instance->download_overview_ods($groupid, $groupingid, $includeinactive);
+                $exportservice->download_overview_ods($groupid, $groupingid, $includeinactive);
                 break;
             default:
                 break;

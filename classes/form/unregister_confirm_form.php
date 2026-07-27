@@ -15,14 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains mod_grouptool's confirmation form for imports
+ * Contains mod_grouptool's confirmation form for unregister
  *
  * @package   mod_grouptool
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Hannes Laimer
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool;
+
+namespace mod_grouptool\form;
+
+use coding_exception;
+use context_module;
+use moodleform;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -34,20 +39,21 @@ if (isset($CFG)) {
 }
 
 /**
- * class representing the moodleform used in the import-tab to confirm import
+ * class representing the moodleform used in the unregister-tab to confirm unregister
  *
  * @package   mod_grouptool
- * @author    Philipp Hager
- * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @author    Hannes Laimer
+ * @copyright 2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class import_confirm_form extends \moodleform {
-    /** @var \context_module */
+class unregister_confirm_form extends moodleform {
+    /** @var context_module */
     private $context = null;
+
     /**
-     * Definition of import form
+     * Definition of unregister form
      *
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     protected function definition() {
         $mform = $this->_form;
@@ -55,10 +61,10 @@ class import_confirm_form extends \moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setDefault('id', $this->_customdata['id']);
         $mform->setType('id', PARAM_INT);
-        $this->context = \context_module::instance($this->_customdata['id']);
+        $this->context = context_module::instance($this->_customdata['id']);
 
         $mform->addElement('hidden', 'tab');
-        $mform->setDefault('tab', 'import');
+        $mform->setDefault('tab', 'unregister');
         $mform->setType('tab', PARAM_TEXT);
 
         foreach ($this->_customdata['groups'] as $group) {
@@ -71,9 +77,9 @@ class import_confirm_form extends \moodleform {
         $mform->setDefault('data', $this->_customdata['data']);
         $mform->setType('data', PARAM_NOTAGS);
 
-        $mform->addElement('hidden', 'forceregistration');
-        $mform->setDefault('forceregistration', $this->_customdata['forceregistration']);
-        $mform->setType('forceregistration', PARAM_BOOL);
+        $mform->addElement('hidden', 'unregfrommgroups');
+        $mform->setDefault('unregfrommgroups', $this->_customdata['unregfrommgroups']);
+        $mform->setType('unregfrommgroups', PARAM_BOOL);
 
         $mform->addElement('html', $this->_customdata['confirmmessage']);
 
@@ -84,7 +90,7 @@ class import_confirm_form extends \moodleform {
     }
 
     /**
-     * Validation for import form
+     * Validation for unregister form
      * If there are errors return array of errors ("fieldname"=>"error message"),
      * otherwise true if ok.
      *

@@ -22,26 +22,22 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\local\exception;
+
+namespace mod_grouptool\exception;
 
 /**
- * General exception during the registration/queue/marking process!
+ * Exception when the user's queue limit will be exceeded!
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class registration extends \moodle_exception {
+class exceeduserqueuelimit extends registration {
     /**
      * Constructor
-     *
-     * @param string $description (optional) exception description string identifier
-     * @param string $module (optional) location of the string definition
-     * @param mixed $a (optional) additional data used in the language string
      */
-    public function __construct($description = 'general_registration_exception', $module = 'grouptool', $a = null) {
-
-        parent::__construct($description, $module, '', $a);
+    public function __construct() {
+        parent::__construct('exceeduserqueuelimit', 'grouptool');
     }
 }

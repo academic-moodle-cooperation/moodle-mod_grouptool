@@ -25,6 +25,8 @@
 
 namespace mod_grouptool\event;
 
+use coding_exception;
+
 /**
  * The \mod_grouptool\registration_deleted class holds the logic for the event
  *
@@ -52,7 +54,7 @@ class registration_deleted extends registration {
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventregistrationdeleted', 'grouptool');

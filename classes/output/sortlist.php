@@ -25,6 +25,17 @@
 
 namespace mod_grouptool\output;
 
+use cm_info;
+use coding_exception;
+use dml_exception;
+use mod_grouptool;
+use mod_grouptool\domain\activegroup;
+use mod_grouptool\local\grouptool_instance;
+use renderable;
+use stdClass;
+use const PARAM_ALPHA;
+use const PARAM_BOOL;
+
 /**
  * Representation a sortable collection of active groups with advanced fields!
  *
@@ -33,12 +44,12 @@ namespace mod_grouptool\output;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class sortlist implements \renderable {
+class sortlist implements renderable {
     /** @var string $tableclass CSS class for table */
     public $tableclass = 'coloredrows';
-    /** @var \stdClass[] $groupings array of non-empty groupings of this course */
+    /** @var stdClass[] $groupings array of non-empty groupings of this course */
     public $groupings = [];
-    /** @var \mod_grouptool\output\activegroup[] $groups array of activegroups */
+    /** @var activegroup[] $groups array of activegroups */
     public $groups = [];
     /** @var int $globalsize active groups standard/global group size */
     public $globalsize = 0;
@@ -46,7 +57,7 @@ class sortlist implements \renderable {
     public $usesize = 0;
     /** @var int $filter current filter (all/active/inactive) */
     public $filter = null;
-    /** @var \stdClass | \cm_info $cm course module object */
+    /** @var stdClass | cm_info $cm course module object */
     public $cm = null;
     /** @var array */
     public $selected = [];
@@ -59,10 +70,10 @@ class sortlist implements \renderable {
      * Constructor
      *
      * @param int $courseid ID of related course
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param int $filter optional current filter (active/inactive/all)
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function __construct($courseid, $cm, $filter = null) {
         global $SESSION, $DB, $OUTPUT;
@@ -76,9 +87,9 @@ class sortlist implements \renderable {
             $this->usesize = $grouptool->use_size;
         }
 
-        $this->selected = optional_param_array('selected', null, \PARAM_BOOL);
+        $this->selected = optional_param_array('selected', null, PARAM_BOOL);
         if (!isset($SESSION->sortlist)) {
-            $SESSION->sortlist = new \stdClass();
+            $SESSION->sortlist = new stdClass();
         }
         if (!isset($SESSION->sortlist->selected)) {
             $SESSION->sortlist->selected = [];
@@ -95,9 +106,9 @@ class sortlist implements \renderable {
      * Load the groups from DB
      *
      * @param int $courseid Course for whom to fetch the groups
-     * @param \stdClass|int $cm course module object or ID
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @param stdClass|int $cm course module object or ID
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function loadgroups($courseid, $cm) {
         global $DB;
@@ -113,11 +124,11 @@ class sortlist implements \renderable {
             [$grpssql, $params] = $DB->get_in_or_equal($groups);
             $grouping = '';
             $groupingwhere = '';
-            if ($this->filter == \mod_grouptool::FILTER_ACTIVE) {
+            if ($this->filter == grouptool_instance::FILTER_ACTIVE) {
                 $activefilter = ' AND active = 1 ';
-            } else if ($this->filter == \mod_grouptool::FILTER_INACTIVE) {
+            } else if ($this->filter == grouptool_instance::FILTER_INACTIVE) {
                 $activefilter = ' AND active = 0 ';
-            } else if ($this->filter == \mod_grouptool::FILTER_ALL) {
+            } else if ($this->filter == grouptool_instance::FILTER_ALL) {
                 $activefilter = '';
             } else if ($this->filter > 10) {
                 $activefilter = '';
@@ -189,8 +200,8 @@ class sortlist implements \renderable {
     /**
      * Compare if two groups are in correct order
      *
-     * @param \mod_grouptool\output\activegroup $a
-     * @param \mod_grouptool\output\activegroup $b
+     * @param activegroup $a
+     * @param activegroup $b
      *
      * @return int -1 (a > b)| 0 (a == b)| 1 (a > b)
      */
@@ -205,12 +216,12 @@ class sortlist implements \renderable {
     /**
      * Update the element selected-state if corresponding params are set
      *
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function refresh_select_state() {
         global $COURSE;
-        $action = optional_param('class_action', 0, \PARAM_ALPHA);
-        $gobutton = optional_param('do_class_action', 0, \PARAM_BOOL);
+        $action = optional_param('class_action', 0, PARAM_ALPHA);
+        $gobutton = optional_param('do_class_action', 0, PARAM_BOOL);
 
         if (empty($gobutton)) {
             return;

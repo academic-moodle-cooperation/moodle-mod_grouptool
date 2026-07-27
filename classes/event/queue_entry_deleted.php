@@ -22,7 +22,16 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use cm_info;
+use coding_exception;
+use context_module;
+use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * The \mod_grouptool\queue_entry_deleted class holds the logic for the event
@@ -32,7 +41,7 @@ namespace mod_grouptool\event;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class queue_entry_deleted extends \core\event\base {
+class queue_entry_deleted extends base {
     /**
      * Init method.
      *
@@ -47,17 +56,17 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted by observer/eventhandler
      *
-     * @param \stdClass|\cm_info $cm course module object
-     * @param \stdClass $entrydata data of deleted queue entry
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @param stdClass|cm_info $cm course module object
+     * @param stdClass $entrydata data of deleted queue entry
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_via_eventhandler(\stdClass | \cm_info $cm, \stdClass $entrydata) {
+    public static function create_via_eventhandler(stdClass|cm_info $cm, stdClass $entrydata) {
         $entrydata->source = 'event';
         $event = self::create([
             'objectid' => $entrydata->id,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => (array)$entrydata,
+            'context' => context_module::instance($cm->id),
+            'other' => (array)$entrydata,
         ]);
         return $event;
     }
@@ -65,17 +74,17 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted i.e. because user has enough registrations
      *
-     * @param \stdClass|\cm_info $cm course module object
-     * @param \stdClass $entrydata data of deleted queue entry
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @param stdClass|cm_info $cm course module object
+     * @param stdClass $entrydata data of deleted queue entry
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_limit_violation(\stdClass | \cm_info $cm, \stdClass $entrydata) {
+    public static function create_limit_violation(stdClass|cm_info $cm, stdClass $entrydata) {
         $entrydata->reason = 'registration limit violation';
         $event = self::create([
             'objectid' => $entrydata->id,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => (array)$entrydata,
+            'context' => context_module::instance($cm->id),
+            'other' => (array)$entrydata,
         ]);
         return $event;
     }
@@ -83,18 +92,18 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Convenience method to create event object if queue entry is deleted by direct user action
      *
-     * @param \stdClass|\cm_info $cm course module object
-     * @param \stdClass $entrydata data of deleted queue entry
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @param stdClass|cm_info $cm course module object
+     * @param stdClass $entrydata data of deleted queue entry
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_direct(\stdClass | \cm_info $cm, \stdClass $entrydata) {
+    public static function create_direct(stdClass|cm_info $cm, stdClass $entrydata) {
         $entrydata->source = null;
         $entrydata->reason = null;
         $event = self::create([
             'objectid' => $entrydata->id,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => (array)$entrydata,
+            'context' => context_module::instance($cm->id),
+            'other' => (array)$entrydata,
         ]);
         return $event;
     }
@@ -118,15 +127,15 @@ class queue_entry_deleted extends \core\event\base {
         }
 
         return "The queue entry for the user with id '" . $this->data['other']['userid'] .
-               "' in agrp with id '" . $this->data['other']['agrpid'] . "'" .
-               " in " . $this->objecttable . " with course module id '$this->contextinstanceid' was deleted" . $source . $reason;
+            "' in agrp with id '" . $this->data['other']['agrpid'] . "'" .
+            " in " . $this->objecttable . " with course module id '$this->contextinstanceid' was deleted" . $source . $reason;
     }
 
     /**
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventqueueentrydeleted', 'grouptool');
@@ -135,13 +144,13 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", [
-            'id'      => $this->contextinstanceid,
-            'tab'     => 'overview',
+        return new moodle_url("/mod/$this->objecttable/view.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => 'overview',
             'groupid' => $this->data['other']['groupid'],
         ]);
     }
@@ -149,31 +158,31 @@ class queue_entry_deleted extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The queue_entry_deleted event must define objectid and object table.');
+            throw new coding_exception('The queue_entry_deleted event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         // ...groupid, agrpid, userid.
         if (empty($this->data['other']['groupid'])) {
-            throw new \coding_exception('Groupid has to be specified!');
+            throw new coding_exception('Groupid has to be specified!');
         }
 
         if (empty($this->data['other']['agrpid'])) {
-            throw new \coding_exception('Active-Group-ID has to be specified!');
+            throw new coding_exception('Active-Group-ID has to be specified!');
         }
 
         if (empty($this->data['other']['userid'])) {
-            throw new \coding_exception('User-ID has to be specified!');
+            throw new coding_exception('User-ID has to be specified!');
         }
     }
 }

@@ -22,12 +22,17 @@
  * @copyright     2017 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\queue_manager;
+
 defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
 
 require_once($CFG->libdir . "/externallib.php");
 require_once($CFG->libdir . '/grouplib.php');
 require_once($CFG->dirroot . '/group/lib.php');
-require_once($CFG->dirroot . "/mod/grouptool/locallib.php");
 
 /**
  * Grouptool's external class containing all external functions!
@@ -275,8 +280,8 @@ class mod_grouptool_external extends external_api {
         $agrpid = $DB->get_field('grouptool_agrps', 'id', ['grouptoolid' => $cm->instance, 'groupid' => $params['groupid']]);
         $grouptoolrec = $DB->get_record('grouptool', ['id' => $cm->instance]);
         if (!empty($grouptoolrec->use_queue)) {
-            $grouptool = new mod_grouptool($cm->id, $grouptoolrec, $cm, $course);
-            $grouptool->fill_from_queue($agrpid);
+            $queuemangaer = new queue_manager($cmid, new grouptool_data_object($grouptoolrec), $cm, $course, $context);
+            $queuemangaer->fill_from_queue($agrpid);
         }
 
         return $result;
@@ -505,9 +510,9 @@ class mod_grouptool_external extends external_api {
                 ]);
                 if (
                     !$DB->record_exists('grouptool_agrps', [
-                    'groupid' => $cur['groupid'],
-                    'grouptoolid' => $cm->instance,
-                    'sort_order' => $cur['order'],
+                        'groupid' => $cur['groupid'],
+                        'grouptoolid' => $cm->instance,
+                        'sort_order' => $cur['order'],
                     ])
                 ) {
                     $failed[] = "groupid " . $cur['groupid'];

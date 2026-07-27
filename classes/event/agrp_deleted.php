@@ -22,7 +22,15 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use coding_exception;
+use context_module;
+use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * The \mod_grouptool\agrp_deleted class holds the logic for the event.
@@ -32,7 +40,7 @@ namespace mod_grouptool\event;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class agrp_deleted extends \core\event\base {
+class agrp_deleted extends base {
     /**
      * Init method.
      *
@@ -47,14 +55,14 @@ class agrp_deleted extends \core\event\base {
     /**
      * Create object from data object and set properties.
      *
-     * @param \stdClass $data event data
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @param stdClass $data event data
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function create_from_object(\stdClass $data) {
+    public static function create_from_object(stdClass $data) {
         $event = self::create([
             'objectid' => $data->id,
-            'context' => \context_module::instance($data->cmid),
+            'context' => context_module::instance($data->cmid),
             'other' => $data,
         ]);
         return $event;
@@ -63,11 +71,11 @@ class agrp_deleted extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
+        return new moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
@@ -76,16 +84,16 @@ class agrp_deleted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-            return "The active group with id '" . $this->data['other']->agrpid . "' " .
-                   "representing group with id '" . $this->data['other']->groupid . "' " .
-                   "in grouptool with the course module id '$this->contextinstanceid' has been deleted.";
+        return "The active group with id '" . $this->data['other']->agrpid . "' " .
+            "representing group with id '" . $this->data['other']->groupid . "' " .
+            "in grouptool with the course module id '$this->contextinstanceid' has been deleted.";
     }
 
     /**
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventagrpdeleted', 'grouptool');
@@ -94,32 +102,32 @@ class agrp_deleted extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
 
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The agrp_deleted event must define objectid and object table.');
+            throw new coding_exception('The agrp_deleted event must define objectid and object table.');
         }
 
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         if (empty($this->data['other']->cmid)) {
-            throw new \coding_exception('CMID must be specified.');
+            throw new coding_exception('CMID must be specified.');
         }
 
         if (empty($this->data['other']->groupid)) {
-            throw new \coding_exception('Group-ID must be specified.');
+            throw new coding_exception('Group-ID must be specified.');
         }
 
         if (empty($this->data['other']->agrpid)) {
-            throw new \coding_exception('Active-Group-ID must be specified.');
+            throw new coding_exception('Active-Group-ID must be specified.');
         }
     }
 }

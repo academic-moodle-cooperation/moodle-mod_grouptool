@@ -14,99 +14,117 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript handling pop-over displaying group members
+ * Javascript handling pop-over displaying group members.
  *
  * @module   mod_grouptool/memberspopup
- * @author    Philipp Hager
+ * @author   Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- /**
-  * @module mod_grouptool/memberspopup
-  */
-define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str', 'core/log'], function($, ModalFactory, templates,
-                                                                                                        url, str, log) {
+
+define([
+    'jquery',
+    'core/modal',
+    'core/templates',
+    'core/url',
+    'core/str',
+    'core/log'
+], function($, Modal, Templates, Url, Str, Log) {
+
+    Log.info('Loading groupmembers JS...', 'mod_grouptool');
 
     /**
+     * Constructor.
+     *
      * @constructor
      * @alias module:mod_grouptool/memberspopup
      */
     var Memberspopup = function() {
         this.showidnumber = false;
         this.courseid = '';
+        this.modal = null;
+        this.modalpromise = null;
     };
 
     var instance = new Memberspopup();
 
     /**
-     * Initializes the JS module
-     * @param {object} config
+     * Initializes the JS module.
+     *
+     * @param {Object} config Configuration object.
+     * @param {Boolean} config.showidnumber Whether idnumber should be shown.
+     * @param {Number|String} config.courseid Course id.
      */
     instance.initializer = function(config) {
-
         instance.showidnumber = config.showidnumber;
         instance.courseid = config.courseid;
 
-        log.info('Initialize groupmembers JS!', 'mod_grouptool');
+        Log.info('Initialize groupmembers JS!', 'mod_grouptool');
 
-        if (!instance.modal) {
-            instance.modalpromise = ModalFactory.create({
-                type: ModalFactory.types.MODAL,
+        if (!instance.modalpromise) {
+            instance.modalpromise = Modal.create({
                 body: '...'
             });
         }
 
-        str.get_string('groupmembers').done(function(s) {
-            log.info('Done loading strings...', 'mod_grouptool');
-            instance.modalpromise.done(function(modal) {
-                log.info('Done preparing modal...', 'mod_grouptool');
+        Str.get_string('groupmembers').done(function(groupmembersstring) {
+            Log.info('Done loading strings...', 'mod_grouptool');
+
+            instance.modalpromise.then(function(modal) {
+                Log.info('Done preparing modal...', 'mod_grouptool');
+
                 instance.modal = modal;
-                $('#registration_form').on('click', 'span.memberstooltip > a', null, function(e) {
+
+                $('#registration_form').on('click', 'span.memberstooltip > a', function(e) {
                     e.stopPropagation();
                     e.preventDefault();
-                    var element = $(e.target);
 
+                    var element = $(e.currentTarget);
                     var statushelp = element.parents('form').data('statushelp');
 
-                    var absregs;
+                    var absregs = [];
+                    var gtregs = [];
+                    var mregs = [];
+                    var queued = [];
+
                     try {
-                        absregs = element.data('absregs');
+                        absregs = element.data('absregs') || [];
                     } catch (ex) {
                         absregs = [];
                     }
 
-                    var gtregs;
                     try {
-                        gtregs = element.data('gtregs');
+                        gtregs = element.data('gtregs') || [];
                     } catch (ex) {
                         gtregs = [];
                     }
 
-                    var mregs;
                     try {
-                        mregs = element.data('mregs');
+                        mregs = element.data('mregs') || [];
                     } catch (ex) {
                         mregs = [];
                     }
 
-                    var queued;
                     try {
-                        queued = element.data('queued');
+                        queued = element.data('queued') || [];
                     } catch (ex) {
                         queued = [];
                     }
 
-                    var name;
+                    var name = groupmembersstring;
+
                     try {
-                        name = s + ': ' + element.data('name');
+                        if (element.data('name')) {
+                            name = groupmembersstring + ': ' + element.data('name');
+                        }
                     } catch (ex) {
-                        name = s;
+                        name = groupmembersstring;
                     }
 
                     var context = {
                         courseid: instance.courseid,
                         showidnumber: instance.showidnumber,
-                        profileurl: url.relativeUrl("/user/view.php?course=" + instance.courseid + "&id="),
+                        profileurl: Url.relativeUrl('/user/view.php?course=' + instance.courseid + '&id='),
                         statushelp: statushelp,
                         absregs: absregs,
                         gtregs: gtregs,
@@ -114,24 +132,33 @@ define(['jquery', 'core/modal_factory', 'core/templates', 'core/url', 'core/str'
                         queued: queued
                     };
 
-                    // This will call the function to load and render our template.
-                    var promise = templates.render('mod_grouptool/groupmembers', context);
+                    Templates.render('mod_grouptool/groupmembers', context)
+                        .then(function(source) {
+                            instance.modal.setTitle(name);
+                            instance.modal.setBody(source);
+                            instance.modal.show();
 
-                    // How we deal with promise objects is by adding callbacks.
-                    promise.done(function(source) {
-                        // Here eventually I have my compiled template, and any javascript that it generated.
-                        instance.modal.setTitle(name);
-                        instance.modal.setBody(source);
-                        instance.modal.show();
-                    }).fail(function(ex) {
-                        // Deal with this exception (I recommend core/notify exception function for this).
-                        instance.modal.setBody(ex.message);
-                        instance.modal.show();
-                    });
+                            return source;
+                        })
+                        .catch(function(ex) {
+                            Log.error('Error rendering groupmembers template: ' + ex, 'mod_grouptool');
+
+                            if (ex && ex.message) {
+                                instance.modal.setBody(ex.message);
+                            } else {
+                                instance.modal.setBody(String(ex));
+                            }
+
+                            instance.modal.show();
+                        });
                 });
+
+                return modal;
+            }).catch(function(ex) {
+                Log.error('Error preparing modal: ' + ex, 'mod_grouptool');
             });
         }).fail(function(ex) {
-            log.error("Error getting strings: " + ex, "mod_grouptool");
+            Log.error('Error getting strings: ' + ex, 'mod_grouptool');
         });
     };
 

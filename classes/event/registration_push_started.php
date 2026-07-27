@@ -22,8 +22,16 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use cm_info;
+use coding_exception;
+use context_module;
 use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * The \mod_grouptool\registration_push_started class holds the logic for the event
@@ -33,7 +41,7 @@ use core\event\base;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class registration_push_started extends \core\event\base {
+class registration_push_started extends base {
     /**
      * Init method.
      *
@@ -48,14 +56,14 @@ class registration_push_started extends \core\event\base {
     /**
      * Convenience method to create event object from course module object
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @return base event object
-     * @throws \coding_exception
+     * @throws coding_exception
      */
-    public static function create_from_object(\stdClass | \cm_info $cm) {
+    public static function create_from_object(stdClass|cm_info $cm) {
         $event = self::create([
             'objectid' => $cm->instance,
-            'context' => \context_module::instance($cm->id),
+            'context' => context_module::instance($cm->id),
         ]);
         return $event;
     }
@@ -67,14 +75,14 @@ class registration_push_started extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' started pushing registrations in '{$this->objecttable}' with the " .
-               "course module id '$this->contextinstanceid' to moodle groups.";
+            "course module id '$this->contextinstanceid' to moodle groups.";
     }
 
     /**
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventregistrationpushstarted', 'grouptool');
@@ -83,28 +91,28 @@ class registration_push_started extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
+        return new moodle_url("/mod/$this->objecttable/view.php", ['id' => $this->contextinstanceid, 'tab' => 'overview']);
     }
 
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
         // Make sure this class is never used without proper object details.
         if (empty($this->objectid) || empty($this->objecttable)) {
-            throw new \coding_exception('The registration_push_started event must define objectid and object table.');
+            throw new coding_exception('The registration_push_started event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
     }
 }

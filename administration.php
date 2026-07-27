@@ -23,8 +23,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\view_controller;
+
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
+
+global $SESSION, $OUTPUT, $CFG, $DB, $USER, $PAGE;
+
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/mod/grouptool/lib.php');
@@ -36,7 +41,7 @@ require_once($CFG->libdir . '/pdflib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-global $SESSION, $OUTPUT, $CFG, $DB, $PAGE;
+
 
 /** @var int Show all groups in filters. */
 const FILTER_ALL = 0;
@@ -129,9 +134,7 @@ if ($mainnode) {
         $groupcreationnode->make_active();
     }
 }
-
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
-
+$viewcontroller = new view_controller($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 echo $OUTPUT->header();
 
 if (!$canadministrategroups) {
@@ -141,7 +144,7 @@ if (!$canadministrategroups) {
 
 switch ($tab) {
     case 'group_creation':
-        $instance->view_creation();
+        $viewcontroller->view_creation();
         break;
 
     case 'noaccess':
@@ -152,8 +155,7 @@ switch ($tab) {
         break;
 
     default:
-        $instance->view_administration();
-        break;
+        $viewcontroller->view_administration();
 }
 
 echo $OUTPUT->footer();

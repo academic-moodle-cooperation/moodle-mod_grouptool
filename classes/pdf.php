@@ -25,8 +25,11 @@
 
 namespace mod_grouptool;
 
+use coding_exception;
 use context_course;
-use mod_grouptool\local\tests\grouptool;
+use core_user\fields;
+use mod_grouptool\local\grouptool_utils;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -96,7 +99,7 @@ class pdf extends \pdf {
      * @param string $format The format used for pages
      * @param bool $unicode TRUE means that the input text is unicode (default = true)
      * @param string $encoding Charset encoding (used only when converting back html entities); default is UTF-8.
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function __construct(
         $type,
@@ -133,7 +136,7 @@ class pdf extends \pdf {
             );
         }
 
-        $this->useridentityfields = grouptool::get_useridentity_fields();
+        $this->useridentityfields = grouptool_utils::get_useridentity_fields();
         $this->setFontSubsetting(false);
 
         // Set orientation (P/L)!
@@ -141,8 +144,13 @@ class pdf extends \pdf {
         $this->setPageOrientation($orientation);
 
         // Set document information!
-        $this->SetCreator(format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]) . ' | ' .
-            get_string('pluginname', 'grouptool'));
+        $this->SetCreator(
+            format_string(
+                $SITE->fullname,
+                true,
+                ['context' => context_course::instance(SITEID)]
+            ) . ' | ' . get_string('pluginname', 'grouptool')
+        );
         $this->SetAuthor(fullname($USER));
 
         // Set header/footer!
@@ -200,7 +208,7 @@ class pdf extends \pdf {
      * @param int $timeavailable time since the checkmark is available
      * @param int $timedue time due to which students can submit
      * @param string $viewname the checkmark-modulename to view
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function set_overview_header_data(
         $coursename = 'coursename',
@@ -232,7 +240,7 @@ class pdf extends \pdf {
      * @param int $timeavailable time since the checkmark is available
      * @param int $timedue time due to which students can submit
      * @param string $viewname the checkmark-modulename to view
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function set_userlist_header_data(
         $coursename,
@@ -264,7 +272,7 @@ class pdf extends \pdf {
      * @param int $timeavailable time since the checkmark is available
      * @param int $timedue time due to which students can submit
      * @param string $viewname the grouptool-modulename to view
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function set_header_data(
         $coursename,
@@ -607,10 +615,10 @@ class pdf extends \pdf {
      *
      * @param string $groupname
      * @param string $groupinfo some statistic data about the group
-     * @param \stdClass[] $registration the users registered in grouptool-group
-     * @param \stdClass[] $queue the queued users
-     * @param \stdClass[] $moodlemembers the users registered in moodle-group
-     * @throws \coding_exception
+     * @param stdClass[] $registration the users registered in grouptool-group
+     * @param stdClass[] $queue the queued users
+     * @param stdClass[] $moodlemembers the users registered in moodle-group
+     * @throws coding_exception
      */
     public function add_grp_overview($groupname, $groupinfo, $registration = [], $queue = [], $moodlemembers = []) {
         $fill = 0;
@@ -770,7 +778,7 @@ class pdf extends \pdf {
     /**
      * Writes the table header for overview tables to the PDF
      *
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     private function add_overview_table_header() {
         // Print table-header!
@@ -850,7 +858,7 @@ class pdf extends \pdf {
                 $this->MultiCell(
                     $identitycolumnwidth * $writewidth,
                     $normalheight,
-                    \core_user\fields::get_display_name($key),
+                    fields::get_display_name($key),
                     $border,
                     'C',
                     true,
@@ -968,7 +976,7 @@ class pdf extends \pdf {
      * @param array $row Array containing all data of a single row
      * @param bool $fill Rather or not the current line is filled with a shade of lightgrey. Is toggled after every call.
      * @param bool $forcefill Force the current row to be filled with a shade of lightgrey
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     private function add_overview_row($row, &$fill, $forcefill = false) {
         $margins = $this->getMargins();
@@ -1083,7 +1091,7 @@ class pdf extends \pdf {
      * @param bool $header if it's a header-row or not
      * @param bool $getheightonly return only the height of the row
      * @return int height of written row
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function add_userdata($row, $header = false, $getheightonly = false) {
         global $SESSION;

@@ -24,15 +24,15 @@
  */
 
 // @codingStandardsIgnoreLine
-if (((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
-    || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))
+if (
+    ((isset($_POST['tab']) && $_POST['tab'] === 'import') || (isset($_GET['tab']) && $_GET['tab'] === 'import')
+        || (isset($_POST['tab']) && $_POST['tab'] === 'unregister') || (isset($_GET['tab']) && $_GET['tab'] === 'unregister'))
 ) {
     // @codingStandardsIgnoreLine
     define('NO_OUTPUT_BUFFERING', true);
 }
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 require_once($CFG->dirroot . '/mod/grouptool/definitions.php');
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/mod/grouptool/lib.php');
@@ -42,7 +42,8 @@ require_once($CFG->libdir . '/gradelib.php');
 require_once($CFG->libdir . '/grade/grade_grade.php');
 require_once($CFG->libdir . '/pdflib.php');
 
-defined('MOODLE_INTERNAL') || die();
+use mod_grouptool\domain\grouptool_data_object;
+use mod_grouptool\local\model\view_controller;
 
 global $SESSION, $OUTPUT, $CFG, $DB, $PAGE;
 
@@ -113,7 +114,7 @@ if ($mainnode = $PAGE->navigation->find('mod_grouptool_registration', null)) {
     }
 }
 
-$instance = new mod_grouptool($cm->id, $grouptool, $cm, $course, $context);
+$viewcontroller = new view_controller($cm->id, new grouptool_data_object($grouptool), $cm, $course, $context);
 
 if (!$canviewregistrations) {
     $SESSION->mod_grouptool->currenttab = 'noaccess';
@@ -134,8 +135,7 @@ switch ($tab) {
             $select = new single_select($url, 'tab', $options, 'import', false);
             echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         }
-
-        $instance->view_import();
+        $viewcontroller->view_import();
         break;
 
     case 'unregister':
@@ -143,8 +143,7 @@ switch ($tab) {
             $select = new single_select($url, 'tab', $options, 'unregister', false);
             echo html_writer::tag('div', $OUTPUT->render($select), ['class' => 'grouptool_manage_user_select']) . '<br>';
         }
-
-        $instance->view_unregister();
+        $viewcontroller->view_unregister();
         break;
 
     case 'noaccess':
@@ -155,8 +154,7 @@ switch ($tab) {
         break;
 
     default:
-        $instance->view_overview();
-        break;
+        $viewcontroller->view_overview();
 }
 
 echo $OUTPUT->footer();

@@ -22,7 +22,12 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\output;
+
+namespace mod_grouptool\domain;
+
+use dml_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * Representation of single group with additional data!
@@ -54,19 +59,19 @@ class activegroup {
     /** @var bool $selected active groups selection status (selected or not) */
     public $selected;
 
-    /** @var bool  */
+    /** @var bool */
     public $checked = false;
 
-    /** @var \moodle_url url to edit this group*/
+    /** @var moodle_url url to edit this group */
     public $editurl = null;
 
-    /** @var array  */
+    /** @var array */
     public $groupingid = [];
 
-    /** @var bool  true if the status of the group is missing*/
+    /** @var bool  true if the status of the group is missing */
     public $missing = false;
 
-    /** @var null not empty if there is a grouppicture used*/
+    /** @var null not empty if there is a grouppicture used */
     public $grouppix = null;
 
     /** @var array array of grouping ids */
@@ -100,8 +105,8 @@ class activegroup {
     /**
      * Convenience method using data in object
      *
-     * @param \stdClass $data Object containing all necessary data
-     * @return \mod_grouptool\output\activegroup active group object
+     * @param stdClass $data Object containing all necessary data
+     * @return activegroup active group object
      */
     public static function construct_from_obj($data) {
         return new activegroup(
@@ -122,8 +127,8 @@ class activegroup {
      *
      * @param int $groupid ID of related moodle-group
      * @param int $grouptoolid ID of related grouptool instance
-     * @return \mod_grouptool\output\activegroup active group object
-     * @throws \dml_exception
+     * @return activegroup active group object
+     * @throws dml_exception
      */
     public function get_by_groupid($groupid, $grouptoolid) {
         global $DB;
@@ -156,7 +161,7 @@ class activegroup {
      * Load active groups related groupings
      *
      * @return void
-     * @throws \dml_exception
+     * @throws dml_exception
      */
     public function load_groupings() {
         global $DB;

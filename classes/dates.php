@@ -22,9 +22,11 @@
  * @copyright 2021 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool;
 
 use core\activity_dates;
+use mod_grouptool\local\grouptool_instance;
 
 /**
  * Class for fetching the important dates in mod_assign for a given module instance and a user.
@@ -41,10 +43,8 @@ class dates extends activity_dates {
     protected function get_dates(): array {
         global $CFG;
 
-        require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
-
         $course = get_course($this->cm->course);
-        $grouptool = new \mod_grouptool($this->cm->id, null, $this->cm, $course);
+        $grouptool = new grouptool_instance($this->cm->id, null, $this->cm, $course);
         $grouptoolsettings = $grouptool->get_settings();
 
         $timeopen = $grouptoolsettings->timeavailable ?? null;
@@ -55,7 +55,7 @@ class dates extends activity_dates {
         if ($timeopen) {
             $date = [
                 'label' => get_string('availabledate', 'mod_grouptool') . ':',
-                'timestamp' => (int) $timeopen,
+                'timestamp' => (int)$timeopen,
             ];
             $dates[] = $date;
         }
@@ -63,7 +63,7 @@ class dates extends activity_dates {
         if ($timedue) {
             $date = [
                 'label' => get_string('duedate', 'mod_grouptool') . ':',
-                'timestamp' => (int) $timedue,
+                'timestamp' => (int)$timedue,
             ];
             $dates[] = $date;
         }

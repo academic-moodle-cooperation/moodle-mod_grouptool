@@ -22,9 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- /**
-  * @module mod_grouptool/multiseltoggle
-  */
+/**
+ * @module mod_grouptool/multiseltoggle
+ */
 define(['jquery', 'core/str', 'core/log'], function($, str, log) {
 
     var PLUS = 'fa-plus'; // Alternatives: 'fa-plus-square' or 'fa-plus-square-o'!

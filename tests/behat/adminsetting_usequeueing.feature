@@ -6,14 +6,14 @@ Feature: Within a moodle instance, an administrator should be able to set the va
 
   Background:
     Given the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher1 | Teacher | 1 | teacher1@example.com |
+      | username | firstname | lastname | email                |
+      | teacher1 | Teacher   | 1        | teacher1@example.com |
     And the following "courses" exist:
       | fullname | shortname | category | groupmode |
-      | Course 1 | C1 | 0 | 1|
+      | Course 1 | C1        | 0        | 1         |
     And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | C1 | editingteacher |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
 
   @javascript
   Scenario: Switch as an admin to the adminsettings of the module grouptool and change the value of "Use queueing" to "Yes". Then login as a teacher and add a new grouptool to a course and check whether the default value has changed.
@@ -25,9 +25,9 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I log out
     And I log in as "teacher1"
     And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
-      | Grouptool name | Test grouptool name - Yes |
-      | ID number | Test grouptool name - Yes |
-      | Description | Add a grouptool to the current course |
+      | Grouptool name | Test grouptool name - Yes             |
+      | ID number      | Test grouptool name - Yes             |
+      | Description    | Add a grouptool to the current course |
     And I log out
     When I am on the "Test grouptool name - Yes" "grouptool activity" page logged in as admin
     And I navigate to "Settings" in current page administration
@@ -45,9 +45,9 @@ Feature: Within a moodle instance, an administrator should be able to set the va
     And I log out
     When I log in as "teacher1"
     And I add a grouptool activity to course "Course 1" section "1" and I fill the form with:
-      | Grouptool name | Test grouptool name - No |
-      | ID number | Test grouptool name - No |
-      | Description | Add a grouptool to the current course |
+      | Grouptool name | Test grouptool name - No              |
+      | ID number      | Test grouptool name - No              |
+      | Description    | Add a grouptool to the current course |
     And I log out
     And I am on the "Test grouptool name - No" "grouptool activity" page logged in as admin
     And I navigate to "Settings" in current page administration

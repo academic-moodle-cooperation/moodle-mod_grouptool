@@ -22,7 +22,16 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace mod_grouptool\event;
+
+use cm_info;
+use coding_exception;
+use context_module;
+use core\event\base;
+use moodle_exception;
+use moodle_url;
+use stdClass;
 
 /**
  * The \mod_grouptool\user_imported class holds the logic for the event
@@ -32,7 +41,7 @@ namespace mod_grouptool\event;
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class user_imported extends \core\event\base {
+class user_imported extends base {
     /**
      * Init method.
      *
@@ -47,19 +56,19 @@ class user_imported extends \core\event\base {
     /**
      * Convenience method for user imports where registration in grouptool is forced
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param int $id grouptool id
      * @param int $agrp active group id
      * @param int $group group id
      * @param int $user user id
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function import_forced(\stdClass | \cm_info $cm, $id, $agrp, $group, $user) {
+    public static function import_forced(stdClass|cm_info $cm, $id, $agrp, $group, $user) {
         $event = self::create([
             'objectid' => $id,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => [
+            'context' => context_module::instance($cm->id),
+            'other' => [
                 'agrp' => $agrp,
                 'group' => $group,
                 'user' => $user,
@@ -72,17 +81,17 @@ class user_imported extends \core\event\base {
     /**
      * Convenience method for user imports
      *
-     * @param \stdClass|\cm_info $cm course module object
+     * @param stdClass|cm_info $cm course module object
      * @param int $group group id
      * @param int $user user id
-     * @return \core\event\base event object
-     * @throws \coding_exception
+     * @return base event object
+     * @throws coding_exception
      */
-    public static function import(\stdClass | \cm_info $cm, $group, $user) {
+    public static function import(stdClass|cm_info $cm, $group, $user) {
         $event = self::create([
             'objectid' => 0,
-            'context'  => \context_module::instance($cm->id),
-            'other'    => [
+            'context' => context_module::instance($cm->id),
+            'other' => [
                 'group' => $group,
                 'user' => $user,
                 'type' => '',
@@ -103,15 +112,15 @@ class user_imported extends \core\event\base {
             $force = '';
         }
         return "The user with id '" . $this->data['other']['user'] . "' was imported" .
-               " in the group with id '" . $this->data['other']['group'] . "'" . $force .
-               " in grouptool with course module id '$this->contextinstanceid' by user with id '$this->userid'";
+            " in the group with id '" . $this->data['other']['group'] . "'" . $force .
+            " in grouptool with course module id '$this->contextinstanceid' by user with id '$this->userid'";
     }
 
     /**
      * Return localised event name.
      *
      * @return string
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public static function get_name() {
         return get_string('eventuserimported', 'grouptool');
@@ -120,13 +129,13 @@ class user_imported extends \core\event\base {
     /**
      * Get URL related to the action.
      *
-     * @return \moodle_url
-     * @throws \moodle_exception
+     * @return moodle_url
+     * @throws moodle_exception
      */
     public function get_url() {
-        return new \moodle_url("/mod/$this->objecttable/view.php", [
-            'id'      => $this->contextinstanceid,
-            'tab'     => 'overview',
+        return new moodle_url("/mod/$this->objecttable/view.php", [
+            'id' => $this->contextinstanceid,
+            'tab' => 'overview',
             'groupid' => $this->data['other']['group'],
         ]);
     }
@@ -134,8 +143,8 @@ class user_imported extends \core\event\base {
     /**
      * Custom validation.
      *
-     * @throws \coding_exception
      * @return void
+     * @throws coding_exception
      */
     protected function validate_data() {
         parent::validate_data();
@@ -144,23 +153,23 @@ class user_imported extends \core\event\base {
             ($this->data['other']['type'] == 'force')
             && empty($this->objectid) || empty($this->objecttable)
         ) {
-            throw new \coding_exception('The user_imported event must define objectid and object table.');
+            throw new coding_exception('The user_imported event must define objectid and object table.');
         }
         // Make sure the context level is set to module.
         if ($this->contextlevel != CONTEXT_MODULE) {
-            throw new \coding_exception('Context level must be CONTEXT_MODULE.');
+            throw new coding_exception('Context level must be CONTEXT_MODULE.');
         }
 
         if (empty($this->data['other']['group'])) {
-            throw new \coding_exception('Group has to be specified!');
+            throw new coding_exception('Group has to be specified!');
         }
 
         if ($this->data['other']['type'] == 'force' && empty($this->data['other']['agrp'])) {
-            throw new \coding_exception('Active-Group has to be specified!');
+            throw new coding_exception('Active-Group has to be specified!');
         }
 
         if (empty($this->data['other']['user'])) {
-            throw new \coding_exception('User has to be specified!');
+            throw new coding_exception('User has to be specified!');
         }
     }
 }

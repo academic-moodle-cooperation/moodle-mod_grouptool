@@ -165,16 +165,19 @@
     margin-right: auto;
     text-align: left;
 }
+
 .path-mod-grouptool .grading_gradingtable {
     display: table;
     margin-left: auto;
     margin-right: auto;
 }
+
 .path-mod-grouptool .grading_previewtable {
     display: table;
     margin-left: auto;
     margin-right: auto;
 }
+
 .path-mod-grouptool .grading_previewtable td[rowspan] {
     text-align: center;
 }
@@ -306,6 +309,7 @@
     margin-right: 1em;
     vertical-align: middle;
 }
+
 .path-mod-grouptool #registration_form .group .queued {
     margin-left: 1em;
     margin-right: 1em;
@@ -380,6 +384,7 @@
 .path-mod-grouptool .userlist th {
     white-space: nowrap;
 }
+
 .path-mod-grouptool .userlist th div {
     display: inline;
 }

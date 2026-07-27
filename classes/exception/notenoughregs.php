@@ -22,21 +22,29 @@
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace mod_grouptool\local\exception;
+
+namespace mod_grouptool\exception;
 
 /**
- * Exception when the user's registration limit will be exceeded!
+ * Exception when the user has not enough marked groups to be registered completely
  *
  * @package   mod_grouptool
  * @author    Philipp Hager
  * @copyright 2014 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class exceeduserreglimit extends registration {
+class notenoughregs extends registration {
     /**
      * Constructor
+     *
+     * @param string $text (optional) Text to use instead of standard-text (notenoughregs, grouptool)
+     * @param mixed $a (optional) Data used by language string
      */
-    public function __construct() {
-        parent::__construct('exceeduserreglimit', 'grouptool');
+    public function __construct($text = '', $a = null) {
+        if ($text === '') {
+            $text = 'notenoughregs';
+        }
+
+        parent::__construct($text, 'grouptool', $a);
     }
 }

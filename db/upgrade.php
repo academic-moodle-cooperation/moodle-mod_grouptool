@@ -119,7 +119,7 @@ function xmldb_grouptool_upgrade($oldversion) {
         // Launch rename field size --> grpsize.
         $dbman->rename_field($table, $field, 'grpsize');
         $pbar->update(2, $count, "Rename grouptool_agrps->size " .
-                                 "to grouptool_agrps->grpsize...finished");
+            "to grouptool_agrps->grpsize...finished");
 
         $pbar->update(3, $count, "drop key agrp_id...");
         // Define key agrp_id (foreign) to be dropped form grouptool_registered.
@@ -322,8 +322,8 @@ function xmldb_grouptool_upgrade($oldversion) {
 
     // The following code has code of 2 upgrade steps compressed to a foreach!
     $tables = [
-            2013112701 => new xmldb_table('grouptool_registered'),
-            2013112702 => new xmldb_table('grouptool_queued'),
+        2013112701 => new xmldb_table('grouptool_registered'),
+        2013112702 => new xmldb_table('grouptool_queued'),
     ];
     foreach ($tables as $vers => $table) {
         if ($oldversion < $vers) {
@@ -335,7 +335,7 @@ function xmldb_grouptool_upgrade($oldversion) {
             $key = new xmldb_key('user_id', XMLDB_KEY_FOREIGN, ['user_id'], 'user', ['id']);
             // Launch drop key user_id.
             $dbman->drop_key($table, $key);
-             // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
+            // Define index agrp_id-user_id (unique) to be dropped form grouptool_registered.
             $index = new xmldb_index('agrp_id-user_id', XMLDB_INDEX_UNIQUE, ['agrp_id', 'user_id']);
             // Conditionally launch drop index agrp_id-user_id.
             if ($dbman->index_exists($table, $index)) {
@@ -392,12 +392,12 @@ function xmldb_grouptool_upgrade($oldversion) {
     if ($oldversion < 2014110703) {
         // Move module settings from config table to config_plugins!
         $settingsnames = [
-                'requiremodintro', 'name_scheme', 'allow_reg',
-                'show_members', 'immediate_reg', 'allow_unreg',
-                'grpsize', 'use_size', 'use_individual', 'use_queue',
-                'max_queues', 'allow_multiple', 'choose_min', 'choose_max',
-                'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted',
-                'force_importreg', 'importfields',
+            'requiremodintro', 'name_scheme', 'allow_reg',
+            'show_members', 'immediate_reg', 'allow_unreg',
+            'grpsize', 'use_size', 'use_individual', 'use_queue',
+            'max_queues', 'allow_multiple', 'choose_min', 'choose_max',
+            'ifmemberadded', 'ifmemberremoved', 'ifgroupdeleted',
+            'force_importreg', 'importfields',
         ];
         // Check if everything is all right!
         foreach ($settingsnames as $key => $cur) {
@@ -405,14 +405,14 @@ function xmldb_grouptool_upgrade($oldversion) {
             if (!isset($CFG->$name)) {
                 unset($settingsnames[$key]);
                 echo "Can't find setting for '" . $name . "'. It will be ignored. Please check the setting after the upgrade!" .
-                     html_writer::empty_tag('br') . "<br />";
+                    html_writer::empty_tag('br') . "<br />";
                 continue;
             }
             if ($DB->count_records('config', ['name' => $name]) != 1) {
                 unset($settingsnames[$key]);
                 echo "Can't select setting for '" . $name .
-                     "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!" .
-                     html_writer::empty_tag('br') . "<br />";
+                    "' uniquely in the DB. It will be ignored. Please check the setting after the upgrade!" .
+                    html_writer::empty_tag('br') . "<br />";
                 continue;
             }
         }
@@ -491,12 +491,12 @@ function xmldb_grouptool_upgrade($oldversion) {
 
         // Set all former calendar events from CALENDAR_EVENT_TYPE_STANDARD to CALENDAR_EVENT_TYPE_ACTION!
         $count = $DB->count_records('event', [
-                'modulename' => 'grouptool',
-                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE,
+            'modulename' => 'grouptool',
+            'eventtype' => GROUPTOOL_EVENT_TYPE_DUE,
         ]);
         $rs = $DB->get_recordset('event', [
-                'modulename' => 'grouptool',
-                'eventtype'  => GROUPTOOL_EVENT_TYPE_DUE,
+            'modulename' => 'grouptool',
+            'eventtype' => GROUPTOOL_EVENT_TYPE_DUE,
         ]);
         $i = 0;
         $cmnames = [];
