@@ -26,6 +26,8 @@ use core_courseformat\local\overview\overviewitem;
 use core_courseformat\output\local\overview\overviewaction;
 use core_string_manager;
 use mod_grouptool\dates;
+use mod_grouptool\local\model\registration_manager;
+
 /**
  * Grouptool overview integration.
  *
@@ -34,8 +36,8 @@ use mod_grouptool\dates;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class overview extends activityoverviewbase {
-    /** @var \mod_grouptool $grouptool the grouptool instance. */
-    private \mod_grouptool $grouptool;
+    /** @var registration_manager */
+    private registration_manager $registrationmanager;
     /** @var renderer_helper */
     protected readonly renderer_helper $rendererhelper;
     /** @var core_string_manager */
@@ -60,18 +62,19 @@ class overview extends activityoverviewbase {
 
         parent::__construct($cm, $rendererhelper, $stringmanager);
 
-        $this->grouptool = new \mod_grouptool(
-            $this->cm->id,
+        $this->registrationmanager = new registration_manager(
+            $cm->id,
             null,
-            $this->cm,
-            $this->cm->get_course()
+            $cm,
+            $cm->get_course(),
+            $cm->context,
         );
     }
     #[\Override]
     public function get_due_date_overview(): ?overviewitem {
         global $USER;
 
-        $duedate = $this->grouptool->get_settings()->timedue;
+        $duedate = $this->registrationmanager->get_settings()->timedue;
 
         if (empty($duedate)) {
             return new overviewitem(
@@ -130,10 +133,9 @@ class overview extends activityoverviewbase {
             return null;
         }
 
-        $registrations = $this->grouptool->get_registration_stats($USER->id);
-        // TODO Add langsring for Rgeisered students
+        $registrations = $this->registrationmanager->get_registration_stats($USER->id);
         return new overviewitem(
-            name: 'Registered students',
+            name: get_string('registeredstudents', 'grouptool'),
             value: true,
             content: get_string(
                 'count_of_total',
@@ -158,21 +160,25 @@ class overview extends activityoverviewbase {
             return null;
         }
 
-        $registration = $this->grouptool->get_user_reg_count($USER->id);
-        [, $min, ] = $this->grouptool->get_reg_settings();
+        $registrationcount = (int) $this->registrationmanager ->get_user_reg_count($USER->id);
 
-        if ($registration >= $min && $registration > 0) {
+        if ($registrationcount > 0) {
             return new overviewitem(
-                name: get_string('registration_details', 'grouptool'),
+                name: get_string('registrationstatus', 'grouptool'),
                 value: true,
-                content:get_string('registered', 'grouptool')
+                content: get_string('registered', 'grouptool'),
             );
         }
 
         return new overviewitem(
-            name: get_string('registration_details', 'grouptool'),
-            value: true,
-            content: get_string('not_registered', 'grouptool')
+            name: get_string('registrationstatus', 'grouptool'),
+            value: false,
+            content: get_string('registrationmissing', 'grouptool'),
+            alertcount: 1,
+            alertlabel: get_string(
+                'registrationmissing',
+                'grouptool',
+            ),
         );
     }
 }
