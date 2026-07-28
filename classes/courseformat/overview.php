@@ -160,7 +160,7 @@ class overview extends activityoverviewbase {
             return null;
         }
 
-        $registrationcount = (int) $this->registrationmanager ->get_user_reg_count($USER->id);
+        $registrationcount = (int) $this->registrationmanager->get_user_reg_count($USER->id);
 
         if ($registrationcount > 0) {
             return new overviewitem(
