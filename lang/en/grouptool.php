@@ -467,7 +467,6 @@ $string['registered'] = 'Registered';
 $string['registered_in_group_info'] = '{$a->username} registered in group <strong>{$a->groupname}</strong>';
 $string['registered_on_rank'] = 'Registered on rank #{$a}';
 $string['registeredstudents'] = 'Registered students';
-$string['registeredstudents'] = 'Registered students';
 $string['registration_details'] = 'Registration details';
 $string['registration_missing'] = '1 registration missing';
 $string['registration_period_end'] = 'End of registration for';
