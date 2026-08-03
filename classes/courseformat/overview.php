@@ -58,7 +58,6 @@ class overview extends activityoverviewbase {
         core_string_manager $stringmanager,
     ) {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/grouptool/locallib.php');
 
         parent::__construct($cm, $rendererhelper, $stringmanager);
 
