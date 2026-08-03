@@ -58,6 +58,7 @@ class overview extends activityoverviewbase {
         core_string_manager $stringmanager,
     ) {
         global $CFG;
+
         parent::__construct($cm, $rendererhelper, $stringmanager);
 
         $this->registrationmanager = new registration_manager(
