@@ -1198,7 +1198,6 @@ function mod_grouptool_core_calendar_provide_event_action(calendar_event $event,
             $label = get_string('view');
             $itemcount = -1;
         }
-        $url = new moodle_url($url, ['tab' => 'overview']);
         $actionable = true;
     }
 
