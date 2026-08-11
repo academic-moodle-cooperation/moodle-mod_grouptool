@@ -969,7 +969,7 @@ class view_controller extends grouptool_instance {
                         'id' => $this->cm->id,
                         'tab' => 'group_admin',
                     ];
-                    $preview .= html_writer::link(new moodle_url('/mod/grouptool/view.php', $urlparams), $linktext, [
+                    $preview .= html_writer::link(new moodle_url('/mod/grouptool/administration.php', $urlparams), $linktext, [
                         'class' => 'ml-1',
                     ]);
                 }
