@@ -27,8 +27,6 @@ use mod_grouptool\event\course_module_instance_list_viewed;
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-global $DB, $OUTPUT, $PAGE, $CFG;
-
 $id = required_param('id', PARAM_INT);   // Course.
 
 try {
@@ -38,6 +36,8 @@ try {
 }
 
 require_course_login($course);
+
+\core_courseformat\activityoverviewbase::redirect_to_overview_page($id, 'grouptool');
 
 /* TRIGGER THE VIEW ALL EVENT */
 $event = course_module_instance_list_viewed::create([
@@ -55,7 +55,7 @@ $PAGE->set_context($coursecontext);
 
 echo $OUTPUT->header();
 
-if (!$grouptools = get_all_instances_in_course('grouptool', $course)) {
+if (! $grouptools = get_all_instances_in_course('grouptool', $course)) {
     notice(get_string('nogrouptools', 'grouptool'), new moodle_url(
         '/course/view.php',
         ['id' => $course->id]
@@ -65,19 +65,19 @@ if (!$grouptools = get_all_instances_in_course('grouptool', $course)) {
 $table = new html_table();
 
 if ($course->format == 'weeks') {
-    $table->head = [
-        get_string('week'), get_string('name'), get_string('info'),
-        get_string('moduleintro'),
+    $table->head  = [
+            get_string('week'), get_string('name'), get_string('info'),
+            get_string('moduleintro'),
     ];
     $table->align = ['center', 'left', 'left', 'left'];
 } else if ($course->format == 'topics') {
-    $table->head = [
-        get_string('topic'), get_string('name'), get_string('info'),
-        get_string('moduleintro'),
+    $table->head  = [
+            get_string('topic'), get_string('name'), get_string('info'),
+            get_string('moduleintro'),
     ];
     $table->align = ['center', 'left', 'left', 'left', 'left'];
 } else {
-    $table->head = [get_string('name'), get_string('info'), get_string('moduleintro')];
+    $table->head  = [get_string('name'), get_string('info'), get_string('moduleintro')];
     $table->align = ['left', 'left', 'left', 'left'];
 }
 
@@ -95,8 +95,8 @@ foreach ($grouptools as $grouptool) {
         || has_capability('mod/grouptool:view_regs_group_view', $context)
     ) {
         $attrib = [
-            'title' => $strgrouptool,
-            'href' => $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $grouptool->coursemodule,
+                'title' => $strgrouptool,
+                'href'  => $CFG->wwwroot . '/mod/grouptool/view.php?id=' . $grouptool->coursemodule,
         ];
         if ($grouptool->visible) {
             $attrib['class'] = 'dimmed';
@@ -108,7 +108,7 @@ foreach ($grouptools as $grouptool) {
             $str .= html_writer::tag(
                 'div',
                 get_string('availabledate', 'grouptool') . ': ' .
-                html_writer::tag('span', userdate($grouptool->timeavailable)),
+                    html_writer::tag('span', userdate($grouptool->timeavailable)),
                 $attr
             );
         }
