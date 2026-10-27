@@ -99,13 +99,14 @@ if (
     $context->statushelp = $helpicon->export_for_template($OUTPUT);
     $context->name = $group->name;
 
-    // Cache needed user records right now!
-    $userfields = \core_user\fields::for_name()->get_sql();
+    // Cache needed user records right now.
+    $userfields = \core_user\fields::for_name()->get_sql('', false, '', 'id');
     if ($showidnumber) {
-        $fields = "id,idnumber" . $userfields;
+        $fields = 'id, idnumber' . $userfields->selects;
     } else {
-        $fields = "id" . $userfields;
+        $fields = 'id' . $userfields->selects;
     }
+
     $users = $DB->get_records_list("user", 'id', $gtregs + $queued, null, $fields);
 
     $context->absregs = [];

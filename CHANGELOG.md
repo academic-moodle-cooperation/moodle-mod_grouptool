@@ -1,6 +1,10 @@
 CHANGELOG
 ========
 
+5.1.1 (2026-10-12)
+------------------
+* [FIXED] #8817 FIxed Show group member giving error message for students
+
 5.1.0 (2026-01-21)
 ------------------
 * Moodle 5.1.0 compatible version
